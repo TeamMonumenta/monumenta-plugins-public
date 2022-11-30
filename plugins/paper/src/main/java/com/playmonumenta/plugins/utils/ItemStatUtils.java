@@ -534,11 +534,11 @@ public class ItemStatUtils {
 		STRENGTH_CANCEL(new StrengthCancel(), false, false, false, false);
 
 		public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(EnchantmentType.values())
-			.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
+			                                                                    .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
 		public static final Set<EnchantmentType> SPAWNABLE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
-			.filter(type -> type.mIsSpawnable)
-			.collect(Collectors.toUnmodifiableSet());
+			                                                                  .filter(type -> type.mIsSpawnable)
+			                                                                  .collect(Collectors.toUnmodifiableSet());
 
 		static final String KEY = "Enchantments";
 
@@ -584,7 +584,7 @@ public class ItemStatUtils {
 
 		public boolean isItemTypeEnchantment() {
 			return this == MAGIC_WAND
-				|| this == ALCHEMICAL_ALEMBIC;
+				       || this == ALCHEMICAL_ALEMBIC;
 		}
 
 		public boolean isRegionScaled() {
@@ -593,11 +593,11 @@ public class ItemStatUtils {
 
 		public boolean isHidden() {
 			return this == MAINHAND_OFFHAND_DISABLE
-				|| this == OFFHAND_MAINHAND_DISABLE
-				|| this == HIDE_ATTRIBUTES
-				|| this == HIDE_ENCHANTS
-				|| this == HIDE_INFO
-				|| this == NO_GLINT;
+				       || this == OFFHAND_MAINHAND_DISABLE
+				       || this == HIDE_ATTRIBUTES
+				       || this == HIDE_ENCHANTS
+				       || this == HIDE_INFO
+				       || this == NO_GLINT;
 		}
 
 		public Component getDisplay(int level) {
@@ -675,15 +675,15 @@ public class ItemStatUtils {
 		STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, true, false);
 
 		public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
-			.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
+			                                                                 .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
 		public static final Set<InfusionType> STAT_TRACK_OPTIONS = Arrays.stream(InfusionType.values())
-			.filter(type -> type.mIsStatTrackOption)
-			.collect(Collectors.toUnmodifiableSet());
+			                                                           .filter(type -> type.mIsStatTrackOption)
+			                                                           .collect(Collectors.toUnmodifiableSet());
 
 		public static final Set<InfusionType> SPAWNABLE_INFUSIONS = Arrays.stream(InfusionType.values())
-			.filter(type -> type.mIsSpawnable)
-			.collect(Collectors.toUnmodifiableSet());
+			                                                            .filter(type -> type.mIsSpawnable)
+			                                                            .collect(Collectors.toUnmodifiableSet());
 
 		public static final ImmutableSet<InfusionType> DELVE_INFUSIONS = ImmutableSet.of(
 			ARDOR, AURA, CARAPACE, CHOLER, EMPOWERED, EPOCH, EXECUTION, EXPEDITE, MITOSIS, NATANT,
@@ -785,14 +785,14 @@ public class ItemStatUtils {
 		THORNS(new ThornsDamage(), true, true);
 
 		static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(AttributeType.values())
-			.collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
+			                                                           .collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
 
-		static final ImmutableList<String> MAINHAND_ATTRIBUTE_TYPES = ImmutableList.of(
-			ATTACK_DAMAGE_ADD.getName(),
-			ATTACK_SPEED.getCodeName(),
-			PROJECTILE_DAMAGE_ADD.getName(),
-			PROJECTILE_SPEED.getName(),
-			THROW_RATE.getName()
+		public static final ImmutableList<AttributeType> MAINHAND_ATTRIBUTE_TYPES = ImmutableList.of(
+			ATTACK_DAMAGE_ADD,
+			ATTACK_SPEED,
+			PROJECTILE_DAMAGE_ADD,
+			PROJECTILE_SPEED,
+			THROW_RATE
 		);
 
 		static final String KEY = "Attributes";
@@ -850,33 +850,34 @@ public class ItemStatUtils {
 			return mIsMainhandRegionScaled;
 		}
 
-		public static Component getDisplay(String name, double amount, Slot slot, Operation operation) {
+		public static Component getDisplay(AttributeType attribute, double amount, Slot slot, Operation operation) {
+			String name = attribute.getName();
 			if (slot == Slot.MAINHAND && operation == Operation.ADD) {
-				if (ATTACK_DAMAGE_ADD.getName().equals(name)) {
+				if (attribute == ATTACK_DAMAGE_ADD) {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount + 1), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
-				} else if (ATTACK_SPEED.getName().equals(name)) {
+				} else if (attribute == ATTACK_SPEED) {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount + 4), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
-				} else if (PROJECTILE_SPEED.getName().equals(name) || THROW_RATE.getName().equals(name)) {
+				} else if (attribute == PROJECTILE_SPEED || attribute == THROW_RATE) {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 				} else if (PROJECTILE_DAMAGE_ADD.getName().equals(name)) {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 				}
-			} else if (slot == Slot.MAINHAND && PROJECTILE_SPEED.getName().equals(name)) {
+			} else if (slot == Slot.MAINHAND && attribute == PROJECTILE_SPEED) {
 				return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 			}
 
-			if (ARMOR.getName().equals(name) || AGILITY.getName().equals(name)) {
+			if (attribute == ARMOR || attribute == AGILITY) {
 				if (operation == Operation.ADD) {
 					return Component.text(String.format("%s %s", NUMBER_CHANGE_FORMATTER.format(amount), name), amount > 0 ? TextColor.fromHexString("#33CCFF") : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 				} else {
 					return Component.text(String.format("%s %s", PERCENT_CHANGE_FORMATTER.format(amount), name), amount > 0 ? TextColor.fromHexString("#33CCFF") : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 				}
 			} else {
-				if (operation == Operation.ADD && KNOCKBACK_RESISTANCE.getName().equals(name)) {
+				if (operation == Operation.ADD && attribute == KNOCKBACK_RESISTANCE) {
 					return Component.text(String.format("%s %s", NUMBER_CHANGE_FORMATTER.format(amount * 10), name.replace(" Add", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 				} else if (operation == Operation.ADD) {
 					return Component.text(String.format("%s %s", NUMBER_CHANGE_FORMATTER.format(amount), name.replace(" Add", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
-				} else if (PROJECTILE_SPEED.getName().equals(name)) {
+				} else if (attribute == PROJECTILE_SPEED) {
 					return Component.text(String.format("%s %s", PERCENT_CHANGE_FORMATTER.format(amount), name.replace(" Multiply", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 				} else {
 					return Component.text(String.format("%s %s", PERCENT_CHANGE_FORMATTER.format(amount), name.replace(" Multiply", "")), amount > 0 ? NamedTextColor.BLUE : NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
@@ -886,10 +887,6 @@ public class ItemStatUtils {
 
 		public static @Nullable AttributeType getAttributeType(String name) {
 			return REVERSE_MAPPINGS.get(name.replace(" ", ""));
-		}
-
-		public static List<String> getMainhandAttributeNames() {
-			return MAINHAND_ATTRIBUTE_TYPES;
 		}
 	}
 
@@ -1356,7 +1353,7 @@ public class ItemStatUtils {
 	}
 
 	public static @Nullable PlayerClass getCharmClass(NBTList<String> charmLore) {
-		List<PlayerClass> classes = (new MonumentaClasses()).getClasses();
+		List<PlayerClass> classes = new MonumentaClasses().getClasses();
 
 		for (String line : charmLore) {
 			for (PlayerClass playerClass : classes) {
@@ -2205,7 +2202,7 @@ public class ItemStatUtils {
 							starString += "★";
 						}
 						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false))
-							.append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClassComponent(monumenta.getStringList(CHARM_KEY))));
+							         .append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClassComponent(monumenta.getStringList(CHARM_KEY))));
 					}
 				}
 
@@ -2233,16 +2230,16 @@ public class ItemStatUtils {
 			QuiverListener.ArrowTransformMode transformMode = getArrowTransformMode(item);
 			if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
 				lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+					         .append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			} else {
 				lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					.append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+					         .append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			}
 		}
 
 		if (isUpgradedLimeTesseract(item)) {
 			lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-				.append(Component.text(getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+				         .append(Component.text(getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
 		}
 
 		int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
@@ -2275,70 +2272,65 @@ public class ItemStatUtils {
 		}
 
 		NBTCompoundList attributes = getAttributes(nbt);
-		EnumMap<Slot, List<NBTListCompound>> attributesBySlots = new EnumMap<>(Slot.class);
-		List<NBTListCompound> mainhandAttributes = new ArrayList<>();
-
-		for (Slot slot : Slot.values()) {
-			attributesBySlots.put(slot, new ArrayList<>());
-		}
-
-		if (attributes != null) {
+		if (attributes != null
+			    && getEnchantmentLevel(item, EnchantmentType.HIDE_ATTRIBUTES) == 0) {
+			EnumMap<Slot, EnumMap<AttributeType, List<NBTListCompound>>> attributesBySlots = new EnumMap<>(Slot.class);
 			for (NBTListCompound attribute : attributes) {
 				Slot slot = Slot.getSlot(attribute.getString(Slot.KEY));
-				if (slot == Slot.MAINHAND && Operation.getOperation(attribute.getString(Operation.KEY)) == Operation.ADD && (AttributeType.getMainhandAttributeNames().contains(attribute.getString(ATTRIBUTE_NAME_KEY)) || attribute.getString(ATTRIBUTE_NAME_KEY).equals("Attack Speed"))) {
-					mainhandAttributes.add(attribute);
-				} else {
-					List<NBTListCompound> slotAttributes = attributesBySlots.get(slot);
-					if (slotAttributes != null) {
-						slotAttributes.add(attribute);
-					}
-				}
+				AttributeType attributeType = AttributeType.getAttributeType(attribute.getString(ATTRIBUTE_NAME_KEY));
+				attributesBySlots.computeIfAbsent(slot, key -> new EnumMap<>(AttributeType.class))
+					.computeIfAbsent(attributeType, key -> new ArrayList<>())
+					.add(attribute);
 			}
-		}
 
-		if (getEnchantmentLevel(item, EnchantmentType.HIDE_ATTRIBUTES) == 0) {
 			for (Slot slot : Slot.values()) {
-				List<NBTListCompound> attributesBySlot = attributesBySlots.get(slot);
-				if ((attributesBySlot == null || attributesBySlot.isEmpty()) && (slot != Slot.MAINHAND || mainhandAttributes.isEmpty())) {
+				EnumMap<AttributeType, List<NBTListCompound>> attributesBySlot = attributesBySlots.get(slot);
+				if (attributesBySlot == null || attributesBySlot.isEmpty()) {
 					continue;
 				}
 
 				lore.add(Component.empty());
 				lore.add(slot.getDisplay());
 
+				// If mainhand, display certain attributes differently (attack and projectile related ones), and also show them before other attributes
 				if (slot == Slot.MAINHAND) {
 					boolean needsAttackSpeed = false;
-					int attackSpeedIndex = 0;
-					for (String name : AttributeType.getMainhandAttributeNames()) {
-						for (NBTListCompound attribute : mainhandAttributes) {
-							if (name.equals(attribute.getString(ATTRIBUTE_NAME_KEY)) && name.equals("Attack Damage Add")) {
-								needsAttackSpeed = true;
-								attackSpeedIndex = lore.size() + 1;
-							}
-							if (name.equals(attribute.getString(ATTRIBUTE_NAME_KEY)) && !lore.contains(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), Operation.getOperation(attribute.getString(Operation.KEY))))) {
-								lore.add(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), Operation.getOperation(attribute.getString(Operation.KEY))));
-							} else if ((name.equals("AttackSpeed") && attribute.getString(ATTRIBUTE_NAME_KEY).equals("Attack Speed") && attribute.getDouble(AMOUNT_KEY) != 0) && !lore.contains(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), Operation.getOperation(attribute.getString(Operation.KEY))))) {
-								lore.add(AttributeType.getDisplay("Attack Speed", attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), Operation.getOperation(attribute.getString(Operation.KEY))));
-								needsAttackSpeed = false;
+					for (AttributeType attributeType : AttributeType.MAINHAND_ATTRIBUTE_TYPES) {
+						List<NBTListCompound> attributesByType = attributesBySlot.get(attributeType);
+						if (attributesByType != null) {
+							for (NBTListCompound attribute : attributesByType) {
+								if (Operation.getOperation(attribute.getString(Operation.KEY)) != Operation.ADD
+									    && attributeType != AttributeType.PROJECTILE_SPEED) {
+									continue;
+								}
+								lore.add(AttributeType.getDisplay(attributeType, attribute.getDouble(AMOUNT_KEY), slot, Operation.getOperation(attribute.getString(Operation.KEY))));
+								if (attributeType == AttributeType.ATTACK_DAMAGE_ADD) {
+									needsAttackSpeed = true;
+								} else if (attributeType == AttributeType.ATTACK_SPEED) {
+									needsAttackSpeed = false;
+								}
 							}
 						}
-					}
-					if (needsAttackSpeed) {
-						lore.add(attackSpeedIndex, AttributeType.getDisplay("Attack Speed", 0, Slot.MAINHAND, Operation.ADD));
+						// show default attack speed if an item has attack damage, but no attack speed attribute
+						if (needsAttackSpeed && attributeType == AttributeType.ATTACK_SPEED) {
+							lore.add(AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
+						}
 					}
 				}
 
-				if (attributesBySlot != null) {
-					for (AttributeType type : AttributeType.values()) {
-						String name = type.getName();
-						for (Operation operation : Operation.values()) {
-							for (NBTListCompound attribute : attributesBySlot) {
-								if (Operation.getOperation(attribute.getString(Operation.KEY)) == operation && name.equals(attribute.getString(ATTRIBUTE_NAME_KEY))) {
-									if (!lore.contains(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), operation))) {
-										lore.add(AttributeType.getDisplay(name, attribute.getDouble(AMOUNT_KEY), Slot.getSlot(attribute.getString(Slot.KEY)), operation));
-									}
-									break;
-								}
+				for (AttributeType type : AttributeType.values()) {
+					List<NBTListCompound> attributesByType = attributesBySlot.get(type);
+					if (attributesByType == null) {
+						continue;
+					}
+					for (Operation operation : Operation.values()) {
+						if (slot == Slot.MAINHAND && AttributeType.MAINHAND_ATTRIBUTE_TYPES.contains(type) && (operation == Operation.ADD || type == AttributeType.PROJECTILE_SPEED)) {
+							continue; // handled above
+						}
+						for (NBTListCompound attribute : attributesByType) {
+							if (Operation.getOperation(attribute.getString(Operation.KEY)) == operation) {
+								lore.add(AttributeType.getDisplay(type, attribute.getDouble(AMOUNT_KEY), slot, operation));
+								break;
 							}
 						}
 					}
