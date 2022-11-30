@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -61,17 +62,21 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		DamageType type = event.getType();
-		if (type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
+		boolean huntingCompanion = event.getAbility() == ClassAbility.HUNTING_COMPANION;
+		if (huntingCompanion || type == DamageType.PROJECTILE || type == DamageType.PROJECTILE_SKILL) {
 			double multiplier = 1 + PERCENT_BASE_DAMAGE;
-			if (isLevelTwo()) {
-				multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE));
+			if (!huntingCompanion) {
+				if (isLevelTwo()) {
+					multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE));
+				}
+				if (isEnhanced()) {
+					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), MAX_DISTANCE) * DAMAGE_PER_BLOCK;
+				}
 			}
-			if (isEnhanced()) {
-				multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), MAX_DISTANCE) * DAMAGE_PER_BLOCK;
-			}
+
 			event.setDamage(event.getDamage() * multiplier);
 
-			if (isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage()) && (type != DamageType.PROJECTILE || (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
+			if (!huntingCompanion && isLevelTwo() && (enemy.getNoDamageTicks() <= enemy.getMaximumNoDamageTicks() / 2f || enemy.getLastDamage() < event.getDamage()) && (type != DamageType.PROJECTILE || (event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)))) {
 				mTicksToStackDecay = mDecayTime;
 
 				if (mStacks < mMaxStacks) {

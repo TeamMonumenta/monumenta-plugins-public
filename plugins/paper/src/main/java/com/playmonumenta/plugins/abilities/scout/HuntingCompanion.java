@@ -34,7 +34,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Dolphin;
@@ -44,7 +43,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Strider;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -238,7 +237,7 @@ public class HuntingCompanion extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (!mSummons.containsValue(enemy) && event.getType() == DamageType.PROJECTILE && (event.getDamager() instanceof AbstractArrow || event.getDamager() instanceof Snowball)) {
+		if (!mSummons.containsValue(enemy) && event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false)) {
 			Mob nearestSummon = findNearestNonTargetingSummon(enemy);
 			if (nearestSummon != null) {
 				mSummons.replace(nearestSummon, enemy);
@@ -395,7 +394,7 @@ public class HuntingCompanion extends Ability {
 		Location summonLoc = summon.getLocation();
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(summon.getLocation(), DETECTION_RANGE);
 
-		nearbyMobs.removeIf(Entity::isInvulnerable);
+		nearbyMobs.removeIf(DamageUtils::isImmuneToDamage);
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
 		List<LivingEntity> unfilteredNearbyMobs = new ArrayList<>(nearbyMobs);
