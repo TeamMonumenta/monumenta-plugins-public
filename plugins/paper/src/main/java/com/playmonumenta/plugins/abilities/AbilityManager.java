@@ -124,6 +124,9 @@ import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorUtils;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
@@ -148,8 +151,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -544,6 +549,8 @@ public class AbilityManager {
 		MonumentaNetworkChatIntegration.refreshPlayer(player);
 		ClientModHandler.updateAbilities(player);
 
+		updateSilence(player, collection, false);
+
 		return collection;
 	}
 
@@ -911,6 +918,22 @@ public class AbilityManager {
 
 		// Run updatePlayerAbilities to clear existing ability effects.
 		updatePlayerAbilities(player, true);
+	}
+
+	public void updateSilence(Player player, boolean forceUpdateClientMod) {
+		updateSilence(player, getPlayerAbilities(player), forceUpdateClientMod);
+	}
+
+	public void updateSilence(Player player, AbilityCollection playerAbilities, boolean forceUpdateClientMod) {
+		NavigableSet<AbilitySilence> silence = mPlugin.mEffectManager.getEffects(player, AbilitySilence.class);
+		NavigableSet<Stasis> stasis = mPlugin.mEffectManager.getEffects(player, Stasis.class);
+		int silenceDuration = Stream.concat(silence.stream(), stasis.stream())
+			                      .mapToInt(Effect::getDuration).max().orElse(0);
+		boolean silenced = silenceDuration > 0;
+		if (playerAbilities.isSilenced() != silenced || forceUpdateClientMod) {
+			ClientModHandler.silenced(player, silenceDuration);
+		}
+		playerAbilities.setSilenced(silenced);
 	}
 
 	public void trackCharges(Player player, ClassAbility ability, int charges) {

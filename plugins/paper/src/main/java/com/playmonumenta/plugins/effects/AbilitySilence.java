@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -34,15 +35,15 @@ public class AbilitySilence extends ZeroArgumentEffect {
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			player.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
-			AbilityManager.getManager().getPlayerAbilities(player).silence();
-			ClientModHandler.silenced(player, getDuration());
+			AbilityManager.getManager().updateSilence(player, true);
 		}
 	}
 
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player player) {
-			AbilityManager.getManager().getPlayerAbilities(player).unsilence();
+			Bukkit.getScheduler().runTask(Plugin.getInstance(),
+				() -> AbilityManager.getManager().updateSilence(player, false));
 			ClientModHandler.silenced(player, 0);
 		}
 	}

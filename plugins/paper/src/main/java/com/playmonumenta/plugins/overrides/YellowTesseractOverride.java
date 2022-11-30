@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
+import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
+import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -12,6 +14,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -42,6 +45,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootContext;
 
 public class YellowTesseractOverride extends BaseOverride {
+
+	public static final String COOLDOWN_SCORE = "YellowCooldown";
+
 	private static final TextComponent TESSERACT_NAME = Component.text("Tesseract of the Elements", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
 	private static final TextComponent CONFIGURED = Component.text("Tesseract of the Elements - Configured", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
 	private static final String CLASS_STR = "Class: ";
@@ -76,8 +82,26 @@ public class YellowTesseractOverride extends BaseOverride {
 			return true;
 		}
 
-		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME.content(), false) || InventoryUtils.testForItemWithName(item, "(u)", false)) {
+		if (!InventoryUtils.testForItemWithName(item, TESSERACT_NAME.content(), false)) {
 			return true;
+		}
+
+		if (InventoryUtils.testForItemWithName(item, "(u)", false)) {
+			if (action.equals(Action.LEFT_CLICK_AIR) || action.equals(Action.LEFT_CLICK_BLOCK)) {
+				return true;
+			}
+			if (!player.getAdvancementProgress(Bukkit.getAdvancement(NamespacedKeyUtils.fromString("monumenta:quests/r2/primevalcreations013"))).isDone()) {
+				player.sendMessage(Component.text("You must have completed Primeval Creations: 013-2 Wools in order to use this tesseract.", NamedTextColor.RED));
+				return false;
+			}
+			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
+				ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, 0);
+			}
+			if (ScoreboardUtils.getScoreboardValue(player, COOLDOWN_SCORE).orElse(0) > 0) {
+				player.sendMessage(Component.text("Warning: Your Yellow Tesseract is on cooldown! You will be silenced if you perform any changes to your skills.", NamedTextColor.YELLOW));
+			}
+			new ClassSelectionCustomInventory(player, true).openInventory(player, Plugin.getInstance());
+			return false;
 		}
 
 		if (!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
@@ -91,12 +115,6 @@ public class YellowTesseractOverride extends BaseOverride {
 		// If a player doesn't have any abilities, tell them that's required
 		if (AbilityManager.getManager().getPlayerAbilities(player).getAbilitiesIgnoringSilence().isEmpty()) {
 			player.sendMessage(Component.text("You need to have a class and abilities first!", NamedTextColor.RED));
-			return false;
-		}
-		// If the player is silenced/stasised, they cannot change abilities
-		// This is to fix an exploit where multiple classes' abilities could be obtained at once
-		if (AbilityManager.getManager().getPlayerAbilities(player).isSilenced()) {
-			player.sendMessage(Component.text("You cannot use this Tesseract while silenced!", NamedTextColor.RED));
 			return false;
 		}
 
@@ -123,18 +141,11 @@ public class YellowTesseractOverride extends BaseOverride {
 			/* Active and soulbound to player */
 			if ((action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK))) {
 				boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5);
-				int cd = ScoreboardUtils.getScoreboardValue(player, "YellowCooldown").orElse(0);
+				int cd = ScoreboardUtils.getScoreboardValue(player, COOLDOWN_SCORE).orElse(0);
 				// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
 				if (safeZone && cd > 0) {
-					ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 0);
+					ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, 0);
 					cd = 0;
-				}
-				// If the CD hasn't hit 0, tell the player and exit.
-				if (cd != 0) {
-					player.sendMessage(Component.text("The Tesseract is still on cooldown! You have ", NamedTextColor.RED)
-						                   .append(Component.text(cd, NamedTextColor.RED).decorate(TextDecoration.BOLD))
-						                   .append(Component.text(" minute" + (cd == 1 ? "" : "s") + " remaining until you can use it again.", NamedTextColor.RED)));
-					return false;
 				}
 				// If there's a mob in range and the player isn't in a safezone,
 				// tell the player and exit
@@ -145,6 +156,14 @@ public class YellowTesseractOverride extends BaseOverride {
 				// If Right-Click and YellowCooldown = 0 and either no mobs in range or in safezone,
 				// we can change skills.
 				changeSkills(player, item);
+				// If the CD hasn't hit 0, tell the player and silence them.
+				if (cd != 0) {
+					player.sendMessage(Component.text("The Tesseract is still on cooldown! You have been silenced for 30s.", NamedTextColor.RED)
+						                   .append(Component.text(" You have ", NamedTextColor.GRAY))
+						                   .append(Component.text(cd, NamedTextColor.RED).decorate(TextDecoration.BOLD))
+						                   .append(Component.text(" minute" + (cd == 1 ? "" : "s") + " remaining until you can use it again without being silenced.", NamedTextColor.GRAY)));
+					Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
+				}
 			}
 		}
 
@@ -175,7 +194,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
 
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
-			ScoreboardUtils.setScoreboardValue(player, "YellowCooldown", 5);
+			ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, 5);
 		}
 	}
 

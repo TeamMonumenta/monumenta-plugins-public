@@ -1,14 +1,18 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
+import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
+import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -49,6 +53,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public static final String R3_UNLOCK_SCOREBOARD = "R3Access";
 	private static final int R3_UNLOCK_SCORE = 1;
 
+	private final boolean mFromYellowTess;
+	private final boolean mWasYellowTessOnCooldown;
+
 	private int mCurrentPage = 1;
 
 	/*
@@ -60,7 +67,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 
 	public ClassSelectionCustomInventory(Player player) {
+		this(player, false);
+	}
+
+	public ClassSelectionCustomInventory(Player player, boolean fromYellowTess) {
 		super(player, 54, "Class Selection GUI");
+		mFromYellowTess = fromYellowTess;
+		mWasYellowTessOnCooldown = fromYellowTess && ScoreboardUtils.getScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE) > 0;
 		makeClassSelectPage(player);
 	}
 
@@ -94,9 +107,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				}
 			} else if (chosenSlot == P1_RESET_CLASS_LOC) {
 				AbilityUtils.resetClass(player);
+				updateYellowTessCooldown(player);
 				makeClassSelectPage(player);
 			} else if (chosenSlot == P1_RESET_SPEC_LOC) {
 				AbilityUtils.resetSpec(player);
+				updateYellowTessCooldown(player);
 				makeClassSelectPage(player);
 			} else if (chosenSlot == P1_CHANGE_TRIGGERS_LOC) {
 				new AbilityTriggersGui(player).open();
@@ -129,6 +144,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				}
 			} else if (chosenSlot == SKILL_PAGE_RESET_SPEC_LOC) {
 				AbilityUtils.resetSpec(player);
+				updateYellowTessCooldown(player);
 				for (PlayerClass oneClass : mClasses.mClasses) {
 					if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) == oneClass.mClass) {
 						makeSkillSelectPage(oneClass, player);
@@ -414,9 +430,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					}
 				}
 				makeSkillSelectPage(oneClass, player);
-				if (AbilityManager.getManager() != null) {
-					AbilityManager.getManager().updatePlayerAbilities(player, true);
-				}
+				updatePlayerAbilities(player);
 				return;
 			}
 		}
@@ -458,9 +472,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			}
 			makeSpecPage(theClass, spec, player);
 		}
-		if (AbilityManager.getManager() != null) {
-			AbilityManager.getManager().updatePlayerAbilities(player, true);
-		}
+		updatePlayerAbilities(player);
 	}
 
 	public void applyEnhancementChosen(int chosenSlot, Player player, boolean add) {
@@ -487,10 +499,25 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentCount + 1);
 				}
 				makeSkillSelectPage(oneClass, player);
-				if (AbilityManager.getManager() != null) {
-					AbilityManager.getManager().updatePlayerAbilities(player, true);
-				}
+				updatePlayerAbilities(player);
 				return;
+			}
+		}
+	}
+
+	private void updatePlayerAbilities(Player player) {
+		if (AbilityManager.getManager() != null) {
+			AbilityManager.getManager().updatePlayerAbilities(player, true);
+			updateYellowTessCooldown(player);
+		}
+	}
+
+	private void updateYellowTessCooldown(Player player) {
+		if (mFromYellowTess
+			    && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
+			ScoreboardUtils.setScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE, 5);
+			if (mWasYellowTessOnCooldown) {
+				Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 			}
 		}
 	}

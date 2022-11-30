@@ -36,7 +36,7 @@ public class Stasis extends ZeroArgumentEffect {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, getDuration(), 100));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, getDuration(), 100));
 			player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
-			AbilityManager.getManager().getPlayerAbilities(player).silence();
+			AbilityManager.getManager().updateSilence(player, true);
 		}
 
 	}
@@ -57,8 +57,7 @@ public class Stasis extends ZeroArgumentEffect {
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			entity.removeScoreboardTag(Constants.Tags.STASIS);
-			AbilityManager.getManager().updatePlayerAbilities(player, false);
-			AbilityManager.getManager().getPlayerAbilities(player).unsilence();
+			AbilityManager.getManager().updatePlayerAbilities(player, false); // also updates silence
 		}
 	}
 

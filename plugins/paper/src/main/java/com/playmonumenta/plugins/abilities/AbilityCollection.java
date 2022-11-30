@@ -106,12 +106,8 @@ public class AbilityCollection {
 		return playerAbilities;
 	}
 
-	public void silence() {
-		mIsSilenced = true;
-	}
-
-	public void unsilence() {
-		mIsSilenced = false;
+	void setSilenced(boolean silenced) {
+		mIsSilenced = silenced;
 	}
 
 	public boolean isSilenced() {
