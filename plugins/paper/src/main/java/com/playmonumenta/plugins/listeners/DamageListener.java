@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
@@ -170,6 +172,34 @@ public class DamageListener implements Listener {
 		}
 		if (!event.isLifelineCancel()) {
 			mPlugin.mEffectManager.damageEvent(event);
+		}
+
+		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
+		if (source instanceof Player player && damager instanceof Projectile) {
+			double damage = event.getDamage();
+			// Now, set damage to 0.001 (to allow for knockback effects), and customly damage enemy using damage function.
+			event.setDamage(0.001);
+			if (mPlugin.mEffectManager.hasEffect(damagee, ProjectileIframe.SOURCE)) {
+				Effect effect = mPlugin.mEffectManager.getActiveEffect(damagee, ProjectileIframe.SOURCE);
+				if (effect instanceof ProjectileIframe projectileIframe) {
+					int duration = projectileIframe.getDuration();
+					double magnitude = projectileIframe.getMagnitude();
+
+					// If incoming damage is greater than magnitude, subtract and deal damage.
+					// Otherwise, do nothing.
+					if (damage > magnitude) {
+						double extraDamage = damage - magnitude;
+						DamageUtils.damage(player, damagee, DamageEvent.DamageType.TRUE, extraDamage, event.getAbility(), true, false);
+						mPlugin.mEffectManager.addEffect(damagee, ProjectileIframe.SOURCE, new ProjectileIframe(duration, damage));
+					}
+				} else {
+					DamageUtils.damage(player, damagee, DamageEvent.DamageType.TRUE, damage, event.getAbility(), true, false);
+					mPlugin.mEffectManager.addEffect(damagee, ProjectileIframe.SOURCE, new ProjectileIframe(ProjectileIframe.IFRAME_DURATION, damage));
+				}
+			} else {
+				DamageUtils.damage(player, damagee, DamageEvent.DamageType.TRUE, damage, event.getAbility(), true, false);
+				mPlugin.mEffectManager.addEffect(damagee, ProjectileIframe.SOURCE, new ProjectileIframe(ProjectileIframe.IFRAME_DURATION, damage));
+			}
 		}
 	}
 
