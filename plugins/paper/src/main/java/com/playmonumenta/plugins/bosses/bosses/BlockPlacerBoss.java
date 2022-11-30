@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 /**
@@ -245,7 +246,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 					for (Location loc : bridgeLocations) {
 						Block block = loc.getBlock();
 						Material material = block.getType();
-						if (IGNORED_MATERIALS.contains(material)) {
+						if (IGNORED_MATERIALS.contains(material) || block.isSolid()) {
 							continue;
 						}
 
@@ -253,22 +254,22 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 							continue;
 						}
 
-						if (material.isAir() || block.isLiquid() || !block.isSolid()) {
-							for (Player player : PlayerUtils.playersInRange(block.getLocation(), 2, true)) {
-								if (block.getBoundingBox().overlaps(player.getBoundingBox())) {
-									return;
-								}
+						Location blockLoc = loc.getBlock().getLocation();
+						BoundingBox box = BoundingBox.of(blockLoc, blockLoc.add(1, 1, 1));
+						for (Player player : PlayerUtils.playersInRange(loc.toCenterLocation(), 3, true)) {
+							if (box.overlaps(player.getBoundingBox())) {
+								continue;
 							}
-							block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
-							loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.7f);
-							pathfinder.moveTo(loc.clone().add(0, 1, 0));
-							new BukkitRunnable() {
-								@Override
-								public void run() {
-									pathfinder.moveTo(loc.clone().add(0, 1, 0));
-								}
-							}.runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), 5);
 						}
+						block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
+						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.7f);
+						pathfinder.moveTo(loc.clone().add(0, 1, 0));
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								pathfinder.moveTo(loc.clone().add(0, 1, 0));
+							}
+						}.runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), 5);
 					}
 
 				}
