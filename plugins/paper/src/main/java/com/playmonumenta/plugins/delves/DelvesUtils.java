@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.MobListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -34,6 +35,7 @@ import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Shulker;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.MetadataValue;
@@ -388,6 +390,20 @@ public class DelvesUtils {
 					char c = name.charAt(i);
 					if (Character.isLetter(c)) {
 						soulNameBuilder.append(c);
+					}
+				}
+
+				if (mob instanceof Shulker) {
+					//can't summon to the same location, so summoning it at one block higher
+					int iteration = 0;
+					Location finalLoc;
+					while (iteration < 100) {
+						iteration++;
+						finalLoc = loc.clone().add(FastUtils.randomIntInRange(-2, 2), FastUtils.randomIntInRange(-2, 2), FastUtils.randomIntInRange(-2, 2));
+						if (finalLoc.getBlock().getType() == Material.AIR && !loc.equals(finalLoc) && finalLoc.clone().add(0, -1, 0).getBlock().isSolid()) {
+							iteration = 1000;
+							loc = finalLoc;
+						}
 					}
 				}
 

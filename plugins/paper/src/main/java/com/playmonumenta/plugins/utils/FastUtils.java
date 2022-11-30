@@ -39,6 +39,10 @@ public class FastUtils {
 		}
 	}
 
+	public static int randomIntInRange(int min, int max) {
+		return min == max ? min : (RANDOM.nextInt() * (max - min)) + min;
+	}
+
 	public static double randomDoubleInRange(double min, double max) {
 		return min == max ? min : (RANDOM.nextDouble() * (max - min)) + min;
 	}
