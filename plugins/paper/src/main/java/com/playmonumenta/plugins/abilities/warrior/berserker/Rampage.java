@@ -89,9 +89,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	public void cast() {
-		Location loc = mPlayer.getLocation();
-
-		if (mStacks >= ACTIVE_MIN_STACKS && loc.getPitch() > 70) {
+		if (mStacks >= ACTIVE_MIN_STACKS) {
 			World world = mPlayer.getWorld();
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mStacks * RAMPAGE_STACK_PERCENTAGE);
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RAMPAGE_RADIUS));
@@ -103,6 +101,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			mPlugin.mEffectManager.addEffect(mPlayer, CUSTOM_REGENERATION_EFFECT_NAME, new CustomRegeneration(mStacks * 10, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlugin));
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(mStacks * 10, getDamageResistanceRatio() - 1));
 
+			Location loc = mPlayer.getLocation();
 			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(0, 1, 0), 50, 3, 1, 3, 0).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, mStacks * 0.4f, 0.5f);
