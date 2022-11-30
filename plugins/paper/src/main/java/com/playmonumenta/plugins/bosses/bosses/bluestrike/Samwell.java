@@ -670,6 +670,9 @@ public class Samwell extends BossAbilityGroup {
 					itemStack.setAmount(0);
 				}
 			}
+			if (isBossItem(player.getItemOnCursor())) {
+				player.setItemOnCursor(null);
+			}
 		}
 	}
 
@@ -689,6 +692,9 @@ public class Samwell extends BossAbilityGroup {
 				if (isDaggerItem(itemStack)) {
 					itemStack.setAmount(0);
 				}
+			}
+			if (isDaggerItem(player.getItemOnCursor())) {
+				player.setItemOnCursor(null);
 			}
 		}
 	}
