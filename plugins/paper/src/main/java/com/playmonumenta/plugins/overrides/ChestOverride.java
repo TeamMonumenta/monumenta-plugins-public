@@ -148,7 +148,11 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		}
 
-		List<Player> players = PlayerUtils.playersInRange(block.getLocation(), 30, true, true);
+		List<Player> players = PlayerUtils.playersInLootScalingRange(block.getLocation());
+
+		if (players.isEmpty()) {
+			players = PlayerUtils.playersInRange(block.getLocation(), 250, true, true);
+		}
 
 		// Runs replacement with any nearby player
 		if (!players.isEmpty()) {
