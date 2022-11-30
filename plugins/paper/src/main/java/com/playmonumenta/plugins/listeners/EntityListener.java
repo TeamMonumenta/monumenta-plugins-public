@@ -440,7 +440,8 @@ public class EntityListener implements Listener {
 	public void hangingBreakByEntityEvent(HangingBreakByEntityEvent event) {
 		Entity damager = event.getRemover();
 
-		if (ZoneUtils.hasZoneProperty(event.getEntity().getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+		if (ZoneUtils.hasZoneProperty(event.getEntity().getLocation(), ZoneProperty.ADVENTURE_MODE)
+			    && !(damager instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
 			return;
 		}
