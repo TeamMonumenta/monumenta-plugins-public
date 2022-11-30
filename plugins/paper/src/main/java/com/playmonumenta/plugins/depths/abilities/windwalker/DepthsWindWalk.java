@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -112,8 +114,8 @@ public class DepthsWindWalk extends DepthsAbility {
 							} else {
 								new PartialParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
 
-								mob.setVelocity(mob.getVelocity().setY(0.5));
-								if (!DepthsUtils.isPlant(mob)) {
+								if (!ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag)) {
+									mob.setVelocity(mob.getVelocity().setY(0.5));
 									PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, LEVITATION_DURATION, 0, true, false));
 								}
 							}

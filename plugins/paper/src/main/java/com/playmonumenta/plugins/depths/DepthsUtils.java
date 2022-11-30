@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.AbstractHorse;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
@@ -278,25 +276,6 @@ public class DepthsUtils {
 			}
 		}
 
-	}
-
-	public static boolean isPlant(Entity entity) {
-		if (entity != null) {
-			String name = entity.getName();
-			if (name.contains("Dionaea")) {
-				List<String> plantNames = new ArrayList<>();
-				plantNames.add("Spore Dionaea");
-				plantNames.add("Vampiric Dionaea");
-				plantNames.add("Poisonous Dionaea");
-				plantNames.add("Fertilizer Dionaea");
-				for (String plant : plantNames) {
-					if (name.contains(plant)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
 	}
 
 	//Store the player ability data to a file, including the name of the player and the room they died in.

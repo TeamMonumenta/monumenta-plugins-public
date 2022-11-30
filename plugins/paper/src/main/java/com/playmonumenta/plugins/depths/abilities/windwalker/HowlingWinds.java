@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -86,7 +87,7 @@ public class HowlingWinds extends DepthsAbility {
 				mTicks++;
 				if (mTicks % PULL_INTERVAL[mRarity - 1] == 0) {
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, PULL_RADIUS)) {
-						if (!(EntityUtils.isBoss(mob) || DepthsUtils.isPlant(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+						if (!(EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag))) {
 							Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
 							double ratio = BASE_RATIO + vector.length() / PULL_RADIUS;
 							mob.setVelocity(mob.getVelocity().add(vector.normalize().multiply(PULL_VELOCITY).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0))));

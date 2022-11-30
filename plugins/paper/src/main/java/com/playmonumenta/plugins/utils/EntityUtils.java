@@ -829,7 +829,9 @@ public class EntityUtils {
 	public static final String SLOW_EFFECT_NAME = "SlowEffect";
 
 	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		plugin.mEffectManager.addEffect(mob, SLOW_EFFECT_NAME, new PercentSpeed(ticks, -amount, SLOW_EFFECT_NAME));
+		if (!ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag)) {
+			plugin.mEffectManager.addEffect(mob, SLOW_EFFECT_NAME, new PercentSpeed(ticks, -amount, SLOW_EFFECT_NAME));
+		}
 	}
 
 	public static boolean isSlowed(Plugin plugin, LivingEntity mob) {

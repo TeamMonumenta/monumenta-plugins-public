@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -79,7 +81,7 @@ public class Cryobox extends DepthsAbility {
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
-			if (EntityUtils.isBoss(mob) || DepthsUtils.isPlant(mob) || mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
+			if (EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG)) {
 				continue;
 			}
 			Location mobLoc = mob.getLocation();

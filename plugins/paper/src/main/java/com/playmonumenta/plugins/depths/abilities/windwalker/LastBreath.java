@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -12,6 +13,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -86,7 +88,7 @@ public class LastBreath extends DepthsAbility {
 		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, SPEED[mRarity - 1], SPEED_EFFECT_NAME));
 		mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, RESISTANCE_TICKS[mRarity - 1], 4));
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-			if (!DepthsUtils.isPlant(e)) {
+			if (!ScoreboardUtils.checkTag(e, CrowdControlImmunityBoss.identityTag)) {
 				Vector knockback = e.getVelocity().add(e.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(KNOCKBACK_SPEED));
 				knockback.setY(knockback.getY() * 2);
 				e.setVelocity(knockback.add(new Vector(0, 0.25, 0)));

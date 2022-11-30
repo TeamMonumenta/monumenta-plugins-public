@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.WeakHashMap;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -88,7 +90,7 @@ public class Earthquake extends DepthsAbility {
 				public void run() {
 					if (mTicks >= EARTHQUAKE_TIME) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-							if (!DepthsUtils.isPlant(mob)) {
+							if (!ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag)) {
 								knockup(mob);
 							}
 

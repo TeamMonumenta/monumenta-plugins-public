@@ -126,7 +126,7 @@ public class ChaosDagger extends DepthsAbility {
 					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2);
 					world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
 					mHitMob = mTarget;
-					if (EntityUtils.isBoss(mTarget) || mTarget.getScoreboardTags().contains("boss_ccimmune")) {
+					if (EntityUtils.isBoss(mTarget)) {
 						EntityUtils.applySlow(mPlugin, STUN_DURATION, 0.99f, mTarget);
 					} else {
 						EntityUtils.applyStun(mPlugin, STUN_DURATION, mTarget);

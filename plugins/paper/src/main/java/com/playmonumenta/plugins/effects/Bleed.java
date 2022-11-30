@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -42,8 +44,10 @@ public class Bleed extends SingleArgumentEffect {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
-								new PercentSpeed(20, -mAmount, PERCENT_SPEED_EFFECT_NAME));
+							if (!ScoreboardUtils.checkTag(le, CrowdControlImmunityBoss.identityTag)) {
+								mPlugin.mEffectManager.addEffect(le, PERCENT_SPEED_EFFECT_NAME,
+									new PercentSpeed(20, -mAmount, PERCENT_SPEED_EFFECT_NAME));
+							}
 							mPlugin.mEffectManager.addEffect(le, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
 								new PercentDamageDealt(20, -mAmount));
 						}
