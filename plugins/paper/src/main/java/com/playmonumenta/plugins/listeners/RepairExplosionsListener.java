@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -20,10 +21,13 @@ import org.bukkit.block.data.type.Snow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.plugin.Plugin;
 
 
@@ -256,6 +260,53 @@ public class RepairExplosionsListener implements Listener {
 		commonExplosionHandler(event.blockList());
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void structureGrowEvent(StructureGrowEvent event) {
+		if (!ServerProperties.getRepairExplosions()) {
+			return;
+		}
+
+		List<Block> blocks = new ArrayList<>();
+		for (BlockState bs : event.getBlocks()) {
+			// TODO: Fix logic below and replace, currently not functional (replaces with existing block)
+//			Block tempBlock = bs.getBlock();
+//			Material tempMaterial = bs.getType();
+//			tempBlock.setType(Material.AIR);
+//			blocks.add(tempBlock);
+//			tempBlock.setType(tempMaterial);
+
+			// TODO: remove this later once above logic fixed
+			blocks.add(bs.getBlock());
+		}
+
+		commonExplosionHandler(blocks);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void blockPlaceEvent(BlockPlaceEvent event) {
+		if (!ServerProperties.getRepairExplosions() || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+			return;
+		}
+
+		// Get initial block state to pass through
+		BlockState oldBlockState = event.getBlockReplacedState();
+		BlockState newBlockState = event.getBlock().getState();
+
+		event.getBlock().setBlockData(oldBlockState.getBlockData());
+		commonExplosionHandler(List.of(event.getBlock()));
+
+		event.getBlock().setBlockData(newBlockState.getBlockData());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void blockBreakEvent(BlockBreakEvent event) {
+		if (!ServerProperties.getRepairExplosions() || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+			return;
+		}
+
+		commonExplosionHandler(List.of(event.getBlock()));
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
 		if (!ServerProperties.getRepairExplosions()) {
@@ -294,6 +345,11 @@ public class RepairExplosionsListener implements Listener {
 							}
 						}
 					}
+				} else {
+					// Replace non-air blocks (placed blocks)
+					mPlugin.getLogger().fine("Repairing block " + state.getType() + " at " + state.getLocation());
+					needsSave = true;
+					state.update(true, false);
 				}
 			}
 		}

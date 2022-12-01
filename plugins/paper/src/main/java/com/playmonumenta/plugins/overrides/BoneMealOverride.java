@@ -21,6 +21,6 @@ public class BoneMealOverride extends BaseOverride {
 	}
 
 	private boolean canBoneMeal(Location loc) {
-		return !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BONE_MEAL_DISABLED);
+		return !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BONE_MEAL_DISABLED) && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_QUICK_BUILDING);
 	}
 }

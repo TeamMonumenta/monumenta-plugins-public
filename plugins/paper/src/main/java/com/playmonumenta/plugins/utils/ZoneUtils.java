@@ -45,6 +45,7 @@ public class ZoneUtils {
 		BONE_MEAL_DISABLED("Bone Meal Disabled"),
 		LAND_BOAT_POSSIBLE("Land Boat Possible"),
 		NO_QUICK_BUILDING("NoQuickBuilding"),
+		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
 		LOOTROOM("Lootroom");
 
 		private final String mPropertyName;

@@ -18,16 +18,19 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.TreeType;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
@@ -70,7 +73,7 @@ public class WorldshaperOverride {
 			return false;
 		}
 
-		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ADVENTURE_MODE) || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 			return false;
 		}
 
@@ -251,20 +254,25 @@ public class WorldshaperOverride {
 
 		boolean blockPlaced = false;
 		for (Location location : blockPlacePattern) {
-			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanInteractWithBlock(player, location, false)) {
+			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanInteractWithBlock(player, location, false) || ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
 				continue;
 			}
 
-			BlockData blockData = getBlockAndSubtract(item);
-			if (blockData != null) {
-				location.getBlock().setBlockData(blockData);
-				blockPlaced = true;
-				new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
-				player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 0.75f);
-				CoreProtectIntegration.logPlacement(player, location, blockData.getMaterial(), blockData);
-			} else {
-				player.sendMessage(ChatColor.RED + "There were not enough valid blocks to place in the shulker!");
-				break;
+			StructureGrowEvent event = new StructureGrowEvent(location, TreeType.TREE, true, player, List.of(location.getBlock().getState()));
+			Bukkit.getPluginManager().callEvent(event);
+			if (!event.isCancelled()) {
+				BlockData blockData = getBlockAndSubtract(item);
+				if (blockData != null) {
+					location.getBlock().setBlockData(blockData);
+					blockPlaced = true;
+					new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
+					player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 0.75f);
+					CoreProtectIntegration.logPlacement(player, location, blockData.getMaterial(), blockData);
+
+				} else {
+					player.sendMessage(ChatColor.RED + "There were not enough valid blocks to place in the shulker!");
+					break;
+				}
 			}
 		}
 

@@ -114,34 +114,40 @@ public class FirmamentOverride {
 					}
 				}
 
-				// Place the chosen block instead of the Firmament
-				// This is done by setting the "replaced" block state to the desired block state, and then cancelling the event, which will "revert" the block to this state
-				event.getBlockReplacedState().setBlockData(blockData);
+				// Log for overworld replacements
+				BlockPlaceEvent placeEvent = new BlockPlaceEvent(event.getBlock(), event.getBlockReplacedState(), event.getBlockAgainst(), currentItem, event.getPlayer(), event.canBuild());
+				Bukkit.getPluginManager().callEvent(placeEvent);
+				placeEvent.getBlockReplacedState().setBlockData(blockData);
+				if (!event.isCancelled()) {
+					// Place the chosen block instead of the Firmament
+					// This is done by setting the "replaced" block state to the desired block state, and then cancelling the event, which will "revert" the block to this state
+					event.getBlockReplacedState().setBlockData(blockData);
 
-				// Log the placement of the block
-				CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), blockData.getMaterial(), blockData);
+					// Log the placement of the block
+					CoreProtectIntegration.logPlacement(player, event.getBlock().getLocation(), blockData.getMaterial(), blockData);
 
-				// Update the Shulker's inventory unless it was a free placement
-				if (removeItem) {
-					shulkerInventory.setItem(i, currentItem.subtract());
-					shulkerMeta.setBlockState(shulkerBox);
-					item.setItemMeta(shulkerMeta);
-				}
-
-				// Prevent sending block update packets for neighbors of the placed block
-				FirmamentLagFix.firmamentUsed(event.getBlock());
-
-				// Force update physics on the placed block
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-					BlockState state = event.getBlock().getState();
-					if (state.getBlockData().equals(blockData)) {
-						event.getBlock().setType(Material.AIR, false);
-						state.update(true, true);
+					// Update the Shulker's inventory unless it was a free placement
+					if (removeItem) {
+						shulkerInventory.setItem(i, currentItem.subtract());
+						shulkerMeta.setBlockState(shulkerBox);
+						item.setItemMeta(shulkerMeta);
 					}
-				});
 
-				// Cancel the event
-				return false;
+					// Prevent sending block update packets for neighbors of the placed block
+					FirmamentLagFix.firmamentUsed(event.getBlock());
+
+					// Force update physics on the placed block
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+						BlockState state = event.getBlock().getState();
+						if (state.getBlockData().equals(blockData)) {
+							event.getBlock().setType(Material.AIR, false);
+							state.update(true, true);
+						}
+					});
+
+					// Cancel the event
+					return false;
+				}
 			}
 		}
 		player.sendMessage(ChatColor.RED + "There are no valid blocks to place in the shulker!");

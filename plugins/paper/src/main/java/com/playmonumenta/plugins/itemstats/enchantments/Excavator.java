@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -40,7 +42,11 @@ public class Excavator implements Enchantment {
 		}
 
 		Block block = event.getBlock();
-		if (mIgnoredMats.contains(block.getType()) || ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
+		if (mIgnoredMats.contains(block.getType())) {
+			return;
+		}
+
+		if (mAlreadyBrokenLocations.contains(block.getLocation())) {
 			return;
 		}
 
@@ -79,14 +85,20 @@ public class Excavator implements Enchantment {
 				player.sendMessage("Block face was Non-Cartesian.");
 				break;
 		}
+		mAlreadyBrokenLocations.clear();
 	}
 
 	private void breakBlock(Player player, ItemStack mainHand, Block block, int x, int y, int z) {
 		Block relative = block.getRelative(x, y, z);
-		if (canBreakBlock(relative, player)) {
-			CoreProtectIntegration.logRemoval(player, relative);
-			relative.breakNaturally(mainHand, true);
-			ItemUtils.damageItem(mainHand, 1, true);
+		mAlreadyBrokenLocations.add(relative.getLocation());
+		BlockBreakEvent event = new BlockBreakEvent(relative, player);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!event.isCancelled()) {
+			if (canBreakBlock(relative, player)) {
+				CoreProtectIntegration.logRemoval(player, relative);
+				relative.breakNaturally(mainHand, true);
+				ItemUtils.damageItem(mainHand, 1, true);
+			}
 		}
 	}
 
@@ -99,8 +111,12 @@ public class Excavator implements Enchantment {
 		Material.BARRIER,
 		Material.SPAWNER,
 		Material.CHEST,
-		Material.TRAPPED_CHEST
+		Material.TRAPPED_CHEST,
+		Material.WATER,
+		Material.LAVA
 	);
+
+	private List<Location> mAlreadyBrokenLocations = new ArrayList<>();
 
 	private boolean canBreakBlock(Block block, Player player) {
 		if (block.isLiquid() || block.isEmpty()) {
