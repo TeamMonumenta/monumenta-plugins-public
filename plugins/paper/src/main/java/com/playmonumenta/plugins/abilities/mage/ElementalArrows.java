@@ -73,7 +73,7 @@ public class ElementalArrows extends Ability {
 					(int) ELEMENTAL_ARROWS_RADIUS,
 					(int) (AOE_DAMAGE_MULTIPLIER * 100)
 				),
-				String.format("Your next elemental arrow every %ss stuns non elite enemies hit for %ss and deals an extra %s%% bow damage to affected enemies.",
+				String.format("Your next elemental arrow every %ss also stuns enemies hit for %ss and deals an extra %s%% bow damage to affected enemies.",
 					ENHANCED_ARROW_COOLDOWN / 20,
 					ENHANCED_ARROW_STUN_DURATION / 20,
 					(int) (ENHANCED_DAMAGE_MULTIPLIER * 100)
@@ -97,20 +97,32 @@ public class ElementalArrows extends Ability {
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ELEMENTAL_ARROWS_DURATION);
 
 		if (proj.hasMetadata("ElementalArrowsFireArrow")) {
-			applyArrowEffects(event, enemy, 1, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
-				EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
-			});
+			if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
+				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
+				putOnCooldown();
+				applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
+					EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
+					EntityUtils.applyStun(mPlugin, stunDuration, entity);
+				});
+			} else {
+				applyArrowEffects(event, enemy, 1, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
+					EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
+				});
+			}
 		} else if (proj.hasMetadata("ElementalArrowsIceArrow")) {
 			double slowAmplifier = SLOW_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
-			applyArrowEffects(event, enemy, 1, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
-				EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
-			});
-		} else if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
-			putOnCooldown();
-			int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
-			applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY, playerItemStats, null, (entity) -> {
-				EntityUtils.applyStun(mPlugin, stunDuration, entity);
-			});
+			if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
+				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
+				putOnCooldown();
+				applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
+					EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
+					EntityUtils.applyStun(mPlugin, stunDuration, entity);
+				});
+			} else {
+				applyArrowEffects(event, enemy, 1, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
+					EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
+				});
+			}
 		}
 		return true; // creates new damage instances
 	}
@@ -150,6 +162,12 @@ public class ElementalArrows extends Ability {
 			if (isEnhanced() && !isOnCooldown()) {
 				projectile.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
 				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
+				// Apply additional fire or ice effect without adding particle trail
+				if (mPlayer.isSneaking()) {
+					projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
+				} else {
+					projectile.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
+				}
 			} else if (mPlayer.isSneaking()) {
 				projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
 				projectile.setFireTicks(0);
