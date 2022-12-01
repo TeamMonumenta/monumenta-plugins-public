@@ -61,6 +61,8 @@ public class MasterworkUtils {
 
 	private static final String GALLEY_MAT = "epic:r3/gallery/items/torn_canvas";
 
+	private static final String GODSPORE_MAT = "epic:r3/godspore/items/tainted_spores";
+
 	public enum MasterworkCost {
 		FOREST_ONE("forest_1", FOREST_FRAG, 1, HYPER_ARCHOS_RING, 1),
 		FOREST_TWO("forest_2", FOREST_FRAG, 1, HYPER_ARCHOS_RING, 3),
@@ -141,6 +143,16 @@ public class MasterworkUtils {
 		HALLS_SEVENA("gallery1_7a", GALLEY_MAT, 64, FORTITUDE_AUGMENT, 16),
 		HALLS_SEVENB("gallery1_7b", GALLEY_MAT, 64, POTENCY_AUGMENT, 16),
 		HALLS_SEVENC("gallery1_7c", GALLEY_MAT, 64, ALACRITY_AUGMENT, 16),
+
+		GODSPORE_ONE("godspore_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		GODSPORE_TWO("godspore_2", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		GODSPORE_THREE("godspore_3", GODSPORE_MAT, 6, HYPER_ARCHOS_RING, 4),
+		GODSPORE_FOUR("godspore_4", GODSPORE_MAT, 12, HYPER_ARCHOS_RING, 4),
+		GODSPORE_FIVE("godspore_5", PULSATING_DIAMOND, 12, HYPER_ARCHOS_RING, 4),
+		GODSPORE_SIX("godspore_6", GODSPORE_MAT, 18, HYPER_ARCHOS_RING, 4),
+		GODSPORE_SEVENA("godspore_7a", GODSPORE_MAT, 32, FORTITUDE_AUGMENT, 16),
+		GODSPORE_SEVENB("godspore_7b", GODSPORE_MAT, 32, POTENCY_AUGMENT, 16),
+		GODSPORE_SEVENC("godspore_7c", GODSPORE_MAT, 32, ALACRITY_AUGMENT, 16),
 
 		MISC_ONE("misc_1", PULSATING_SHARD, 6, HYPER_ARCHOS_RING, 1),
 		MISC_TWO("misc_2", PULSATING_SHARD, 6, HYPER_ARCHOS_RING, 3),
