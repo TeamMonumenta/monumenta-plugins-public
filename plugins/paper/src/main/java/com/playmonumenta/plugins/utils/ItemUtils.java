@@ -1317,5 +1317,4 @@ public class ItemUtils {
 			return new ItemIdentifier(null, null);
 		}
 	}
-
 }

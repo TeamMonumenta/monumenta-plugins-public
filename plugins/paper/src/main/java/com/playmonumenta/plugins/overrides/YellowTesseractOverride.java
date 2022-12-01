@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -42,7 +41,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.loot.LootContext;
 
 public class YellowTesseractOverride extends BaseOverride {
 
@@ -71,7 +69,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 	@Override
 	public boolean inventoryClickInteraction(Plugin plugin, Player player, ItemStack item, InventoryClickEvent event) {
-		if (event.getClick() != ClickType.RIGHT) {
+		if (event.getClick() != ClickType.RIGHT || item.getAmount() > 1) {
 			return true;
 		}
 		return interaction(player, Action.RIGHT_CLICK_AIR, item);
@@ -120,11 +118,9 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		// This tesseract is not updated or otherwise broken, replace it with a fresh one
 		if (ItemStatUtils.getTier(item) != ItemStatUtils.Tier.UNIQUE) {
-			for (ItemStack tess : Bukkit.getLootTable(NamespacedKey.fromString("epic:r2/quests/114_elements")).populateLoot(FastUtils.RANDOM, new LootContext.Builder(player.getLocation()).build())) {
-				item.setItemMeta(tess.getItemMeta());
-				player.sendMessage(ChatColor.RED + "Your Tesseract had incorrect data, so it has been replaced. Only report this if it happens multiple times on the same Tesseract or if the replacement does not function.");
-				return false;
-			}
+			setToBlankTesseract(player, item);
+			player.sendMessage(ChatColor.RED + "Your Tesseract had incorrect data, so it has been replaced. Only report this if it happens multiple times on the same Tesseract or if the replacement does not function.");
+			return false;
 		}
 
 		if (!InventoryUtils.testForItemWithLore(item, CLASS_STR)
@@ -171,10 +167,7 @@ public class YellowTesseractOverride extends BaseOverride {
 	}
 
 	private void resetTesseract(Player player, ItemStack item) {
-		clearTesseractLore(item);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(TESSERACT_NAME);
-		item.setItemMeta(meta);
+		setToBlankTesseract(player, item);
 		ItemUtils.setPlainTag(item);
 
 		Location pLoc = player.getLocation();
@@ -182,6 +175,13 @@ public class YellowTesseractOverride extends BaseOverride {
 		new PartialParticle(Particle.BLOCK_DUST, pLoc, 10, 0.5, 0.5, 0.5, 0, Material.BLACK_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has been reset!", NamedTextColor.YELLOW));
+	}
+
+	private void setToBlankTesseract(Player player, ItemStack item) {
+		ItemStack newItem = InventoryUtils.getItemFromLootTable(player, NamespacedKey.fromString("epic:r2/quests/114_elements"));
+		if (newItem != null) {
+			item.setItemMeta(newItem.getItemMeta());
+		}
 	}
 
 	private void changeSkills(Player player, ItemStack item) {
