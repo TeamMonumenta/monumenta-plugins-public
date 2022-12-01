@@ -60,7 +60,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = target.getLocation();
-			world.playSound(loc, Sound.EVENT_RAID_HORN, 0.5f, 1.5f);
+			world.playSound(loc, Sound.EVENT_RAID_HORN, 50f, 1.5f);
 			world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 30, 2, 0, 2, 0);
 			world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 0.5, 0), 30, 2, 0.5, 2, 0);
 
@@ -85,7 +85,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 							if (!AbilityUtils.isStealthed(mTarget)) {
 								Set<String> tags = mob.getScoreboardTags();
 								// Don't set target of mobs with this ability, or else infinite loop
-								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS))) {
+								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG))) {
 									mob.setTarget(mTarget);
 
 									EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
