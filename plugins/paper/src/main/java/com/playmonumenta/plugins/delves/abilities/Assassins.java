@@ -16,7 +16,7 @@ public class Assassins {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 		{
-			"Mobs deal 50% extra damage when not in the player",
+			"Mobs deal 40% extra damage when not in the player",
 			"field of view, and have a 30% chance to become",
 			"\"stealthed,\" gaining new abilities."
 		}
@@ -39,7 +39,7 @@ public class Assassins {
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!DelvesUtils.isDelveMob(mob)) {
 			mob.addScoreboardTag(UnseenBoss.identityTag);
-			mob.addScoreboardTag(UnseenBoss.identityTag + "[damageincrease=1.5]");
+			mob.addScoreboardTag(UnseenBoss.identityTag + "[damageincrease=1.4]");
 			if (FastUtils.RANDOM.nextDouble() < .3) {
 				List<List<String>> abilityPool = new ArrayList<>(ABILITY_POOL);
 				abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));

@@ -36,8 +36,8 @@ public class UnseenBoss extends BossAbilityGroup {
 			Vector lineOfSight = new Vector(0, 0, 1);
 			lineOfSight.rotateAroundY(Math.toRadians(-player.getLocation().getYaw()));
 			Vector mobToPlayer = mBoss.getLocation().toVector().subtract(player.getLocation().toVector());
-			// If the mob is outside of 60 degrees to left or right increase damage
-			if (lineOfSight.angle(mobToPlayer) > Math.toRadians(60.0)) {
+			// If the mob is outside of 75 degrees to left or right increase damage (previously 60)
+			if (lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0)) {
 				player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1f, 0.8f);
 				event.setDamage(event.getDamage() * mParam.DAMAGE_INCREASE);
 			}
