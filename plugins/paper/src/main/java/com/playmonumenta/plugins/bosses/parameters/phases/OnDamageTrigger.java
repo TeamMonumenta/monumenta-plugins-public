@@ -30,7 +30,7 @@ public class OnDamageTrigger extends Trigger {
 	@Override public boolean onDamage(LivingEntity boss, LivingEntity damagee, DamageEvent event) {
 		if (mDamageType == event.getType()) {
 			mCurrentDamage += event.getDamage();
-		} else if ((event.getBossSpellName() != null && event.getBossSpellName().equals(mCustomAbilityName)) || "TOTAL".equals(mCustomAbilityName)) {
+		} else if ((event.getBossSpellName() != null && event.getBossSpellName().equals(mCustomAbilityName)) || "ALL".equals(mCustomAbilityName)) {
 			mCurrentDamage += event.getDamage();
 		}
 
