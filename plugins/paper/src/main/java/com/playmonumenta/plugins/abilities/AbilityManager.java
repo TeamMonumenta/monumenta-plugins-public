@@ -153,6 +153,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -185,10 +186,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class AbilityManager {
 
-	private static final String CLICK_TICK_METAKEY = "ClickedThisTickMetakey";
+	private static final String LEFT_CLICK_TICK_METAKEY = "IgnoreLeftClicksUntil";
+	private static final String RIGHT_CLICK_TICK_METAKEY = "IgnoreRightClicksUntil";
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
 
 	private static @Nullable AbilityManager mManager = null;
@@ -620,8 +623,7 @@ public class AbilityManager {
 		}
 
 		// after the damage event, as HolyJavelin casts itself on melee attacks with added functionality
-		if (event.getType() == DamageEvent.DamageType.MELEE
-			    && MetadataUtils.checkOnceInRecentTicks(mPlugin, player, CLICK_TICK_METAKEY, 1)) {
+		if (event.getType() == DamageEvent.DamageType.MELEE) {
 			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
 		}
 	}
@@ -756,9 +758,7 @@ public class AbilityManager {
 	}
 
 	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {
-		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, player, CLICK_TICK_METAKEY, 2)) {
-			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
-		}
+		checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
 
 		conditionalCast(player, (ability) -> ability.playerAnimationEvent(event));
 	}
@@ -852,14 +852,12 @@ public class AbilityManager {
 		Action action = event.getAction();
 		// Right-clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
 		// Right clicks also sometimes create an additional left click up to 2 ticks later, thus check within the past 2 ticks.
-		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, player, CLICK_TICK_METAKEY, 2)) {
-			if (action == Action.LEFT_CLICK_AIR
-				    || action == Action.LEFT_CLICK_BLOCK) {
-				checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
-			} else if (action == Action.RIGHT_CLICK_AIR
-				           || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR)) {
-				checkTrigger(player, AbilityTrigger.Key.RIGHT_CLICK);
-			}
+		if (action == Action.LEFT_CLICK_AIR
+			    || action == Action.LEFT_CLICK_BLOCK) {
+			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
+		} else if (action == Action.RIGHT_CLICK_AIR
+			           || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR)) {
+			checkTrigger(player, AbilityTrigger.Key.RIGHT_CLICK);
 		}
 		// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
 		// thus we have to ignore the usual click limiter here.
@@ -872,7 +870,42 @@ public class AbilityManager {
 		}
 	}
 
+	private ConcurrentSkipListSet<UUID> mDropKeyDisabledLeftClicks = new ConcurrentSkipListSet<>();
+
+	// Called asynchronously by the drop key packet listener, thus cannot use most of the Bukkit API
+	public void preDropKey(Player player) {
+		mDropKeyDisabledLeftClicks.add(player.getUniqueId());
+	}
+
 	public boolean checkTrigger(Player player, AbilityTrigger.Key key) {
+		// click rate limiter: the client sends multiple click events per physical button press, especially for right clicks that send a right or a left click up to 2 ticks later
+		// thus, limit clicks to once per tick, and additionally make right clicks ignore left or right clicks for 1/2 ticks, depending on the held item's type
+		if (key == AbilityTrigger.Key.LEFT_CLICK || key == AbilityTrigger.Key.RIGHT_CLICK) {
+			if (key == AbilityTrigger.Key.LEFT_CLICK && mDropKeyDisabledLeftClicks.contains(player.getUniqueId())) {
+				return false;
+			}
+			int currentTick = Bukkit.getServer().getCurrentTick();
+			int noClicksUntil = MetadataUtils.getMetadata(player, key == AbilityTrigger.Key.LEFT_CLICK ? LEFT_CLICK_TICK_METAKEY : RIGHT_CLICK_TICK_METAKEY, currentTick - 100);
+			if (noClicksUntil >= currentTick) {
+				return false;
+			}
+			if (key == AbilityTrigger.Key.LEFT_CLICK) {
+				MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick);
+			} else {
+				ItemStack mainHand = player.getInventory().getItemInMainHand();
+				if (ItemUtils.isSomePotion(mainHand) || ItemUtils.isProjectileWeapon(mainHand)) {
+					MetadataUtils.setMetadata(player, RIGHT_CLICK_TICK_METAKEY, currentTick);
+					MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick + 2);
+				} else {
+					MetadataUtils.setMetadata(player, RIGHT_CLICK_TICK_METAKEY, currentTick + 1);
+				}
+			}
+		} else if (key == AbilityTrigger.Key.DROP) {
+			// clear the custom left click prevention and add the usual metadata key instead to prevent left clicks for the rest of the tick
+			mDropKeyDisabledLeftClicks.remove(player.getUniqueId());
+			MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, Bukkit.getServer().getCurrentTick());
+		}
+
 		// Disable sneak+left click abilities when using an Experiencinator/Crystallizer
 		// TODO would be nice if all SQ interactibles would prevent skill activation - but how to do that in general?
 		// Cancelling events cannot be used, as that is used to prevent vanilla actions from occurring. Some custom way to annotate an event as handled by SQ would be needed.
@@ -881,6 +914,7 @@ public class AbilityManager {
 			    && ExperiencinatorUtils.getConfig(player.getLocation(), false).getExperiencinator(player.getInventory().getItemInMainHand()) != null) {
 			return false;
 		}
+
 		AbilityCollection playerAbilities = getPlayerAbilities(player);
 		if (playerAbilities.isSilenced()) {
 			// if silenced, just return if any trigger matches (to cancel the swap event properly)

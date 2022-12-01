@@ -113,6 +113,7 @@ public class AbilityTriggersGui extends Gui {
 				case LEFT_CLICK -> Material.IRON_SWORD;
 				case RIGHT_CLICK -> Material.BOW;
 				case SWAP -> Material.TORCH;
+				case DROP -> Material.DROPPER;
 			}, () -> {
 				mNewTrigger.setKey(AbilityTrigger.Key.values()[(mNewTrigger.getKey().ordinal() + 1) % AbilityTrigger.Key.values().length]);
 				mNewTrigger.getKeyOptions().clear();

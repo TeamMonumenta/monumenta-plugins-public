@@ -36,14 +36,12 @@ public final class ItemDropListener implements Listener {
 	private static final String LORE_TAG = "DisableDropLore";
 	private static final String INTERESTING_TAG = "DisableDropInteresting";
 	private static final String ALL_TAG = "DisableDropAll";
-	private static final String HOLDING_TAG = "DisableDropHolding";
 	private static final String EQUIPPED_TAG = "DisableDropEquipped";
 
 	private final Set<UUID> mTieredPlayers = new HashSet<>();
 	private final Set<UUID> mLorePlayers = new HashSet<>();
 	private final Set<UUID> mInterestingPlayers = new HashSet<>();
 	private final Set<UUID> mAllPlayers = new HashSet<>();
-	private final Set<UUID> mHoldingPlayers = new HashSet<>();
 	private final Set<UUID> mEquippedPlayers = new HashSet<>();
 
 	public ItemDropListener() {
@@ -96,15 +94,6 @@ public final class ItemDropListener implements Listener {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withAliases(ALIAS)
-			.withArguments(new LiteralArgument("holding"))
-			.executesPlayer((sender, args) -> {
-				disableHolding(sender);
-			})
-			.register();
-
-		new CommandAPICommand(COMMAND)
-			.withPermission(perms)
-			.withAliases(ALIAS)
 			.withArguments(new LiteralArgument("equipped"))
 			.executesPlayer((sender, args) -> {
 				disableEquipped(sender);
@@ -142,8 +131,6 @@ public final class ItemDropListener implements Listener {
 			mInterestingPlayers.add(uuid);
 		} else if (tags.contains(ALL_TAG)) {
 			mAllPlayers.add(uuid);
-		} else if (tags.contains(HOLDING_TAG)) {
-			mHoldingPlayers.add(uuid);
 		} else if (tags.contains(EQUIPPED_TAG)) {
 			mEquippedPlayers.add(uuid);
 		}
@@ -166,11 +153,8 @@ public final class ItemDropListener implements Listener {
 			|| event.getAction() == InventoryAction.DROP_ONE_SLOT) {
 
 			HumanEntity human = event.getWhoClicked();
-			if (!(human instanceof Player)) {
-				return;
-			}
-			Player player = (Player) human;
-			if (player.getGameMode() == GameMode.CREATIVE) {
+			if (!(human instanceof Player player)
+				    || player.getGameMode() == GameMode.CREATIVE) {
 				return;
 			}
 
@@ -185,10 +169,6 @@ public final class ItemDropListener implements Listener {
 			UUID uuid = player.getUniqueId();
 			if (isDropDisabled(uuid, item)) {
 				event.setCancelled(true);
-			} else if (mHoldingPlayers.contains(uuid)) {
-				if (player.getInventory().equals(event.getClickedInventory()) && event.getSlot() == player.getInventory().getHeldItemSlot()) {
-					event.setCancelled(true);
-				}
 			} else if (mEquippedPlayers.contains(uuid)) {
 				if (player.getInventory().equals(event.getClickedInventory()) && isEquipmentSlot(event.getSlot())) {
 					event.setCancelled(true);
@@ -218,13 +198,6 @@ public final class ItemDropListener implements Listener {
 		UUID uuid = player.getUniqueId();
 		if (isDropDisabled(uuid, item)) {
 			event.setCancelled(true);
-		} else if (mHoldingPlayers.contains(uuid)) {
-			int heldSlotId = playerInventory.getHeldItemSlot();
-			int droppedSlotId = Plugin.getInstance().mTrackingManager.mPlayers.getDroppedSlotId(event);
-
-			if (heldSlotId == droppedSlotId) {
-				event.setCancelled(true);
-			}
 		} else if (mEquippedPlayers.contains(uuid)) {
 			int droppedSlotId = Plugin.getInstance().mTrackingManager.mPlayers.getDroppedSlotId(event);
 
@@ -235,7 +208,7 @@ public final class ItemDropListener implements Listener {
 	}
 
 	/**
-	 * Checks if dropping the given item is not allowed. Can not and does not check {@link #mHoldingPlayers} and {@link #mEquippedPlayers}.
+	 * Checks if dropping the given item is not allowed. Can not and does not check {@link #mEquippedPlayers}.
 	 */
 	private boolean isDropDisabled(UUID uuid, ItemStack item) {
 		if (mAllPlayers.contains(uuid)) {
@@ -285,13 +258,6 @@ public final class ItemDropListener implements Listener {
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items.");
 	}
 
-	private void disableHolding(Player player) {
-		remove(player);
-		player.addScoreboardTag(HOLDING_TAG);
-		mHoldingPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop the item you are holding.");
-	}
-
 	private void disableEquipped(Player player) {
 		remove(player);
 		player.addScoreboardTag(EQUIPPED_TAG);
@@ -308,14 +274,13 @@ public final class ItemDropListener implements Listener {
 
 	private boolean hasTag(Player player) {
 		Set<String> tags = player.getScoreboardTags();
-		return tags.contains(TIERED_TAG) || tags.contains(LORE_TAG) || tags.contains(HOLDING_TAG) || tags.contains(EQUIPPED_TAG) || tags.contains(INTERESTING_TAG) || tags.contains(ALL_TAG);
+		return tags.contains(TIERED_TAG) || tags.contains(LORE_TAG) || tags.contains(EQUIPPED_TAG) || tags.contains(INTERESTING_TAG) || tags.contains(ALL_TAG);
 	}
 
 	private void remove(Player player) {
 		player.removeScoreboardTag(LORE_TAG);
 		player.removeScoreboardTag(INTERESTING_TAG);
 		player.removeScoreboardTag(ALL_TAG);
-		player.removeScoreboardTag(HOLDING_TAG);
 		player.removeScoreboardTag(EQUIPPED_TAG);
 		player.removeScoreboardTag(TIERED_TAG);
 		removeFromSets(player);
@@ -326,7 +291,6 @@ public final class ItemDropListener implements Listener {
 		mLorePlayers.remove(uuid);
 		mInterestingPlayers.remove(uuid);
 		mAllPlayers.remove(uuid);
-		mHoldingPlayers.remove(uuid);
 		mEquippedPlayers.remove(uuid);
 		mTieredPlayers.remove(uuid);
 	}

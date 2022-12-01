@@ -38,7 +38,10 @@ public class AbilityTrigger {
 	}
 
 	public enum Key {
-		LEFT_CLICK("Left Click"), RIGHT_CLICK("Right Click"), SWAP("Swap Hands"),
+		LEFT_CLICK("Left Click"),
+		RIGHT_CLICK("Right Click"),
+		SWAP("Swap Hands"),
+		DROP("Drop Item"),
 		;
 
 		private final String mDisplay;

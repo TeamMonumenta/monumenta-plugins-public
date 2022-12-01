@@ -38,6 +38,7 @@ public class ProtocolLibIntegration {
 		syncManager.addPacketListener(new EntityEquipmentReplacer(plugin));
 		syncManager.addPacketListener(new WorldNameReplacer(plugin));
 		syncManager.addPacketListener(new EntityNameReplacer(plugin));
+		syncManager.addPacketListener(new DropKeyPacketListener(plugin));
 
 		mPlayerTitleManager = new PlayerTitleManager(syncManager);
 
