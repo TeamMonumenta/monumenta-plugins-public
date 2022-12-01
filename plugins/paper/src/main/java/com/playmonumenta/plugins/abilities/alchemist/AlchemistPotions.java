@@ -75,7 +75,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	public static final double DAMAGE_PER_SKILL_POINT = 0.5;
 	public static final double DAMAGE_PER_SPEC_POINT = 2;
 	// Alchemist.java assumes that these two constants are equal - update the description there if you change these values to be different.
-	private static final double DAMAGE_PER_ENHANCEMENT = DAMAGE_PER_SPEC_POINT;
+	public static final double DAMAGE_PER_ENHANCEMENT = 1.5;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
 	private static final double RADIUS = 4;
 

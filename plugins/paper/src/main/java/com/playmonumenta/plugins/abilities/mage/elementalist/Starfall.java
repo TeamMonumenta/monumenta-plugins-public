@@ -30,8 +30,8 @@ public class Starfall extends Ability {
 	public static final String NAME = "Starfall";
 	public static final ClassAbility ABILITY = ClassAbility.STARFALL;
 
-	public static final int DAMAGE_1 = 13;
-	public static final int DAMAGE_2 = 23;
+	public static final int DAMAGE_1 = 15;
+	public static final int DAMAGE_2 = 27;
 	public static final int SIZE = 6;
 	public static final int DISTANCE = 25;
 	public static final int FIRE_SECONDS = 5;
