@@ -20,7 +20,7 @@ public class PatronRed extends PatronParticles {
 				int particleScore = ScoreboardUtils.getScoreboardValue(player, "ShinyRed").orElse(0);
 				return (
 					particleScore > 0
-						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_5
+						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_3
 						&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
 				);
 			})

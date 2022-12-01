@@ -73,24 +73,20 @@ public class Constants {
 	// + In-game rank
 	// + Plots iron block
 	// + Castle head
-	public static final int PATREON_TIER_1 = 1;
+	public static final int PATREON_TIER_1 = 5;
 	// + White particles
 	// + Stat tracking
 	// + Patreon Parakeet
 	// + Shrine heads
 	// + Hope skins
-	public static final int PATREON_TIER_2 = 5;
+	public static final int PATREON_TIER_2 = 10;
 	// + 1 daily buff
-	// + Purple particles
+	// + Greed particles
 	// Plots iron → gold block
-	public static final int PATREON_TIER_3 = 10;
+	public static final int PATREON_TIER_3 = 20;
 	// 1 → 2 daily buffs
-	// + Green particles
-	public static final int PATREON_TIER_4 = 20;
-	// 2 → 3 daily buffs
-	// + Red particles
-	// Plots gold → diamond block
-	public static final int PATREON_TIER_5 = 30;
+	// + Red and Purple particles
+
 
 	static {
 		Materials.WEARABLE.addAll(Materials.ARMOR);

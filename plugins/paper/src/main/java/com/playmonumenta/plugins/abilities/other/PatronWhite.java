@@ -19,7 +19,7 @@ public class PatronWhite extends PatronParticles {
 				int particleScore = ScoreboardUtils.getScoreboardValue(player, "ShinyWhite").orElse(0);
 				return (
 					particleScore > 0
-						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_2
+						&& PlayerData.getPatreonDollars(player) >= Constants.PATREON_TIER_1
 						&& !PremiumVanishIntegration.isInvisibleOrSpectator(player)
 				);
 			})

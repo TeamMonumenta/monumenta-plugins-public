@@ -429,7 +429,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		// Parteon parrot
 		// This one cannot be bought in-game. This also means it has no purchase date.
-		ItemStack buyPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", List.of("Become a Tier 2 patreon to unlock"));
+		ItemStack buyPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", List.of("Become a Tier 1 patreon to unlock"));
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, buyPatreon,
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) < 5 && mSelectedAction == ParrotAction.NONE));
 

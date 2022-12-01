@@ -297,7 +297,7 @@ public class VanityManager implements Listener {
 	}
 
 	public static boolean hasFreeAccess(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_4;
+		return ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_3;
 	}
 
 	public static boolean isValidOffhandVanityItem(ItemStack item) {
