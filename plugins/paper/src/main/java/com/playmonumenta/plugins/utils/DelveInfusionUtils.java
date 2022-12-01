@@ -30,6 +30,7 @@ public class DelveInfusionUtils {
 
 	/**When set to true the refund function will return all the XP used for the infusion, when false only the 75% */
 	public static final boolean FULL_REFUND = false;
+	public static final double REFUND_PERCENT = 0.75;
 
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
@@ -159,7 +160,7 @@ public class DelveInfusionUtils {
 
 		int xp = ExperienceUtils.getTotalExperience(player);
 		for (int i = 0; i <= levelXp; i++) {
-			xp += (int) ((FULL_REFUND ? XP_COST_PER_LEVEL[i] : XP_COST_PER_LEVEL[i] * 0.75) * item.getAmount());
+			xp += (int) (XP_COST_PER_LEVEL[i] * (FULL_REFUND ? 1 : REFUND_PERCENT) * item.getAmount());
 		}
 		ExperienceUtils.setTotalExperience(player, xp);
 	}

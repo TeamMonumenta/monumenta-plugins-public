@@ -24,6 +24,7 @@ public class InfusionUtils {
 	 * When set to true the refund function will return all the XP used for the infusion, when false only the 75%
 	 */
 	public static final boolean FULL_REFUND = false;
+	public static final double REFUND_PERCENT = 0.75;
 	public static final String PULSATING_GOLD = "epic:r1/items/currency/pulsating_gold";
 	public static final String PULSATING_EMERALD = "epic:r2/items/currency/pulsating_emerald";
 	public static final String PULSATING_DIAMOND = "epic:r3/items/currency/pulsating_diamond";
@@ -183,7 +184,7 @@ public class InfusionUtils {
 			}
 		}
 
-		refundXP = (int) ((FULL_REFUND ? refundXP : refundXP * 0.75) * item.getAmount());
+		refundXP = (int) (refundXP * (FULL_REFUND ? 1 : REFUND_PERCENT) * item.getAmount());
 		ExperienceUtils.setTotalExperience(player, xp + refundXP);
 	}
 

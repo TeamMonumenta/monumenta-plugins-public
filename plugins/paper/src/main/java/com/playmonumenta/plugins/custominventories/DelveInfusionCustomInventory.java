@@ -712,7 +712,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		refundMeta.displayName(Component.text("Click to refund this item's infusions.", NamedTextColor.DARK_GRAY)
 			.decoration(TextDecoration.ITALIC, false)
 			.decoration(TextDecoration.BOLD, true));
-		splitLoreLine(refundMeta, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : "50") + "% of the experience, but all of the materials back.", MAX_LORE_LENGTH, ChatColor.GRAY);
+		splitLoreLine(refundMeta, "You will receive " + (DelveInfusionUtils.FULL_REFUND ? "100" : (int) (DelveInfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", MAX_LORE_LENGTH, ChatColor.GRAY);
 		mRefundItem.setItemMeta(refundMeta);
 
 		//Cake for max level reached
