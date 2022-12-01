@@ -87,11 +87,6 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 								// Don't set target of mobs with this ability, or else infinite loop
 								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG))) {
 									mob.setTarget(mTarget);
-
-									EffectManager.getInstance().addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
-											new PercentSpeed(PERCENT_SPEED_DURATION, PERCENT_SPEED_EFFECT,
-													PERCENT_SPEED_EFFECT_NAME));
-
 									Location loc = mob.getLocation();
 									double distance = loc.distance(locTarget);
 									Vector velocity = locTarget.clone().subtract(loc).toVector().multiply(0.19);
