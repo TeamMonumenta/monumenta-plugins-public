@@ -1555,6 +1555,10 @@ public class ItemStatUtils {
 		}
 	}
 
+	public static boolean hasEnchantment(@Nullable ItemStack item, EnchantmentType type) {
+		return getEnchantmentLevel(item, type) > 0;
+	}
+
 	public static @Nullable NBTCompound getPlayerModified(final NBTItem nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
@@ -1666,6 +1670,10 @@ public class ItemStatUtils {
 		if (updateItem) {
 			generateItemStats(item);
 		}
+	}
+
+	public static boolean hasInfusion(@Nullable ItemStack item, InfusionType type) {
+		return getInfusionLevel(item, type) > 0;
 	}
 
 	public static NBTCompoundList getAttributes(final NBTItem nbt) {

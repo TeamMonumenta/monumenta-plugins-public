@@ -37,17 +37,19 @@ public class Starvation implements Enchantment {
 	}
 
 	public static void apply(Player player, int level) {
-		int currFood = player.getFoodLevel();
-		float currSat = player.getSaturation();
-		float newSat = Math.max(0, currSat - level);
-		float remainder = Math.max(0, level - currSat);
-		int newFood = Math.max(0, (int) (currFood - remainder));
-		player.setSaturation(newSat);
-		player.setFoodLevel(newFood);
-		World world = player.getWorld();
-		world.spawnParticle(Particle.SNEEZE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1);
-		world.spawnParticle(Particle.SLIME, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1);
-		world.playSound(player.getLocation(), Sound.ENTITY_HOGLIN_AMBIENT, 1, 1.25f);
+		if (level > 0) {
+			int currFood = player.getFoodLevel();
+			float currSat = player.getSaturation();
+			float newSat = Math.max(0, currSat - level);
+			float remainder = Math.max(0, level - currSat);
+			int newFood = Math.max(0, (int) (currFood - remainder));
+			player.setSaturation(newSat);
+			player.setFoodLevel(newFood);
+			World world = player.getWorld();
+			world.spawnParticle(Particle.SNEEZE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1);
+			world.spawnParticle(Particle.SLIME, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1);
+			world.playSound(player.getLocation(), Sound.ENTITY_HOGLIN_AMBIENT, 1, 1.25f);
+		}
 	}
 
 }

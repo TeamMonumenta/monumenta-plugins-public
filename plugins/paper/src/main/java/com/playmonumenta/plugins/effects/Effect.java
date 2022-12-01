@@ -24,6 +24,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	protected int mDuration;
 	public String mEffectID;
+	private boolean mDisplay = true;
 	private boolean mDisplayTime = true;
 
 	public Effect(int duration, String effectID) {
@@ -166,9 +167,11 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	@Override
 	public @Nullable String getDisplay() {
-		String specificDisplay = getSpecificDisplay();
-		if (specificDisplay != null) {
-			return ChatColor.GREEN + specificDisplay + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+		if (mDisplay) {
+			String specificDisplay = getSpecificDisplay();
+			if (specificDisplay != null) {
+				return ChatColor.GREEN + specificDisplay + (mDisplayTime ? " " + ChatColor.GRAY + StringUtils.intToMinuteAndSeconds(mDuration / 20) : "");
+			}
 		}
 		return null;
 	}
@@ -179,6 +182,11 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 			return -1;
 		}
 		return mDuration;
+	}
+
+	public Effect displays(boolean display) {
+		mDisplay = display;
+		return this;
 	}
 
 	public Effect displaysTime(boolean displayTime) {

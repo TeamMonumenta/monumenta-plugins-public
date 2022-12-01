@@ -409,22 +409,6 @@ public class PotionUtils {
 		return OPPOSITE_EFFECTS.get(type);
 	}
 
-	public static boolean isLuckPotion(PotionMeta meta) {
-		boolean isLuckPotion = false;
-		if (meta.getBasePotionData().getType().equals(PotionType.LUCK)) {
-			isLuckPotion = true;
-		}
-
-		for (PotionEffect effect : meta.getCustomEffects()) {
-			if (effect.getType().equals(PotionEffectType.LUCK)) {
-				isLuckPotion = true;
-				break;
-			}
-		}
-
-		return isLuckPotion;
-	}
-
 	// Duration is greater than about 10 hours
 	public static boolean isInfinite(PotionEffect effect) {
 		return isInfinite(effect.getDuration());

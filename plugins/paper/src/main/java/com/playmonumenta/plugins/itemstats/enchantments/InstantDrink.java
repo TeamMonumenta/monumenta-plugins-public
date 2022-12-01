@@ -1,13 +1,13 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -42,11 +42,7 @@ public class InstantDrink implements Enchantment {
 			if (item.getType() == Material.POTION && item.getItemMeta() instanceof PotionMeta meta) {
 				ItemStatUtils.applyCustomEffects(plugin, player, item);
 
-				//Apply Starvation if applicable
-				int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
-				if (starvation > 0) {
-					Starvation.apply(player, starvation);
-				}
+				Starvation.apply(player, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION));
 
 				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);
 				Color color = meta.getColor();
@@ -64,10 +60,14 @@ public class InstantDrink implements Enchantment {
 				}
 
 				//Wait, this is illegal for a potion to have.
-				if (ItemStatUtils.getEnchantmentLevel(ItemStatUtils.getEnchantments(new NBTItem(item)), EnchantmentType.INFINITY) > 0) {
+				if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY)) {
 					event.setUseItemInHand(Result.DENY);
 				} else if (player.getGameMode() != GameMode.CREATIVE) {
-					item.setAmount(item.getAmount() - 1);
+					if (NonClericProvisionsPassive.testRandomChance(player)) {
+						NonClericProvisionsPassive.sacredProvisionsSound(player);
+					} else {
+						item.setAmount(item.getAmount() - 1);
+					}
 				}
 			}
 		}
