@@ -65,8 +65,8 @@ public class AbilityTrigger {
 		NO_BLOCKS("not holding blocks", "may be holding blocks",
 			player -> !player.getInventory().getItemInMainHand().getType().isBlock()),
 		NO_MISC("not holding a compass or multitool", "may be holding a compass or multitool",
-			player -> player.getInventory().getItemInMainHand().getType() == Material.COMPASS
-				          || Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0),
+			player -> !(player.getInventory().getItemInMainHand().getType() == Material.COMPASS
+				|| Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0)),
 		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe",
 			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
 		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield",
