@@ -47,11 +47,11 @@ public class Stamina implements Enchantment {
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source != null) {
-			apply(plugin, player, value);
+			applyStamina(plugin, player, value);
 		}
 	}
 
-	public static void apply(Plugin plugin, Player player, double level) {
+	private void applyStamina(Plugin plugin, Player player, double level) {
 		NavigableSet<Effect> s = plugin.mEffectManager.getEffects(player, STAMINA_EFFECT);
 		if (s != null && s.last().getDuration() > DURATION - 20) {
 			// attacked within 1s, do not run anything/refresh effect

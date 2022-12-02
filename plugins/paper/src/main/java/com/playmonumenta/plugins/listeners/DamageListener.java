@@ -137,11 +137,8 @@ public class DamageListener implements Listener {
 
 		// Player getting damaged
 		if (damagee instanceof Player player) {
-			mPlugin.mEffectManager.damageEvent(event);
+			mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
 			mPlugin.mAbilityManager.onHurt(player, event, damager, source);
-			if (!event.getReorderItemStatEvent()) {
-				mPlugin.mItemStatManager.onHurt(mPlugin, player, event, damager, source);
-			}
 
 			if (event.getFinalDamage(true) >= player.getHealth()
 				    && !event.isCancelled()) {
@@ -156,18 +153,15 @@ public class DamageListener implements Listener {
 					if (playerItemStats != null) {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, playerItemStats, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
-						mPlugin.mEffectManager.damageEvent(event);
 					}
 				} else {
 					PlayerItemStats eventPlayerItemStats = event.getPlayerItemStats();
 					if (eventPlayerItemStats != null) {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, eventPlayerItemStats, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
-						mPlugin.mEffectManager.damageEvent(event);
 					} else {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
-						mPlugin.mEffectManager.damageEvent(event);
 					}
 				}
 				// Check for activity purposes
@@ -176,6 +170,10 @@ public class DamageListener implements Listener {
 				}
 			}
 		}
+		if (!event.isLifelineCancel()) {
+			mPlugin.mEffectManager.damageEvent(event);
+		}
+
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
 		if (source instanceof Player player && damager instanceof Projectile) {
 			double damage = event.getDamage();

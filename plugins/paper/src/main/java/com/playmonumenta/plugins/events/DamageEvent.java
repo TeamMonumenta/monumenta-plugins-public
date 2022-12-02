@@ -158,7 +158,7 @@ public class DamageEvent extends Event implements Cancellable {
 	private final EntityDamageEvent mEvent;
 
 	private final Metadata mMetadata;
-	private boolean mReorderItemStatEvent;
+	private boolean mLifelineCancel;
 
 	private final double mOriginalDamage;
 
@@ -180,7 +180,7 @@ public class DamageEvent extends Event implements Cancellable {
 		mMetadata = metadata;
 		mOriginalDamage = event.getDamage();
 		mEvent = event;
-		mReorderItemStatEvent = false;
+		mLifelineCancel = false;
 
 		if (mDamager instanceof Projectile proj) {
 			ProjectileSource source = proj.getShooter();
@@ -276,12 +276,12 @@ public class DamageEvent extends Event implements Cancellable {
 		mEvent.setCancelled(cancelled);
 	}
 
-	public void setReorderItemStatEvent(boolean reorderItemStatEvent) {
-		mReorderItemStatEvent = reorderItemStatEvent;
+	public void setLifelineCancel(boolean lifelineCancel) {
+		mLifelineCancel = lifelineCancel;
 	}
 
-	public boolean getReorderItemStatEvent() {
-		return mReorderItemStatEvent;
+	public boolean isLifelineCancel() {
+		return mLifelineCancel;
 	}
 
 	public @Nullable ItemStatManager.PlayerItemStats getPlayerItemStats() {
