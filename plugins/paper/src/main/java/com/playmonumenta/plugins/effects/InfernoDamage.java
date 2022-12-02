@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
@@ -43,7 +44,7 @@ public class InfernoDamage extends Effect {
 			if (mPlayer != null) {
 				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, Inferno.CHARM_DAMAGE, damage);
 			}
-			DamageUtils.damage(mPlayer, le, DamageType.AILMENT, damage, null, true, false);
+			DamageUtils.damage(mPlayer, le, DamageType.AILMENT, damage, ClassAbility.INFERNO, true, false);
 			new PartialParticle(Particle.FLAME, le.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05).spawnAsEnemyBuff();
 		}
 	}
