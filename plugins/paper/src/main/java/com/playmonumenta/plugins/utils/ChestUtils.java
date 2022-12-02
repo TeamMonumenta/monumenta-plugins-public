@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -126,27 +129,64 @@ public class ChestUtils {
 				List<List<ItemStack>> itemBuckets = distributeLootToBuckets(new ArrayList<>(popLoot), otherPlayers.size() + 1);
 
 				// The orig container starts with the first bucket of items
-				// Need to make a copy here because the buckets lists are not modifyable
-				List<ItemStack> itemsForOrigContainer = new ArrayList<ItemStack>(itemBuckets.get(0));
+				// Need to make a copy here because the buckets lists are not modifiable
+				List<ItemStack> itemsForOrigContainer = new ArrayList<>(itemBuckets.get(0));
 
 				int bucketIdx = 1; // Start at 1, first one was already taken by source player
-				int numOtherLootBoxes = 0;
+				Set<String> otherLootBoxPlayers = new TreeSet<>();
+				Set<String> noSharePlayers = new TreeSet<>();
 				for (Player other : otherPlayers) {
 					if (giveLootBoxSliceToPlayer(itemBuckets.get(bucketIdx), other)) {
-						numOtherLootBoxes++;
+						otherLootBoxPlayers.add(other.getName());
 					} else {
 						// Failed to give this slice to the other player (no lootbox or it is full)
 						// Put all these items in the orig container
 						itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
+						noSharePlayers.add(other.getName());
 					}
 					bucketIdx++;
 				}
 
-				if (numOtherLootBoxes > 0) {
+				if (!otherLootBoxPlayers.isEmpty()) {
 					// Sound to indicate loot was split
 					// /playsound minecraft:block.note_block.bass player @s ~ ~ ~ 0.2 1.4
 					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 0.2f, 1.4f);
-					MessagingUtils.sendActionBarMessage(player, "Loot distributed to " + numOtherLootBoxes + " other nearby player" + (numOtherLootBoxes == 1 ? "" : "s"));
+
+					StringJoiner otherPlayersJoiner = new StringJoiner(", ");
+					for (String other : otherLootBoxPlayers) {
+						otherPlayersJoiner.add(other);
+					}
+					Component lootboxPlayers = Component.text(otherLootBoxPlayers.size()
+						+ " other nearby player" + (otherLootBoxPlayers.size() == 1 ? "" : "s"),
+						NamedTextColor.GOLD)
+						.hoverEvent(Component.text(otherPlayersJoiner.toString()));
+
+					Component noSharePlayerComponent;
+					if (noSharePlayers.isEmpty()) {
+						noSharePlayerComponent = Component.empty();
+					} else {
+						StringJoiner noShareJoiner = new StringJoiner(", ");
+						for (String other : noSharePlayers) {
+							noShareJoiner.add(other);
+						}
+						noSharePlayerComponent = Component.text(noSharePlayers.size()
+									+ " other player" + (noSharePlayers.size() == 1 ? "" : "s") + " got no share",
+								NamedTextColor.GOLD)
+							.hoverEvent(Component.text(otherPlayersJoiner.toString()));
+						noSharePlayerComponent = Component.text(", and ", NamedTextColor.GOLD)
+							.append(noSharePlayerComponent);
+					}
+
+					Component lootDistributedMessage = Component.text("Loot distributed to ", NamedTextColor.GOLD)
+						.append(lootboxPlayers)
+						.append(noSharePlayerComponent);
+
+					if (player.getScoreboardTags().contains("ActionBarLootbox")) {
+						player.sendActionBar(lootDistributedMessage);
+					} else {
+						lootDistributedMessage = lootDistributedMessage.hoverEvent(Component.text(otherPlayersJoiner.toString()));
+						player.sendMessage(lootDistributedMessage);
+					}
 				}
 
 				// Put the remainder of the loot in the original container
@@ -262,7 +302,7 @@ public class ChestUtils {
 	/**
 	 * Puts a player's fractional split of loot in a LOOTBOX in their inventory if present.
 	 *
-	 * Returns whether or not this was possible. If false the loot should be shared back into the generating chest.
+	 * Returns whether this was possible. If false the loot should be shared back into the generating chest.
 	 */
 	private static boolean giveLootBoxSliceToPlayer(List<ItemStack> loot, Player player) {
 		ItemStack lootBox = getNextLootboxWithSpace(player);
@@ -379,11 +419,9 @@ public class ChestUtils {
 			int usedSlots = 0;
 			if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
 				@Nullable ItemStack[] lootBoxContents = shulkerMeta.getInventory().getContents();
-				if (lootBoxContents != null) {
-					for (@Nullable ItemStack lootBoxItem : lootBoxContents) {
-						if (lootBoxItem != null && !lootBoxItem.getType().equals(Material.AIR)) {
-							++usedSlots;
-						}
+				for (@Nullable ItemStack lootBoxItem : lootBoxContents) {
+					if (lootBoxItem != null && !lootBoxItem.getType().equals(Material.AIR)) {
+						++usedSlots;
 					}
 				}
 			}
@@ -443,8 +481,8 @@ public class ChestUtils {
 
 	private static int countEmptyNormalLootboxSpaces(Inventory inventory) {
 		int empty = 0;
-		for (ItemStack subitem : inventory.getContents()) {
-			if (subitem == null || subitem.getType().isAir()) {
+		for (ItemStack subItem : inventory.getContents()) {
+			if (subItem == null || subItem.getType().isAir()) {
 				empty++;
 			}
 		}
@@ -474,7 +512,7 @@ public class ChestUtils {
 						}
 						numAvailSpaces += availSpaces;
 					}
-				} else if (item.getItemMeta() instanceof BlockStateMeta blockmeta && blockmeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
+				} else if (item.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
 					// Normal lootbox
 					int availSpaces = countEmptyNormalLootboxSpaces(shulkerMeta.getInventory());
 					// Will return the first available box
@@ -549,8 +587,7 @@ public class ChestUtils {
 
 	public static void generateLootInventory(Collection<ItemStack> populatedLoot, Inventory inventory, Player player, boolean randomlyDistribute) {
 		List<ItemStack> lootList = populatedLoot.stream()
-			.filter((item) -> item != null && !item.getType().isAir())
-			.collect(Collectors.toList());
+			.filter((item) -> item != null && !item.getType().isAir()).toList();
 
 		List<Integer> freeSlots = new ArrayList<>(27);
 		for (int i = 0; i < 27; i++) {
@@ -564,7 +601,7 @@ public class ChestUtils {
 		ArrayDeque<Integer> slotsWithMultipleItems = new ArrayDeque<>();
 		for (ItemStack lootItem : lootList) {
 			if (freeSlots.size() == 0) {
-				Plugin.getInstance().getLogger().severe("Tried to overfill container for player " + player.getName() + " at inventory " + inventory.getType().toString() + " at location " + player.getLocation().toString());
+				Plugin.getInstance().getLogger().severe("Tried to overfill container for player " + player.getName() + " at inventory " + inventory.getType() + " at location " + player.getLocation());
 				player.sendMessage("Tried to overfill this container! Please report this");
 				break;
 			}
@@ -580,17 +617,20 @@ public class ChestUtils {
 		}
 
 		while (randomlyDistribute && freeSlots.size() > 1 && slotsWithMultipleItems.size() > 0) {
-			int splitslot = slotsWithMultipleItems.remove();
+			int splitSlot = slotsWithMultipleItems.remove();
 			int slot = freeSlots.remove(0);
 
-			ItemStack toSplitItem = inventory.getItem(splitslot);
+			ItemStack toSplitItem = inventory.getItem(splitSlot);
+			if (toSplitItem == null) {
+				continue;
+			}
 			ItemStack splitItem = toSplitItem.clone();
 			int amountToSplit = toSplitItem.getAmount() / 2;
 			int amountRemaining = toSplitItem.getAmount() - amountToSplit;
 
 			if (MMLog.isLevelEnabled(Level.FINER)) {
-				MMLog.finer("generateLootInventory: Splitting item type " + toSplitItem.getType().toString() +
-				            " with count " + toSplitItem.getAmount() + " in slot " + splitslot +
+				MMLog.finer("generateLootInventory: Splitting item type " + toSplitItem.getType() +
+				            " with count " + toSplitItem.getAmount() + " in slot " + splitSlot +
 							" into count " + amountRemaining + " and " + amountToSplit + " in slot " + slot);
 			}
 
@@ -603,8 +643,8 @@ public class ChestUtils {
 				slotsWithMultipleItems.add(slot);
 		    }
 			if (amountRemaining > 1) {
-				MMLog.finer("generateLootInventory: Adding slot " + splitslot + " to multiple items list");
-				slotsWithMultipleItems.add(splitslot);
+				MMLog.finer("generateLootInventory: Adding slot " + splitSlot + " to multiple items list");
+				slotsWithMultipleItems.add(splitSlot);
 		    }
 		}
 	}
