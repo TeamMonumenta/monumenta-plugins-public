@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 public class Soothing implements Infusion {
 
-	public static final double HEAL_PER_LEVEL = 0.0275;
+	public static final double HEAL_PER_LEVEL = 0.04;
 
 	@Override
 	public String getName() {

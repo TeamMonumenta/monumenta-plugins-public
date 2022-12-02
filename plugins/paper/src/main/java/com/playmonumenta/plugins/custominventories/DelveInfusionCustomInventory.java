@@ -293,7 +293,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack blueItem = new ItemStack(Material.BLUE_WOOL);
 		ItemMeta blueMeta = blueItem.getItemMeta();
 		blueMeta.displayName(Component.text("Soothing", TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(blueMeta, "Regenerate 0.0275 health per level each second.", MAX_LORE_LENGTH, ChatColor.GRAY);
+		splitLoreLine(blueMeta, "Regenerate 0.04 health per level each second.", MAX_LORE_LENGTH, ChatColor.GRAY);
 		List<Component> blueLore = blueMeta.lore();
 		blueLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.SOOTHING), TextColor.fromHexString("#555555")));
 		blueMeta.lore(blueLore);
@@ -326,7 +326,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		ItemStack portalItem = new ItemStack(Material.IRON_BLOCK);
 		ItemMeta portalMeta = portalItem.getItemMeta();
 		portalMeta.displayName(Component.text("Galvanic", TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(portalMeta, "Gain a 1% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.", MAX_LORE_LENGTH, ChatColor.GRAY);
+		splitLoreLine(portalMeta, "Gain a 1.25% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.", MAX_LORE_LENGTH, ChatColor.GRAY);
 		List<Component> portalLore = portalMeta.lore();
 		portalLore.add(Component.text("Requires " + mDelveMatsMap.get(DelveInfusionSelection.GALVANIC), TextColor.fromHexString("#555555")));
 		portalMeta.lore(portalLore);
@@ -595,7 +595,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.BLUE_WOOL, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Soothing level " + (i + 1), TextColor.fromCSSHexString("#0C2CA2")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Regenerate " + 0.0275 * (i + 1) + " health each second.", MAX_LORE_LENGTH, ChatColor.GRAY);
+			splitLoreLine(meta, "Regenerate " + 0.04 * (i + 1) + " health each second.", MAX_LORE_LENGTH, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			blueItems.add(panel);
 		}
@@ -634,7 +634,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.IRON_BLOCK, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Galvanic level " + (i + 1), TextColor.fromCSSHexString("#DBDBD7")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "Gain a " + (i + 1) + "% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.", MAX_LORE_LENGTH, ChatColor.GRAY);
+			splitLoreLine(meta, "Gain a " + (1.25 * (i + 1)) + "% chance per level to stun a mob for 2 seconds (0.5 seconds for elites) when dealing or taking non-ability melee or projectile damage.", MAX_LORE_LENGTH, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			portalItems.add(panel);
 		}

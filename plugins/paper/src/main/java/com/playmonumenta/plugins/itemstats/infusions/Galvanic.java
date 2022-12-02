@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Galvanic implements Infusion {
 
-	private static final double STUN_CHANCE_PER_LVL = 0.01;
+	private static final double STUN_CHANCE_PER_LVL = 0.0125;
 	public static final int DURATION_NORMAL = 2 * 20; // 2 seconds
 	public static final int DURATION_ELITE = 10; // 0.5 seconds
 

@@ -38,7 +38,7 @@ public class WindWalk extends MultipleChargeAbility {
 	private static final double WIND_WALK_Y_VELOCITY = 0.2;
 	private static final double WIND_WALK_Y_VELOCITY_MULTIPLIER = 0.2;
 	private static final double WIND_WALK_VELOCITY_BONUS = 1.5;
-	private static final int WIND_WALK_CDR = 20 * 3;
+	private static final int WIND_WALK_CDR = 20 * 4;
 
 	public static final String CHARM_COOLDOWN = "Wind Walk Cooldown";
 	public static final String CHARM_CHARGE = "Wind Walk Charge";
