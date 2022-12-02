@@ -17,15 +17,24 @@ import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.EnumSet;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class AdvancingShadows extends Ability {
@@ -39,8 +48,10 @@ public class AdvancingShadows extends Ability {
 	private static final double DAMAGE_BONUS_1 = 0.3;
 	private static final double DAMAGE_BONUS_2 = 0.4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
-	private static final double ENHANCEMENT_BONUS_DAMAGE = 0.2;
-	private static final int ENHANCEMENT_BONUS_DAMAGE_DURATION = 20 * 5;
+	private static final int ENHANCEMENT_KILL_REQUIREMENT_TIME = 20;
+	private static final int ENHANCEMENT_CHAIN_DURATION = 20 * 3;
+
+	private static final float[] PITCHES = {1.6f, 1.8f, 1.6f, 1.8f, 2f};
 
 	public static final String CHARM_DAMAGE = "Advancing Shadows Damage Multiplier";
 	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
@@ -49,7 +60,6 @@ public class AdvancingShadows extends Ability {
 
 	private static final String PERCENT_DAMAGE_DEALT_EFFECT_NAME = "AdvancingShadowsPercentDamageDealtEffect";
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
-	private static final String ENHANCEMENT_EFFECT_NAME = "AdvancingShadowsEnhancementPercentDamageDealtEffect";
 
 	public static final AbilityInfo<AdvancingShadows> INFO =
 		new AbilityInfo<>(AdvancingShadows.class, "Advancing Shadows", AdvancingShadows::new)
@@ -67,9 +77,9 @@ public class AdvancingShadows extends Ability {
 					DURATION / 20,
 					ADVANCING_SHADOWS_RANGE_2 - 1,
 					(int) ADVANCING_SHADOWS_AOE_KNOCKBACKS_RANGE),
-				String.format("You deal %s%% extra damage for %ss to the target.",
-					(int) (ENHANCEMENT_BONUS_DAMAGE * 100),
-					ENHANCEMENT_BONUS_DAMAGE_DURATION / 20))
+				String.format("If the mob you teleported to dies within %ss, you can recast Advancing Shadows again in the next %ss.",
+					ENHANCEMENT_KILL_REQUIREMENT_TIME / 20,
+					ENHANCEMENT_CHAIN_DURATION / 20))
 			.cooldown(ADVANCING_SHADOWS_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AdvancingShadows::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
@@ -77,6 +87,11 @@ public class AdvancingShadows extends Ability {
 
 	private final double mPercentDamageDealt;
 	private final double mActivationRange;
+	private final Team mColorTeam;
+
+	private int mEnhancementKillTick = -999;
+	private int mEnhancementChain = 0;
+	private boolean mCanRecast = false;
 
 	private final AdvancingShadowsCS mCosmetic;
 
@@ -86,12 +101,21 @@ public class AdvancingShadows extends Ability {
 		mActivationRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, (isLevelOne() ? ADVANCING_SHADOWS_RANGE_1 : ADVANCING_SHADOWS_RANGE_2));
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AdvancingShadowsCS(), AdvancingShadowsCS.SKIN_LIST);
+		mColorTeam = ScoreboardUtils.getExistingTeamOrCreate("advancingShadowsColor", NamedTextColor.BLACK);
 	}
 
 	public void cast() {
-		if (isOnCooldown()) {
+		// Enhancement: If mCanRecast is true (which shows that targeted mob died in 1s), allow recast of AS for next 3 seconds.
+		if (isOnCooldown() && !(isEnhanced() && mCanRecast && mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION >= Bukkit.getCurrentTick())) {
 			return;
 		}
+
+		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
+			// Lose Kill chain if last kill tick was over 60 ticks ago.
+			mEnhancementChain = 0;
+		}
+
+		mCanRecast = false;
 
 		// Basically makes sure if the target is in LoS and if there is a path.
 		Location eyeLoc = mPlayer.getEyeLocation();
@@ -193,7 +217,46 @@ public class AdvancingShadows extends Ability {
 			}
 
 			if (isEnhanced()) {
-				mPlugin.mEffectManager.addEffect(mPlayer, ENHANCEMENT_EFFECT_NAME, new PercentDamageDealt(ENHANCEMENT_BONUS_DAMAGE_DURATION, ENHANCEMENT_BONUS_DAMAGE, null, 0, (player, enemy) -> enemy == entity));
+				// Create a Timer which checks every tick for the next second if Advancing Shadows is still up.
+				if (Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entity.getUniqueId().toString()) == null) {
+					mColorTeam.addEntry(entity.getUniqueId().toString());
+				}
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, ENHANCEMENT_KILL_REQUIREMENT_TIME, 0));
+				new BukkitRunnable() {
+					int mT = 0;
+
+					@Override public void run() {
+						if (mT > ENHANCEMENT_KILL_REQUIREMENT_TIME) {
+							mEnhancementChain = 0;
+							// Revert glowing color to normal white
+							if (mColorTeam.hasEntry(entity.getUniqueId().toString())) {
+								mColorTeam.removeEntry(entity.getUniqueId().toString());
+							}
+
+							cancel();
+							return;
+						} else if (entity.isDead() || !entity.isValid()) {
+							for (int i = 0; i < PITCHES.length; i++) {
+								float pitch = PITCHES[i];
+								new BukkitRunnable() {
+									@Override
+									public void run() {
+										world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_RESONATE, 1, pitch);
+									}
+								}.runTaskLater(mPlugin, i);
+							}
+							mCanRecast = true;
+							mEnhancementKillTick = Bukkit.getCurrentTick();
+							mEnhancementChain++;
+
+							MessagingUtils.sendActionBarMessage(mPlayer, "Advancing Shadows Chain: " + mEnhancementChain);
+							cancel();
+							return;
+						}
+
+						mT++;
+					}
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 
 			mCosmetic.tpParticle(mPlayer);
