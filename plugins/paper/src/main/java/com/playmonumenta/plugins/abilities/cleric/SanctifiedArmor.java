@@ -80,6 +80,10 @@ public class SanctifiedArmor extends Ability {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 
+			// Have to send this damage event through time to get correct final damage dealt
+			mPlugin.mItemStatManager.onHurt(mPlugin, mPlayer, event, damager, source);
+			event.setReorderItemStatEvent(true);
+
 			MovementUtils.knockAway(mPlayer, source, KNOCKBACK_SPEED, KNOCKBACK_SPEED, true);
 			if (isLevelTwo()) {
 				EntityUtils.applySlow(mPlugin, CharmManager.getDuration(mPlayer, CHARM_DURATION, SLOWNESS_DURATION), SLOWNESS_AMPLIFIER_2 + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), source);

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -41,6 +42,9 @@ public class NegateDamage extends Effect {
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		if (mCount > 0 && (mAffectedTypes == null || mAffectedTypes.contains(event.getType())) && !event.isCancelled() && !event.isBlockedByShield()) {
+			if (event.getSource() != null && entity instanceof Player player) {
+				ItemStatUtils.applyBlockedOnHitItemStats(Plugin.getInstance(), player);
+			}
 			event.setCancelled(true);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation();

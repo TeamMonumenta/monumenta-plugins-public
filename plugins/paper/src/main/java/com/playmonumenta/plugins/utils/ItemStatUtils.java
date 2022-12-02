@@ -2026,6 +2026,11 @@ public class ItemStatUtils {
 		addPlayerModified(new NBTItem(item, true)).setInteger(CHARGES_KEY, charges);
 	}
 
+	public static void applyBlockedOnHitItemStats(Plugin plugin, Player player) {
+		Stamina.apply(plugin, player, plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.STAMINA));
+		Carapace.apply(plugin, player, plugin.mItemStatManager.getInfusionLevel(player, InfusionType.CARAPACE));
+	}
+
 	public static void generateItemStats(final ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;

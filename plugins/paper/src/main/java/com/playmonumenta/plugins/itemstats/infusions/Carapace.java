@@ -30,16 +30,20 @@ public class Carapace implements Infusion {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		if (source != null) {
-			// Runs one tick later so that it does not affect this attack
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(modifiedLevel) - 1));
-				}
-			}.runTaskLater(plugin, 1);
+			apply(plugin, player, value);
 		}
+	}
+
+	public static void apply(Plugin plugin, Player player, double level) {
+		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) level);
+		// Runs one tick later so that it does not affect this attack
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(modifiedLevel) - 1));
+			}
+		}.runTaskLater(plugin, 1);
 	}
 
 	public static double getDamageTakenMultiplier(double level) {

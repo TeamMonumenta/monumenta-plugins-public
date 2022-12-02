@@ -104,8 +104,6 @@ public class PrismaticShield extends Ability {
 			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAbsorptionHealth + 1);
 
 			if (healthRemaining <= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
-				mPlugin.mEffectManager.damageEvent(event);
-				event.setLifelineCancel(true);
 				if (event.isCancelled() || event.isBlocked()) {
 					return;
 				}

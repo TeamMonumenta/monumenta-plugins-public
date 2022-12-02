@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -53,6 +54,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 		LivingEntity source = event.getSource();
 		if (source != null) {
+			ItemStatUtils.applyBlockedOnHitItemStats(mPlugin, mPlayer);
 			if (EntityUtils.isBoss(source)) {
 				event.setDamage(event.getDamage() / 2);
 			} else {
