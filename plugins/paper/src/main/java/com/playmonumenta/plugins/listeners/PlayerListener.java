@@ -938,12 +938,10 @@ public class PlayerListener implements Listener {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
-			|| cause.equals(TeleportCause.END_GATEWAY)
-			|| cause.equals(TeleportCause.END_PORTAL)
-			|| (cause.equals(TeleportCause.ENDER_PEARL)
-			&& (ZoneUtils.hasZoneProperty(event.getFrom(), ZoneProperty.ADVENTURE_MODE)
-			|| ZoneUtils.hasZoneProperty(event.getTo(), ZoneProperty.ADVENTURE_MODE)))
-			|| cause.equals(TeleportCause.NETHER_PORTAL)) {
+			    || cause.equals(TeleportCause.END_GATEWAY)
+			    || cause.equals(TeleportCause.END_PORTAL)
+			    || cause.equals(TeleportCause.ENDER_PEARL) // ender pearl teleportation is handled manually by EnderPearlTracker
+			    || cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -951,7 +949,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		Location loc = event.getTo();
 
-		if (!cause.equals(TeleportCause.UNKNOWN) && !cause.equals(TeleportCause.ENDER_PEARL) && !player.getGameMode().equals(GameMode.SPECTATOR) && !cause.equals(TeleportCause.SPECTATE)) {
+		if (!cause.equals(TeleportCause.UNKNOWN) && !player.getGameMode().equals(GameMode.SPECTATOR) && !cause.equals(TeleportCause.SPECTATE)) {
 			runTeleportRunnable(player, loc);
 		}
 

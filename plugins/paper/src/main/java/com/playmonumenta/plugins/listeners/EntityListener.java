@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.depths.abilities.steelsage.SteelStallion;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -554,7 +555,7 @@ public class EntityListener implements Listener {
 
 				// Check if the player has an infinity ender pearl
 				if (itemInMainHand.getType().equals(Material.ENDER_PEARL)
-					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					    && itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 					EnderPearl newPearl = (EnderPearl) origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 
 					// Copy the item's name/etc so it can be textured
@@ -564,7 +565,13 @@ public class EntityListener implements Listener {
 					newPearl.setShooter(player);
 					newPearl.setVelocity(origPearl.getVelocity());
 					event.setCancelled(true);
-					return;
+					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES)) {
+						new EnderPearlTracker(player, newPearl);
+					}
+				} else {
+					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES)) {
+						new EnderPearlTracker(player, origPearl);
+					}
 				}
 			} else if (event.getEntity() instanceof AbstractArrow arrow) {
 				// Sets piercing on Arrows, even if source comes from bows.
