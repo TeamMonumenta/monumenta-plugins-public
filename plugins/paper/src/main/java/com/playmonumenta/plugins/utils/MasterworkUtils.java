@@ -61,7 +61,7 @@ public class MasterworkUtils {
 
 	private static final String GALLEY_MAT = "epic:r3/gallery/items/torn_canvas";
 
-	private static final String GODSPORE_MAT = "epic:r3/godspore/items/tainted_spores";
+	private static final String GODSPORE_MAT = "epic:r3/godspore/items/fungal_remnants";
 
 	public enum MasterworkCost {
 		FOREST_ONE("forest_1", FOREST_FRAG, 1, HYPER_ARCHOS_RING, 1),
@@ -245,8 +245,9 @@ public class MasterworkUtils {
 
 	private static String itemNameSuffix(Player p, String itemName) {
 		if (itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
-			NamespacedKeyUtils.fromString(GALLEY_MAT))))) {
-			//Torn Canvas, do nothing
+			NamespacedKeyUtils.fromString(GALLEY_MAT)))) || itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
+			NamespacedKeyUtils.fromString(GODSPORE_MAT))))) {
+			//Torn Canvas or Fungal Remnants, do nothing
 			return "";
 		}
 		return "s";
