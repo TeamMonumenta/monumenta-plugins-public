@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses.abilities;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
+import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -9,9 +10,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
-import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -57,15 +56,14 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 			DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.ESOTERIC_ENHANCEMENTS, mPlayerItemStats), mDamage, true, false, false);
 			EntityUtils.applyBleed(com.playmonumenta.plugins.Plugin.getInstance(), mBleedDuration, mBleedAmount, entity);
 		}
-
-		List<Block> blockList = event.blockList();
-		blockList.clear();
 	}
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		// Set damage to 0 for non-boss hostile mobs to apply normal knockback. Bosses should not take any knockback
-		if (EntityUtils.isHostileMob(damagee) && !EntityUtils.isBoss(damagee)) {
+		if (EntityUtils.isHostileMob(damagee)
+			    && !EntityUtils.isBoss(damagee)
+			    && !damagee.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag)) {
 			event.setDamage(0);
 		} else {
 			event.setCancelled(true);
