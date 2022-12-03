@@ -86,6 +86,10 @@ public class ChestOverride extends BaseOverride {
 			return true;
 		}
 
+		if (block.getState() instanceof Chest chest && !chest.getLock().isEmpty()) {
+			return false;
+		}
+
 		// Iterate over adjacent blocks to trigger physics
 		for (Vector vec : ADJACENT_OFFSETS) {
 			Location tmpLoc = block.getLocation().add(vec);
