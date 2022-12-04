@@ -893,7 +893,7 @@ public class AbilityManager {
 				MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick);
 			} else {
 				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				if (ItemUtils.isSomePotion(mainHand) || ItemUtils.isProjectileWeapon(mainHand)) {
+				if (ItemUtils.isSomePotion(mainHand) || ItemUtils.isProjectileWeapon(mainHand) || mainHand.getType().isBlock()) {
 					MetadataUtils.setMetadata(player, RIGHT_CLICK_TICK_METAKEY, currentTick);
 					MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick + 2);
 				} else {
