@@ -21,7 +21,7 @@ public class StatTrackManager {
 	//The system will attempt to update the item for one minute after it's first used
 	public static final int NUM_RETRIES = 60;
 
-	public static final int PATRON_TIER = Constants.PATREON_TIER_2;
+	public static final int PATRON_TIER = Constants.PATREON_TIER_1;
 
 	private static @Nullable StatTrackManager mInstance;
 

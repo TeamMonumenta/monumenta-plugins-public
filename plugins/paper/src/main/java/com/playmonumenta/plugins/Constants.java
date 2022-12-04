@@ -71,21 +71,22 @@ public class Constants {
 
 	// + Discord channel
 	// + In-game rank
-	// + Plots iron block
 	// + Castle head
-	public static final int PATREON_TIER_1 = 5;
 	// + White particles
 	// + Stat tracking
 	// + Patreon Parakeet
-	// + Shrine heads
-	// + Hope skins
-	public static final int PATREON_TIER_2 = 10;
+	public static final int PATREON_TIER_1 = 5;
+
 	// + 1 daily buff
 	// + Greed particles
-	// Plots iron → gold block
-	public static final int PATREON_TIER_3 = 20;
+	// + Plot Borders
+	// + Emojis
+	public static final int PATREON_TIER_2 = 10;
+
 	// 1 → 2 daily buffs
 	// + Red and Purple particles
+	// + Free vanity
+	public static final int PATREON_TIER_3 = 20;
 
 
 	static {
