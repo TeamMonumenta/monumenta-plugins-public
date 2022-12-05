@@ -8,7 +8,9 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -89,12 +91,15 @@ public class Excavator implements Enchantment {
 	}
 
 	private void breakBlock(Player player, ItemStack mainHand, Block block, int x, int y, int z) {
+		if (x == 0 && y == 0 && z == 0) {
+			return;
+		}
 		Block relative = block.getRelative(x, y, z);
 		mAlreadyBrokenLocations.add(relative.getLocation());
-		BlockBreakEvent event = new BlockBreakEvent(relative, player);
-		Bukkit.getPluginManager().callEvent(event);
-		if (!event.isCancelled()) {
-			if (canBreakBlock(relative, player)) {
+		if (canBreakBlock(relative, player)) {
+			BlockBreakEvent event = new BlockBreakEvent(relative, player);
+			Bukkit.getPluginManager().callEvent(event);
+			if (!event.isCancelled()) {
 				CoreProtectIntegration.logRemoval(player, relative);
 				relative.breakNaturally(mainHand, true);
 				ItemUtils.damageItem(mainHand, 1, true);
