@@ -256,10 +256,15 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 
 						Location blockLoc = loc.getBlock().getLocation();
 						BoundingBox box = BoundingBox.of(blockLoc, blockLoc.add(1, 1, 1));
+						boolean overlaps = false;
 						for (Player player : PlayerUtils.playersInRange(loc.toCenterLocation(), 3, true)) {
 							if (box.overlaps(player.getBoundingBox())) {
-								continue;
+								overlaps = true;
+								break;
 							}
+						}
+						if (overlaps) {
+							continue;
 						}
 						block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
 						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.7f);
