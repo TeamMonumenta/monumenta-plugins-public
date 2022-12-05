@@ -40,7 +40,7 @@ public class GruesomeAlchemy extends PotionAbility {
 			.shorthandName("GA")
 			.descriptions(
 				"Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. " +
-					"These potions deal 80% of the damage of your Brutal potions and do not afflict damage over time. " +
+					"These potions deal 80% of the magic damage of your Brutal potions and do not afflict damage over time. " +
 					"Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. " +
 					"If Alchemical Artillery is active, left clicking while holding a bow, crossbow, or trident will also swap modes.",
 				"The Slow and Vulnerability are increased to 20%.",

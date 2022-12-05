@@ -79,7 +79,7 @@ public class Bezoar extends Ability {
 					"every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.",
 				"The Bezoar now additionally grants +15% damage from all sources for 8s.",
 				"When a Bezoar would spawn, 10% of the time it will summon a Philosopher's Stone instead. " +
-					"When the Philosopher's Stone is picked up, the player and the Alchemist gain 4 absorption health for 8s and the Alchemist gains 3 potions.")
+					"When the Philosopher's Stone is picked up, the player and the Alchemist gain 4 absorption hearts for 8s and the Alchemist gains 3 potions.")
 			.displayItem(new ItemStack(Material.LIME_CONCRETE, 1));
 
 	private int mKills = 0;
