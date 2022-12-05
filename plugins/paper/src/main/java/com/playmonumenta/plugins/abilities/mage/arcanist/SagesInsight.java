@@ -53,13 +53,16 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			.scoreboardId("SagesInsight")
 			.shorthandName("SgI")
 			.descriptions(
-				String.format("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to %s, but decay every %ss of not gaining one. Once %s Insights are revealed, cooldowns of the previous %s spells cast are refreshed. This sets your Insights back to 0.",
+				String.format("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to %s, " +
+						"but decay every %ss of not gaining one. Once %s Insights are revealed, %s " +
+						"cast is refreshed. This sets your Insights back to 0.",
 					MAX_STACKS,
 					DECAY_TIMER / 20,
 					MAX_STACKS,
-					ABILITIES_COUNT_1
+					(ABILITIES_COUNT_1 == 1) ? "the cooldown of the previous spell"
+						: String.format("the cooldowns of the previous %s spells", ABILITIES_COUNT_1)
 				),
-				String.format("Sage's Insight now refreshes the cooldowns of your previous %s spells upon activating.",
+				String.format("Sage's Insight now refreshes the cooldowns of your previous %s spells, upon activating.",
 					ABILITIES_COUNT_2
 				))
 			.displayItem(new ItemStack(Material.ENDER_EYE, 1));

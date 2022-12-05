@@ -75,7 +75,7 @@ public class Dodging extends Ability {
 			.descriptions(
 				String.format("Blocks an arrow, thrown potion, blaze fireball, or snowball that would have hit you. Cooldown: %ss.",
 					DODGING_COOLDOWN_1 / 20),
-				String.format("The cooldown is reduced to %s s. When this ability is triggered, you gain +%s%% Speed for %ss.",
+				String.format("The cooldown is reduced to %ss. When this ability is triggered, you gain +%s%% Speed for %ss.",
 					DODGING_COOLDOWN_2 / 20,
 					(int) (PERCENT_SPEED * 100),
 					DODGING_SPEED_EFFECT_DURATION / 20),

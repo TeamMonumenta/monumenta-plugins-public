@@ -64,8 +64,9 @@ public class CelestialBlessing extends Ability {
 			.scoreboardId("Celestial")
 			.shorthandName("CB")
 			.descriptions(
-				"When you left-click while sneaking, you and all other players in a %s radius gain +%s%% melee and projectile damage and +%s%% speed for %ss. Cooldown: %ss."
-					.formatted(CELESTIAL_RADIUS,
+				("When you left-click while sneaking, you and all other players in a %s block radius gain +%s%% melee and " +
+					"projectile damage and +%s%% speed for %ss. Cooldown: %ss.")
+					.formatted((long) CELESTIAL_RADIUS,
 						StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
 						StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
 						StringUtils.ticksToSeconds(CELESTIAL_DURATION),
