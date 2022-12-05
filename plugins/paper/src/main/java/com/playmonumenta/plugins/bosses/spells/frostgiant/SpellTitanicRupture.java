@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.growables.GrowableAPI;
+import com.playmonumenta.scriptedquests.growables.GrowableProgress;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -39,6 +41,9 @@ public class SpellTitanicRupture extends Spell {
 
 	//Used to store locations of icicle blocks to delete them
 	private List<Location> mLocs = new ArrayList<>();
+
+	//Stores references to growables that are in progress growing
+	private List<GrowableProgress> mGrowables = new ArrayList<>();
 
 
 	public SpellTitanicRupture(Plugin plugin, LivingEntity boss, Location loc) {
@@ -107,10 +112,12 @@ public class SpellTitanicRupture extends Spell {
 		}
 
 		//Call growable to create the Titanic Rupture Icicle 20 blocks above the player
-		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 		try {
-			scriptedQuestsPlugin.mGrowableManager.grow("titanicruptureicicle", loc.clone().add(0, 20, 0), 1, 10, true);
+			GrowableProgress newGrowable = GrowableAPI.grow("titanicruptureicicle", loc.clone().add(0, 20, 0), 1, 10, true);
+
+			// Add it to the list for now, and when it's done, have it remove itself from the list
+			mGrowables.add(newGrowable);
+			newGrowable.whenComplete((growable) -> mGrowables.remove(growable));
 		} catch (Exception e) {
 			mPlugin.getLogger().warning("Failed to grow scripted quests structure 'titanicruptureicicle': " + e.getMessage());
 			e.printStackTrace();
@@ -219,6 +226,12 @@ public class SpellTitanicRupture extends Spell {
 	@Override
 	public void cancel() {
 		super.cancel();
+
+		/* Need to make a copy of the growables list because it also removes entries from the list when they are cancelled */
+		for (GrowableProgress growable : new ArrayList<>(mGrowables)) {
+			growable.cancel();
+		}
+		mGrowables.clear();
 
 		for (Location loc : mLocs) {
 			Location l = loc.clone();

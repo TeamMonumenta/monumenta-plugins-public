@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.ClockworkAssassination;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.DoomsdayClock;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.MarchingFate;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.MidnightToll;

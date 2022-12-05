@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -625,18 +626,11 @@ public final class Lich extends BossAbilityGroup {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5.0f, 0.5f);
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 150, 0, 0, 0, 0.75).spawnAsBoss();
 						// put out torches by growables
-						com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-						scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager()
-							.getPlugin("ScriptedQuests");
 						try {
-							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlamePxPz",
-								mStart.getLocation().add(23, 21, 23), 1, 3, false);
-							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlameNxPz",
-								mStart.getLocation().add(-23, 21, 23), 1, 3, false);
-							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlameNxNz",
-								mStart.getLocation().add(-23, 21, -23), 1, 3, false);
-							scriptedQuestsPlugin.mGrowableManager.grow("LichNoFlamePxNz",
-								mStart.getLocation().add(23, 21, -23), 1, 3, false);
+							GrowableAPI.grow("LichNoFlamePxPz", mStart.getLocation().add(23, 21, 23), 1, 3, false);
+							GrowableAPI.grow("LichNoFlameNxPz", mStart.getLocation().add(-23, 21, 23), 1, 3, false);
+							GrowableAPI.grow("LichNoFlameNxNz", mStart.getLocation().add(-23, 21, -23), 1, 3, false);
+							GrowableAPI.grow("LichNoFlamePxNz", mStart.getLocation().add(23, 21, -23), 1, 3, false);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -1867,15 +1861,9 @@ public final class Lich extends BossAbilityGroup {
 						top = 1;
 					}
 					// Grow the lich flame using growables
-					com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-					scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager()
-						.getPlugin("ScriptedQuests");
 
 					try {
-						if (scriptedQuestsPlugin != null) {
-							scriptedQuestsPlugin.mGrowableManager.grow("LichFlame", tower.get(top).clone().add(0, 3, 0), 1,
-								4, false);
-						}
+						GrowableAPI.grow("LichFlame", tower.get(top).clone().add(0, 3, 0), 1, 4, false);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

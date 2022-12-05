@@ -32,6 +32,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,7 +46,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -628,10 +628,8 @@ public class FrostGiant extends BossAbilityGroup {
 					this.cancel();
 
 					//Grow the FG statue using growables
-					com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-					scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 					try {
-						scriptedQuestsPlugin.mGrowableManager.grow("FrostGiantStatue", mStartLoc, 1, 2, false);
+						GrowableAPI.grow("FrostGiantStatue", mStartLoc, 1, 2, false);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -785,9 +783,6 @@ public class FrostGiant extends BossAbilityGroup {
 			loc.subtract(FastUtils.cos(radian), 1, FastUtils.sin(radian));
 		}
 
-		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
-
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -795,7 +790,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 				//Instantly spawn the FG statue
 				try {
-					scriptedQuestsPlugin.mGrowableManager.grow("FrostGiantStatue", mStartLoc, 1, 300, false);
+					GrowableAPI.grow("FrostGiantStatue", mStartLoc, 1, 300, false);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -808,7 +803,7 @@ public class FrostGiant extends BossAbilityGroup {
 					@Override
 					public void run() {
 						try {
-							scriptedQuestsPlugin.mGrowableManager.grow("FrostGiantStatueBarrier2", mStartLoc.clone().add(0, 13, 1), 1, 2, false);
+							GrowableAPI.grow("FrostGiantStatueBarrier2", mStartLoc.clone().add(0, 13, 1), 1, 2, false);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

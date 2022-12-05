@@ -8,9 +8,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -106,10 +106,8 @@ public class SpellStonemason extends Spell {
 									return;
 								}
 
-								com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
-								scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin) Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 								try {
-									scriptedQuestsPlugin.mGrowableManager.grow("constructpillar", loc, 1, 7, true);
+									GrowableAPI.grow("constructpillar", loc, 1, 7, true);
 								} catch (Exception e) {
 									mPlugin.getLogger().warning("Failed to grow scripted quests structure 'constructpillar': " + e.getMessage());
 									e.printStackTrace();
