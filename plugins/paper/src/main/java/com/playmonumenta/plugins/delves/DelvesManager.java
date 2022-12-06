@@ -150,6 +150,10 @@ public class DelvesManager implements Listener {
 			//somehow a mobs delve mobs spawned with a distance longer then MAX_PARTY_DISTANCE from the party
 			//if this happens in R3 we need to increase MAX_PARTY_DISTANCE - make a log
 			List<Player> playerInWorld = new ArrayList<>(loc.getWorld().getPlayers());
+			if (playerInWorld.isEmpty()) {
+				MMLog.warning("[DelveManager] No players in world on spawn of a (potential) delve mob");
+				return playerInWorld;
+			}
 			playerInWorld.sort((player1, player2) -> (int) (loc.distance(player1.getLocation()) - loc.distance(player2.getLocation())));
 			Player player = playerInWorld.get(0);
 			MMLog.warning("[DelveManager] Party Empty when spawned a delveMob - Real Distance: " + loc.distance(player.getLocation()));
