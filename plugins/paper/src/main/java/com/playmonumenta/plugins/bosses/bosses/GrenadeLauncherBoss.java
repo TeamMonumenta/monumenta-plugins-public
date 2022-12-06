@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -54,7 +55,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public String SPELL_NAME = "";
 
 		@BossParam(help = "Let you choose the targets of this spell")
-		public EntityTargets BOMB_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET;
+		public EntityTargets BOMB_TARGET = EntityTargets.GENERIC_ONE_PLAYER_TARGET.clone().setFilters(List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT));
 
 		@BossParam(help = "Contains both: the target of the explosion and the radius of the lingering")
 		public EntityTargets EXPLOSION_TARGET = EntityTargets.GENERIC_PLAYER_TARGET;
