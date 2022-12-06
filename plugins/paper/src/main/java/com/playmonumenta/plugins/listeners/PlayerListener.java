@@ -249,7 +249,6 @@ public class PlayerListener implements Listener {
 		ItemStack item = event.getItem();
 		Block block = event.getClickedBlock();
 		Material mat = (block != null) ? block.getType() : Material.AIR;
-		Location location = block.getLocation();
 
 		// Plot Security: If block is in a plot but the player is in adventure, cancel.
 		if (block != null && player != null && player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(block.getLocation())) {
@@ -257,7 +256,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE && ZoneUtils.hasZoneProperty(location, ZoneProperty.RESTRICTED)) {
+		if (player.getGameMode() != GameMode.CREATIVE && block != null && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)) {
 			event.setCancelled(true);
 			event.setUseInteractedBlock(Event.Result.DENY);
 			return;
@@ -291,7 +290,7 @@ public class PlayerListener implements Listener {
 		if (event.useInteractedBlock() != Event.Result.DENY) {
 			if (block != null) {
 				if ((player.getGameMode() == GameMode.ADVENTURE
-					    && ZoneUtils.isInPlot(location))) {
+					&& ZoneUtils.isInPlot(block.getLocation()))) {
 					event.setUseInteractedBlock(Event.Result.DENY);
 					return;
 				}

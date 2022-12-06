@@ -110,13 +110,6 @@ public class AdvancingShadows extends Ability {
 			return;
 		}
 
-		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
-			// Lose Kill chain if last kill tick was over 60 ticks ago.
-			mEnhancementChain = 0;
-		}
-
-		mCanRecast = false;
-
 		// Basically makes sure if the target is in LoS and if there is a path.
 		Location eyeLoc = mPlayer.getEyeLocation();
 		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) Math.ceil(mActivationRange));
@@ -127,12 +120,20 @@ public class AdvancingShadows extends Ability {
 		RaycastData data = ray.shootRaycast();
 
 		LivingEntity entity = data.getEntities().stream()
-			                      .filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t))
-			                      .findFirst()
-			                      .orElse(null);
+			.filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t))
+			.findFirst()
+			.orElse(null);
+
 		if (entity == null) {
 			return;
 		}
+
+		if (isEnhanced() && (mEnhancementKillTick + ENHANCEMENT_CHAIN_DURATION < Bukkit.getCurrentTick())) {
+			// Lose Kill chain if last kill tick was over 60 ticks ago.
+			mEnhancementChain = 0;
+		}
+
+		mCanRecast = false;
 
 		double maxRange = mActivationRange;
 		double origDistance = mPlayer.getLocation().distance(entity.getLocation());
