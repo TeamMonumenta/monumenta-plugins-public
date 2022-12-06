@@ -765,6 +765,10 @@ public class EntityListener implements Listener {
 			return;
 		}
 
+		if (event.getEntity().getScoreboardTags().contains(AlchemicalAberrationBoss.identityTag)) {
+			event.blockList().clear();
+		}
+
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();

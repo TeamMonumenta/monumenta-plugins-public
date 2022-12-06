@@ -71,7 +71,7 @@ public class TwoHanded implements Enchantment {
 			ItemStack mainhand = inventory.getItemInMainHand();
 			if (offhand.getType() == Material.SHIELD && event.getHand() == EquipmentSlot.OFF_HAND) {
 				player.setCooldown(offhand.getType(), 20 * 20);
-			} else if (mainhand.getType() == Material.SHIELD && event.getHand() == EquipmentSlot.OFF_HAND) {
+			} else if (mainhand.getType() == Material.SHIELD && event.getHand() == EquipmentSlot.HAND) {
 				player.setCooldown(mainhand.getType(), 20 * 20);
 			}
 		}
