@@ -127,7 +127,10 @@ public class ScorchedEarth extends MultipleChargeAbility {
 
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (mPlayer.isSneaking() && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())) {
+		if (mPlayer.isSneaking()
+			&& ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
+			&& mAlchemistPotions.isAlchemistPotion(potion)) {
+
 			int ticks = mPlayer.getTicksLived();
 			// Prevent double casting on accident
 			if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
