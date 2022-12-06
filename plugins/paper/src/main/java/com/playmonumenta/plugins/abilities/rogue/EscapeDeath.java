@@ -85,7 +85,7 @@ public class EscapeDeath extends Ability {
 		}
 
 		double absorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, ABSORPTION_HEALTH);
-		if (!event.isBlocked() && !isOnCooldown()) {
+		if (!event.isBlocked() && !isOnCooldown() && event.getSource() != null) {
 			double newHealth = mPlayer.getHealth() - event.getFinalDamage(true);
 			boolean dealDamageLater = newHealth < 0 && newHealth > -absorptionHealth && isLevelTwo();
 			if (newHealth <= TRIGGER_THRESHOLD_HEALTH && (newHealth > 0 || dealDamageLater)) {
