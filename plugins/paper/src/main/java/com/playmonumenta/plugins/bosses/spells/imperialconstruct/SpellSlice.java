@@ -41,6 +41,7 @@ public class SpellSlice extends Spell {
 		if (mRingMode) {
 			runnable = new BukkitRunnable() {
 				private int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks % 10 == 0) {
@@ -134,6 +135,7 @@ public class SpellSlice extends Spell {
 			int finalZMin = zMin;
 			runnable = new BukkitRunnable() {
 				private int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks % 10 == 0) {

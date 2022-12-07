@@ -33,7 +33,7 @@ public class LichJudgementBoss extends BossAbilityGroup {
 		Location loc = mBoss.getLocation().clone().add(23, 0, 0);
 		int playercount = Lich.playersInRange(loc, detectionRange, true).size();
 		double hpdel = 375;
-		double hp = (int) (hpdel * (1 + (1 - 1/Math.E) * Math.log(playercount)));
+		double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.log(playercount)));
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
 		mBoss.setHealth(hp);
 
@@ -42,14 +42,14 @@ public class LichJudgementBoss extends BossAbilityGroup {
 		));
 
 		List<Spell> passives = Arrays.asList(
-				new SpellBossBlockBreak(mBoss, mCenter.getY(), 1, 3, 1, false, false),
-				// Teleport the boss to spawnLoc if he gets too far away from where he spawned
-				new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> loc.distance(b.getLocation()) > 80),
-				// Teleport the boss to spawnLoc if he is stuck in bedrock
-				new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
-																		  b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-																		  b.getLocation().getBlock().getType() == Material.LAVA)
-				);
+			new SpellBossBlockBreak(mBoss, mCenter.getY(), 1, 3, 1, false, false),
+			// Teleport the boss to spawnLoc if he gets too far away from where he spawned
+			new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> loc.distance(b.getLocation()) > 80),
+			// Teleport the boss to spawnLoc if he is stuck in bedrock
+			new SpellConditionalTeleport(mBoss.getVehicle(), mCenter, b -> b.getLocation().getBlock().getType() == Material.BEDROCK ||
+				                                                               b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+				                                                               b.getLocation().getBlock().getType() == Material.LAVA)
+		);
 
 		super.constructBoss(activeSpells, passives, detectionRange, null);
 	}

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
@@ -28,14 +29,12 @@ public class SpellForce extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -44,14 +43,13 @@ public class SpellForce extends SpellBaseAoE {
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.65f);
 		world.playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, 1f, 0.8f);
-		world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3);
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -69,7 +67,7 @@ public class SpellForce extends SpellBaseAoE {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 100, 0));
 				MovementUtils.knockAway(mLauncher, player, 1.2f, false);
 			}
-			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
+			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0).spawnAsEntityActive(mLauncher);
 		}
 	}
 

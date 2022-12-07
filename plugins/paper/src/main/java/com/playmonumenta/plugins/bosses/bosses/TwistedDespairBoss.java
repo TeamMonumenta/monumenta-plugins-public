@@ -24,7 +24,7 @@ public class TwistedDespairBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new SpellTpBehindPlayer(plugin, boss, TP_BEHIND_COOLDOWN)));
+			new SpellTpBehindPlayer(plugin, boss, TP_BEHIND_COOLDOWN)));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 

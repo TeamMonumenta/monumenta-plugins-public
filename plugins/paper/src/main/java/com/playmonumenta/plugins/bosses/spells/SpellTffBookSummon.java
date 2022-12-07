@@ -20,8 +20,8 @@ public class SpellTffBookSummon extends Spell {
 	private final LivingEntity mBoss;
 	private final int mCoolDown = 20 * 20;
 	private final EnumSet<EntityType> mTypes = EnumSet.of(
-			EntityType.VEX
-			);
+		EntityType.VEX
+	);
 	private int mT = 5 * 20;
 
 	public SpellTffBookSummon(Plugin plugin, LivingEntity boss) {
@@ -37,9 +37,9 @@ public class SpellTffBookSummon extends Spell {
 			List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(mBoss.getLocation(), PLAYER_RANGE, mTypes);
 			if (nearbyEntities.size() < MAX_NEARBY_SUMMONS) {
 				//check target
-				if (((mBoss instanceof Mob) && (((Mob)mBoss).getTarget() != null) && (((Mob)mBoss).getTarget() instanceof Player))) {
+				if (((mBoss instanceof Mob) && (((Mob) mBoss).getTarget() != null) && (((Mob) mBoss).getTarget() instanceof Player))) {
 					//check line of sight
-					if (LocationUtils.hasLineOfSight(mBoss, ((Mob)mBoss).getTarget())) {
+					if (LocationUtils.hasLineOfSight(mBoss, ((Mob) mBoss).getTarget())) {
 						mT = mCoolDown;
 						summon();
 					}

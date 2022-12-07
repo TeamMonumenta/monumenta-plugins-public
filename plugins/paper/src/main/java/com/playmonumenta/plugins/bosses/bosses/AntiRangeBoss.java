@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -41,7 +42,7 @@ public class AntiRangeBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			loc.add(0, 1, 0);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.3);
+			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
 			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.2f, 1.5f);
 		}
 	}

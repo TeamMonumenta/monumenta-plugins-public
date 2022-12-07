@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.Samwell;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -116,19 +117,19 @@ public class SpellRealitySlash extends Spell {
 					double yloc = line.getY();
 					double zloc = line.getZ();
 					for (int i = 1; i < 30; i++) {
-						//world.spawnParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0);
+						//new PartialParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0).spawnAsEntityActive(mBoss);
 						Location newLoc = new Location(world, mBossX + (xloc * i), mBossY + (yloc * i), mBossZ + (zloc * i));
 						if (newLoc.getBlock().getType() == Material.AIR) {
-							world.spawnParticle(Particle.SQUID_INK, newLoc, 1, 0.25, 0.25, 0.25, 0);
+							new PartialParticle(Particle.SQUID_INK, newLoc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 						} else {
-							world.spawnParticle(Particle.SQUID_INK, newLoc.add(0, 0.5, 0), 1, 0.25, 0.25, 0.25, 0);
+							new PartialParticle(Particle.SQUID_INK, newLoc.add(0, 0.5, 0), 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
 				world.playSound(mLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.25f, mPitch);
 				world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 1.25f, mPitch);
-				world.spawnParticle(Particle.CLOUD, mLoc, 8, 1, 0.1, 1, 0.25);
-				world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 5, 1, 0.1, 1, 0.25);
+				new PartialParticle(Particle.CLOUD, mLoc, 8, 1, 0.1, 1, 0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SMOKE_LARGE, mLoc, 5, 1, 0.1, 1, 0.25).spawnAsEntityActive(mBoss);
 
 				//Has a max of 3 rifts
 				if (mT >= 20 * 2) {
@@ -145,7 +146,6 @@ public class SpellRealitySlash extends Spell {
 
 	private void createRift(Location loc, List<Player> players) {
 		List<Location> locs = new ArrayList<>();
-		World world = mBoss.getWorld();
 
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
@@ -189,12 +189,12 @@ public class SpellRealitySlash extends Spell {
 
 				locs.add(bLoc);
 				if (bLoc.getBlock().getType() == Material.AIR) {
-					mWorld.spawnParticle(Particle.CLOUD, bLoc, 3, 0.5, 0.5, 0.5, 0.25);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 3, 0.5, 0.5, 0.5, 0.125);
+					new PartialParticle(Particle.CLOUD, bLoc, 3, 0.5, 0.5, 0.5, 0.25).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, bLoc, 3, 0.5, 0.5, 0.5, 0.125).spawnAsEntityActive(mBoss);
 				} else {
 					Location newBLoc = bLoc.clone().add(0, 0.5, 0);
-					mWorld.spawnParticle(Particle.CLOUD, newBLoc, 3, 0.5, 0.5, 0.5, 0.25);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, newBLoc, 3, 0.5, 0.5, 0.5, 0.125);
+					new PartialParticle(Particle.CLOUD, newBLoc, 3, 0.5, 0.5, 0.5, 0.25).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, newBLoc, 3, 0.5, 0.5, 0.5, 0.125).spawnAsEntityActive(mBoss);
 				}
 				mWorld.playSound(bLoc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.HOSTILE, 1, 0.85f);
 
@@ -222,18 +222,18 @@ public class SpellRealitySlash extends Spell {
 				mT += 5;
 				for (Location loc : locs) {
 					if (loc.getBlock().getType() == Material.AIR) {
-						world.spawnParticle(Particle.CLOUD, loc, 1, 0.5, 0.5, 0.5, 0.075);
-						world.spawnParticle(Particle.CRIT, loc, 1, 0.5, 0.5, 0.5, 0.075);
-						world.spawnParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.5, 0.5, 0.5, 0.1);
-						world.spawnParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.5, 0.5, 0.5, 0.1);
+						new PartialParticle(Particle.CLOUD, loc, 1, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CRIT, loc, 1, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 					} else {
 						Location newLoc = loc.clone().add(0, 0.5, 0);
-						world.spawnParticle(Particle.CLOUD, newLoc, 1, 0.5, 0.5, 0.5, 0.075);
-						world.spawnParticle(Particle.CRIT, newLoc, 1, 0.5, 0.5, 0.5, 0.075);
-						world.spawnParticle(Particle.REDSTONE, newLoc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, newLoc, 1, 0.5, 0.5, 0.5, 0.1);
-						world.spawnParticle(Particle.DAMAGE_INDICATOR, newLoc, 1, 0.5, 0.5, 0.5, 0.1);
+						new PartialParticle(Particle.CLOUD, newLoc, 1, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CRIT, newLoc, 1, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.REDSTONE, newLoc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, newLoc, 1, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, newLoc, 1, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 					}
 					BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
 					for (Player player : players) {

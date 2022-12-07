@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -86,7 +87,8 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 				private final Mob mMob = (Mob) mBoss;
 				private Location mLastLocation = mMob.getLocation();
 
-				@Override public void run() {
+				@Override
+				public void run() {
 					if (mBoss.getScoreboardTags().contains(STOP_PLACING_BLOCK) || ZoneUtils.hasZoneProperty(mBoss, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 						return;
 					}
@@ -106,7 +108,8 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 					}
 				}
 
-				@Override public int cooldownTicks() {
+				@Override
+				public int cooldownTicks() {
 					return 0;
 				}
 
@@ -180,7 +183,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 										/* Only allow bosses to break blocks in areas where explosions are allowed */
 										testloc.getBlock().setType(Material.AIR);
 										loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.2f, 0.6f);
-										loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+										new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 										destroyedBlock = true;
 									}
 								} else if (y > 0 && material.isSolid() && isBreakable(block, material)) {
@@ -205,7 +208,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						}
 						if (badBlockList.size() > 0) {
 							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
-							loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 							destroyedBlock = true;
 						}
 					}
@@ -281,7 +284,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 
 				private static boolean isBreakable(Block block, Material material) {
 					return !IGNORED_MATERIALS.contains(material) && material.isSolid() &&
-						       (!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable());
+						       (!(block.getState() instanceof Lootable) || !((Lootable) block.getState()).hasLootTable());
 				}
 			}
 		);

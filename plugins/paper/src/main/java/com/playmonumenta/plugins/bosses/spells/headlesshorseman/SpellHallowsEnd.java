@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -50,27 +51,28 @@ public class SpellHallowsEnd extends Spell {
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 2, 0.85f);
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
 				if (mTicks % 2 == 0) {
 					for (int i = 0; i < 15; i++) {
-						world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05);
+						new PartialParticle(Particle.FLAME, loc.clone().add(0, i, 0), 3, 0.2, 0.2, 0.2, 0.05).spawnAsEntityActive(mBoss);
 					}
 				}
 
 				if (mTicks >= 25) {
 					this.cancel();
 					for (int i = 0; i < 15; i++) {
-						world.spawnParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, i, 0), 5, 0.2, 0.2, 0.2, 0.1);
-						world.spawnParticle(Particle.FLAME, loc.clone().add(0, i, 0), 8, 0.2, 0.2, 0.2, 0.125);
+						new PartialParticle(Particle.SMOKE_NORMAL, loc.clone().add(0, i, 0), 5, 0.2, 0.2, 0.2, 0.1).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.FLAME, loc.clone().add(0, i, 0), 8, 0.2, 0.2, 0.2, 0.125).spawnAsEntityActive(mBoss);
 					}
 
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.75f);
-					world.spawnParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.15);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
-					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15);
-					world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 3.5, true)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							int mNDT = player.getNoDamageTicks();

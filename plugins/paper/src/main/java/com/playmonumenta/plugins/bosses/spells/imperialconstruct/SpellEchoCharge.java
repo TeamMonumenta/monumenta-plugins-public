@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -12,7 +13,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
@@ -103,6 +109,7 @@ public class SpellEchoCharge extends Spell {
 					// Execute ability after charging
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mT = 0;
+
 						@Override
 						public synchronized void cancel() {
 							super.cancel();
@@ -167,8 +174,8 @@ public class SpellEchoCharge extends Spell {
 		for (int i = 0; i < LINE_LENGTH; i++) {
 			chargeBox1.shift(baseVector1);
 			if (i % 4 == 0) {
-				world.spawnParticle(Particle.ELECTRIC_SPARK, chargeBox1.getCenter().toLocation(world), 6, 3.5, 0.1, 3.5, 0.01);
-				world.spawnParticle(Particle.WAX_ON, chargeBox1.getCenter().toLocation(world), 2, 3.5, 0.1, 3.5, 0.01);
+				new PartialParticle(Particle.ELECTRIC_SPARK, chargeBox1.getCenter().toLocation(world), 6, 3.5, 0.1, 3.5, 0.01).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.WAX_ON, chargeBox1.getCenter().toLocation(world), 2, 3.5, 0.1, 3.5, 0.01).spawnAsEntityActive(mBoss);
 			}
 		}
 
@@ -184,28 +191,28 @@ public class SpellEchoCharge extends Spell {
 
 
 		// Start 1 Spot
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLine1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
 
 		// Start 2 Spot
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLine2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
 
 		// End 1 Spot
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLineEnd1, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
 
 		// End 2 Spot
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05);
-		world.spawnParticle(Particle.WAX_ON, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.ELECTRIC_SPARK, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.WAX_ON, telegraphLineEnd2, 1, 0.35, 0.5, 0.35, 0.05).spawnAsEntityActive(mBoss);
 
 		new PPLine(Particle.ELECTRIC_SPARK, telegraphLine1, telegraphLineEnd1).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
 		new PPLine(Particle.WAX_ON, telegraphLine1, telegraphLineEnd1).shiftStart(0.75).countPerMeter(1).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsBoss();
@@ -227,6 +234,7 @@ public class SpellEchoCharge extends Spell {
 		}
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Vector baseVector = endLoc.clone().subtract(startLoc).toVector();
@@ -235,9 +243,9 @@ public class SpellEchoCharge extends Spell {
 				if (mTicks > 0 && mTicks < 20 * 2) {
 					for (int i = 0; i < LINE_LENGTH; i++) {
 						chargeBox.shift(baseVector);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, chargeBox.getCenter().toLocation(world), 1, 4, 3, 4, 0.05);
-						world.spawnParticle(Particle.ELECTRIC_SPARK, chargeBox.getCenter().toLocation(world), 2, 4, 3, 4, 0.05);
-						for (Player player: nearbyPlayers) {
+						new PartialParticle(Particle.EXPLOSION_NORMAL, chargeBox.getCenter().toLocation(world), 1, 4, 3, 4, 0.05).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.ELECTRIC_SPARK, chargeBox.getCenter().toLocation(world), 2, 4, 3, 4, 0.05).spawnAsEntityActive(mBoss);
+						for (Player player : nearbyPlayers) {
 							if (chargeBox.contains(player.getLocation().toVector())) {
 								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MELEE, mDamage, null, false, true);
 							}
@@ -248,7 +256,7 @@ public class SpellEchoCharge extends Spell {
 				if (mTicks >= 20 * 2) {
 					for (int i = 0; i < LINE_LENGTH; i++) {
 						chargeBox.shift(baseVector);
-						world.spawnParticle(Particle.VILLAGER_ANGRY, chargeBox.getCenter().toLocation(world), 25, 5, 3, 5, 0.05);
+						new PartialParticle(Particle.VILLAGER_ANGRY, chargeBox.getCenter().toLocation(world), 25, 5, 3, 5, 0.05).spawnAsEntityActive(mBoss);
 					}
 					this.cancel();
 				}

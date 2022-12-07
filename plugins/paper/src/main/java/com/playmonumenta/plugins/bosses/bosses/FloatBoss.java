@@ -20,8 +20,8 @@ public class FloatBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-		                                new SpellFloat(boss)
-		                            );
+			new SpellFloat(boss)
+		);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

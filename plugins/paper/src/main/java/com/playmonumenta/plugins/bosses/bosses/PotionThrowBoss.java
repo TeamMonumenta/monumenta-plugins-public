@@ -113,7 +113,8 @@ public class PotionThrowBoss extends BossAbilityGroup {
 							tp.setVelocity(potVelocity.normalize().multiply(potSpeed));
 							tp.setMetadata(potionTag, new FixedMetadataValue(mPlugin, null));
 							new BukkitRunnable() {
-								@Override public void run() {
+								@Override
+								public void run() {
 									if (!tp.isValid() || tp.isDead()) {
 										cancel();
 										return;
@@ -130,7 +131,8 @@ public class PotionThrowBoss extends BossAbilityGroup {
 					return mParams.COOLDOWN;
 				}
 
-				@Override public boolean canRun() {
+				@Override
+				public boolean canRun() {
 					return !mParams.THROWING_TARGET.getTargetsList(mBoss).isEmpty();
 				}
 			}
@@ -154,6 +156,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 				new BukkitRunnable() {
 					double mCurrentRadius = mParams.ENEMIES_TARGET.getRange() / 10;
 					final double mRadiusIncrease = mCurrentRadius;
+
 					@Override
 					public void run() {
 						for (int i = 0; i < 360; i += 15) {
@@ -191,6 +194,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 				new BukkitRunnable() {
 					double mCurrentRadius = mParams.ALLY_TARGET.getRange() / 10;
 					final double mRadiusIncrease = mCurrentRadius;
+
 					@Override
 					public void run() {
 						for (int i = 0; i < 360; i += 15) {
@@ -213,7 +217,6 @@ public class PotionThrowBoss extends BossAbilityGroup {
 				mParams.EFFECTS_ALLY.apply(allay, mBoss);
 			}
 		}
-
 
 
 	}

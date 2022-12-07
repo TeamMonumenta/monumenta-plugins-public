@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraJump;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraPassiveSummon;
 import com.playmonumenta.plugins.bosses.spells.shura.SpellShuraSmoke;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -109,7 +110,9 @@ public class CShura extends BossAbilityGroup {
 			};
 			new BukkitRunnable() {
 				int mT = 0;
-				@Override public void run() {
+
+				@Override
+				public void run() {
 					if (mT < dio1.length) {
 						for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
 							p.sendMessage(suffix + dio1[mT]);
@@ -144,7 +147,9 @@ public class CShura extends BossAbilityGroup {
 		mCutscene = true;
 		new BukkitRunnable() {
 			int mT = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				if (mT < dio.length) {
 					for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
 						p.sendMessage(suffix + dio[mT]);
@@ -205,7 +210,7 @@ public class CShura extends BossAbilityGroup {
 			loc.add(sideways.multiply(3));
 			for (int i = 0; i < 3; i++) {
 				if (loc.getBlock().isPassable()) {
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
 
 					mBoss.teleport(loc);
@@ -237,7 +242,9 @@ public class CShura extends BossAbilityGroup {
 		};
 		new BukkitRunnable() {
 			int mT = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				List<Player> players = PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true);
 				if (mT < ded.length) {
 					for (Player p : players) {

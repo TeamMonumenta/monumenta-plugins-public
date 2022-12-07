@@ -6,10 +6,16 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -87,12 +93,13 @@ public class SuspendedBallistae extends Spell {
 			.spawnAsBoss();
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (mT % 2 == 0) {
 					world.playSound(shotLoc, Sound.ENTITY_CAT_HISS, 0.1f, 1.5f);
 				}
-				world.spawnParticle(Particle.WAX_OFF, shotLoc, 5, 0.2, 0.2, 0.2, 0.05);
+				new PartialParticle(Particle.WAX_OFF, shotLoc, 5, 0.2, 0.2, 0.2, 0.05).spawnAsEntityActive(mBoss);
 				new PPCircle(Particle.SMOKE_LARGE, targetLoc, mRadius)
 					.count(7)
 					.ringMode(true)

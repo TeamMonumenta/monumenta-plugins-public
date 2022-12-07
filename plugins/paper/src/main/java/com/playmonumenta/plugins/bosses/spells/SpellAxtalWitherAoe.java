@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
@@ -26,14 +27,12 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 25, 6, 3, 6);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 25, 6, 3, 6).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.25, 0.25, 0.25, 0, null, true);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.25, 0.25, 0.25, 0, null, true).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -42,13 +41,12 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 1f);
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 1.5f);
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 125, 0, 0, 0, 0.5, null, true);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 125, 0, 0, 0, 0.5, null, true).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.35, null, true);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.35, null, true).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

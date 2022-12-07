@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -44,32 +45,34 @@ public class SpellBeeBombs extends Spell {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
 
 				if (mTicks >= 30) {
 					this.cancel();
-					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125);
+					new PartialParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125).spawnAsEntityActive(mBoss);
 
 					LivingEntity bat = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ExplosiveDrone");
 					new BukkitRunnable() {
 						int mTicks = 0;
+
 						@Override
 						public void run() {
 							mTicks++;
 							if (mTicks % 2 == 0) {
-								world.spawnParticle(Particle.FLAME, bat.getLocation(), 1, 0.25, .25, .25, 0.025);
-								world.spawnParticle(Particle.SMOKE_NORMAL, bat.getLocation(), 2, 0.25, .25, .25, 0.025);
+								new PartialParticle(Particle.FLAME, bat.getLocation(), 1, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SMOKE_NORMAL, bat.getLocation(), 2, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
 							}
 							if (mTicks >= 20 * 6) {
 								bat.remove();
 								this.cancel();
 								Location loc = bat.getLocation();
-								world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.15);
-								world.spawnParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1);
-								world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15);
-								world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+								new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {
@@ -95,20 +98,21 @@ public class SpellBeeBombs extends Spell {
 		World world = mBoss.getWorld();
 		for (int i = 0; i < mCount; i++) {
 			Location loc = new Location(
-			    world,
-			    mCenter.getX() + FastUtils.randomDoubleInRange(-15, 15),
-			    mCenter.getY() + FastUtils.randomDoubleInRange(1, 3),
-			    mCenter.getZ() + FastUtils.randomDoubleInRange(-15, 15)
+				world,
+				mCenter.getX() + FastUtils.randomDoubleInRange(-15, 15),
+				mCenter.getY() + FastUtils.randomDoubleInRange(1, 3),
+				mCenter.getZ() + FastUtils.randomDoubleInRange(-15, 15)
 			);
 			spawnBat(loc);
 		}
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 3, 1.1f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 3, 0.75f);
-		world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.1);
+		new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.1).spawnAsEntityActive(mBoss);
 		new BukkitRunnable() {
 			int mTicks = 0;
 			Location mLoc = mBoss.getLocation().add(0, 1, 0);
+
 			@Override
 			public void run() {
 				mTicks++;
@@ -118,12 +122,12 @@ public class SpellBeeBombs extends Spell {
 					return;
 				}
 
-				world.spawnParticle(Particle.SMOKE_NORMAL, mLoc, 5, 0.4, .4, .4, 0.025);
+				new PartialParticle(Particle.SMOKE_NORMAL, mLoc, 5, 0.4, .4, .4, 0.025).spawnAsEntityActive(mBoss);
 				if (mTicks >= 50) {
 					this.cancel();
-					world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 5, 0.4, .4, .4, 0.125);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.09);
-					world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 40, 0.4, .4, .4, 0.1);
+					new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 5, 0.4, .4, .4, 0.125).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.09).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 40, 0.4, .4, .4, 0.1).spawnAsEntityActive(mBoss);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 0.65f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 3, 0.75f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 3, 1f);

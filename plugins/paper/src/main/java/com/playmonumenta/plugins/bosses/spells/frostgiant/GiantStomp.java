@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -50,6 +51,7 @@ public class GiantStomp extends Spell {
 
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						Location loc = mBoss.getLocation();
@@ -66,7 +68,7 @@ public class GiantStomp extends Spell {
 								vec = new Vector(FastUtils.cos(radian1) * i, 0, FastUtils.sin(radian1) * i);
 								vec = VectorUtils.rotateYAxis(vec, 5);
 								Location l = loc.clone().add(vec);
-								world.spawnParticle(Particle.REDSTONE, l, 5, 0.1, 1, 0.1, 0.1, BLUE_COLOR);
+								new PartialParticle(Particle.REDSTONE, l, 5, 0.1, 1, 0.1, 0.1, BLUE_COLOR).spawnAsEntityActive(mBoss);
 							}
 						}
 

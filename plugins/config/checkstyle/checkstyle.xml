@@ -200,10 +200,18 @@
 			<property name="message" value="Indent must use tab characters"/>
 			<property name="ignoreComments" value="true"/>
 		</module>
+		<!-- Require ignoreCancelled attribute in @EventHandlers -->
 		<module name="RegexpSinglelineJava">
 			<property name="format" value="@EventHandler(?!.*ignoreCancelled.*)"/>
 			<property name="ignoreComments" value="true"/>
 			<property name="message" value="Event handlers must specify ignoreCancelled"/>
+		</module>
+		<!-- Disallow using World.spawnParticle() directly -->
+		<module name="RegexpSinglelineJava">
+			<property name="format" value="\.spawnParticle\("/>
+			<property name="ignoreComments" value="true"/>
+			<property name="message"
+					  value="Do not use World.spawnParticle() directly - use one of the PartialParticle classes"/>
 		</module>
 		<module name="Regexp">
 			<property name="format" value="[ \t]+$"/>

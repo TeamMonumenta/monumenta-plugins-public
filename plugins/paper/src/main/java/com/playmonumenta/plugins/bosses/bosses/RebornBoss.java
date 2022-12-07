@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
 import org.bukkit.Particle;
@@ -69,10 +70,11 @@ public class RebornBoss extends BossAbilityGroup {
 			}
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
 					mT++;
-					world.spawnParticle(Particle.TOTEM, mBoss.getEyeLocation(), 4, 0, 0, 0, 0.35);
+					new PartialParticle(Particle.TOTEM, mBoss.getEyeLocation(), 4, 0, 0, 0, 0.35).spawnAsEntityActive(mBoss);
 					if (mT > 20 * 2) {
 						this.cancel();
 					}

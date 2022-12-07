@@ -113,7 +113,8 @@ public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 		}
 	}
 
-	@Override public boolean canRun() {
+	@Override
+	public boolean canRun() {
 		return !mCooldown;
 	}
 

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -46,13 +47,13 @@ public class SpellAxtalTntThrow extends Spell {
 			@Override
 			public void run() {
 				mLauncher.teleport(loc);
-				loc.getWorld().spawnParticle(Particle.LAVA, loc, 2, 0, 0, 0, 0.01);
+				new PartialParticle(Particle.LAVA, loc, 2, 0, 0, 0, 0.01).spawnAsEntityActive(mLauncher);
 			}
 		};
 		Runnable particles2 = new Runnable() {
 			@Override
 			public void run() {
-				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 4, 0, 0, 0, 0.07);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 4, 0, 0, 0, 0.07).spawnAsEntityActive(mLauncher);
 				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.77F);
 			}
 		};

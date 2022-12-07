@@ -38,13 +38,13 @@ public class SpellFloat extends Spell {
 			mFloater.getLocation().add(new Vector(1, -1, 0)),
 			mFloater.getLocation().add(new Vector(0, -1, -1)),
 			mFloater.getLocation().add(new Vector(0, -1, 1)),
-		};
+			};
 		Location[] potentialWaterExits = {
 			mFloater.getLocation().add(new Vector(-1, 0, 0)),
 			mFloater.getLocation().add(new Vector(1, 0, 0)),
 			mFloater.getLocation().add(new Vector(0, 0, -1)),
 			mFloater.getLocation().add(new Vector(0, 0, 1)),
-		};
+			};
 		Location blockAbove = entityEyes.add(new Vector(0, 1, 0));
 
 		// This is the actual floating code
@@ -57,8 +57,8 @@ public class SpellFloat extends Spell {
 
 		// Keep track of how long the entity has been in approximately the same spot
 		if (Math.abs(entityFeet.getX() - mPrevLoc.getX()) > HORIZONTAL_MOVEMENT_ALLOWANCE ||
-			Math.abs(entityFeet.getZ() - mPrevLoc.getZ()) > HORIZONTAL_MOVEMENT_ALLOWANCE ||
-			Math.abs(entityFeet.getY() - mPrevLoc.getY()) > VERTICAL_MOVEMENT_ALLOWANCE) {
+			    Math.abs(entityFeet.getZ() - mPrevLoc.getZ()) > HORIZONTAL_MOVEMENT_ALLOWANCE ||
+			    Math.abs(entityFeet.getY() - mPrevLoc.getY()) > VERTICAL_MOVEMENT_ALLOWANCE) {
 			mTicksInSamePos = 0;
 		} else {
 			mTicksInSamePos++;
@@ -71,8 +71,8 @@ public class SpellFloat extends Spell {
 			if (entityFeet.getBlock().isLiquid() && !entityEyes.getBlock().isLiquid()) {
 				for (int i = 0; i < 4; i++) {
 					if (potentialWaterExits[i].getBlock().getType().isSolid() &&
-					    potentialWaterExits[i].add(new Vector(0, 1, 0)).getBlock().isPassable() &&
-					    potentialWaterExits[i].add(new Vector(0, 2, 0)).getBlock().isPassable()) {
+						    potentialWaterExits[i].add(new Vector(0, 1, 0)).getBlock().isPassable() &&
+						    potentialWaterExits[i].add(new Vector(0, 2, 0)).getBlock().isPassable()) {
 						this.jump(true, i);
 						mJumpCooldown = JUMP_COOLDOWN;
 						break;
@@ -81,8 +81,8 @@ public class SpellFloat extends Spell {
 			} else if (mFloater.getLocation().getBlock().isPassable() && !entityEyes.getBlock().isLiquid()) {
 				for (int i = 0; i < 4; i++) {
 					if (potentialWaterEntrances[i].getBlock().isLiquid() &&
-					    potentialWaterEntrances[i].add(new Vector(0, 1, 0)).getBlock().isPassable() &&
-					    potentialWaterEntrances[i].add(new Vector(0, 2, 0)).getBlock().isPassable()) {
+						    potentialWaterEntrances[i].add(new Vector(0, 1, 0)).getBlock().isPassable() &&
+						    potentialWaterEntrances[i].add(new Vector(0, 2, 0)).getBlock().isPassable()) {
 						this.jump(false, i);
 						mJumpCooldown = JUMP_COOLDOWN;
 						break;

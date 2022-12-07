@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSlice;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellSteelboreSpread;
 import com.playmonumenta.plugins.bosses.spells.imperialconstruct.SpellStonemason;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -651,6 +652,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 		if (event.getEntity().getKiller() != null) {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks >= 20 * 5) {
@@ -669,7 +671,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 					if (mTicks % 10 == 0) {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 					}
-					world.spawnParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1);
+					new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 
 					mTicks += 2;
 				}

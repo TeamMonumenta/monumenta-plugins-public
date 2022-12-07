@@ -36,7 +36,7 @@ public class SpellSummonBlueStrike extends Spell {
 	private final Plugin mPlugin;
 
 	public SpellSummonBlueStrike(Plugin plugin, LivingEntity boss, Location center, HashMap<Double, LoSPool> weights, int timeBetween,
-								 int innerCircleR, int outerCircleR) {
+	                             int innerCircleR, int outerCircleR) {
 		mBoss = boss;
 		mWeights = weights;
 		mTimeBetween = timeBetween;

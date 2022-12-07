@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -90,9 +91,9 @@ public class MarchingFate extends Spell {
 			}
 			if (distance <= 0.6 && !mHasRun) {
 				marcher.teleport(mCenter);
-				world.spawnParticle(Particle.EXPLOSION_HUGE, mCenter.clone().add(0, 3, 0), 25, 11, 3, 11);
-				world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mCenter, 40, 17, 1, 17);
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, mCenter.clone().add(0, 3, 0), 40, 17, 3, 17);
+				new PartialParticle(Particle.EXPLOSION_HUGE, mCenter.clone().add(0, 3, 0), 25, 11, 3, 11).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mCenter, 40, 17, 1, 17).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, mCenter.clone().add(0, 3, 0), 40, 17, 3, 17).spawnAsEntityActive(mBoss);
 				world.playSound(mCenter, Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0.8f);
 				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 0.5f);
 				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
@@ -122,7 +123,8 @@ public class MarchingFate extends Spell {
 
 		if (mT % 10 == 0) {
 			// Damage players if there are marchers too close to each other
-			outer: for (Entity marcher : mMarchers) {
+			outer:
+			for (Entity marcher : mMarchers) {
 				Location loc = marcher.getLocation();
 				if (loc.distance(mCenter) < PROXIMITY) {
 					continue;
@@ -146,7 +148,7 @@ public class MarchingFate extends Spell {
 
 						Vector between = LocationUtils.getVectorTo(eLoc, loc).normalize();
 						for (double i = 0; i < distance; i += distance / 5) {
-							world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(between.clone().multiply(i)).add(0, 1.5, 0), 3, 0.2, 0.2, 0.2, 0);
+							new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(between.clone().multiply(i)).add(0, 1.5, 0), 3, 0.2, 0.2, 0.2, 0).spawnAsEntityActive(mBoss);
 						}
 
 						obfuscation = 4;

@@ -4,6 +4,7 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -62,14 +63,14 @@ public class SpellSpinDown extends Spell {
 		Location secondLoc = bossLoc.clone().add(0, 1, 0);
 		World world = mStartLoc.getWorld();
 		world.playSound(bossLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, secondLoc, 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.CLOUD, secondLoc, 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, secondLoc, 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, secondLoc, 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(mStartLoc.clone().add(0, 1, 0));
 		world.playSound(bossLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, secondLoc, 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, secondLoc, 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, secondLoc, 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, secondLoc, 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, bossLoc, 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 
 		FrostGiant.delayHailstormDamage();
 
@@ -103,7 +104,7 @@ public class SpellSpinDown extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.HOSTILE, 4, mPitch);
 					mPitch += 0.01f;
 
-					world.spawnParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 2, 0), 5, 1, 0.35, 1, 0.25, Material.FROSTED_ICE.createBlockData());
+					new PartialParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 2, 0), 5, 1, 0.35, 1, 0.25, Material.FROSTED_ICE.createBlockData()).spawnAsEntityActive(mBoss);
 				}
 
 				//Shoots out ice blocks every third tick after 3 seconds
@@ -116,6 +117,7 @@ public class SpellSpinDown extends Spell {
 
 					new BukkitRunnable() {
 						int mTicks = 0;
+
 						@Override
 						public void run() {
 							//Once the ice touches the ground or after 5 seconds, create a 4*4 square of damaging frosted ice (cracked)
@@ -174,6 +176,7 @@ public class SpellSpinDown extends Spell {
 		//Revert frosted ice after 60 seconds, and also damage players that step on it during that
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 
@@ -219,7 +222,7 @@ public class SpellSpinDown extends Spell {
 				}
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
-					    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
+						    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
 						Vector vel = player.getVelocity();
 						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Frosted Ice");
 						player.setVelocity(vel);

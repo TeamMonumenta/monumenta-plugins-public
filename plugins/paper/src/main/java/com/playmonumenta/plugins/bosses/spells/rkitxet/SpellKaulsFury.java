@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.rkitxet;
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -85,9 +86,9 @@ public class SpellKaulsFury extends Spell {
 
 						double completionRatio = ((double) mT) / mChargeTime;
 						double chargingRadius = RADIUS * completionRatio;
-						world.spawnParticle(Particle.SPELL_WITCH, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0);
-						world.spawnParticle(Particle.FLAME, mLocation, 8 + (int) (completionRatio * 25), chargingRadius / 2, chargingRadius / 2, chargingRadius / 2, 0);
-						world.spawnParticle(Particle.SMOKE_LARGE, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0);
+						new PartialParticle(Particle.SPELL_WITCH, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.FLAME, mLocation, 8 + (int) (completionRatio * 25), chargingRadius / 2, chargingRadius / 2, chargingRadius / 2, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SMOKE_LARGE, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0).spawnAsEntityActive(mBoss);
 
 						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
 						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
@@ -100,11 +101,11 @@ public class SpellKaulsFury extends Spell {
 
 						// 5.0 because 5 ticks and mImpactTime is in ticks, and to make it a double
 						mLocation = mLocation.subtract(0, (5.0 * HEIGHT) / mImpactTime, 0);
-						world.spawnParticle(Particle.SPELL_WITCH, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
-						world.spawnParticle(Particle.FLAME, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0);
-						world.spawnParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0);
-						world.spawnParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
-						world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
+						new PartialParticle(Particle.SPELL_WITCH, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.FLAME, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
 
 						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
 						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
@@ -128,12 +129,12 @@ public class SpellKaulsFury extends Spell {
 						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
 
 						ParticleUtils.explodingRingEffect(mPlugin, mLocation, RADIUS, 1, 4,
-								Arrays.asList(
-										new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-											world.spawnParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.1);
-											world.spawnParticle(Particle.SMOKE_LARGE, location, 1, 0.1, 0.1, 0.1, 0.1);
-										})
-								));
+							Arrays.asList(
+								new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+									new PartialParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.SMOKE_LARGE, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
+								})
+							));
 
 						mRKitxet.setFuryTarget(null);
 						this.cancel();

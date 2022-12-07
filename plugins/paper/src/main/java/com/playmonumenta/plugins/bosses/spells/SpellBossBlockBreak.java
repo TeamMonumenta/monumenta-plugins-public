@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,18 +36,18 @@ public class SpellBossBlockBreak extends Spell {
 	private List<Material> mNoBreak;
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-			Material.AIR,
-			Material.COMMAND_BLOCK,
-			Material.CHAIN_COMMAND_BLOCK,
-			Material.REPEATING_COMMAND_BLOCK,
-			Material.BEDROCK,
-			Material.BARRIER,
-			Material.SPAWNER,
-			Material.WATER,
-			Material.LAVA,
-			Material.END_PORTAL,
-			Material.LIGHT
-		);
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER,
+		Material.WATER,
+		Material.LAVA,
+		Material.END_PORTAL,
+		Material.LIGHT
+	);
 
 	/*
 	 * for world bosses only
@@ -94,7 +95,7 @@ public class SpellBossBlockBreak extends Spell {
 		if (target.getLocation().getY() > mDepth + 0.5 && target.getLocation().getY() >= mBoss.getLocation().getY() + 0.5) {
 			mINC++;
 			if (target.getLocation().getY() >= mBoss.getLocation().getY() + 1 && target.getLocation().getY() >= mBoss.getLocation().getY() + 0.5
-					&& mBoss.getLocation().distance(target.getLocation()) < 6 && mINC > 5) {
+				    && mBoss.getLocation().distance(target.getLocation()) < 6 && mINC > 5) {
 				l = target.getLocation();
 				l.setY(target.getLocation().getY() - 2);
 				shift = 0;
@@ -144,7 +145,7 @@ public class SpellBossBlockBreak extends Spell {
 				}
 			}
 			l.getWorld().playSound(l, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
-			l.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, l, 6, 1, 1, 1, 0.03);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, l, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mBoss);
 		}
 	}
 

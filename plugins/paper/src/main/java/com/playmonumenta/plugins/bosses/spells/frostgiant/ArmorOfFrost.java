@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -118,12 +119,12 @@ public class ArmorOfFrost extends Spell {
 
 		if (mBossClass.mFrostArmorActive) {
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
-			world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 40, 0, 0, 0, 1);
-			world.spawnParticle(Particle.CRIT, mBoss.getLocation(), 40, 0, 0, 0, 1);
-			world.spawnParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE));
+			new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.CRIT, mBoss.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
 			mLevel -= 1;
 			if (mLevel <= 0) {
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 4, 0), 50, 0.5, 0.5, 0.5, 0.3);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation().add(0, 4, 0), 50, 0.5, 0.5, 0.5, 0.3).spawnAsEntityActive(mBoss);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 3, 2);
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 3, 2);
 				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), FrostGiant.detectionRange, "tellraw @s [\"\",{\"text\":\"The icicle pierces the armor, shattering it.\",\"color\":\"aqua\"}]");
@@ -169,7 +170,6 @@ public class ArmorOfFrost extends Spell {
 
 	private void runAnimation() {
 
-		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 		Location tempLoc = loc.clone();
 
@@ -178,15 +178,15 @@ public class ArmorOfFrost extends Spell {
 				//Each level adds one ring up to level 3. At level 3, all three rings
 				if (mLevel >= 1) {
 					tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 4, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 4, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 				}
 				if (mLevel >= 2) {
 					tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 2, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 2, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 				}
 				if (mLevel >= 3) {
 					tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 6, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc.add(3 * FastUtils.cos(deg), 6, 3 * FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 				}
 			}
 		}

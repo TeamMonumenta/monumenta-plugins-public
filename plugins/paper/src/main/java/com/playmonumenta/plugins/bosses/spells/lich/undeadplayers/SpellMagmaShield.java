@@ -51,6 +51,7 @@ public class SpellMagmaShield extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1, 0.8f);
 		BukkitRunnable runA = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
@@ -73,6 +74,7 @@ public class SpellMagmaShield extends Spell {
 					}
 					BukkitRunnable runB = new BukkitRunnable() {
 						double mRadius = 0;
+
 						@Override
 						public void run() {
 							if (mRadius == 0) {

@@ -34,6 +34,7 @@ public class PunchResistBoss extends BossAbilityGroup {
 		if (damager instanceof Projectile) {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					mBoss.setVelocity(new Vector(0, 0, 0));

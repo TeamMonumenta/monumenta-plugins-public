@@ -13,14 +13,13 @@ import org.bukkit.potion.PotionEffectType;
 
 /**
  * @deprecated use boss_onhit instead, like this:
- *<blockquote><pre>
+ * <blockquote><pre>
  * /boss var Tags add boss_onhit
  * /boss var Tags add boss_onhit[effects=[(WITHER,80,1)]]
  * CARE this ability has some particle and sound, fix those too if you don't want the default values
  * </pre></blockquote>
  * G3m1n1Boy
- *
-*/
+ */
 @Deprecated
 public class WitherHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_witherhit";

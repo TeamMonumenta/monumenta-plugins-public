@@ -40,7 +40,7 @@ public class SpellBaseSummon extends Spell {
 	public interface SummonMobAt {
 		/**
 		 * Given a valid locationto target, summon the mob
-		 *
+		 * <p>
 		 * Must return the entity spawned for cancellation purposes
 		 */
 		@Nullable Entity run(Location loc, int times);
@@ -72,19 +72,19 @@ public class SpellBaseSummon extends Spell {
 	private List<Location> mLocations = new ArrayList<>();
 
 	/**
-	 * @param plugin                Plugin
-	 * @param boss                  the entity that will cast this spell
-	 * @param cooldown              cooldown
-	 * @param summoningDuration     how much the summoning will last
-	 * @param summonRange           range of how distance the spawn can be
-	 * @param canBeStopped          if the spell can be stopped when the bos is stunned
-	 * @param canMove               if the bos can move while casting
-	 * @param singleTarget          if the spell will only launch at one random pos
-	 * @param summonQuantity        return the number of mob that will be spawned at each pos
-	 * @param spawningLocations     return a list of spawning locations
-	 * @param summonMob             return the mob spawned at the given location
-	 * @param bossAnimation         animation for the boss
-	 * @param summonAnimation       animation for each summon mob
+	 * @param plugin            Plugin
+	 * @param boss              the entity that will cast this spell
+	 * @param cooldown          cooldown
+	 * @param summoningDuration how much the summoning will last
+	 * @param summonRange       range of how distance the spawn can be
+	 * @param canBeStopped      if the spell can be stopped when the bos is stunned
+	 * @param canMove           if the bos can move while casting
+	 * @param singleTarget      if the spell will only launch at one random pos
+	 * @param summonQuantity    return the number of mob that will be spawned at each pos
+	 * @param spawningLocations return a list of spawning locations
+	 * @param summonMob         return the mob spawned at the given location
+	 * @param bossAnimation     animation for the boss
+	 * @param summonAnimation   animation for each summon mob
 	 */
 	public SpellBaseSummon(
 		Plugin plugin,
@@ -255,7 +255,7 @@ public class SpellBaseSummon extends Spell {
 							return;
 						}
 
-						Location mobLoc = mob.getLocation().add(0, mDeepness/mSummoningDuration, 0);
+						Location mobLoc = mob.getLocation().add(0, mDeepness / mSummoningDuration, 0);
 						mob.teleport(mobLoc);
 						mSummonAnimation.run(mob, mobLoc, mTimer);
 

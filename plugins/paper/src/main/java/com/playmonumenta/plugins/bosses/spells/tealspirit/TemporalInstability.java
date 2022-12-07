@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -62,8 +63,8 @@ public class TemporalInstability extends Spell {
 				Location loc = mBoss.getLocation();
 				player.playSound(loc, Sound.PARTICLE_SOUL_ESCAPE, 1.0f, 0.5f);
 				player.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1.0f, 0.5f);
-				loc.getWorld().spawnParticle(Particle.SOUL, loc.clone().add(0, 1.5, 0), 5, 0.5, 2, 0.5, 0);
-				loc.getWorld().spawnParticle(Particle.END_ROD, loc.clone().add(0, 1.5, 0), 5, 0.5, 2, 0.5, 0);
+				new PartialParticle(Particle.SOUL, loc.clone().add(0, 1.5, 0), 5, 0.5, 2, 0.5, 0).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.END_ROD, loc.clone().add(0, 1.5, 0), 5, 0.5, 2, 0.5, 0).spawnAsEntityActive(mBoss);
 			}
 		}
 	}

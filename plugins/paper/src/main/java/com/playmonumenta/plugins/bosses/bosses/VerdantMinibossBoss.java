@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellKaulsFury;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -107,15 +108,14 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				if (mBoss.isValid() && !mBoss.isDead() && mShielded) {
-					World world = mBoss.getWorld();
 					Location loc = mBoss.getLocation();
 					for (double deg = 0; deg < 360; deg += 8) {
-						world.spawnParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 0.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
-						world.spawnParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.25, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
-						world.spawnParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
+						new PartialParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 0.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0).spawnAsBoss();
+						new PartialParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.25, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0).spawnAsBoss();
+						new PartialParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0).spawnAsBoss();
 					}
 
-					world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 1, 0), 10, 1, 1, 1);
+					new PartialParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 1, 0), 10, 1, 1, 1).spawnAsBoss();
 				} else {
 					this.cancel();
 					return;
@@ -181,9 +181,9 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 							double completionRatio = ((double) mT) / CHARGE_TIME;
 							double chargingRadius = RADIUS * completionRatio;
-							world.spawnParticle(Particle.SPELL_WITCH, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0);
-							world.spawnParticle(Particle.FLAME, mLocation, 8 + (int) (completionRatio * 25), chargingRadius / 2, chargingRadius / 2, chargingRadius / 2, 0);
-							world.spawnParticle(Particle.SMOKE_LARGE, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0);
+							new PartialParticle(Particle.SPELL_WITCH, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0).spawnAsBoss();
+							new PartialParticle(Particle.FLAME, mLocation, 8 + (int) (completionRatio * 25), chargingRadius / 2, chargingRadius / 2, chargingRadius / 2, 0).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_LARGE, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0).spawnAsBoss();
 
 							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
 							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
@@ -196,11 +196,11 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 							// 5.0 because 5 ticks and impact time is in ticks, and to make it a double
 							mLocation = mLocation.subtract(0, (5.0 * HEIGHT) / IMPACT_TIME, 0);
-							world.spawnParticle(Particle.SPELL_WITCH, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
-							world.spawnParticle(Particle.FLAME, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0);
-							world.spawnParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0);
-							world.spawnParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
-							world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0);
+							new PartialParticle(Particle.SPELL_WITCH, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsBoss();
+							new PartialParticle(Particle.FLAME, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0).spawnAsBoss();
+							new PartialParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsBoss();
+							new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsBoss();
 
 							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
 							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
@@ -224,12 +224,12 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
 
 							ParticleUtils.explodingRingEffect(mPlugin, mLocation, RADIUS, 1, 4,
-									Arrays.asList(
-											new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-												world.spawnParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.1);
-												world.spawnParticle(Particle.SMOKE_LARGE, location, 1, 0.1, 0.1, 0.1, 0.1);
-											})
-									));
+								Arrays.asList(
+									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+										new PartialParticle(Particle.FLAME, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+										new PartialParticle(Particle.SMOKE_LARGE, location, 1, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
+									})
+								));
 
 							this.cancel();
 						}
@@ -262,7 +262,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 		}
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 1);
-		world.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 15, 0.5, 0, 0.5);
+		new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 15, 0.5, 0, 0.5).spawnAsBoss();
 
 		//Add new spell
 		SpellManager spellManager = getSpellManager();
@@ -303,61 +303,61 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	private SpellManager getTeccatlSpellManager() {
 		World world = mBoss.getWorld();
 		return new SpellManager(Arrays.asList(
-				new SpellBaseCharge(mPlugin, mBoss, 32, 80, 25, false,
-						0, 0, 0,
-						true,
-						// Warning sound/particles at boss location and slow boss
-						(LivingEntity player) -> {
-							world.spawnParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 50, 2, 2, 2);
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.5f);
-							mBoss.setAI(false);
-						},
-						// Warning particles
-						(Location loc) -> {
-							world.spawnParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0);
-						},
-						// Charge attack sound/particles at boss location
-						(LivingEntity player) -> {
-							world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
-						},
-						// Attack hit a player
-						(LivingEntity target) -> {
-							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData());
-							world.spawnParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData());
-							BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 20);
-						},
-						// Attack particles
-						(Location loc) -> {
-							world.spawnParticle(Particle.FLAME, loc, 4, 0.5, 0.5, 0.5, 0.075);
-							world.spawnParticle(Particle.CRIT, loc, 8, 0.5, 0.5, 0.5, 0);
-						},
-						// Ending particles on boss
-						() -> {
-							world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15);
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
-							mBoss.setAI(true);
-						})
-					));
+			new SpellBaseCharge(mPlugin, mBoss, 32, 80, 25, false,
+				0, 0, 0,
+				true,
+				// Warning sound/particles at boss location and slow boss
+				(LivingEntity player) -> {
+					new PartialParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 50, 2, 2, 2).spawnAsBoss();
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.5f);
+					mBoss.setAI(false);
+				},
+				// Warning particles
+				(Location loc) -> {
+					new PartialParticle(Particle.CRIT, loc, 2, 0.65, 0.65, 0.65, 0).spawnAsBoss();
+				},
+				// Charge attack sound/particles at boss location
+				(LivingEntity player) -> {
+					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsBoss();
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
+				},
+				// Attack hit a player
+				(LivingEntity target) -> {
+					new PartialParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 5, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData()).spawnAsBoss();
+					new PartialParticle(Particle.BLOCK_CRACK, target.getEyeLocation(), 12, 0.4, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData()).spawnAsBoss();
+					BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 20);
+				},
+				// Attack particles
+				(Location loc) -> {
+					new PartialParticle(Particle.FLAME, loc, 4, 0.5, 0.5, 0.5, 0.075).spawnAsBoss();
+					new PartialParticle(Particle.CRIT, loc, 8, 0.5, 0.5, 0.5, 0).spawnAsBoss();
+				},
+				// Ending particles on boss
+				() -> {
+					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsBoss();
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
+					mBoss.setAI(true);
+				})
+		));
 	}
 
 	private SpellManager getTlorixSpellManager() {
 		return new SpellManager(Arrays.asList(
-				new SpellBombToss(mPlugin, mBoss, detectionRange, 2, 50, 160,
-						(World world, TNTPrimed tnt, Location loc) -> {
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
-							world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-							world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4);
+			new SpellBombToss(mPlugin, mBoss, detectionRange, 2, 50, 160,
+				(World world, TNTPrimed tnt, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
+					new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4).spawnAsBoss();
 
-							for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {
-								if (player.hasLineOfSight(tnt)) {
-									double multiplier = (8 - player.getLocation().distance(loc)) / 8;
-									BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 32 * multiplier);
-									player.setFireTicks((int)(20 * 8 * multiplier));
-									EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (20 * 8 * multiplier), player, mBoss);
-								}
-							}
-						})
-			));
+					for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {
+						if (player.hasLineOfSight(tnt)) {
+							double multiplier = (8 - player.getLocation().distance(loc)) / 8;
+							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 32 * multiplier);
+							player.setFireTicks((int) (20 * 8 * multiplier));
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (20 * 8 * multiplier), player, mBoss);
+						}
+					}
+				})
+		));
 	}
 }

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -49,8 +50,8 @@ public class SpellBash extends Spell {
 				@Override
 				public void run() {
 					mTicks++;
-					mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.175);
-					mWorld.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.5, 0.4, 0.025);
+					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.175).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.4, 0.5, 0.4, 0.025).spawnAsEntityActive(mBoss);
 					if (mTicks >= 25) {
 						this.cancel();
 						Location loc = mBoss.getEyeLocation().subtract(0, 0.15, 0);
@@ -58,31 +59,32 @@ public class SpellBash extends Spell {
 						loc.setDirection(direction);
 						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
 						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 1.25f);
-						mWorld.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.25);
-						mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 15, 0.1, 0.1, 0.1, 0.2);
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 15, 0.1, 0.1, 0.1, 0.2).spawnAsEntityActive(mBoss);
 						new BukkitRunnable() {
 							double mDegrees = 30;
-						@Override
-						public void run() {
-							Vector vec;
-							for (double r = 1; r < 5; r += 0.5) {
-								for (double degree = mDegrees; degree <= mDegrees + 60; degree += 8) {
-									double radian1 = Math.toRadians(degree);
-									vec = new Vector(FastUtils.cos(radian1) * r, 0.75, FastUtils.sin(radian1) * r);
-									vec = VectorUtils.rotateZAxis(vec, 20);
-									vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 20);
-									vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
-									Location l = loc.clone().add(vec);
-									mWorld.spawnParticle(Particle.CRIT, l, 1, 0.1, 0.1, 0.1, 0.025);
-									mWorld.spawnParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025);
+							@Override
+							public void run() {
+								Vector vec;
+								for (double r = 1; r < 5; r += 0.5) {
+									for (double degree = mDegrees; degree <= mDegrees + 60; degree += 8) {
+										double radian1 = Math.toRadians(degree);
+										vec = new Vector(FastUtils.cos(radian1) * r, 0.75, FastUtils.sin(radian1) * r);
+										vec = VectorUtils.rotateZAxis(vec, 20);
+										vec = VectorUtils.rotateXAxis(vec, loc.getPitch() - 20);
+										vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+
+										Location l = loc.clone().add(vec);
+										new PartialParticle(Particle.CRIT, l, 1, 0.1, 0.1, 0.1, 0.025).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.CRIT_MAGIC, l, 1, 0.1, 0.1, 0.1, 0.025).spawnAsEntityActive(mBoss);
+									}
+								}
+								mDegrees += 60;
+								if (mDegrees >= 150) {
+									this.cancel();
 								}
 							}
-							mDegrees += 60;
-							if (mDegrees >= 150) {
-								this.cancel();
-							}
-						}
 
 						}.runTaskTimer(mPlugin, 0, 1);
 

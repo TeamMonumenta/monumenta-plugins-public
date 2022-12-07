@@ -28,12 +28,12 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	private static final DecimalFormat holoDigits = new DecimalFormat("0.0"); // number of 0s/#s determines maximum digits shown
 
 	private final Component HOLOGRAM_DEFAULT_NAME = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-		.append(Component.text("???", NamedTextColor.DARK_AQUA))
-		.append(Component.text(" (", NamedTextColor.YELLOW))
-		.append(Component.text("???", NamedTextColor.DARK_AQUA))
-		.append(Component.text("/", NamedTextColor.YELLOW))
-		.append(Component.text("???", NamedTextColor.DARK_AQUA))
-		.append(Component.text(")", NamedTextColor.YELLOW));
+		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
+		                                                .append(Component.text(" (", NamedTextColor.YELLOW))
+		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
+		                                                .append(Component.text("/", NamedTextColor.YELLOW))
+		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
+		                                                .append(Component.text(")", NamedTextColor.YELLOW));
 
 	private double mDPSCounter = -1;
 	private double mDPSCounter10s = -1;
@@ -108,20 +108,20 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 					if (mDPSDisp10s >= 0) {
 						hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-							.append(Component.text(" (", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-							.append(Component.text("/", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							.append(Component.text(")", NamedTextColor.YELLOW));
+							                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+							                  .append(Component.text(" (", NamedTextColor.YELLOW))
+							                  .append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
+							                  .append(Component.text("/", NamedTextColor.YELLOW))
+							                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+							                  .append(Component.text(")", NamedTextColor.YELLOW));
 					} else {
 						hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-							.append(Component.text(" (", NamedTextColor.YELLOW))
-							.append(Component.text("???", NamedTextColor.DARK_AQUA))
-							.append(Component.text("/", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							.append(Component.text(")", NamedTextColor.YELLOW));
+							                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+							                  .append(Component.text(" (", NamedTextColor.YELLOW))
+							                  .append(Component.text("???", NamedTextColor.DARK_AQUA))
+							                  .append(Component.text("/", NamedTextColor.YELLOW))
+							                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+							                  .append(Component.text(")", NamedTextColor.YELLOW));
 					}
 
 					mHologram.customName(hologramDisplay);
@@ -136,12 +136,12 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						mDPSDisp10s = mDPSCounter10s / 10;
 						mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-							.append(Component.text(" (", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-							.append(Component.text("/", NamedTextColor.YELLOW))
-							.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							.append(Component.text(")", NamedTextColor.YELLOW)));
+							                     .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+							                     .append(Component.text(" (", NamedTextColor.YELLOW))
+							                     .append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
+							                     .append(Component.text("/", NamedTextColor.YELLOW))
+							                     .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+							                     .append(Component.text(")", NamedTextColor.YELLOW)));
 
 						mDPSCounter10s = -1;
 					}, 200);

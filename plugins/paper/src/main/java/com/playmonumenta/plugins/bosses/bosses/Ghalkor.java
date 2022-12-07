@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorFlameBolt;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorFlamingCharge;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.GhalkorForwardSweep;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -80,16 +81,15 @@ public final class Ghalkor extends BossAbilityGroup {
 		mMiddleLoc = mSpawnLoc.add(-2, 0, 0);
 
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
-				new GhalkorFlamingCharge(mPlugin, mBoss, this),
-				new GhalkorFlameBolt(mBoss, mPlugin, this),
-				new GhalkorForwardSweep(mPlugin, mBoss, this)
-				));
-
+			new GhalkorFlamingCharge(mPlugin, mBoss, this),
+			new GhalkorFlameBolt(mBoss, mPlugin, this),
+			new GhalkorForwardSweep(mPlugin, mBoss, this)
+		));
 
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
-				new SpellBlockBreak(boss, 2, 3, 2)
-			);
+			new SpellBlockBreak(boss, 2, 3, 2)
+		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 
@@ -101,8 +101,8 @@ public final class Ghalkor extends BossAbilityGroup {
 			Location loc = mBoss.getLocation();
 			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
 			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
-			world.spawnParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1);
-			world.spawnParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0);
+			new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
+			new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" This pain... My blood boils!\",\"color\":\"dark_gray\"}]");
 		});
@@ -144,8 +144,8 @@ public final class Ghalkor extends BossAbilityGroup {
 					Location loc = mBoss.getLocation();
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
 					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
-					world.spawnParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1);
-					world.spawnParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0);
+					new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
 					this.cancel();
 				}
@@ -167,15 +167,15 @@ public final class Ghalkor extends BossAbilityGroup {
 				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
 				for (Player p : PlayerUtils.playersInRange(mMiddleLoc, detectionRange, true)) {
 					if ((mMiddleLoc.distance(p.getLocation()) > 22
-							|| mMiddleLoc.getY() - p.getLocation().getY() >= 3
-							|| (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
-							&& p.getGameMode() != GameMode.CREATIVE) {
+						     || mMiddleLoc.getY() - p.getLocation().getY() >= 3
+						     || (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
+						    && p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
 						p.setVelocity(vel);
 
 						p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1, 0f);
-						p.spawnParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2);
+						new PartialParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2).spawnAsEntityActive(boss);
 					}
 				}
 			}
@@ -190,6 +190,7 @@ public final class Ghalkor extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			private int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks == 20 * 2) {
@@ -201,7 +202,7 @@ public final class Ghalkor extends BossAbilityGroup {
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Yah Broer, the nonbelievers draw close.\",\"color\":\"dark_gray\"}]");
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 5, 0.8f);
 				} else if (mTicks == 20 * 6) {
-					mBoss.getWorld().spawnParticle(Particle.FLAME, mBoss.getLocation(), 200, 0.1, 0.1, 0.1, 0.3);
+					new PartialParticle(Particle.FLAME, mBoss.getLocation(), 200, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(boss);
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 5, 2);
 				} else if (mTicks == 20 * 6 + 10) {
 					this.cancel();
@@ -270,13 +271,13 @@ public final class Ghalkor extends BossAbilityGroup {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 	}
 }

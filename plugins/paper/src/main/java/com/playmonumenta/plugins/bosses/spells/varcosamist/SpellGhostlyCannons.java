@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -46,13 +47,14 @@ public class SpellGhostlyCannons extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks += 2;
 				float fTick = mTicks;
 				float ft = fTick / 25;
-				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005);
-				world.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125);
+				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125).spawnAsEntityActive(mBoss);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10, 0.5f + ft);
 				if (mTicks >= 20 * 2) {
 					this.cancel();
@@ -61,6 +63,7 @@ public class SpellGhostlyCannons extends Spell {
 					BukkitRunnable runnable = new BukkitRunnable() {
 
 						int mI = 0;
+
 						@Override
 						public void run() {
 							mI++;
@@ -110,6 +113,7 @@ public class SpellGhostlyCannons extends Spell {
 			Location mLoc = locInput.clone();
 			World mWorld = locInput.getWorld();
 			int mTicks = 60;
+
 			@Override
 			public void run() {
 				mTicks--;
@@ -121,21 +125,21 @@ public class SpellGhostlyCannons extends Spell {
 						double dist = player.getLocation().distance(mLoc);
 						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
 						for (double deg = 0; deg < 360; deg += (step * 45)) {
-							player.spawnParticle(Particle.REDSTONE, mLoc.clone().add(FastUtils.cos(deg) * size, 0, FastUtils.sin(deg) * size), 1, 0.15, 0.15, 0.15, 0, CANNONS_COLOR);
+							new PartialParticle(Particle.REDSTONE, mLoc.clone().add(FastUtils.cos(deg) * size, 0, FastUtils.sin(deg) * size), 1, 0.15, 0.15, 0.15, 0, CANNONS_COLOR).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
 				Location particle = mLoc.clone().add(0, mTicks / 3.0, 0);
-				mWorld.spawnParticle(Particle.SMOKE_NORMAL, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
+				new PartialParticle(Particle.SMOKE_NORMAL, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true).spawnAsEntityActive(mBoss);
 				if (FastUtils.RANDOM.nextBoolean()) {
-					mWorld.spawnParticle(Particle.CRIT, particle, 1, 0, 0, 0, 0, null, true);
+					new PartialParticle(Particle.CRIT, particle, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
 				}
 				mWorld.playSound(particle, Sound.ENTITY_ARROW_SHOOT, 1, 1);
 				if (mTicks <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 15, 0, 0, 0, 0.175, null, false);
-					mWorld.spawnParticle(Particle.CRIT, mLoc, 10, 0, 0, 0, 0.25, null, false);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 15, 0, 0, 0, 0.175, null, false).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.CRIT, mLoc, 10, 0, 0, 0, 0.25, null, false).spawnAsEntityActive(mBoss);
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 3, 3, 3);
 					for (Player player : PlayerUtils.playersInRange(mLoc, 3, true)) {

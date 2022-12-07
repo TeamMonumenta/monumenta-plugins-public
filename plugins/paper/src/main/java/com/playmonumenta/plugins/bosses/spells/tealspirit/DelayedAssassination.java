@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
@@ -79,7 +80,7 @@ public class DelayedAssassination extends SpellTpBehindPlayer {
 			public void run() {
 				mTicks++;
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
-				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
+				new PartialParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 
 				if (mTicks > 40) {
 					this.cancel();

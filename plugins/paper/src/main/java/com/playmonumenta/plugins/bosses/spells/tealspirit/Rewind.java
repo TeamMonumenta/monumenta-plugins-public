@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -91,7 +92,7 @@ public class Rewind extends Spell {
 								vec = VectorUtils.rotateYAxis(vec, mCenter.getYaw() + dir);
 								Location l = mCenter.clone().add(vec);
 								if (r % 2 == 0) {
-									world.spawnParticle(Particle.END_ROD, l, 1, 0.05, 1.5, 0.05, 0.01);
+									new PartialParticle(Particle.END_ROD, l, 1, 0.05, 1.5, 0.05, 0.01).spawnAsEntityActive(mBoss);
 								}
 							}
 						}
@@ -125,7 +126,7 @@ public class Rewind extends Spell {
 								vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 								vec = VectorUtils.rotateYAxis(vec, mCenter.getYaw() + dir);
 								Location l = loc.clone().add(vec);
-								world.spawnParticle(Particle.FLAME, l, 1, 0.05, 1.5, 0.05, 0.01);
+								new PartialParticle(Particle.FLAME, l, 1, 0.05, 1.5, 0.05, 0.01).spawnAsEntityActive(mBoss);
 								//1.5 -> 15
 								BoundingBox box = BoundingBox.of(l, 0.65, 15, 0.65);
 								boxes.add(box);
@@ -173,12 +174,12 @@ public class Rewind extends Spell {
 										if (mob.getType() != EntityType.SHULKER || !mob.getScoreboardTags().contains("NoMove")) {
 											Location destination = origin.clone().add(relative.get(mob));
 											mob.teleport(destination);
-											world.spawnParticle(Particle.FALLING_OBSIDIAN_TEAR, destination.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1);
+											new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, destination.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 										}
 									}
 
 									player.playSound(origin, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1.5f);
-									world.spawnParticle(Particle.FALLING_OBSIDIAN_TEAR, origin.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1);
+									new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, origin.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 								}
 								mTeal.changePhase(mActiveSpells, mPassiveSpells, null);
 								this.cancel();

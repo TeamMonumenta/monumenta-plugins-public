@@ -23,7 +23,7 @@ public class HandSwapBoss extends BossAbilityGroup {
 		}
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		    new SpellHandSwap((Mob)mBoss)
+			new SpellHandSwap((Mob) mBoss)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);

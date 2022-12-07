@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -27,16 +28,16 @@ public class SpellChangeFloor extends Spell {
 	private int mFloorDuration;
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-	            Material.AIR,
-	            Material.COMMAND_BLOCK,
-	            Material.CHAIN_COMMAND_BLOCK,
-	            Material.REPEATING_COMMAND_BLOCK,
-				Material.BARRIER,
-	            Material.BEDROCK,
-	            Material.OBSIDIAN,
-	            Material.CHEST,
-	            Material.SPAWNER
-	        );
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BARRIER,
+		Material.BEDROCK,
+		Material.OBSIDIAN,
+		Material.CHEST,
+		Material.SPAWNER
+	);
 
 
 	public SpellChangeFloor(Plugin plugin, LivingEntity launcher, Location centerLoc, int range, int radius, Material material, int floorduration) {
@@ -82,14 +83,14 @@ public class SpellChangeFloor extends Spell {
 					// Particles over the changed blocks
 					for (BlockState state : mBlocksToRestore) {
 						Location loc = state.getLocation().add(0.5f, 1f, 0.5f);
-						loc.getWorld().spawnParticle(Particle.DRAGON_BREATH, loc, 1, 0.3, 0.3, 0.3, 0);
+						new PartialParticle(Particle.DRAGON_BREATH, loc, 1, 0.3, 0.3, 0.3, 0).spawnAsEntityActive(mBoss);
 					}
 				}
 
 				if (mTicks == 0) {
 					target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 4f);
 					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 5f);
-					mBoss.getLocation().getWorld().spawnParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0);
+					new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0).spawnAsEntityActive(mBoss);
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3));
 
 					// Get a list of blocks that should be changed
@@ -98,8 +99,8 @@ public class SpellChangeFloor extends Spell {
 							for (int dz = -mRadius; dz < mRadius; dz++) {
 								BlockState state = target.getLocation().add(dx, dy, dz).getBlock().getState();
 								if (!mIgnoredMats.contains(state.getType()) &&
-								    !state.getType().isInteractable() &&
-									FastUtils.RANDOM.nextInt(16) > 6) {
+									    !state.getType().isInteractable() &&
+									    FastUtils.RANDOM.nextInt(16) > 6) {
 									mBlocksToRestore.add(state);
 								}
 							}

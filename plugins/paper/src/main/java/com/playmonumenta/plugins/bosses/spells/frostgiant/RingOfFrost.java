@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -87,7 +88,7 @@ public class RingOfFrost extends Spell {
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_SNOW_GOLEM_SHOOT, SoundCategory.HOSTILE, 3, mPitch);
 				mPitch += 0.025f;
 
-				world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 3, 0), 20, 2, 4, 2, 0);
+				new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 3, 0), 20, 2, 4, 2, 0).spawnAsEntityActive(mBoss);
 
 				//After 4 seconds, damage everyone outside the green circle and pull them in
 				if (mTicks >= 20 * 4) {
@@ -101,7 +102,7 @@ public class RingOfFrost extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 50, true)) {
 						if (!player.getLocation().toVector().isInSphere(vec, mRadius) && mStartLoc.distance(player.getLocation()) <= FrostGiant.fighterRange) {
 							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 40, null, false, true, "Ring of Frost");
-							world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.25, 0.45, 0.25, 0.2);
+							new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.25, 0.45, 0.25, 0.2).spawnAsEntityActive(mBoss);
 							MovementUtils.knockAway(loc, player, -2.75f, 0.5f, false);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 3));
 						}

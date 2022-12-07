@@ -34,6 +34,7 @@ public class SpellBaseTrail extends Spell {
 	public interface HitAction {
 		/**
 		 * Called when a trail node intersects a player
+		 *
 		 * @param player Player being targeted
 		 * @param loc    Location of the trail node
 		 */
@@ -44,7 +45,8 @@ public class SpellBaseTrail extends Spell {
 	public interface ExpireAction {
 		/**
 		 * Called when a trail node intersects a player
-		 * @param loc    Location of the trail node
+		 *
+		 * @param loc Location of the trail node
 		 */
 		void run(World world, Location loc);
 	}
@@ -66,18 +68,18 @@ public class SpellBaseTrail extends Spell {
 	private int mTicks = 0;
 
 	/**
-	 * @param boss                Boss
-	 * @param tickRate            How many ticks to wait between updates (trail creation, particles, etc.) - should divide trailRate
-	 * @param trailRate           How many ticks to wait between dropping trail nodes (must be multiple of 2)
-	 * @param trailDuration       How many ticks before a trail node expires (must be multiple of 2)
-	 * @param trailGroundOnly     Whether or not trail nodes should only be laid on the ground
-	 * @param trailConsumed       Whether or not trail nodes should be removed when they hit a player
-	 * @param hitboxLength        Length of trail node hitboxes
-	 * @param trailAesthetic      Called every two ticks at each trail node
-	 * @param hitAction           Called when a trail node intersects a player
+	 * @param boss            Boss
+	 * @param tickRate        How many ticks to wait between updates (trail creation, particles, etc.) - should divide trailRate
+	 * @param trailRate       How many ticks to wait between dropping trail nodes (must be multiple of 2)
+	 * @param trailDuration   How many ticks before a trail node expires (must be multiple of 2)
+	 * @param trailGroundOnly Whether or not trail nodes should only be laid on the ground
+	 * @param trailConsumed   Whether or not trail nodes should be removed when they hit a player
+	 * @param hitboxLength    Length of trail node hitboxes
+	 * @param trailAesthetic  Called every two ticks at each trail node
+	 * @param hitAction       Called when a trail node intersects a player
 	 */
 	public SpellBaseTrail(LivingEntity boss, int tickRate, int trailRate, int trailDuration, boolean trailGroundOnly, boolean trailConsumed,
-			double hitboxLength, AestheticAction trailAesthetic, HitAction hitAction, ExpireAction expireAction) {
+	                      double hitboxLength, AestheticAction trailAesthetic, HitAction hitAction, ExpireAction expireAction) {
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mTickRate = tickRate;

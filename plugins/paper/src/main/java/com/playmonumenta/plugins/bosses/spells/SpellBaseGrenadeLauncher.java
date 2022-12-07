@@ -57,27 +57,26 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	 */
 
 	/**
-	 *
-	 * @param plugin The monumenta plugin for runnables
-	 * @param boss The mob that is casting this ability
-	 * @param grenadeMaterial Material for the grenade
-	 * @param explodeOnTouch if the grenade should explode before touching the ground when hit another entity
-	 * @param explodeDelay if not explodeOnTouch ?  ticks to wait before checking for entity overlap to this block (explode) : ticks to wait before the lob explode when hitting the gound
-	 * @param lobs number of lobs casted per target
-	 * @param lobsDelay ticks between each lobs
-	 * @param duration the max duration of the grenade
-	 * @param cooldown cooldown of this spell
-	 * @param lingeringDuration the duration of the lingering
-	 * @param lingeringRadius the range of the lingering
-	 * @param grenadeTargets return the target of the grenade
-	 * @param explosionTargets return the target of the explosion and also used for the lingering
-	 * @param aestheticsBoss aesthetics launch at the start of the spell
-	 * @param grenadeAesthetics aesthetics launch at grenade location each tick
+	 * @param plugin              The monumenta plugin for runnables
+	 * @param boss                The mob that is casting this ability
+	 * @param grenadeMaterial     Material for the grenade
+	 * @param explodeOnTouch      if the grenade should explode before touching the ground when hit another entity
+	 * @param explodeDelay        if not explodeOnTouch ?  ticks to wait before checking for entity overlap to this block (explode) : ticks to wait before the lob explode when hitting the gound
+	 * @param lobs                number of lobs casted per target
+	 * @param lobsDelay           ticks between each lobs
+	 * @param duration            the max duration of the grenade
+	 * @param cooldown            cooldown of this spell
+	 * @param lingeringDuration   the duration of the lingering
+	 * @param lingeringRadius     the range of the lingering
+	 * @param grenadeTargets      return the target of the grenade
+	 * @param explosionTargets    return the target of the explosion and also used for the lingering
+	 * @param aestheticsBoss      aesthetics launch at the start of the spell
+	 * @param grenadeAesthetics   aesthetics launch at grenade location each tick
 	 * @param explosionAesthetics aesthetics launch when the grenade explode
-	 * @param hitAction action called for each livingentity that explosionTargets return
-	 * @param ringAesthetics aesthetics for the ring lingering
-	 * @param cencterAesthetics aesthetics for the cencter of the ring lingering
-	 * @param lingeringHitAction action called for each livingentity that explosionTargets return if inside of the range lingeringRadius
+	 * @param hitAction           action called for each livingentity that explosionTargets return
+	 * @param ringAesthetics      aesthetics for the ring lingering
+	 * @param cencterAesthetics   aesthetics for the cencter of the ring lingering
+	 * @param lingeringHitAction  action called for each livingentity that explosionTargets return if inside of the range lingeringRadius
 	 */
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -105,33 +104,32 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		LingeringRingAesthetics ringAesthetics,
 		LingeringCenterAesthetics cencterAesthetics,
 		HitAction lingeringHitAction
-		) {
-			mPlugin = plugin;
-			mBoss = boss;
-			mGrenadeMaterial = grenadeMaterial;
-			mExplodeOnTouch = explodeOnTouch;
-			mExplodeDelay = explodeDelay;
-			mLobs = lobs;
-			mLobsDelay = lobsDelay;
-			mDuration = duration;
-			mCooldown = cooldown;
-			mGrenadeTargets = grenadeTargets;
-			mExplosionTargets = explosionTargets;
-			mAestheticsBoss = aestheticsBoss;
-			mGrenadeAesthetics = grenadeAesthetics;
-			mExplosionAesthetics = explosionAesthetics;
-			mHitAction = hitAction;
+	) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mGrenadeMaterial = grenadeMaterial;
+		mExplodeOnTouch = explodeOnTouch;
+		mExplodeDelay = explodeDelay;
+		mLobs = lobs;
+		mLobsDelay = lobsDelay;
+		mDuration = duration;
+		mCooldown = cooldown;
+		mGrenadeTargets = grenadeTargets;
+		mExplosionTargets = explosionTargets;
+		mAestheticsBoss = aestheticsBoss;
+		mGrenadeAesthetics = grenadeAesthetics;
+		mExplosionAesthetics = explosionAesthetics;
+		mHitAction = hitAction;
 
-			//lingering stuff
-			mLingeringDuration = lingeringDuration;
-			mLingeringRadius = lingeringRadius;
-			mLingeringCenterAesthetics = cencterAesthetics;
-			mLingeringRingAesthetics = ringAesthetics;
-			mLingeringHit = lingeringHitAction;
+		//lingering stuff
+		mLingeringDuration = lingeringDuration;
+		mLingeringRadius = lingeringRadius;
+		mLingeringCenterAesthetics = cencterAesthetics;
+		mLingeringRingAesthetics = ringAesthetics;
+		mLingeringHit = lingeringHitAction;
 
 
-		}
-
+	}
 
 
 	@Override
@@ -144,7 +142,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			for (LivingEntity target : targets) {
 				new BukkitRunnable() {
 					int mLobsLaunched = 0;
-					@Override public void run() {
+
+					@Override
+					public void run() {
 						launchGrenade(bossLocation, target);
 						mLobsLaunched++;
 						if (mLobsLaunched >= mLobs) {
@@ -249,7 +249,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				}
 
 
-
 				void launchLingering(Location startingLoc) {
 					if (mLingeringDuration > 0) {
 						new BukkitRunnable() {
@@ -311,7 +310,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	}
 
 
-
 	@Override
 	public int cooldownTicks() {
 		return mCooldown;
@@ -337,7 +335,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	public interface HitAction {
 		void launch(LivingEntity boss, LivingEntity target, Location location);
 	}
-
 
 
 	//Lingering stuff

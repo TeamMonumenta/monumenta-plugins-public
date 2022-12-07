@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.bosses.spells.falsespirit.SpellMultiEarthshake;
 import com.playmonumenta.plugins.bosses.spells.falsespirit.TriplicateSlash;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -128,14 +129,14 @@ public final class FalseSpirit extends BossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-				case PORTAL_TAG:
-					portals.add(e);
-					break;
-				case PORTAL_CEILING_TAG:
-					ceilingPortal = e;
-					break;
-				default:
-					break;
+					case PORTAL_TAG:
+						portals.add(e);
+						break;
+					case PORTAL_CEILING_TAG:
+						ceilingPortal = e;
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -156,25 +157,24 @@ public final class FalseSpirit extends BossAbilityGroup {
 		}
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellForceTwo(plugin, boss, 5, 20 * 2),
-				new TriplicateSlash(plugin, boss)
-				));
+			new SpellForceTwo(plugin, boss, 5, 20 * 2),
+			new TriplicateSlash(plugin, boss)
+		));
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new SpellForceTwo(plugin, boss, 5, 20 * 2),
-				new TriplicateSlash(plugin, boss),
-				new SpellMultiEarthshake(plugin, boss, 1, multiEarthshakeDuration, mDelve, mSpawnLoc),
-				new SpellFlamethrower(plugin, boss, mDelve)
-				));
-
+			new SpellForceTwo(plugin, boss, 5, 20 * 2),
+			new TriplicateSlash(plugin, boss),
+			new SpellMultiEarthshake(plugin, boss, 1, multiEarthshakeDuration, mDelve, mSpawnLoc),
+			new SpellFlamethrower(plugin, boss, mDelve)
+		));
 
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellPurgeNegatives(boss, 20 * 5),
-				new DamageBlocker(plugin, boss, mHell, mCeilingHell),
-				new SpellBlockBreak(boss, 2, 3, 2),
-				new NothingnessSeeker(plugin, boss, passiveCooldown, passiveSpeed, mDelve)
-			);
+			new SpellPurgeNegatives(boss, 20 * 5),
+			new DamageBlocker(plugin, boss, mHell, mCeilingHell),
+			new SpellBlockBreak(boss, 2, 3, 2),
+			new NothingnessSeeker(plugin, boss, passiveCooldown, passiveSpeed, mDelve)
+		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 
@@ -251,6 +251,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -286,7 +287,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 						p.setVelocity(vel);
 
 						p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1, 0.5f);
-						p.spawnParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2);
+						new PartialParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2).spawnAsEntityActive(boss);
 					}
 				}
 				int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
@@ -350,7 +351,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 		mBoss.setHealth(Math.min(hp, max));
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
 		world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1, 2f);
-		world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR);
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
 	}
 
 	@Override
@@ -363,14 +364,14 @@ public final class FalseSpirit extends BossAbilityGroup {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 	}
 
 	@Override
@@ -393,6 +394,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks >= 20 * 5) {
@@ -418,7 +420,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 				}
 
-				world.spawnParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1);
+				new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 
 				mTicks += 2;
 			}

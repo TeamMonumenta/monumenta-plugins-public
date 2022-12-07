@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellPurgeGlowing;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -89,12 +90,12 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 		}
 
 		SpellManager spells = new SpellManager(
-				Arrays.asList(
-						new SpellDeathlyCharge(mPlugin, mBoss, 20 * 15, "The Mist is callin' ye still. Let it in...!"),
-						new SpellGhostlyCannons(mPlugin, mBoss, 22, mCenter, true, "Call down the cannons mateys, right quick!"),
-						new SpellSwitcheroo(mPlugin, mBoss, 20 * 10, 30, "A trap be set now. Get ye into it!"),
-						new ForcefulGrip(mPlugin, mBoss, 20 * 10, "Yarr, get ye over here! I'll deal with ye myself.") //change later lmao
-				));
+			Arrays.asList(
+				new SpellDeathlyCharge(mPlugin, mBoss, 20 * 15, "The Mist is callin' ye still. Let it in...!"),
+				new SpellGhostlyCannons(mPlugin, mBoss, 22, mCenter, true, "Call down the cannons mateys, right quick!"),
+				new SpellSwitcheroo(mPlugin, mBoss, 20 * 10, 30, "A trap be set now. Get ye into it!"),
+				new ForcefulGrip(mPlugin, mBoss, 20 * 10, "Yarr, get ye over here! I'll deal with ye myself.") //change later lmao
+			));
 
 		//Passive Spells
 		SpellPlayerAction action = SpellActions.getTooLowAction(mBoss, mCenter);
@@ -133,7 +134,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 			}
 			//Let the players know something happened
 			player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, 0.3f, 0.9f);
-			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5);
+			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsEntityActive(mBoss);
 		}
 	}
 
@@ -178,6 +179,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mCount = 0;
+
 			@Override
 			public void run() {
 				String[] dio = {"The light... it burns...", "That lantern be shinin' through the beyond..."};

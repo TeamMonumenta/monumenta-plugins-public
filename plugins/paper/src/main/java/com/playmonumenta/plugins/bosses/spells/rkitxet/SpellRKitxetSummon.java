@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.rkitxet;
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class SpellRKitxetSummon extends Spell {
 
 			Location loweredLoc = randomSpreadLoc.clone().subtract(0, 1.5, 0); //Starts spawning in the ground
 			loweredLoc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 0.75f);
-			loweredLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.LIME_WOOL.createBlockData());
+			new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.LIME_WOOL.createBlockData()).spawnAsEntityActive(mBoss);
 			Collections.shuffle(mSummonOptions);
 			Entity summon = LibraryOfSoulsIntegration.summon(loweredLoc, mSummonOptions.get(0));
 			if (summon != null && summon instanceof LivingEntity) {
@@ -70,6 +71,7 @@ public class SpellRKitxetSummon extends Spell {
 					int mTicks = 0;
 					double mYInc = 1.6 / SUMMON_TIME;
 					boolean mRaised = false;
+
 					@Override
 					public void run() {
 						mTicks++;
@@ -84,7 +86,7 @@ public class SpellRKitxetSummon extends Spell {
 							//Break 2 blocks where the mob is so it isn't trapped
 							summonedMob.getLocation().getBlock().breakNaturally();
 							summonedMob.getLocation().add(0, 1, 0).getBlock().breakNaturally();
-							loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc, 6, 0.25, 0.1, 0.25, 0.25, Material.GREEN_CONCRETE_POWDER.createBlockData());
+							new PartialParticle(Particle.BLOCK_DUST, loc, 6, 0.25, 0.1, 0.25, 0.25, Material.GREEN_CONCRETE_POWDER.createBlockData()).spawnAsEntityActive(mBoss);
 						}
 
 						if (mBoss.isDead() || !mBoss.isValid()) {

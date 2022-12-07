@@ -124,7 +124,7 @@ public class Shatter extends Spell {
 										}
 										//Once it leaves the arena, stop iterating
 										if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-											|| l.distance(mStartLoc) > FrostGiant.fighterRange) {
+											    || l.distance(mStartLoc) > FrostGiant.fighterRange) {
 											continue;
 										}
 										//Move up one block if on barrier or bedrock level

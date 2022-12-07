@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
@@ -59,32 +60,32 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
 				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
-					// Initiate Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1);
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
-					},
-					// Launch Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1.5f);
-					},
-					// Projectile Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 5, 0.1, 0.1, 0.1, 0.05);
-						world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0);
-						if (ticks % 40 == 0) {
-							world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f);
-						}
-					},
-					// Hit Action
-					(World world, LivingEntity target, Location loc) -> {
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
-						world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
-						world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 30, 0, 0, 0, 0.25);
-						if (target != null) {
-							BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
-						}
-					})
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1);
+					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1.5f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
+					if (ticks % 40 == 0) {
+						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f);
+					}
+				},
+				// Hit Action
+				(World world, LivingEntity target, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+					if (target != null) {
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
+					}
+				})
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null);

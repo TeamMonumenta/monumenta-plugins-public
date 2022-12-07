@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.snowspirit;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -24,7 +25,7 @@ public class ElfSummon extends Spell {
 	private int mMaxNearby;
 
 	public ElfSummon(Plugin plugin, Entity launcher, int count,
-	                              int repeats, int nearbyRadius, int maxNearby) {
+	                 int repeats, int nearbyRadius, int maxNearby) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mCount = count;
@@ -60,13 +61,13 @@ public class ElfSummon extends Spell {
 				for (int j = 0; j < mCount; j++) {
 					Entity summon = LibraryOfSoulsIntegration.summon(loc, "HolidayElf");
 					if (summon instanceof Lootable) {
-						((Lootable)summon).clearLootTable();
+						((Lootable) summon).clearLootTable();
 					}
 				}
 				for (Entity elf : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
 					if (elf.getType() == EntityType.ZOMBIE) {
-						double x = 0.5f * FastUtils.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
-						double z = 0.5f * FastUtils.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double x = 0.5f * FastUtils.cos((double) FastUtils.RANDOM.nextInt(628) / 100);
+						double z = 0.5f * FastUtils.sin((double) FastUtils.RANDOM.nextInt(628) / 100);
 						elf.setVelocity(new Vector(x, 0.5, z));
 					}
 				}
@@ -86,7 +87,7 @@ public class ElfSummon extends Spell {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
 				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 0.8f, 0.5f);
-				centerLoc.getWorld().spawnParticle(Particle.CRIMSON_SPORE, centerLoc, 20, 1.5, 1.5, 1.5, 0.01);
+				new PartialParticle(Particle.CRIMSON_SPORE, centerLoc, 20, 1.5, 1.5, 1.5, 0.01).spawnAsEntityActive(mLauncher);
 			}
 		};
 		for (int i = 0; i < (40 + mRepeats * 15) / 3; i++) {

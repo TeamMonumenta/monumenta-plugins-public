@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
@@ -13,7 +14,7 @@ public class SpellVindictiveParticle extends Spell {
 
 	@Override
 	public void run() {
-		mBoss.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0);
+		new PartialParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0).spawnAsEntityActive(mBoss);
 	}
 
 	@Override

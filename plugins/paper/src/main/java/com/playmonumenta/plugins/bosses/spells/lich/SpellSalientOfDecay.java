@@ -96,6 +96,7 @@ public class SpellSalientOfDecay extends Spell {
 			BukkitRunnable runB = new BukkitRunnable() {
 				Vector mDir = LocationUtils.getDirectionTo(player.getLocation().add(0, 1.25, 0), mBoss.getLocation().add(0, 1.25, 0));
 				int mT = 0;
+
 				@Override
 				public void run() {
 					mT += 2;
@@ -122,6 +123,7 @@ public class SpellSalientOfDecay extends Spell {
 									p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 6, 0));
 									BukkitRunnable runC = new BukkitRunnable() {
 										int mT = 0;
+
 										@Override
 										public void run() {
 											if (SpellDimensionDoor.getShadowed().contains(p)) {

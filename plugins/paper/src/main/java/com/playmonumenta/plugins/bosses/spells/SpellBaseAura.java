@@ -1,8 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -14,6 +13,7 @@ public class SpellBaseAura extends Spell {
 	public interface ApplyAuraEffect {
 		/**
 		 * Runs on users when they are within range of the aura
+		 *
 		 * @param player The player to affect
 		 */
 		void run(Player player);
@@ -39,8 +39,6 @@ public class SpellBaseAura extends Spell {
 
 	private final int mRadius; // Computed maximum of mDX, mDY, mDZ
 	private int mEffectIter; // Number of effect iterations - rolls around between 0 and 2
-	private int mParticleIter; // Number of particle iterations - rolls around between 0 and 20
-	private final List<Player> mParticlePlayers; // Players who have opted to get particles
 
 	public SpellBaseAura(Entity boss, double dx, double dy, double dz, int numParticles,
 	                     Particle particle, Object particleArg, ApplyAuraEffect auraEffect) {
@@ -56,10 +54,9 @@ public class SpellBaseAura extends Spell {
 		mParticle = particle;
 		mParticleArg = particleArg;
 		mAuraEffect = auraEffect;
-		mParticlePlayers = new ArrayList<Player>();
 		mParticlesSummoner = null;
 
-		mRadius = (int)Math.max(mDX, Math.max(mDY, mDZ));
+		mRadius = (int) Math.max(mDX, Math.max(mDY, mDZ));
 		mEffectIter = 0;
 	}
 
@@ -76,10 +73,9 @@ public class SpellBaseAura extends Spell {
 		mParticle = null;
 		mParticleArg = null;
 		mAuraEffect = auraEffect;
-		mParticlePlayers = new ArrayList<Player>();
 		mParticlesSummoner = particlesSummoner;
 
-		mRadius = (int)Math.max(mDX, Math.max(mDY, mDZ));
+		mRadius = (int) Math.max(mDX, Math.max(mDY, mDZ));
 		mEffectIter = 0;
 	}
 
@@ -93,18 +89,20 @@ public class SpellBaseAura extends Spell {
 		Location bossLoc = mBoss.getLocation();
 
 		if (mParticle != null) {
-			for (Player player : mParticlePlayers) {
-				if (mParticleArg != null) {
-					// Generate particles in area
-					player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg);
-					// Generate particles immediately around boss
-					player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg);
-				} else {
-					// Generate particles in area
-					player.spawnParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ);
-					// Generate particles immediately around boss
-					player.spawnParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1);
-				}
+			if (mParticleArg != null) {
+				// Generate particles in area
+				new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg)
+					.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
+					.spawnAsEntityActive(mBoss);
+				// Generate particles immediately around boss
+				new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg).spawnAsEntityActive(mBoss);
+			} else {
+				// Generate particles in area
+				new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ)
+					.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
+					.spawnAsEntityActive(mBoss);
+				// Generate particles immediately around boss
+				new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1).spawnAsEntityActive(mBoss);
 			}
 		} else if (mParticlesSummoner != null) {
 			//new version using particlesSummoner
@@ -120,34 +118,10 @@ public class SpellBaseAura extends Spell {
 				for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
 					Location playerLoc = player.getLocation();
 					if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-							Math.abs(playerLoc.getY() - bossLoc.getY()) < mDY &&
-							Math.abs(playerLoc.getZ() - bossLoc.getZ()) < mDZ) {
+						    Math.abs(playerLoc.getY() - bossLoc.getY()) < mDY &&
+						    Math.abs(playerLoc.getZ() - bossLoc.getZ()) < mDZ) {
 						// Player is within range
 						mAuraEffect.run(player);
-					}
-				}
-			}
-		}
-
-		// Update the group of nearby players who can see the particles every 5s
-		if (mParticle != null) {
-			mParticleIter++;
-			if (mParticleIter >= 20) {
-				mParticleIter = 0;
-
-				// Loop through all nearby players and put the ones that don't have
-				// the noAuraParticles tag on a list to send particles to them
-				mParticlePlayers.clear();
-				for (Player player : PlayerUtils.playersInRange(bossLoc, 80, true)) {
-					boolean particlesOk = true;
-					for (String tag : player.getScoreboardTags()) {
-						if (tag.equals("noAuraParticles")) {
-							particlesOk = false;
-							break;
-						}
-					}
-					if (particlesOk) {
-						mParticlePlayers.add(player);
 					}
 				}
 			}

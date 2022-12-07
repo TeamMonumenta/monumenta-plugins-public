@@ -102,6 +102,7 @@ public class SpellAutoAttack extends Spell {
 			if (Lich.playersInRange(mBoss.getLocation(), mRange, true).size() > 0) {
 				BukkitRunnable runA = new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						mTicks++;
@@ -131,7 +132,7 @@ public class SpellAutoAttack extends Spell {
 								} else if (mBoss instanceof Mob) {
 									Mob mob = (Mob) mBoss;
 									if (mob.getTarget() != null && mob.getTarget() instanceof Player) {
-										launchBolt((Player)mob.getTarget());
+										launchBolt((Player) mob.getTarget());
 									} else {
 										Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 										world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 1.5f, 0.75f);

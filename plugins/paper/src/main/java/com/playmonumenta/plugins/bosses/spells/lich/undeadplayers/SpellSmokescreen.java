@@ -47,6 +47,7 @@ public class SpellSmokescreen extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_CREEPER_PRIMED, SoundCategory.HOSTILE, 1.0f, 0.8f);
 		BukkitRunnable run = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (mT == 0) {

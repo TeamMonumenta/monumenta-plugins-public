@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -71,7 +72,7 @@ public class SpellTpBehindPlayer extends Spell {
 			} else {
 				LivingEntity target = ((Mob) mLauncher).getTarget();
 				if (target instanceof Player && target.getLocation().distance(mLauncher.getLocation()) < mRange
-						&& !ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
+					    && !ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
 					targetPlayer = (Player) target;
 				}
 			}
@@ -109,8 +110,8 @@ public class SpellTpBehindPlayer extends Spell {
 						locTest.setY(locTest.getY() + verticalShift);
 						if (canTeleport(locTest)) {
 							loc.add(0, mLauncher.getHeight() / 2, 0);
-							world.spawnParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1);
-							world.spawnParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125);
+							new PartialParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
 
 							mLauncher.teleport(locTest);
 							if (mLauncher instanceof Mob mob && !AbilityUtils.isStealthed(target)) {
@@ -123,13 +124,13 @@ public class SpellTpBehindPlayer extends Spell {
 							onTeleport(target);
 
 							locTest.add(0, mLauncher.getHeight() / 2, 0);
-							world.spawnParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1);
-							world.spawnParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125);
+							new PartialParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
+							new PartialParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
 							world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 
 							// The mPlugin here is of the incorrect type for some reason
 							if (mLauncher instanceof Creeper) {
-								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun + TP_STUN_CREEPER_INCRISED, (LivingEntity) mLauncher);
+								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun + TP_STUN_CREEPER_INCRISED, mLauncher);
 							} else {
 								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun, mLauncher);
 							}
@@ -161,7 +162,7 @@ public class SpellTpBehindPlayer extends Spell {
 			public void run() {
 				mTicks++;
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
-				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
+				new PartialParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 
 				if (mTicks > mTPDelay) {
 					this.cancel();
@@ -181,14 +182,14 @@ public class SpellTpBehindPlayer extends Spell {
 
 		// Check the 8 corners of the bounding box and the location itself for blocks
 		if (isObstructed(loc, box)
-				|| isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMinZ()), box)
-				|| isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMaxZ()), box)
-				|| isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMinZ()), box)
-				|| isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMaxZ()), box)
-				|| isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMinZ()), box)
-				|| isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMaxZ()), box)
-				|| isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMinZ()), box)
-				|| isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMaxZ()), box)) {
+			    || isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMinZ()), box)
+			    || isObstructed(new Location(world, box.getMinX(), box.getMinY(), box.getMaxZ()), box)
+			    || isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMinZ()), box)
+			    || isObstructed(new Location(world, box.getMinX(), box.getMaxY(), box.getMaxZ()), box)
+			    || isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMinZ()), box)
+			    || isObstructed(new Location(world, box.getMaxX(), box.getMinY(), box.getMaxZ()), box)
+			    || isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMinZ()), box)
+			    || isObstructed(new Location(world, box.getMaxX(), box.getMaxY(), box.getMaxZ()), box)) {
 			return false;
 		}
 

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.varcosamist;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -76,16 +77,16 @@ public class SpellSwitcheroo extends Spell {
 				mobLoc.setY(mLauncher.getLocation().getY() + 0.1f);
 				World world = mLauncher.getWorld();
 
-				world.spawnParticle(Particle.SPELL_WITCH, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
-				world.spawnParticle(Particle.SMOKE_LARGE, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125);
+				new PartialParticle(Particle.SPELL_WITCH, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
+				new PartialParticle(Particle.SMOKE_LARGE, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
 				mLauncher.teleport(targetLoc);
 				target.teleport(mobLoc);
-				world.spawnParticle(Particle.SPELL_WITCH, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
-				world.spawnParticle(Particle.SMOKE_LARGE, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125);
+				new PartialParticle(Particle.SPELL_WITCH, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
+				new PartialParticle(Particle.SMOKE_LARGE, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 
-				world.spawnParticle(Particle.SMOKE_LARGE, targetLoc, 65, 0, 0, 0, 0.1);
-				world.spawnParticle(Particle.EXPLOSION_LARGE, targetLoc, 4, 0, 0, 0, 0);
+				new PartialParticle(Particle.SMOKE_LARGE, targetLoc, 65, 0, 0, 0, 0.1).spawnAsEntityActive(mLauncher);
+				new PartialParticle(Particle.EXPLOSION_LARGE, targetLoc, 4, 0, 0, 0, 0).spawnAsEntityActive(mLauncher);
 				world.playSound(targetLoc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 
@@ -99,11 +100,12 @@ public class SpellSwitcheroo extends Spell {
 
 						int mT = 0;
 						Location mLoc = mobLoc;
+
 						@Override
 						public void run() {
 							mT += 2;
-							world.spawnParticle(Particle.CRIT, mLoc, 12, 1.5, 0.15, 1.5, 0.05);
-							world.spawnParticle(Particle.REDSTONE, mLoc, 4, 1.5, 0.15, 1.5, 0.025, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f));
+							new PartialParticle(Particle.CRIT, mLoc, 12, 1.5, 0.15, 1.5, 0.05).spawnAsEntityActive(mLauncher);
+							new PartialParticle(Particle.REDSTONE, mLoc, 4, 1.5, 0.15, 1.5, 0.025, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f)).spawnAsEntityActive(mLauncher);
 
 							if (mT % 10 == 0) {
 								for (Player player : PlayerUtils.playersInRange(mobLoc, 3, true)) {
@@ -138,7 +140,7 @@ public class SpellSwitcheroo extends Spell {
 			public void run() {
 				mTicks++;
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
-				particleLoc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03);
+				new PartialParticle(Particle.PORTAL, particleLoc, 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 
 				if (mTicks > mTpDelay) {
 					this.cancel();

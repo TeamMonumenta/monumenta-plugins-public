@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
-
 public class SpellLightningStrike extends Spell {
 	public static final DustOptions DUST_GRAY_LARGE = new DustOptions(Color.fromRGB(51, 51, 51), 5);
 	public static final DustOptions DUST_YELLOW_LARGE = new DustOptions(Color.fromRGB(255, 255, 64), 1.25f);
@@ -47,15 +46,15 @@ public class SpellLightningStrike extends Spell {
 	private static final int SHOCK_RADIUS = 3;
 	private static final int SHOCK_VERTICAL_RANGE = 10;
 	private static final int SHOCK_INTERVAL_TICKS = 2;
-	private static final int SHOCK_DELAY_TICKS = (int)(1.75 * Constants.TICKS_PER_SECOND);
+	private static final int SHOCK_DELAY_TICKS = (int) (1.75 * Constants.TICKS_PER_SECOND);
 	private static final int SHOCK_COUNT = 10;
 
 	// Lingering fire
 	private static final double FIRE_DAMAGE_MULTIPLIER = 0.1;
 	private static final int FIRE_RADIUS = SHOCK_RADIUS;
-	private static final int FIRE_DURATION_TICKS = (int)(5.25 * Constants.TICKS_PER_SECOND);
-	private static final int FIRE_INTERVAL_TICKS = (int)(0.5 * Constants.TICKS_PER_SECOND);
-	private static final int FIRE_DELAY_TICKS = (int)(0.25 * Constants.TICKS_PER_SECOND);
+	private static final int FIRE_DURATION_TICKS = (int) (5.25 * Constants.TICKS_PER_SECOND);
+	private static final int FIRE_INTERVAL_TICKS = (int) (0.5 * Constants.TICKS_PER_SECOND);
+	private static final int FIRE_DELAY_TICKS = (int) (0.25 * Constants.TICKS_PER_SECOND);
 	private static final int FIRE_ALIGHT_TICKS = 3 * Constants.TICKS_PER_SECOND;
 
 	private Kaul mKaul;
@@ -181,10 +180,10 @@ public class SpellLightningStrike extends Spell {
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
 		int electricRingMarkerCount = 8;
 		PPCircle electricRingMarker = new PPCircle(Particle.REDSTONE, strikeLocation, SHOCK_RADIUS)
-			.ringMode(true)
-			.count(5 * electricRingMarkerCount)
-			.delta(0, 0.25, 0)
-			.data(DUST_YELLOW_LARGE);
+			                              .ringMode(true)
+			                              .count(5 * electricRingMarkerCount)
+			                              .delta(0, 0.25, 0)
+			                              .data(DUST_YELLOW_LARGE);
 
 		BukkitRunnable lightningRunnable = new BukkitRunnable() {
 			int mCountdownTicks = SHOCK_DELAY_TICKS;
@@ -206,7 +205,7 @@ public class SpellLightningStrike extends Spell {
 				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
 					// P: Lightning starts
 					PPLightning lightning = new PPLightning(Particle.END_ROD, strikeLocation)
-						.count(8);
+						                        .count(8);
 					lightning.init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
 					lightning.spawnAsBoss();
 					mInternalParticleRunnable = lightning.runnable();
@@ -378,17 +377,17 @@ public class SpellLightningStrike extends Spell {
 
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
 		PPCircle fireRingMarker = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS)
-			.ringMode(true)
-			.count(5)
-			.delta(0, 0.25, 0);
+			                          .ringMode(true)
+			                          .count(5)
+			                          .delta(0, 0.25, 0);
 
 		// /particle flame ~ ~ ~ 0.1 1 0.1 0.1 0
 		int risingFlamesCount = 5;
 		PPCircle risingFlames = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS)
-			.count(3 * risingFlamesCount)
-			.delta(0.1, 1, 0.1)
-			.extraRange(0.05, 0.1)
-			.directionalMode(true);
+			                        .count(3 * risingFlamesCount)
+			                        .delta(0.1, 1, 0.1)
+			                        .extraRange(0.05, 0.1)
+			                        .directionalMode(true);
 		risingFlames.deltaVariance(true, false, true);
 		risingFlames.mVaryPositiveY = true;
 
@@ -397,8 +396,8 @@ public class SpellLightningStrike extends Spell {
 		int smallSmokeCount = 4;
 		int largeSmokeCount = 2;
 		PPCircle smoke = new PPCircle(Particle.SMOKE_NORMAL, fireLocation, FIRE_RADIUS)
-			.count(5)
-			.extraRange(0, 0.01);
+			                 .count(5)
+			                 .extraRange(0, 0.01);
 
 		int fireSoundLastThreshold = 3 * Constants.TICKS_PER_SECOND;
 		BukkitRunnable fireRunnable = new BukkitRunnable() {
@@ -413,16 +412,16 @@ public class SpellLightningStrike extends Spell {
 
 				// P: Rising flames
 				if (mRemainingTicks != FIRE_DURATION_TICKS) {
-					risingFlames.mCount = (int)Math.ceil(risingFlamesCount * diminishingCountFactor);
+					risingFlames.mCount = (int) Math.ceil(risingFlamesCount * diminishingCountFactor);
 				}
 				risingFlames.spawnAsBoss();
 
 				// P: Large smoke transitions to small
-				smoke.mCount = (int)Math.ceil(smallSmokeCount * diminishingCountFactor);
+				smoke.mCount = (int) Math.ceil(smallSmokeCount * diminishingCountFactor);
 				smoke.spawnAsBoss();
 				if (mRemainingTicks > FIRE_DURATION_TICKS / 2) {
 					smoke.mParticle = Particle.SMOKE_LARGE;
-					smoke.mCount = (int)Math.ceil(largeSmokeCount * diminishingCountFactor / 2);
+					smoke.mCount = (int) Math.ceil(largeSmokeCount * diminishingCountFactor / 2);
 					smoke.spawnAsBoss();
 					smoke.mParticle = Particle.SMOKE_NORMAL;
 				}
@@ -454,21 +453,21 @@ public class SpellLightningStrike extends Spell {
 						1.5f
 					);
 				} else if (
-					mRemainingTicks >= fireSoundLastThreshold
-					&& mRemainingTicks % 3 == 0
+					       mRemainingTicks >= fireSoundLastThreshold
+						       && mRemainingTicks % 3 == 0
 				) {
 					world.playSound(
 						fireLocation,
 						Sound.ENTITY_BLAZE_BURN,
 						SoundCategory.HOSTILE,
 						1,
-						(float)FastUtils.randomDoubleInRange(0, 1.5)
+						(float) FastUtils.randomDoubleInRange(0, 1.5)
 					);
 				}
 
 				if (
 					mRemainingTicks <= FIRE_DURATION_TICKS - FIRE_DELAY_TICKS
-					&& mRemainingTicks % FIRE_INTERVAL_TICKS == 0
+						&& mRemainingTicks % FIRE_INTERVAL_TICKS == 0
 				) {
 					Collection<Player> burnPlayers = PlayerUtils.playersInSphere(
 						fireLocation,

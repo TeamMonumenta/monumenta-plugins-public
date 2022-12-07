@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -41,18 +42,20 @@ public class SpellFluffingDeath extends Spell {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 12, 10));
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks += 2;
 				float fTick = mTicks;
 				float ft = fTick / 25;
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 3, 0.35, 0, 0.35, 0.1);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 3, 0.35, 0, 0.35, 0.1).spawnAsEntityActive(mBoss);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
 				if (mTicks >= 20 * 2) {
 					this.cancel();
 					new BukkitRunnable() {
 
 						int mInnerTicks = 0;
+
 						@Override
 						public void run() {
 							mInnerTicks++;
@@ -89,17 +92,18 @@ public class SpellFluffingDeath extends Spell {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
 			double mY = spawnY;
+
 			@Override
 			public void run() {
 				mY -= 1;
 				Location particle = loc.clone().add(0, mY, 0);
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, particle, 1, 0.2f, 0.2f, 0.2f, 0.05, null, true);
-				world.spawnParticle(Particle.CLOUD, particle, 1, 0, 0, 0, 0, null, true);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, particle, 1, 0.2f, 0.2f, 0.2f, 0.05, null, true).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CLOUD, particle, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
-					world.spawnParticle(Particle.FLAME, loc, 25, 0, 0, 0, 0.175, null, true);
-					world.spawnParticle(Particle.CLOUD, loc, 75, 0, 0, 0, 0.25, null, true);
+					new PartialParticle(Particle.FLAME, loc, 25, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.CLOUD, loc, 75, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 1);
@@ -114,14 +118,14 @@ public class SpellFluffingDeath extends Spell {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
-		world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
-		world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 	}
 
 	@Override

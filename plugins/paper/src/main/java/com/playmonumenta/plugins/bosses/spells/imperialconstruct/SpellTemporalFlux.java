@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.GameMode;
@@ -43,6 +44,7 @@ public class SpellTemporalFlux extends Spell {
 			Location mLoc;
 			int mBaseSize = 15;
 			double mRate = 1;
+
 			@Override
 			public void run() {
 				mTicks++;
@@ -59,7 +61,7 @@ public class SpellTemporalFlux extends Spell {
 							double x = Math.cos(a) * radius;
 							double z = Math.sin(a) * radius;
 							mLoc.add(x, y, z);
-							mBoss.getWorld().spawnParticle(Particle.SPELL_WITCH, mLoc, 1, 0, 0, 0, 0);
+							new PartialParticle(Particle.SPELL_WITCH, mLoc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 							mLoc.subtract(x, y, z);
 						}
 					}
@@ -70,20 +72,21 @@ public class SpellTemporalFlux extends Spell {
 						double mMaxRadius = 25;
 						double mSecondaryRate;
 						int mTicks = 0;
+
 						@Override
 						public void run() {
 							mTicks++;
 							mLoc = mBoss.getLocation();
-							mSecondaryRate = (double) mTicks/mBurstTime;
+							mSecondaryRate = (double) mTicks / mBurstTime;
 							double rotation = 0;
 							double radius = mMaxRadius * mSecondaryRate; //Make the circle a bit bigger than a unit circle.
 							for (int i = 0; i < 36; i++) {
-							  rotation += 10;
-							  double radian = Math.toRadians(rotation); //Converts the rotation degrees into radians
-							  //Add 1 to the y-axis to move the circle up by 1
-							  mLoc.add(Math.cos(radian) * radius, 1, Math.sin(radian) * radius); //Add Location
-							  mWorld.spawnParticle(Particle.FLAME, mLoc, 1, 0, 0, 0, 0);
-							  mLoc.subtract(Math.cos(radian) * radius, 1, Math.sin(radian) * radius); //Reset location to original position
+								rotation += 10;
+								double radian = Math.toRadians(rotation); //Converts the rotation degrees into radians
+								//Add 1 to the y-axis to move the circle up by 1
+								mLoc.add(Math.cos(radian) * radius, 1, Math.sin(radian) * radius); //Add Location
+								new PartialParticle(Particle.FLAME, mLoc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+								mLoc.subtract(Math.cos(radian) * radius, 1, Math.sin(radian) * radius); //Reset location to original position
 							}
 
 							if (mTicks >= mBurstTime) {
@@ -96,7 +99,7 @@ public class SpellTemporalFlux extends Spell {
 					mActiveRunnables.add(runnable2);
 
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.HOSTILE, 10f, 1f);
-					mWorld.spawnParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation().add(0, 2, 0), 60, 1, 1, 1, 0.001);
+					new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation().add(0, 2, 0), 60, 1, 1, 1, 0.001).spawnAsEntityActive(mBoss);
 					this.cancel();
 				}
 			}

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -29,21 +30,22 @@ public class SpellOmegaLeap extends Spell {
 	public void run() {
 		World world = mBoss.getWorld();
 		mBoss.setVelocity(new Vector(0, 1.5, 0));
-		world.spawnParticle(Particle.FLAME, mBoss.getLocation(), 175, 0, 0, 0, 0.175, null, true);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 75, 0, 0, 0, 0.25, null, true);
+		new PartialParticle(Particle.FLAME, mBoss.getLocation(), 175, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 75, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.5f, 0f);
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
 				if (mTicks >= 5 && mBoss.isOnGround() && !mBoss.isDead() && mBoss.isValid()) {
 					this.cancel();
 					Location loc = mBoss.getLocation();
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0.02, 0.02, 0.02, 0);
-					world.spawnParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1.5f);
@@ -52,6 +54,7 @@ public class SpellOmegaLeap extends Spell {
 						double mRotation = 0;
 						double mRadius = 1;
 						Location mAttackLocation = mBoss.getLocation();
+
 						@Override
 						public void run() {
 							if (mRadius >= 15) {
@@ -61,11 +64,11 @@ public class SpellOmegaLeap extends Spell {
 								Location loc = mBoss.getLocation();
 								mRotation += 10;
 								double radian1 = Math.toRadians(mRotation);
-								loc.add(FastUtils.cos(radian1)*mRadius, 0.25, FastUtils.sin(radian1)*mRadius);
-								world.spawnParticle(Particle.FLAME, loc, 2, 0.2, 0.2, 0.2, 0.1, null, true);
-								world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.2, 0.2, 0.2, 0.65, null, true);
+								loc.add(FastUtils.cos(radian1) * mRadius, 0.25, FastUtils.sin(radian1) * mRadius);
+								new PartialParticle(Particle.FLAME, loc, 2, 0.2, 0.2, 0.2, 0.1, null, true).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.2, 0.2, 0.2, 0.65, null, true).spawnAsEntityActive(mBoss);
 
-								loc.subtract(FastUtils.cos(radian1)*mRadius, 0.25, FastUtils.sin(radian1)*mRadius);
+								loc.subtract(FastUtils.cos(radian1) * mRadius, 0.25, FastUtils.sin(radian1) * mRadius);
 							}
 							for (Player player : PlayerUtils.playersInRange(mAttackLocation, mRadius, true)) {
 								if (player.getLocation().toVector().isInSphere(mAttackLocation.toVector(), mRadius)) {

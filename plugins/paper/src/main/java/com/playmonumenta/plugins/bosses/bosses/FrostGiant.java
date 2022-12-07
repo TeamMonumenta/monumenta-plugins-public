@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.bosses.spells.frostgiant.UltimateSeismicRuin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -242,23 +243,23 @@ public class FrostGiant extends BossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-				default:
-					break;
-				case START_TAG:
-					mStart = e;
-					break;
-				case NORTH:
-					mNorthStand = e;
-					break;
-				case EAST:
-					mEastStand = e;
-					break;
-				case SOUTH:
-					mSouthStand = e;
-					break;
-				case WEST:
-					mWestStand = e;
-					break;
+					default:
+						break;
+					case START_TAG:
+						mStart = e;
+						break;
+					case NORTH:
+						mNorthStand = e;
+						break;
+					case EAST:
+						mEastStand = e;
+						break;
+					case SOUTH:
+						mSouthStand = e;
+						break;
+					case WEST:
+						mWestStand = e;
+						break;
 				}
 			}
 		}
@@ -291,6 +292,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (!mCutsceneDone || mPreventTargetting) {
@@ -307,7 +309,7 @@ public class FrostGiant extends BossAbilityGroup {
 				}
 
 
-				if (mT >= 20 * 6 && mBoss.getLocation().distance(mStuckLoc) < 0.5 && ((Creature)mBoss).getTarget() != null) {
+				if (mT >= 20 * 6 && mBoss.getLocation().distance(mStuckLoc) < 0.5 && ((Creature) mBoss).getTarget() != null) {
 					teleport(mStartLoc);
 					mT = 0;
 				} else if (mStuckLoc == null || mBoss.getLocation().distance(mStuckLoc) > 0.5) {
@@ -326,6 +328,7 @@ public class FrostGiant extends BossAbilityGroup {
 		//After targetting the same player for 30 seconds, play a sound and change targets after 1/2 a second
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (!mCutsceneDone || mPreventTargetting) {
@@ -342,6 +345,7 @@ public class FrostGiant extends BossAbilityGroup {
 				} else if (mT >= 20 * 30 && c.getTarget().equals(mTargeted)) {
 					new BukkitRunnable() {
 						int mTicks = 0;
+
 						@Override
 						public void run() {
 							if (mTicks >= 10) {
@@ -395,76 +399,76 @@ public class FrostGiant extends BossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 5);
 
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
-				new SpellGlacialPrison(mPlugin, mBoss, fighterRange, mStartLoc),
-				new RingOfFrost(mPlugin, mBoss, 12, mStartLoc)
-				));
+			new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
+			new Shatter(mPlugin, mBoss, 3f, mStartLoc),
+			new SpellGlacialPrison(mPlugin, mBoss, fighterRange, mStartLoc),
+			new RingOfFrost(mPlugin, mBoss, 12, mStartLoc)
+		));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
-				new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration - 5, 90, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration - 5, 90, mStartLoc),
-				new SpellSpinDown(mPlugin, mBoss, mStartLoc),
-				new SpellSpinDown(mPlugin, mBoss, mStartLoc)
-				));
+			new Shatter(mPlugin, mBoss, 3f, mStartLoc),
+			new SpellAirGolemStrike(mPlugin, mBoss, mStartLoc),
+			new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration - 5, 90, mStartLoc),
+			new SpellGreatswordSlam(mPlugin, mBoss, frostedIceDuration - 5, 90, mStartLoc),
+			new SpellSpinDown(mPlugin, mBoss, mStartLoc),
+			new SpellSpinDown(mPlugin, mBoss, mStartLoc)
+		));
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
-				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
-				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 20, 90, mStartLoc)
-				));
+			new Shatter(mPlugin, mBoss, 3f, mStartLoc),
+			new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
+			new SpellFrostRift(mPlugin, mBoss, mStartLoc),
+			new SpellGreatswordSlam(mPlugin, mBoss, 20, 90, mStartLoc)
+		));
 
 		SpellManager phase4Spells = new SpellManager(Arrays.asList(
-				new Shatter(mPlugin, mBoss, 3f, mStartLoc),
-				new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
-				new SpellFrostRift(mPlugin, mBoss, mStartLoc),
-				new SpellGreatswordSlam(mPlugin, mBoss, 20, 60, mStartLoc)
-				));
+			new Shatter(mPlugin, mBoss, 3f, mStartLoc),
+			new SpellTitanicRupture(mPlugin, mBoss, mStartLoc),
+			new SpellFrostRift(mPlugin, mBoss, mStartLoc),
+			new SpellGreatswordSlam(mPlugin, mBoss, 20, 60, mStartLoc)
+		));
 
 		List<Spell> phase1PassiveSpells = Arrays.asList(
-				new ArmorOfFrost(mPlugin, mBoss, this, 2),
-				new SpellPurgeNegatives(mBoss, 20 * 4),
-				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new GiantStomp(mPlugin, mBoss),
-				new SpellRemoveLevitation(mBoss)
-				);
+			new ArmorOfFrost(mPlugin, mBoss, this, 2),
+			new SpellPurgeNegatives(mBoss, 20 * 4),
+			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
+			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+			new GiantStomp(mPlugin, mBoss),
+			new SpellRemoveLevitation(mBoss)
+		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
-				new ArmorOfFrost(mPlugin, mBoss, this, 2),
-				new SpellPurgeNegatives(mBoss, 20 * 3),
-				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new SpellFrostedIceBreak(mBoss),
-				new GiantStomp(mPlugin, mBoss),
-				new SpellRemoveLevitation(mBoss)
-				);
+			new ArmorOfFrost(mPlugin, mBoss, this, 2),
+			new SpellPurgeNegatives(mBoss, 20 * 3),
+			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
+			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+			new SpellFrostedIceBreak(mBoss),
+			new GiantStomp(mPlugin, mBoss),
+			new SpellRemoveLevitation(mBoss)
+		);
 		List<Spell> phase3PassiveSpells = Arrays.asList(
-				new ArmorOfFrost(mPlugin, mBoss, this, 1),
-				new SpellPurgeNegatives(mBoss, 20 * 2),
-				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new SpellFrostedIceBreak(mBoss),
-				new GiantStomp(mPlugin, mBoss),
-				new SpellRemoveLevitation(mBoss)
-				);
+			new ArmorOfFrost(mPlugin, mBoss, this, 1),
+			new SpellPurgeNegatives(mBoss, 20 * 2),
+			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
+			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+			new SpellFrostedIceBreak(mBoss),
+			new GiantStomp(mPlugin, mBoss),
+			new SpellRemoveLevitation(mBoss)
+		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
-				new ArmorOfFrost(mPlugin, mBoss, this, 1, false),
-				new SpellPurgeNegatives(mBoss, 20 * 2),
-				new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
-				new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
-				new SpellFrostbite(mPlugin, mBoss, mStartLoc),
-				new SpellFrostedIceBreak(mBoss),
-				new GiantStomp(mPlugin, mBoss),
-				new SpellRemoveLevitation(mBoss)
-				);
+			new ArmorOfFrost(mPlugin, mBoss, this, 1, false),
+			new SpellPurgeNegatives(mBoss, 20 * 2),
+			new SpellFrostGiantBlockBreak(mBoss, 5, 15, 5, mStartLoc),
+			new SpellHailstorm(mPlugin, mBoss, hailstormRadius, mStartLoc),
+			new SpellFrostbite(mPlugin, mBoss, mStartLoc),
+			new SpellFrostedIceBreak(mBoss),
+			new GiantStomp(mPlugin, mBoss),
+			new SpellRemoveLevitation(mBoss)
+		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(100, mBoss -> {
@@ -567,19 +571,19 @@ public class FrostGiant extends BossAbilityGroup {
 		//Show hailstorm before fight starts
 		new BukkitRunnable() {
 			Creature mC = (Creature) mBoss;
+
 			@Override
 			public void run() {
 				Location loc = mStartLoc.clone();
-				World world = mBoss.getWorld();
 				for (double degree = 0; degree < 360; degree += 8) {
 					double radian = Math.toRadians(degree);
 					double cos = FastUtils.cos(radian);
 					double sin = FastUtils.sin(radian);
 					loc.add(cos * (hailstormRadius + 5), 2.5, sin * (hailstormRadius + 5));
-					world.spawnParticle(Particle.CLOUD, loc, 3, 3, 1, 4, 0.075);
-					world.spawnParticle(Particle.CLOUD, loc, 3, 3, 4, 4, 0.075);
-					world.spawnParticle(Particle.REDSTONE, loc, 3, 3, 4, 4, 0.075, BLUE_COLOR);
-					world.spawnParticle(Particle.REDSTONE, loc, 3, 3, 1, 4, 0.075, BLUE_COLOR);
+					new PartialParticle(Particle.CLOUD, loc, 3, 3, 1, 4, 0.075).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.CLOUD, loc, 3, 3, 4, 4, 0.075).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.REDSTONE, loc, 3, 3, 4, 4, 0.075, BLUE_COLOR).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.REDSTONE, loc, 3, 3, 1, 4, 0.075, BLUE_COLOR).spawnAsEntityActive(boss);
 					loc.subtract(cos * (hailstormRadius + 5), 2.5, sin * (hailstormRadius + 5));
 				}
 
@@ -589,7 +593,7 @@ public class FrostGiant extends BossAbilityGroup {
 						double cos = FastUtils.cos(radian);
 						double sin = FastUtils.sin(radian);
 						loc.add(cos * hailstormRadius, 0.5, sin * hailstormRadius);
-						world.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR);
+						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, LIGHT_BLUE_COLOR).spawnAsEntityActive(boss);
 						loc.subtract(cos * hailstormRadius, 0.5, sin * hailstormRadius);
 					}
 				}
@@ -615,13 +619,14 @@ public class FrostGiant extends BossAbilityGroup {
 			double mRadius = 0;
 			Location mLoc = mStartLoc.clone();
 			List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange, true);
+
 			@Override
 			public void run() {
 				mRadius += 1.5;
 				for (double degree = 0; degree < 360; degree += 5) {
 					double radian = Math.toRadians(degree);
 					mLoc.add(FastUtils.cos(radian) * mRadius, 1, FastUtils.sin(radian) * mRadius);
-					world.spawnParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35);
+					new PartialParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35).spawnAsEntityActive(boss);
 					mLoc.subtract(FastUtils.cos(radian) * mRadius, 1, FastUtils.sin(radian) * mRadius);
 				}
 				if (mRadius >= 40) {
@@ -637,6 +642,7 @@ public class FrostGiant extends BossAbilityGroup {
 					new BukkitRunnable() {
 						int mTicks = 0;
 						int mRotation = 0;
+
 						@Override
 						public void run() {
 							mTicks += 2;
@@ -650,8 +656,8 @@ public class FrostGiant extends BossAbilityGroup {
 								double rad2 = Math.toRadians(mRotation + 180);
 								Location loc2 = mStartLoc.clone().add(FastUtils.cos(rad2) * 3, y, FastUtils.sin(rad2));
 
-								world.spawnParticle(Particle.SPELL_INSTANT, loc1, 5, 0.1, 0.1, 0.1, 0);
-								world.spawnParticle(Particle.SPELL_INSTANT, loc2, 5, 0.1, 0.1, 0.1, 0);
+								new PartialParticle(Particle.SPELL_INSTANT, loc1, 5, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.SPELL_INSTANT, loc2, 5, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(boss);
 							}
 							mRotation += 10;
 							if (mRotation >= 360) {
@@ -663,10 +669,10 @@ public class FrostGiant extends BossAbilityGroup {
 							}
 
 							if (mTicks % 10 == 0) {
-								world.spawnParticle(Particle.BLOCK_DUST, mStartLoc, 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData());
-								world.spawnParticle(Particle.BLOCK_DUST, mStartLoc, 75, 5, 0.35, 5, 0.25, Material.COARSE_DIRT.createBlockData());
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, mStartLoc, 15, 5, 0.35, 5, 0.15);
-								world.spawnParticle(Particle.CLOUD, mStartLoc, 20, 5, 0.35, 5, 0.15);
+								new PartialParticle(Particle.BLOCK_DUST, mStartLoc, 40, 2, 0.35, 2, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.BLOCK_DUST, mStartLoc, 75, 5, 0.35, 5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, mStartLoc, 15, 5, 0.35, 5, 0.15).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.CLOUD, mStartLoc, 20, 5, 0.35, 5, 0.15).spawnAsEntityActive(boss);
 							}
 						}
 					}.runTaskTimer(mPlugin, 0, 2);
@@ -681,6 +687,7 @@ public class FrostGiant extends BossAbilityGroup {
 								double mR = 0;
 								Location mLoc = mStartLoc.clone();
 								List<Player> mPlayers = PlayerUtils.playersInRange(mLoc, detectionRange, true);
+
 								@Override
 								public void run() {
 									if (mR == 0) {
@@ -723,7 +730,7 @@ public class FrostGiant extends BossAbilityGroup {
 									for (double degree = 0; degree < 360; degree += 5) {
 										double radian = Math.toRadians(degree);
 										mLoc.add(FastUtils.cos(radian) * mR, 1, FastUtils.sin(radian) * mR);
-										world.spawnParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35);
+										new PartialParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35).spawnAsEntityActive(boss);
 										mLoc.subtract(FastUtils.cos(radian) * mR, 1, FastUtils.sin(radian) * mR);
 									}
 									if (mR >= 40) {
@@ -779,7 +786,7 @@ public class FrostGiant extends BossAbilityGroup {
 		for (double degree = 0; degree < 360; degree += 5) {
 			double radian = Math.toRadians(degree);
 			loc.add(FastUtils.cos(radian), 1, FastUtils.sin(radian));
-			world.spawnParticle(Particle.CLOUD, loc, 4, 1, 1, 1, 0.35);
+			new PartialParticle(Particle.CLOUD, loc, 4, 1, 1, 1, 0.35).spawnAsEntityActive(mBoss);
 			loc.subtract(FastUtils.cos(radian), 1, FastUtils.sin(radian));
 		}
 
@@ -815,13 +822,14 @@ public class FrostGiant extends BossAbilityGroup {
 		new BukkitRunnable() {
 			double mRadius = 0;
 			Location mLoc = mStartLoc.clone();
+
 			@Override
 			public void run() {
 				mRadius += 1.5;
 				for (double degree = 0; degree < 360; degree += 5) {
 					double radian = Math.toRadians(degree);
 					mLoc.add(FastUtils.cos(radian) * mRadius, 1, FastUtils.sin(radian) * mRadius);
-					world.spawnParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35);
+					new PartialParticle(Particle.CLOUD, mLoc, 4, 1, 1, 1, 0.35).spawnAsEntityActive(mBoss);
 					mLoc.subtract(FastUtils.cos(radian) * mRadius, 1, FastUtils.sin(radian) * mRadius);
 				}
 				if (mRadius >= 40) {
@@ -836,6 +844,7 @@ public class FrostGiant extends BossAbilityGroup {
 			int mRotation = 360;
 			//The end totem green particle sequence
 			boolean mEndingParticles = false;
+
 			@Override
 			public void run() {
 
@@ -845,7 +854,7 @@ public class FrostGiant extends BossAbilityGroup {
 						world.playSound(mStartLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 					}
 
-					world.spawnParticle(Particle.EXPLOSION_LARGE, mStartLoc.clone().add(0, 5, 0), 1, 1, 5, 1);
+					new PartialParticle(Particle.EXPLOSION_LARGE, mStartLoc.clone().add(0, 5, 0), 1, 1, 5, 1).spawnAsEntityActive(mBoss);
 				}
 
 				if (mTicks >= 20 * 4 && mTicks <= 20 * 10 && mTicks % 2 == 0) {
@@ -857,8 +866,8 @@ public class FrostGiant extends BossAbilityGroup {
 						double rad2 = Math.toRadians(mRotation + 180);
 						Location loc2 = mBoss.getLocation().clone().add(FastUtils.cos(rad2) * 3, y, FastUtils.sin(rad2));
 
-						world.spawnParticle(Particle.SPELL_WITCH, loc1, 5, 0.1, 0.1, 0.1, 0);
-						world.spawnParticle(Particle.SPELL_WITCH, loc2, 5, 0.1, 0.1, 0.1, 0);
+						new PartialParticle(Particle.SPELL_WITCH, loc1, 5, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SPELL_WITCH, loc2, 5, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 					}
 					mRotation -= 20;
 					if (mRotation <= 0) {
@@ -872,13 +881,13 @@ public class FrostGiant extends BossAbilityGroup {
 				if (mTicks >= 20 * 4 && mTicks <= 20 * 10 && mTicks % 10 == 0) {
 					world.playSound(mStartLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 2, FastUtils.RANDOM.nextFloat());
 					world.playSound(mStartLoc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 2, mPitch);
-					world.spawnParticle(Particle.BLOCK_DUST, startLoc, 100, 2, 0.35, 2, 0.25, Material.BLUE_ICE.createBlockData());
-					world.spawnParticle(Particle.BLOCK_DUST, startLoc, 100, 2, 0.35, 2, 0.25, Material.IRON_TRAPDOOR.createBlockData());
-					world.spawnParticle(Particle.DRAGON_BREATH, startLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.25);
+					new PartialParticle(Particle.BLOCK_DUST, startLoc, 100, 2, 0.35, 2, 0.25, Material.BLUE_ICE.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.BLOCK_DUST, startLoc, 100, 2, 0.35, 2, 0.25, Material.IRON_TRAPDOOR.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.DRAGON_BREATH, startLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.25).spawnAsEntityActive(mBoss);
 				}
 
 				if (!mEndingParticles && mTicks >= 20 * 10 /*&& (startLoc.getBlock().getType() == Material.BARRIER || startLoc.getBlock().getType() == Material.AIR) */) {
-					world.spawnParticle(Particle.VILLAGER_HAPPY, startLoc.clone().add(0, 5, 0), 300, 1, 5, 1, 0.25);
+					new PartialParticle(Particle.VILLAGER_HAPPY, startLoc.clone().add(0, 5, 0), 300, 1, 5, 1, 0.25).spawnAsEntityActive(mBoss);
 					mEndingParticles = true;
 				}
 
@@ -948,8 +957,8 @@ public class FrostGiant extends BossAbilityGroup {
 	private static ItemStack modifyItemName(ItemStack item, String newName, TextColor color, boolean isUnderlined) {
 		ItemMeta im = item.getItemMeta();
 		im.displayName(Component.text(newName, color, TextDecoration.BOLD)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.UNDERLINED, isUnderlined));
+			               .decoration(TextDecoration.ITALIC, false)
+			               .decoration(TextDecoration.UNDERLINED, isUnderlined));
 		item.setItemMeta(im);
 		ItemUtils.setPlainName(item, newName);
 
@@ -985,6 +994,7 @@ public class FrostGiant extends BossAbilityGroup {
 		if (event.getDamager() instanceof Projectile proj) {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					mBoss.setVelocity(new Vector(0, 0, 0));
@@ -1046,14 +1056,14 @@ public class FrostGiant extends BossAbilityGroup {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 
 		//Both abilities delayed by 1.5s
 		//Delays damage for melee
@@ -1118,7 +1128,7 @@ public class FrostGiant extends BossAbilityGroup {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, FrostGiant.detectionRange)) {
 			if (mob.getType() == EntityType.IRON_GOLEM) {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, GOLEM_FREEZE_EFFECT_NAME,
-						new PercentSpeed(20 * 20, -1, GOLEM_FREEZE_EFFECT_NAME));
+					new PercentSpeed(20 * 20, -1, GOLEM_FREEZE_EFFECT_NAME));
 				mob.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 10));
 			}
 		}

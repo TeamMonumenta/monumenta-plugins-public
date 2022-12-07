@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellEarthenRupture;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellPrimordialBolt;
 import com.playmonumenta.plugins.bosses.spells.kaul.SpellRaiseJungle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -23,7 +24,6 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -63,7 +63,6 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
 		Location spawnLoc = mBoss.getLocation();
-		World world = mBoss.getWorld();
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
 		int hpDelta = 768;
 		double bossTargetHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
@@ -81,14 +80,14 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1,
 				(LivingEntity mBoss) -> {
-					world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-					                    0.4, 0.35, Material.BROWN_CONCRETE.createBlockData());
+					new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
+						0.4, 0.35, Material.BROWN_CONCRETE.createBlockData()).spawnAsEntityActive(boss);
 				}
 			),
 			new SpellConditionalTeleport(mBoss, spawnLoc, b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-														       || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-														       || b.getLocation().getBlock().getType() == Material.LAVA
-														       || b.getLocation().getBlock().getType() == Material.WATER),
+				                                                   || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+				                                                   || b.getLocation().getBlock().getType() == Material.LAVA
+				                                                   || b.getLocation().getBlock().getType() == Material.WATER),
 			new SpellShieldStun(30 * 20)
 		);
 

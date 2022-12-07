@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 import com.playmonumenta.plugins.bosses.bosses.Svalgot;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -39,6 +40,7 @@ public class SvalgotRisingBlackflame extends Spell {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 1));
 		new BukkitRunnable() {
 			public int mTicks = 0;
+
 			@Override
 			public void run() {
 
@@ -47,10 +49,10 @@ public class SvalgotRisingBlackflame extends Spell {
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1, 0f);
 				}
 
-				world.spawnParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.BONE_BLOCK.createBlockData());
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25, 0.1, 0.25, 0.25);
-				world.spawnParticle(Particle.SPELL_WITCH, loc, 2, 0.25, 0.1, 0.25, 0.25);
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.25, 0.1, 0.25, 0.25);
+				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPELL_WITCH, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
@@ -60,9 +62,9 @@ public class SvalgotRisingBlackflame extends Spell {
 
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 2);
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
-					world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.BONE_BLOCK.createBlockData());
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 100, 3, 0.1, 3, 0.25);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
+					new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, DAMAGE, "Rising Blackflame", loc);
 						MovementUtils.knockAway(loc, player, 0.50f, 1f, false);

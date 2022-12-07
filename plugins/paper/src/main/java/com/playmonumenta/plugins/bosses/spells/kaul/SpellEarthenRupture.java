@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -53,8 +54,8 @@ public class SpellEarthenRupture extends Spell {
 					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, 2, 0.9f);
 				}
 
-				world.spawnParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData());
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25, 0.1, 0.25, 0.25);
+				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
@@ -62,9 +63,9 @@ public class SpellEarthenRupture extends Spell {
 					this.cancel();
 					mChargeUp.reset();
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.9f);
-					world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData());
-					world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
+					new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 20, "Earthen Rupture", mBoss.getLocation());
 						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
@@ -53,13 +54,14 @@ public class UnyieldingBoss extends BossAbilityGroup {
 			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "UnyieldingResistanceEffect", new PercentDamageReceived(40, -1));
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks == 0) {
 						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ITEM_BREAK, 2f, 1f);
 					}
 					if (mTicks % 6 == 0) {
-						mBoss.getWorld().spawnParticle(Particle.DRAGON_BREATH, mBoss.getLocation().add(0, mBoss.getBoundingBox().getHeight()/2, 0), 30, mBoss.getBoundingBox().getWidthX()/2.0, mBoss.getBoundingBox().getHeight()/2, mBoss.getBoundingBox().getWidthZ()/2.0, 0);
+						new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation().add(0, mBoss.getBoundingBox().getHeight() / 2, 0), 30, mBoss.getBoundingBox().getWidthX() / 2.0, mBoss.getBoundingBox().getHeight() / 2, mBoss.getBoundingBox().getWidthZ() / 2.0, 0).spawnAsEntityActive(mBoss);
 					}
 					if (mTicks == 40) {
 						this.cancel();

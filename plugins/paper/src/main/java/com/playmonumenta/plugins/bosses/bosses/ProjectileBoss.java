@@ -156,7 +156,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		int lifetimeTicks = (int) (p.DISTANCE/p.SPEED);
+		int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
 
 		if (p.TARGETS == EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT) {
 			//same object

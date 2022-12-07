@@ -62,9 +62,9 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 		List<String> summonableMobs = List.of("SeaWolf", "PirateGunner", "DrownedCrewman");
 
 		String[] speak = new String[] {
-				"Yarr! It be you again? This shan't end the way it did before, matey!",
-				"Ye took me treasure, ye stole me fleece. Now I be takin' ye to the beyond!",
-				"Yarr! Me ghostly crew rides forth!"};
+			"Yarr! It be you again? This shan't end the way it did before, matey!",
+			"Ye took me treasure, ye stole me fleece. Now I be takin' ye to the beyond!",
+			"Yarr! Me ghostly crew rides forth!"};
 
 		int radius = 50;
 		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, radius, radius, radius)) {
@@ -91,8 +91,8 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
 		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 5, 2, mCenter, this),
-		                                          new SpellJibberJabber(mBoss, speak, radius),
-		                                          action, tooHighAction);
+			new SpellJibberJabber(mBoss, speak, radius),
+			action, tooHighAction);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellPurgeNegatives(mBoss, 100)));
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();

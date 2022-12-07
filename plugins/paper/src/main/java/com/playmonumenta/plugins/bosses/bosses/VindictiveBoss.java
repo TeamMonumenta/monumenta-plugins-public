@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellVindictiveParticle;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Arrays;
 import java.util.List;
@@ -51,12 +52,12 @@ public class VindictiveBoss extends BossAbilityGroup {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), RANGE)) {
 			Location loc = mob.getEyeLocation();
 			world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
-			world.spawnParticle(Particle.FLAME, loc, 20, 0, 0, 0, 0.1);
+			new PartialParticle(Particle.FLAME, loc, 20, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 
 			plugin.mEffectManager.addEffect(mob, PERCENT_SPEED_EFFECT_NAME,
-					new PercentSpeed(DURATION, PERCENT_SPEED_EFFECT, PERCENT_SPEED_EFFECT_NAME));
+				new PercentSpeed(DURATION, PERCENT_SPEED_EFFECT, PERCENT_SPEED_EFFECT_NAME));
 			plugin.mEffectManager.addEffect(mob, PERCENT_DAMAGE_DEALT_EFFECT_NAME,
-					new PercentDamageDealt(DURATION, PERCENT_DAMAGE_DEALT_EFFECT));
+				new PercentDamageDealt(DURATION, PERCENT_DAMAGE_DEALT_EFFECT));
 
 			mob.setHealth(Math.min(EntityUtils.getMaxHealth(mob), mob.getHealth() + HEAL));
 		}

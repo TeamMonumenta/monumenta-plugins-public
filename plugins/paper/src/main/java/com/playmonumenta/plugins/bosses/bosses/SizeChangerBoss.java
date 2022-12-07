@@ -128,9 +128,10 @@ public class SizeChangerBoss extends BossAbilityGroup {
 			if (!mParams.PARTICLES.isEmpty()) {
 				new BukkitRunnable() {
 					final Location mLoc = mBoss.getLocation().clone().add(0, height / 2, 0);
+
 					@Override
 					public void run() {
-						for (int i = 0; i < 360; i = (int) (i + 20 * (2f/mCurrentSize))) {
+						for (int i = 0; i < 360; i = (int) (i + 20 * (2f / mCurrentSize))) {
 							double rad = Math.toRadians(i);
 							double cos = FastUtils.cos(rad) * height;
 							double sin = FastUtils.sin(rad) * height;

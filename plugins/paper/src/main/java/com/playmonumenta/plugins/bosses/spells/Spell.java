@@ -66,7 +66,7 @@ public abstract class Spell implements Cloneable {
 
 	/**
 	 * Whether this spell is currently active.
-	 *
+	 * <p>
 	 * By default, this checks if there are active runnables, but may be overridden by spells to be more specific.
 	 */
 	public boolean isRunning() {
@@ -104,7 +104,7 @@ public abstract class Spell implements Cloneable {
 
 	/**
 	 * Whether this ability ignores being silenced.
-	 *
+	 * <p>
 	 * Currently only works for passive spells.
 	 */
 	public boolean bypassSilence() {

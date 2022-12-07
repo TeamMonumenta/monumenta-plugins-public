@@ -47,13 +47,13 @@ public class BarrierBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, boss, p.DETECTION, p.COOLDOWN, p.HITS_TO_BREAK, p.IS_CARAPACE,
-				(Location loc) -> {
-					p.SOUND_REFRESH.play(loc);
-				}, (Location loc) -> {
-					p.PARTICLE.spawn(boss, loc, 0, 1, 0);
-				}, (Location loc) -> {
-					p.SOUND_BREAK.play(loc);
-				})));
+			(Location loc) -> {
+				p.SOUND_REFRESH.play(loc);
+			}, (Location loc) -> {
+			p.PARTICLE.spawn(boss, loc, 0, 1, 0);
+		}, (Location loc) -> {
+			p.SOUND_BREAK.play(loc);
+		})));
 		super.constructBoss(SpellManager.EMPTY, passives, p.DETECTION, null);
 	}
 

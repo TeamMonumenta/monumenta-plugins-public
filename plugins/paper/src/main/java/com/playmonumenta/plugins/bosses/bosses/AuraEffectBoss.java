@@ -58,9 +58,9 @@ public class AuraEffectBoss extends BossAbilityGroup {
 					p.PARTICLE_ENTITY.spawn(boss, entity.getLocation().clone().add(0, 1, 0));
 				},
 				(p.EFFECTS == EffectsList.EMPTY ? null :
-					(Player player) -> {
-						p.EFFECTS.apply(player, mBoss);
-					}
+					 (Player player) -> {
+						 p.EFFECTS.apply(player, mBoss);
+					 }
 				)
 			)
 		);

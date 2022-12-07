@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.PortalBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -129,7 +130,7 @@ public class SpellUltimateShulkerMania extends Spell {
 			}
 			//Let the players know something happened
 			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 0.3f, 0.9f);
-			p.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, p.getLocation(), 25, 1.5, 1.5, 1.5);
+			new PartialParticle(Particle.VILLAGER_ANGRY, p.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsEntityActive(mBoss);
 		}
 	}
 

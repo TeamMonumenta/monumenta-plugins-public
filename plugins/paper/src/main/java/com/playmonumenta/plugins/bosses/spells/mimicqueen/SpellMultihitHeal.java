@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.mimicqueen;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -42,6 +43,7 @@ public class SpellMultihitHeal extends Spell {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
@@ -50,16 +52,17 @@ public class SpellMultihitHeal extends Spell {
 
 					new BukkitRunnable() {
 						int mCount = 0;
+
 						@Override
 						public void run() {
 							mCount++;
 							Location loc = mBoss.getLocation();
 
-							world.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 5, 1, 1, 1, 0.25);
+							new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 5, 1, 1, 1, 0.25).spawnAsEntityActive(mBoss);
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 3, 0.75f);
 							for (int deg = 0; deg < 360; deg += 45) {
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, loc.clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 4, 1, 1.5, 1, 0);
-								world.spawnParticle(Particle.SWEEP_ATTACK, loc.clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 3, 1, 1.5, 1, 0);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc.clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 4, 1, 1.5, 1, 0).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SWEEP_ATTACK, loc.clone().add(3 * FastUtils.cos(deg), 0, 3 * FastUtils.sin(deg)), 3, 1, 1.5, 1, 0).spawnAsEntityActive(mBoss);
 							}
 
 							for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
@@ -80,7 +83,7 @@ public class SpellMultihitHeal extends Spell {
 								}
 								world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
 								world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1, 2f);
-								world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR);
+								new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 5, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
 							}
 
 							if (mCount > 5) {

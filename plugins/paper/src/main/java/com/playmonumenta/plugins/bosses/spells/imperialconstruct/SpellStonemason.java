@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -70,7 +71,7 @@ public class SpellStonemason extends Spell {
 
 							for (Location loc : locs) {
 								loc.add(cos * mRadius, 0.5, sin * mRadius);
-								world.spawnParticle(Particle.SQUID_INK, loc, 1, 0, 0, 0, 0);
+								new PartialParticle(Particle.SQUID_INK, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								loc.subtract(cos * mRadius, 0.5, sin * mRadius);
 							}
 						}
@@ -87,7 +88,7 @@ public class SpellStonemason extends Spell {
 							}
 						}
 
-						world.spawnParticle(Particle.LAVA, loc, 20, 2, 0.1, 2, 0.25);
+						new PartialParticle(Particle.LAVA, loc, 20, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 2);
 						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.HOSTILE, 1.5f, 0);
 
@@ -99,6 +100,7 @@ public class SpellStonemason extends Spell {
 
 						BukkitRunnable runnable2 = new BukkitRunnable() {
 							int mTicks = 0;
+
 							@Override
 							public void run() {
 								if (mTicks > 10) {
@@ -131,9 +133,9 @@ public class SpellStonemason extends Spell {
 							for (Location loc : locs) {
 								loc.add(cos * mRadius, 0.5, sin * mRadius);
 								if (FastUtils.RANDOM.nextDouble() < 0.5) {
-									world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0);
+									new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								} else {
-									world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0);
+									new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								}
 								loc.subtract(cos * mRadius, 0.5, sin * mRadius);
 							}
@@ -141,8 +143,8 @@ public class SpellStonemason extends Spell {
 					}
 
 					for (Location loc : locs) {
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData());
-						world.spawnParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25);
+						new PartialParticle(Particle.BLOCK_DUST, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 
 						if (mChargeUp.getTime() % 6 == 0) {
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1, 0f);

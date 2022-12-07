@@ -83,7 +83,7 @@ public class SpellBurningVengence extends Spell {
 								if (mCenter.distance(player.getLocation()) < mRange) {
 									DamageUtils.damage(mBoss, player, DamageType.FIRE, 4, null, false, true, "Burning Vengence");
 									EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 5, player, mBoss);
-									MovementUtils.pullTowardsByUnit(mBoss, player, (float)0.5);
+									MovementUtils.pullTowardsByUnit(mBoss, player, (float) 0.5);
 								}
 							}
 							loc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);

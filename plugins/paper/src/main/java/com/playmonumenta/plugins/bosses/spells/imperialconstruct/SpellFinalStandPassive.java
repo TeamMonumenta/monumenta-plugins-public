@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -9,7 +10,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -35,7 +35,6 @@ public class SpellFinalStandPassive extends Spell {
 
 		if (mTimer >= mInterval) {
 			mTimer = 0;
-			World world = mBoss.getWorld();
 			for (double deg = 0; deg < 360; deg += 3 * 2) {
 				double cos = FastUtils.cosDeg(deg);
 				double sin = FastUtils.sinDeg(deg);
@@ -43,15 +42,15 @@ public class SpellFinalStandPassive extends Spell {
 				for (int x = mRadius; x < mMaxRadius; x += 3) {
 					Location loc = mCenter.clone().add(cos * x, 0, sin * x);
 
-					world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0);
+					new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 					if (deg % 4 == 0) {
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.FIRE.createBlockData());
+						new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.FIRE.createBlockData()).spawnAsEntityActive(mBoss);
 					} else {
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRYING_OBSIDIAN.createBlockData());
+						new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRYING_OBSIDIAN.createBlockData()).spawnAsEntityActive(mBoss);
 					}
 
 					if (deg % 30 == 0) {
-						world.spawnParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25);
+						new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
 					}
 
 				}

@@ -126,7 +126,7 @@ public class RKitxet extends BossAbilityGroup {
 						//Give 10 seconds at the beginning of the fight before actually damaging
 						if (mBoss.getTicksLived() >= 200) {
 							PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 30 * 20, 2));
-							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location)null);
+							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location) null);
 						}
 					} else if (player.isInWaterOrBubbleColumn()) {
 						PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 25 * 20, 2));
@@ -229,6 +229,7 @@ public class RKitxet extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mCount = 0;
+
 			@Override
 			public void run() {
 				String message = "";
@@ -279,6 +280,7 @@ public class RKitxet extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mCount = 0;
+
 			@Override
 			public void run() {
 				String message = "";

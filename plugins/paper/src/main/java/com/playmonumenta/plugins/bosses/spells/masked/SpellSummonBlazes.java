@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.masked;
 
 import com.playmonumenta.plugins.bosses.bosses.Masked;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -36,7 +37,7 @@ public class SpellSummonBlazes extends Spell {
 	@Override
 	public boolean canRun() {
 		return EntityUtils.getNearbyMobs(mLauncher.getLocation(), Masked.DETECTION_RANGE, EnumSet.of(EntityType.BLAZE)).size()
-		       < PlayerUtils.playersInRange(mLauncher.getLocation(), Masked.DETECTION_RANGE, true).size() * MAX_NEARBY_BLAZES_MULTIPLIER;
+			       < PlayerUtils.playersInRange(mLauncher.getLocation(), Masked.DETECTION_RANGE, true).size() * MAX_NEARBY_BLAZES_MULTIPLIER;
 	}
 
 	@Override
@@ -56,18 +57,18 @@ public class SpellSummonBlazes extends Spell {
 				mLauncher.teleport(mLoc);
 				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 4f, 2f);
 				for (int j = 0; j < 5; j++) {
-					Location particleLoc = centerLoc.clone().add(((double)(FastUtils.RANDOM.nextInt(4000) - 2000) / 1000),
-					                                             ((double)(FastUtils.RANDOM.nextInt(4000) - 2000) / 1000),
-																 ((double)(FastUtils.RANDOM.nextInt(4000) - 2000) / 1000));
-					particleLoc.getWorld().spawnParticle(Particle.LAVA, particleLoc, 4, 0, 0, 0, 0.01);
+					Location particleLoc = centerLoc.clone().add(((double) (FastUtils.RANDOM.nextInt(4000) - 2000) / 1000),
+						((double) (FastUtils.RANDOM.nextInt(4000) - 2000) / 1000),
+						((double) (FastUtils.RANDOM.nextInt(4000) - 2000) / 1000));
+					new PartialParticle(Particle.LAVA, particleLoc, 4, 0, 0, 0, 0.01).spawnAsEntityActive(mLauncher);
 				}
 
 				mCountdown--;
 				if (mCountdown <= 0) {
 					for (int j = 0; j < mCount; j++) {
 						Entity blaz = mLoc.getWorld().spawnEntity(mLoc, EntityType.BLAZE);
-						double x = 0.5f * FastUtils.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
-						double z = 0.5f * FastUtils.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double x = 0.5f * FastUtils.cos((double) FastUtils.RANDOM.nextInt(628) / 100);
+						double z = 0.5f * FastUtils.sin((double) FastUtils.RANDOM.nextInt(628) / 100);
 						blaz.setVelocity(new Vector(x, 0.3, z));
 					}
 

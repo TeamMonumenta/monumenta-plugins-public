@@ -63,6 +63,7 @@ public class ClockworkAssassination extends Spell {
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mT = 0;
 						int mIndex = 0;
+
 						@Override
 						public void run() {
 							double progress = 1 - ((double) mT / (double) EXECUTION_TIME);

@@ -256,7 +256,6 @@ public class SpellBaseLaser extends Spell {
 	}
 
 
-
 	@FunctionalInterface
 	public interface TickAction {
 		/**

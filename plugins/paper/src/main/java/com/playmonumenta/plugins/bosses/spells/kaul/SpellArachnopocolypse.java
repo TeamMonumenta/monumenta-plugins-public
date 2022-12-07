@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -75,7 +76,7 @@ public class SpellArachnopocolypse extends Spell {
 					spiderLocations.put("WaterVassal", new Vector(15, -8, 15));
 
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0).spawnAsEntityActive(mBoss);
 
 					double health = 80 * BossUtils.healthScalingCoef(players.size(), 0.5, 0.5);
 
@@ -94,7 +95,7 @@ public class SpellArachnopocolypse extends Spell {
 	private void riseSpider(Location loc, String los, int health) {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
-		world.spawnParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
+		new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 		Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), los);
 		EntityUtils.setAttributeBase(spider, Attribute.GENERIC_MAX_HEALTH, health);
 		spider.setHealth(health);

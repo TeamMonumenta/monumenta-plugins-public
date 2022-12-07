@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -30,10 +31,11 @@ public class SpellBladeDance extends Spell {
 		World world = mCaster.getWorld();
 		mCaster.setInvulnerable(true);
 		world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
-		world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0);
+		new PartialParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0).spawnAsEntityActive(mCaster);
 		new BukkitRunnable() {
 			int mIndex = 0;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mCaster.isDead() || !mCaster.isValid()) {
@@ -42,7 +44,7 @@ public class SpellBladeDance extends Spell {
 				}
 
 				mIndex += 2;
-				world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0);
+				new PartialParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0).spawnAsEntityActive(mCaster);
 				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
 				mPitch += 0.2f;
 				Location loc1 = mCaster.getLocation().add(6, 6, 6);
@@ -66,9 +68,9 @@ public class SpellBladeDance extends Spell {
 					public void run() {
 						mTicks++;
 						mLoc1.add(mDir.clone().multiply(1.15));
-						world.spawnParticle(Particle.CRIT_MAGIC, mLoc1, 4, 0, 0, 0, 0.35);
-						world.spawnParticle(Particle.CLOUD, mLoc1, 1, 0, 0, 0, 0);
-						world.spawnParticle(Particle.SWEEP_ATTACK, mLoc1, 1, 0, 0, 0, 0);
+						new PartialParticle(Particle.CRIT_MAGIC, mLoc1, 4, 0, 0, 0, 0.35).spawnAsEntityActive(mCaster);
+						new PartialParticle(Particle.CLOUD, mLoc1, 1, 0, 0, 0, 0).spawnAsEntityActive(mCaster);
+						new PartialParticle(Particle.SWEEP_ATTACK, mLoc1, 1, 0, 0, 0, 0).spawnAsEntityActive(mCaster);
 						if (mTicks >= 10) {
 							this.cancel();
 						}
@@ -96,8 +98,8 @@ public class SpellBladeDance extends Spell {
 								mRotation += 24;
 								double radian1 = Math.toRadians(mRotation);
 								mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-								world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0);
-								world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+								new PartialParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mCaster);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mCaster);
 								mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 							}
@@ -115,9 +117,9 @@ public class SpellBladeDance extends Spell {
 					}.runTaskTimer(mPlugin, 0, 1);
 					world.playSound(mCaster.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 					world.playSound(mCaster.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
-					world.spawnParticle(Particle.FLAME, mCaster.getLocation(), 150, 0, 0, 0, 0.25);
-					world.spawnParticle(Particle.CLOUD, mCaster.getLocation(), 70, 0, 0, 0, 0.25);
-					world.spawnParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0);
+					new PartialParticle(Particle.FLAME, mCaster.getLocation(), 150, 0, 0, 0, 0.25).spawnAsEntityActive(mCaster);
+					new PartialParticle(Particle.CLOUD, mCaster.getLocation(), 70, 0, 0, 0, 0.25).spawnAsEntityActive(mCaster);
+					new PartialParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0).spawnAsEntityActive(mCaster);
 					for (Player player : PlayerUtils.playersInRange(mCaster.getLocation(), 4, true)) {
 						DamageUtils.damage(mCaster, player, DamageType.MELEE, 16);
 						MovementUtils.knockAway(mCaster.getLocation(), player, 0.45f, false);

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBullet;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import java.util.Arrays;
 import java.util.Collections;
@@ -82,7 +83,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 			new SpellBullet(plugin, boss, new Vector(0, 0, 0), p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY, p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN,
 				p.ACCEL, p.ACCEL_START, p.ACCEL_END, p.PASS_THROUGH, p.ROTATION_SPEED,
 				(Entity entity, int tick) -> {
-					float t = tick/10;
+					float t = tick / 10;
 					if (tick % 5 == 0) {
 						world.playSound(mBoss.getLocation(), p.CHARGE_SOUND, p.CHARGE_VOLUME, t);
 					}
@@ -95,9 +96,9 @@ public class BulletHellBoss extends BossAbilityGroup {
 					if (!blocked) {
 						BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.PROJECTILE, p.DAMAGE);
 					}
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 				}
-		))), Collections.emptyList(), p.DETECTION, null, 0);
+			))), Collections.emptyList(), p.DETECTION, null, 0);
 
 	}
 

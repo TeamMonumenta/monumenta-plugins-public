@@ -20,8 +20,8 @@ public class TffBookSummonBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		List<Spell> passiveSpells = Arrays.asList(
-										new SpellTffBookSummon(plugin, boss)
-										);
+			new SpellTffBookSummon(plugin, boss)
+		);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

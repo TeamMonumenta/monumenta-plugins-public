@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -38,8 +39,8 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					List<Entity> nearbyEntities = boss.getNearbyEntities(detectionRange, detectionRange, detectionRange);
 
 					if (nearbyEntities.stream().filter(
-							e -> e.getScoreboardTags().contains(GraySummoned.identityTag)
-						).count() > MAX_NEARBY_SUMMONS) {
+						e -> e.getScoreboardTags().contains(GraySummoned.identityTag)
+					).count() > MAX_NEARBY_SUMMONS) {
 						return 0;
 					}
 
@@ -51,62 +52,62 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 
 					return 0;
 				}, () -> {
-					// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
-					List<Player> targets = PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true);
-					List<Location> targetLoc = new ArrayList<>();
-					Collections.shuffle(targets);
-					switch (targets.size()) {
-						case 0, 1, 2 -> {
-							for (Player player : targets) {
-								targetLoc.add(player.getLocation());
-							}
-							return targetLoc;
+				// Run on some number of nearby players. Scale a bit below linear to avoid insane spam
+				List<Player> targets = PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true);
+				List<Location> targetLoc = new ArrayList<>();
+				Collections.shuffle(targets);
+				switch (targets.size()) {
+					case 0, 1, 2 -> {
+						for (Player player : targets) {
+							targetLoc.add(player.getLocation());
 						}
-						case 3, 4 -> {
-							targets.remove(0);
-							for (Player player : targets) {
-								targetLoc.add(player.getLocation());
-							}
-							return targetLoc;
-						}
-						case 5, 6 -> {
-							targets.remove(0);
-							targets.remove(0);
-							for (Player player : targets) {
-								targetLoc.add(player.getLocation());
-							}
-							return targetLoc;
-						}
-						case 7, 8 -> {
-							targets.remove(0);
-							targets.remove(0);
-							targets.remove(0);
-							for (Player player : targets) {
-								targetLoc.add(player.getLocation());
-							}
-							return targetLoc;
-						}
-						default -> {
-							for (Player player : targets.subList(0, 5)) {
-								targetLoc.add(player.getLocation());
-							}
-							return targetLoc;
-						}
+						return targetLoc;
 					}
-				}, (summonLoc, times) -> {
-					summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
-					return LibraryOfSoulsIntegration.summon(summonLoc, mobName);
-				}, (LivingEntity bos, Location loc, int ticks) -> {
-					if (ticks == 0) {
-						boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 1.5f, 1.0f);
+					case 3, 4 -> {
+						targets.remove(0);
+						for (Player player : targets) {
+							targetLoc.add(player.getLocation());
+						}
+						return targetLoc;
 					}
-					loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+					case 5, 6 -> {
+						targets.remove(0);
+						targets.remove(0);
+						for (Player player : targets) {
+							targetLoc.add(player.getLocation());
+						}
+						return targetLoc;
+					}
+					case 7, 8 -> {
+						targets.remove(0);
+						targets.remove(0);
+						targets.remove(0);
+						for (Player player : targets) {
+							targetLoc.add(player.getLocation());
+						}
+						return targetLoc;
+					}
+					default -> {
+						for (Player player : targets.subList(0, 5)) {
+							targetLoc.add(player.getLocation());
+						}
+						return targetLoc;
+					}
+				}
+			}, (summonLoc, times) -> {
+				summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
+				return LibraryOfSoulsIntegration.summon(summonLoc, mobName);
+			}, (LivingEntity bos, Location loc, int ticks) -> {
+				if (ticks == 0) {
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 1.5f, 1.0f);
+				}
+				new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
-				}, (LivingEntity bos, Location loc, int ticks) -> {
-					if (ticks == 0) {
-						loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
-					}
-				})));
+			}, (LivingEntity bos, Location loc, int ticks) -> {
+				if (ticks == 0) {
+					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
+				}
+			})));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}

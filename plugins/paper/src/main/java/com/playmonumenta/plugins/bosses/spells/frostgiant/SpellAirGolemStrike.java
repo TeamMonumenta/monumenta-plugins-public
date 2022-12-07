@@ -5,10 +5,11 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class SpellAirGolemStrike extends Spell {
 		} else if (players.size() <= 10) {
 			count = players.size() / 2;
 		} else {
-			count = (int)((players.size() / 3) + 1.5);
+			count = (int) ((players.size() / 3) + 1.5);
 		}
 
 		count = Math.min(12, count);
@@ -92,7 +93,7 @@ public class SpellAirGolemStrike extends Spell {
 	private void spawnGolems(Location target, List<Player> players) {
 		Location loc = target;
 		World world = mBoss.getWorld();
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 5, 0);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0);
 		//If in air, subtract 1 y value until the block is not air
 		if (target.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
 			while (loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
@@ -104,6 +105,7 @@ public class SpellAirGolemStrike extends Spell {
 
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				Creature c = (Creature) golem;
@@ -129,11 +131,12 @@ public class SpellAirGolemStrike extends Spell {
 		new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 1;
+
 			@Override
 			public void run() {
 				if (mT >= 40) {
-					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.HOSTILE, 5, 0);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0);
+					world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.HOSTILE, 1, 0);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 
 					//The particles that damage after 2 seconds, in the larger hitbox
 					BoundingBox box = BoundingBox.of(loc, 1, 20, 1);
@@ -144,14 +147,10 @@ public class SpellAirGolemStrike extends Spell {
 					}
 					Location particleLoc = loc.clone();
 					//Creates line of particles
-					for (double deg = 0; deg < 360; deg += (1 * 10)) {
-						double cos = FastUtils.cos(deg);
-						double sin = FastUtils.sin(deg);
-						for (int y = loc.getBlockY(); y < loc.getBlockY() + 10; y += 1) {
-							particleLoc.setY(y);
-							world.spawnParticle(Particle.FLAME, loc.clone().add(2 * cos, 0, 2 * sin), 1, 0.15, 0.15, 0.15, 0.25);
-							world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(3 * cos, 0, 3 * sin), 1, 0.15, 0.15, 0.15, 0.1);
-						}
+					for (int y = loc.getBlockY(); y < loc.getBlockY() + 10; y += 1) {
+						particleLoc.setY(y);
+						new PPCircle(Particle.FLAME, loc, 2).ringMode(true).count(36).delta(0.15).extra(0.25).spawnAsEntityActive(mBoss);
+						new PPCircle(Particle.DRAGON_BREATH, loc, 3).ringMode(true).count(36).delta(0.15).extra(0.1).spawnAsEntityActive(mBoss);
 					}
 
 					golem.teleport(loc);
@@ -167,18 +166,12 @@ public class SpellAirGolemStrike extends Spell {
 				}
 
 				if (mT % 10 == 0) {
-					world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1, mPitch);
+					world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.2f, mPitch);
 				}
 				mPitch += 0.05f;
 
-				for (double deg = 0; deg < 360; deg += (1 * 10)) {
-					if (FastUtils.RANDOM.nextDouble() > 0.4) {
-						double cos = FastUtils.cos(deg);
-						double sin = FastUtils.sin(deg);
-						world.spawnParticle(Particle.FLAME, loc.clone().add(2 * cos, 0, 2 * sin), 1, 0.25, 0.25, 0.25, 0);
-					}
-				}
-				world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.5, 0.5, 0.5);
+				new PPCircle(Particle.FLAME, loc, 2).ringMode(true).count(22).delta(0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
 
 				mT += 5;
 			}

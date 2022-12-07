@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.bosses.spells.bluestrike.SpellSummonBlueStrikeT
 import com.playmonumenta.plugins.bosses.spells.bluestrike.SpellSummonLavaTitan;
 import com.playmonumenta.plugins.effects.SamwellBlackbloodDagger;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -150,8 +151,8 @@ public class Samwell extends BossAbilityGroup {
 			new SpellConditionalTeleport(boss, startLoc, b -> {
 				// Boss isn't stuck in lava or bedrock
 				boolean condition1 = b.getLocation().getBlock().getType() == Material.BEDROCK ||
-					b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-					b.getLocation().getBlock().getType() == Material.LAVA;
+					                     b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+					                     b.getLocation().getBlock().getType() == Material.LAVA;
 
 				// Boss isn't too far off arena.
 				boolean condition2 = (boss.getLocation().distance(startLoc) > 30) || Math.abs(boss.getLocation().getY() - startLoc.getY()) > 5;
@@ -456,9 +457,9 @@ public class Samwell extends BossAbilityGroup {
 		FireworkMeta fm = firework.getFireworkMeta();
 
 		fm.addEffect(FireworkEffect.builder()
-			.with(FireworkEffect.Type.BALL_LARGE)
-			.withColor(Color.RED)
-			.build());
+			             .with(FireworkEffect.Type.BALL_LARGE)
+			             .withColor(Color.RED)
+			             .build());
 
 		fm.setPower(0);
 		firework.setFireworkMeta(fm);
@@ -468,7 +469,8 @@ public class Samwell extends BossAbilityGroup {
 		mIzzyAbility.complete();
 
 		new BukkitRunnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (daggerEntity.isDead() || !daggerEntity.isValid()) {
 					this.cancel();
 					return;
@@ -525,7 +527,7 @@ public class Samwell extends BossAbilityGroup {
 			return;
 		}
 
-		String[] dio = new String[]{
+		String[] dio = new String[] {
 			"I... I shouldn't have ever left the Valley...",
 			"None of this was worth it... None of it...",
 			"Listening to you... was the biggest mistake... I ever...",
@@ -538,7 +540,7 @@ public class Samwell extends BossAbilityGroup {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
 
 			if (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
-				|| player.getLocation().distance(mSpawnLoc) > 30) {
+				    || player.getLocation().distance(mSpawnLoc) > 30) {
 				// Feeling nice today?
 				player.teleport(mSpawnLoc);
 			}
@@ -566,7 +568,7 @@ public class Samwell extends BossAbilityGroup {
 					double radian = Math.toRadians(degree);
 					Location loc = mLoc.clone();
 					loc.add(FastUtils.cos(radian) * mRadius, 1, FastUtils.sin(radian) * mRadius);
-					world.spawnParticle(Particle.CLOUD, loc, 1, 1, 1, 1, 0.35);
+					new PartialParticle(Particle.CLOUD, loc, 1, 1, 1, 1, 0.35).spawnAsEntityActive(mBoss);
 				}
 				if (mRadius >= 40) {
 					this.cancel();
@@ -582,7 +584,7 @@ public class Samwell extends BossAbilityGroup {
 				if (mT % 20 == 0) {
 					world.playSound(mSpawnLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 10, 1);
 				}
-				world.spawnParticle(Particle.EXPLOSION_LARGE, mSpawnLoc.clone().add(0, 5, 0), 1, 10, 10, 10);
+				new PartialParticle(Particle.EXPLOSION_LARGE, mSpawnLoc.clone().add(0, 5, 0), 1, 10, 10, 10).spawnAsEntityActive(mBoss);
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
@@ -595,7 +597,8 @@ public class Samwell extends BossAbilityGroup {
 		new BukkitRunnable() {
 			int mT = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", ChatColor.RED + dio[mT]));
 				mT++;
 				if (mT == dio.length) {
@@ -625,7 +628,7 @@ public class Samwell extends BossAbilityGroup {
 		for (LivingEntity e : livingEntities) {
 			Set<String> tags = e.getScoreboardTags();
 			if (tags.contains(BlueStrikeTargetNPCBoss.identityTag)
-				|| tags.contains(BlueStrikeTurretBoss.identityTag)) {
+				    || tags.contains(BlueStrikeTurretBoss.identityTag)) {
 				e.setHealth(0);
 			}
 		}
@@ -636,12 +639,13 @@ public class Samwell extends BossAbilityGroup {
 		new BukkitRunnable() {
 			int mT = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				mT++;
 				List<LivingEntity> livingEntities = EntityUtils.getNearbyMobs(mSpawnLoc, 50);
 				for (LivingEntity e : livingEntities) {
 					if (EntityUtils.isHostileMob(e)
-						&& e != mBoss) {
+						    && e != mBoss) {
 						e.setHealth(0);
 					}
 				}

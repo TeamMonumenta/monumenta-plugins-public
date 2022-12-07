@@ -57,7 +57,8 @@ public class SpellCraftDaggerAnimation extends Spell {
 		mTicks++;
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 0;
 	}
 }

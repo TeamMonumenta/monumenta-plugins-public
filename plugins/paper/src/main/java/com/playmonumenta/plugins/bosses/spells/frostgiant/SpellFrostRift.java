@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -38,9 +39,9 @@ import org.bukkit.util.Vector;
  */
 public class SpellFrostRift extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mStartLoc;
 	private boolean mCooldown = false;
 
 	//Removes frost rift lines, used in cancelling spell
@@ -97,10 +98,7 @@ public class SpellFrostRift extends Spell {
 		new BukkitRunnable() {
 			double mT = 0;
 			float mPitch = 1;
-			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
-			double mBossX = mLoc.getX();
-			double mBossY = mLoc.getY();
-			double mBossZ = mLoc.getZ();
+			final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
 
 			@Override
 			public void run() {
@@ -113,13 +111,13 @@ public class SpellFrostRift extends Spell {
 					double yloc = line.getY();
 					double zloc = line.getZ();
 					for (int i = 1; i < 30; i++) {
-						//world.spawnParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0);
-						world.spawnParticle(Particle.SQUID_INK, mBossX + (xloc * i), mBossY + (yloc * i), mBossZ + (zloc * i), 1, 0.25, 0.25, 0.25, 0);
+						//new PartialParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SQUID_INK, mLoc.clone().add(xloc * i, yloc * i, zloc * i), 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 					}
 				}
 				world.playSound(mLoc, Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 0.5f, mPitch);
-				world.spawnParticle(Particle.CLOUD, mLoc, 8, 1, 0.1, 1, 0.25);
-				world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 5, 1, 0.1, 1, 0.25);
+				new PartialParticle(Particle.CLOUD, mLoc, 8, 1, 0.1, 1, 0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SMOKE_LARGE, mLoc, 5, 1, 0.1, 1, 0.25).spawnAsEntityActive(mBoss);
 
 				//Has a max of 3 rifts
 				if (mT >= 20 * 2) {
@@ -136,18 +134,18 @@ public class SpellFrostRift extends Spell {
 	}
 
 	private void createRift(Location loc, List<Player> players) {
-		List<Location> locs = new ArrayList<Location>();
-		World world = mBoss.getWorld();
+		List<Location> locs = new ArrayList<>();
 
 		Map<Location, Material> oldBlocks = new HashMap<>();
 		Map<Location, BlockData> oldData = new HashMap<>();
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
-			World mWorld = mLoc.getWorld();
-			Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
-			BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 0.35, 0.85);
-			Location mOgLoc = mLoc.clone();
+			final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+			final World mWorld = mLoc.getWorld();
+			final Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
+			final BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 0.35, 0.85);
+			final Location mOgLoc = mLoc.clone();
+
 			@Override
 			public void run() {
 				mBox.shift(mDir.clone().multiply(1.25));
@@ -184,8 +182,8 @@ public class SpellFrostRift extends Spell {
 				bLoc.add(0, 0.5, 0);
 
 				locs.add(bLoc);
-				mWorld.spawnParticle(Particle.CLOUD, bLoc, 3, 0.5, 0.5, 0.5, 0.25);
-				mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 3, 0.5, 0.5, 0.5, 0.125);
+				new PartialParticle(Particle.CLOUD, bLoc, 3, 0.5, 0.5, 0.5, 0.25).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, bLoc, 3, 0.5, 0.5, 0.5, 0.125).spawnAsEntityActive(mBoss);
 				mWorld.playSound(bLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1, 0.85f);
 
 				for (Player player : players) {
@@ -206,15 +204,16 @@ public class SpellFrostRift extends Spell {
 		//If touching the "line" of particles, get debuffed and take damaged. Can be blocked over
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT += 5;
 				for (Location loc : locs) {
-					world.spawnParticle(Particle.CLOUD, loc, 1, 0.5, 0.5, 0.5, 0.075);
-					world.spawnParticle(Particle.CRIT, loc, 1, 0.5, 0.5, 0.5, 0.075);
-					world.spawnParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.5, 0.5, 0.5, 0.1);
-					world.spawnParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.5, 0.5, 0.5, 0.1);
+					new PartialParticle(Particle.CLOUD, loc, 1, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.CRIT, loc, 1, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.REDSTONE, loc, 1, 0.5, 0.5, 0.5, 0.075, BLACK_COLOR).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 					BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(box)) {

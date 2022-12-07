@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -94,15 +95,15 @@ public class SpellBlockBreak extends Spell {
 							for (Block b : event.blockList()) {
 								b.setType(Material.AIR);
 								b.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
-								b.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 							}
 						}
 					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
-						!BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material) &&
-						(material.isSolid() || ItemUtils.carpet.contains(material) || ItemUtils.candles.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
-						(!(block.getState() instanceof Lootable)
-							|| (!((Lootable) block.getState()).hasLootTable()
-							&& !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
+						           !BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material) &&
+						           (material.isSolid() || ItemUtils.carpet.contains(material) || ItemUtils.candles.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
+						           (!(block.getState() instanceof Lootable)
+							            || (!((Lootable) block.getState()).hasLootTable()
+								                && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
 						badBlockList.add(block);
 					}
 				}
@@ -129,7 +130,7 @@ public class SpellBlockBreak extends Spell {
 				}
 
 				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
-				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellFireball;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Arrays;
 import java.util.Collections;
 import org.bukkit.Location;
@@ -23,11 +24,11 @@ public class FireballBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellFireball(plugin, boss, detectionRange, 30, 1, 160, 2.0f, true, true,
-			                  // Launch effect
-			                  (Location loc) -> {
-			                      loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);
-			                      loc.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.4, 0.4, 0.4, 0);
-			                  })
+				// Launch effect
+				(Location loc) -> {
+					loc.getWorld().playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1.0f, 1.0f);
+					new PartialParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(boss);
+				})
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);

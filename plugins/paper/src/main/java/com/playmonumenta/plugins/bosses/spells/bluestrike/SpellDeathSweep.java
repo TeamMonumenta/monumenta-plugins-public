@@ -73,7 +73,8 @@ public class SpellDeathSweep extends Spell {
 		new BukkitRunnable() {
 			int mT = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 					return;

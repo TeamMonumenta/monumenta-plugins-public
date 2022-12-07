@@ -20,17 +20,18 @@ import org.bukkit.util.Vector;
 /**
  * This is the base spell for a bolt spell.
  * Odd bug: When the projectile is fired, the mob is knocked back
- * @author FirelordWeaponry
  *
+ * @author FirelordWeaponry
  */
 public class SpellBaseBolt extends Spell {
 	@FunctionalInterface
 	public interface TickAction {
 		/**
 		 * User function called once every two ticks while bolt is charging
-		 * @param entity  The entity charging the bolt
-		 * @param tick    Number of ticks since start of attack
-		 *      NOTE - Only even numbers are returned here!
+		 *
+		 * @param entity The entity charging the bolt
+		 * @param tick   Number of ticks since start of attack
+		 *               NOTE - Only even numbers are returned here!
 		 */
 		void run(Entity entity, int tick);
 	}
@@ -39,7 +40,8 @@ public class SpellBaseBolt extends Spell {
 	public interface CastAction {
 		/**
 		 * User function called once the bolt is fired
-		 * @param entity  The entity firing the bolt
+		 *
+		 * @param entity The entity firing the bolt
 		 */
 		void run(Entity entity);
 	}
@@ -49,6 +51,7 @@ public class SpellBaseBolt extends Spell {
 		/**
 		 * User function called many times per tick with the location where
 		 * a bolt particle should be spawned
+		 *
 		 * @param loc Location to spawn a particle
 		 */
 		void run(Location loc);
@@ -84,22 +87,21 @@ public class SpellBaseBolt extends Spell {
 	private final @Nullable Predicate<Player> mPlayerFilter;
 
 	/**
-	 *
-	 * @param plugin The main plugin
-	 * @param caster The mob casting the spell
-	 * @param delay The chargeup timer;the time before the bolt is casted (in ticks)
-	 * @param duration The duration of the bolt;how long it lasts (in ticks)
-	 * @param velocity The velocity of the bolt
-	 * @param detectRange The range in which a player has to be in in order for the spell to be charged and used
-	 * @param hitboxRadius The radius of the hitbox
-	 * @param stopOnFirstHit Whether to target a single player (Default is its current target, otherwise select at random)
-	 * @param shots The amount of shots
-	 * @param rate The rate of fire for shots
-	 * @param tickAction The action to perform while charging the bolt
-	 * @param castAction The action to perform when the bolt is casted
-	 * @param particleAction The action the bolt performs while it travels
+	 * @param plugin          The main plugin
+	 * @param caster          The mob casting the spell
+	 * @param delay           The chargeup timer;the time before the bolt is casted (in ticks)
+	 * @param duration        The duration of the bolt;how long it lasts (in ticks)
+	 * @param velocity        The velocity of the bolt
+	 * @param detectRange     The range in which a player has to be in in order for the spell to be charged and used
+	 * @param hitboxRadius    The radius of the hitbox
+	 * @param stopOnFirstHit  Whether to target a single player (Default is its current target, otherwise select at random)
+	 * @param shots           The amount of shots
+	 * @param rate            The rate of fire for shots
+	 * @param tickAction      The action to perform while charging the bolt
+	 * @param castAction      The action to perform when the bolt is casted
+	 * @param particleAction  The action the bolt performs while it travels
 	 * @param intersectAction The action the bolt performs when it intersects a block or player
-	 * @param playerFilter A function to evaluate whether a player is a valid target (true) or not (false)
+	 * @param playerFilter    A function to evaluate whether a player is a valid target (true) or not (false)
 	 */
 	public SpellBaseBolt(Plugin plugin, LivingEntity caster, int delay, int duration, double velocity,
 	                     double detectRange, double hitboxRadius, boolean singleTarget, boolean stopOnFirstHit, int shots, int rate,
@@ -127,6 +129,7 @@ public class SpellBaseBolt extends Spell {
 		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, false).size() > 0) {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					mTicks++;
@@ -176,6 +179,7 @@ public class SpellBaseBolt extends Spell {
 		mCastAction.run(mCaster);
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;

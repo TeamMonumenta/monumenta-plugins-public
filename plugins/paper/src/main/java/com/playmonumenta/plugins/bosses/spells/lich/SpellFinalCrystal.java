@@ -113,6 +113,7 @@ public class SpellFinalCrystal extends Spell {
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT;
 			int mCount = mCrystal.size();
+
 			@Override
 			public void run() {
 				//glowy crystal to tell players to break
@@ -216,6 +217,7 @@ public class SpellFinalCrystal extends Spell {
 							BukkitRunnable runC = new BukkitRunnable() {
 								int mTicks = 0;
 								Location mLoc = loc.clone().add(0, 0.2, 0);
+
 								@Override
 								public void run() {
 									mTicks += 5;
@@ -226,7 +228,7 @@ public class SpellFinalCrystal extends Spell {
 										for (Player player : Lich.playersInRange(block.getLocation(), 4, true)) {
 											if (mCenter.distance(player.getLocation()) < mRange) {
 												/* Fire aura can not be blocked */
-												BossUtils.bossDamagePercent(mBoss, player, 0.15, (Location)null, "Souldrain Pool");
+												BossUtils.bossDamagePercent(mBoss, player, 0.15, (Location) null, "Souldrain Pool");
 												AbilityUtils.increaseDamageDealtPlayer(player, 20 * 8, -0.3, "Lich");
 											}
 										}

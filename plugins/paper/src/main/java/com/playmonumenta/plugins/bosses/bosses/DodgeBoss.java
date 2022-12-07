@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
@@ -66,7 +67,7 @@ public class DodgeBoss extends BossAbilityGroup {
 			loc.add(sideways.multiply(mParams.TELEPORT_RANGE));
 			for (int i = 0; i < mParams.TELEPORT_RANGE; i++) {
 				if (loc.getBlock().isPassable()) {
-					world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
 
 					mBoss.teleport(loc);

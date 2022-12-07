@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -37,8 +38,8 @@ public class SpellDetectionCircle extends Spell {
 			.withPermission(CommandPermission.fromString("mobspell.detectioncircle"))
 			.withArguments(arguments)
 			.executes((sender, args) -> {
-				new SpellDetectionCircle(plugin, (Location)args[1], (Integer)args[2],
-										 (Integer)args[3], (Location)args[4]).run();
+				new SpellDetectionCircle(plugin, (Location) args[1], (Integer) args[2],
+					(Integer) args[3], (Location) args[4]).run();
 			})
 			.register();
 	}
@@ -58,22 +59,22 @@ public class SpellDetectionCircle extends Spell {
 
 			@Override
 			public void run() {
-				int n = FastUtils.RANDOM.nextInt(40) + 50 + (int)(mRadius * 4);
+				int n = FastUtils.RANDOM.nextInt(40) + 50 + (int) (mRadius * 4);
 				double precision = n;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(mCenter.getWorld(), 0, mCenter.getY() + 5, 0);
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
-					angle = (double)j * increment;
+					angle = (double) j * increment;
 					particleLoc.setX(mCenter.getX() + (mRadius * FastUtils.cos(angle)));
 					particleLoc.setZ(mCenter.getZ() + (mRadius * FastUtils.sin(angle)));
-					particleLoc.setY(mCenter.getY() + 5 * (double)(FastUtils.RANDOM.nextInt(120) - 60) / 60);
-					particleLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0);
+					particleLoc.setY(mCenter.getY() + 5 * (double) (FastUtils.RANDOM.nextInt(120) - 60) / 60);
+					new PartialParticle(Particle.SMOKE_LARGE, particleLoc, 1, 0.02, 0.02, 0.02, 0).spawnAsBoss();
 				}
 
 				for (Player player : mCenter.getWorld().getPlayers()) {
 					if (player.getLocation().distance(mCenter) < mRadius &&
-						(player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
+						    (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
 						mTarget.getBlock().setType(Material.REDSTONE_BLOCK);
 						this.cancel();
 						break;

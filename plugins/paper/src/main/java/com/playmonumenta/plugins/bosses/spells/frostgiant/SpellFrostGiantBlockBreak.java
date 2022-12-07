@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,14 +50,14 @@ public class SpellFrostGiantBlockBreak extends Spell {
 	}
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-	            Material.AIR,
-	            Material.COMMAND_BLOCK,
-	            Material.CHAIN_COMMAND_BLOCK,
-	            Material.REPEATING_COMMAND_BLOCK,
-	            Material.BEDROCK,
-				Material.BARRIER,
-	            Material.SPAWNER
-	        );
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER
+	);
 
 	@Override
 	public void run() {
@@ -84,12 +85,12 @@ public class SpellFrostGiantBlockBreak extends Spell {
 							for (Block b : event.blockList()) {
 								b.setType(Material.AIR);
 								b.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
-								b.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 							}
 						}
 					} else if (!mIgnoredMats.contains(material) && !mNoBreak.contains(material) &&
-						(material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.carpet.contains(material)) &&
-						(!(block.getState() instanceof Lootable) || !((Lootable)block.getState()).hasLootTable())) {
+						           (material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.carpet.contains(material)) &&
+						           (!(block.getState() instanceof Lootable) || !((Lootable) block.getState()).hasLootTable())) {
 						badBlockList.add(block);
 					}
 				}
@@ -114,7 +115,7 @@ public class SpellFrostGiantBlockBreak extends Spell {
 			}
 			if (badBlockList.size() > 0) {
 				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
-				loc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 			}
 		}
 	}

@@ -47,6 +47,7 @@ public class SpellThrowSummon extends Spell {
 
 		BukkitRunnable task = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;

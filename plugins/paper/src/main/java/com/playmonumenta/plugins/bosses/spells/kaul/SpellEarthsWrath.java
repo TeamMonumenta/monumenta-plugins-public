@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -52,7 +53,7 @@ public class SpellEarthsWrath extends Spell {
 				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 2, 1);
 				}
-				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.25, 0.1, 0.25, 0.25);
+				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.reset();
@@ -67,13 +68,14 @@ public class SpellEarthsWrath extends Spell {
 							final Location mPoint = loc.clone().add(FastUtils.cos(mRadian1) * 0.5, 0, FastUtils.sin(mRadian1) * 0.5);
 							final Vector mDir = LocationUtils.getDirectionTo(mPoint, loc);
 							int mTicks = 0;
+
 							@Override
 							public void run() {
 								mTicks++;
 								mBox.shift(mDir.clone().multiply(0.45));
 								Location bLoc = mBox.getCenter().toLocation(world);
-								world.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
+								new PartialParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, "Earth's Wrath");
@@ -99,7 +101,6 @@ public class SpellEarthsWrath extends Spell {
 		runnable.runTaskTimer(mPlugin, 1, 1);
 		mActiveRunnables.add(runnable);
 	}
-
 
 
 	@Override

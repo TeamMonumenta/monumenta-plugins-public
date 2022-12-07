@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.falsespirit;
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -43,6 +44,7 @@ public class TriplicateSlash extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Location loc = mBoss.getLocation();
@@ -67,7 +69,7 @@ public class TriplicateSlash extends Spell {
 								BoundingBox box = BoundingBox.of(l, 0.65, 3, 0.65);
 								boxes.add(box);
 
-								world.spawnParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.2, 0.1, 0.1);
+								new PartialParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.2, 0.1, 0.1).spawnAsEntityActive(mBoss);
 							}
 						}
 					}
@@ -102,7 +104,7 @@ public class TriplicateSlash extends Spell {
 
 								//Spawns particles
 								Location l = loc.clone().add(vec);
-								world.spawnParticle(Particle.CRIT, l, 1, 0.1, 0.2, 0.1, 0);
+								new PartialParticle(Particle.CRIT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsEntityActive(mBoss);
 							}
 						}
 					}

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -49,13 +50,13 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellRunAction(() -> {
-					mTicksLived += 5;
-					if (mTicksLived > LIFETIME) {
-						boss.damage(999);
-					}
-				})
-			);
+			new SpellRunAction(() -> {
+				mTicksLived += 5;
+				if (mTicksLived > LIFETIME) {
+					boss.damage(999);
+				}
+			})
+		);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
@@ -73,7 +74,7 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 
 		Location loc = mBoss.getLocation();
 		loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
-		loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
+		new PartialParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
 		event.setDamage(1);
 	}
 
@@ -88,7 +89,7 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		}
 
 		if (event.getHitEntity() != null && !(event.getHitEntity() instanceof Player) &&
-				event.getHitEntity() instanceof LivingEntity le && !(event.getHitEntity() instanceof Snowman)) {
+			    event.getHitEntity() instanceof LivingEntity le && !(event.getHitEntity() instanceof Snowman)) {
 			DamageUtils.damage(mBoss, le, DamageType.PROJECTILE, mParams.DAMAGE);
 		}
 	}

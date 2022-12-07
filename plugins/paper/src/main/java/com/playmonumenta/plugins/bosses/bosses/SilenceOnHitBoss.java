@@ -13,14 +13,13 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * @deprecated use boss_onhit instead, like this:
- *<blockquote><pre>
+ * <blockquote><pre>
  * /boss var Tags add boss_onhit
  * /boss var Tags add boss_onhit[effects=[(silence,100)]]
  * CARE this ability has some particle and sound, fix those too if you don't want the default values
  * </pre></blockquote>
  * G3m1n1Boy
- *
-*/
+ */
 @Deprecated
 public class SilenceOnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_silencehit";

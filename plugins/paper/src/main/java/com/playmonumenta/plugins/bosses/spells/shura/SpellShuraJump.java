@@ -49,6 +49,7 @@ public class SpellShuraJump extends Spell {
 		BukkitRunnable a = new BukkitRunnable() {
 			int mT = 0;
 			List<Player> mTargeted = new ArrayList<Player>();
+
 			@Override
 			public void run() {
 				//List is farthest players in the beginning, and nearest players at the end
@@ -74,7 +75,7 @@ public class SpellShuraJump extends Spell {
 		Location loc = mBoss.getLocation();
 		Location locTarget = p.getLocation();
 		world.playSound(loc, Sound.ENTITY_PILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1f, 1.1f);
-		world.spawnParticle(Particle.CLOUD, loc, 15, 1, 0f, 1, 0);
+		new PartialParticle(Particle.CLOUD, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(mBoss);
 
 		Location moveTo = loc.clone();
 		int i;
@@ -112,13 +113,13 @@ public class SpellShuraJump extends Spell {
 					// start leaping
 					if (mBoss.getLocation().distance(mLeapLocation) < 1) {
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
-						world.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 15, 1, 0f, 1, 0);
+						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 15, 1, 0f, 1, 0).spawnAsEntityActive(mBoss);
 						((Mob) mBoss).getPathfinder().stopPathfinding();
 						mBoss.setVelocity(finalVelocity);
 						mLeaping = true;
 					}
 				} else {
-					world.spawnParticle(Particle.REDSTONE, mBoss.getLocation(), 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
+					new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(mBoss);
 					mBoss.setFallDistance(0);
 					if (mBoss.isOnGround() && mHasBeenOneTick) {
 						land(mDirection, world);
@@ -163,7 +164,7 @@ public class SpellShuraJump extends Spell {
 		ParticleUtils.explodingRingEffect(mPlugin, mBoss.getLocation(), 4, 1, 4,
 			Arrays.asList(
 				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> {
-					world.spawnParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1);
+					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
 				})
 			));
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
@@ -198,7 +199,7 @@ public class SpellShuraJump extends Spell {
 							vec = VectorUtils.rotateYAxis(vec, tloc.getYaw() + 90);
 
 							Location l = mBoss.getLocation().clone().add(vec);
-							world.spawnParticle(Particle.SWEEP_ATTACK, l, 1, 0, 0, 0, 0);
+							new PartialParticle(Particle.SWEEP_ATTACK, l, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 							BoundingBox box = BoundingBox.of(l, 0.4, 10, 0.4);
 
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 7, true)) {

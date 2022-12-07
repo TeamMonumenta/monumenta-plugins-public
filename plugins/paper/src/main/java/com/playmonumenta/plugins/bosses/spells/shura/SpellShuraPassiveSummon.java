@@ -61,7 +61,7 @@ public class SpellShuraPassiveSummon extends Spell {
 			int inc = 0;
 			Location spawnLoc = mCenter.clone().add(r * FastUtils.cos(theta), 5, r * FastUtils.sin(theta));
 			while ((spawnLoc.getBlock().isPassable() || spawnLoc.getBlock().isEmpty()) &&
-				!spawnLoc.getBlock().isLiquid() && inc < terminate) {
+				       !spawnLoc.getBlock().isLiquid() && inc < terminate) {
 				spawnLoc.add(0, -1, 0);
 				inc++;
 			}

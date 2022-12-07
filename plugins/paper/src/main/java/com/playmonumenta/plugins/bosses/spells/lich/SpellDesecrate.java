@@ -106,6 +106,7 @@ public class SpellDesecrate extends Spell {
 						double mRadius = 0;
 						boolean mBool = true;
 						final Location mBossLoc = loc;
+
 						@Override
 						public void run() {
 							mChargeUp.setProgress(1 - mRadius / 15.0d);

@@ -79,6 +79,7 @@ public class SpellDarkOmen extends Spell {
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT = 0.0;
 			List<Vector> mBasevec = new ArrayList<Vector>();
+
 			@Override
 			public void run() {
 				mChargeUp.nextTick();
@@ -142,6 +143,7 @@ public class SpellDarkOmen extends Spell {
 			//launch blade tip
 			BukkitRunnable runB = new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
 					mT++;

@@ -4,6 +4,7 @@ import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -15,7 +16,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	// https://minecraft.fandom.com/wiki/Commands/particle#Arguments
 	// https://papermc.io/javadocs/paper/1.16/org/bukkit/entity/Player.html#spawnParticle-org.bukkit.Particle-org.bukkit.Location-int-double-double-double-double-T-
 
-	private static final int PARTICLE_SPAWN_DISTANCE = 50;
+	private static final int PARTICLE_SPAWN_DISTANCE_SQUARED = 50 * 50;
 
 	public Particle mParticle;
 	public Location mLocation;
@@ -59,6 +60,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	public boolean mVaryNegativeX = false;
 	public boolean mVaryNegativeY = false;
 	public boolean mVaryNegativeZ = false;
+
+	private @Nullable Predicate<Player> mPlayerCondition;
 
 	public AbstractPartialParticle(Particle particle, Location location) {
 		mParticle = particle;
@@ -204,6 +207,11 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 
 	public SelfT minimumMultiplier(boolean minimumMultiplier) {
 		mMinimumMultiplier = minimumMultiplier;
+		return getSelf();
+	}
+
+	public SelfT conditional(Predicate<Player> playerCondition) {
+		mPlayerCondition = playerCondition;
 		return getSelf();
 	}
 
@@ -383,7 +391,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 
 	private SelfT forEachNearbyPlayer(Consumer<Player> playerAction) {
 		for (Player player : mLocation.getWorld().getPlayers()) {
-			if (player.getLocation().distance(mLocation) < PARTICLE_SPAWN_DISTANCE) {
+			if (player.getLocation().distanceSquared(mLocation) < PARTICLE_SPAWN_DISTANCE_SQUARED
+				    && (mPlayerCondition == null || mPlayerCondition.test(player))) {
 				playerAction.accept(player);
 			}
 		}

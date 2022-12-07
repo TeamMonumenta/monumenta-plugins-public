@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellJibberJabber;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSummonConstantly;
 import com.playmonumenta.plugins.bosses.spells.varcosamist.SpellSwitcheroo;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -90,12 +91,12 @@ public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 
 		//Active Spells
 		SpellManager spells = new SpellManager(
-				Arrays.asList(
-						new SpellDeathlyCharge(mPlugin, mBoss, 20 * 20, "It be time. The beyond is callin' for ye, thief. The Mist will take ye to yer grave..."),
-						new SpellGhostlyCannons(mPlugin, mBoss, 22, mCenter, false, "Call down the cannons mateys!"),
-						new SpellSwitcheroo(mPlugin, mBoss, 20 * 16, 50, "A trap be set now. Get ye into it!"),
-						new ForcefulGrip(mPlugin, mBoss, 20 * 10, "Yarr, get ye over here! I'll deal with ye myself.")
-				));
+			Arrays.asList(
+				new SpellDeathlyCharge(mPlugin, mBoss, 20 * 20, "It be time. The beyond is callin' for ye, thief. The Mist will take ye to yer grave..."),
+				new SpellGhostlyCannons(mPlugin, mBoss, 22, mCenter, false, "Call down the cannons mateys!"),
+				new SpellSwitcheroo(mPlugin, mBoss, 20 * 16, 50, "A trap be set now. Get ye into it!"),
+				new ForcefulGrip(mPlugin, mBoss, 20 * 10, "Yarr, get ye over here! I'll deal with ye myself.")
+			));
 		//Passive Spells
 		SpellPlayerAction action = SpellActions.getTooLowAction(mBoss, mCenter);
 
@@ -134,7 +135,7 @@ public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 			}
 			//Let the players know something happened
 			player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, 0.3f, 0.9f);
-			player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5);
+			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsEntityActive(mBoss);
 		}
 	}
 

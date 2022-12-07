@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.rkitxet;
 
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -43,17 +44,16 @@ public class SpellShardShield extends Spell {
 		//This function runs every 5 ticks
 		mTicks += 5;
 
-		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 		if (mShielded) {
 
 			for (double deg = 0; deg < 360; deg += 8) {
-				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 0.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
-				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.25, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
-				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
+				new PartialParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 0.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.25, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.DOLPHIN, loc.clone().add(1.25 * FastUtils.cosDeg(deg), 1.75, 1.25 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 			}
 
-			world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 1, 0), 10, 1, 1, 1);
+			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 1, 0), 10, 1, 1, 1).spawnAsEntityActive(mBoss);
 		} else if (mUnshieldableTime == 0 && mTicks % mShieldInterval == 0) {
 			applyShield(false);
 		}
@@ -100,7 +100,7 @@ public class SpellShardShield extends Spell {
 
 			World world = mBoss.getWorld();
 			world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 1);
-			world.spawnParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 15, 0.5, 0, 0.5);
+			new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 15, 0.5, 0, 0.5).spawnAsEntityActive(mBoss);
 		}
 	}
 

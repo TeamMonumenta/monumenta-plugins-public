@@ -34,7 +34,7 @@ public class UnstableBoss extends BossAbilityGroup {
 		// The cause of death is NOT equal to a player attack
 		if (event.getEntity().getKiller() == null) {
 			mBoss.getLocation().getWorld().createExplosion(mBoss, mPFinal.EXPLOSION_POWER, mPFinal.SET_FIRE,
-					mPFinal.BREAK_BLOCK);
+				mPFinal.BREAK_BLOCK);
 		}
 	}
 }

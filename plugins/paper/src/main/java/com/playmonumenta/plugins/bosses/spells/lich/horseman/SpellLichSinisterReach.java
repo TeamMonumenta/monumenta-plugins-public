@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich.horseman;
 
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -102,7 +103,7 @@ public class SpellLichSinisterReach extends Spell {
 							vec = VectorUtils.rotateXAxis(vec, mTloc.getPitch());
 
 							Location l = mTloc.clone().add(vec);
-							world.spawnParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05);
+							new PartialParticle(Particle.CRIT, l, 1, 0.5, 0.5, 0.5, 0.05).spawnAsEntityActive(mBoss);
 						}
 					}
 
@@ -134,9 +135,9 @@ public class SpellLichSinisterReach extends Spell {
 								vec = VectorUtils.rotateXAxis(vec, mTloc.getPitch());
 								vec = VectorUtils.rotateYAxis(vec, yaw2);
 								Location l = mTloc.clone().add(vec);
-								world.spawnParticle(Particle.FLAME, l, 1, 0.1, 0.1, 0.1, 0.065);
+								new PartialParticle(Particle.FLAME, l, 1, 0.1, 0.1, 0.1, 0.065).spawnAsEntityActive(mBoss);
 								if (r >= 4.5) {
-									world.spawnParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.1, 0.1, 0);
+									new PartialParticle(Particle.SWEEP_ATTACK, l, 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 								}
 							}
 						}
@@ -153,9 +154,9 @@ public class SpellLichSinisterReach extends Spell {
 	public void multiHit(Player p) {
 		BukkitRunnable runB = new BukkitRunnable() {
 			int mInc = 0;
+
 			@Override
 			public void run() {
-				World world = mBoss.getWorld();
 				mBoss.setAI(false);
 				LivingEntity horse = null;
 				if (mBoss.getVehicle() != null) {
@@ -166,7 +167,7 @@ public class SpellLichSinisterReach extends Spell {
 
 				if (mInc < 24 && mInc % 2 == 0) {
 					p.setNoDamageTicks(0);
-					world.spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 15, 0.1, 0.1, 0.1, 0.75);
+					new PartialParticle(Particle.CRIT_MAGIC, p.getLocation(), 15, 0.1, 0.1, 0.1, 0.75).spawnAsEntityActive(mBoss);
 					BossUtils.bossDamagePercent(mBoss, p, 1.0, mBoss.getLocation(), true, "Sinister Reach");
 					// Doesn't matter if the player is blocking, there are 12 hits and only one can be blocked
 					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 10));

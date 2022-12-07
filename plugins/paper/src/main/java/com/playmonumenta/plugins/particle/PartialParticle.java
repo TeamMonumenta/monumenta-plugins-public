@@ -29,6 +29,10 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 		this(particle, location, count, delta, delta, delta, extra);
 	}
 
+	public PartialParticle(Particle particle, Location location, int count, @Nullable Object data) {
+		this(particle, location, count, 0, 0, 0, 0, data);
+	}
+
 	/*
 	 * Share the same delta for X, Y and Z.
 	 * Use default multiplier mode.
@@ -76,6 +80,10 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 	 */
 	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, false, 0);
+	}
+
+	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode) {
+		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, 0, true);
 	}
 
 	/*

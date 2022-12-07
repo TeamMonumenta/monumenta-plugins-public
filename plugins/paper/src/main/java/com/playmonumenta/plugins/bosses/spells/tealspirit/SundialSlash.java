@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -50,8 +51,8 @@ public class SundialSlash extends Spell {
 				List<BoundingBox> boxes = new ArrayList<>();
 				for (double r = 0; r < RADIUS; r++) {
 					for (double degree = 0; degree < DEGREES + 10; degree += 5) {
-						boxes.addAll(cone(world, bossLoc, yaw, degree, mDeg, r));
-						boxes.addAll(cone(world, bossLoc, yaw, degree, mDeg, -r));
+						boxes.addAll(cone(bossLoc, yaw, degree, mDeg, r));
+						boxes.addAll(cone(bossLoc, yaw, degree, mDeg, -r));
 					}
 				}
 
@@ -86,7 +87,7 @@ public class SundialSlash extends Spell {
 		runnable.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, PERIOD);
 	}
 
-	private List<BoundingBox> cone(World world, Location bossLoc, double yaw, double degree, double mDeg, double r) {
+	private List<BoundingBox> cone(Location bossLoc, double yaw, double degree, double mDeg, double r) {
 		double radian = Math.toRadians(degree + mDeg);
 		Vector vec = new Vector(FastUtils.cos(radian) * r, 0, FastUtils.sin(radian) * r);
 		vec = VectorUtils.rotateYAxis(vec, yaw);
@@ -102,7 +103,7 @@ public class SundialSlash extends Spell {
 		} else {
 			color = Color.fromRGB(255, 255, 71);
 		}
-		world.spawnParticle(Particle.REDSTONE, l.clone().add(0, 1, 0), 1, 0.1, 0.1, 0.1, 0.1, new Particle.DustOptions(color, 1));
+		new PartialParticle(Particle.REDSTONE, l.clone().add(0, 1, 0), 1, 0.1, 0.1, 0.1, 0.1, new Particle.DustOptions(color, 1)).spawnAsEntityActive(mBoss);
 
 		return boxes;
 	}

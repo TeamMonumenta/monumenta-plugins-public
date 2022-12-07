@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.masked;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -59,13 +60,13 @@ public class SpellShadowGlade extends Spell {
 			@Override
 			public void run() {
 				zoneStart.getWorld().playSound(zoneStart, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 2f, 0.5f);
-				zoneStart.getWorld().spawnParticle(Particle.FLAME, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01);
+				new PartialParticle(Particle.FLAME, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01).spawnAsEnemy();
 				if (mJ / mCount >= 24) {
 					for (Player player : pList) {
 						Location pPos = player.getLocation();
 						pPos.getWorld().playSound(pPos, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
 					}
-					zoneStart.getWorld().spawnParticle(Particle.LAVA, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01);
+					new PartialParticle(Particle.LAVA, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01).spawnAsEnemy();
 				}
 				mJ++;
 

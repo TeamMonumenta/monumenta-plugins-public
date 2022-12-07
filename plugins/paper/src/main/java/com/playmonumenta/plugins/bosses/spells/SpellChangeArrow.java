@@ -19,7 +19,7 @@ public class SpellChangeArrow extends Spell {
 		int rand = FastUtils.RANDOM.nextInt(4);
 		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, 1);
 
-		PotionMeta meta = (PotionMeta)stack.getItemMeta();
+		PotionMeta meta = (PotionMeta) stack.getItemMeta();
 		if (rand == 0) {
 			meta.addCustomEffect(new PotionEffect(PotionEffectType.WITHER, 60, 1), false);
 		} else if (rand == 1) {

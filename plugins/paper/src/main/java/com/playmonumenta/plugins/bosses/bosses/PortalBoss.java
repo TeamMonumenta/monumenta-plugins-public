@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.bosses.spells.portalboss.SpellRisingCircles;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellUltimateShulkerMania;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -227,7 +228,7 @@ public final class PortalBoss extends BossAbilityGroup {
 							Location loc = new Location(mBoss.getWorld(), mSpawnLoc.getX() + x, mSpawnLoc.getY() + y, mSpawnLoc.getZ() + z);
 							if (mBoss.getWorld().getBlockAt(loc).getType() == Material.SMOOTH_STONE && FastUtils.RANDOM.nextBoolean() && FastUtils.RANDOM.nextBoolean()) {
 								mBoss.getWorld().getBlockAt(loc).setType(Material.HONEY_BLOCK);
-								mBoss.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								mReplaceBlocks.add(loc);
 							}
 						}

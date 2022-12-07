@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class SpellIceBreak extends Spell {
 				}
 				if (shouldBreak) {
 					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.3f, 0.9f);
-					block.getLocation().getWorld().spawnParticle(Particle.WATER_SPLASH, block.getLocation(), 10, 1, 1, 1, 0.03);
+					new PartialParticle(Particle.WATER_SPLASH, block.getLocation(), 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 					block.setType(Material.AIR);
 					mBrokenBlocks.add(block);
 				}
@@ -76,7 +77,7 @@ public class SpellIceBreak extends Spell {
 				// Randomise a bit to make it look better.
 				if (FastUtils.RANDOM.nextDouble() < 0.6 || block == locationBelow.getBlock()) {
 					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.1f, 0.9f);
-					block.getLocation().getWorld().spawnParticle(Particle.CLOUD, block.getLocation(), 10, 1, 1, 1, 0.03);
+					new PartialParticle(Particle.CLOUD, block.getLocation(), 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 					block.setType(Material.FROSTED_ICE);
 					mFrostedBlocks.add(block);
 				}

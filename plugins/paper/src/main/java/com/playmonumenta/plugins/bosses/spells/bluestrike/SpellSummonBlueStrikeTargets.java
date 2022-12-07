@@ -30,7 +30,7 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 	private final List<Vector> mShulkerSpots;
 
 	public SpellSummonBlueStrikeTargets(LivingEntity boss, Location center, int timeBetween, int mobsPer,
-										int innerCircleR, int outerCircleR) {
+	                                    int innerCircleR, int outerCircleR) {
 		mBoss = boss;
 		mTimeBetween = timeBetween;
 		mTimer = 0; // Init first summon cast to be immediate.
@@ -55,7 +55,8 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 		}
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		mTimer--;
 		if (mTimer < 0) {
 			mTimer = mTimeBetween;
@@ -80,7 +81,8 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 		}
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 0;
 	}
 
@@ -98,7 +100,7 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 		for (LivingEntity e : livingEntities) {
 			Set<String> tags = e.getScoreboardTags();
 			if (tags.contains(BlueStrikeTargetNPCBoss.identityTag)
-				|| tags.contains(BlueStrikeTurretBoss.identityTag)) {
+				    || tags.contains(BlueStrikeTurretBoss.identityTag)) {
 				return true;
 			}
 		}

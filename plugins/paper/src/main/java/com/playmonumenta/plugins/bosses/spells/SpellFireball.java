@@ -22,6 +22,7 @@ public class SpellFireball extends Spell {
 	public interface LaunchFireballEffect {
 		/**
 		 * Runs at location of boss and target when generating a fireball
+		 *
 		 * @param loc The location of boss and player
 		 */
 		void run(Location loc);
@@ -39,15 +40,15 @@ public class SpellFireball extends Spell {
 	private final int mDuration;
 
 	/**
-	 * @param plugin          Plugin
-	 * @param boss            Boss
-	 * @param range           Range within which players may be targeted
-	 * @param delay           Delay between fireballs
-	 * @param count           Number of fireballs spawned (per attack)
-	 * @param yield           Explosive power
-	 * @param isIncendiary    Creates fire or not
-	 * @param singleTarget    Target random player (true) or all players (false)
-	 * @param launchEffect    Function to run on boss and targeted player(s)
+	 * @param plugin       Plugin
+	 * @param boss         Boss
+	 * @param range        Range within which players may be targeted
+	 * @param delay        Delay between fireballs
+	 * @param count        Number of fireballs spawned (per attack)
+	 * @param yield        Explosive power
+	 * @param isIncendiary Creates fire or not
+	 * @param singleTarget Target random player (true) or all players (false)
+	 * @param launchEffect Function to run on boss and targeted player(s)
 	 */
 	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count, int duration,
 	                     float yield, boolean isIncendiary, boolean singleTarget,
@@ -133,7 +134,7 @@ public class SpellFireball extends Spell {
 				Location spawnLoc = mBoss.getEyeLocation();
 				Vector direction = target.getEyeLocation().subtract(spawnLoc).toVector().normalize();
 				spawnLoc = spawnLoc.add(direction.multiply(2));
-				Fireball fireball = (Fireball)mBoss.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
+				Fireball fireball = (Fireball) mBoss.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
 				fireball.setDirection(direction);
 				fireball.setVelocity(direction.multiply(2));
 				fireball.setYield(mYield);

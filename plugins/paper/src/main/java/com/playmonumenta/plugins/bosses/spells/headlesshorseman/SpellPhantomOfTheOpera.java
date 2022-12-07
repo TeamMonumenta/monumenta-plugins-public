@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,7 +60,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 			if (players.size() <= 2) {
 				num = 2;
 			} else {
-				num = (int)Math.ceil(players.size() / 3 + 1);
+				num = (int) Math.ceil(players.size() / 3 + 1);
 			}
 
 			if (num >= 5) {
@@ -85,24 +86,25 @@ public class SpellPhantomOfTheOpera extends Spell {
 					int mInc = 0;
 					double mN = 0;
 					double mPlayerScalingHP = 0;
+
 					@Override
 					public void run() {
 						mInc++;
 						int y = mInc / 4;
 						Location particle = pLoc.clone().add(0, y, 0);
-						world.spawnParticle(Particle.SMOKE_LARGE, particle, 4, 0.3, 0, 0.3, 0.1);
+						new PartialParticle(Particle.SMOKE_LARGE, particle, 4, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 
 						//stop particle spawns + spawn phantoms after 1.5 second
 						if (mInc >= 30) {
 							this.cancel();
 							Location sLoc = pLoc.clone().add(0, 7.5, 0);
 							world.playSound(sLoc, Sound.ENTITY_WITHER_HURT, 3, 0.75f);
-							world.spawnParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1);
+							new PartialParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1).spawnAsEntityActive(mBoss);
 							LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
 
 							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 							if (players.size() == 0) {
-							      return;
+								return;
 							}
 
 							int playerCount = players.size();

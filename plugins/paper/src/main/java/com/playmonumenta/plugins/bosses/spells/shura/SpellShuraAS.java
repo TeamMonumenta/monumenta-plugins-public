@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.shura;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -53,8 +54,8 @@ public class SpellShuraAS extends Spell {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			mMarked = true;
 			Location loc = mBoss.getLocation();
-			world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f);
-			world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
+			new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsEntityActive(mBoss);
 			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 			mBoss.teleport(mCenter.clone().add(0, -10, 0));
 			mTarget.sendMessage(ChatColor.AQUA + "A chill runs down your spine.");
@@ -63,10 +64,11 @@ public class SpellShuraAS extends Spell {
 			BukkitRunnable tp = new BukkitRunnable() {
 				int mT = 0;
 				boolean mTrigger = true;
+
 				@Override
 				public void run() {
 					mT += 10;
-					world.spawnParticle(Particle.REDSTONE, mTarget.getLocation().add(0, 1.5, 0), 6, 0.5, 0.5, 0.5, 0, DARK_RED);
+					new PartialParticle(Particle.REDSTONE, mTarget.getLocation().add(0, 1.5, 0), 6, 0.5, 0.5, 0.5, 0, DARK_RED).spawnAsEntityActive(mBoss);
 					if (mT >= 2 * 20 && mTrigger) {
 						mTrigger = false;
 						//tp behind
@@ -77,8 +79,8 @@ public class SpellShuraAS extends Spell {
 						loc.add(shift);
 						mBoss.teleport(loc);
 						((Mob) mBoss).setTarget(mTarget);
-						world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f);
-						world.spawnParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f);
+						new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsEntityActive(mBoss);
 						world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 					}
 					if (mT >= 7 * 20) {
@@ -102,7 +104,9 @@ public class SpellShuraAS extends Spell {
 			damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 6, -1));
 			BukkitRunnable dot = new BukkitRunnable() {
 				int mT = 0;
-				@Override public void run() {
+
+				@Override
+				public void run() {
 					mT++;
 					BossUtils.blockableDamage(mBoss, damagee, DamageEvent.DamageType.MAGIC, 10, "Advancing Shadows", null);
 					if (mT >= 6) {

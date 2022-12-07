@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.PortalBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -77,7 +78,7 @@ public class SpellPortalSummons extends Spell {
 					//Summon the mob using our location
 					Location sLoc = loc.clone().add(x, 0.25, z);
 					loc.getWorld().playSound(sLoc, Sound.BLOCK_GRAVEL_BREAK, 1, 0.75f);
-					loc.getWorld().spawnParticle(Particle.BLOCK_DUST, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData());
+					new PartialParticle(Particle.BLOCK_DUST, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData()).spawnAsEntityActive(mBoss);
 					Random r = new Random();
 					int roll = r.nextInt(3);
 					Entity summonedMob = null;

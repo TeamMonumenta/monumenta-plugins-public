@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -151,8 +152,8 @@ public class TealSpirit extends BossAbilityGroup {
 					LibraryOfSoulsIntegration.summon(loc, "EchoOfOblivion");
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
 					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
-					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
-					world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+					new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 				}
 				PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
 			});
@@ -252,8 +253,8 @@ public class TealSpirit extends BossAbilityGroup {
 					LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
 					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
-					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
-					world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+					new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 				}
 				PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
 			});
@@ -370,8 +371,8 @@ public class TealSpirit extends BossAbilityGroup {
 					LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
 					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
 					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
-					world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
-					world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+					new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 				}
 				PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "i call forth the echoes radiating from the edges of oblivion itself. rise, emperor!"));
 			});
@@ -476,11 +477,11 @@ public class TealSpirit extends BossAbilityGroup {
 		Collections.shuffle(players);
 		if (players.size() > 2) {
 			for (int i = 0; i < 1; i++) {
-				manager.addEffect(players.get(i), TemporalFlux.GENERIC_NAME, new TemporalFlux(20*30));
+				manager.addEffect(players.get(i), TemporalFlux.GENERIC_NAME, new TemporalFlux(20 * 30));
 			}
 		} else if (players.size() <= 2) {
 			for (Player p : players) {
-				manager.addEffect(p, TemporalFlux.GENERIC_NAME, new TemporalFlux(20*30));
+				manager.addEffect(p, TemporalFlux.GENERIC_NAME, new TemporalFlux(20 * 30));
 			}
 		}
 	}
@@ -502,8 +503,8 @@ public class TealSpirit extends BossAbilityGroup {
 		for (Location loc : locs) {
 			mExchangers.add(LibraryOfSoulsIntegration.summon(loc, "TemporalExchanger"));
 			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
-			world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
-			world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+			new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 		}
 	}
 
@@ -523,8 +524,8 @@ public class TealSpirit extends BossAbilityGroup {
 		for (Location loc : locs) {
 			mShielders.add(LibraryOfSoulsIntegration.summon(loc, "TemporalAnchor"));
 			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
-			world.spawnParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1);
-			world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1);
+			new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 		}
 	}
 
@@ -540,6 +541,7 @@ public class TealSpirit extends BossAbilityGroup {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (mT > Rewind.CHARGE_TIME + Rewind.REWIND_TIME) {

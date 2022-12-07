@@ -32,17 +32,17 @@ public class SpellAmpHex extends Spell {
 	private Plugin mPlugin;
 	private LivingEntity mBoss;
 	private Collection<PotionEffectType> mBadEffects = Arrays.asList(
-			PotionEffectType.BLINDNESS,
-			PotionEffectType.CONFUSION,
-			PotionEffectType.HUNGER,
-			PotionEffectType.LEVITATION,
-			PotionEffectType.POISON,
-			PotionEffectType.SLOW,
-			PotionEffectType.SLOW_DIGGING,
-			PotionEffectType.UNLUCK,
-			PotionEffectType.WEAKNESS,
-			PotionEffectType.WITHER
-			);
+		PotionEffectType.BLINDNESS,
+		PotionEffectType.CONFUSION,
+		PotionEffectType.HUNGER,
+		PotionEffectType.LEVITATION,
+		PotionEffectType.POISON,
+		PotionEffectType.SLOW,
+		PotionEffectType.SLOW_DIGGING,
+		PotionEffectType.UNLUCK,
+		PotionEffectType.WEAKNESS,
+		PotionEffectType.WITHER
+	);
 	private PartialParticle mPortal;
 	private PartialParticle mBreath;
 	private PartialParticle mSmoke;
@@ -105,7 +105,7 @@ public class SpellAmpHex extends Spell {
 					Vector toMobVector = p.getLocation().toVector().subtract(mBoss.getLocation().toVector()).setY(0).normalize();
 					if (playerDir.dot(toMobVector) > 0.33) {
 						int debuffCount = 0;
-						for (PotionEffectType effectType: mBadEffects) {
+						for (PotionEffectType effectType : mBadEffects) {
 							PotionEffect effect = p.getPotionEffect(effectType);
 							if (effect != null) {
 								debuffCount++;

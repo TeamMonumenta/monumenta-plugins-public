@@ -20,7 +20,9 @@ public class SpellBarrier extends Spell {
 
 	@FunctionalInterface
 	public interface RefreshBarrierAction {
-		/** The action that runs when the barrier comes up
+		/**
+		 * The action that runs when the barrier comes up
+		 *
 		 * @param loc The location to run the effect
 		 */
 		void run(Location loc);
@@ -28,7 +30,9 @@ public class SpellBarrier extends Spell {
 
 	@FunctionalInterface
 	public interface BarrierRunningAmbientAction {
-		/** The action that runs every other tick to create a circle of particles while the barrier is active
+		/**
+		 * The action that runs every other tick to create a circle of particles while the barrier is active
+		 *
 		 * @param loc The location to run the effect
 		 */
 		void run(Location loc);
@@ -36,8 +40,10 @@ public class SpellBarrier extends Spell {
 
 	@FunctionalInterface
 	public interface BreakBarrierAction {
-		/** The action to run when the barrier gets broken
-		 *  @param loc The location at which to run the effect
+		/**
+		 * The action to run when the barrier gets broken
+		 *
+		 * @param loc The location at which to run the effect
 		 */
 		void run(Location loc);
 	}
@@ -57,7 +63,7 @@ public class SpellBarrier extends Spell {
 	private int mTimer = 0;
 
 	public SpellBarrier(Plugin plugin, LivingEntity boss, int detectionRadius, int rechargeTime, int hitsToBreak, boolean isCarapace, RefreshBarrierAction refreshAction, BarrierRunningAmbientAction ambientRunningAction,
-			BreakBarrierAction breakAction) {
+	                    BreakBarrierAction breakAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mActivationRadius = detectionRadius;

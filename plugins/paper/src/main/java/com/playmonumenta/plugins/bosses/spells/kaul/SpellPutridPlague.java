@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -50,7 +51,7 @@ public class SpellPutridPlague extends Spell {
 	private ChargeUpManager mChargeUp;
 
 	public static boolean getPlagueActive() {
-	    return mPlagueActive;
+		return mPlagueActive;
 	}
 
 	public SpellPutridPlague(Plugin plugin, LivingEntity boss, double range, boolean phase3, Location center) {
@@ -59,7 +60,7 @@ public class SpellPutridPlague extends Spell {
 		mRange = range;
 		mPhase3 = phase3;
 		mCenter = center;
-		mTime = (int)(mPhase3 ? 20 * 7.5 : 20 * 9);
+		mTime = (int) (mPhase3 ? 20 * 7.5 : 20 * 9);
 
 		mChargeUp = new ChargeUpManager(mBoss, mTime, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Putrid Plague...",
 			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
@@ -82,9 +83,9 @@ public class SpellPutridPlague extends Spell {
 		List<ArmorStand> points = new ArrayList<ArmorStand>();
 		for (Entity e : mBoss.getNearbyEntities(mRange, mRange, mRange)) {
 			if ((e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
-			     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
-			     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
-			     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) && e instanceof ArmorStand) {
+				     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
+				     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
+				     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) && e instanceof ArmorStand) {
 				points.add((ArmorStand) e);
 			}
 		}
@@ -143,26 +144,27 @@ public class SpellPutridPlague extends Spell {
 				Location mPoint2 = point.getLocation().add(-4, 6, -4);
 				Location mPoint3 = point.getLocation().add(4, 6, -4);
 				Location mPoint4 = point.getLocation().add(-4, 6, 4);
+
 				@Override
 				public void run() {
 
 					for (Player player : players) {
 						// Spawn the particles for players so that way there
 						// isn't as much particle lag
-						player.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0);
+						new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0).spawnAsEntityActive(mBoss);
 					}
 
-					world.spawnParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45, 0, null, true);
-					world.spawnParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7, 0, null, true);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7, 0, null, true).spawnAsEntityActive(mBoss);
 
 					Location cLoc = point.getLocation();
 					for (double rotation = 0; rotation < 360; rotation += 6) {
 						double radian = Math.toRadians(rotation);
 						cLoc.add(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
-						world.spawnParticle(Particle.SPELL_INSTANT, cLoc, 1, 0, 0, 0, 0, null, true);
+						new PartialParticle(Particle.SPELL_INSTANT, cLoc, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
 						cLoc.subtract(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
 					}
 
@@ -179,17 +181,17 @@ public class SpellPutridPlague extends Spell {
 								if ((resistance == null || resistance.getAmplifier() < 4)
 									    && !StasisListener.isInStasis(player)) {
 									player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
-									world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15);
-									world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
-										Material.LIME_CONCRETE.createBlockData());
+									new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
+										Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
 									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
 									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Putrid Plague");
 								}
 							} else {
-								world.spawnParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1);
-								world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1);
+								new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
 								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
 								if (!mPhase3) {
 									player.removePotionEffect(PotionEffectType.WITHER);
@@ -199,9 +201,9 @@ public class SpellPutridPlague extends Spell {
 								} else {
 									for (PotionEffect effect : player.getActivePotionEffects()) {
 										if (effect.getType().equals(PotionEffectType.WITHER)
-										    || effect.getType().equals(PotionEffectType.SLOW)
-										    || effect.getType().equals(PotionEffectType.POISON)
-										    || effect.getType().equals(PotionEffectType.WEAKNESS)) {
+											    || effect.getType().equals(PotionEffectType.SLOW)
+											    || effect.getType().equals(PotionEffectType.POISON)
+											    || effect.getType().equals(PotionEffectType.WEAKNESS)) {
 											int duration = effect.getDuration() - (20 * 80);
 											if (duration <= 0) {
 												continue;

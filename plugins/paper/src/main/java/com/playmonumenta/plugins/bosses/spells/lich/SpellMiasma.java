@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -41,9 +41,8 @@ public class SpellMiasma extends Spell {
 			mT = 2;
 			for (Player player : Lich.playersInRange(mCenter, mRange, true)) {
 				if (player.getLocation().getY() > mDepth + 10 && player.getGameMode() == GameMode.SURVIVAL) {
-					World world = player.getWorld();
 					Location l = player.getEyeLocation();
-					world.spawnParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25);
+					new PartialParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 
 					DamageUtils.damage(mBoss, player, DamageType.MAGIC, 20, null, false, true, "Miasma");
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 0));

@@ -128,6 +128,7 @@ public class SpellRaiseDead extends Spell {
 		PartialParticle dust2 = new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
 		new BukkitRunnable() {
 			int mINC = 0;
+
 			@Override
 			public void run() {
 				mINC += 2;

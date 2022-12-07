@@ -40,7 +40,8 @@ public class BlueAirBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null, 100, 20);
 	}
 
-	@Override public void death(EntityDeathEvent event) {
+	@Override
+	public void death(EntityDeathEvent event) {
 		double chance = FastUtils.RANDOM.nextDouble();
 
 		if (chance < SPAWN_CHANCE[mBlueTimeOfDay]) {

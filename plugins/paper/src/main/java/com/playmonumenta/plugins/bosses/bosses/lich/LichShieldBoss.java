@@ -44,7 +44,7 @@ public class LichShieldBoss extends BossAbilityGroup {
 		List<Player> players = Lich.playersInRange(mCenter, detectionRange, true);
 		if (players.size() > hpScaling) {
 			//14 hp crystals if there are more than 10 players to prevent aleph spam
-			mHp = 14 * (1 + (1 - 1/Math.E) * Math.log(players.size() - hpScaling));
+			mHp = 14 * (1 + (1 - 1 / Math.E) * Math.log(players.size() - hpScaling));
 		}
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mHp);
 		mBoss.setHealth(mHp);

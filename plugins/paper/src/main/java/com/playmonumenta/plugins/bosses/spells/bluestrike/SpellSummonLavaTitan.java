@@ -46,7 +46,8 @@ public class SpellSummonLavaTitan extends Spell {
 		);
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		mCooldown = true;
 		new BukkitRunnable() {
 
@@ -60,7 +61,8 @@ public class SpellSummonLavaTitan extends Spell {
 		new BukkitRunnable() {
 			int mT = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mT % (cooldownTicks() / 10) == 0) {
 					mCenter.getWorld().playSound(mCenter, Sound.BLOCK_BEEHIVE_DRIP, 20, 0.5f);
 				}
@@ -74,7 +76,8 @@ public class SpellSummonLavaTitan extends Spell {
 		}.runTaskTimer(mPlugin, 0, 5);
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		if (mPhase <= 3) {
 			return 10 * 20;
 		} else {
@@ -90,7 +93,8 @@ public class SpellSummonLavaTitan extends Spell {
 	private void summon() {
 		new BukkitRunnable() {
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 
@@ -105,7 +109,8 @@ public class SpellSummonLavaTitan extends Spell {
 							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Lava Cannon...");
 						}
 
-						@Override public void run() {
+						@Override
+						public void run() {
 							mChargeUp.setProgress(1 - ((double) mT / (LavaCannonBoss.BULLET_DURATION + 40)));
 							if (mT > (LavaCannonBoss.BULLET_DURATION + 40)) {
 								this.cancel();
@@ -124,7 +129,8 @@ public class SpellSummonLavaTitan extends Spell {
 		LibraryOfSoulsIntegration.summon(loc, "LavaTitan");
 
 		new BukkitRunnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				mCenter.getWorld().playSound(mCenter, Sound.ENTITY_ELDER_GUARDIAN_CURSE, 5, 0.5f);
 				int rand2 = (int) Math.floor(FastUtils.randomDoubleInRange(0, 6.99));
 				if (rand2 == rand) {

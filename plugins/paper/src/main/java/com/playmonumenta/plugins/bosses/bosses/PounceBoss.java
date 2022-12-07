@@ -86,47 +86,47 @@ public final class PounceBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
-				(World world, Location loc) -> {
-					p.SOUND_START.play(loc, 1f, 1f);
-					p.PARTICLE_START.spawn(boss, loc, 1d, 0d, 1d);
-				}, (World world, Location loc) -> {
+			(World world, Location loc) -> {
+				p.SOUND_START.play(loc, 1f, 1f);
+				p.PARTICLE_START.spawn(boss, loc, 1d, 0d, 1d);
+			}, (World world, Location loc) -> {
 			p.SOUND_LEAP.play(loc, 1f, 1f);
 			p.PARTICLE_LEAP.spawn(boss, loc, 1d, 0f, 1d, 0d);
-				}, (World world, Location loc) -> {
+		}, (World world, Location loc) -> {
 			p.PARTICLE_LEAPING.spawn(boss, loc, 0.5, 0.5, 0.5, 1d);
-				}, (World world, Player player, Location loc, Vector dir) -> {
-					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-							Arrays.asList(
-									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-										p.PARTICLE_RING.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
-									})
-							));
+		}, (World world, Player player, Location loc, Vector dir) -> {
+			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
+				Arrays.asList(
+					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+						p.PARTICLE_RING.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
+					})
+				));
 			p.SOUND_HIT.play(loc, 1, 1);
 			p.PARTICLE_HIT.spawn(boss, loc);
 
-					if (player != null) {
-						if (p.DAMAGE > 0) {
-							BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
-						}
+			if (player != null) {
+				if (p.DAMAGE > 0) {
+					BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
+				}
 
-						if (p.DAMAGE_PERCENT > 0.0) {
-							BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
-						}
-						p.EFFECTS.apply(player, boss);
+				if (p.DAMAGE_PERCENT > 0.0) {
+					BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
+				}
+				p.EFFECTS.apply(player, boss);
 
-						return;
-					}
-					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
-						if (p.DAMAGE > 0) {
-							BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
-						}
+				return;
+			}
+			for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
+				if (p.DAMAGE > 0) {
+					BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
+				}
 
-						if (p.DAMAGE_PERCENT > 0.0) {
-							BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
-						}
-						p.EFFECTS.apply(players, boss);
-					}
-					})));
+				if (p.DAMAGE_PERCENT > 0.0) {
+					BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
+				}
+				p.EFFECTS.apply(players, boss);
+			}
+		})));
 		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

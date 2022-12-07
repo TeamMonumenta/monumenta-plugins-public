@@ -29,7 +29,7 @@ public final class ShieldSwitchBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellShieldSwitch((Mob)mBoss, plugin)
+			new SpellShieldSwitch((Mob) mBoss, plugin)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);

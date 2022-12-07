@@ -26,12 +26,15 @@ public class PhasesManagerBoss extends BossAbilityGroup {
 
 		Spell spell = new Spell() {
 			int mTicks = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				mParam.PHASES.tick(mBoss, mTicks);
 				mTicks += 5;
 			}
 
-			@Override public int cooldownTicks() {
+			@Override
+			public int cooldownTicks() {
 				return 5;
 			}
 		};
@@ -39,19 +42,23 @@ public class PhasesManagerBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, List.of(spell), -1, null);
 	}
 
-	@Override public void onHurt(DamageEvent event) {
+	@Override
+	public void onHurt(DamageEvent event) {
 		mParam.PHASES.onHurt(mBoss, event.getSource(), event);
 	}
 
-	@Override public void onDamage(DamageEvent event, LivingEntity damagee) {
+	@Override
+	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		mParam.PHASES.onDamage(mBoss, event.getDamagee(), event);
 	}
 
-	@Override public void death(EntityDeathEvent event) {
+	@Override
+	public void death(EntityDeathEvent event) {
 		mParam.PHASES.onDeath(mBoss);
 	}
 
-	@Override public void bossCastAbility(SpellCastEvent event) {
+	@Override
+	public void bossCastAbility(SpellCastEvent event) {
 		mParam.PHASES.onBossCastAbility(mBoss, event);
 	}
 

@@ -38,7 +38,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 			boss.setRemoveWhenFarAway(true);
 		}
 
-		Mob mob = (Mob)boss;
+		Mob mob = (Mob) boss;
 
 		final Parameters param = BossParameters.getParameters(boss, identityTag, new Parameters());
 

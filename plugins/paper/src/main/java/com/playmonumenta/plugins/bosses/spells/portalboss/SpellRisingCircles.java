@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.portalboss;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -58,7 +59,7 @@ public class SpellRisingCircles extends Spell {
 						double sin = FastUtils.sinDeg(deg);
 
 						for (int x = innerRadius; x < outerRadius; x++) {
-							world.spawnParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, -1, sin * x), 1, 0.1, 0.1, 0.1, 0);
+							new PartialParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, -1, sin * x), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
@@ -85,15 +86,15 @@ public class SpellRisingCircles extends Spell {
 						for (int x = innerRadius; x < outerRadius; x += inc) {
 							Location loc = mStartLoc.clone().add(cos * x, 0, sin * x);
 
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0);
+							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 							if (deg % 4 == 0) {
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).spawnAsEntityActive(mBoss);
 							} else {
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).spawnAsEntityActive(mBoss);
 							}
 
 							if (deg % 30 == 0) {
-								world.spawnParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25);
+								new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
 							}
 
 						}

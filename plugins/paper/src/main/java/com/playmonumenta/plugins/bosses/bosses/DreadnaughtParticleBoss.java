@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDreadnaughtParticle;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -64,8 +65,8 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 1, 0.5f);
-			world.spawnParticle(Particle.FLAME, loc, 50, 3, 1, 3, 0);
-			world.spawnParticle(Particle.SMOKE_LARGE, loc, 200, 3, 1, 3, 0);
+			new PartialParticle(Particle.FLAME, loc, 50, 3, 1, 3, 0).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.SMOKE_LARGE, loc, 200, 3, 1, 3, 0).spawnAsEntityActive(mBoss);
 		}
 	}
 }

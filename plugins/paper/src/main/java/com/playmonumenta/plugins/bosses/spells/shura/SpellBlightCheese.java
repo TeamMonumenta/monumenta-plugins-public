@@ -34,7 +34,8 @@ public class SpellBlightCheese extends Spell {
 		mPWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 3, 0.4, 0.4, 0.4, 0.1);
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		mT += 5;
 		if (mT > 20) {
 			for (Player p : PlayerUtils.playersInRange(mCenter, mRange, true)) {
@@ -54,7 +55,8 @@ public class SpellBlightCheese extends Spell {
 		}
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 0;
 	}
 }

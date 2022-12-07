@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellWindWalk;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -72,37 +73,37 @@ public final class SwordsageRichter extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBladeDance(plugin, mBoss),
 			new SpellWindWalk(plugin, mBoss),
-			new SpellBaseBolt(plugin, mBoss, (int)(20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1,
-			                  (Entity entity, int tick) -> {
-			                      float t = tick / 10;
-			                      world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005);
-			                      world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005);
-			                      world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, t);
-			                      mBoss.removePotionEffect(PotionEffectType.SLOW);
-			                      mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 1));
-			                  },
+			new SpellBaseBolt(plugin, mBoss, (int) (20 * 2.5), 30, 1.4, 20, 0.5, false, false, 1, 1,
+				(Entity entity, int tick) -> {
+					float t = tick / 10;
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, t);
+					mBoss.removePotionEffect(PotionEffectType.SLOW);
+					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 1));
+				},
 
-			                  (Entity entity) -> {
-			                      world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0);
-			                      world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 30, 0.2, 0, 0.2, 0.15);
-			                  },
+				(Entity entity) -> {
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 30, 0.2, 0, 0.2, 0.15).spawnAsEntityActive(boss);
+				},
 
-			                  (Location loc) -> {
-			                      world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 2);
-			                      world.spawnParticle(Particle.CLOUD, loc, 3, 0.05, 0.05, 0.05, 0.03);
-			                      world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0);
-			                      world.spawnParticle(Particle.REDSTONE, loc, 40, 0.25, 0.25, 0.25, BOLT_COLOR);
-			                  },
+				(Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 2);
+					new PartialParticle(Particle.CLOUD, loc, 3, 0.05, 0.05, 0.05, 0.03).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.REDSTONE, loc, 40, 0.25, 0.25, 0.25, BOLT_COLOR).spawnAsEntityActive(boss);
+				},
 
-			                  (Player player, Location loc, boolean blocked) -> {
-			                      if (!blocked) {
-			                          BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15);
-			                          player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));
-			                          player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 0));
-			                      }
-			                      world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175);
-			                  },
-							  null)
+				(Player player, Location loc, boolean blocked) -> {
+					if (!blocked) {
+						BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15);
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 0));
+					}
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
+				},
+				null)
 		));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
@@ -132,9 +133,9 @@ public final class SwordsageRichter extends BossAbilityGroup {
 
 		events.put(30, mBoss -> {
 			super.changePhase(phase2Spells, passiveSpells,
-			                  (LivingEntity entity) -> {
-			                      knockback(plugin, 7);
-			                  });
+				(LivingEntity entity) -> {
+					knockback(plugin, 7);
+				});
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"Agh! I won't lose to a weakling like you!\",\"color\":\"white\"}]");
 		});
 
@@ -155,10 +156,10 @@ public final class SwordsageRichter extends BossAbilityGroup {
 				public void run() {
 					mBoss.remove();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 2, 1);
-					world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
+					new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
 
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(boss);
 
 					new BukkitRunnable() {
 						@Override
@@ -167,6 +168,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 							new BukkitRunnable() {
 								int mT = 0;
 								boolean mAttacked = false;
+
 								@Override
 								public void run() {
 									mT++;
@@ -175,9 +177,9 @@ public final class SwordsageRichter extends BossAbilityGroup {
 										for (Player player : players) {
 											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
-											world.spawnParticle(Particle.FLAME, player.getLocation(), 200, 0, 0, 0, 0.25);
-											world.spawnParticle(Particle.CLOUD, player.getLocation(), 100, 0, 0, 0, 0.25);
-											world.spawnParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0);
+											new PartialParticle(Particle.FLAME, player.getLocation(), 200, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+											new PartialParticle(Particle.CLOUD, player.getLocation(), 100, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+											new PartialParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0).spawnAsEntityActive(boss);
 										}
 									} else {
 										float pitch = mT / 20;
@@ -185,8 +187,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 										for (Player player : players) {
 											Location loc = player.getLocation().add(0, 1, 0);
 											player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, pitch);
-											world.spawnParticle(Particle.SWEEP_ATTACK, loc, 20, offset, offset, offset, 0);
-											world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 40, offset, offset, offset, 0);
+											new PartialParticle(Particle.SWEEP_ATTACK, loc, 20, offset, offset, offset, 0).spawnAsEntityActive(boss);
+											new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, offset, offset, offset, 0).spawnAsEntityActive(boss);
 										}
 									}
 
@@ -248,6 +250,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 				Location mLoc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(summonRadius), 1.5, FastUtils.RANDOM.nextInt(summonRadius));
 				double mRotation = 0;
 				double mRadius = 4;
+
 				@Override
 				public void run() {
 					if (mBoss.isDead()) {
@@ -258,8 +261,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					for (int i = 0; i < 5; i++) {
 						double radian1 = Math.toRadians(mRotation + (72 * i));
 						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-						world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 3, 0.1, 0.1, 0.1, 0);
-						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 5, 0.1, 0.1, 0.1, 0.15);
+						new PartialParticle(Particle.SPELL_INSTANT, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 5, 0.1, 0.1, 0.1, 0.15).spawnAsEntityActive(mBoss);
 						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					}
 					mRotation += 8;
@@ -267,8 +270,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					if (mRadius <= 0) {
 						this.cancel();
 						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.25f);
-						world.spawnParticle(Particle.SPELL_INSTANT, mLoc, 50, 0.1, 0.1, 0.1, 1);
-						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
+						new PartialParticle(Particle.SPELL_INSTANT, mLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsEntityActive(mBoss);
 						LibraryOfSoulsIntegration.summon(mLoc, mobdata);
 					}
 				}
@@ -298,8 +301,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					mRotation += 24;
 					double radian1 = Math.toRadians(mRotation);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+					new PartialParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 				}

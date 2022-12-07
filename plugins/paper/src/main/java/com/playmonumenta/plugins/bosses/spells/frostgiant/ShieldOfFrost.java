@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -50,19 +51,19 @@ public class ShieldOfFrost extends Spell {
 			@Override
 			public void run() {
 				mTicks++;
-				world.spawnParticle(Particle.SPIT, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 6, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 12, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0);
+				new PartialParticle(Particle.SPIT, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 6, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 12, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0).spawnAsEntityActive(mBoss);
 				if (mBoss.getAbsorptionAmount() <= 0) {
 					this.cancel();
 					mBoss.removePotionEffect(PotionEffectType.ABSORPTION);
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, 3, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3, 0.5f);
-					world.spawnParticle(Particle.SPIT, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 150, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.5);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 250, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.65);
+					new PartialParticle(Particle.SPIT, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 150, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.5).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 250, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.65).spawnAsEntityActive(mBoss);
 				}
 				if (mTicks >= 9 * 20 && mTicks % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, 3, 1.5f);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 2, 1, 1, 1, 0.5);
+					new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 2, 1, 1, 1, 0.5).spawnAsEntityActive(mBoss);
 					if (!mShatter) {
 						mShatter = true;
 						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), 50, "tellraw @s [\"\",{\"text\":\"The frost shield's energy is becoming unstable!\",\"color\":\"aqua\"}]");
@@ -70,8 +71,8 @@ public class ShieldOfFrost extends Spell {
 				}
 				if (mTicks >= 20 * 12 && mBoss.getAbsorptionAmount() > 0) {
 					this.cancel();
-					world.spawnParticle(Particle.SPIT, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 100, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.5);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 150, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.65);
+					new PartialParticle(Particle.SPIT, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 100, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.5).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 150, mBoss.getWidth() / 2, mBoss.getHeight() / 2, mBoss.getWidth() / 2, 0.65).spawnAsEntityActive(mBoss);
 					new BukkitRunnable() {
 						Location mLoc = mBoss.getLocation();
 						double mRadius = 0;
@@ -86,8 +87,8 @@ public class ShieldOfFrost extends Spell {
 								for (int j = 0; j < 2; j++) {
 									mRadius += 1.5;
 									mLoc.add(cos * mRadius, 0, sin * mRadius);
-									world.spawnParticle(Particle.FIREWORKS_SPARK, mLoc, 2, 0, 0, 0, 0.3);
-									world.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.25);
+									new PartialParticle(Particle.FIREWORKS_SPARK, mLoc, 2, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 									mLoc.subtract(cos * mRadius, 0, sin * mRadius);
 								}
 							}
@@ -117,8 +118,8 @@ public class ShieldOfFrost extends Spell {
 		if (mBoss.getAbsorptionAmount() > 0 && damager instanceof Player player) {
 			World world = mBoss.getWorld();
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 2));
-			world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.15);
-			world.spawnParticle(Particle.SPIT, player.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0.2);
+			new PartialParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 12, 0.4, 0.4, 0.4, 0.15).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.SPIT, player.getLocation().add(0, 1, 0), 3, 0.4, 0.4, 0.4, 0.2).spawnAsEntityActive(mBoss);
 			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
 		}
 	}

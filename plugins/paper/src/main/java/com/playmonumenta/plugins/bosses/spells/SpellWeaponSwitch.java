@@ -35,7 +35,7 @@ public class SpellWeaponSwitch extends Spell {
 			// Switch to ranged weapon if not already equipped
 
 			if (!RANGED_MATERIALS.contains(curItem.getType())
-				&& RANGED_MATERIALS.contains(offItem.getType())) {
+				    && RANGED_MATERIALS.contains(offItem.getType())) {
 				// Need to switch hands - offhand is ranged
 				mLauncher.getEquipment().setItemInMainHand(offItem);
 				mLauncher.getEquipment().setItemInOffHand(curItem);
@@ -43,7 +43,7 @@ public class SpellWeaponSwitch extends Spell {
 		} else {
 			// Switch to non-ranged weapon if not already equipped
 			if (RANGED_MATERIALS.contains(curItem.getType())
-				&& !RANGED_MATERIALS.contains(offItem.getType())) {
+				    && !RANGED_MATERIALS.contains(offItem.getType())) {
 				// Need to switch hands - offhand is not ranged and mainhand is
 				mLauncher.getEquipment().setItemInMainHand(offItem);
 				mLauncher.getEquipment().setItemInOffHand(curItem);

@@ -103,7 +103,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 			int mT = 0;
 			Vector mVector;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mT <= chargeTime(mPhase) * 0.6) {
 					mVector = LocationUtils.getDirectionTo(mTarget.getLocation(), mBoss.getLocation());
 					Location loc = mBoss.getLocation();
@@ -145,7 +146,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 			int mT = 0;
 			BoundingBox mBox = BoundingBox.of(LocationUtils.getEntityCenter(mBoss), hitbox, hitbox + 0.5, hitbox);
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				mBox.shift(dir.clone().setY(0).normalize().multiply(velocity));
 				Location loc = mBox.getCenter().toLocation(mBoss.getWorld());
 				for (Player player : players) {
@@ -173,7 +175,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 			int mT = 0;
 			boolean mPlaceBlocks = false;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (!mForecastBlocks && lockedTrajectory) {
 					mPlaceBlocks = true;
 					mForecastBlocks = true;
@@ -199,9 +202,9 @@ public class LavaCannonBoss extends BossAbilityGroup {
 								Location bLoc = particleLoc.clone().add(x, y, z);
 
 								if (bLoc.getBlock().isSolid()
-									&& !BlockUtils.isMechanicalBlock(bLoc.getBlock().getType())
-									&& !BlockUtils.isValuableBlock(bLoc.getBlock().getType())
-									&& bLoc.getBlock().getType() != WARNING_BLOCK) {
+									    && !BlockUtils.isMechanicalBlock(bLoc.getBlock().getType())
+									    && !BlockUtils.isValuableBlock(bLoc.getBlock().getType())
+									    && bLoc.getBlock().getType() != WARNING_BLOCK) {
 									mOldBlocks.put(bLoc, bLoc.getBlock().getType());
 									bLoc.getBlock().setType(WARNING_BLOCK);
 									break;
@@ -232,9 +235,9 @@ public class LavaCannonBoss extends BossAbilityGroup {
 								Location bLoc = particleLoc.clone().add(x, y, z);
 
 								if (bLoc.getBlock().isSolid()
-									&& !BlockUtils.isMechanicalBlock(bLoc.getBlock().getType())
-									&& !BlockUtils.isValuableBlock(bLoc.getBlock().getType())
-									&& bLoc.getBlock().getType() != WARNING_BLOCK) {
+									    && !BlockUtils.isMechanicalBlock(bLoc.getBlock().getType())
+									    && !BlockUtils.isValuableBlock(bLoc.getBlock().getType())
+									    && bLoc.getBlock().getType() != WARNING_BLOCK) {
 									mOldBlocks.put(bLoc, bLoc.getBlock().getType());
 									bLoc.getBlock().setType(WARNING_BLOCK);
 									break;
@@ -250,7 +253,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 						new BukkitRunnable() {
 							int mTicks = 0;
 
-							@Override public void run() {
+							@Override
+							public void run() {
 								mTicks += 2;
 								if (mBoss.isDead() || !mBoss.isValid() || mPhase != mSamwell.mPhase || mTicks > (BULLET_DURATION + chargeTime(mPhase) + 20)) {
 									for (Map.Entry<Location, Material> e : mOldBlocks.entrySet()) {

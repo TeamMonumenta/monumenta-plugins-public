@@ -86,7 +86,7 @@ public class RejuvenationBoss extends BossAbilityGroup {
 				(Location loc, int ticks) -> {
 					p.PARTICLE_CHARGE_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
 					if (ticks <= (p.DURATION - 5) && ticks % 2 == 0) {
-						p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float)ticks / (float)100));
+						p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float) ticks / (float) 100));
 					}
 				},
 				(Location loc, int ticks) -> {
@@ -113,7 +113,7 @@ public class RejuvenationBoss extends BossAbilityGroup {
 						target.setHealth(hp);
 					}
 				}
-				)));
+			)));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}

@@ -37,7 +37,8 @@ public class SpellShuraSmoke extends Spell {
 		mRange = range;
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		// Choose random player within range that has line of sight to boss
 		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 		Collections.shuffle(players);
@@ -59,6 +60,7 @@ public class SpellShuraSmoke extends Spell {
 
 		new BukkitRunnable() {
 			World mWorld = mBoss.getWorld();
+
 			@Override
 			public void run() {
 				// Particles while flying through the air
@@ -80,6 +82,7 @@ public class SpellShuraSmoke extends Spell {
 					PPCircle indicator = new PPCircle(Particle.SPELL_WITCH, loc, mRadius).count(3).ringMode(true).delta(0.1, 0, 0.1);
 					new BukkitRunnable() {
 						int mTicks = 0;
+
 						@Override
 						public void run() {
 							mTicks += 2;
@@ -108,7 +111,8 @@ public class SpellShuraSmoke extends Spell {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 4 * 20;
 	}
 }

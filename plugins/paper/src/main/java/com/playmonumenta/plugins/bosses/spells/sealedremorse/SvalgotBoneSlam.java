@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
 import com.playmonumenta.plugins.bosses.bosses.Svalgot;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -40,41 +41,41 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 
 	public SvalgotBoneSlam(Plugin plugin, LivingEntity boss, Svalgot bossClass) {
 		super(plugin, boss, JUMP_HEIGHT, Ghalkor.detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN, VELOCITY_MULTIPLIER,
-		(World world, Location loc) -> {
-			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 0);
-			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0);
+			(World world, Location loc) -> {
+				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 0);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
 
-			EntityUtils.addAttribute(boss, Attribute.GENERIC_ATTACK_DAMAGE,
+				EntityUtils.addAttribute(boss, Attribute.GENERIC_ATTACK_DAMAGE,
 					new AttributeModifier(ATTACK_MODIFIER_NAME, -1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-		}, (World world, Location loc) -> {
-			world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
-			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0);
-		}, (World world, Location loc) -> {
-			world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
-		}, (World world, Player player, Location loc, Vector dir) -> {
-			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
+			}, (World world, Location loc) -> {
+				world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
+			}, (World world, Location loc) -> {
+				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
+			}, (World world, Player player, Location loc, Vector dir) -> {
+				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 					Arrays.asList(
-							new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-								world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1);
-								world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.1);
-							})
+						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+							new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
+						})
 					));
 
-			EntityUtils.removeAttribute(boss, Attribute.GENERIC_ATTACK_DAMAGE, ATTACK_MODIFIER_NAME);
+				EntityUtils.removeAttribute(boss, Attribute.GENERIC_ATTACK_DAMAGE, ATTACK_MODIFIER_NAME);
 
-			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1.25F);
-			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 2, 0);
-			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
-			world.spawnParticle(Particle.SMOKE_LARGE, loc, 20, 0F, 0F, 0F, 0.3F);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1.25F);
+				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.HOSTILE, 2, 0);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 60, 0F, 0F, 0F, 0.2F).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0F, 0F, 0F, 0.3F).spawnAsEntityActive(boss);
 
-			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 3 * (int)(DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
-			if (player != null) {
-				BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Bone Slam", boss.getLocation());
-				return;
-			}
-			for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-				BossUtils.blockableDamage(boss, players, DamageType.MAGIC, DAMAGE, "Bone Slam", boss.getLocation());
-			}
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 3 * (int) (DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0).spawnAsEntityActive(boss);
+				if (player != null) {
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Bone Slam", boss.getLocation());
+					return;
+				}
+				for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
+					BossUtils.blockableDamage(boss, players, DamageType.MAGIC, DAMAGE, "Bone Slam", boss.getLocation());
+				}
 			});
 
 		mBossClass = bossClass;

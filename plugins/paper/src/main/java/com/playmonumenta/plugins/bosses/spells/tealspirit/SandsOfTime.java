@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -167,13 +168,14 @@ public class SandsOfTime extends Spell {
 				}
 				target.add(FastUtils.randomDoubleInRange(-0.75, 0.75), 0, FastUtils.randomDoubleInRange(-0.75, 0.75));
 				target = LocationUtils.fallToGround(target, mCenter.getY());
-				Location current = mCenter.clone().add(0, 6, 0).add(offset.clone().multiply(1.0/3));
+				Location current = mCenter.clone().add(0, 6, 0).add(offset.clone().multiply(1.0 / 3));
 				Vector path = LocationUtils.getDirectionTo(target, current);
 				double pullback = -0.5;
 				double shoot = (current.distance(target) - pullback * 3) / 5;
 
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mT = 1;
+
 					@Override
 					public void run() {
 						Vector move;
@@ -187,7 +189,9 @@ public class SandsOfTime extends Spell {
 
 						double length = move.length();
 						for (double r = 0; r <= length; r += 0.3 + 0.2 * length) {
-							world.spawnParticle(Particle.REDSTONE, current.clone().add(move.clone().normalize().multiply(r)), 1, new Particle.DustOptions(color, 2.5f));
+							new PartialParticle(Particle.REDSTONE, current.clone().add(move.clone().normalize().multiply(r)), 1, new Particle.DustOptions(color, 2.5f))
+								.minimumMultiplier(false)
+								.spawnAsEntityActive(mBoss);
 						}
 						current.add(move);
 

@@ -94,6 +94,7 @@ public class SpellGravityWell extends Spell {
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			Location mLoc = p.getLocation().add(0, 0.2, 0);
+
 			@Override
 			public void run() {
 
@@ -101,7 +102,7 @@ public class SpellGravityWell extends Spell {
 				mRad -= 0.5;
 				indicator.radius(mRadius).location(mLoc).spawnAsBoss();
 				for (int i = 0; i < 6; i++) {
-					double radian = Math.toRadians(mRotation + (60*i));
+					double radian = Math.toRadians(mRotation + (60 * i));
 					mLoc.add(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
 					mWitch.location(mLoc).spawnAsBoss();
 					mPortal2.location(mLoc).spawnAsBoss();
@@ -121,6 +122,7 @@ public class SpellGravityWell extends Spell {
 					mBreath.location(mBoss.getLocation()).spawnAsBoss();
 					BukkitRunnable runB = new BukkitRunnable() {
 						int mT = 0;
+
 						@Override
 						public void run() {
 							mT++;
@@ -152,7 +154,7 @@ public class SpellGravityWell extends Spell {
 							mRotation += 7.5;
 							mRad -= 0.5;
 							for (int i = 0; i < 6; i++) {
-								double radian = Math.toRadians(mRotation + (60*i));
+								double radian = Math.toRadians(mRotation + (60 * i));
 								mLoc.add(FastUtils.cos(radian) * mRad, 0, FastUtils.sin(radian) * mRad);
 								mWitch.location(mLoc).spawnAsBoss();
 								mPortal2.location(mLoc).spawnAsBoss();

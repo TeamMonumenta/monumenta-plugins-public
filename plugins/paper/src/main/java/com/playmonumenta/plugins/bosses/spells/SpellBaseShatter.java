@@ -62,7 +62,8 @@ public class SpellBaseShatter extends Spell {
 		mHitAction = hitAction;
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		mBoss.setAI(false);
 		List<? extends LivingEntity> targets = mSpellTargets.getTargets();
 
@@ -85,7 +86,8 @@ public class SpellBaseShatter extends Spell {
 			int mT = 0;
 			float mPitch = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				mT += 2;
 				mPitch += 0.025f;
 
@@ -125,7 +127,7 @@ public class SpellBaseShatter extends Spell {
 											l.add(0, 1, 0);
 										}
 										if (l.getBlock().getType() != mIndicator && l.getBlock().getType().isSolid()
-											&& !(BlockUtils.isMechanicalBlock(l.getBlock().getType()) || BlockUtils.isValuableBlock(l.getBlock().getType()))) {
+											    && !(BlockUtils.isMechanicalBlock(l.getBlock().getType()) || BlockUtils.isValuableBlock(l.getBlock().getType()))) {
 											mOldBlocks.put(l, l.getBlock().getState());
 											l.getBlock().setType(mIndicator);
 										}
@@ -213,7 +215,8 @@ public class SpellBaseShatter extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return mCooldown;
 	}
 

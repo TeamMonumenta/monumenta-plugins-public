@@ -175,7 +175,7 @@ public class SpellSoulShackle extends Spell {
 					Vector baseVect = LocationUtils.getDirectionTo(p.getLocation(), pLoc);
 
 					for (int inc = 0; inc < 100; inc++) {
-						world.spawnParticle(Particle.END_ROD, endLoc, 1, 0.1, 0.1, 0.1, 0);
+						new PartialParticle(Particle.END_ROD, endLoc, 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 						endLoc.add(baseVect.clone().multiply(0.5));
 						if (endLoc.distance(pLoc) > p.getLocation().distance(pLoc)) {
 							break;

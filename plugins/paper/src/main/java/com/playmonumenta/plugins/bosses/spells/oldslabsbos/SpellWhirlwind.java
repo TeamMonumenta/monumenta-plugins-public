@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.oldslabsbos;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -46,15 +47,15 @@ public class SpellWhirlwind extends Spell {
 
 				Location loc = mBoss.getLocation();
 
-				mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.125);
-				mWorld.spawnParticle(Particle.CRIT, loc, 8, 0.1, 0.1, 0.1, 0.6);
+				new PartialParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.125).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CRIT, loc, 8, 0.1, 0.1, 0.1, 0.6).spawnAsEntityActive(mBoss);
 				if (mTicks % 2 == 0) {
 
 					for (int i = 0; i < 15; i += 1) {
 						double radian1 = Math.toRadians(24 * i);
 						loc.add(FastUtils.cos(radian1) * mRadius, 0.1, FastUtils.sin(radian1) * mRadius);
-						mWorld.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.025);
-						mWorld.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0.25);
+						new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.025).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 						loc.subtract(FastUtils.cos(radian1) * mRadius, 0.1, FastUtils.sin(radian1) * mRadius);
 
 					}
@@ -71,21 +72,22 @@ public class SpellWhirlwind extends Spell {
 						double mRotation = 0;
 						double mSin = 0;
 						double mY = 0;
+
 						@Override
 						public void run() {
 							Location loc = mBoss.getLocation();
-							mWorld.spawnParticle(Particle.CLOUD, loc, 4, 0.1, 0.1, 0.1, 0.15);
-							mWorld.spawnParticle(Particle.CRIT, loc, 12, 0.1, 0.1, 0.1, 0.85);
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.85f + ((float)FastUtils.RANDOM.nextDouble() * 0.5f));
+							new PartialParticle(Particle.CLOUD, loc, 4, 0.1, 0.1, 0.1, 0.15).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.CRIT, loc, 12, 0.1, 0.1, 0.1, 0.85).spawnAsEntityActive(mBoss);
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.85f + ((float) FastUtils.RANDOM.nextDouble() * 0.5f));
 							for (int i = 0; i < 2; i++) {
 								mRotation += 10;
 								mSin += 0.1;
 								mY = 1 + FastUtils.sin(mSin);
 								double radian1 = Math.toRadians(mRotation);
 								loc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-								mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0.025);
-								mWorld.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025);
-								mWorld.spawnParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2);
+								new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0.025).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.025).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.CRIT, loc, 4, 0.1, 0.1, 0.1, 0.2).spawnAsEntityActive(mBoss);
 								loc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 								/*

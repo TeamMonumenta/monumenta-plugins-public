@@ -41,8 +41,9 @@ public class SpellBaseLeapAttack extends Spell {
 	public interface JumpVelocityModifier {
 		/**
 		 * Called just before the boss's velocity is set to leap them towards the player
-		 * @param velocity Initial velocity
-		 * @param bossLoc Boss's starting leap location
+		 *
+		 * @param velocity  Initial velocity
+		 * @param bossLoc   Boss's starting leap location
 		 * @param targetLoc Target leap location
 		 * @return Modified velocity
 		 */
@@ -53,10 +54,10 @@ public class SpellBaseLeapAttack extends Spell {
 	public interface MidLeapTickAction {
 		/**
 		 * Called on the boss every tick while leaping.
-		 *
+		 * <p>
 		 * Can use this to adjust the boss's velocity to nudge towards the player, for example, or other effects.
 		 *
-		 * @param boss The boss
+		 * @param boss         The boss
 		 * @param targetPlayer The player the boss leaped towards
 		 */
 		void run(LivingEntity boss, Player targetPlayer);
@@ -78,24 +79,24 @@ public class SpellBaseLeapAttack extends Spell {
 	private final MidLeapTickAction mMidLeapTick;
 
 	/**
-	 * @param plugin              Plugin
-	 * @param boss                Boss
-	 * @param range               Range within which players may be targeted
-	 * @param minRange            Minimum range for the attack to initiate
-	 * @param runDistance         How far the mob runs before leaping
-	 * @param cooldown            How often this spell can be cast
-	 * @param velocityMultiplier  Adjusts distance of the leap (multiplier of 1 usually lands around the target at a distance of 8+ blocks away)
-	 * @param initiateAesthetic   Called when the attack initiates
-	 * @param leapAesthetic       Called when the boss leaps
-	 * @param leapingAesthetic    Called each tick at boss location during leap
-	 * @param hitAction           Called when the boss intersects a player or lands
-	 * @param velocityModifier    Called just before the boss's velocity is set to leap them towards the player
-	 * @param midLeapTick         Called whilet he boss is in mid air heading towards a target player
+	 * @param plugin             Plugin
+	 * @param boss               Boss
+	 * @param range              Range within which players may be targeted
+	 * @param minRange           Minimum range for the attack to initiate
+	 * @param runDistance        How far the mob runs before leaping
+	 * @param cooldown           How often this spell can be cast
+	 * @param velocityMultiplier Adjusts distance of the leap (multiplier of 1 usually lands around the target at a distance of 8+ blocks away)
+	 * @param initiateAesthetic  Called when the attack initiates
+	 * @param leapAesthetic      Called when the boss leaps
+	 * @param leapingAesthetic   Called each tick at boss location during leap
+	 * @param hitAction          Called when the boss intersects a player or lands
+	 * @param velocityModifier   Called just before the boss's velocity is set to leap them towards the player
+	 * @param midLeapTick        Called whilet he boss is in mid air heading towards a target player
 	 */
 	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
 	                           double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
-							   AestheticAction leapingAesthetic, HitAction hitAction, JumpVelocityModifier velocityModifier,
-							   MidLeapTickAction midLeapTick) {
+	                           AestheticAction leapingAesthetic, HitAction hitAction, JumpVelocityModifier velocityModifier,
+	                           MidLeapTickAction midLeapTick) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();

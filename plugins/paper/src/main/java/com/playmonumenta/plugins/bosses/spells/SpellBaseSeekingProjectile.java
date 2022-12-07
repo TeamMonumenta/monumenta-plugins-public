@@ -1,6 +1,10 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,20 +80,20 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private int mChargeRemain;
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
-			AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers,
+	                                  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, range, singleTarget, launchTracking, cooldown, delay,
-				speed, turnRadius, lifetimeTicks, hitboxLength, collidesWithBlocks, lingers, 0, false,
-				initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
+			speed, turnRadius, lifetimeTicks, hitboxLength, collidesWithBlocks, lingers, 0, false,
+			initiateAesthetic, launchAesthetic, projectileAesthetic, hitAction);
 	}
 
 	/**
-	 * @param range               Range within which players may be targeted
-	 * @param singleTarget        Target random player (true) or all players (false)
+	 * @param range        Range within which players may be targeted
+	 * @param singleTarget Target random player (true) or all players (false)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, int range, boolean singleTarget, boolean launchTracking, int cooldown, int delay,
-			double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-			AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+	                                  AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -133,8 +137,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 	//Constructors above are redirected to this one.
 
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int cooldown, int delay,
-									  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
-									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double speed, double turnRadius, int lifetimeTicks, double hitboxLength, boolean collidesWithBlocks, boolean lingers, int collisionCheckDelay, boolean collidesWithOthers,
+	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		this(plugin, boss, launchTracking, 1, 40, cooldown, delay,
 			0, 0, 0, 0, 200.0, 100.0, 1, 30, speed, turnRadius,
 			lifetimeTicks, hitboxLength, lingers, collidesWithBlocks, 0.5, 0.125, collidesWithOthers, collisionCheckDelay,
@@ -169,9 +173,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 	 * @param hitAction           Called when the projectile intersects a player (or possibly a block)
 	 */
 	public SpellBaseSeekingProjectile(Plugin plugin, LivingEntity boss, boolean launchTracking, int charge, int chargeInterval, int cooldown, int delay,
-									  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
-									  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
-									  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
+	                                  double offsetX, double offsetY, double offsetZ, int mirror, double fixYaw, double fixPitch, int split, double splitAngle, double speed, double turnRadius,
+	                                  int lifetimeTicks, double hitboxLength, boolean lingers, boolean collidesWithBlocks, double speedLiquid, double speedBlocks, boolean collidesWithOthers, int collisionCheckDelay,
+	                                  GetSpellTargets<LivingEntity> targets, AestheticAction initiateAesthetic, AestheticAction launchAesthetic, AestheticAction projectileAesthetic, HitAction hitAction) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -336,7 +340,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	public <V extends LivingEntity> void launchDX(V target, Location targetLoc, double offsetX, double offsetY, double offsetZ,
-												  int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
+	                                              int split, double splitAngle, int mirror, double fixYaw, double fixPitch) {
 		// yaw degrees of splits
 		double[] yaws = new double[split];
 		for (int i = 0; i < split; i++) {
@@ -363,7 +367,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	}
 
 	public <V extends LivingEntity> void launch(V target, Location targetLoc, boolean fixed, double fYaw, double fPitch,
-												double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
+	                                            double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
 		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -375,7 +379,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 			V mTarget = target;
 			//Base direction of projectiles
 			Vector mBaseDir = !fixed ? targetLoc.clone().subtract(mLocation).toVector().normalize() :
-				VectorUtils.rotationToVector(fYaw + mBoss.getLocation().getYaw(), fPitch);
+				                  VectorUtils.rotationToVector(fYaw + mBoss.getLocation().getYaw(), fPitch);
 			//Hint: Clone is important for multiple launching
 			//Vector mDirection = targetLoc.clone().subtract(mLocation).toVector().normalize();
 			Vector mDirection = VectorUtils.rotateTargetDirection(

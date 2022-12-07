@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -66,13 +67,14 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 		events.put(50, mBoss -> {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					mTicks++;
 					Location loc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(SUMMON_RADIUS), 1.5, FastUtils.RANDOM.nextInt(SUMMON_RADIUS));
 					summonSOTF(loc);
-					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15);
+					new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15).spawnAsEntityActive(boss);
 					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
 					if (mTicks >= 4) {
 						this.cancel();
@@ -90,13 +92,14 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 		events.put(20, mBoss -> {
 			new BukkitRunnable() {
 				int mTicks = 0;
+
 				@Override
 				public void run() {
 					mTicks++;
 					Location loc = mBoss.getLocation().add(FastUtils.RANDOM.nextInt(SUMMON_RADIUS), 1.5, FastUtils.RANDOM.nextInt(SUMMON_RADIUS));
 					summonSOTF(loc);
-					world.spawnParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175);
-					world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15);
+					new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15).spawnAsEntityActive(boss);
 					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
 					if (mTicks >= 5) {
 						this.cancel();
@@ -138,8 +141,8 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 					mRotation += 24;
 					double radian1 = Math.toRadians(mRotation);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+					new PartialParticle(Particle.SWEEP_ATTACK, mLoc, 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 				}

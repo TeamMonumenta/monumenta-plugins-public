@@ -8,8 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
 /**
- * @deprecated
- * use boss_tpbehind instead, like this:
+ * @deprecated use boss_tpbehind instead, like this:
  * <blockquote><pre>
  * /boss var Tags add boss_tpbehind
  * /boss var Tags add boss_tpbehind[random=false,range=50]

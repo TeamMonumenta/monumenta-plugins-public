@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameCharge;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameGolemNecromancy;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -74,25 +75,24 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 		mEndLoc = endLoc;
 
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
-				new BlackflameCharge(plugin, boss, this),
-				new BlackflameBurst(boss, plugin, this),
-				new BlackflameOrb(boss, plugin, this),
-				new BlackflameGolemNecromancy(mPlugin, mBoss, 10, detectionRange, 90, 20 * 6, mSpawnLoc.getY(), mSpawnLoc, this)
-				));
-
+			new BlackflameCharge(plugin, boss, this),
+			new BlackflameBurst(boss, plugin, this),
+			new BlackflameOrb(boss, plugin, this),
+			new BlackflameGolemNecromancy(mPlugin, mBoss, 10, detectionRange, 90, 20 * 6, mSpawnLoc.getY(), mSpawnLoc, this)
+		));
 
 
 		List<Spell> passiveNormalSpells = Arrays.asList(
-				new SpellBlockBreak(boss, 2, 3, 2),
-				new SpellShieldStun(6 * 20)
-			);
+			new SpellBlockBreak(boss, 2, 3, 2),
+			new SpellShieldStun(6 * 20)
+		);
 
 		//Under 50%, adds passive
 		List<Spell> lowHealthPassives = Arrays.asList(
-				new SpellBlockBreak(boss, 2, 3, 2),
-				new PassiveVoidRift(boss, plugin, 20 * 9),
-				new SpellShieldStun(6 * 20)
-			);
+			new SpellBlockBreak(boss, 2, 3, 2),
+			new PassiveVoidRift(boss, plugin, 20 * 9),
+			new SpellShieldStun(6 * 20)
+		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 
@@ -127,15 +127,15 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 				//If player too far from arena center or below 4 blocks or too high and is on a block, damage them
 				for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
-							|| mSpawnLoc.getY() - p.getLocation().getY() >= 3
-							|| (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
-							&& p.getGameMode() != GameMode.CREATIVE) {
+						     || mSpawnLoc.getY() - p.getLocation().getY() >= 3
+						     || (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
+						    && p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
 						p.setVelocity(vel);
 
 						p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1, 0f);
-						p.spawnParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2);
+						new PartialParticle(Particle.FLAME, p.getLocation(), 10, 0.5, 0.25, 0.5, 0.2).spawnAsEntityActive(boss);
 					}
 				}
 			}
@@ -159,6 +159,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 			int mCount = 1;
 			int mTicks = 0;
 			double mYInc = 3 / 40.0;
+
 			@Override
 			public void run() {
 				Creature c = (Creature) mBoss;
@@ -181,7 +182,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 					mBoss.teleport(mBoss.getLocation().add(0, mYInc, 0));
 				}
 
-				world.spawnParticle(Particle.SMOKE_LARGE, mSpawnLoc, mCount, 0, 0, 0, 0.1);
+				new PartialParticle(Particle.SMOKE_LARGE, mSpawnLoc, mCount, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
 				if (mTicks % 2 == 0) {
 					if (mCount < 40) {
 						mCount++;
@@ -223,8 +224,8 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 				Location loc = mBoss.getLocation();
 				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 5f, 0.6f);
 				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 5f, 1.5f);
-				world.spawnParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1);
-				world.spawnParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 10, 0.35, 0.5, 0.35, 0);
+				new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 10, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 			}
 		}.runTaskTimer(mPlugin, 20 * 60, 20 * 60);
 	}
@@ -251,6 +252,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks >= 20 * 5) {
@@ -274,8 +276,8 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 				}
 
-				world.spawnParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1);
-				world.spawnParticle(Particle.CLOUD, mSpawnLoc, 80, 0, 0, 0, 0.1);
+				new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CLOUD, mSpawnLoc, 80, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 
 				mTicks += 2;
 			}
@@ -300,13 +302,13 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 	}
 }

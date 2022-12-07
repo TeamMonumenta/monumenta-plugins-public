@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -61,19 +62,19 @@ public class FireBombTossBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBombToss(plugin, boss, p.DETECTION, p.LOBS, p.FUSE_TIME, p.COOLDOWN,
-					(World world, TNTPrimed tnt, Location loc) -> {
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
-						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-						world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4);
+				(World world, TNTPrimed tnt, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4).spawnAsEntityActive(boss);
 
-						for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
-							if (player.hasLineOfSight(tnt)) {
-								double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
-								BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier, p.SPELL_NAME, boss.getLocation());
-								EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (p.FIRE_DURATION * multiplier), player, mBoss);
-							}
+					for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
+						if (player.hasLineOfSight(tnt)) {
+							double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
+							BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier, p.SPELL_NAME, boss.getLocation());
+							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (p.FIRE_DURATION * multiplier), player, mBoss);
 						}
-					})
+					}
+				})
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);

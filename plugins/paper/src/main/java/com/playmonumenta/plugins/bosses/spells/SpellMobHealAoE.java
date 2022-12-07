@@ -61,6 +61,7 @@ public class SpellMobHealAoE extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTimer = 0;
 			double mCurrentRadius = mParticleRadius;
+
 			@Override
 			public void run() {
 				Location loc = mBoss.getLocation();
@@ -90,6 +91,7 @@ public class SpellMobHealAoE extends Spell {
 					new BukkitRunnable() {
 						final Location mLoc = mBoss.getLocation();
 						double mBurstRadius = 0;
+
 						@Override
 						public void run() {
 							for (int j = 0; j < 2; j++) {

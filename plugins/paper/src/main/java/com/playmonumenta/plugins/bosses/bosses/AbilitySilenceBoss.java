@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.Collections;
 import org.bukkit.Color;
@@ -15,14 +16,13 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * @deprecated use boss_onhit instead, like this:
- *<blockquote><pre>
+ * <blockquote><pre>
  * /boss var Tags add boss_onhit
  * /boss var Tags add boss_onhit[SilenceTicks=60,COLOR=XXXXX]
  * we have yet to find a way to look at color
  * </pre></blockquote>
  * G3m1n1Boy
- *
-*/
+ */
 @Deprecated
 public class AbilitySilenceBoss extends BossAbilityGroup {
 
@@ -58,7 +58,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 			World world = player.getWorld();
 			Location loc = player.getLocation().add(0, 1, 0);
 			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 0.25f, 2f);
-			world.spawnParticle(Particle.REDSTONE, loc, 100, 0, 0, 0, 0.5, mParams.COLOR);
+			new PartialParticle(Particle.REDSTONE, loc, 100, 0, 0, 0, 0.5, mParams.COLOR).spawnAsEntityActive(mBoss);
 
 			AbilityUtils.silencePlayer(player, mParams.DURATION);
 		}

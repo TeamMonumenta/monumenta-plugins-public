@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -105,7 +106,7 @@ public class SpellRaiseJungle extends Spell {
 						sLoc.setY(ARENA_FLOOR + 0.25);
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0); // should end up 1.5 blocks below the arena floor
-					LivingEntity ele = (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, "EarthElemental");
+					LivingEntity ele = (LivingEntity) LibraryOfSoulsIntegration.summon(spawn, "EarthElemental");
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());
@@ -115,6 +116,7 @@ public class SpellRaiseJungle extends Spell {
 							Location mPLoc = scLoc;
 							double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
+
 							@Override
 							public void run() {
 								mTicks++;
@@ -126,7 +128,7 @@ public class SpellRaiseJungle extends Spell {
 								if (mTicks >= mSummonTime && !mRaised) {
 									mRaised = true;
 									ele.setAI(true);
-									mPLoc.getWorld().spawnParticle(Particle.BLOCK_DUST, mPLoc, 6, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA);
+									new PartialParticle(Particle.BLOCK_DUST, mPLoc, 6, 0.25, 0.1, 0.25, 0.25, PARTICLE_DATA).spawnAsEntityActive(mBoss);
 								}
 
 								if (mBoss.isDead() || !mBoss.isValid()) {
@@ -205,7 +207,7 @@ public class SpellRaiseJungle extends Spell {
 		if (mSummoned.size() > 0) {
 			event.setDamage(event.getDamage() * 0.4);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
-			mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA);
+			new PartialParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA).spawnAsEntityActive(mBoss);
 		}
 	}
 

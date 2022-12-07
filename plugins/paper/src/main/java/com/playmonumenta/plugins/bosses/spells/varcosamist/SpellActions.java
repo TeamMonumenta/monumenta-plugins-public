@@ -15,7 +15,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 
-
 public class SpellActions {
 	//Not technically a spell - just putting the repeated actions in a seperate class
 	public static SpellPlayerAction getTooLowAction(LivingEntity boss, Location center) {

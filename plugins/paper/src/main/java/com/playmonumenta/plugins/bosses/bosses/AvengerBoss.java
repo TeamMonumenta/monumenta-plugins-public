@@ -96,7 +96,7 @@ public class AvengerBoss extends BossAbilityGroup {
 
 			// Only trigger when the player kills a mob within range
 			if (entity.getKiller() != null
-					&& entity.getLocation().distance(bossLoc) < mParam.RADIUS) {
+				    && entity.getLocation().distance(bossLoc) < mParam.RADIUS) {
 				mParam.SOUND_DEATH.play(bossLoc, 0.1f, 0.8f);
 				mParam.PARTICLE_DEATH.spawn(mBoss, bossLoc.clone().add(0, mBoss.getHeight() / 2, 0), 0.25, 0.45, 0.25, 1);
 

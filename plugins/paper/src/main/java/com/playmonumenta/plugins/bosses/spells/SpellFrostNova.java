@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
@@ -30,14 +31,12 @@ public class SpellFrostNova extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.CLOUD, loc, 7, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
+		new PartialParticle(Particle.CLOUD, loc, 7, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
+		new PartialParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -50,9 +49,8 @@ public class SpellFrostNova extends SpellBaseAoE {
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.2);
-		world.spawnParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0);
+		new PartialParticle(Particle.CLOUD, loc, 2, 0.1, 0.1, 0.1, 0.2).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SNOWBALL, loc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

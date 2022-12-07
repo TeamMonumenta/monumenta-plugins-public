@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
@@ -34,17 +35,17 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBombToss(plugin, boss, detectionRange, LOBS, FUSE,
-					(World world, TNTPrimed tnt, Location loc) -> {
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
-						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+				(World world, TNTPrimed tnt, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 
-						for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
-							if (player.hasLineOfSight(tnt)) {
-								double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
-								BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier);
-							}
+					for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
+						if (player.hasLineOfSight(tnt)) {
+							double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
+							BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier);
 						}
-					})
+					}
+				})
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);

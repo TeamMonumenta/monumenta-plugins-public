@@ -88,7 +88,6 @@ public class ShulkerEquipmentListener implements Listener {
 
 	private final Plugin mPlugin;
 	private final Map<UUID, BukkitRunnable> mLockBoxCooldowns = new HashMap<>();
-	private final Map<UUID, BukkitRunnable> mCharmBoxCooldowns = new HashMap<>();
 
 	public ShulkerEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;

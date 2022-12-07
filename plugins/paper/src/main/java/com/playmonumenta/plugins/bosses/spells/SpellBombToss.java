@@ -26,8 +26,9 @@ public class SpellBombToss extends Spell {
 	public interface ExplodeAction {
 		/**
 		 * Optional custom explosion code to replace the TNT explosion
-		 * @param tnt    TNT entity at the explosion (useful for line of sight calculations)
-		 * @param loc    Location of the explosion
+		 *
+		 * @param tnt TNT entity at the explosion (useful for line of sight calculations)
+		 * @param loc Location of the explosion
 		 */
 		void run(World world, TNTPrimed tnt, Location loc);
 	}
@@ -86,6 +87,7 @@ public class SpellBombToss extends Spell {
 
 		BukkitRunnable task = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
@@ -145,6 +147,7 @@ public class SpellBombToss extends Spell {
 			BukkitRunnable fuseSound = new BukkitRunnable() {
 				TNTPrimed mTnt = tnt;
 				int mCount = 0;
+
 				@Override
 				public void run() {
 					if (mCount >= 3) {
@@ -163,6 +166,7 @@ public class SpellBombToss extends Spell {
 			// Create explosion manually for proper damage calculations; source it at a mob entity and use the TNT location
 			BukkitRunnable explosion = new BukkitRunnable() {
 				TNTPrimed mTnt = tnt;
+
 				@Override
 				public void run() {
 					if (mExplodeAction == null) {

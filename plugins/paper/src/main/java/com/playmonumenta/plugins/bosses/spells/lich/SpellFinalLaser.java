@@ -48,17 +48,17 @@ public class SpellFinalLaser extends Spell {
 	private static final double CHECK_INCREMENT = 0.75;
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
-			Material.AIR,
-			Material.COMMAND_BLOCK,
-			Material.CHAIN_COMMAND_BLOCK,
-			Material.REPEATING_COMMAND_BLOCK,
-			Material.BEDROCK,
-			Material.BARRIER,
-			Material.SPAWNER,
-			Material.WATER,
-			Material.LAVA,
-			Material.END_PORTAL
-		);
+		Material.AIR,
+		Material.COMMAND_BLOCK,
+		Material.CHAIN_COMMAND_BLOCK,
+		Material.REPEATING_COMMAND_BLOCK,
+		Material.BEDROCK,
+		Material.BARRIER,
+		Material.SPAWNER,
+		Material.WATER,
+		Material.LAVA,
+		Material.END_PORTAL
+	);
 
 	public SpellFinalLaser(Plugin plugin, LivingEntity boss, Location loc, double range) {
 		mPlugin = plugin;

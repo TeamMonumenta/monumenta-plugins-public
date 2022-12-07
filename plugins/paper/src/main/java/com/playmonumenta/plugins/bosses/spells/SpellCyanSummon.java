@@ -15,8 +15,8 @@ public class SpellCyanSummon extends Spell {
 	private static final int PLAYER_RANGE = 16;
 	private static final int MAX_NEARBY_SUMMONS = 12;
 	private final EnumSet<EntityType> mTypes = EnumSet.of(
-			EntityType.ZOMBIFIED_PIGLIN
-			);
+		EntityType.ZOMBIFIED_PIGLIN
+	);
 
 	private final LivingEntity mBoss;
 
@@ -40,7 +40,7 @@ public class SpellCyanSummon extends Spell {
 
 		}
 
-		if (((mBoss instanceof Mob) && (((Mob)mBoss).getTarget() instanceof Player))) {
+		if (((mBoss instanceof Mob) && (((Mob) mBoss).getTarget() instanceof Player))) {
 			return true;
 		}
 

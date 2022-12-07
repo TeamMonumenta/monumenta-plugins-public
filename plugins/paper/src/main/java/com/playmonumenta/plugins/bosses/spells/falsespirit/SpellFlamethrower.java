@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -61,6 +62,7 @@ public class SpellFlamethrower extends Spell {
 		//Start up warning for flamethrower
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (((!mDelve && mTicks % 6 == 0) || (mDelve && mTicks % 4 == 0)) && mLoc.distance(target.getEyeLocation()) > 0.5) {
@@ -80,7 +82,7 @@ public class SpellFlamethrower extends Spell {
 					endLoc = box.getCenter().toLocation(mBoss.getWorld());
 
 					if (FastUtils.RANDOM.nextInt(3) == 0) {
-						endLoc.getWorld().spawnParticle(Particle.CLOUD, endLoc, 1, 0.02, 0.02, 0.02, 0);
+						new PartialParticle(Particle.CLOUD, endLoc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(mBoss);
 					}
 
 					List<Block> blocks = new ArrayList<Block>();
@@ -129,6 +131,7 @@ public class SpellFlamethrower extends Spell {
 						int mFireLoc = 0;
 						//Don't hit a player twice in the same tick
 						List<Player> mHitPlayers = new ArrayList<>();
+
 						@Override
 						public void run() {
 							if (mT % 20 == 0) {
@@ -158,10 +161,10 @@ public class SpellFlamethrower extends Spell {
 								box.shift(baseVect);
 								endLoc = box.getCenter().toLocation(mBoss.getWorld());
 								if (FastUtils.RANDOM.nextInt(3) == 0) {
-									endLoc.getWorld().spawnParticle(Particle.FLAME, endLoc, 1, 0.02, 0.02, 0.02, 0);
+									new PartialParticle(Particle.FLAME, endLoc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(mBoss);
 								}
 								if (i % 10 == mFireLoc) {
-									endLoc.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, endLoc, 3, 0.05, 0.05, 0.05, 0.05);
+									new PartialParticle(Particle.SOUL_FIRE_FLAME, endLoc, 3, 0.05, 0.05, 0.05, 0.05).spawnAsEntityActive(mBoss);
 								}
 								if (i % 40 == 0) {
 									world.playSound(endLoc, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.HOSTILE, 0.5f, 2f);

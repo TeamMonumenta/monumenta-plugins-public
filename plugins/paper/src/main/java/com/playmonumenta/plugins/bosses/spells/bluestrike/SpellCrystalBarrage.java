@@ -66,7 +66,8 @@ public class SpellCrystalBarrage extends Spell {
 		mPHit = new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 20, 0.25, 0.25, 0.25, 0.25);
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		mCooldown = true;
 		new BukkitRunnable() {
 
@@ -83,7 +84,8 @@ public class SpellCrystalBarrage extends Spell {
 
 		new BukkitRunnable() {
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 
@@ -98,7 +100,8 @@ public class SpellCrystalBarrage extends Spell {
 							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Crystal Barrage...");
 						}
 
-						@Override public void run() {
+						@Override
+						public void run() {
 							mChargeUp.setProgress(1 - ((double) mT / BULLET_DURATION));
 							if (mT > BULLET_DURATION) {
 								this.cancel();
@@ -114,7 +117,8 @@ public class SpellCrystalBarrage extends Spell {
 			int mT = 0;
 			int mBullets = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				// Aim to spawn everything in 3 seconds, which suggests spawning 1 every tick.
 				// If Phase 4, then spawn two bullets per tick.
 				if (mPhase <= 3) {

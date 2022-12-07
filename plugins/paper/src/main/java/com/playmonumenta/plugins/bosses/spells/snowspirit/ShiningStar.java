@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -39,7 +40,7 @@ public class ShiningStar extends Spell {
 	private static final double SPEED = 0.8;
 	private static final double TURN_RADIUS = 0;
 	private static final int DISTANCE = 32;
-	private static final int LIFETIME_TICKS = (int)(DISTANCE / SPEED);
+	private static final int LIFETIME_TICKS = (int) (DISTANCE / SPEED);
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
@@ -50,31 +51,31 @@ public class ShiningStar extends Spell {
 		mPlugin = plugin;
 
 		mMissile = new SpellBaseSeekingProjectile(plugin, boss, SnowSpirit.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-				// Initiate Aesthetic
-				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-				},
-				// Launch Aesthetic
-				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.5f);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
-				},
-				// Projectile Aesthetic
-				(World world, Location loc, int ticks) -> {
-					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.025);
-					world.spawnParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.05);
-					world.spawnParticle(Particle.DOLPHIN, loc, 3, 0, 0, 0, 0.3);
-				},
-				// Hit Action
-				(World world, LivingEntity player, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
-					world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25);
-					if (player != null) {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", mBoss.getLocation());
-					}
-				});
+			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.025).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.DOLPHIN, loc, 3, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
+			},
+			// Hit Action
+			(World world, LivingEntity player, Location loc) -> {
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
+				if (player != null) {
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", mBoss.getLocation());
+				}
+			});
 	}
 
 	@Override
@@ -87,6 +88,7 @@ public class ShiningStar extends Spell {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks >= DURATION) {

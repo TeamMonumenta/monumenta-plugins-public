@@ -90,7 +90,8 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 		new BukkitRunnable() {
 			int mTicks = 0;
 
-			@Override public void run() {
+			@Override
+			public void run() {
 				// Shoot Laser!
 				Location startLocation = mBoss.getEyeLocation();
 				Location endLocation = mTarget.getLocation().add(0, mTarget.getEyeHeight() * 3 / 5, 0);

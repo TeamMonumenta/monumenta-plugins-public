@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.bosses.spells.snowspirit.JollyBall;
 import com.playmonumenta.plugins.bosses.spells.snowspirit.ShiningStar;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -76,22 +77,22 @@ public class SnowSpirit extends BossAbilityGroup {
 		mActiveMinibosses = new ArrayList<>();
 
 		SpellManager activeSpells1 = new SpellManager(Arrays.asList(
-				new SpellForceTwo(plugin, boss, 5, 20 * 3),
-				new DeckTheHalls(plugin, boss),
-				new ElfSummon(plugin, mBoss, 3, 3, 20, 15)
-			));
+			new SpellForceTwo(plugin, boss, 5, 20 * 3),
+			new DeckTheHalls(plugin, boss),
+			new ElfSummon(plugin, mBoss, 3, 3, 20, 15)
+		));
 
 		SpellManager activeSpells2 = new SpellManager(Arrays.asList(
-				new SpellForceTwo(plugin, boss, 5, 20 * 3),
-				new DeckTheHalls(plugin, boss),
-				new ShiningStar(boss, plugin),
-				new ElfSummon(plugin, mBoss, 3, 3, 20, 15)
-			));
+			new SpellForceTwo(plugin, boss, 5, 20 * 3),
+			new DeckTheHalls(plugin, boss),
+			new ShiningStar(boss, plugin),
+			new ElfSummon(plugin, mBoss, 3, 3, 20, 15)
+		));
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellPurgeNegatives(boss, 20 * 8),
-				new JollyBall(plugin, boss, 12 * 20, 0.25)
-			);
+			new SpellPurgeNegatives(boss, 20 * 8),
+			new JollyBall(plugin, boss, 12 * 20, 0.25)
+		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 
@@ -132,13 +133,14 @@ public class SnowSpirit extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
 
-				mBoss.getWorld().spawnParticle(Particle.SNOWBALL, mBoss.getLocation(), 10, 1, 1, 1);
+				new PartialParticle(Particle.SNOWBALL, mBoss.getLocation(), 10, 1, 1, 1).spawnAsEntityActive(boss);
 
 				if (mSpawnLoc.distance(mBoss.getLocation()) > 6) {
 					mTicks += 10;
@@ -206,14 +208,14 @@ public class SnowSpirit extends BossAbilityGroup {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
-		world.spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 	}
 
 
@@ -236,6 +238,7 @@ public class SnowSpirit extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mTicks >= ShiningStar.DURATION + 10) {
@@ -261,7 +264,7 @@ public class SnowSpirit extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 				}
 
-				world.spawnParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1);
+				new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 
 				mTicks += 2;
 			}

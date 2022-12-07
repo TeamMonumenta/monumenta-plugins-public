@@ -113,6 +113,7 @@ public class TemporalRift extends Spell {
 					mBreath.location(mBoss.getLocation()).spawnAsBoss();
 					BukkitRunnable runB = new BukkitRunnable() {
 						int mT = 0;
+
 						@Override
 						public void run() {
 							mT++;

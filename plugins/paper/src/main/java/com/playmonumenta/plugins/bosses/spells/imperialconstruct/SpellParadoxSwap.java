@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -70,14 +71,15 @@ public class SpellParadoxSwap extends Spell {
 		nearbyPlayers.remove((Player) damager);
 		for (Player p : nearbyPlayers) {
 			if (p != damager &&
-				!com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, TemporalFlux.class)) {
-					mBoss.getWorld().spawnParticle(Particle.SOUL, mBoss.getLocation(), 20, 1, 1, 1);
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.HOSTILE, 30, 1);
-					com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, TemporalFlux.GENERIC_NAME, new TemporalFlux(20*30));
-					//
-					mOnCooldown = true;
+				    !com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, TemporalFlux.class)) {
+				new PartialParticle(Particle.SOUL, mBoss.getLocation(), 20, 1, 1, 1).spawnAsEntityActive(mBoss);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.HOSTILE, 30, 1);
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, TemporalFlux.GENERIC_NAME, new TemporalFlux(20 * 30));
+				//
+				mOnCooldown = true;
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mT = 0;
+
 					@Override
 					public void run() {
 						if (mT >= mCoolDown) {
@@ -89,7 +91,7 @@ public class SpellParadoxSwap extends Spell {
 				};
 				runnable.runTaskTimer(mPlugin, 0, 1);
 				mActiveRunnables.add(runnable);
-					return;
+				return;
 			}
 		}
 	}

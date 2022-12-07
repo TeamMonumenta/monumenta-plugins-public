@@ -74,7 +74,8 @@ public class StarfallBoss extends BossAbilityGroup {
 							Location mLocation = target.getLocation();
 
 
-							@Override public void run() {
+							@Override
+							public void run() {
 								if (mBoss.isDead() || !mBoss.isValid()) {
 									cancel();
 									return;
@@ -135,7 +136,7 @@ public class StarfallBoss extends BossAbilityGroup {
 									}
 								}
 
-								p.SOUND_LOCKING.play(mLocation, 1, 1.5f * (((float) mTicks + 1)/(float) p.LOCKING_DURATION));
+								p.SOUND_LOCKING.play(mLocation, 1, 1.5f * (((float) mTicks + 1) / (float) p.LOCKING_DURATION));
 
 
 								mTicks += 2;
@@ -145,11 +146,13 @@ public class StarfallBoss extends BossAbilityGroup {
 
 				}
 
-				@Override public int cooldownTicks() {
+				@Override
+				public int cooldownTicks() {
 					return p.COOLDOWN;
 				}
 
-				@Override public boolean canRun() {
+				@Override
+				public boolean canRun() {
 					return !p.TARGETS.getTargetsList(mBoss).isEmpty();
 				}
 			}

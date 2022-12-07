@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -66,8 +67,8 @@ public class SpellFrostbite extends Spell {
 				BossUtils.bossDamagePercent(mBoss, player, 0.15, mBoss.getLocation(), "Frostbite");
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, playerLoc.add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
-				world.spawnParticle(Particle.SPIT, playerLoc, 6, 0.4, 0.4, 0.4, 0.2);
+				new PartialParticle(Particle.FIREWORKS_SPARK, playerLoc.add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPIT, playerLoc, 6, 0.4, 0.4, 0.4, 0.2).spawnAsEntityActive(mBoss);
 				if (!mWarned.contains(player)) {
 					player.sendMessage(ChatColor.RED + "The upper air is freezing!");
 					mWarned.add(player);
@@ -76,8 +77,8 @@ public class SpellFrostbite extends Spell {
 				BossUtils.bossDamagePercent(mBoss, player, 0.15, mBoss.getLocation(), "Frostbite");
 
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, playerLoc.add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
-				world.spawnParticle(Particle.SPIT, playerLoc, 6, 0.4, 0.4, 0.4, 0.2);
+				new PartialParticle(Particle.FIREWORKS_SPARK, playerLoc.add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SPIT, playerLoc, 6, 0.4, 0.4, 0.4, 0.2).spawnAsEntityActive(mBoss);
 				if (!mWarned.contains(player)) {
 					player.sendMessage(ChatColor.RED + "The lower air is freezing!");
 					mWarned.add(player);

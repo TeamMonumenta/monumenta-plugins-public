@@ -35,12 +35,12 @@ public class PlayerTargetBoss extends BossAbilityGroup {
 			boss.setRemoveWhenFarAway(true);
 		}
 
-		mSpellTargetPlayer = new SpellTargetVisiblePlayer((Mob)boss, detectionRange, 60, 160);
+		mSpellTargetPlayer = new SpellTargetVisiblePlayer((Mob) boss, detectionRange, 60, 160);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRunAction(() -> {
-				if (boss instanceof Wolf && ((Wolf)boss).isTamed()) {
-					((Wolf)boss).setAngry(false);
+				if (boss instanceof Wolf && ((Wolf) boss).isTamed()) {
+					((Wolf) boss).setAngry(false);
 				} else {
 					mSpellTargetPlayer.run();
 				}

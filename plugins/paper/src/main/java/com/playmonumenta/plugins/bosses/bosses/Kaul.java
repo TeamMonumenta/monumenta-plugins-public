@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.bosses.spells.kaul.SpellVolcanicDemise;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -207,32 +208,32 @@ public class Kaul extends BossAbilityGroup {
 
 		}.runTaskTimer(mPlugin, 0, 5);
 		SpellManager phase1Spells = new SpellManager(
-		    Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
-		                  new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
-		                  new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-		                  new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
+			Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
+				new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
 
 		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
 
 		SpellManager phase2Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, false, mShrineMarker.getLocation()),
-			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-			              new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
-			              new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
-			              judgement));
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+				new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
+				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
+				judgement));
 
 		SpellManager phase3Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, true, mShrineMarker.getLocation()),
-			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-			              new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
-			              new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-			              judgement));
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
+				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
+				judgement));
 
 		SpellManager phase4Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, detectionRange, true, mShrineMarker.getLocation()),
-			              new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
-			              new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
-			              new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
+				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
+				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
+				new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
 
 		List<UUID> hit = new ArrayList<UUID>();
 
@@ -244,11 +245,11 @@ public class Kaul extends BossAbilityGroup {
 					return;
 				}
 				// Damage has no direction so can't be blocked */
-				if (BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location)null)) {
+				if (BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location) null)) {
 					/* Player survived the damage */
 					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
 					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
-					world.spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15);
+					new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 					cd.add(player.getUniqueId());
 					new BukkitRunnable() {
 						@Override
@@ -271,77 +272,77 @@ public class Kaul extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
+					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_1, false, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().getBlock().getType() == Material.LAVA
-				                             || b.getLocation().getBlock().getType() == Material.WATER), action
+				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().getBlock().getType() == Material.LAVA
+					     || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase2PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
-				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 8, 0.35,
+					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_2, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().getBlock().getType() == Material.LAVA
-				                             || b.getLocation().getBlock().getType() == Material.WATER), action
+				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().getBlock().getType() == Material.LAVA
+					     || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
-				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				                    0.35, 0.1);
-				world.spawnParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				                    0.35, RED_COLOR);
-				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				                    0.45, 0.35, Material.BLUE_WOOL.createBlockData());
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
+					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
+				new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
+					0.35, 0.1).spawnAsBoss();
+				new PartialParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
+					0.35, RED_COLOR).spawnAsBoss();
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
+					0.45, 0.35, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_3, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().getBlock().getType() == Material.LAVA
-				                             || b.getLocation().getBlock().getType() == Material.WATER), action
+				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().getBlock().getType() == Material.LAVA
+					     || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 		List<Spell> phase4PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, 8, 1, 3, 1, true, true),
 			new SpellBaseParticleAura(boss, 1, (LivingEntity mBoss) -> {
-				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				                    0.45, 0.35, Material.GREEN_CONCRETE.createBlockData());
-				world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				                    0.35, 0.1);
-				world.spawnParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
-				                    0.35, RED_COLOR);
-				world.spawnParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
-				                    0.45, 0.35, Material.BLUE_WOOL.createBlockData());
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
+					0.45, 0.35, Material.GREEN_CONCRETE.createBlockData()).spawnAsBoss();
+				new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
+					0.35, 0.1).spawnAsBoss();
+				new PartialParticle(Particle.REDSTONE, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35, 0.45,
+					0.35, RED_COLOR).spawnAsBoss();
+				new PartialParticle(Particle.FALLING_DUST, mBoss.getLocation().add(0, mBoss.getHeight() / 2, 0), 2, 0.35,
+					0.45, 0.35, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
 			}),
 			new SpellLightningStrike(this, LIGHTNING_STRIKE_COOLDOWN_SECONDS_4, true, mShrineMarker.getLocation()),
 			new SpellLightningStorm(boss, detectionRange),
 			new SpellShieldStun(30 * 20),
 			new SpellConditionalTeleport(mBoss, spawnLoc,
-			                             b -> b.getLocation().getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
-				                             || b.getLocation().getBlock().getType() == Material.LAVA
-				                             || b.getLocation().getBlock().getType() == Material.WATER), action
+				b -> b.getLocation().getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK
+					     || b.getLocation().getBlock().getType() == Material.LAVA
+					     || b.getLocation().getBlock().getType() == Material.WATER), action
 		);
 
 
@@ -385,13 +386,13 @@ public class Kaul extends BossAbilityGroup {
 							for (int i = 0; i < 5; i++) {
 								double radian1 = Math.toRadians(mRotation + (72 * i));
 								mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-								world.spawnParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
-								Material.COARSE_DIRT.createBlockData());
+								new PartialParticle(Particle.SPELL_WITCH, mLoc, 6, 0.25, 0.25, 0.25, 0).spawnAsBoss();
+								new PartialParticle(Particle.BLOCK_DUST, mLoc, 4, 0.25, 0.25, 0.25, 0.25,
+									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 								mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 							}
-							world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8,
-							                    0);
+							new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8,
+								0).spawnAsBoss();
 							mRotation += 8;
 							mRadius -= 0.25;
 
@@ -412,21 +413,21 @@ public class Kaul extends BossAbilityGroup {
 									public void run() {
 										mT++;
 										mRadius = mT;
-										world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0);
-										world.spawnParticle(Particle.SMOKE_NORMAL, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0);
+										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 20, 8, 5, 8, 0).spawnAsBoss();
+										new PartialParticle(Particle.SMOKE_NORMAL, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 8, 0).spawnAsBoss();
 										for (int i = 0; i < 36; i++) {
 											double radian1 = Math.toRadians(mRotation + (10 * i));
 											loc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-											world.spawnParticle(Particle.SPELL_WITCH, loc, 3, 0.4, 0.4, 0.4, 0);
-											world.spawnParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.4, 0.4, 0.25,
-											                    Material.COARSE_DIRT.createBlockData());
+											new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
+											new PartialParticle(Particle.BLOCK_DUST, loc, 2, 0.4, 0.4, 0.4, 0.25,
+												Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 											loc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 										}
 										for (Block block : LocationUtils.getEdge(loc.clone().subtract(mT, 0, mT),
-										                                 loc.clone().add(mT, 0, mT))) {
+											loc.clone().add(mT, 0, mT))) {
 											if (FastUtils.RANDOM.nextInt(6) == 1 && block.getType() == Material.SMOOTH_SANDSTONE
-											    && block.getLocation().add(0, 1.5, 0).getBlock()
-											    .getType() == Material.AIR) {
+												    && block.getLocation().add(0, 1.5, 0).getBlock()
+													       .getType() == Material.AIR) {
 												block.setType(Material.SMOOTH_RED_SANDSTONE);
 											}
 										}
@@ -438,7 +439,7 @@ public class Kaul extends BossAbilityGroup {
 								}.runTaskTimer(mPlugin, 0, 1);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 									player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1,
-									                 0.75f);
+										0.75f);
 								}
 								new BukkitRunnable() {
 
@@ -493,9 +494,9 @@ public class Kaul extends BossAbilityGroup {
 					for (int i = 0; i < 5; i++) {
 						double radian1 = Math.toRadians(mRotation + (72 * i));
 						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-						world.spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
-						world.spawnParticle(Particle.BLOCK_DUST, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
-						Material.DIRT.createBlockData());
+						new PartialParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsBoss();
+						new PartialParticle(Particle.BLOCK_DUST, mLoc, 3, 0.1, 0.1, 0.1, 0.25,
+							Material.DIRT.createBlockData()).spawnAsBoss();
 						mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 					}
 					mRotation += 8;
@@ -504,9 +505,9 @@ public class Kaul extends BossAbilityGroup {
 						this.cancel();
 						world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
 						world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
-						world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 50, 0.1, 0.1, 0.1, 1);
-						world.spawnParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
-						                    Material.DIRT.createBlockData());
+						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsBoss();
+						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
+							Material.DIRT.createBlockData()).spawnAsBoss();
 						LivingEntity miniboss = spawnPrimordial(mLoc);
 						new BukkitRunnable() {
 
@@ -566,9 +567,9 @@ public class Kaul extends BossAbilityGroup {
 					List<ArmorStand> points = new ArrayList<ArmorStand>();
 					for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 						if ((e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
-						    || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
-						    || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
-						    || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) && e instanceof ArmorStand) {
+							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
+							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
+							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) && e instanceof ArmorStand) {
 							points.add((ArmorStand) e);
 						}
 					}
@@ -586,30 +587,30 @@ public class Kaul extends BossAbilityGroup {
 								public void run() {
 									mT++;
 									if (mT % 2 == 0) {
-										world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
+										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0).spawnAsBoss();
 									}
-									world.spawnParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0);
-									world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 16, 0.35, 0.45, 0.35, 0);
-									world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 1, 0.35, 0.45, 0.35, 0);
+									new PartialParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 10, 8, 5, 9, 0).spawnAsBoss();
+									new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1.25, 0), 16, 0.35, 0.45, 0.35, 0).spawnAsBoss();
+									new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1.25, 0), 1, 0.35, 0.45, 0.35, 0).spawnAsBoss();
 									if (mT == 1) {
 										mLoc.getWorld().createExplosion(mLoc, 6, true);
 										mLoc.getWorld().createExplosion(mLoc.clone().subtract(0, 4, 0), 6, true);
 									}
 									mLoc.add(mDir.clone().multiply(0.35));
 									if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)) {
-										world.spawnParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
-										world.spawnParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData());
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1);
+										new PartialParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
+										new PartialParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.BLUE_WOOL.createBlockData()).spawnAsBoss();
+										new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1).spawnAsBoss();
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)) {
-										world.spawnParticle(Particle.REDSTONE, mLoc, 15, 0.4, 0.4, 0.4, RED_COLOR);
-										world.spawnParticle(Particle.FALLING_DUST, mLoc, 10, 0.4, 0.4, 0.4, Material.RED_WOOL.createBlockData());
+										new PartialParticle(Particle.REDSTONE, mLoc, 15, 0.4, 0.4, 0.4, RED_COLOR).spawnAsBoss();
+										new PartialParticle(Particle.FALLING_DUST, mLoc, 10, 0.4, 0.4, 0.4, Material.RED_WOOL.createBlockData()).spawnAsBoss();
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)) {
-										world.spawnParticle(Particle.FLAME, mLoc, 10, 0.3, 0.3, 0.3, 0.1);
-										world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.4, 0.4, 0.4, 0);
+										new PartialParticle(Particle.FLAME, mLoc, 10, 0.3, 0.3, 0.3, 0.1).spawnAsBoss();
+										new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
 									} else if (point.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
-										world.spawnParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
-										world.spawnParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData());
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1);
+										new PartialParticle(Particle.FALLING_DUST, mLoc, 9, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
+										new PartialParticle(Particle.BLOCK_DUST, mLoc, 5, 0.4, 0.4, 0.4, Material.GREEN_TERRACOTTA.createBlockData()).spawnAsBoss();
+										new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 2, 0.4, 0.4, 0.4, 0.1).spawnAsBoss();
 									}
 									if (mLoc.distance(mSpawnLoc.clone().add(0, 5, 0)) < 1.25 || mLoc.distance(mBoss.getLocation().add(0, 1, 0)) < 1.25) {
 										this.cancel();
@@ -622,14 +623,14 @@ public class Kaul extends BossAbilityGroup {
 
 									if (mHits >= 4) {
 										this.cancel();
-										world.spawnParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1);
-										world.spawnParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1);
+										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1).spawnAsBoss();
+										new PartialParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1).spawnAsBoss();
 										mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
 										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
 										changePhase(SpellManager.EMPTY, phase3PassiveSpells, null);
-										world.spawnParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175);
-										world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25);
+										new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175).spawnAsBoss();
+										new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
+										new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_GENERIC_EXPLODE, 5, 0.9f);
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
 
@@ -646,8 +647,8 @@ public class Kaul extends BossAbilityGroup {
 												for (int i = 0; i < 36; i++) {
 													double radian1 = Math.toRadians(mRotation + (10 * i));
 													mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-													world.spawnParticle(Particle.FLAME, mLoc, 2, 0.25, 0.25, 0.25, 0.1);
-													world.spawnParticle(Particle.BLOCK_DUST, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData());
+													new PartialParticle(Particle.FLAME, mLoc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsBoss();
+													new PartialParticle(Particle.BLOCK_DUST, mLoc, 2, 0.25, 0.25, 0.25, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 													mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 												}
 												for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
@@ -740,9 +741,9 @@ public class Kaul extends BossAbilityGroup {
 				for (int i = 0; i < 5; i++) {
 					double radian1 = Math.toRadians(mRotation + (72 * i));
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0);
-					world.spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
-					Material.COARSE_DIRT.createBlockData());
+					new PartialParticle(Particle.SPELL_WITCH, mLoc, 3, 0.1, 0.1, 0.1, 0).spawnAsBoss();
+					new PartialParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
+						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
 				}
 				mRotation += 8;
@@ -751,7 +752,7 @@ public class Kaul extends BossAbilityGroup {
 					this.cancel();
 					world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
 					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
-					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1);
+					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
 					LivingEntity miniboss = spawnImmortal(mLoc);
 					if (miniboss != null) {
 						EntityUtils.setAttributeBase(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, EntityUtils.getAttributeBaseOrDefault(miniboss, Attribute.GENERIC_MOVEMENT_SPEED, 0) + 0.01);
@@ -805,9 +806,9 @@ public class Kaul extends BossAbilityGroup {
 					mRotation += 24;
 					double radian1 = Math.toRadians(mRotation);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
-					mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
-					                               Material.COARSE_DIRT.createBlockData());
-					world.spawnParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1);
+					new PartialParticle(Particle.BLOCK_DUST, mLoc, 4, 0.2, 0.2, 0.2, 0.25,
+						Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
+					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 3, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 				}
@@ -828,14 +829,14 @@ public class Kaul extends BossAbilityGroup {
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
-		world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 		mBoss.teleport(loc);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
-		world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-		world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 	}
 
 	@Override
@@ -857,8 +858,8 @@ public class Kaul extends BossAbilityGroup {
 					}
 				}
 				World world = mBoss.getWorld();
-				world.spawnParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1);
-				world.spawnParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1);
+				new PartialParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1).spawnAsBoss();
+				new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1).spawnAsBoss();
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
 			}
 		}
@@ -971,8 +972,8 @@ public class Kaul extends BossAbilityGroup {
 				for (int i = 0; i < 36; i++) {
 					double radian1 = Math.toRadians(mRotation + (10 * i));
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null, true);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null, true);
+					new PartialParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null, true).spawnAsBoss();
+					new PartialParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null, true).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 				}
 				for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
@@ -1018,8 +1019,8 @@ public class Kaul extends BossAbilityGroup {
 							mT++;
 							if (mT <= 60) {
 								mBoss.teleport(mBoss.getLocation().subtract(0, 0.05, 0));
-								mBoss.getWorld().spawnParticle(Particle.BLOCK_DUST, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
-								                               Material.COARSE_DIRT.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
+									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 							} else {
 								mBoss.getEquipment().clear();
 								mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 27, 0));
@@ -1073,9 +1074,9 @@ public class Kaul extends BossAbilityGroup {
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 100, 10));
 				World world = mBoss.getWorld();
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 0f);
-				world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-				world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 				String[] dio = new String[] {
 					"THE JUNGLE'S WILL IS UNASSAILABLE, YET YOU SCURRY ACROSS MY SHRINE LIKE ANTS.",
 					"IS THE DEFILEMENT OF THE DREAM NOT ENOUGH!?"
@@ -1110,9 +1111,9 @@ public class Kaul extends BossAbilityGroup {
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999, 0));
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 9999, 0));
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 0f);
-							world.spawnParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15);
-							world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15);
-							world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1);
+							new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
+							new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
+							new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 							mBoss.getEquipment().setArmorContents(armorc);
 							mBoss.getEquipment().setItemInMainHand(m);
 							mBoss.getEquipment().setItemInOffHand(o);

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
@@ -28,13 +29,12 @@ public class SpellRage extends SpellBaseAoE {
 			mIsCasting = true;
 		}
 
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -47,9 +47,8 @@ public class SpellRage extends SpellBaseAoE {
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 1, 0.1, 0.1, 0.1, 0.3);
-		world.spawnParticle(Particle.BUBBLE_POP, loc, 2, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.BUBBLE_POP, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -57,8 +56,8 @@ public class SpellRage extends SpellBaseAoE {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mLauncher.getLocation(), mRadius)) {
 			PotionUtils.applyPotion(mob, mob, new PotionEffect(PotionEffectType.SPEED, 120, 0, true, false));
 			PotionUtils.applyPotion(mob, mob, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 120, 1, true, false));
-			mob.getWorld().spawnParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1);
-			mob.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, mob.getLocation().add(0, mob.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0);
+			new PartialParticle(Particle.SPELL_WITCH, mob.getLocation().add(0, mob.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
+			new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation().add(0, mob.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(mLauncher);
 		}
 
 		mIsCasting = false;

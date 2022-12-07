@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants.NotePitches;
 import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -46,6 +47,7 @@ public class DeckTheHalls extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Location loc = mBoss.getLocation();
@@ -79,7 +81,7 @@ public class DeckTheHalls extends Spell {
 								BoundingBox box = BoundingBox.of(l, 0.65, 3, 0.65);
 								boxes.add(box);
 
-								world.spawnParticle(Particle.SNOW_SHOVEL, l, 1, 0.1, 0.2, 0.1, 0.1);
+								new PartialParticle(Particle.SNOW_SHOVEL, l, 1, 0.1, 0.2, 0.1, 0.1).spawnAsEntityActive(mBoss);
 							}
 						}
 					}
@@ -115,7 +117,7 @@ public class DeckTheHalls extends Spell {
 
 								//Spawns particles
 								Location l = loc.clone().add(vec);
-								world.spawnParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
+								new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(mBoss);
 							}
 						}
 					}

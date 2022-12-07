@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Color;
@@ -32,11 +33,11 @@ public class FestiveTesseractSnowmanBoss extends BossAbilityGroup {
 				mTicksLived += 5;
 
 				Location loc = boss.getLocation();
-				loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 2, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
-				loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 2, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
-				loc.getWorld().spawnParticle(Particle.SNOWBALL, loc, 2, 0.2, 0.2, 0.2, 0);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SNOWBALL, loc, 2, 0.2, 0.2, 0.2, 0).spawnAsEntityActive(boss);
 				if (mTicksLived > LIFETIME) {
-					loc.getWorld().spawnParticle(Particle.CLOUD, loc.add(0, 0.5, 0), 30, 0.8, 0.5, 0.8, 0.05);
+					new PartialParticle(Particle.CLOUD, loc.add(0, 0.5, 0), 30, 0.8, 0.5, 0.8, 0.05).spawnAsEntityActive(boss);
 					boss.damage(999);
 				}
 			})

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,7 +30,7 @@ public class DamageReducedBoss extends BossAbilityGroup {
 		if (event.getDamage() < 4) {
 			Location loc = mBoss.getLocation();
 			loc.getWorld().playSound(loc, Sound.ENTITY_SHULKER_HURT_CLOSED, SoundCategory.HOSTILE, 1f, 1f);
-			loc.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1.4, 0), 20, 0, 0, 0, 0.4);
+			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc.add(0, 1.4, 0), 20, 0, 0, 0, 0.4).spawnAsEntityActive(mBoss);
 			event.setCancelled(true);
 		} else {
 			event.setDamage(event.getDamage() - 4);

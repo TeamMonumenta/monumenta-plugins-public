@@ -31,7 +31,6 @@ public class WhispersBoss extends BossAbilityGroup {
 	private List<BukkitRunnable> mCleanse = new ArrayList<>();
 
 
-
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new WhispersBoss(plugin, boss);
 	}
@@ -45,7 +44,7 @@ public class WhispersBoss extends BossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (damagee instanceof Player player && !EntityUtils.hasAttributesContaining(player, Attribute.GENERIC_MAX_HEALTH, "Whispers" + mBoss.getUniqueId())
-			&& !event.getType().equals(DamageType.TRUE) && !event.isBlocked()) {
+			    && !event.getType().equals(DamageType.TRUE) && !event.isBlocked()) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {

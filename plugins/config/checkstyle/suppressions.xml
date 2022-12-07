@@ -15,4 +15,9 @@
 	<suppress files=".*[\\/]ClientModHandler.java"
 			  checks="MemberName"
 			  message=".*Member name.*must match pattern.*"/>
+
+	<!-- suppress the spawnParticle check for PartialParticle classes themselves -->
+	<suppress files=".*com[\\/]playmonumenta[\\/]plugins[\\/]particle[\\/].*\.java"
+			  checks="RegexpSinglelineJava"
+			  message=".*spawnParticle.*"/>
 </suppressions>

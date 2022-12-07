@@ -5,18 +5,26 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
-
 
 
 public class SpellRush extends Spell {
@@ -67,6 +75,7 @@ public class SpellRush extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 100f, 1f);
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				Creature c = (Creature) mBoss;
@@ -124,7 +133,7 @@ public class SpellRush extends Spell {
 					mBoss.setVelocity(dir);
 					if (mTicks % 10 == 0) {
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
-						world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 2, 2, 2);
+						new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 2, 2, 2).spawnAsEntityActive(mBoss);
 					}
 
 				}
@@ -140,6 +149,7 @@ public class SpellRush extends Spell {
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mTicks = 0;
 				int mCount = 0;
+
 				@Override
 				public void run() {
 					/* Replace a slice of blocks every tick, so that all blocks are replaced over the duration */

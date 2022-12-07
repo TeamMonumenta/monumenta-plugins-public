@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLeapAttack;
 import com.playmonumenta.plugins.bosses.spells.SpellDuelist;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -51,78 +52,78 @@ public class WrathBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellBaseLeapAttack(plugin, boss, mParams.DETECTION,
 			mParams.MIN_RANGE, mParams.RUN_DISTANCE, mParams.COOLDOWN, mParams.VELOCITY_MULTIPLIER,
-				// Initiate Aesthetic
-				(World world, Location loc) -> {
-					world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0);
-					world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
-				},
-				// Leap Aesthetic
-				(World world, Location loc) -> {
-					world.spawnParticle(Particle.CLOUD, loc, 20, 0.1, 0.1, 0.1, 0.1);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
-				},
-				// Leaping Aesthetic
-				(World world, Location loc) -> {
-					world.spawnParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1);
-					world.spawnParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.25, 0.25, 0.25, 0);
-				},
-				// Hit Action
-				(World world, Player player, Location loc, Vector dir) -> {
-					new BukkitRunnable() {
-						World mWorld = world;
-						Location mLocation = loc;
-						Vector mDirection = dir;
-						int mTime = 0;
+			// Initiate Aesthetic
+			(World world, Location loc) -> {
+				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
+				world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
+			},
+			// Leap Aesthetic
+			(World world, Location loc) -> {
+				new PartialParticle(Particle.CLOUD, loc, 20, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+			},
+			// Leaping Aesthetic
+			(World world, Location loc) -> {
+				new PartialParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
+			},
+			// Hit Action
+			(World world, Player player, Location loc, Vector dir) -> {
+				new BukkitRunnable() {
+					World mWorld = world;
+					Location mLocation = loc;
+					Vector mDirection = dir;
+					int mTime = 0;
 
-						@Override
-						public void run() {
-							mTime++;
+					@Override
+					public void run() {
+						mTime++;
 
-							if (mTime <= 5) {
-								Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
-								Vector sideways = new Vector(mDirection.getZ(), 1, -mDirection.getX()).multiply(3);
-								Vector forward = mDirection.clone().multiply(3);
-								locParticle.subtract(sideways.clone().multiply(0.5));
-								locParticle.subtract(forward.clone().multiply(0.5));
-								locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * mTime)));
-								locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * mTime)));
-								mWorld.spawnParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0);
+						if (mTime <= 5) {
+							Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
+							Vector sideways = new Vector(mDirection.getZ(), 1, -mDirection.getX()).multiply(3);
+							Vector forward = mDirection.clone().multiply(3);
+							locParticle.subtract(sideways.clone().multiply(0.5));
+							locParticle.subtract(forward.clone().multiply(0.5));
+							locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * mTime)));
+							locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * mTime)));
+							new PartialParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
-								if (mTime == 2) {
-									mWorld.spawnParticle(Particle.CRIT, mLocation, 100, 0, 0, 0, 0.5);
-									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0);
-									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
-										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
-									}
+							if (mTime == 2) {
+								new PartialParticle(Particle.CRIT, mLocation, 100, 0, 0, 0, 0.5).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0).spawnAsEntityActive(boss);
+								mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+								for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
+									BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
 								}
-							} else if (mTime <= 10) {
-								Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
-								Vector sideways = new Vector(-mDirection.getZ(), 1, mDirection.getX()).multiply(3);
-								Vector forward = mDirection.clone().multiply(3);
-								locParticle.subtract(sideways.clone().multiply(0.5));
-								locParticle.subtract(forward.clone().multiply(0.5));
-								locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * (mTime - 5))));
-								locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * (mTime - 5))));
-								mWorld.spawnParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0);
-
-								if (mTime == 7) {
-									mWorld.spawnParticle(Particle.CRIT, mLocation, 200, 0, 0, 0, 1);
-									mWorld.spawnParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0);
-									mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-									mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
-									for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
-										p.setNoDamageTicks(0);
-										BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
-									}
-								}
-							} else {
-								this.cancel();
 							}
+						} else if (mTime <= 10) {
+							Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
+							Vector sideways = new Vector(-mDirection.getZ(), 1, mDirection.getX()).multiply(3);
+							Vector forward = mDirection.clone().multiply(3);
+							locParticle.subtract(sideways.clone().multiply(0.5));
+							locParticle.subtract(forward.clone().multiply(0.5));
+							locParticle.add(forward.clone().multiply(Math.sin(Math.PI / 10 * (mTime - 5))));
+							locParticle.add(sideways.clone().multiply(Math.cos(Math.PI / 10 * (mTime - 5))));
+							new PartialParticle(Particle.SWEEP_ATTACK, locParticle, 4, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
+
+							if (mTime == 7) {
+								new PartialParticle(Particle.CRIT, mLocation, 200, 0, 0, 0, 1).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0).spawnAsEntityActive(boss);
+								mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
+								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+								for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
+									p.setNoDamageTicks(0);
+									BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
+								}
+							}
+						} else {
+							this.cancel();
 						}
-					}.runTaskTimer(mPlugin, 0, 1);
-				}, null, null), new SpellDuelist(plugin, boss, mParams.COOLDOWN, mParams.DAMAGE)));
+					}
+				}.runTaskTimer(mPlugin, 0, 1);
+			}, null, null), new SpellDuelist(plugin, boss, mParams.COOLDOWN, mParams.DAMAGE)));
 
 		new BukkitRunnable() {
 			@Override
@@ -133,7 +134,6 @@ public class WrathBoss extends BossAbilityGroup {
 
 		super.constructBoss(activeSpells, Collections.emptyList(), mParams.DETECTION, null);
 	}
-
 
 
 }

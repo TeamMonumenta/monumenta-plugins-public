@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -49,6 +50,7 @@ public class PassiveVoidRift extends Spell {
 
 			new BukkitRunnable() {
 				private int mTicks = 0;
+
 				@Override
 				public void run() {
 					if (mTicks >= 20 * 1.25) {
@@ -61,14 +63,14 @@ public class PassiveVoidRift extends Spell {
 
 								for (Location loc : locs) {
 									loc.add(cos * mRadius, 0.5, sin * mRadius);
-									world.spawnParticle(Particle.SQUID_INK, loc, 1, 0, 0, 0, 0);
+									new PartialParticle(Particle.SQUID_INK, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 									loc.subtract(cos * mRadius, 0.5, sin * mRadius);
 								}
 							}
 						}
 
 						for (Location loc : locs) {
-							world.spawnParticle(Particle.LAVA, loc, 20, 2, 0.1, 2, 0.25);
+							new PartialParticle(Particle.LAVA, loc, 20, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 2);
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
 
@@ -90,9 +92,9 @@ public class PassiveVoidRift extends Spell {
 							for (Location loc : locs) {
 								loc.add(cos * mRadius, 0.5, sin * mRadius);
 								if (FastUtils.RANDOM.nextDouble() < 0.5) {
-									world.spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
+									new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								} else {
-									world.spawnParticle(Particle.END_ROD, loc, 1, 0, 0, 0, 0);
+									new PartialParticle(Particle.END_ROD, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								}
 								loc.subtract(cos * mRadius, 0.5, sin * mRadius);
 							}
@@ -100,8 +102,8 @@ public class PassiveVoidRift extends Spell {
 					}
 
 					for (Location loc : locs) {
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData());
-						world.spawnParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25);
+						new PartialParticle(Particle.BLOCK_DUST, loc, 10, 2, 0.1, 2, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 
 						if (mTicks % 10 == 0) {
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1, 0f);

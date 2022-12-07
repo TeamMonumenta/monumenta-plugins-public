@@ -76,7 +76,8 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 		SpellManager spell = new SpellManager(
 			List.of(
 				new Spell() {
-					@Override public void run() {
+					@Override
+					public void run() {
 						boolean hasGlowing = mBoss.isGlowing();
 						mBoss.setGlowing(true);
 
@@ -123,7 +124,7 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 											for (LivingEntity target : targets) {
 												if (target.getBoundingBox().overlaps(box)) {
 													int debuffCount = 0;
-													for (PotionEffectType effectType: BAD_EFFECTS) {
+													for (PotionEffectType effectType : BAD_EFFECTS) {
 														PotionEffect effect = target.getPotionEffect(effectType);
 														if (effect != null) {
 															debuffCount++;
@@ -154,11 +155,13 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 						mActiveRunnables.add(runB);
 					}
 
-					@Override public int cooldownTicks() {
+					@Override
+					public int cooldownTicks() {
 						return p.COOLDOWN;
 					}
 
-					@Override public boolean canRun() {
+					@Override
+					public boolean canRun() {
 						return !p.TARGETS.getTargetsList(mBoss).isEmpty();
 					}
 				}

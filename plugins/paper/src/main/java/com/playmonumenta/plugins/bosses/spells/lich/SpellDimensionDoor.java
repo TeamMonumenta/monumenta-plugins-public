@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -188,8 +189,8 @@ public class SpellDimensionDoor extends Spell {
 					//move portal center to ground, stop above bedrock so it doesn't replace bedrock
 					Location locdown = mLoc.clone().subtract(0, 1, 0);
 					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
-						|| mLoc.getBlock().isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
-						&& mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
+						        || mLoc.getBlock().isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
+						       && mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
 						locdown = mLoc.clone().subtract(0, 1, 0);
 					}
@@ -319,7 +320,7 @@ public class SpellDimensionDoor extends Spell {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 		mShadowed.add(p);
 
-		String[] dio = new String[]{
+		String[] dio = new String[] {
 			"There's something moving in the darkness! It looks like... me?!",
 			"This darkness is dangerous. I need to find a way out!",
 			"What is that pulsating mass in the center of the arena?"
@@ -380,7 +381,7 @@ public class SpellDimensionDoor extends Spell {
 			@Override
 			public void run() {
 				mT -= 2;
-				p.spawnParticle(Particle.SPELL_WITCH, spectre.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0);
+				new PartialParticle(Particle.SPELL_WITCH, spectre.getEyeLocation(), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 				double progress = mT * 1.0d / tick;
 				if (progress >= 0) {
 					bar.setProgress(progress);

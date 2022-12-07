@@ -45,6 +45,7 @@ public class SpellHealUndead extends Spell {
 			double mRotation = 0;
 			double mRadius = 5;
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mRadius -= 0.25;
@@ -56,7 +57,7 @@ public class SpellHealUndead extends Spell {
 				}
 				mSpell1.location(mBoss.getLocation().add(0, 1, 0)).spawnAsEnemy();
 				for (int i = 0; i < 3; i++) {
-					double radian = Math.toRadians(mRotation + (120*i));
+					double radian = Math.toRadians(mRotation + (120 * i));
 					loc.add(Math.cos(radian) * mRadius, 0, Math.sin(radian) * mRadius);
 					mSpell2.location(loc).spawnAsEnemy();
 					loc.subtract(Math.cos(radian) * mRadius, 0, Math.sin(radian) * mRadius);

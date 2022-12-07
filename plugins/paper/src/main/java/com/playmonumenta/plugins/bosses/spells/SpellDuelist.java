@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -73,7 +74,7 @@ public class SpellDuelist extends Spell {
 			Vector sideways = new Vector(direction.getZ() / 2, 0, -direction.getX() / 2);
 			Location locParticle = mBoss.getLocation().add(0, 1.75, 0).subtract(sideways.clone().multiply(10));
 			for (int i = 0; i <= 20; i++) {
-				mWorld.spawnParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR);
+				new PartialParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR).spawnAsEntityActive(mBoss);
 				locParticle.add(sideways);
 			}
 
@@ -99,8 +100,8 @@ public class SpellDuelist extends Spell {
 						hitbox1.shift(shift1);
 						loc2.add(shift2);
 						hitbox2.shift(shift2);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc1, 1, 0, 0, 0, 0);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc2, 1, 0, 0, 0, 0);
+						new PartialParticle(Particle.SWEEP_ATTACK, loc1, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SWEEP_ATTACK, loc2, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 
 						Iterator<Player> iter = mPlayers.iterator();
 						while (iter.hasNext()) {
@@ -126,7 +127,7 @@ public class SpellDuelist extends Spell {
 			Vector direction = target.getLocation().subtract(mBoss.getLocation()).toVector().setY(0).normalize();
 			Location locParticle = mBoss.getEyeLocation();
 			for (int i = 0; i < 10; i++) {
-				mWorld.spawnParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR);
+				new PartialParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR).spawnAsEntityActive(mBoss);
 				locParticle.add(0, 0.5, 0);
 			}
 
@@ -145,7 +146,7 @@ public class SpellDuelist extends Spell {
 					for (int i = 0; i < RANGE; i++) {
 						loc.add(shift);
 						hitbox.shift(shift);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0);
+						new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 
 						Iterator<Player> iter = mPlayers.iterator();
 						while (iter.hasNext()) {
@@ -171,7 +172,7 @@ public class SpellDuelist extends Spell {
 			Vector sideways = new Vector(direction.getZ() / 2, 0, -direction.getX() / 2);
 			Location locParticle = mBoss.getLocation().subtract(sideways.clone().multiply(10));
 			for (int i = 0; i <= 20; i++) {
-				mWorld.spawnParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR);
+				new PartialParticle(Particle.REDSTONE, locParticle, 5, 0.2, 0.2, 0.2, 0, SWORD_COLOR).spawnAsEntityActive(mBoss);
 				locParticle.add(sideways);
 			}
 
@@ -197,8 +198,8 @@ public class SpellDuelist extends Spell {
 						hitbox1.shift(shift1);
 						loc2.add(shift2);
 						hitbox2.shift(shift2);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc1, 1, 0, 0, 0, 0);
-						mWorld.spawnParticle(Particle.SWEEP_ATTACK, loc2, 1, 0, 0, 0, 0);
+						new PartialParticle(Particle.SWEEP_ATTACK, loc1, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SWEEP_ATTACK, loc2, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 
 						Iterator<Player> iter = mPlayers.iterator();
 						while (iter.hasNext()) {

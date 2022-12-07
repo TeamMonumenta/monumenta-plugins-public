@@ -60,7 +60,9 @@ public class SoundBoss extends BossAbilityGroup {
 			final boolean mHasLegs = !(EntityUtils.isFlyingMob(mBoss) || EntityUtils.isWaterMob(mBoss));
 			int mHalfSecondTimer = 0;
 			int mAmbientTimer = 0;
-			@Override public void run() {
+
+			@Override
+			public void run() {
 				mHalfSecondTimer++;
 				mAmbientTimer++;
 
@@ -78,7 +80,8 @@ public class SoundBoss extends BossAbilityGroup {
 				}
 			}
 
-			@Override public int cooldownTicks() {
+			@Override
+			public int cooldownTicks() {
 				return 1;
 			}
 		});
@@ -86,7 +89,8 @@ public class SoundBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, spellList, -1, null, 1);
 	}
 
-	@Override public void onHurt(DamageEvent event) {
+	@Override
+	public void onHurt(DamageEvent event) {
 		if (event.getFinalDamage(false) <= 0 || event.getFinalDamage(true) >= mBoss.getHealth()) {
 			//no sound when no damage or on death
 			return;
@@ -110,7 +114,8 @@ public class SoundBoss extends BossAbilityGroup {
 		mBoss.addScoreboardTag("HasDoneSoundThisHalfSecond");
 	}
 
-	@Override public void death(EntityDeathEvent event) {
+	@Override
+	public void death(EntityDeathEvent event) {
 		mParams.DEATH_SOUND.play(mBoss.getLocation());
 	}
 }

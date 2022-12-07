@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -63,8 +64,8 @@ public class SpellAxtalMeleeMinions extends Spell {
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
 					if (skelly.getType() == EntityType.SKELETON) {
-						double x = 0.5f * FastUtils.cos((double)FastUtils.RANDOM.nextInt(628) / 100);
-						double z = 0.5f * FastUtils.sin((double)FastUtils.RANDOM.nextInt(628) / 100);
+						double x = 0.5f * FastUtils.cos((double) FastUtils.RANDOM.nextInt(628) / 100);
+						double z = 0.5f * FastUtils.sin((double) FastUtils.RANDOM.nextInt(628) / 100);
 						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}
@@ -84,7 +85,7 @@ public class SpellAxtalMeleeMinions extends Spell {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
 				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
-				centerLoc.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
 			}
 		};
 		for (int i = 0; i < (40 + mRepeats * 15) / 3; i++) {

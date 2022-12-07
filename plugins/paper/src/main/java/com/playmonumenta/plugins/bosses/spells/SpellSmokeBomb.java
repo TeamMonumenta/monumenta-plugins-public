@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -61,15 +62,16 @@ public class SpellSmokeBomb extends Spell {
 
 		Runnable animLoop = new Runnable() {
 			int mSound = 0;
+
 			@Override
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
 				if (mSound % 4 == 0) {
-					centerLoc.getWorld().playSound(centerLoc, Sound.UI_TOAST_IN, (float)mRadius / 7, (float)(0.5 + FastUtils.RANDOM.nextInt(150) / 100));
+					centerLoc.getWorld().playSound(centerLoc, Sound.UI_TOAST_IN, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
 				}
 				mSound++;
-				centerLoc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, centerLoc, 10, 1, 1, 1, 0.01);
+				new PartialParticle(Particle.SMOKE_NORMAL, centerLoc, 10, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
 			}
 		};
 
@@ -80,19 +82,19 @@ public class SpellSmokeBomb extends Spell {
 				double precision = FastUtils.RANDOM.nextInt(50) + 100;
 				double increment = (2 * Math.PI) / precision;
 				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
-				double rad = (double)(mRadius * mW) / 5;
+				double rad = (double) (mRadius * mW) / 5;
 				double angle = 0;
 				for (int j = 0; j < precision; j++) {
 					angle = j * increment;
 					particleLoc.setX(lloc.getX() + (rad * FastUtils.cos(angle)));
 					particleLoc.setZ(lloc.getZ() + (rad * FastUtils.sin(angle)));
 					particleLoc.setY(lloc.getY() + 1.5);
-					particleLoc.getWorld().spawnParticle(Particle.SMOKE_NORMAL, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0);
+					new PartialParticle(Particle.SMOKE_NORMAL, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0).spawnAsEntityActive(mLauncher);
 				}
 				if (mW == 0) {
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.77F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.5F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float)mRadius / 7, 0.65F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.77F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.5F);
+					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.65F);
 				}
 				mW++;
 			}

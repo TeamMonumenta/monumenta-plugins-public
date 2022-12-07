@@ -256,8 +256,8 @@ public final class Lich extends BossAbilityGroup {
 				} else if (!mCutscene) {
 					mT += 5;
 					if (mT >= 20 * 9
-						&& mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
-						&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
+						    && mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
+						    && !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 						mT = 0;
 						Collections.shuffle(mTp);
 						World world = mBoss.getWorld();
@@ -425,7 +425,7 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.setGravity(false);
 			// dialogue?
-			String[] dio = new String[]{
+			String[] dio = new String[] {
 				"I PROMISED THAT IF I SAW YOU AGAIN, I WOULD DESTROY YOU.",
 				"WHY DO YOU PERSIST?"
 			};
@@ -482,8 +482,8 @@ public final class Lich extends BossAbilityGroup {
 											e.printStackTrace();
 										}
 									}
-									world.spawnParticle(Particle.SOUL_FIRE_FLAME, mSkull.getLocation(), 4, 0, 0, 0,
-										0.03);
+									new PartialParticle(Particle.SOUL_FIRE_FLAME, mSkull.getLocation(), 4, 0, 0, 0,
+										0.03).spawnAsEntityActive(boss);
 
 									// slight delay to prevent exploding too early incase the wither skull somehow
 									// despawned
@@ -510,8 +510,8 @@ public final class Lich extends BossAbilityGroup {
 										for (Block b : badBlockList) {
 											b.setType(Material.AIR);
 										}
-										world.spawnParticle(Particle.EXPLOSION_NORMAL, endLoc.clone().add(0, 2, 0), 96,
-											2, 2, 2, 0);
+										new PartialParticle(Particle.EXPLOSION_NORMAL, endLoc.clone().add(0, 2, 0), 96,
+											2, 2, 2, 0).spawnAsEntityActive(boss);
 										world.playSound(endLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.5f, 1.0f);
 										// spawn the crystal for holy chest
 										List<Location> loc = new ArrayList<Location>();
@@ -570,7 +570,7 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.setGravity(false);
 			// dialogue?
-			String[] dio = new String[]{
+			String[] dio = new String[] {
 				"ENOUGH. YOU CANNOT DEFEAT ME.",
 				"MY SEARCH IS FAR TOO IMPORTANT FOR YOUR MEDDLING.",
 				"THE VEIL IS RIPPING APART AND I SEEK THE SOURCE.",
@@ -755,11 +755,11 @@ public final class Lich extends BossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		mBoss.teleport(mStart.getLocation().add(0, 17, 0));
 		// new spawn animation
-		String[] ani = new String[]{"loadstructure \"isles/lich/Spawn1\" ~-17 ~6 ~-17",
-			"loadstructure \"isles/lich/Spawn2\" ~-17 ~6 ~-17",
-			"loadstructure \"isles/lich/Spawn3\" ~-17 ~6 ~-17"};
-		String[] end = new String[]{"loadstructure \"isles/lich/Spawn4\" ~-17 ~6 ~-17",
-			"loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17"};
+		String[] ani = new String[] {"loadstructure \"isles/lich/Spawn1\" ~-17 ~6 ~-17",
+		                             "loadstructure \"isles/lich/Spawn2\" ~-17 ~6 ~-17",
+		                             "loadstructure \"isles/lich/Spawn3\" ~-17 ~6 ~-17"};
+		String[] end = new String[] {"loadstructure \"isles/lich/Spawn4\" ~-17 ~6 ~-17",
+		                             "loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17"};
 
 		EntityEquipment equips = mBoss.getEquipment();
 		ItemStack[] a = equips.getArmorContents();
@@ -784,20 +784,20 @@ public final class Lich extends BossAbilityGroup {
 						if (mT < ani.length) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 0.75f);
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-								+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-								+ ani[mT];
+								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+								             + ani[mT];
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 							mT++;
 						} else {
 							this.cancel();
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-								+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-								+ end[0];
+								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+								             + end[0];
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 							// make boss visible
 							new PartialParticle(Particle.END_ROD, mStart.getLocation().add(0, 17, 0), 750, 6, 6, 6, 0).spawnAsBoss();
-							world.spawnParticle(Particle.EXPLOSION_HUGE, mStart.getLocation().add(0, 18, 0), 10, 4, 4,
-								4, 0);
+							new PartialParticle(Particle.EXPLOSION_HUGE, mStart.getLocation().add(0, 18, 0), 10, 4, 4,
+								4, 0).spawnAsEntityActive(boss);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 14, 100));
 							mBoss.getEquipment().setArmorContents(a);
@@ -817,8 +817,8 @@ public final class Lich extends BossAbilityGroup {
 								@Override
 								public void run() {
 									String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-										+ mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-										+ end[1];
+										             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+										             + end[1];
 									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 									world.playSound(mStart.getLocation().add(0, 17, 0), Sound.BLOCK_ENDER_CHEST_CLOSE,
 										10.0f, 0.5f);
@@ -826,7 +826,7 @@ public final class Lich extends BossAbilityGroup {
 							}.runTaskLater(mPlugin, 50);
 
 							// dialogue functions
-							String[] dio = new String[]{
+							String[] dio = new String[] {
 								"AH, THE SWEET SMELL OF THE DESERT. HOW I HAVE MISSED THIS.",
 								"MY MONTHS AWAY FROM THE SANDS HAVE TAKEN A TOLL.",
 								"NOW, I BELIEVE YOU HAVE DISTURBED MY SEARCH."
@@ -907,8 +907,8 @@ public final class Lich extends BossAbilityGroup {
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		World world = player.getWorld();
-		world.spawnParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
-			Material.MELON.createBlockData());
+		new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 10, 0.4, 0.45, 0.4,
+			Material.MELON.createBlockData()).spawnAsBoss();
 		new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 30, 0.45, 0.45, 0.45, 0.15).spawnAsBoss();
 		Location spawnLoc = player.getLocation();
 		if (player.getLocation().getY() <= mStart.getLocation().getY()) {
@@ -1061,7 +1061,7 @@ public final class Lich extends BossAbilityGroup {
 		if (source instanceof Player player && player.getLocation().distance(mBoss.getLocation()) > 15) {
 			event.setCancelled(true);
 			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 5);
-			mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
+			new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1).spawnAsBoss();
 			player.sendMessage(ChatColor.AQUA + "Hekawt has formed a miasma shield around himself! Get closer to pierce through the shield!");
 			//stop teleport
 			return;
@@ -1189,7 +1189,7 @@ public final class Lich extends BossAbilityGroup {
 			ItemStack vanityBoots = vanityData.getEquipped(EquipmentSlot.FEET);
 			boots = ItemUtils.clone(vanityBoots != null && !VanityManager.isInvisibleVanityItem(vanityBoots) ? vanityBoots : inv.getBoots());
 		}
-		ItemStack[] items = new ItemStack[]{helm, chest, legs, boots};
+		ItemStack[] items = new ItemStack[] {helm, chest, legs, boots};
 		for (ItemStack item : items) {
 			if (item == null) {
 				continue;
@@ -1355,7 +1355,7 @@ public final class Lich extends BossAbilityGroup {
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 17, 10));
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 17, 1));
 		}
-		String[] dio1 = new String[]{
+		String[] dio1 = new String[] {
 			"I... WILL... NOT... BE... DESTROYED...",
 			"NO! I MUST... SPEAK... THE PARTING VEIL..."
 		};
@@ -1517,7 +1517,7 @@ public final class Lich extends BossAbilityGroup {
 
 	private void surprise() {
 		mDefeated = false;
-		String[] dio = new String[]{
+		String[] dio = new String[] {
 			"...THE PARTING VEIL GRANTS ME STRENGTH.",
 			"IT SUSTAINS ME. I HAVE NO TIME FOR DEATH."
 		};
@@ -1530,17 +1530,17 @@ public final class Lich extends BossAbilityGroup {
 
 		//prevent players above the barrier ceiling from seeing title
 		String title = ChatColor.GOLD + "" + ChatColor.BOLD + "VI" +
-			ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "C" +
-			ChatColor.GOLD + "" + ChatColor.BOLD + "T" +
-			ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "OR" +
-			ChatColor.GOLD + "" + ChatColor.BOLD + "Y";
+			               ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "C" +
+			               ChatColor.GOLD + "" + ChatColor.BOLD + "T" +
+			               ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "OR" +
+			               ChatColor.GOLD + "" + ChatColor.BOLD + "Y";
 
 		String subtitle = ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "H" +
-			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "ek" +
-			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "aw" +
-			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "t, Th" +
-			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "e" +
-			ChatColor.DARK_GRAY + "" + ChatColor.BOLD + " Eternal";
+			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "ek" +
+			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "aw" +
+			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "t, Th" +
+			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "e" +
+			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + " Eternal";
 
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 			p.sendTitle(title, subtitle, 0, 80, 20);
@@ -1549,6 +1549,7 @@ public final class Lich extends BossAbilityGroup {
 		// haha surprise fuck you I'm not dead dialogues
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				if (mT < dio.length) {
@@ -1557,7 +1558,8 @@ public final class Lich extends BossAbilityGroup {
 						if (mT == 0) {
 							new BukkitRunnable() {
 
-								@Override public void run() {
+								@Override
+								public void run() {
 									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 										"playsound epic:music.hekawtp4 record " + p.getUniqueId() + " ~ ~ ~ 5 1");
 								}
@@ -1658,7 +1660,7 @@ public final class Lich extends BossAbilityGroup {
 
 		// partial respawn arena
 		String cmd = "execute positioned " + mStart.getLocation().getX() + " " + mStart.getLocation().getY() + " "
-			+ mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
+			             + mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 
 		//warning smoke ring
@@ -1910,12 +1912,12 @@ public final class Lich extends BossAbilityGroup {
 			public void run() {
 				mDead = true;
 				World world = mBoss.getWorld();
-				String[] finaldio = new String[]{
+				String[] finaldio = new String[] {
 					"I SHOULD NOT HAVE EMERGED... THE VEIL IS FRAYING.",
 					"THERE IS POWER OUT THERE THAT COULD BE MINE, IF ONLY I HAD REMAINED.",
 					"SEARCHING... SOMETHING HAS BROKEN..."
 				};
-				String[] enddio = new String[]{
+				String[] enddio = new String[] {
 					"REALITY...",
 					"WOULD...",
 					"BE...",

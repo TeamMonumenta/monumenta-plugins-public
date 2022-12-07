@@ -22,7 +22,7 @@ public class SpellBaseCharge extends Spell {
 	public interface WarningAction {
 		/**
 		 * Action to notify player when the boss starts the attack
-		 *
+		 * <p>
 		 * Probably slow the boss down, particles, and a sound
 		 *
 		 * @param target Targeted LivingEntity
@@ -45,7 +45,7 @@ public class SpellBaseCharge extends Spell {
 		/**
 		 * Action run when the boss begins the attack
 		 * Boss location will be the origin point
-		 *
+		 * <p>
 		 * Probably Particles / sound
 		 *
 		 * @param target Targeted LivingEntity
@@ -57,7 +57,7 @@ public class SpellBaseCharge extends Spell {
 	public interface HitPlayerAction {
 		/**
 		 * Action to take when a player is hit by the boss charge
-		 *
+		 * <p>
 		 * Probably particles, sound, and damage player
 		 *
 		 * @param target Hit LivingEntity
@@ -447,7 +447,7 @@ public class SpellBaseCharge extends Spell {
 		}
 
 		if (switchAggro != null && charger instanceof Mob && switchAggro instanceof LivingEntity) {
-			((Mob)charger).setTarget((LivingEntity) switchAggro);
+			((Mob) charger).setTarget((LivingEntity) switchAggro);
 		}
 
 		if (end != null) {
@@ -485,7 +485,7 @@ public class SpellBaseCharge extends Spell {
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
 					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, mStartAction, mParticleAction, mHitPlayerAction,
-					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
+						mEndAction, true, mStopOnFirstHit, mYStartAdd);
 					mChargesDone++;
 					if (mChargesDone >= charges) {
 						this.cancel();
@@ -537,7 +537,7 @@ public class SpellBaseCharge extends Spell {
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
 					doCharge(target, mBoss, mTargetLoc, players, mStartAction, mParticleAction, mHitPlayerAction,
-					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
+						mEndAction, true, mStopOnFirstHit, mYStartAdd);
 					this.cancel();
 					mActiveRunnables.remove(this);
 				}
@@ -570,7 +570,7 @@ public class SpellBaseCharge extends Spell {
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
 					doCharge(target, mBoss, mTargetLoc, targets, mStartAction, mParticleAction, mHitPlayerAction,
-					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
+						mEndAction, true, mStopOnFirstHit, mYStartAdd);
 					this.cancel();
 					mActiveRunnables.remove(this);
 				}
@@ -610,7 +610,7 @@ public class SpellBaseCharge extends Spell {
 				} else if (mTicks >= mChargeTicks) {
 					// Do the "real" charge attack
 					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, mStartAction, mParticleAction, mHitPlayerAction,
-					         mEndAction, true, mStopOnFirstHit, mYStartAdd);
+						mEndAction, true, mStopOnFirstHit, mYStartAdd);
 					mChargesDone++;
 					if (mChargesDone >= charges) {
 						this.cancel();

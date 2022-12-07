@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.falsespirit;
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -95,7 +96,7 @@ public class DamageBlocker extends Spell {
 						mWarned.add(player);
 					}
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
-					mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1);
+					new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 				}
 			} else {
 				player.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 10, 1.5f);
@@ -116,7 +117,7 @@ public class DamageBlocker extends Spell {
 					vec = VectorUtils.rotateYAxis(vec, bossLoc.getYaw());
 
 					Location l = bossLoc.clone().add(vec);
-					mBoss.getWorld().spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
+					new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsEntityActive(mBoss);
 				}
 			}
 		} else {
@@ -131,7 +132,7 @@ public class DamageBlocker extends Spell {
 							vec = VectorUtils.rotateYAxis(vec, bossLoc.getYaw());
 
 							Location l = bossLoc.clone().add(vec);
-							player.spawnParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0);
+							new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsEntityActive(mBoss);
 						}
 					}
 				}

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -43,7 +44,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 		Material.BARRIER
 	);
 
-	private final LivingEntity mBoss;
+	private final LivingEntity mLauncher;
 	private final Plugin mPlugin;
 
 	private static final int COOLDOWN = 20 * 20;
@@ -121,48 +122,48 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 				if (ticks % 2 == 0) {
 					world.playSound(loc, Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 0.25f, 1.5f);
 				}
-				world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.05);
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.1, 0.1, 0.1, 0.05);
-				world.spawnParticle(Particle.ELECTRIC_SPARK, loc, 4, 0.25, 0.25, 0.25, 0.05);
+				new PartialParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.ELECTRIC_SPARK, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(boss);
 			},
 			// Hit Action
 			(World world, LivingEntity le, Location loc) -> {
 				loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1, 0);
-				loc.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
+				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsEntityActive(boss);
 				if (le instanceof Player player) {
 					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Silver Bolts", boss.getLocation());
 					cage(player);
 				}
 
-				world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 1, 1, 1);
+				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 1, 1, 1).spawnAsEntityActive(boss);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
 			});
 
 		mPlugin = plugin;
-		mBoss = boss;
+		mLauncher = boss;
 
-		mChargeUp = new ChargeUpManager(mBoss, DELAY, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Silver Bolts",
+		mChargeUp = new ChargeUpManager(mLauncher, DELAY, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Silver Bolts",
 			BarColor.YELLOW, BarStyle.SOLID, 60);
 	}
 
 	@Override
 	public void run() {
 		super.run();
-		World world = mBoss.getWorld();
+		World world = mLauncher.getWorld();
 		mChargeUp.reset();
 		BukkitRunnable chargeUpRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (mChargeUp.nextTick()) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1.5f, 1.5f);
-					mBoss.setGlowing(false);
+					world.playSound(mLauncher.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1.5f, 1.5f);
+					mLauncher.setGlowing(false);
 					this.cancel();
 				} else {
-					mBoss.setGlowing(true);
+					mLauncher.setGlowing(true);
 					if (mChargeUp.getTime() % 4 == 0) {
-						Location loc = mBoss.getLocation();
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2);
-						world.spawnParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2);
+						Location loc = mLauncher.getLocation();
+						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mLauncher);
+						new PartialParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mLauncher);
 					}
 				}
 			}

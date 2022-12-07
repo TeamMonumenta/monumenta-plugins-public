@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.Arrays;
 import java.util.List;
@@ -36,19 +37,20 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBaseTrail(boss, TICK_RATE, TRAIL_RATE, TRAIL_DURATION, TRAIL_GROUND_ONLY, TRAIL_CONSUMED, HITBOX_LENGTH,
-					// Trail Aesthetic
-					(World world, Location loc) -> {
-						world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.3, 0.1, 0.3, 0);
-						world.spawnParticle(Particle.FALLING_OBSIDIAN_TEAR, loc, 1, 0.3, 0.2, 0.3, 0);
-					},
-					// Hit Action
-					(World world, Player player, Location loc) -> {
-						world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 0.5f);
-						world.spawnParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25);
-						DamageUtils.damage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE);
-					},
-					// Expire Action
-					(World world, Location loc) -> { })
+				// Trail Aesthetic
+				(World world, Location loc) -> {
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.3, 0.1, 0.3, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, loc, 1, 0.3, 0.2, 0.3, 0).spawnAsEntityActive(boss);
+				},
+				// Hit Action
+				(World world, Player player, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 0.5f);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+					DamageUtils.damage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE);
+				},
+				// Expire Action
+				(World world, Location loc) -> {
+				})
 		);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);

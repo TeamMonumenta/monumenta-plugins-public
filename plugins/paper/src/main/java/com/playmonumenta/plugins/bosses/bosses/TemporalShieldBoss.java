@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -33,7 +34,7 @@ public class TemporalShieldBoss extends BossAbilityGroup {
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(boss.getLocation(), detectionRange, detectionRange, detectionRange);
 				for (Player p : PlayerUtils.playersInRange(boss.getLocation(), 40, true)) {
 					if (manager.hasEffect(p, TemporalFlux.class)) {
-						p.spawnParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 10, 1, 1, 1, 0.01);
+						new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 10, 1, 1, 1, 0.01).spawnAsEntityActive(boss);
 					}
 				}
 				for (LivingEntity e : mobs) {

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -20,10 +21,10 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * @deprecated use boss_projectile instead, like this:
  * <blockquote><pre>
-	/bos var Tags add boss_projectile
-	/bos var Tags add boss_projectile[damage=30,distance=128,speed=0.8,delay=20,cooldown=140,turnRadius=0.035,effects=[(pull,3)]]
-	/bos var Tags add boss_projectile[SoundStart=[(ITEM_CROSSBOW_LOADING_MIDDLE,2,0.5)],SoundHit=[(ENTITY_ARMOR_STAND_BREAK,1,0.5)],SoundProjectile=[(ENTITY_ARROW_SHOOT,2,0.2)],SoundLaunch=[(ITEM_CROSSBOW_SHOOT,2,0.5)]]
-	/bos var Tags add boss_projectile[ParticleLaunch=[(SMOKE_NORMAL,1)],ParticleProjectile=[(crit,3,0,0,0,0.1),(SPELL_INSTANT,4,0.25,0.25,0.25)],ParticleHit=[(CRIT,50,0,0,0,0.25)]]
+ * /bos var Tags add boss_projectile
+ * /bos var Tags add boss_projectile[damage=30,distance=128,speed=0.8,delay=20,cooldown=140,turnRadius=0.035,effects=[(pull,3)]]
+ * /bos var Tags add boss_projectile[SoundStart=[(ITEM_CROSSBOW_LOADING_MIDDLE,2,0.5)],SoundHit=[(ENTITY_ARMOR_STAND_BREAK,1,0.5)],SoundProjectile=[(ENTITY_ARROW_SHOOT,2,0.2)],SoundLaunch=[(ITEM_CROSSBOW_SHOOT,2,0.5)]]
+ * /bos var Tags add boss_projectile[ParticleLaunch=[(SMOKE_NORMAL,1)],ParticleProjectile=[(crit,3,0,0,0,0.1),(SPELL_INSTANT,4,0.25,0.25,0.25)],ParticleHit=[(CRIT,50,0,0,0,0.25)]]
  * </pre></blockquote>
  * G3m1n1Boy
  */
@@ -59,33 +60,33 @@ public class HookBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
 				p.SPEED, p.TURN_RADIUS, p.LIFETIME_TICKS, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
-					// Initiate Aesthetic
-					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DAMAGE, 0));
-						world.playSound(loc, Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 2f, 0.5f);
-					},
-					// Launch Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
-						world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 2f, 0.5f);
-					},
-					// Projectile Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.spawnParticle(Particle.CRIT, loc, 3, 0, 0, 0, 0.1);
-						world.spawnParticle(Particle.SMOKE_LARGE, loc, 4, 0.25, 0.25, 0.25, 0);
-						if (ticks % 40 == 0) {
-							world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 2f, 0.2f);
-						}
-					},
-					// Hit Action
-					(World world, LivingEntity target, Location loc) -> {
-						world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
-						world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
-						if (target != null) {
-							BossUtils.blockableDamage(boss, target, DamageType.PROJECTILE, p.DAMAGE);
-							MovementUtils.pullTowards(boss, target, 1);
-						}
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DAMAGE, 0));
+					world.playSound(loc, Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 2f, 0.5f);
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 2f, 0.5f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.CRIT, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 4, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
+					if (ticks % 40 == 0) {
+						world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 2f, 0.2f);
 					}
+				},
+				// Hit Action
+				(World world, LivingEntity target, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
+					new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+					if (target != null) {
+						BossUtils.blockableDamage(boss, target, DamageType.PROJECTILE, p.DAMAGE);
+						MovementUtils.pullTowards(boss, target, 1);
+					}
+				}
 			)));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null);

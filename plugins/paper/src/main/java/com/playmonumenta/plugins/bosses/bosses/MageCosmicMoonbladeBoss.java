@@ -80,7 +80,8 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 						new BukkitRunnable() {
 							int mDegree = 45;
 
-							@Override public void run() {
+							@Override
+							public void run() {
 
 								for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
 									for (double degree = mDegree; degree < mDegree + 30; degree += 5) {

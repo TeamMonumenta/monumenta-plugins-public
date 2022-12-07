@@ -83,7 +83,7 @@ public class SpellBullet extends Spell {
 	private double mRotationSpeed;
 
 	public SpellBullet(Plugin plugin, LivingEntity caster, Vector offset, int duration, int delay, int emissionSpeed, double velocity, double detectRange, double hitboxRadius, int cooldown, int bulletDuration, String pattern,
-						   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
+	                   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
 		mPlugin = plugin;
 		mEmissionSpeed = emissionSpeed;
 		mCaster = caster;
@@ -113,7 +113,7 @@ public class SpellBullet extends Spell {
 			int mTicks = 0;
 			int mCasts = 0;
 			double mRotation = 0;
-			int mJunkoOffset = (int)(Math.random() * 2);
+			int mJunkoOffset = (int) (Math.random() * 2);
 			double mRandomAngle = Math.random() * 3.14;
 			Location mSanaeLoc = mCaster.getLocation().clone().add(new Vector(7.75, 0, 0).add(mOffset).rotateAroundY(mRandomAngle));
 			double mSanaeAngle = 162 / 180.0 * 3.14 + mRandomAngle;

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -79,10 +80,11 @@ public class SpellGlacialPrison extends Spell {
 		for (Player player : targets) {
 			new BukkitRunnable() {
 				int mT = 0;
+
 				@Override
 				public void run() {
 					mT++;
-					world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 2, 0.4, 0.4, 0.4, 0.05);
+					new PartialParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 2, 0.4, 0.4, 0.4, 0.05).spawnAsEntityActive(mBoss);
 
 					if (mBoss.isDead() || !mBoss.isValid()) {
 						this.cancel();
@@ -91,8 +93,8 @@ public class SpellGlacialPrison extends Spell {
 					if (mT >= 40) {
 						this.cancel();
 						//Blocks
-						world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 30, 0.4, 0.4, 0.4, 0.2);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 35, 0.4, 0.4, 0.4, 0.25);
+						new PartialParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 30, 0.4, 0.4, 0.4, 0.2).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 1, 0), 35, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(mBoss);
 						world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 0.5f);
 						world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
 
@@ -145,6 +147,7 @@ public class SpellGlacialPrison extends Spell {
 						new BukkitRunnable() {
 							int mTicks = 0;
 							float mPitch = 0;
+
 							@Override
 							public void run() {
 								mTicks++;
@@ -164,9 +167,9 @@ public class SpellGlacialPrison extends Spell {
 									}
 								}
 
-								world.spawnParticle(Particle.FIREWORKS_SPARK, middle, 3, 1, 1, 1, 0);
-								world.spawnParticle(Particle.CLOUD, middle, 2, 1, 1, 1, 0);
-								world.spawnParticle(Particle.DAMAGE_INDICATOR, middle, 1, 0.5, -0.25, 0.5, 0.005);
+								new PartialParticle(Particle.FIREWORKS_SPARK, middle, 3, 1, 1, 1, 0).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.CLOUD, middle, 2, 1, 1, 1, 0).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.DAMAGE_INDICATOR, middle, 1, 0.5, -0.25, 0.5, 0.005).spawnAsEntityActive(mBoss);
 
 								if (mTicks % 10 == 0) {
 									world.playSound(center, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.HOSTILE, 1, mPitch);
@@ -188,8 +191,8 @@ public class SpellGlacialPrison extends Spell {
 											loc.getBlock().setType(Material.AIR);
 										}
 									}
-									world.spawnParticle(Particle.FIREWORKS_SPARK, middle, 50, 1, 1, 1, 0.35);
-									world.spawnParticle(Particle.CLOUD, middle, 75, 1, 1, 1, 0.25);
+									new PartialParticle(Particle.FIREWORKS_SPARK, middle, 50, 1, 1, 1, 0.35).spawnAsEntityActive(mBoss);
+									new PartialParticle(Particle.CLOUD, middle, 75, 1, 1, 1, 0.25).spawnAsEntityActive(mBoss);
 									world.playSound(center, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
 									world.playSound(center, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.75f);
 									if (player.getLocation().distance(center) <= 2) {

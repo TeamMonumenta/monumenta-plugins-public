@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
@@ -59,40 +60,40 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
-				(World world, Location loc) -> {
-					mBoss.addScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
-					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
-					world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
-				}, (World world, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
-					world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
-				}, (World world, Location loc) -> {
-					world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
-				}, (World world, Player player, Location loc, Vector dir) -> {
-					mBoss.removeScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
-					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-							Arrays.asList(
-									new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-										world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1);
-										world.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1);
-									})
-							));
+			(World world, Location loc) -> {
+				mBoss.addScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
+				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
+				new PartialParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
+			}, (World world, Location loc) -> {
+			world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
+			new PartialParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
+		}, (World world, Location loc) -> {
+			new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
+		}, (World world, Player player, Location loc, Vector dir) -> {
+			mBoss.removeScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
+			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
+				Arrays.asList(
+					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
+						new PartialParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
+						new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
+					})
+				));
 
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
-					world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
-					world.spawnParticle(Particle.LAVA, loc, 3 * (int) (p.DAMAGE_RADIUS * p.DAMAGE_RADIUS), p.DAMAGE_RADIUS, 0.25f, p.DAMAGE_RADIUS, 0);
-					if (player != null) {
-						BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
-						BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
-						return;
-					}
-					for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
-						BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
-						BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
-					}
-					})));
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
+			new PartialParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F).spawnAsEntityActive(boss);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F).spawnAsEntityActive(boss);
+			new PartialParticle(Particle.LAVA, loc, 3 * (int) (p.DAMAGE_RADIUS * p.DAMAGE_RADIUS), p.DAMAGE_RADIUS, 0.25f, p.DAMAGE_RADIUS, 0).spawnAsEntityActive(boss);
+			if (player != null) {
+				BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
+				BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
+				return;
+			}
+			for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
+				BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
+				BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
+			}
+		})));
 		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
 	}
 }

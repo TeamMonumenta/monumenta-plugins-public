@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDrawAggro;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class DummyDecoyBoss extends BossAbilityGroup {
 	public void death(EntityDeathEvent event) {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
-		world.spawnParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 10, 0.5, 1, 0.5, 0.05);
+		new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 		List<LivingEntity> mobsToStun = EntityUtils.getNearbyMobs(mBoss.getLocation(), DummyDecoy.STUN_RADIUS);
 		for (LivingEntity le : mobsToStun) {
 			EntityUtils.applyStun(Plugin.getInstance(), mStunTime, le);

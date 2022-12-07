@@ -69,7 +69,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			Bukkit.getScheduler().runTask(mMonPlugin, () -> {
 				mAbilities = Stream.of(CholericFlames.class, GraspingClaws.class,
 						MelancholicLament.class, HauntingShades.class, WitheringGaze.class)
-					.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
+					             .map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).toArray(Ability[]::new);
 			});
 		}
 	}
@@ -81,8 +81,8 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	}
 
 	public static void attack(com.playmonumenta.plugins.Plugin plugin, Player p, ItemStatManager.PlayerItemStats playerItemStats,
-							  LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
-							  Ability[] abilities, int duration) {
+	                          LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
+	                          Ability[] abilities, int duration) {
 		if (p != null || playerItemStats != null) {
 			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.5f, 1.0f);
 

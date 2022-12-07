@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
@@ -29,7 +30,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 	public KamikazeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellRunAction(() -> boss.getLocation().getWorld().spawnParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0))
+			new SpellRunAction(() -> new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation().clone().add(new Location(boss.getWorld(), 0, 1, 0)), 2, 0.5, 1, 0.5, 0).spawnAsEntityActive(boss))
 		);
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}
@@ -42,7 +43,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 				((Damageable) damager).setHealth(0);
 				World world = damager.getWorld();
 				world.playSound(event.getDamager().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
-				world.spawnParticle(Particle.EXPLOSION_LARGE, event.getDamager().getLocation(), 10, 0.5, 1, 0.5, 0.05);
+				new PartialParticle(Particle.EXPLOSION_LARGE, event.getDamager().getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 			}
 		}
 	}
@@ -56,7 +57,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 				entity.setHealth(0);
 				World world = event.getEntity().getWorld();
 				world.playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
-				world.spawnParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 10, 0.5, 1, 0.5, 0.05);
+				new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 			}
 		}
 	}

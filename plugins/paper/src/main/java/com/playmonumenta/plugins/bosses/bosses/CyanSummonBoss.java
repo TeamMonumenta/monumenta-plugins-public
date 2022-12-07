@@ -19,8 +19,8 @@ public class CyanSummonBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-		                                                 new SpellCyanSummon(boss)
-		                                             ));
+			new SpellCyanSummon(boss)
+		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
 	}

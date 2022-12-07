@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -150,14 +151,14 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			Set<String> tags = as.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-				case SUMMON_TAG:
-					mGates.add(as);
-					break;
-				case SUMMON_CEILING_TAG:
-					mCeilingGate = as;
-					break;
-				default:
-					break;
+					case SUMMON_TAG:
+						mGates.add(as);
+						break;
+					case SUMMON_CEILING_TAG:
+						mCeilingGate = as;
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -166,11 +167,11 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-				case TRIDENT_TAG:
-					mTridentStands.add(e);
-					break;
-				default:
-					break;
+					case TRIDENT_TAG:
+						mTridentStands.add(e);
+						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -195,8 +196,8 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			Entity mob = LibraryOfSoulsIntegration.summon(as.getLocation().add(FastUtils.randomDoubleInRange(-1, 1), 0, FastUtils.randomDoubleInRange(-1, 1)), delveMiniboss);
 			mMobs.add(mob);
 
-			world.spawnParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1);
-			world.spawnParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125);
+			new PartialParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
+			new PartialParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(boss);
 			world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 2);
@@ -206,6 +207,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -217,7 +219,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				//No more than 15 mobs from one portal can be out at a time
 				//Custom spawn rate for delves, 50% faster for normal portals and 25% faster for the ceiling portal
 				if (((!mDelve && mTicks % (100 / mPlayerCount) == 0) || (mDelve && mCeilingGate != null && mTicks % (80 / mPlayerCount) == 0) || (mDelve && mCeilingGate == null && mTicks % (67 / mPlayerCount) == 0))
-						&& mMobs.size() <= 15) {
+					    && mMobs.size() <= 15) {
 					ArmorStand as = mGates.get(FastUtils.RANDOM.nextInt(mGates.size()));
 					String mobName;
 
@@ -231,12 +233,12 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					Entity mob = LibraryOfSoulsIntegration.summon(as.getLocation().add(FastUtils.randomDoubleInRange(-1, 1), 0, FastUtils.randomDoubleInRange(-1, 1)), mobName);
 					//Gives slow falling to ceiling mobs
 					if (mCeilingGate != null && mob instanceof LivingEntity) {
-						((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 10, 0));
+						((LivingEntity) mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 10, 0));
 					}
 					mMobs.add(mob);
 
-					world.spawnParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1);
-					world.spawnParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125);
+					new PartialParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(boss);
 					world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 
 					//After 60 seconds, kill mob
@@ -273,7 +275,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					item.setGlowing(true);
 
 					world.playSound(item.getLocation(), Sound.ITEM_TOTEM_USE, 15, 0);
-					world.spawnParticle(Particle.CRIT, item.getLocation(), 20, 0.1, 0.1, 0.1);
+					new PartialParticle(Particle.CRIT, item.getLocation(), 20, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 
 					PlayerUtils.executeCommandOnNearbyPlayers(item.getLocation(), 75, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! On the hanging bookshelves! The Spear has formed! Take it and throw it at the gate!\",\"color\":\"white\"}]");
 
@@ -285,6 +287,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					//Spawns an end gateway to have a beacon laser to indicate location
 					new BukkitRunnable() {
 						int mT = 2;
+
 						@Override
 						public void run() {
 							if (item.isDead() || !item.isValid() || mBoss.isDead() || !mBoss.isValid()) {
@@ -405,7 +408,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				}
 			}
 			World world = mBoss.getWorld();
-			world.spawnParticle(Particle.EXPLOSION_HUGE, as.getLocation(), 1, 0, 0, 0);
+			new PartialParticle(Particle.EXPLOSION_HUGE, as.getLocation(), 1, 0, 0, 0).spawnAsEntityActive(mBoss);
 			world.playSound(as.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 
 			BoundingBox box = BoundingBox.of(as.getLocation(), 3, 3, 3);

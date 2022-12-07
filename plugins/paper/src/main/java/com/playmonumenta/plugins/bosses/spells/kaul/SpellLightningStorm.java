@@ -1,7 +1,7 @@
-
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -16,7 +16,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
 
 
 public class SpellLightningStorm extends Spell {
@@ -79,21 +78,21 @@ public class SpellLightningStorm extends Spell {
 		Location loc = player.getLocation();
 		for (int i = 0; i < 10; i++) {
 			strike.subtract(0, 1, 0);
-			world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_1_COLOR);
-			world.spawnParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_2_COLOR);
+			new PartialParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_1_COLOR).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.REDSTONE, strike, 10, 0.3, 0.3, 0.3, YELLOW_2_COLOR).spawnAsEntityActive(mBoss);
 		}
-		world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.25);
-		world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175);
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
 		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
 
 		/* Too-high lightning hits you directly and can not be blocked */
-		BossUtils.bossDamagePercent(mBoss, player, 0.5, (Location)null, "Lightning Storm");
+		BossUtils.bossDamagePercent(mBoss, player, 0.5, (Location) null, "Lightning Storm");
 		if (!mWarnedPlayers.contains(player)) {
 			mWarnedPlayers.add(player);
 			player.sendMessage(ChatColor.AQUA
-			                   + "That hurt! There must be a lightning storm above you. Staying close to the ground might help to not get struck again.");
+				                   + "That hurt! There must be a lightning storm above you. Staying close to the ground might help to not get struck again.");
 		}
 	}
 

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBombToss;
 import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellBash;
 import com.playmonumenta.plugins.bosses.spells.oldslabsbos.SpellWhirlwind;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -83,6 +84,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.witch.ambient master @s ~ ~ ~ 10 0.6");
 			new BukkitRunnable() {
 				int mIdx = 0;
+
 				@Override
 				public void run() {
 					String line = mDio[mIdx];
@@ -100,9 +102,9 @@ public class OldLabsBoss extends BossAbilityGroup {
 						mBoss.setInvulnerable(false);
 						mBoss.setGravity(true);
 
-						mBoss.getWorld().spawnParticle(Particle.CLOUD, loc, 10, 0.2, 0.45, 0.2, 0.125);
-						mBoss.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 75, 0.2, 0.45, 0.2, 0.2);
-						mBoss.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0.2, 0.45, 0.2, 0.15);
+						new PartialParticle(Particle.CLOUD, loc, 10, 0.2, 0.45, 0.2, 0.125).spawnAsEntityActive(boss);
+						new PartialParticle(Particle.SMOKE_NORMAL, loc, 75, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0.2, 0.45, 0.2, 0.15).spawnAsEntityActive(boss);
 						for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 							MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Elcard", ChatColor.RED + "The Ignoble");
 							player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 10, 1.65f);
@@ -120,14 +122,14 @@ public class OldLabsBoss extends BossAbilityGroup {
 	/* This is called either when the boss chunk loads OR when he is first created */
 	private void resumeBossFight(Plugin plugin, LivingEntity boss) {
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
-				new SpellBombToss(plugin, mBoss, 20, 2, 1, 100, false, true),
-				new SpellBash(plugin, mBoss)
-			));
+			new SpellBombToss(plugin, mBoss, 20, 2, 1, 100, false, true),
+			new SpellBash(plugin, mBoss)
+		));
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
-				new SpellWhirlwind(plugin, mBoss),
-				new SpellBash(plugin, mBoss)
-			));
+			new SpellWhirlwind(plugin, mBoss),
+			new SpellBash(plugin, mBoss)
+		));
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		events.put(75, mBoss -> {
@@ -146,17 +148,17 @@ public class OldLabsBoss extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"Ugh, looks like I might need help from those bandits after all...\",\"color\":\"white\"}]");
 			Location spawnLoc = mSpawnLoc.clone().add(-1, -1, 13);
 			try {
-				spawnLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2);
+				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSoldier");
 				if (mob instanceof LivingEntity) {
-					((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
+					((LivingEntity) mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}
 
 				spawnLoc = spawnLoc.add(2, 0, 0);
-				spawnLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2);
+				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSlinger");
 				if (mob instanceof LivingEntity) {
-					((LivingEntity)mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
+					((LivingEntity) mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}
 			} catch (Exception ex) {
 				mPlugin.getLogger().warning("Failed to spawn labs boss summons");

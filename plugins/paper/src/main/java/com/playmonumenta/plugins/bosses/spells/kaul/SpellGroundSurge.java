@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -49,11 +50,12 @@ public class SpellGroundSurge extends Spell {
 	public void run() {
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
-		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int)(20 * 2.75), 1));
+		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (int) (20 * 2.75), 1));
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		BukkitRunnable runnable = new BukkitRunnable() {
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 
@@ -62,8 +64,8 @@ public class SpellGroundSurge extends Spell {
 				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 3, mPitch);
 				}
-				world.spawnParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData());
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.1, 0.25, 0.25);
+				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 
 				if (mChargeUp.nextTick()) {
 					this.cancel();
@@ -135,17 +137,17 @@ public class SpellGroundSurge extends Spell {
 								}
 
 								world.playSound(bLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.75f, 1);
-								world.spawnParticle(Particle.BLOCK_DUST, bLoc, 20, 0.5, 0.5, 0.5, 0.25, Material.COARSE_DIRT.createBlockData());
-								world.spawnParticle(Particle.FLAME, bLoc, 15, 0.5, 0.5, 0.5, 0.075);
-								world.spawnParticle(Particle.LAVA, bLoc, 2, 0.5, 0.5, 0.5, 0.25);
+								new PartialParticle(Particle.BLOCK_DUST, bLoc, 20, 0.5, 0.5, 0.5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.FLAME, bLoc, 15, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.LAVA, bLoc, 2, 0.5, 0.5, 0.5, 0.25).spawnAsEntityActive(mBoss);
 								for (Player player : players) {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										this.cancel();
 										BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 24, "Ground Surge", mBoss.getLocation());
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1f);
-										world.spawnParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2);
-										world.spawnParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25);
+										new PartialParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 										world.playSound(bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 										// Send surges to all other players now.
@@ -164,6 +166,7 @@ public class SpellGroundSurge extends Spell {
 											int mTicks = 0;
 											int mHits = 0;
 											List<UUID> mHit = new ArrayList<UUID>();
+
 											@Override
 											public void run() {
 												mTicks++;
@@ -191,19 +194,19 @@ public class SpellGroundSurge extends Spell {
 												//Have particles with collision show only for the player who's targeted.
 												//This is to prevent lag from the numerous other surges that have these same
 												//Particles
-												player.spawnParticle(Particle.BLOCK_DUST, innerBoxLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData());
-												world.spawnParticle(Particle.FLAME, innerBoxLoc, 6, 0.2, 0.2, 0.2, 0.075);
-												player.spawnParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25);
+												new PartialParticle(Particle.BLOCK_DUST, innerBoxLoc, 8, 0.2, 0.2, 0.2, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
+												new PartialParticle(Particle.FLAME, innerBoxLoc, 6, 0.2, 0.2, 0.2, 0.075).spawnAsEntityActive(mBoss);
+												new PartialParticle(Particle.LAVA, innerBoxLoc, 1, 0.2, 0.2, 0.2, 0.25).spawnAsEntityActive(mBoss);
 												for (Player surgePlayer : players) {
 													if (surgePlayer.getBoundingBox().overlaps(mBox)
-															&& !surgePlayer.getUniqueId().equals(player.getUniqueId())
-															&& !mHit.contains(surgePlayer.getUniqueId())) {
+														    && !surgePlayer.getUniqueId().equals(player.getUniqueId())
+														    && !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
 														BossUtils.blockableDamage(mBoss, surgePlayer, DamageType.BLAST, 40, "Ground Surge", mBoss.getLocation());
 														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														MovementUtils.knockAway(loc, player, 0.3f, 1f);
-														world.spawnParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2);
-														world.spawnParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25);
+														new PartialParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
+														new PartialParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 														world.playSound(innerBoxLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
 														mHits++;
 														mTicks = 0;

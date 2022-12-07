@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
@@ -36,7 +37,6 @@ public class MobRisingBoss extends BossAbilityGroup {
 		public SoundsList SOUNDS = SoundsList.EMPTY;
 
 	}
-
 
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -78,7 +78,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 							p.SOUNDS.play(bos.getLocation());
 						}
 
-						loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+						new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
 						if (ticks >= p.DURATION) {
 							bos.setGlowing(false);
@@ -89,7 +89,7 @@ public class MobRisingBoss extends BossAbilityGroup {
 						if (ticks == 0) {
 							mob.setGlowing(true);
 						}
-						loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+						new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
 						if (ticks >= p.DURATION) {
 							mob.setGlowing(false);

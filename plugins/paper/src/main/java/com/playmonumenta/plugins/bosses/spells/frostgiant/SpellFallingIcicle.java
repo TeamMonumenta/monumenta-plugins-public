@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,7 +51,7 @@ public class SpellFallingIcicle extends Spell {
 		//If projectiles overlap the approximate bounding box for the static icicles and stuck in a block, execute icicle fall
 		for (AbstractArrow proj : projectiles) {
 			if ((proj.getShooter() == null || proj.getShooter() instanceof Player)
-					&& proj.getAttachedBlock() != null && mBox.overlaps(proj.getBoundingBox())) {
+				    && proj.getAttachedBlock() != null && mBox.overlaps(proj.getBoundingBox())) {
 
 				proj.setShooter(mBoss);
 
@@ -118,6 +119,7 @@ public class SpellFallingIcicle extends Spell {
 				new BukkitRunnable() {
 					int mTicks = 0;
 					double mPreviousY = ice.getLocation().getY();
+
 					@Override
 					public void run() {
 
@@ -126,9 +128,9 @@ public class SpellFallingIcicle extends Spell {
 
 						//Cancel automatically if it takes too long
 						if (mTicks >= 40) {
-							world.spawnParticle(Particle.FIREWORKS_SPARK, ice.getLocation(), 40, 0, 0, 0, 1);
-							world.spawnParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1);
-							world.spawnParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE));
+							new PartialParticle(Particle.FIREWORKS_SPARK, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
 							for (FallingBlock b : ices) {
 								Location bLoc = b.getLocation();
 								if (bLoc.getBlock().getType() == Material.ICE || bLoc.getBlock().getType() == Material.FROSTED_ICE) {
@@ -143,9 +145,9 @@ public class SpellFallingIcicle extends Spell {
 							this.cancel();
 						}
 						if (ice.isOnGround() || ice.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
-							world.spawnParticle(Particle.FIREWORKS_SPARK, ice.getLocation(), 40, 0, 0, 0, 1);
-							world.spawnParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1);
-							world.spawnParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE));
+							new PartialParticle(Particle.FIREWORKS_SPARK, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.CRIT, ice.getLocation(), 40, 0, 0, 0, 1).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
 							for (FallingBlock b : ices) {
 								Location bLoc = b.getLocation();
 								if (bLoc.getBlock().getType() == Material.ICE || bLoc.getBlock().getType() == Material.FROSTED_ICE) {
@@ -188,6 +190,7 @@ public class SpellFallingIcicle extends Spell {
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mTicks = 0;
 				int mCount = 0;
+
 				@Override
 				public void run() {
 					/* Replace a slice of blocks every tick, so that all blocks are replaced over the duration */

@@ -23,7 +23,7 @@ public class WeaponSwitchBoss extends BossAbilityGroup {
 		}
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellWeaponSwitch((Mob)mBoss)
+			new SpellWeaponSwitch((Mob) mBoss)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);

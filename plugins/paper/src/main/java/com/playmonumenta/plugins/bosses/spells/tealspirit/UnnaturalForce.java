@@ -3,11 +3,17 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -62,7 +68,7 @@ public class UnnaturalForce extends Spell {
 
 						for (int x = mInnerRadius; x < mOuterRadius; x++) {
 							for (int i = 0; i < MAX_HEIGHT; i++) {
-								world.spawnParticle(Particle.SPELL_WITCH, mSpawnLoc.clone().add(cos * x, i, sin * x), 1, 0.1, 0.1, 0.1, 0);
+								new PartialParticle(Particle.SPELL_WITCH, mSpawnLoc.clone().add(cos * x, i, sin * x), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 							}
 						}
 					}
@@ -81,15 +87,15 @@ public class UnnaturalForce extends Spell {
 						for (int x = mInnerRadius; x < mOuterRadius; x += inc) {
 							Location loc = mSpawnLoc.clone().add(cos * x, 0, sin * x);
 
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0);
+							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 							if (deg % 4 == 0) {
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.DEEPSLATE_TILES.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.DEEPSLATE_TILES.createBlockData()).spawnAsEntityActive(mBoss);
 							} else {
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.POLISHED_DEEPSLATE.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.POLISHED_DEEPSLATE.createBlockData()).spawnAsEntityActive(mBoss);
 							}
 
 							if (deg % 30 == 0) {
-								world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.15, 0.1, 0.15, 0.25);
+								new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0.15, 0.1, 0.15, 0.25).spawnAsEntityActive(mBoss);
 							}
 
 						}

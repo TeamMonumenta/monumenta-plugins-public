@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellMultihitHeal;
 import com.playmonumenta.plugins.bosses.spells.mimicqueen.SpellSummonMiniboss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -76,43 +77,43 @@ public final class MimicQueen extends BossAbilityGroup {
 
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-				new SpellMultihitHeal(plugin, boss),
-				new SpellSummonMiniboss(plugin, boss),
-				new SpellTpBehindPlayer(plugin, boss, 120, 80, 50, 10, true),
-				new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-						SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-						// Initiate Aesthetic
-						(World world, Location loc, int ticks) -> {
-							PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-							world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
-						},
-						// Launch Aesthetic
-						(World world, Location loc, int ticks) -> {
-							world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
-							world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
-						},
-						// Projectile Aesthetic
-						(World world, Location loc, int ticks) -> {
-							world.spawnParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1);
-							world.spawnParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0);
-							if (ticks % 40 == 0) {
-								world.playSound(loc, Sound.ENTITY_BLAZE_BURN, SoundCategory.HOSTILE, 0.5f, 0.2f);
-							}
-						},
-						// Hit Action
-						(World world, LivingEntity target, Location loc) -> {
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
-							world.spawnParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25);
-							if (target != null) {
-								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, DAMAGE);
-							}
-						})
+			new SpellMultihitHeal(plugin, boss),
+			new SpellSummonMiniboss(plugin, boss),
+			new SpellTpBehindPlayer(plugin, boss, 120, 80, 50, 10, true),
+			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
+				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
+					if (ticks % 40 == 0) {
+						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, SoundCategory.HOSTILE, 0.5f, 0.2f);
+					}
+				},
+				// Hit Action
+				(World world, LivingEntity target, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
+					new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+					if (target != null) {
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, DAMAGE);
+					}
+				})
 		));
 
 		List<Spell> passiveSpells = Arrays.asList(
-				new SpellBlockBreak(boss),
-				new SpellPurgeNegatives(boss, 20 * 6)
-			);
+			new SpellBlockBreak(boss),
+			new SpellPurgeNegatives(boss, 20 * 6)
+		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
 import org.bukkit.Location;
@@ -47,20 +48,20 @@ public class UltimateSeismicRuin extends Spell {
 			char dir = mDirections.get(random);
 			mDirections.remove(random);
 			switch (dir) {
-			default:
-				break;
-			case 'n':
-				ruinNorth();
-				break;
-			case 'e':
-				ruinEast();
-				break;
-			case 's':
-				ruinSouth();
-				break;
-			case 'w':
-				ruinWest();
-				break;
+				default:
+					break;
+				case 'n':
+					ruinNorth();
+					break;
+				case 'e':
+					ruinEast();
+					break;
+				case 's':
+					ruinSouth();
+					break;
+				case 'w':
+					ruinWest();
+					break;
 			}
 		} else {
 			return;
@@ -87,18 +88,18 @@ public class UltimateSeismicRuin extends Spell {
 				if (l.getBlock().getType() != Material.AIR) {
 					int rand = FastUtils.RANDOM.nextInt(6);
 					switch (rand) {
-					default:
-					case 0:
-					case 1:
-					case 2:
-						break;
-					case 3:
-					case 4:
-						l.getBlock().setType(Material.MAGMA_BLOCK);
-						break;
-					case 5:
-						l.getBlock().setType(Material.HONEY_BLOCK);
-						break;
+						default:
+						case 0:
+						case 1:
+						case 2:
+							break;
+						case 3:
+						case 4:
+							l.getBlock().setType(Material.MAGMA_BLOCK);
+							break;
+						case 5:
+							l.getBlock().setType(Material.HONEY_BLOCK);
+							break;
 					}
 				}
 			}
@@ -108,6 +109,7 @@ public class UltimateSeismicRuin extends Spell {
 			int mT = 0;
 			int mY = 12;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mT % 10 == 0) {
@@ -128,6 +130,7 @@ public class UltimateSeismicRuin extends Spell {
 						int mTicks = 0;
 						int mX = 0;
 						int mZ = -6;
+
 						@Override
 						public void run() {
 							mTicks++;
@@ -138,7 +141,7 @@ public class UltimateSeismicRuin extends Spell {
 								mWorld.playSound(l, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0);
 								for (int i = -18; i <= 18; i += 2) {
 									l.set(loc.getX() + i, loc.getY(), loc.getZ() + mZ);
-									mWorld.spawnParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1);
+									new PartialParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 								}
 							}
 
@@ -195,13 +198,13 @@ public class UltimateSeismicRuin extends Spell {
 						Location l = loc.clone().add(x, 0, -2);
 						int count = 1;
 
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -1), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 1), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 9), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 5), count, 1, 0.15, 1, 0.25);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -1), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 1), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 9), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 5), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
 
 						if (x % 4 == 0) {
-							mWorld.spawnParticle(Particle.EXPLOSION_LARGE, l.clone().add(0, mY, 5), count / 3, 0.15, 0.15, 0.15, 0.05);
+							new PartialParticle(Particle.EXPLOSION_LARGE, l.clone().add(0, mY, 5), count / 3, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
@@ -221,18 +224,18 @@ public class UltimateSeismicRuin extends Spell {
 				if (l.getBlock().getType() != Material.AIR) {
 					int rand = FastUtils.RANDOM.nextInt(6);
 					switch (rand) {
-					default:
-					case 0:
-					case 1:
-					case 2:
-						break;
-					case 3:
-					case 4:
-						l.getBlock().setType(Material.MAGMA_BLOCK);
-						break;
-					case 5:
-						l.getBlock().setType(Material.HONEY_BLOCK);
-						break;
+						default:
+						case 0:
+						case 1:
+						case 2:
+							break;
+						case 3:
+						case 4:
+							l.getBlock().setType(Material.MAGMA_BLOCK);
+							break;
+						case 5:
+							l.getBlock().setType(Material.HONEY_BLOCK);
+							break;
 					}
 				}
 			}
@@ -242,6 +245,7 @@ public class UltimateSeismicRuin extends Spell {
 			int mT = 0;
 			int mY = 12;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mT % 10 == 0) {
@@ -262,6 +266,7 @@ public class UltimateSeismicRuin extends Spell {
 						int mTicks = 0;
 						int mX = 6;
 						int mZ = 0;
+
 						@Override
 						public void run() {
 							mTicks++;
@@ -272,7 +277,7 @@ public class UltimateSeismicRuin extends Spell {
 								mWorld.playSound(l, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0);
 								for (int i = -18; i <= 18; i += 2) {
 									l.set(loc.getX() + mX, loc.getY(), loc.getZ() + i);
-									mWorld.spawnParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1);
+									new PartialParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 								}
 							}
 
@@ -330,13 +335,13 @@ public class UltimateSeismicRuin extends Spell {
 
 						int count = 1;
 
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-9, 0, 0), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(1, 0, 0), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-1, 0, 0), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-5, 0, 0), count, 1, 0.15, 1, 0.25);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-9, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(1, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-1, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-5, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
 
 						if (z % 4 == 0) {
-							mWorld.spawnParticle(Particle.EXPLOSION_LARGE, l.clone().add(-5, mY, 0), count / 3, 0.15, 0.15, 0.15, 0.05);
+							new PartialParticle(Particle.EXPLOSION_LARGE, l.clone().add(-5, mY, 0), count / 3, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
@@ -356,18 +361,18 @@ public class UltimateSeismicRuin extends Spell {
 				if (l.getBlock().getType() != Material.AIR) {
 					int rand = FastUtils.RANDOM.nextInt(6);
 					switch (rand) {
-					default:
-					case 0:
-					case 1:
-					case 2:
-						break;
-					case 3:
-					case 4:
-						l.getBlock().setType(Material.MAGMA_BLOCK);
-						break;
-					case 5:
-						l.getBlock().setType(Material.HONEY_BLOCK);
-						break;
+						default:
+						case 0:
+						case 1:
+						case 2:
+							break;
+						case 3:
+						case 4:
+							l.getBlock().setType(Material.MAGMA_BLOCK);
+							break;
+						case 5:
+							l.getBlock().setType(Material.HONEY_BLOCK);
+							break;
 					}
 				}
 			}
@@ -377,6 +382,7 @@ public class UltimateSeismicRuin extends Spell {
 			int mT = 0;
 			int mY = 12;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mT % 10 == 0) {
@@ -397,6 +403,7 @@ public class UltimateSeismicRuin extends Spell {
 						int mTicks = 0;
 						int mX = 0;
 						int mZ = 6;
+
 						@Override
 						public void run() {
 							mTicks++;
@@ -407,7 +414,7 @@ public class UltimateSeismicRuin extends Spell {
 								mWorld.playSound(l, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0);
 								for (int i = -18; i <= 18; i += 2) {
 									l.set(loc.getX() + i, loc.getY(), loc.getZ() + mZ);
-									mWorld.spawnParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1);
+									new PartialParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 								}
 							}
 
@@ -465,13 +472,13 @@ public class UltimateSeismicRuin extends Spell {
 
 						int count = 1;
 
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 1), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -1), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -9), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -5), count, 1, 0.15, 1, 0.25);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, 1), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -1), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -9), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(0, 0, -5), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
 
 						if (x % 4 == 0) {
-							mWorld.spawnParticle(Particle.EXPLOSION_LARGE, l.clone().add(0, mY, -5), count / 3, 0.15, 0.15, 0.15, 0.05);
+							new PartialParticle(Particle.EXPLOSION_LARGE, l.clone().add(0, mY, -5), count / 3, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
@@ -491,18 +498,18 @@ public class UltimateSeismicRuin extends Spell {
 				if (l.getBlock().getType() != Material.AIR) {
 					int rand = FastUtils.RANDOM.nextInt(6);
 					switch (rand) {
-					default:
-					case 0:
-					case 1:
-					case 2:
-						break;
-					case 3:
-					case 4:
-						l.getBlock().setType(Material.MAGMA_BLOCK);
-						break;
-					case 5:
-						l.getBlock().setType(Material.HONEY_BLOCK);
-						break;
+						default:
+						case 0:
+						case 1:
+						case 2:
+							break;
+						case 3:
+						case 4:
+							l.getBlock().setType(Material.MAGMA_BLOCK);
+							break;
+						case 5:
+							l.getBlock().setType(Material.HONEY_BLOCK);
+							break;
 					}
 				}
 			}
@@ -512,6 +519,7 @@ public class UltimateSeismicRuin extends Spell {
 			int mT = 0;
 			int mY = 12;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				if (mT % 10 == 0) {
@@ -532,6 +540,7 @@ public class UltimateSeismicRuin extends Spell {
 						int mTicks = 0;
 						int mX = -6;
 						int mZ = 0;
+
 						@Override
 						public void run() {
 							mTicks++;
@@ -542,7 +551,7 @@ public class UltimateSeismicRuin extends Spell {
 								mWorld.playSound(l, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0);
 								for (int i = -18; i <= 18; i += 2) {
 									l.set(loc.getX() + mX, loc.getY(), loc.getZ() + i);
-									mWorld.spawnParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1);
+									new PartialParticle(Particle.EXPLOSION_HUGE, l, 1, 1, 1, 1).spawnAsEntityActive(mBoss);
 								}
 							}
 
@@ -600,13 +609,13 @@ public class UltimateSeismicRuin extends Spell {
 
 						int count = 1;
 
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-1, 0, 0), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(1, 0, 0), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(9, 0, 0), count, 1, 0.15, 1, 0.25);
-						mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, l.clone().add(5, 0, 0), count, 1, 0.15, 1, 0.25);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(-1, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(1, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(9, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DAMAGE_INDICATOR, l.clone().add(5, 0, 0), count, 1, 0.15, 1, 0.25).spawnAsEntityActive(mBoss);
 
 						if (z % 4 == 0) {
-							mWorld.spawnParticle(Particle.EXPLOSION_LARGE, l.clone().add(5, mY, 0), count / 3, 0.15, 0.15, 0.15, 0.05);
+							new PartialParticle(Particle.EXPLOSION_LARGE, l.clone().add(5, mY, 0), count / 3, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
 						}
 					}
 				}

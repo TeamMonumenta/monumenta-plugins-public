@@ -53,7 +53,7 @@ public class SpellShadowRealm extends Spell {
 				SpellDimensionDoor.clearShadowed();
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(shadowloc, 55);
 				mobs.removeIf(e -> e.getType() == EntityType.MAGMA_CUBE || e.getType() == EntityType.ARMOR_STAND ||
-						e.getScoreboardTags().contains("Boss") || e.getLocation().getY() >= mCenter.getY() - 8);
+					                   e.getScoreboardTags().contains("Boss") || e.getLocation().getY() >= mCenter.getY() - 8);
 				for (LivingEntity m : mobs) {
 					m.setHealth(0);
 				}

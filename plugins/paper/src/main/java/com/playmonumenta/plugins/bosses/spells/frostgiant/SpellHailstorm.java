@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -102,6 +103,7 @@ public class SpellHailstorm extends Spell {
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mTicks = 0;
 					float mPitch = 1;
+
 					@Override
 					public void run() {
 						if (mTicks <= 10) {
@@ -110,8 +112,8 @@ public class SpellHailstorm extends Spell {
 
 						if (mTicks % 10 == 0) {
 							world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 1);
-							world.spawnParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
-							world.spawnParticle(Particle.SPIT, player.getLocation().add(0, 1, 0), 6, 0.4, 0.4, 0.4, 0.2);
+							new PartialParticle(Particle.FIREWORKS_SPARK, player.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.SPIT, player.getLocation().add(0, 1, 0), 6, 0.4, 0.4, 0.4, 0.2).spawnAsEntityActive(mBoss);
 
 						}
 

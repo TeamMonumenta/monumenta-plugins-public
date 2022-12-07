@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
@@ -81,26 +82,26 @@ public class TealQuestBoss extends BossAbilityGroup {
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, JUMP_HEIGHT, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN_SLAM, VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
-					world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
+					new PartialParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
 				}, (World world, Location loc) -> {
 				world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
-				world.spawnParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0);
+				new PartialParticle(Particle.LAVA, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
 			}, (World world, Location loc) -> {
-				world.spawnParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f));
+				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
 			}, (World world, Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 					Arrays.asList(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
-							world.spawnParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1);
-							world.spawnParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1);
+							new PartialParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
+							new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 						})
 					));
 
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.3F, 0);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2, 1.25F);
-				world.spawnParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F);
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F);
-				world.spawnParticle(Particle.LAVA, loc, 3 * (int) (DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0);
+				new PartialParticle(Particle.FLAME, loc, 60, 0F, 0F, 0F, 0.2F).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.LAVA, loc, 3 * (int) (DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0).spawnAsEntityActive(boss);
 				if (player != null) {
 					BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT);
 					return;
@@ -113,14 +114,12 @@ public class TealQuestBoss extends BossAbilityGroup {
 				@Override
 				protected void chargeAuraAction(Location loc) {
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 1, 2));
-					World world = loc.getWorld();
-					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, ((double) RADIUS) / 3, ((double) RADIUS) / 3, ((double) RADIUS) / 3, 0.05);
+					new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, ((double) RADIUS) / 3, ((double) RADIUS) / 3, ((double) RADIUS) / 3, 0.05).spawnAsEntityActive(boss);
 				}
 
 				@Override
 				protected void chargeCircleAction(Location loc) {
-					World world = loc.getWorld();
-					world.spawnParticle(Particle.CRIT, loc, 1, 0.25, 0.25, 0.25, 0.05);
+					new PartialParticle(Particle.CRIT, loc, 1, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(boss);
 				}
 
 				@Override
@@ -131,9 +130,8 @@ public class TealQuestBoss extends BossAbilityGroup {
 
 				@Override
 				protected void circleOutburstAction(Location loc) {
-					World world = loc.getWorld();
-					world.spawnParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0.3);
-					world.spawnParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING);
+					new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING).spawnAsEntityActive(boss);
 				}
 
 				@Override
@@ -145,16 +143,15 @@ public class TealQuestBoss extends BossAbilityGroup {
 			}));
 
 		List<Spell> passives = new ArrayList<>(Arrays.asList(new SpellBarrier(plugin, mBoss, detectionRange, RECHARGE_TIME, HITS_TO_BREAK, false,
-				(Location loc) -> {
-					World world = loc.getWorld();
-					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
-				}, (Location loc) -> {
-					World world = loc.getWorld();
-					world.spawnParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, REDSTONE_COLOR_BARRIER);
-				}, (Location loc) -> {
-					World world = loc.getWorld();
-					world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
-				}), new SpellCrowdControlClear(boss, CLEAR_TIME)));
+			(Location loc) -> {
+				World world = loc.getWorld();
+				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1, 1);
+			}, (Location loc) -> {
+			new PartialParticle(Particle.REDSTONE, loc, 4, 0, 1, 0, REDSTONE_COLOR_BARRIER).spawnAsEntityActive(boss);
+		}, (Location loc) -> {
+			World world = loc.getWorld();
+			world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
+		}), new SpellCrowdControlClear(boss, CLEAR_TIME)));
 
 		BossBarManager barManager = new BossBarManager(plugin, mBoss, detectionRange, BarColor.BLUE, BarStyle.SOLID, null);
 
@@ -164,7 +161,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int players = BossUtils.getPlayersInRangeForHealthScaling(mBoss, 35);
-		double targetHealth = 1000 * (Math.log1p(players)/Math.log(2));
+		double targetHealth = 1000 * (Math.log1p(players) / Math.log(2));
 
 		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(targetHealth);
 		mBoss.setHealth(targetHealth);

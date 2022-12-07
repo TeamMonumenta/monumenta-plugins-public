@@ -27,7 +27,7 @@ public class VolatileBoss extends BossAbilityGroup {
 			throw new Exception("Attempted to give non-creeper the " + identityTag + " ability: " + boss.toString());
 		}
 
-		mCreeper = (Creeper)boss;
+		mCreeper = (Creeper) boss;
 
 		// Boss effectively does nothing
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

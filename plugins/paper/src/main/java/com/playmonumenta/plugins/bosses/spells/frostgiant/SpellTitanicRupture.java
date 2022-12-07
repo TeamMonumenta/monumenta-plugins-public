@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -183,8 +184,8 @@ public class SpellTitanicRupture extends Spell {
 						for (double deg = 0; deg < 360; deg += (1 * 10)) {
 							double cos = FastUtils.cos(deg);
 							double sin = FastUtils.sin(deg);
-							world.spawnParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
-							world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(5 * cos, 0, 5 * sin), 1, 0.15, 0.15, 0.15, 0.1);
+							new PartialParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.DRAGON_BREATH, loc.clone().add(5 * cos, 0, 5 * sin), 1, 0.15, 0.15, 0.15, 0.1).spawnAsEntityActive(mBoss);
 						}
 					}
 					FrostGiant.unfreezeGolems(mBoss);
@@ -202,17 +203,17 @@ public class SpellTitanicRupture extends Spell {
 					if (FastUtils.RANDOM.nextDouble() > 0.4) {
 						double cos = FastUtils.cos(deg);
 						double sin = FastUtils.sin(deg);
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 0, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 0, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 0, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 0, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
 
-						world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(8 * cos, 1, 8 * sin), 1, 0.15, 0.15, 0.15, 0.05);
-						world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(4 * cos, 1, 4 * sin), 1, 0.15, 0.15, 0.15, 0.05);
-						world.spawnParticle(Particle.DRAGON_BREATH, loc.clone().add(2 * cos, 1, 2 * sin), 2, 0.15, 0.15, 0.15, 0.05);
+						new PartialParticle(Particle.DRAGON_BREATH, loc.clone().add(8 * cos, 1, 8 * sin), 1, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DRAGON_BREATH, loc.clone().add(4 * cos, 1, 4 * sin), 1, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.DRAGON_BREATH, loc.clone().add(2 * cos, 1, 2 * sin), 2, 0.15, 0.15, 0.15, 0.05).spawnAsEntityActive(mBoss);
 
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 2, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 2, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR);
-						world.spawnParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 2, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(8 * cos, 2, 8 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 2, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.REDSTONE, loc.clone().add(2 * cos, 2, 2 * sin), 2, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
 					}
 				}
 				mT += 5;

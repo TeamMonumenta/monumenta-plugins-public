@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellShadePossessedParticle;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
@@ -40,8 +41,8 @@ public class ShadePossessedBoss extends BossAbilityGroup {
 		Location loc = mBoss.getLocation();
 
 		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1f, 0.5f);
-		world.spawnParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1);
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 200, 0, 0, 0, 0.2);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 200, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 
 		LibraryOfSoulsIntegration.summon(loc, SHADE_OF_DEATH);
 	}

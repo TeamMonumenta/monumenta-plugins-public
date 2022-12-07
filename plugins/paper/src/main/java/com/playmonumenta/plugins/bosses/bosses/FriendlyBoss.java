@@ -50,25 +50,25 @@ public class FriendlyBoss extends BossAbilityGroup {
 		try {
 			if (boss instanceof Creature creature) {
 				NmsUtils.getVersionAdapter().setFriendly(creature, (LivingEntity target) -> {
-					if (p.DAMAGE != 0) {
-						DamageUtils.damage(mBoss, target, p.TYPE, p.DAMAGE);
-					}
+						if (p.DAMAGE != 0) {
+							DamageUtils.damage(mBoss, target, p.TYPE, p.DAMAGE);
+						}
 
-					if (p.DAMAGE_PERCENTAGE != 0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
-					}
+						if (p.DAMAGE_PERCENTAGE != 0) {
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+						}
 
-					if (p.SOUNDS != SoundsList.EMPTY) {
-						p.SOUNDS.play(target.getEyeLocation());
-					}
+						if (p.SOUNDS != SoundsList.EMPTY) {
+							p.SOUNDS.play(target.getEyeLocation());
+						}
 
-					if (p.PARTICLES != ParticlesList.EMPTY) {
-						p.PARTICLES.spawn(boss, target.getEyeLocation());
-					}
+						if (p.PARTICLES != ParticlesList.EMPTY) {
+							p.PARTICLES.spawn(boss, target.getEyeLocation());
+						}
 
-				},
-				EntityUtils::isHostileMob,
-				p.ATTACK_RANGE);
+					},
+					EntityUtils::isHostileMob,
+					p.ATTACK_RANGE);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

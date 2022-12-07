@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.TealSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -54,6 +55,7 @@ public class DoomsdayClock extends Spell {
 			int mT = -GROWTH_TIME;
 			double mBlackDeg = 0;
 			double mRedDeg = 180;
+
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss == null || mBoss.isDead()) {
@@ -80,7 +82,7 @@ public class DoomsdayClock extends Spell {
 				for (int deg = 0; deg < 360; deg += 15) {
 					Location base = mCenter.clone().add(FastUtils.cosDeg(deg) * RADIUS, 0.5, FastUtils.sinDeg(deg) * RADIUS);
 					for (int y = 0; y < wallHeight; y++) {
-						world.spawnParticle(Particle.CRIT, base.clone().add(0, y, 0), 1, 0.1, 0.1, 0.1, 0);
+						new PartialParticle(Particle.CRIT, base.clone().add(0, y, 0), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 					}
 				}
 				 */
@@ -154,10 +156,10 @@ public class DoomsdayClock extends Spell {
 
 			BoundingBox box = BoundingBox.of(l, 0.8, 50, 0.8);
 			boxes.add(box);
-			mCenter.getWorld().spawnParticle(Particle.REDSTONE, l, 1, new Particle.DustOptions(color, 2));
+			new PartialParticle(Particle.REDSTONE, l, 1, new Particle.DustOptions(color, 2)).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 			if (color.equals(BLACK_COLOR)) {
 				for (int i = 1; i <= 3; i++) {
-					mCenter.getWorld().spawnParticle(Particle.REDSTONE, l.clone().add(0, i, 0), 1, new Particle.DustOptions(color, 1));
+					new PartialParticle(Particle.REDSTONE, l.clone().add(0, i, 0), 1, new Particle.DustOptions(color, 1)).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 				}
 			}
 		}

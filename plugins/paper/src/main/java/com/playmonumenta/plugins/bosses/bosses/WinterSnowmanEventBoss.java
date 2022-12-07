@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import java.util.Collections;
 import org.bukkit.GameMode;
@@ -51,7 +52,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 		if (damager instanceof Snowball && source instanceof Player) {
 			Location loc = mBoss.getLocation();
 			loc.getWorld().playSound(loc, Sound.BLOCK_CORAL_BLOCK_BREAK, SoundCategory.HOSTILE, 2, 0);
-			loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
+			new PartialParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
 			event.setDamage(1);
 			return;
 		}
@@ -63,13 +64,13 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
-			Player player = (Player)event.getHitEntity();
+			Player player = (Player) event.getHitEntity();
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
 				AbsorptionUtils.subtractAbsorption(player, 2);
 
 				Location loc = player.getLocation().add(0, 1.4, 0);
 				loc.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 2);
-				loc.getWorld().spawnParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1);
+				new PartialParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
 				if (AbsorptionUtils.getAbsorption(player) <= 0) {
 					if (mBoss.getCustomName() != null) {
 						player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getUniqueId().toString()));

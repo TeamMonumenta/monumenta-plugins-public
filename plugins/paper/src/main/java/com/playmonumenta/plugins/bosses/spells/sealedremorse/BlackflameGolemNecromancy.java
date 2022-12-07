@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.sealedremorse;
 import com.playmonumenta.plugins.bosses.bosses.BeastOfTheBlackFlame;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -83,7 +84,7 @@ public class BlackflameGolemNecromancy extends Spell {
 						sLoc = loc.clone().add(x, 0.25, z);
 					}
 					Location spawn = sLoc.clone().subtract(0, 1.75, 0);
-					LivingEntity ele = (LivingEntity)LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size())));
+					LivingEntity ele = (LivingEntity) LibraryOfSoulsIntegration.summon(spawn, CONSTRUCTS.get(FastUtils.RANDOM.nextInt(CONSTRUCTS.size())));
 					Location scLoc = sLoc.clone();
 					if (ele != null && !mSummoned.contains(ele.getUniqueId())) {
 						mSummoned.add(ele.getUniqueId());
@@ -94,6 +95,7 @@ public class BlackflameGolemNecromancy extends Spell {
 							Location mPLoc = scLoc;
 							double mYInc = 1.6 / mSummonTime;
 							boolean mRaised = false;
+
 							@Override
 							public void run() {
 								mT++;
@@ -105,7 +107,7 @@ public class BlackflameGolemNecromancy extends Spell {
 								if (mT >= mSummonTime && !mRaised) {
 									mRaised = true;
 									ele.setAI(true);
-									mPLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, mPLoc, 6, 0.25, 0.1, 0.25, 0.25);
+									new PartialParticle(Particle.SMOKE_LARGE, mPLoc, 6, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 								}
 
 								if (mBoss.isDead() || !mBoss.isValid()) {
@@ -143,6 +145,7 @@ public class BlackflameGolemNecromancy extends Spell {
 				}
 				new BukkitRunnable() {
 					int mTicks = 0;
+
 					@Override
 					public void run() {
 						if (mTicks % 10 == 0) {

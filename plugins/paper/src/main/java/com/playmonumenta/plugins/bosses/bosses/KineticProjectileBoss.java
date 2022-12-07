@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -31,7 +32,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 	private static final double SPEED = 0.7;
 	private static final double TURN_RADIUS = 0;
 	private static final int DISTANCE = 32;
-	private static final int LIFETIME_TICKS = (int)(DISTANCE / SPEED);
+	private static final int LIFETIME_TICKS = (int) (DISTANCE / SPEED);
 	private static final double HITBOX_LENGTH = 1.25;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
@@ -48,38 +49,38 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-					SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-					// Initiate Aesthetic
-					(World world, Location loc, int ticks) -> {
-						PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-					},
-					// Launch Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_STEP, 1f, 0.5f);
-					},
-					// Projectile Aesthetic
-					(World world, Location loc, int ticks) -> {
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0.2, 0.2, 0.2, 0.1);
-					},
-					// Hit Action
-					(World world, LivingEntity target, Location loc) -> {
-						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.5f);
-						world.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0);
+				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					world.playSound(loc, Sound.ENTITY_IRON_GOLEM_STEP, 1f, 0.5f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0.2, 0.2, 0.2, 0.1).spawnAsEntityActive(boss);
+				},
+				// Hit Action
+				(World world, LivingEntity target, Location loc) -> {
+					world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.5f);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 
-						BoundingBox hitbox = new BoundingBox();
-						hitbox.shift(loc);
-						hitbox.expand(RADIUS);
+					BoundingBox hitbox = new BoundingBox();
+					hitbox.shift(loc);
+					hitbox.expand(RADIUS);
 
-						for (Player p : PlayerUtils.playersInRange(loc, RADIUS * 3, true)) {
-							if (hitbox.overlaps(p.getBoundingBox())) {
-								BossUtils.blockableDamage(boss, p, DamageType.MAGIC, DAMAGE);
+					for (Player p : PlayerUtils.playersInRange(loc, RADIUS * 3, true)) {
+						if (hitbox.overlaps(p.getBoundingBox())) {
+							BossUtils.blockableDamage(boss, p, DamageType.MAGIC, DAMAGE);
 
-								if (!p.equals(target)) {
-									MovementUtils.knockAway(loc, p, KNOCKBACK_SPEED, false);
-								}
+							if (!p.equals(target)) {
+								MovementUtils.knockAway(loc, p, KNOCKBACK_SPEED, false);
 							}
 						}
-					})
+					}
+				})
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);

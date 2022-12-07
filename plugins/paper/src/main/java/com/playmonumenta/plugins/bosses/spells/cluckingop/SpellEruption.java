@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -32,13 +33,14 @@ public class SpellEruption extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 30, true);
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
-				world.spawnParticle(Particle.LAVA, mBoss.getLocation(), 20, 0.15, 0, 0.15, 0.175);
+				new PartialParticle(Particle.LAVA, mBoss.getLocation(), 20, 0.15, 0, 0.15, 0.175).spawnAsEntityActive(mBoss);
 				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.5f, 1f);
 				for (Player player : players) {
-					world.spawnParticle(Particle.LAVA, player.getLocation(), 10, 0.15, 0, 0.15, 0.175);
+					new PartialParticle(Particle.LAVA, player.getLocation(), 10, 0.15, 0, 0.15, 0.175).spawnAsEntityActive(mBoss);
 				}
 
 				if (mT >= 3) {
@@ -46,8 +48,8 @@ public class SpellEruption extends Spell {
 					for (Player player : players) {
 						player.setVelocity(new Vector(0, 2, 0));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 10));
-						world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
-						world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
+						new PartialParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 						world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 						BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 						new BukkitRunnable() {
@@ -55,15 +57,15 @@ public class SpellEruption extends Spell {
 							@Override
 							public void run() {
 								BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
-								world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
-								world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
+								new PartialParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 								world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 								player.setVelocity(new Vector(0, -2, 0));
 								new BukkitRunnable() {
 
 									@Override
 									public void run() {
-										world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 1, 0, 0, 0, 0.05);
+										new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 1, 0, 0, 0, 0.05).spawnAsEntityActive(mBoss);
 										if (player.isOnGround() || player.isDead() || !player.isValid() || !player.isOnline()) {
 											this.cancel();
 											new BukkitRunnable() {
@@ -71,8 +73,8 @@ public class SpellEruption extends Spell {
 												@Override
 												public void run() {
 													BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
-													world.spawnParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175);
-													world.spawnParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25);
+													new PartialParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
+													new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 													world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 													world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1, 0);
 												}

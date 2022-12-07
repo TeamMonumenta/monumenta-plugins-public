@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -73,12 +74,13 @@ public class SheepGodBoss extends BossAbilityGroup {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"BAAA! BAA BAAAA! BAA BAAA BAAA BAAAAAA!?!?!?\",\"color\":\"dark_red\"}]");
 		new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
 				Location loc = mBoss.getLocation().add(FastUtils.randomDoubleInRange(-10, 10), FastUtils.randomDoubleInRange(0, 3), FastUtils.randomDoubleInRange(-10, 10));
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175);
-				world.spawnParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 
 				if (mT >= 12) {
@@ -87,9 +89,9 @@ public class SheepGodBoss extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_SHEEP_DEATH, 1.5f, 1f);
 					mBoss.remove();
 					this.cancel();
-					world.spawnParticle(Particle.FLAME, mBoss.getLocation(), 300, 0, 0, 0, 0.2);
-					world.spawnParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 150, 0, 0, 0, 0.25);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 150, 0, 0, 0, 0.25);
+					new PartialParticle(Particle.FLAME, mBoss.getLocation(), 300, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 150, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 150, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.5f, 0f);

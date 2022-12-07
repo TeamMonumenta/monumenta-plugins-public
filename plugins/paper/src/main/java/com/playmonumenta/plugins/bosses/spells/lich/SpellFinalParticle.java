@@ -102,6 +102,7 @@ public class SpellFinalParticle extends Spell {
 		Location ballLoc = mBoss.getLocation().add(0, 4.5, 0);
 		BukkitRunnable run = new BukkitRunnable() {
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;

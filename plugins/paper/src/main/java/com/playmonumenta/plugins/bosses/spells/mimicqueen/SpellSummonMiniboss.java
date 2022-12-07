@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.mimicqueen;
 import com.playmonumenta.plugins.bosses.bosses.MimicQueen;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -37,7 +38,7 @@ public class SpellSummonMiniboss extends Spell {
 		Location loc = mBoss.getLocation();
 		mBoss.getWorld().playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 5, 0);
 		mBoss.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 5, 0);
-		mBoss.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 6, 0, 0, 0, 0.5, null, true);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, 0, 0, 0, 0.5, null, true).spawnAsEntityActive(mBoss);
 
 		List<Player> players = PlayerUtils.playersInRange(loc, MimicQueen.detectionRange, true);
 		final int playerCount = ((players.size() > 1) ? players.size() : 1);
@@ -45,6 +46,7 @@ public class SpellSummonMiniboss extends Spell {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			int mCount = 0;
+
 			@Override
 			public void run() {
 				if (mCount >= playerCount) {
@@ -81,10 +83,10 @@ public class SpellSummonMiniboss extends Spell {
 					Location loc = mBoss.getLocation();
 
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 5, 0);
-					mBoss.getWorld().spawnParticle(Particle.CLOUD, loc, 6, 0, 0, 0, 0.5);
+					new PartialParticle(Particle.CLOUD, loc, 6, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
 					mMiniboss = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, mob);
 					if (mMiniboss != null && mMiniboss instanceof Lootable) {
-						((Lootable)mMiniboss).clearLootTable();
+						((Lootable) mMiniboss).clearLootTable();
 					}
 					mCount++;
 					mTicks = 0;

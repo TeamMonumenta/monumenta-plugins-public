@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.bluestrike;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
@@ -11,7 +12,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -32,7 +32,8 @@ public class SpellDominion extends Spell {
 		mSpawnLoc = spawnLoc;
 	}
 
-	@Override public void run() {
+	@Override
+	public void run() {
 		mT--;
 
 		if (mT <= 0) {
@@ -41,12 +42,11 @@ public class SpellDominion extends Spell {
 
 			for (Player player : players) {
 				if (player.getGameMode() == GameMode.ADVENTURE
-					&& (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
-					|| player.getLocation().distance(mSpawnLoc) > 30)
-					&& player.getLocation().add(0, -1, 0).getBlock().getType() != Material.AIR) {
-					World world = player.getWorld();
+					    && (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
+						        || player.getLocation().distance(mSpawnLoc) > 30)
+					    && player.getLocation().add(0, -1, 0).getBlock().getType() != Material.AIR) {
 					Location l = player.getEyeLocation();
-					world.spawnParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25);
+					new PartialParticle(Particle.SQUID_INK, l, 10, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 					BossUtils.bossDamagePercent(mBoss, player, 0.5, "Dominion");
 					player.teleport(mSpawnLoc);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 0));
@@ -60,7 +60,8 @@ public class SpellDominion extends Spell {
 		}
 	}
 
-	@Override public int cooldownTicks() {
+	@Override
+	public int cooldownTicks() {
 		return 0;
 	}
 }

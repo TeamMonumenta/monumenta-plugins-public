@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.rkitxet;
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -35,18 +36,15 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.CRIMSON_SPORE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0);
-		world.spawnParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
-
+		new PartialParticle(Particle.CRIMSON_SPORE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR);
-		world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR);
-		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -57,9 +55,8 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3);
-		world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0.1, VERDANT_PROTECTION_COLOR);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0.1, VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

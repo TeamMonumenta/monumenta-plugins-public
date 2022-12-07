@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import com.playmonumenta.plugins.bosses.bosses.HeadlessHorsemanBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -25,7 +26,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 
 
 public class SpellReaperOfLife extends Spell {
@@ -63,8 +63,8 @@ public class SpellReaperOfLife extends Spell {
 			fallingBlock.setVelocity(vect);
 
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, 3, 1.5f);
-			world.spawnParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025);
-			world.spawnParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025);
+			new PartialParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
 			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
 			List<Player> players = PlayerUtils.playersInRange(mCenter, HeadlessHorsemanBoss.arenaSize, true);
 			if (players.size() != 0) {
@@ -80,6 +80,7 @@ public class SpellReaperOfLife extends Spell {
 			new BukkitRunnable() {
 				double mN = 0;
 				double mPlayerScalingHP = 0;
+
 				@Override
 				public void run() {
 					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
@@ -88,7 +89,7 @@ public class SpellReaperOfLife extends Spell {
 
 						List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 						if (players.size() == 0) {
-						      return;
+							return;
 						}
 
 						int playerCount = players.size();
@@ -143,10 +144,10 @@ public class SpellReaperOfLife extends Spell {
 				}
 				if (mInc % 10 == 0) {
 					world.playSound(mCenter, Sound.ENTITY_CREEPER_HURT, 3, 1f);
-					world.spawnParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1);
+					new PartialParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
 				}
 				if (mInc % 20 == 0) {
-					world.spawnParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1);
+					new PartialParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
 				}
 				if (mInc >= 20 * 7) {
 					z.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 1));
@@ -156,10 +157,10 @@ public class SpellReaperOfLife extends Spell {
 					z.setHealth(0);
 					world.playSound(mCenter, Sound.ENTITY_WITHER_SPAWN, 3, 1f);
 					world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 3, 1f);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
 						if (mCenter.distance(player.getLocation()) < mRange) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location)null, "Reaper of Life");
+							BossUtils.bossDamagePercent(mBoss, player, 0.85, (Location) null, "Reaper of Life");
 							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 3, player, mBoss);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, 20 * 10, 4));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 10, 2));

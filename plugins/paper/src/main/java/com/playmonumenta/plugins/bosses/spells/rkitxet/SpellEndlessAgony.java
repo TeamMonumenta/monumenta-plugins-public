@@ -44,7 +44,7 @@ public class SpellEndlessAgony extends Spell {
 		mCooldown = cooldown;
 
 		mChargeUp = new ChargeUpManager(mRKitxet.getEntity(), MOVEMENT_TIME + WAIT_UNTIL_DAMAGE_TIME, ChatColor.DARK_PURPLE + "Forming Endless Agony...",
-				BarColor.PURPLE, BarStyle.SEGMENTED_10, RKitxet.detectionRange);
+			BarColor.PURPLE, BarStyle.SEGMENTED_10, RKitxet.detectionRange);
 	}
 
 	@Override
@@ -78,6 +78,7 @@ public class SpellEndlessAgony extends Spell {
 
 		BukkitRunnable movementRunnable = new BukkitRunnable() {
 			Location mLoc = target.getLocation();
+
 			@Override
 			public void run() {
 				mChargeUp.nextTick(5);

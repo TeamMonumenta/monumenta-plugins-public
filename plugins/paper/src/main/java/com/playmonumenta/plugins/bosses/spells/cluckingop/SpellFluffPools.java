@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.cluckingop;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
@@ -52,17 +53,19 @@ public class SpellFluffPools extends Spell {
 		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1, 0.5f);
 		new BukkitRunnable() {
 			int mTicks = 0;
+
 			@Override
 			public void run() {
 				mTicks++;
-				world.spawnParticle(Particle.CLOUD, loc, 1, 1, 0.1, 1, 0.1);
+				new PartialParticle(Particle.CLOUD, loc, 1, 1, 0.1, 1, 0.1).spawnAsEntityActive(mBoss);
 
 				if (mTicks >= 20) {
 					this.cancel();
-					world.spawnParticle(Particle.CLOUD, loc, 250, 0, 0, 0, 0.3);
+					new PartialParticle(Particle.CLOUD, loc, 250, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
 					world.playSound(loc, Sound.ITEM_TOTEM_USE, 1, 1f);
 					new BukkitRunnable() {
 						int mInnerTicks = 0;
+
 						@Override
 						public void run() {
 							mInnerTicks += 2;
@@ -70,7 +73,7 @@ public class SpellFluffPools extends Spell {
 								BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 1);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 5, -6));
 							}
-							world.spawnParticle(Particle.CLOUD, loc, 35, 3, 0.1, 3, 0.1);
+							new PartialParticle(Particle.CLOUD, loc, 35, 3, 0.1, 3, 0.1).spawnAsEntityActive(mBoss);
 							if (mInnerTicks >= 20 * 8) {
 								this.cancel();
 							}
