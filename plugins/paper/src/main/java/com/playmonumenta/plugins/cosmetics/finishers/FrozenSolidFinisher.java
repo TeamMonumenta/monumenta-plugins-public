@@ -41,7 +41,11 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					((LivingEntity) killedMob).setAI(false);
 					killedMob.addScoreboardTag(AbilityUtils.IGNORE_TAG);
 					killedMob.setSilent(true);
-					EntityUtils.applySilence(Plugin.getInstance(), 30, (LivingEntity) killedMob);
+					EntityUtils.applySilence(Plugin.getInstance(), 50, (LivingEntity) killedMob);
+					for (Entity passenger : killedMob.getPassengers()) {
+						killedMob.removePassenger(passenger);
+					}
+					killedMob.leaveVehicle();
 					killedMob.setVelocity(new Vector());
 					// Figure out where and when to generate ice
 					BoundingBox box = killedMob.getBoundingBox();
@@ -68,7 +72,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 						ice.setMarker(true);
 						ice.setCollidable(false);
 						ice.getEquipment().setHelmet(new ItemStack(Material.ICE));
-						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, Constants.NotePitches.F11);
+						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, 0.25f, Constants.NotePitches.F11);
 						mArmorStands.add(ice);
 					}
 				} else if (mTicks == 29) {
