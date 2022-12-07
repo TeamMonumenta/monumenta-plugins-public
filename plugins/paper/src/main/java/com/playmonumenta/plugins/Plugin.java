@@ -240,6 +240,7 @@ public class Plugin extends JavaPlugin {
 		SetActivity.register(this);
 		SetMasterwork.register();
 		WalletManager.registerCommand();
+		CoreProtectLogCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -404,7 +405,7 @@ public class Plugin extends JavaPlugin {
 		}
 
 		if (ServerProperties.getShardName().contains("gallery")
-				|| ServerProperties.getShardName().startsWith("dev")) {
+			    || ServerProperties.getShardName().startsWith("dev")) {
 			GalleryCommands.register();
 			manager.registerEvents(new GalleryManager(this), this);
 
