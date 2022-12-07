@@ -131,8 +131,14 @@ public class AbsorptionUtils {
 		if (absorptionInstances != null) {
 			absorptionInstances.mAbsorptionInstances.forEach((amount, duration) -> displayables.add(new AbsorptionDisplayable(amount, duration)));
 		}
+		List<AbsorptionDisplayable> filteredDisplayables = new ArrayList<>();
+		displayables.forEach(d -> {
+			if (filteredDisplayables.stream().noneMatch(d::isEclipsedBy)) {
+				filteredDisplayables.add(d);
+			}
+		});
 
-		return displayables;
+		return filteredDisplayables;
 	}
 
 	// this does not do any tracking, it is purely for display & sorting
@@ -154,6 +160,11 @@ public class AbsorptionUtils {
 		@Override
 		public String getDisplay() {
 			return ChatColor.YELLOW + "" + StringUtils.to2DP(mAmount) + " Absorption " + ChatColor.GRAY + "" + StringUtils.intToMinuteAndSeconds(mDuration / 20);
+		}
+
+
+		public boolean isEclipsedBy(AbsorptionDisplayable other) {
+			return this.mAmount <= other.mAmount && this.mDuration <= other.mDuration;
 		}
 	}
 
