@@ -401,7 +401,7 @@ public class HuntingCompanion extends Ability {
 
 		if (summon instanceof Fox || summon instanceof Strider) {
 			nearbyMobs.removeIf(mob -> Math.abs(mob.getLocation().getY() - summonLoc.getY()) > MAX_TARGET_Y);
-			nearbyMobs.removeIf(EntityUtils::isFlyingMobOrRidingFlyingMob);
+			nearbyMobs.removeIf(mob -> EntityUtils.isFlyingMob(EntityUtils.getEntityStackBase(mob)));
 		} else if (summon instanceof Axolotl || summon instanceof Dolphin) {
 			nearbyMobs.removeIf(mob -> !EntityUtils.isInWater(mob));
 		}

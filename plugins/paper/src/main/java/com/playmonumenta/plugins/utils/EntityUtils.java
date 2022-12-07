@@ -601,6 +601,13 @@ public class EntityUtils {
 		}
 	}
 
+	public static LivingEntity getEntityStackBase(LivingEntity entity) {
+		if (entity.getVehicle() instanceof LivingEntity vehicle) {
+			return getEntityStackBase(vehicle);
+		}
+		return entity;
+	}
+
 	public static List<LivingEntity> getMobsInLine(Location loc, Vector direction, double range, double halfHitboxLength) {
 		Set<LivingEntity> nearbyMobs = new HashSet<>(getNearbyMobs(loc, range));
 		List<LivingEntity> mobsInLine = new ArrayList<>();
