@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -145,7 +146,7 @@ public class PotionConsumeListener implements Listener {
 		if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !onlyGlowing) {
 			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
 			float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
-			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1.0f, 1.0f + pitch);
+			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
 			return;
 		}
 
@@ -172,14 +173,20 @@ public class PotionConsumeListener implements Listener {
 
 	private void rightClickDrinkablePotion(InventoryClickEvent event, Player player, ItemStack item, Inventory clickedInventory) {
 		boolean instantDrink = ItemStatUtils.hasEnchantment(item, EnchantmentType.INSTANT_DRINK);
+
+		if (!instantDrink && mRunnables.get(player.getUniqueId()) != null) {
+			return;
+		}
+
 		int starvation = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION);
 		int slot = event.getSlot();
 		boolean reduceStack = !ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY);
 
 		//If instant drink enchantment, instantly apply potion, otherwise imitate potion drinking
 		if (instantDrink) {
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			ItemStatUtils.applyCustomEffects(mPlugin, player, item);
+			StatTrackManager.incrementStat(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
 
 			//Apply Starvation if applicable
 			Starvation.apply(player, starvation);
@@ -201,6 +208,7 @@ public class PotionConsumeListener implements Listener {
 					if (mTicks >= DRINK_DURATION) {
 						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
 						ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
+						StatTrackManager.incrementStat(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
 
 						Starvation.apply(player, starvation);
 
@@ -227,7 +235,7 @@ public class PotionConsumeListener implements Listener {
 						mRunnables.remove(uuid);
 					}
 					float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f; //Emulate drinking variation of pitch
-					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1.0f, 1.0f + pitch);
+					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
 					mTicks += DRINK_TICK_DELAY;
 				}
 			};
