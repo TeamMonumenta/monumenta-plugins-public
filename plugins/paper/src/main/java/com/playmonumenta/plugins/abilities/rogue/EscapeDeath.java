@@ -54,7 +54,7 @@ public class EscapeDeath extends Ability {
 			.scoreboardId("EscapeDeath")
 			.shorthandName("ED")
 			.descriptions(
-				String.format("When taking damage from a mob leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
+				String.format("When taking damage leaves you below %s hearts, throw a paralyzing grenade that stuns all enemies within %s blocks for %s seconds. Cooldown: %ss.",
 					(int) TRIGGER_THRESHOLD_HEALTH / 2,
 					RANGE,
 					STUN_DURATION / 20,

@@ -49,7 +49,7 @@ public class ViciousCombos extends Ability {
 			.scoreboardId("ViciousCombos")
 			.shorthandName("VC")
 			.descriptions(
-				String.format("Passively, killing an enemy with melee or ability damage refreshes the cooldown of your abilities by %s second. Killing an Elite or Boss enemy instead resets the cooldown of your abilities.",
+				String.format("Passively, killing an enemy refreshes the cooldown of your abilities by %s second. Killing an Elite or Boss enemy instead resets the cooldown of your abilities.",
 					VICIOUS_COMBOS_COOL_1 / 20),
 				String.format("Killing an enemy now refreshes your ability cooldowns by %s seconds. Killing an Elite or Boss enemy inflicts nearby enemies within %s blocks with %s%% weaken and %s%% Vulnerability for %s seconds.",
 					VICIOUS_COMBOS_COOL_2 / 20,
