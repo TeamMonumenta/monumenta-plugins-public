@@ -154,6 +154,7 @@ public class PrismaticShield extends Ability {
 		if (isEnhanced()
 			    && Bukkit.getServer().getCurrentTick() <= mLastActivation + HEAL_DURATION
 			    && event.getAbility() != null
+			    && !event.getAbility().isFake()
 			    && event.getAbility() != ClassAbility.SPELLSHOCK
 			    && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
 			if (MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, HEALED_THIS_TICK_METAKEY)) {

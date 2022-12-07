@@ -207,7 +207,7 @@ public class SanguineHarvest extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null) {
+		if (event.getAbility() == null || event.getAbility().isFake()) {
 			return false;
 		}
 		EntityUtils.applyBleed(mPlugin, BLEED_DURATION, mBleedLevel, enemy);

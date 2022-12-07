@@ -99,7 +99,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		ClassAbility ability = event.getAbility();
-		if (ability == null) {
+		if (ability == null || ability.isFake()) {
 			return false;
 		}
 		mTicksToStackDecay = CharmManager.getDuration(mPlayer, CHARM_DECAY, DECAY_TIMER);

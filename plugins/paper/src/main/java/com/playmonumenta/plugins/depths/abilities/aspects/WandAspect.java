@@ -33,7 +33,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 		if (mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			if (event.getType() == DamageType.MELEE) {
 				event.setDamage(event.getDamage() + DAMAGE);
-			} else if (event.getAbility() != null) {
+			} else if (event.getAbility() != null && !event.getAbility().isFake()) {
 				double initialDamage = event.getDamage();
 
 				//Find out what the damage with full spell power would be here

@@ -126,7 +126,7 @@ public class AstralOmen extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getAbility() == null || event.getAbility() == mInfo.getLinkedSpell() || event.getAbility() == ClassAbility.SPELLSHOCK) {
+		if (event.getAbility() == null || event.getAbility().isFake() || event.getAbility() == mInfo.getLinkedSpell() || event.getAbility() == ClassAbility.SPELLSHOCK) {
 			return false;
 		}
 

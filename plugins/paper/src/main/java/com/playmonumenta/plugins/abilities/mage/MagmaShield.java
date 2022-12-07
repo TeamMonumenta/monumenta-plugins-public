@@ -45,6 +45,7 @@ public class MagmaShield extends Ability {
 	public static final float ENHANCEMENT_FIRE_DAMAGE_BONUS = 0.5f;
 	public static final float ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS = 0.35f;
 	public static final String ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireDamageBonus";
+	public static final String ENHANCEMENT_INFERNO_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldInfernoDamageBonus";
 	public static final String ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME = "MagmaShieldFireAbilityDamageBonus";
 	public static final int ENHANCEMENT_BONUS_DURATION = 6 * 20;
 
@@ -117,7 +118,7 @@ public class MagmaShield extends Ability {
 			if (isEnhanced()) {
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(DamageType.FIRE)));
-				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_DAMAGE_BONUS_EFFECT_NAME,
+				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_INFERNO_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_DAMAGE_BONUS, EnumSet.of(ClassAbility.INFERNO)));
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
