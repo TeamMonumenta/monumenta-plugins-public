@@ -153,7 +153,7 @@ public class Taboo extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mActive) {
 			if (oneSecond) {
-				double selfDamage = EntityUtils.getMaxHealth(mPlayer) * (PERCENT_HEALTH_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SELF_DAMAGE));
+				double selfDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_DAMAGE);
 				if (mPlayer.getHealth() > selfDamage) {
 					mPlayer.setHealth(mPlayer.getHealth() - selfDamage);
 					mPlayer.damage(0);
