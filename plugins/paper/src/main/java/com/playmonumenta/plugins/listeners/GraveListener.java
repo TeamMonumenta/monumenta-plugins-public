@@ -97,7 +97,7 @@ public class GraveListener implements Listener {
 	}
 
 	// handle cancelled events as we're only interested in the act of clicking/attacking the grave, and not whether the attack was successful
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Player player && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && GraveManager.isGrave(event.getEntity())) {
 			GraveManager.onInteract(player, event.getEntity());
