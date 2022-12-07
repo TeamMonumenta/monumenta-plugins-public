@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
@@ -315,6 +316,8 @@ public class ShulkerEquipmentListener implements Listener {
 				return;
 			}
 		}
+
+		StatTrackManager.getInstance().updateInventory(player);
 
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Equipment Swapped");
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);

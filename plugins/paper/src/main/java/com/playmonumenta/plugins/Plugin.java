@@ -37,6 +37,7 @@ import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
@@ -399,6 +400,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new InventoryUpdateListener(), this);
 		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
 		manager.registerEvents(new WalletManager(), this);
+		manager.registerEvents(StatTrackManager.getInstance(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(this), this);
