@@ -431,6 +431,39 @@ public class InventoryUtils {
 		return Collections.emptyList();
 	}
 
+	/**
+	 * Checks if the given inventory can fit all the passed-in items.
+	 * The passed list of items must not have duplicates! Overfull stacks are properly supported, however.
+	 */
+	public static boolean canFitInInventory(List<ItemStack> items, Inventory inventory) {
+		int[] remainingCount = items.stream().mapToInt(ItemStack::getAmount).toArray();
+		// first find existing stacks
+		for (ItemStack itemInInventory : inventory.getStorageContents()) {
+			if (itemInInventory == null) {
+				continue;
+			}
+			for (int i = 0; i < remainingCount.length; i++) {
+				ItemStack item = items.get(i);
+				if (itemInInventory.isSimilar(item)) {
+					remainingCount[i] -= Math.max(0, item.getMaxStackSize() - itemInInventory.getAmount());
+					break;
+				}
+			}
+		}
+		// then find empty slots
+		for (ItemStack itemInInventory : inventory.getStorageContents()) {
+			if (itemInInventory == null) {
+				for (int i = 0; i < remainingCount.length; i++) {
+					if (remainingCount[i] > 0) {
+						remainingCount[i] -= items.get(i).getMaxStackSize();
+						break;
+					}
+				}
+			}
+		}
+		return Arrays.stream(remainingCount).allMatch(i -> i <= 0);
+	}
+
 	public static boolean canFitInInventory(ItemStack item, Inventory inventory) {
 		int remainingCount = item.getAmount();
 
@@ -446,6 +479,20 @@ public class InventoryUtils {
 			}
 		}
 		return false;
+	}
+
+	public static int numCanFitInInventory(ItemStack item, Inventory inventory) {
+		int count = 0;
+
+		// getStorageContents excludes armor, offhand slots
+		for (ItemStack itemInInventory : inventory.getStorageContents()) {
+			if (itemInInventory == null) {
+				count += item.getMaxStackSize();
+			} else if (item.isSimilar(itemInInventory)) {
+				count += Math.max(0, item.getMaxStackSize() - itemInInventory.getAmount());
+			}
+		}
+		return count;
 	}
 
 	/**

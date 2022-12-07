@@ -56,7 +56,8 @@ public abstract class Gui {
 
 		List<HumanEntity> oldViewers = Collections.emptyList();
 		if (mSize != mCustomInventory.getInventory().getSize()
-			    || mTitleDirty) {
+			    || mTitleDirty
+			    || mCustomInventory.mDiscarded) {
 			oldViewers = new ArrayList<>(mCustomInventory.getInventory().getViewers());
 			mCustomInventory.discard();
 			mCustomInventory = new GuiCustomInventory(mSize, mTitle);
@@ -79,7 +80,7 @@ public abstract class Gui {
 	}
 
 	/**
-	 * Shows this GUI to the player.
+	 * Shows this GUI to the player. Can safely be called multiple times.
 	 */
 	public void open() {
 		update();
@@ -175,9 +176,10 @@ public abstract class Gui {
 
 	/**
 	 * Called when the player clicks in the GUI area. Only use this if {@link GuiItem#onClick(Consumer)} is not sufficient for your use case.
+	 * If this returns false, no item's onClick handler will be called.
 	 */
-	protected void onGuiClick(InventoryClickEvent event) {
-
+	protected boolean onGuiClick(InventoryClickEvent event) {
+		return true;
 	}
 
 	/**
@@ -210,13 +212,15 @@ public abstract class Gui {
 				return;
 			}
 			if (event.getClickedInventory() == mInventory) {
+				if (!onGuiClick(event)) {
+					return;
+				}
 				if (event.getSlot() < mItems.size()) {
 					GuiItem item = mItems.get(event.getSlot());
 					if (item != null) {
 						item.clicked(event);
 					}
 				}
-				onGuiClick(event);
 			} else if (event.getClickedInventory() != null) {
 				onPlayerInventoryClick(event);
 			}

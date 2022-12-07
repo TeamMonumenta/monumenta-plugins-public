@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -137,5 +138,10 @@ public interface VersionAdapter {
 	void mobAIChanges(Mob entity);
 
 	Object toVanillaChatComponent(Component component);
+
+	/**
+	 * @return Whether the given item stacks refer to the same vanilla stack. Can e.g. be used to test if an item is still in an inventory, and not just an exact copy.
+	 */
+	boolean isSameItem(ItemStack item1, ItemStack item2);
 
 }

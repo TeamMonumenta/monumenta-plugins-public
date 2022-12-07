@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.overrides.LimeTesseractOverride;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -21,7 +20,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class PickLevelAfterAnvils extends GenericCommand {
 
@@ -49,55 +47,39 @@ public class PickLevelAfterAnvils extends GenericCommand {
 
 	public static void run(Player target) {
 		SignUtils.Menu menu = SignUtils.newMenu(
-				new ArrayList<String>(Arrays.asList("", "~~~~~~~~~~~", "Input total", "levels to keep.")))
+				Arrays.asList("", "~~~~~~~~~~~", "Input total", "levels to keep."))
 			.reopenIfFail(false)
 			.response((player, strings) -> {
 				int inputVal;
 				try {
 					inputVal = Integer.parseInt(strings[0]);
 				} catch (Exception e) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							player.sendMessage(Component.text(FAILURE, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-						}
-					}.runTaskLater(Plugin.getInstance(), 2);
+					player.sendMessage(Component.text(FAILURE, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 					return true;
 				}
 				if (inputVal >= 1 && player.getLevel() >= inputVal) {
-					final int finalInputVal = inputVal;
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							int currentXp = ExperienceUtils.getTotalExperience(player);
-							int anvilsCreated = (currentXp - ExperienceUtils.getTotalExperience(finalInputVal)) / XP_PER_ANVIL;
-							if (anvilsCreated <= 0) {
-								player.sendMessage(Component.text("The levels between your current level and the requested level will not be enough to create an anvil.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-								return;
-							}
-							ExperienceUtils.setTotalExperience(player, currentXp - (anvilsCreated * XP_PER_ANVIL));
-							ItemStack mainHand = player.getInventory().getItemInMainHand();
-							if (ItemStatUtils.isUpgradedLimeTesseract(mainHand)) {
-								player.sendMessage(Component.text("The tesseract pulls from your intellect and gains " + anvilsCreated + " anvil charges.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-								ItemStatUtils.setCharges(mainHand, ItemStatUtils.getCharges(mainHand) + anvilsCreated);
-								ItemStatUtils.generateItemStats(mainHand);
-							} else {
-								if (LimeTesseractOverride.isAnyLimeTesseract(mainHand)) {
-									player.sendMessage(Component.text("The tesseract pulls from your intellect, and gives you " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-								} else {
-									player.sendMessage(Component.text("You have been given " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
-								}
-								InventoryUtils.giveItemFromLootTable(player, ANVIL_TABLE, anvilsCreated);
-							}
+					int currentXp = ExperienceUtils.getTotalExperience(player);
+					int anvilsCreated = (currentXp - ExperienceUtils.getTotalExperience(inputVal)) / XP_PER_ANVIL;
+					if (anvilsCreated <= 0) {
+						player.sendMessage(Component.text("The levels between your current level and the requested level will not be enough to create an anvil.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+						return true;
+					}
+					ExperienceUtils.setTotalExperience(player, currentXp - (anvilsCreated * XP_PER_ANVIL));
+					ItemStack mainHand = player.getInventory().getItemInMainHand();
+					if (ItemStatUtils.isUpgradedLimeTesseract(mainHand)) {
+						player.sendMessage(Component.text("The tesseract pulls from your intellect and gains " + anvilsCreated + " anvil charges.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+						ItemStatUtils.setCharges(mainHand, ItemStatUtils.getCharges(mainHand) + anvilsCreated);
+						ItemStatUtils.generateItemStats(mainHand);
+					} else {
+						if (LimeTesseractOverride.isAnyLimeTesseract(mainHand)) {
+							player.sendMessage(Component.text("The tesseract pulls from your intellect, and gives you " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
+						} else {
+							player.sendMessage(Component.text("You have been given " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 						}
-					}.runTaskLater(Plugin.getInstance(), 2);
+						InventoryUtils.giveItemFromLootTable(player, ANVIL_TABLE, anvilsCreated);
+					}
 				} else {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							player.sendMessage(Component.text(FAILURE, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-						}
-					}.runTaskLater(Plugin.getInstance(), 2);
+					player.sendMessage(Component.text(FAILURE, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 				}
 				return true;
 			});

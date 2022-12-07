@@ -217,7 +217,7 @@ public class AuditListener implements Listener {
 	/* Format:
 	 * (stick 64 "Item Name" ["monumenta:loot_table", (x), (y), (z)])
 	 */
-	private String getItemLogString(@Nullable ItemStack item) {
+	public static String getItemLogString(@Nullable ItemStack item) {
 		if (item == null) {
 			return "";
 		}

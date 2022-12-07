@@ -1084,7 +1084,7 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Properly clones an item stack. The default clone method does not clone NBT, which can lead to issues.
+	 * Properly clones an item stack. The default clone method does not completely clone all NBT, which can lead to issues.
 	 *
 	 * @param itemStack The item stack to be cloned, may be null
 	 * @return A completely new item stack that is a clone of the original item stack
@@ -1093,6 +1093,20 @@ public class ItemUtils {
 		if (itemStack == null) {
 			return null;
 		}
+
+		// NBT doesn't support arbitrary item stacks amounts, so we need to handle this ourselves
+		int amount = itemStack.getAmount();
+		if (amount < 0 || amount > 64) {
+			try {
+				itemStack.setAmount(1);
+				ItemStack clone = NBTItem.convertNBTtoItem(NBTItem.convertItemtoNBT(itemStack));
+				clone.setAmount(amount);
+				return clone;
+			} finally {
+				itemStack.setAmount(amount);
+			}
+		}
+
 		return NBTItem.convertNBTtoItem(NBTItem.convertItemtoNBT(itemStack));
 	}
 
@@ -1101,6 +1115,10 @@ public class ItemUtils {
 	 */
 	public static ItemStack parseItemStack(String nbtMojangson) {
 		return NBTItem.convertNBTtoItem(new NBTContainer(nbtMojangson));
+	}
+
+	public static String serializeItemStack(ItemStack itemStack) {
+		return NBTItem.convertItemtoNBT(itemStack).toString();
 	}
 
 	/**

@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -126,5 +127,10 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public Object toVanillaChatComponent(Component component) {
 		return null;
+	}
+
+	@Override
+	public boolean isSameItem(ItemStack item1, ItemStack item2) {
+		return item1 == item2;
 	}
 }

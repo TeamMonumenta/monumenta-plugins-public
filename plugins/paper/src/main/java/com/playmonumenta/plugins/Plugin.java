@@ -34,6 +34,7 @@ import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
@@ -74,6 +75,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -237,6 +239,7 @@ public class Plugin extends JavaPlugin {
 		AbsorptionCommand.register();
 		SetActivity.register(this);
 		SetMasterwork.register();
+		WalletManager.registerCommand();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -393,6 +396,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(PortalManager.getInstance(), this);
 		manager.registerEvents(new LootingLimiter(), this);
 		manager.registerEvents(new InventoryUpdateListener(), this);
+		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+		manager.registerEvents(new WalletManager(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(this), this);

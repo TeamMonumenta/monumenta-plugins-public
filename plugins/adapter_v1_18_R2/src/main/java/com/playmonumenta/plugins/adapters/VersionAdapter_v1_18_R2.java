@@ -51,6 +51,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.CaveSpider;
@@ -497,4 +498,10 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		return Component.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
 	}
 
+	@Override
+	public boolean isSameItem(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2) {
+		return item1 == item2
+			       || item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
+				          && craftItem1.handle == craftItem2.handle;
+	}
 }

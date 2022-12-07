@@ -143,7 +143,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	};
 
 	private static final int REGION_SETTING_SLOT = 4;
-	private static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
+	public static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
 		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
 		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
 		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Calculation Region: Architect\\\\u0027s Ring\"}'}}}")

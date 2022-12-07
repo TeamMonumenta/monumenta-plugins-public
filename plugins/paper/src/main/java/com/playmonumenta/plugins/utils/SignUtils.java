@@ -14,13 +14,13 @@ import com.google.gson.JsonElement;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,7 +29,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public final class SignUtils {
 
@@ -39,13 +38,13 @@ public final class SignUtils {
 
 	private final Plugin mPlugin;
 
-	private final Map<Player, Menu> mInputs;
+	private final ConcurrentHashMap<Player, Menu> mInputs;
 	private static @Nullable SignUtils INSTANCE = null;
 
 	public SignUtils(Plugin plugin) {
 		INSTANCE = this;
 		mPlugin = plugin;
-		mInputs = new HashMap<>();
+		mInputs = new ConcurrentHashMap<>();
 		listen();
 	}
 
@@ -88,25 +87,19 @@ public final class SignUtils {
 				}
 				event.setCancelled(true);
 
-				boolean success = menu.mResponse != null && menu.mResponse.test(player, event.getPacket().getStringArrays().read(0));
+				// This event handler is called asynchronously. Execute the rest of the code on the main thread via runTask()
+				Bukkit.getScheduler().runTask(plugin, () -> {
+					boolean success = menu.mResponse != null && menu.mResponse.test(player, event.getPacket().getStringArrays().read(0));
 
-				if (!success && menu.mReopenIfFail && !menu.mForceClose) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							menu.open(player);
-						}
-					}.runTaskLater(plugin, 2);
-				}
-				new BukkitRunnable() {
-					@Override
-					public void run() {
+					if (!success && menu.mReopenIfFail && !menu.mForceClose) {
+						menu.open(player);
+					} else {
 						if (player.isOnline() && menu.mPosition != null) {
 							Location location = menu.mPosition.toLocation(player.getWorld());
 							player.sendBlockChange(location, location.getBlock().getBlockData());
-				        }
+						}
 					}
-				}.runTaskLater(plugin, 2);
+				});
 			}
 		});
 	}
@@ -146,28 +139,23 @@ public final class SignUtils {
 			mAllowColor = allowColor;
 			reopenIfFail(false);
 			response((respondingPlayer, updatedLines) -> {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						BlockState updatedBlockState = signBlock.getState();
-						if (!(updatedBlockState instanceof Sign updatedSign)) {
-							return;
+				BlockState updatedBlockState = signBlock.getState();
+				if (!(updatedBlockState instanceof Sign updatedSign)) {
+					return true;
+				} else {
+					CoreProtectIntegration.logRemoval(player, signBlock);
+					for (int lineNum = 0; lineNum < updatedLines.length; ++lineNum) {
+						Component lineComponent;
+						if (allowColor) {
+							lineComponent = MessagingUtils.LEGACY_SERIALIZER.deserialize(updatedLines[lineNum]);
 						} else {
-							CoreProtectIntegration.logRemoval(player, signBlock);
-							for (int lineNum = 0; lineNum < updatedLines.length; ++lineNum) {
-								Component lineComponent;
-								if (allowColor) {
-									lineComponent = MessagingUtils.LEGACY_SERIALIZER.deserialize(updatedLines[lineNum]);
-								} else {
-									lineComponent = MessagingUtils.PLAIN_SERIALIZER.deserialize(updatedLines[lineNum]);
-								}
-								updatedSign.line(lineNum, lineComponent);
-							}
-							updatedSign.update();
-							CoreProtectIntegration.logPlacement(player, signBlock);
+							lineComponent = MessagingUtils.PLAIN_SERIALIZER.deserialize(updatedLines[lineNum]);
 						}
+						updatedSign.line(lineNum, lineComponent);
 					}
-				}.runTask(mPlugin);
+					updatedSign.update();
+					CoreProtectIntegration.logPlacement(player, signBlock);
+				}
 				return true;
 			});
 			open(player, signBlock);
@@ -178,6 +166,10 @@ public final class SignUtils {
 			return this;
 		}
 
+		/**
+		 * Define what happens when the user closes the sign GUI.
+		 * If the passed function returns false and {@link #reopenIfFail(boolean)} is set to true, the GUI will be opened again.
+		 */
 		public Menu response(BiPredicate<Player, String[]> response) {
 			mResponse = response;
 			return this;

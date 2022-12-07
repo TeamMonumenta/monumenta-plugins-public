@@ -142,8 +142,10 @@ public class CommandUtils {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
 
-	// returns the sender as Player, if that sender is a player instance, or a proxied player
-	// returns null otherwise
+	/**
+	 * Returns the sender as Player, if that sender is a player instance, or a proxied player.
+	 * Fails with an error message if not executed by/as a player.
+	 */
 	public static Player getPlayerFromSender(CommandSender sender) throws WrapperCommandSyntaxException {
 		if (sender instanceof Player) {
 			return ((Player) sender);

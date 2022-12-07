@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -288,10 +289,10 @@ public class ItemStatUtils {
 		WILLOWSKIN("willowskin", Component.text("Storied Skin", TextColor.fromHexString("#006400")).decoration(TextDecoration.ITALIC, false)),
 		EPHEMERAL("ephemeral", Component.text("Ephemeral Corridors", TextColor.fromHexString("#8B0000")).decoration(TextDecoration.ITALIC, false)),
 		EPHEMERAL_ENHANCEMENTS("ephemeralenhancements", Component.text("Ephemeral Enhancements", TextColor.fromHexString("#8B0000")).decoration(TextDecoration.ITALIC, false)),
+		REVERIE("reverie", Component.text("Malevolent Reverie", TextColor.fromHexString("#790E47")).decoration(TextDecoration.ITALIC, false)),
 		SANCTUM("sanctum", Component.text("Forsworn Sanctum", TextColor.fromHexString("#52AA00")).decoration(TextDecoration.ITALIC, false)),
 		VERDANT("verdant", Component.text("Verdant Remnants", TextColor.fromHexString("#158315")).decoration(TextDecoration.ITALIC, false)),
 		VERDANTSKIN("verdantskin", Component.text("Threadwarped Skin", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false)),
-		REVERIE("reverie", Component.text("Malevolent Reverie", TextColor.fromHexString("#790E47")).decoration(TextDecoration.ITALIC, false)),
 		AZACOR("azacor", Component.text("Azacor's Malice", TextColor.fromHexString("#FF6F55")).decoration(TextDecoration.ITALIC, false)),
 		KAUL("kaul", Component.text("Kaul's Judgment", TextColor.fromHexString("#00AA00")).decoration(TextDecoration.ITALIC, false)),
 		DIVINE("divine", Component.text("Divine Skin", TextColor.fromHexString("#C6EFF1")).decoration(TextDecoration.ITALIC, false)),
@@ -314,10 +315,10 @@ public class ItemStatUtils {
 		TREASURE("treasure", Component.text("Treasures of Viridia", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
 		INTELLECT("intellect", Component.text("Intellect Crystallizer", TextColor.fromHexString("#82DB17")).decoration(TextDecoration.ITALIC, false)),
 		DELVES("delves", Component.text("Dungeon Delves", TextColor.fromHexString("#B47028")).decoration(TextDecoration.ITALIC, false)),
+		MYTHIC("mythic", Component.text("Mythic Reliquary", TextColor.fromHexString("#C4971A")).decoration(TextDecoration.ITALIC, false)),
 		CARNIVAL("carnival", Component.text("Floating Carnival", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
 		LOWTIDE("lowtide", Component.text("Lowtide Smuggler", TextColor.fromHexString("#196383")).decoration(TextDecoration.ITALIC, false)),
 		DOCKS("docks", Component.text("Expedition Docks", TextColor.fromHexString("#196383")).decoration(TextDecoration.ITALIC, false)),
-		MYTHIC("mythic", Component.text("Mythic Reliquary", TextColor.fromHexString("#C4971A")).decoration(TextDecoration.ITALIC, false)),
 		VALENTINE("valentine", Component.text("Valentine Event", TextColor.fromHexString("#FF7F7F")).decoration(TextDecoration.ITALIC, false)),
 		VALENTINESKIN("valentineskin", Component.text("Valentine Skin", TextColor.fromHexString("#FF7F7F")).decoration(TextDecoration.ITALIC, false)),
 		APRILFOOLS("aprilfools", Component.text("April Fools Event", TextColor.fromHexString("#D22AD2")).decoration(TextDecoration.ITALIC, false)),
@@ -2243,6 +2244,10 @@ public class ItemStatUtils {
 				lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 					         .append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			}
+		}
+
+		if (CustomContainerItemManager.isCustomContainerItem(item)) {
+			CustomContainerItemManager.generateDescription(monumenta, lore::add);
 		}
 
 		if (isUpgradedLimeTesseract(item)) {

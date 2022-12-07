@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.custominventories;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -8,7 +7,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -27,7 +25,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class PEBCustomInventory extends CustomInventory {
@@ -519,39 +516,24 @@ public class PEBCustomInventory extends CustomInventory {
 
 	private void openPickupThresholdSignUI() {
 		SignUtils.Menu menu = SignUtils.newMenu(
-				new ArrayList<>(Arrays.asList("", "~~~~~~~~~~~", "Input a number", "from 1-65 above.")))
-			.reopenIfFail(false)
-			.response((player, strings) -> {
-				int inputVal;
-				try {
-					inputVal = Integer.parseInt(strings[0]);
-				} catch (Exception e) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							player.sendMessage("Input is not an integer.");
-						}
-					}.runTaskLater(Plugin.getInstance(), 2);
-					return false;
-				}
-				if (inputVal >= 1 && inputVal <= 65) {
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-								player.performCommand("pickup threshold " + strings[0]);
-							}
-						}.runTaskLater(Plugin.getInstance(), 2);
-					    return false;
-					} else {
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								player.sendMessage("Input is not with the bounds of 1 - 65.");
-							}
-						}.runTaskLater(Plugin.getInstance(), 2);
-					}
-					return true;
-	            });
+				Arrays.asList("", "~~~~~~~~~~~", "Input a number", "from 1-65 above."))
+			                      .reopenIfFail(false)
+			                      .response((player, strings) -> {
+				                      int inputVal;
+				                      try {
+					                      inputVal = Integer.parseInt(strings[0]);
+				                      } catch (Exception e) {
+					                      player.sendMessage("Input is not an integer.");
+					                      return false;
+				                      }
+				                      if (inputVal >= 1 && inputVal <= 65) {
+					                      player.performCommand("pickup threshold " + strings[0]);
+					                      return false;
+				                      } else {
+					                      player.sendMessage("Input is not with the bounds of 1 - 65.");
+				                      }
+				                      return true;
+			                      });
 
 		menu.open(mPlayer);
 	}
