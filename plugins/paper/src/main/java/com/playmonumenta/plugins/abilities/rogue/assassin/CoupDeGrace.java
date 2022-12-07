@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,8 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 /*
  * Coup De Grâce: If you melee attack a normal enemy and that attack
@@ -66,25 +65,19 @@ public class CoupDeGrace extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
-			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH || event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.QUAKE)) {
-			for (PotionEffect effect : enemy.getActivePotionEffects()) {
-				if (effect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE) && effect.getAmplifier() >= 4) {
-					return false;
-				}
-			}
-
-			double maxHealth = EntityUtils.getMaxHealth(enemy);
-			if (EntityUtils.isElite(enemy)) {
-				if (enemy.getHealth() - event.getFinalDamage(true) < maxHealth * mEliteThreshold) {
+			    && !EntityUtils.isBoss(enemy)
+			    && !DamageUtils.isImmuneToDamage(enemy)
+			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH
+				        || event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.SKIRMISHER)) {
+			// Cannot currently get the real final damage, as some effects like vulnerability will modify it later.
+			// Thus, just check the mob's health a tick later.
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				if (enemy.isValid() && enemy.getHealth() < EntityUtils.getMaxHealth(enemy) * (EntityUtils.isElite(enemy) ? mEliteThreshold : mNormalThreshold)) {
 					execute(enemy);
 				}
-			} else if (!EntityUtils.isBoss(enemy)) {
-				if (enemy.getHealth() - event.getFinalDamage(true) < maxHealth * mNormalThreshold) {
-					execute(enemy);
-				}
-			}
+			});
 		}
-		return false; // only increases event damage, thus no recursion
+		return false;
 	}
 
 	private void execute(LivingEntity le) {
