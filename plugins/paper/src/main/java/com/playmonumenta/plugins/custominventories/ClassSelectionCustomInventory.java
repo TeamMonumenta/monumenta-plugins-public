@@ -73,7 +73,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public ClassSelectionCustomInventory(Player player, boolean fromYellowTess) {
 		super(player, 54, "Class Selection GUI");
 		mFromYellowTess = fromYellowTess;
-		mWasYellowTessOnCooldown = fromYellowTess && ScoreboardUtils.getScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE) > 0;
+		mWasYellowTessOnCooldown = fromYellowTess && YellowTesseractOverride.getCooldown(player) > 0;
 		makeClassSelectPage(player);
 	}
 
@@ -515,7 +515,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	private void updateYellowTessCooldown(Player player) {
 		if (mFromYellowTess
 			    && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
-			ScoreboardUtils.setScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE, 5);
+			YellowTesseractOverride.setCooldown(player, 5);
 			if (mWasYellowTessOnCooldown) {
 				Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 			}

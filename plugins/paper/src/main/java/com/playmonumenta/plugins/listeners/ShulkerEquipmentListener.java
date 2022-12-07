@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -223,10 +222,10 @@ public class ShulkerEquipmentListener implements Listener {
 
 					// Shares Yellow Tesseract cooldown
 					boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5);
-					int yellowCooldown = ScoreboardUtils.getScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE).orElse(0);
+					int yellowCooldown = YellowTesseractOverride.getCooldown(player);
 					// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
 					if (safeZone && yellowCooldown > 0) {
-						ScoreboardUtils.setScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE, 0);
+						YellowTesseractOverride.setCooldown(player, 0);
 						yellowCooldown = 0;
 					}
 
@@ -238,7 +237,7 @@ public class ShulkerEquipmentListener implements Listener {
 							                   .append(Component.text(ChatColor.AQUA + " (Skill CD: " + ChatColor.YELLOW + "" + yellowCooldown + "" + ChatColor.AQUA + " mins)")));
 						mPlugin.mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
-						ScoreboardUtils.setScoreboardValue(player, YellowTesseractOverride.COOLDOWN_SCORE, 3);
+						YellowTesseractOverride.setCooldown(player, 3);
 					}
 
 					swapVanity(player, sboxItem);

@@ -44,7 +44,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class YellowTesseractOverride extends BaseOverride {
 
-	public static final String COOLDOWN_SCORE = "YellowCooldown";
+	private static final String COOLDOWN_SCORE = "YellowCooldown";
 
 	private static final TextComponent TESSERACT_NAME = Component.text("Tesseract of the Elements", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
 	private static final TextComponent CONFIGURED = Component.text("Tesseract of the Elements - Configured", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
@@ -93,9 +93,9 @@ public class YellowTesseractOverride extends BaseOverride {
 				return false;
 			}
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
-				ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, 0);
+				setCooldown(player, 0);
 			}
-			if (ScoreboardUtils.getScoreboardValue(player, COOLDOWN_SCORE).orElse(0) > 0) {
+			if (getCooldown(player) > 0) {
 				player.sendMessage(Component.text("Warning: Your Yellow Tesseract is on cooldown! You will be silenced if you perform any changes to your skills.", NamedTextColor.YELLOW));
 			}
 			new ClassSelectionCustomInventory(player, true).openInventory(player, Plugin.getInstance());
@@ -137,10 +137,10 @@ public class YellowTesseractOverride extends BaseOverride {
 			/* Active and soulbound to player */
 			if ((action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK))) {
 				boolean safeZone = ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5);
-				int cd = ScoreboardUtils.getScoreboardValue(player, COOLDOWN_SCORE).orElse(0);
+				int cd = getCooldown(player);
 				// If the player is in a safezone and the Tesseract is on CD, remove CD and continue.
 				if (safeZone && cd > 0) {
-					ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, 0);
+					setCooldown(player, 0);
 					cd = 0;
 				}
 				// If there's a mob in range and the player isn't in a safezone,
@@ -194,7 +194,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
 
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
-			ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, 5);
+			setCooldown(player, 5);
 		}
 	}
 
@@ -399,4 +399,14 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		return true;
 	}
+
+	public static int getCooldown(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, COOLDOWN_SCORE).orElse(0);
+	}
+
+	public static void setCooldown(Player player, int minutes) {
+		ScoreboardUtils.setScoreboardValue(player, COOLDOWN_SCORE, minutes);
+		player.setCooldown(Material.YELLOW_STAINED_GLASS, minutes * 60 * 20);
+	}
+
 }
