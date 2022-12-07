@@ -90,8 +90,14 @@ public class SandsOfTime extends Spell {
 		Collections.shuffle(bools);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
+			boolean mComplete = false;
+
 			@Override
 			public void run() {
+				if (mComplete) {
+					return;
+				}
+
 				int time = mChargeUp.getTime();
 				if (time % mBellTime == 0 && time < 4 * mBellTime) {
 					int i = time / mBellTime;
@@ -134,19 +140,17 @@ public class SandsOfTime extends Spell {
 						}
 					}
 
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						mBoss.setAI(true);
-						mBoss.setGravity(true);
-					}, BLUE_DELAY);
+					Bukkit.getScheduler().runTaskLater(plugin, this::cancel, BLUE_DELAY);
 
 					mChargeUp.reset();
-					this.cancel();
+					mComplete = true;
 				}
 			}
 
 			@Override
 			public synchronized void cancel() {
 				super.cancel();
+				mChargeUp.reset();
 				mBoss.setAI(true);
 				mBoss.setGravity(true);
 			}
