@@ -42,7 +42,7 @@ public class SpellHailstorm extends Spell {
 	private final Location mStartLoc;
 	private boolean mAttack = false;
 	private final double mRadius;
-	private final List<Player> mWarned = new ArrayList<Player>();
+	private final List<Player> mWarned = new ArrayList<>();
 	private final Map<Player, BukkitRunnable> mDamage = new HashMap<>();
 	private final PPCircle mInnerCircle;
 	private final PPCircle mOuterCircle;
@@ -106,6 +106,12 @@ public class SpellHailstorm extends Spell {
 
 					@Override
 					public void run() {
+						if (player.isDead() || mBoss.isDead() || !mBoss.isValid()) {
+							mDamage.remove(player);
+							this.cancel();
+							return;
+						}
+
 						if (mTicks <= 10) {
 							player.playSound(player.getLocation(), Sound.ENTITY_SNOW_GOLEM_HURT, SoundCategory.HOSTILE, 1, mPitch);
 						}
@@ -118,11 +124,6 @@ public class SpellHailstorm extends Spell {
 						}
 
 						if (mTicks >= 10 && mTicks % 10 == 0) {
-							if (player.isDead() || mBoss.isDead() || !mBoss.isValid() || player.getGameMode() == GameMode.CREATIVE) {
-								mDamage.remove(player);
-								this.cancel();
-							}
-
 							Location loc = mBoss.getLocation();
 							Location pLocY = player.getLocation();
 							pLocY.setY(loc.getY());

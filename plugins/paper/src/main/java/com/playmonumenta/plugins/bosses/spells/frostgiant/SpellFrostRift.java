@@ -227,7 +227,7 @@ public class SpellFrostRift extends Spell {
 				if (mT >= 20 * 18 || mRemoveLines) {
 					this.cancel();
 					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
-						if (e.getKey().getBlock().getType() != Material.AIR) {
+						if (e.getKey().getBlock().getType() == Material.BLACKSTONE) {
 							e.getKey().getBlock().setType(e.getValue());
 							if (oldData.containsKey(e.getKey())) {
 								e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
