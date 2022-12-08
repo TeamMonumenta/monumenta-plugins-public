@@ -22,12 +22,14 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -138,14 +140,15 @@ public class JudgementChain extends Ability {
 	}
 
 	public void passDamage(DamageEvent event) {
-		if (mChainActive && mTarget != null) {
+		if (mChainActive && mTarget != null && event.getAbility() != ClassAbility.COUP_DE_GRACE) {
 			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
 			e.remove(mTarget);
 			e.removeIf(entity -> mPlugin.mEffectManager.hasEffect(entity, EFFECT_NAME));
+			e.removeIf(entity -> ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG));
 			LivingEntity selectedEnemy = EntityUtils.getNearestMob(mTarget.getLocation(), e);
 			double damage = event.getDamage();
 
-			if (selectedEnemy != null && event.getAbility() != ClassAbility.COUP_DE_GRACE) {
+			if (selectedEnemy != null) {
 				if (event.getAbility() != null && event.getSource() instanceof Player p) {
 					mDamageInTick.computeIfAbsent(p, key -> new HashMap<>()).computeIfAbsent(event.getAbility(), key -> new ArrayList<>()).add(event);
 					if (!mRunDamageNextTick) {
@@ -195,7 +198,7 @@ public class JudgementChain extends Ability {
 		World world = mPlayer.getWorld();
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, (int) range, false, true, true);
+		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, (int) range, false, true, true, m -> ScoreboardUtils.checkTag(m, AbilityUtils.IGNORE_TAG));
 		if (e != null && !EntityUtils.isBoss(e) && EntityUtils.isHostileMob(e)) {
 			mTarget = e;
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);

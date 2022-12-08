@@ -385,6 +385,10 @@ public class EntityUtils {
 	}
 
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
+		return getEntityAtCursor(player, range, targetPlayers, targetNonPlayers, checkLos, null);
+	}
+
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, @Nullable Predicate<Entity> ignoreIf) {
 		List<Entity> en = player.getNearbyEntities(range, range, range);
 		ArrayList<LivingEntity> entities = new ArrayList<>();
 		for (Entity e : en) {
@@ -397,8 +401,12 @@ public class EntityUtils {
 			}
 		}
 
+		if (ignoreIf != null) {
+			entities.removeIf(ignoreIf);
+		}
+
 		//  If there's no living entities nearby then we should just leave as there's no reason to continue.
-		if (entities.size() == 0) {
+		if (entities.isEmpty()) {
 			return null;
 		}
 
