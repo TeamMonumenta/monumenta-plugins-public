@@ -13,6 +13,9 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -22,14 +25,14 @@ import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlaceholderAPIIntegration extends PlaceholderExpansion {
-	Plugin mPlugin;
-	boolean mIsPlay;
+	private static final Pattern SHARD_NUMBER_PATTERN = Pattern.compile("(?:-|^dev)(\\d+)$");
+
+	private final Plugin mPlugin;
 
 	public PlaceholderAPIIntegration(Plugin plugin) {
 		super();
 		plugin.getLogger().info("Enabling PlaceholderAPI integration");
 		mPlugin = plugin;
-		mIsPlay = Plugin.IS_PLAY_SERVER;
 	}
 
 	@Override
@@ -55,6 +58,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 	@Override
 	public @Nullable String onPlaceholderRequest(Player player, String identifier) {
 
+		// -------------------------  player-independent placeholders -------------------------
+
 		if (identifier.startsWith("loot_table:")) {
 			String lootTable = identifier.substring("loot_table:".length());
 			ItemStack item = InventoryUtils.getItemFromLootTable(Bukkit.getWorlds().get(0).getSpawnLocation(), NamespacedKeyUtils.fromString(lootTable));
@@ -65,54 +70,28 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 			}
 		}
 
-		if (player == null) {
-			return "";
-		}
-
-		// %monumenta_class%
-		if (identifier.equalsIgnoreCase("class")) {
-			return AbilityUtils.getClass(player);
-		}
-
-		// %monumenta_level%
-		if (identifier.equalsIgnoreCase("level")) {
-			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
-			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
-			return Integer.toString(AbilityUtils.getEffectiveTotalSkillPoints(player) +
-				                        AbilityUtils.getEffectiveTotalSpecPoints(player) +
-				                        ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
-				                        charmPower);
-		}
-
 		if (identifier.equalsIgnoreCase("shard")) {
-			String shard = ServerProperties.getShardName();
-
-			String worldName = player.getWorld().getName();
-			String mask = "Project_Epic-";
-			if (worldName.startsWith(mask)) {
-				return worldName.substring(mask.length());
-			}
-			return shard;
+			return ServerProperties.getShardName();
 		}
 
-		//Player equipped title
-		if (identifier.equalsIgnoreCase("title")) {
-			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
-			if (title != null) {
-				return title.getName() + " ";
-			} else {
-				return "";
+		if (identifier.equalsIgnoreCase("shard_number")) {
+			String fullShardName = PlaceholderAPI.setPlaceholders(null, "%network-relay_shard%");
+			// actual shard numbers except for dev shards (for testing)
+			Matcher matcher = SHARD_NUMBER_PATTERN.matcher(fullShardName);
+			if (matcher.find()) {
+				return matcher.group(1);
 			}
+			return "1";
 		}
 
 		if (identifier.startsWith("shrineicon")) {
 			String shrineType = identifier.substring("shrineicon_".length());
 			if ((shrineType.equalsIgnoreCase("Speed") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D1Finished").orElse(0) > 1) ||
-				(shrineType.equalsIgnoreCase("Resistance") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D3Finished").orElse(0) > 1) ||
-				(shrineType.equalsIgnoreCase("Strength") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D4Finished").orElse(0) > 1) ||
-				(shrineType.equalsIgnoreCase("Intuitive") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D5Finished").orElse(0) > 1) ||
-				(shrineType.equalsIgnoreCase("Thrift") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D6Finished").orElse(0) > 1) ||
-				(shrineType.equalsIgnoreCase("Harvester") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D7Finished").orElse(0) > 1)) {
+				    (shrineType.equalsIgnoreCase("Resistance") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D3Finished").orElse(0) > 1) ||
+				    (shrineType.equalsIgnoreCase("Strength") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D4Finished").orElse(0) > 1) ||
+				    (shrineType.equalsIgnoreCase("Intuitive") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D5Finished").orElse(0) > 1) ||
+				    (shrineType.equalsIgnoreCase("Thrift") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D6Finished").orElse(0) > 1) ||
+				    (shrineType.equalsIgnoreCase("Harvester") && ScoreboardUtils.getScoreboardValue("$PatreonShrine", "D7Finished").orElse(0) > 1)) {
 				return "active";
 			}
 			return "inactive";
@@ -169,6 +148,37 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 				} else {
 					return ChatColor.DARK_GREEN + "Harvester" + ChatColor.WHITE + " is not active.";
 				}
+			}
+		}
+
+		// -------------------------  player-dependent placeholders -------------------------
+
+		if (player == null) {
+			return "";
+		}
+
+		// %monumenta_class%
+		if (identifier.equalsIgnoreCase("class")) {
+			return AbilityUtils.getClass(player);
+		}
+
+		// %monumenta_level%
+		if (identifier.equalsIgnoreCase("level")) {
+			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
+			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
+			return Integer.toString(AbilityUtils.getEffectiveTotalSkillPoints(player) +
+				                        AbilityUtils.getEffectiveTotalSpecPoints(player) +
+				                        ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
+				                        charmPower);
+		}
+
+		//Player equipped title
+		if (identifier.equalsIgnoreCase("title")) {
+			Cosmetic title = CosmeticsManager.getInstance().getActiveCosmetic(player, CosmeticType.TITLE);
+			if (title != null) {
+				return title.getName() + " ";
+			} else {
+				return "";
 			}
 		}
 
