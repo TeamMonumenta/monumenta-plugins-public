@@ -9,8 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class SpellSpawnMobs extends Spell {
-	public static final int MOB_DETECTION_RADIUS = 10;
-	public static final int DEFAULT_MOB_CAP = 15;
+	public static final int DEFAULT_MOB_CAP_RADIUS = 10;
 
 	private final int mSummonRange;
 	private final int mMinSummonRange;
@@ -18,10 +17,15 @@ public class SpellSpawnMobs extends Spell {
 	private final String mSummonName;
 	private final int mSpawns;
 	private final int mMobCap;
+	private final int mMobCapRange;
 
 	private final LivingEntity mBoss;
 
 	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range, int minrange, int mobcap) {
+		this(boss, spawns, losname, cooldown, range, minrange, mobcap, DEFAULT_MOB_CAP_RADIUS);
+	}
+
+	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range, int minrange, int mobcap, int mobcaprange) {
 		mBoss = boss;
 		mSummonRange = range;
 		mMinSummonRange = minrange;
@@ -29,6 +33,7 @@ public class SpellSpawnMobs extends Spell {
 		mSummonName = losname;
 		mSpawns = spawns;
 		mMobCap = mobcap;
+		mMobCapRange = mobcaprange;
 	}
 
 	@Override
@@ -57,7 +62,7 @@ public class SpellSpawnMobs extends Spell {
 
 	@Override
 	public boolean canRun() {
-		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), MOB_DETECTION_RADIUS).size() > mMobCap) {
+		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap) {
 			return false;
 		}
 		return true;
