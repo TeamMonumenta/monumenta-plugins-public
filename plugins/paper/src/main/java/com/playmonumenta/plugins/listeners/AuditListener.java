@@ -42,49 +42,29 @@ public class AuditListener implements Listener {
 		// ScriptedQuests
 		exactOptionalArguments("(scriptedquests:)?questtrigger"),
 		exactOptionalArguments("(minecraft:)?clickable"),
+		exactOptionalArguments("(minecraft:)?leaderboard(?! update)"),
+		exactOptionalArguments("(minecraft:)?waypoint"),
 
 		// MonumentaNetworkChat
 		exactOptionalArguments("help"),
-		exactOptionalArguments("(minecraft:)?ch help"),
-		exactOptionalArguments("(minecraft:)?chat help"),
-		exactOptionalArguments("(minecraft:)?networkchat help"),
-		exactOptionalArguments("(minecraft:)?ch join"),
-		exactOptionalArguments("(minecraft:)?chat join"),
-		exactOptionalArguments("(minecraft:)?networkchat join"),
-		exactOptionalArguments("(minecraft:)?ch leave"),
-		exactOptionalArguments("(minecraft:)?chat leave"),
-		exactOptionalArguments("(minecraft:)?networkchat leave"),
-		exactOptionalArguments("(minecraft:)?ch pause"),
-		exactOptionalArguments("(minecraft:)?chat pause"),
-		exactOptionalArguments("(minecraft:)?networkchat pause"),
-		exactOptionalArguments("(minecraft:)?ch unpause"),
-		exactOptionalArguments("(minecraft:)?chat unpause"),
-		exactOptionalArguments("(minecraft:)?networkchat unpause"),
-		exactOptionalArguments("(minecraft:)?ch player"),
-		exactOptionalArguments("(minecraft:)?chat player"),
-		exactOptionalArguments("(minecraft:)?networkchat player"),
-		exactOptionalArguments("(minecraft:)?ch say"),
-		exactOptionalArguments("(minecraft:)?chat say"),
-		exactOptionalArguments("(minecraft:)?networkchat say"),
-		exactOptionalArguments("(minecraft:)?g"),
-		exactOptionalArguments("(minecraft:)?global"),
-		exactOptionalArguments("(minecraft:)?gc"),
-		exactOptionalArguments("(minecraft:)?guildchat"),
-		exactOptionalArguments("(minecraft:)?l"),
-		exactOptionalArguments("(minecraft:)?local"),
-		exactOptionalArguments("(minecraft:)?wc"),
-		exactOptionalArguments("(minecraft:)?worldchat"),
-		exactOptionalArguments("(minecraft:)?p"),
-		exactOptionalArguments("(minecraft:)?party"),
-		exactOptionalArguments("(minecraft:)?pausechat"),
-		exactOptionalArguments("(minecraft:)?pc"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) help"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) listplayers"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) join"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) leave"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) pause"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) unpause"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) player"),
+		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) say"),
+		exactOptionalArguments("(minecraft:)?(global|g)"),
+		exactOptionalArguments("(minecraft:)?(guildchat|gc)"),
+		exactOptionalArguments("(minecraft:)?(local|l)"),
+		exactOptionalArguments("(minecraft:)?(worldchat|wc)"),
+		exactOptionalArguments("(minecraft:)?(party|p)"),
+		exactOptionalArguments("(minecraft:)?(pausechat|pc)"),
 		exactOptionalArguments("(minecraft:)?me"),
-		exactOptionalArguments("(minecraft:)?msg"),
-		exactOptionalArguments("(minecraft:)?tell"),
-		exactOptionalArguments("(minecraft:)?w"),
+		exactOptionalArguments("(minecraft:)?(msg|tell|w)"),
 		exactOptionalArguments("(minecraft:)?r"),
-		exactOptionalArguments("(minecraft:)?tm"),
-		exactOptionalArguments("(minecraft:)?teammsg"),
+		exactOptionalArguments("(minecraft:)?(teammsg|tm)"),
 		exactOptionalArguments("lfg"),
 		exactOptionalArguments("m"),
 		exactOptionalArguments("mh"),
@@ -98,27 +78,28 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("(coreprotect:)?co l(ookup)?"),
 		exactOptionalArguments("(coreprotect:)?co near"),
 
+		// FAWE
+		exactOptionalArguments("/calc"), // "//calc"
+
 		// Common commands
 		exactOptionalArguments(String.format(
 			"(%s|%s)",
 			JunkItemListener.COMMAND,
 			JunkItemListener.ALIAS
 		)),
-		exactOptionalArguments("(minecraft:)?blockinteractions"),
-		exactOptionalArguments("(minecraft:)?bi"),
-		exactOptionalArguments("(minecraft:)?disabledrop"),
-		exactOptionalArguments("(minecraft:)?dd"),
+		exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
+		exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
 		exactOptionalArguments("(minecraft:)?glowing"),
-		exactOptionalArguments("(minecraft:)?leaderboard(?! update)"),
+		exactNoArguments("(minecraft:)?grave list"),
 		exactOptionalArguments("(minecraft:)?particles"),
-		exactOptionalArguments("playerstats"),
-		exactOptionalArguments("ps"),
+		exactOptionalArguments("(playerstats|ps)"),
 		exactOptionalArguments("peb"),
 		exactOptionalArguments("(minecraft:)?race leaderboard"),
+		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
 		exactOptionalArguments("(minecraft:)?toggleswap"),
 		exactOptionalArguments("(minecraft:)?toggleworldnames"),
-		exactOptionalArguments("(minecraft:)?virtualfirmament"),
-		exactOptionalArguments("(minecraft:)?vf"),
+		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
+		exactOptionalArguments("(minecraft:)?(viewcharms|vc)"),
 		exactOptionalArguments("(spark:)?tps")
 	);
 
@@ -354,6 +335,15 @@ public class AuditListener implements Listener {
 			player.getName(),
 			command
 		));
+	}
+
+	/*
+	 * Returns a regex pattern for the specified exact command
+	 * (eg "r" won't match "restart" as well),
+	 * without arguments after it.
+	 */
+	private static Pattern exactNoArguments(String command) {
+		return Pattern.compile("^/" + command + "$", Pattern.CASE_INSENSITIVE);
 	}
 
 	/*
