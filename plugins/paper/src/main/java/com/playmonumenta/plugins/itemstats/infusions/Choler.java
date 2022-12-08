@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.InfernoDamage;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
@@ -30,7 +31,7 @@ public class Choler implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.getFireTicks() > 0) {
+		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(enemy, InfernoDamage.class)) {
 			event.setDamage(event.getDamage() * getDamageDealtMultiplier(DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value)));
 		}
 	}
