@@ -52,7 +52,7 @@ public class CosmicMoonblade extends Ability {
 			.shorthandName("CM")
 			.descriptions(
 				String.format("Swap while holding a wand to cause a wave of arcane blades to hit every enemy within a %s block cone %s times in rapid succession. " +
-					              "Each slash deals %s arcane magic damage and reduces all your other skill cooldowns by %s%% (Max %ss) if it hits at lease one mob. Cooldown: %ss.",
+					              "Each slash deals %s arcane magic damage and reduces all your other skill cooldowns by %s%% (Max %ss) if it hits at least one mob. Cooldown: %ss.",
 					RADIUS,
 					SWINGS,
 					(int) DAMAGE_1,
