@@ -257,6 +257,10 @@ public final class ItemOverrides {
 		mItems.put(Material.BEACON, new BeaconOverride());
 		mItems.put(Material.TRIDENT, new TridentOverride());
 		mItems.put(Material.BONE, new BoneOverride());
+		mItems.put(Material.COOKED_SALMON, new FishOverride());
+		mItems.put(Material.COOKED_COD, new FishOverride());
+		mItems.put(Material.COD, new FishOverride());
+		mItems.put(Material.SALMON, new FishOverride());
 		mItems.put(Material.SHEARS, new ShearsOverride());
 		mItems.put(Material.FLINT_AND_STEEL, new FlintAndSteelOverride());
 		mItems.put(Material.PUFFERFISH, new PufferfishOverride());
