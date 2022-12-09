@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.LootTableManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -136,10 +138,10 @@ public class ChestUtils {
 				Set<String> otherLootBoxPlayers = new TreeSet<>();
 				Set<String> noSharePlayers = new TreeSet<>();
 				for (Player other : otherPlayers) {
-					if (giveLootBoxSliceToPlayer(itemBuckets.get(bucketIdx), other)) {
+					if (ServerProperties.getLootBoxEnabled() && giveLootBoxSliceToPlayer(itemBuckets.get(bucketIdx), other)) {
 						otherLootBoxPlayers.add(other.getName());
 					} else {
-						// Failed to give this slice to the other player (no lootbox or it is full)
+						// Failed to give this slice to the other player (no lootbox or it is full or lootbox is disabled on this shard)
 						// Put all these items in the orig container
 						itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
 						noSharePlayers.add(other.getName());

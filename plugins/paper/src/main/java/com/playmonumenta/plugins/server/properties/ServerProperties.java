@@ -38,6 +38,7 @@ public class ServerProperties {
 	private boolean mPreventDungeonItemTransfer = true;
 	private boolean mReplaceSpawnerEntities = true;
 	private boolean mInfusionsEnabled = true;
+	private boolean mLootBoxEnabled = true;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
@@ -103,6 +104,10 @@ public class ServerProperties {
 		return INSTANCE.mInfusionsEnabled;
 	}
 
+	public static boolean getLootBoxEnabled() {
+		return INSTANCE.mLootBoxEnabled;
+	}
+
 	public static int getHTTPStatusPort() {
 		return INSTANCE.mHTTPStatusPort;
 	}
@@ -162,6 +167,7 @@ public class ServerProperties {
 			mPreventDungeonItemTransfer = getPropertyValueBool(object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
 			mReplaceSpawnerEntities = getPropertyValueBool(object, "replaceSpawnerEntities", mReplaceSpawnerEntities);
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
+			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
 			mShardName = getPropertyValueString(object, "shardName", mShardName);
@@ -209,6 +215,7 @@ public class ServerProperties {
 		out.add("preventDungeonItemTransfer = " + mPreventDungeonItemTransfer);
 		out.add("replaceSpawnerEntities = " + mReplaceSpawnerEntities);
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
+		out.add("lootBoxEnabled = " + mLootBoxEnabled);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
 		out.add("shardName = " + mShardName);
