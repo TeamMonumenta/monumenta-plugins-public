@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -44,6 +45,9 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					EntityUtils.applySilence(Plugin.getInstance(), 50, (LivingEntity) killedMob);
 					for (Entity passenger : killedMob.getPassengers()) {
 						killedMob.removePassenger(passenger);
+					}
+					if (killedMob instanceof Creeper creeper) {
+						creeper.setMaxFuseTicks(4444);
 					}
 					killedMob.leaveVehicle();
 					killedMob.setVelocity(new Vector());
