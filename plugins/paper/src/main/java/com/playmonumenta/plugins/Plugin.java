@@ -242,6 +242,7 @@ public class Plugin extends JavaPlugin {
 		SetMasterwork.register();
 		WalletManager.registerCommand();
 		CoreProtectLogCommand.register();
+		UpdateStrikeChests.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

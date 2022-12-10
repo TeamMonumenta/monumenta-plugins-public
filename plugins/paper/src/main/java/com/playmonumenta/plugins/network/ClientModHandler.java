@@ -123,6 +123,16 @@ public class ClientModHandler {
 		INSTANCE.sendPacket(player, packet);
 	}
 
+	public static void updateStrikeChests(Player player, int newLimit, @Nullable Integer count) {
+		if (INSTANCE == null) {
+			return;
+		}
+		StrikeChestUpdatePacket packet = new StrikeChestUpdatePacket();
+		packet.newLimit = newLimit;
+		packet.count = count;
+		INSTANCE.sendPacket(player, packet);
+	}
+
 	private void sendPacket(Player player, Packet packet) {
 		player.sendPluginMessage(mPlugin, CHANNEL_ID, mGson.toJson(packet).getBytes(StandardCharsets.UTF_8));
 	}
@@ -230,6 +240,20 @@ public class ClientModHandler {
 		final String _type = "PlayerStatusPacket";
 
 		int silenceDuration;
+
+	}
+
+
+	/**
+	 * Sent whenever the number of chests in a strike changes
+	 */
+	private static class StrikeChestUpdatePacket implements Packet {
+
+		final String _type = "StrikeChestUpdatePacket";
+
+		int newLimit;
+
+		@Nullable Integer count;
 
 	}
 

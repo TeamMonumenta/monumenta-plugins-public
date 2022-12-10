@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 public class Spawn {
 	public static String COMMAND = "spawn";
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.spawn");
 
@@ -24,10 +25,14 @@ public class Spawn {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Collection<Entity> targets = (Collection<Entity>)args[0];
-				for (Entity target : targets) {
-					target.teleport(target.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
-				}
+				run(targets);
 			})
 			.register();
+	}
+
+	public static void run(Collection<Entity> targets) {
+		for (Entity target : targets) {
+			target.teleport(target.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+		}
 	}
 }
