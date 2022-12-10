@@ -1546,6 +1546,13 @@ public final class Lich extends BossAbilityGroup {
 			p.sendTitle(title, subtitle, 0, 80, 20);
 		}
 
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+					"execute as " + p.getUniqueId() + " at @s run function monumenta:mechanisms/music/music_hekawtp4");
+			}
+		}, 20 * 3 + 15);
+
 		// haha surprise fuck you I'm not dead dialogues
 		new BukkitRunnable() {
 			int mT = 0;
@@ -1555,16 +1562,6 @@ public final class Lich extends BossAbilityGroup {
 				if (mT < dio.length) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 						p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mT].toUpperCase());
-						if (mT == 0) {
-							new BukkitRunnable() {
-
-								@Override
-								public void run() {
-									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-										"playsound epic:music.hekawtp4 record " + p.getUniqueId() + " ~ ~ ~ 5 1");
-								}
-							}.runTaskLater(mPlugin, 15);
-						}
 					}
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 1);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 1);
@@ -2062,7 +2059,7 @@ public final class Lich extends BossAbilityGroup {
 										}
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
-											Bukkit.dispatchCommand(p, "scoreboard players set @s MusicCooldown 0");
+											ScoreboardUtils.setScoreboardValue(p, "MusicCooldown", 0);
 											p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
 												ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
 										}
