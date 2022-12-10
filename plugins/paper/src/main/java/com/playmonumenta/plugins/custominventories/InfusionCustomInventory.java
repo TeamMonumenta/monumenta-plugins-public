@@ -84,7 +84,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack perspicacityPanel = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1);
 		ItemMeta perspicacityMeta = perspicacityPanel.getItemMeta();
 		perspicacityMeta.displayName(Component.text("Perspicacity", TextColor.fromCSSHexString("#6666ff")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(perspicacityMeta, "Each level of Perspicacity gives you 0.75% bonus ability damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(perspicacityMeta, "Each level of Perspicacity gives you 0.75% bonus magic damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		perspicacityPanel.setItemMeta(perspicacityMeta);
 		mPanelList.add(perspicacityPanel);
 
@@ -92,7 +92,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack focusPanel = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE, 1);
 		ItemMeta focusMeta = focusPanel.getItemMeta();
 		focusMeta.displayName(Component.text("Focus", TextColor.fromCSSHexString("#FFFF00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(focusMeta, "Each level of Focus gives you 0.75% bonus ranged damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		splitLoreLine(focusMeta, "Each level of Focus gives you 0.75% bonus projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
 		focusPanel.setItemMeta(focusMeta);
 		mPanelList.add(focusPanel);
 
@@ -113,7 +113,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Focus level " + (i + 1), TextColor.fromCSSHexString("#FFFF00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus ranged damage", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus projectile damage", MAX_LORE_LENGHT, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			focusPanels.add(panel);
 		}
@@ -139,7 +139,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Perspicacity level " + (i + 1), TextColor.fromCSSHexString("#6666ff")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus ability damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus magic damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
 			panel.setItemMeta(meta);
 			perspicacityPanels.add(panel);
 		}
