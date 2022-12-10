@@ -1,11 +1,15 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,8 +26,8 @@ public class EmojiCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final Map<UUID, Long> COOLDOWNS = new HashMap<>();
 	public static final String EMOJI_CHOICE_BOARD = "DefaultEmoji";
-	private static final String PATREON_BOARD = "Patreon";
-	private static final int PATREON_MINIMUM = 10;
+	private static final String PATREON_BOARD = Constants.Objectives.PATREON_DOLLARS;
+	private static final int PATREON_MINIMUM = Constants.PATREON_TIER_2;
 	private static final int[] EMOJI_LOCS = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43, 46, 47, 48, 49, 50, 51, 52};
 
 	public static class Emoji {

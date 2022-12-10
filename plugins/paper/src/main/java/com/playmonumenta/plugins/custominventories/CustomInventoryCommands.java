@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -275,7 +276,7 @@ public class CustomInventoryCommands {
 			player.sendMessage("Select an emote in the emoji selection GUI as a default first!");
 			return;
 		}
-		if (list.get(0).mPatreon && !(ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 10)) {
+		if (list.get(0).mPatreon && !(ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_2)) {
 			player.sendMessage("You must be a T2+ Patron to use this emote!");
 			return;
 		}

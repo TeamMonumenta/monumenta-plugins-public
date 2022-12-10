@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.plots;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -91,7 +92,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	static {
 		BORDER_ITEMS.add(new TeleportEntry(0, 47, "Base Choices", "Click to view the plot borders with no requirements.", Material.GRASS_BLOCK, null, 0, "page 1"));
 		BORDER_ITEMS.add(new TeleportEntry(0, 49, "Unlockable Choices", "Click to view plot borders locked behind completion of content.", Material.IRON_INGOT, null, 0, "page 2"));
-		BORDER_ITEMS.add(new TeleportEntry(0, 51, "Patreon Choices", "Click to view options only available to Patrons.", Material.GOLD_INGOT, "Patreon", 10, "page 3"));
+		BORDER_ITEMS.add(new TeleportEntry(0, 51, "Patreon Choices", "Click to view options only available to Patrons.", Material.GOLD_INGOT, Constants.Objectives.PATREON_DOLLARS, Constants.PATREON_TIER_2, "page 3"));
 
 
 		BORDER_ITEMS.add(new TeleportEntry(1, 20, "Narsen Village", "A small town of Narsen citizens, bearing some resemblance to the old plots world.", Material.LIGHT_BLUE_CONCRETE, null, 0, "narsen_village"));

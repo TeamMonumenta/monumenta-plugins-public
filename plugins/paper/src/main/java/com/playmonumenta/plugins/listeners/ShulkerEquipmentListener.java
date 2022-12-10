@@ -11,12 +11,14 @@ import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
+import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -170,6 +172,7 @@ public class ShulkerEquipmentListener implements Listener {
 					sboxItem.setItemMeta(sMeta);
 
 					swapVanity(player, sboxItem);
+					swapParrots(player, sboxItem);
 
 					player.updateInventory();
 					event.setCancelled(true);
@@ -242,6 +245,7 @@ public class ShulkerEquipmentListener implements Listener {
 					}
 
 					swapVanity(player, sboxItem);
+					swapParrots(player, sboxItem);
 
 					player.updateInventory();
 					if (CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()) != null) {
@@ -377,6 +381,23 @@ public class ShulkerEquipmentListener implements Listener {
 			}
 			vanityData.equip(slot, newVanity);
 		}
+	}
+
+	private void swapParrots(Player player, ItemStack shulkerBox) {
+		if (!player.getScoreboardTags().contains(ParrotManager.PARROT_LOCKBOX_SWAP_TAG)) {
+			return;
+		}
+		int playerLeft = ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT).orElse(0);
+		int playerRight = ScoreboardUtils.getScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT).orElse(0);
+		NBTItem nbt = new NBTItem(shulkerBox, true);
+		NBTCompound playerModified = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+		Integer lockboxLeft = playerModified.getInteger(ParrotManager.SCOREBOARD_PARROT_LEFT);
+		Integer lockboxRight = playerModified.getInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT);
+		playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_LEFT, playerLeft);
+		playerModified.setInteger(ParrotManager.SCOREBOARD_PARROT_RIGHT, playerRight);
+		ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_LEFT, lockboxLeft == null ? 0 : lockboxLeft);
+		ScoreboardUtils.setScoreboardValue(player, ParrotManager.SCOREBOARD_PARROT_RIGHT, lockboxRight == null ? 0 : lockboxRight);
+		ParrotManager.updateParrots(player);
 	}
 
 	private void swapCharms(Player player, ShulkerBox shulkerBox) {

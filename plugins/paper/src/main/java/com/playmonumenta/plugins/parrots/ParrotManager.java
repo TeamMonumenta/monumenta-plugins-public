@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.parrots;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -28,6 +29,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ParrotManager implements Listener {
 
+	public static final String PARROT_LOCKBOX_SWAP_TAG = "ParrotLockboxSwap";
+
 	protected static final String SHOULDER_PARROT_TAG = "ParrotPet";
 	protected static final String PLACED_PARROT_TAG = "PlacedParrotPet";
 
@@ -40,7 +43,12 @@ public class ParrotManager implements Listener {
 		GRAY("Gray Cockatiel", 5, Parrot.Variant.GRAY),
 
 		//added with texture
-		PATREON("Patreon Parakeet", 6, Parrot.Variant.RED),
+		PATREON("Patreon Parakeet", 6, Parrot.Variant.RED) {
+			@Override
+			public boolean hasUnlocked(Player player) {
+				return ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) > Constants.PATREON_TIER_1;
+			}
+		},
 		PULSATING_GOLD("Golden Conure", 7, Parrot.Variant.CYAN),
 		PULSATING_EMERALD("Emerald Conure", 8, Parrot.Variant.GREEN),
 		PIRATE("Scoundrel Macaw", 9, Parrot.Variant.BLUE),
@@ -103,6 +111,10 @@ public class ParrotManager implements Listener {
 			}
 			return null;
 		}
+
+		public boolean hasUnlocked(Player player) {
+			return ScoreboardUtils.getScoreboardValue(player, "ParrotBought" + mNumber).orElse(0) > 0;
+		}
 	}
 
 	public enum PlayerShoulder {
@@ -120,10 +132,10 @@ public class ParrotManager implements Listener {
 	private static final String SCOREBOARD_PARROT_BOTH = "ParrotBoth";
 	// 0 if player can hold only one parrot
 
-	private static final String SCOREBOARD_PARROT_LEFT = "ParrotLeft";
+	public static final String SCOREBOARD_PARROT_LEFT = "ParrotLeft";
 	// store the info about which parrot is on the left shoulder
 
-	private static final String SCOREBOARD_PARROT_RIGHT = "ParrotRight";
+	public static final String SCOREBOARD_PARROT_RIGHT = "ParrotRight";
 	// store the info about which parrot is on the right shoulder
 
 	private static final Set<Player> mPrideRight = new HashSet<>();
@@ -196,7 +208,16 @@ public class ParrotManager implements Listener {
 		ParrotVariant leftVariant = ParrotVariant.getVariantByNumber(leftShoulderParrot);
 		ParrotVariant rightVariant = ParrotVariant.getVariantByNumber(rightShoulderParrot);
 
-		if (!hasDoubleShoulders(player) && leftShoulderParrot != 0 && rightShoulderParrot != 0) { // player somehow has two parrots but can only have one - remove one
+		// Verify player unlocks and remove if anything doesn't match
+		if (!hasDoubleShoulders(player) && leftShoulderParrot != 0 && rightShoulderParrot != 0) {
+			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_RIGHT, 0);
+			rightVariant = null;
+		}
+		if (leftVariant != null && !leftVariant.hasUnlocked(player)) {
+			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_LEFT, 0);
+			leftVariant = null;
+		}
+		if (rightVariant != null && !rightVariant.hasUnlocked(player)) {
 			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_RIGHT, 0);
 			rightVariant = null;
 		}

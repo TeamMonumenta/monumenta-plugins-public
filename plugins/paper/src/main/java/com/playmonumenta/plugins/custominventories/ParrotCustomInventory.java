@@ -302,6 +302,24 @@ public final class ParrotCustomInventory extends CustomInventory {
 				return true;
 			}));
 
+		ItemStack lockboxSwapEnabled = buildItem(Material.GRAY_SHULKER_BOX, "Swapping Parrots with Lockboxes: Enabled", List.of());
+		ItemUtils.setPlainName(lockboxSwapEnabled, "Loadout: Alchemist");
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 7, lockboxSwapEnabled,
+			(player, inv) -> player.getScoreboardTags().contains(ParrotManager.PARROT_LOCKBOX_SWAP_TAG),
+			(player, inv) -> {
+				player.getScoreboardTags().remove(ParrotManager.PARROT_LOCKBOX_SWAP_TAG);
+				return true;
+			}));
+
+		ItemStack lockboxSwapDisabled = buildItem(Material.GRAY_SHULKER_BOX, "Swapping Parrots with Lockboxes: Disabled", List.of());
+		ItemUtils.setPlainName(lockboxSwapDisabled, "Loadout: Warrior");
+		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 7, lockboxSwapDisabled,
+			(player, inv) -> !player.getScoreboardTags().contains(ParrotManager.PARROT_LOCKBOX_SWAP_TAG),
+			(player, inv) -> {
+				player.getScoreboardTags().add(ParrotManager.PARROT_LOCKBOX_SWAP_TAG);
+				return true;
+			}));
+
 		//==================================================================================================
 		//                                     FUNCTIONAL ITEMS end
 		//==================================================================================================
@@ -431,13 +449,13 @@ public final class ParrotCustomInventory extends CustomInventory {
 		// This one cannot be bought in-game. This also means it has no purchase date.
 		ItemStack buyPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", List.of("Become a Tier 1 patreon to unlock"));
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, buyPatreon,
-			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) < 5 && mSelectedAction == ParrotAction.NONE));
+			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) < Constants.PATREON_TIER_1 && mSelectedAction == ParrotAction.NONE));
 
 		ItemStack boughtPatreon = buildItem(Material.ORANGE_WOOL, "Patreon Parakeet", List.of("Owned"));
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughtPatreon,
-			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 5 && mSelectedAction == ParrotAction.NONE));
+			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_1 && mSelectedAction == ParrotAction.NONE));
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 10, boughtPatreon,
-			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Patreon").orElse(0) >= 5 && mSelectedAction != ParrotAction.NONE,
+			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) >= Constants.PATREON_TIER_1 && mSelectedAction != ParrotAction.NONE,
 			(player, inv) -> {
 				selectParrot(player, ParrotVariant.PATREON);
 				return true;
