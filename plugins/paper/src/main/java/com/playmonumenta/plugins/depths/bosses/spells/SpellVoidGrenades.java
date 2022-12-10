@@ -58,8 +58,8 @@ public class SpellVoidGrenades extends Spell {
 			public void run() {
 				mTicks++;
 
-				world.spawnParticle(Particle.SOUL, mBoss.getLocation(), 40, 0, 0, 0, 0.1);
-				world.spawnParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 35, 0, 0, 0, 0.1);
+				new PartialParticle(Particle.SOUL, mBoss.getLocation(), 40, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 35, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 				world.playSound(mBoss.getLocation(), Sound.BLOCK_DISPENSER_LAUNCH, 3, 0.75f);
 				Collections.shuffle(players);
 				for (Player player : players) {

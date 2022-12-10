@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -92,15 +93,15 @@ public class SpellVolcanicDeepmise extends Spell {
 					}
 				}
 				Location particle = mLoc.clone().add(0, mY, 0);
-				mWorld.spawnParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true);
+				new PartialParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true).spawnAsEntityActive(mBoss);
 				if (FastUtils.RANDOM.nextBoolean()) {
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true);
+					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 				}
 				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
-					mWorld.spawnParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true);
-					mWorld.spawnParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true);
+					new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 4, 4, 4);
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {

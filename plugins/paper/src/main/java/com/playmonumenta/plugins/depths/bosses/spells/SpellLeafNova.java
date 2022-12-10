@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Color;
@@ -35,18 +36,15 @@ public class SpellLeafNova extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR);
-		world.spawnParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05);
-
+		new PartialParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR);
-		world.spawnParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR);
-		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -57,9 +55,8 @@ public class SpellLeafNova extends SpellBaseAoE {
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		World world = loc.getWorld();
-		world.spawnParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3);
-		world.spawnParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

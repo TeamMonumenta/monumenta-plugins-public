@@ -44,9 +44,9 @@ public class SpellDeathSweep extends Spell {
 		mDelay = getCastTime();
 		mPhase = phase;
 
-		mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1, RED);
-		mPHitCone1 = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1);
-		mPHitCone2 = new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1);
+		mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1, RED).minimumMultiplier(false);
+		mPHitCone1 = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1).minimumMultiplier(false);
+		mPHitCone2 = new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1).minimumMultiplier(false);
 		mPHit = new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation(), 20, 0.25, 0.25, 0.25, 0.25);
 	}
 

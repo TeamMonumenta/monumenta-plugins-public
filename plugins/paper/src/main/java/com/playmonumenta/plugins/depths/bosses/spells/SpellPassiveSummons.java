@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -117,7 +118,7 @@ public class SpellPassiveSummons extends Spell {
 								if (mT >= mSummonTime && !mRaised) {
 									mRaised = true;
 									ele.setAI(true);
-									mPLoc.getWorld().spawnParticle(Particle.SMOKE_LARGE, mPLoc, 6, 0.25, 0.1, 0.25, 0.25);
+									new PartialParticle(Particle.SMOKE_LARGE, mPLoc, 6, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 								}
 
 								if (mBoss.isDead() || !mBoss.isValid()) {

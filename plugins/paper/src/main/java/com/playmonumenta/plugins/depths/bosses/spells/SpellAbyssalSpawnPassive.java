@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -48,7 +49,7 @@ public class SpellAbyssalSpawnPassive extends Spell {
 			}
 
 			//Leave particle trail
-			vex.getWorld().spawnParticle(Particle.REDSTONE, vex.getLocation(), 2, 0.2, 0.2, 0.2, VEX_COLOR);
+			new PartialParticle(Particle.REDSTONE, vex.getLocation(), 2, 0.2, 0.2, 0.2, VEX_COLOR).spawnAsBoss();
 
 			//Teleport if either is too far away from davey
 			if (vex.getLocation().distance(mLauncher.getLocation()) > LEASH_DISTANCE) {
@@ -64,9 +65,12 @@ public class SpellAbyssalSpawnPassive extends Spell {
 			World world = vex.getWorld();
 
 			for (double deg = 0; deg < 360; deg += 6) {
-				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 0, 2 * FastUtils.sinDeg(deg)), 1, 0, 0, 0, 0);
-				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 2 * FastUtils.sinDeg(deg), 0), 1, 0, 0, 0, 0);
-				world.spawnParticle(Particle.DOLPHIN, loc.clone().add(0, 2 * FastUtils.sinDeg(deg), 2 * FastUtils.cosDeg(deg)), 1, 0, 0, 0, 0);
+				new PartialParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 0, 2 * FastUtils.sinDeg(deg)), 1)
+					.minimumMultiplier(false).spawnAsBoss();
+				new PartialParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 2 * FastUtils.sinDeg(deg), 0), 1)
+					.minimumMultiplier(false).spawnAsBoss();
+				new PartialParticle(Particle.DOLPHIN, loc.clone().add(0, 2 * FastUtils.sinDeg(deg), 2 * FastUtils.cosDeg(deg)), 1)
+					.minimumMultiplier(false).spawnAsBoss();
 			}
 
 			if (mTicks % 20 == 0) {

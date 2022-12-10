@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -83,7 +84,8 @@ public class SpellSurroundingDeath extends Spell {
 						double sin = FastUtils.sinDeg(deg);
 
 						for (int x = innerRadius; x < outerRadius; x++) {
-							world.spawnParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, 0, sin * x), 1, 0.1, 0.1, 0.1, 0);
+							new PartialParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, 0, sin * x), 1, 0.1, 0.1, 0.1, 0)
+								.minimumMultiplier(false).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
@@ -110,15 +112,15 @@ public class SpellSurroundingDeath extends Spell {
 						for (int x = innerRadius; x < outerRadius; x += inc) {
 							Location loc = mStartLoc.clone().add(cos * x, 0, sin * x);
 
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0);
+							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 							if (deg % 4 == 0) {
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 							} else {
-								world.spawnParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData());
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 							}
 
 							if (deg % 30 == 0) {
-								world.spawnParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25);
+								new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 							}
 
 						}

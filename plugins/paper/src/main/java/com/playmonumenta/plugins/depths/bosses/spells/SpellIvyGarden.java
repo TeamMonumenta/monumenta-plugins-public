@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -55,24 +56,21 @@ public class SpellIvyGarden extends Spell {
 			if (le != null && !le.isDead()) {
 				runForce(mPlugin, le, mRadius, mTime, mCooldownTicks, false, false, Sound.ENTITY_IRON_GOLEM_ATTACK, 1f, 1,
 						(Location loc) -> {
-							World world = loc.getWorld();
-							world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, ((double) mRadius) / 2, ((double) mRadius) / 2, ((double) mRadius) / 2, 0.05);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, ((double) mRadius) / 2, ((double) mRadius) / 2, ((double) mRadius) / 2, 0.05).minimumMultiplier(false).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
-							World world = loc.getWorld();
-							world.spawnParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1);
+							new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
 							World world = loc.getWorld();
 							world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.65f);
 							world.playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1f, 0.5f);
 							world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, 1f, 0.8f);
-							world.spawnParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f);
+							new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
-							World world = loc.getWorld();
-							world.spawnParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3);
-							world.spawnParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).minimumMultiplier(false).spawnAsEntityActive(le);
+							new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
 							for (Player player : PlayerUtils.playersInRange(le.getLocation(), mRadius, true)) {
@@ -90,7 +88,7 @@ public class SpellIvyGarden extends Spell {
 								}
 								BossUtils.blockableDamage(le, player, DamageType.MAGIC, DAMAGE, "Ivy Garden", le.getLocation());
 
-								player.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0);
+								new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 4, 0.25, 0.5, 0.25, 0).spawnAsEntityActive(le);
 							}
 						});
 				//Resistance
