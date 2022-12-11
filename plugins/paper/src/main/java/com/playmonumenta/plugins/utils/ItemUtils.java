@@ -1080,7 +1080,9 @@ public class ItemUtils {
 	}
 
 	public static boolean isInteresting(ItemStack item) {
-		return ServerProperties.getAlwaysPickupMats().contains(item.getType()) || hasLore(item) || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
+		return ServerProperties.getAlwaysPickupMats().contains(item.getType())
+			       || hasLore(item) && ItemStatUtils.getTier(item) != ItemStatUtils.Tier.ZERO
+			       || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
 	}
 
 	/**

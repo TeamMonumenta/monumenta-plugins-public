@@ -201,7 +201,8 @@ public final class JunkItemListener implements Listener {
 			}
 
 			if (mTieredPlayers.contains(uuid)) {
-				if (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
+				ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
+				if ((tier == ItemStatUtils.Tier.NONE || tier == ItemStatUtils.Tier.ZERO) && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
 					event.setCancelled(true);
 				}
 			} else if (mLorePlayers.contains(uuid)) {
