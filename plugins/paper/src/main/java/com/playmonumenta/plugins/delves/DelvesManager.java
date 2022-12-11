@@ -561,7 +561,9 @@ public class DelvesManager implements Listener {
 
 		EntityUtils.removeAttributesContaining(player, Attribute.GENERIC_MAX_HEALTH, "Whispers");
 
-		Fragile.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.FRAGILE));
+		if (!event.getKeepInventory()) {
+			Fragile.applyModifiers(player, DelvesUtils.getModifierLevel(player, DelvesModifier.FRAGILE));
+		}
 
 		for (LivingEntity mob : player.getLocation().getNearbyLivingEntities(25)) {
 			TwistedMiniBoss boss = BossManager.getInstance().getBoss(mob, TwistedMiniBoss.class);
