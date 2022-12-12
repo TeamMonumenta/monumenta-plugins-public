@@ -179,6 +179,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
@@ -847,26 +848,33 @@ public class AbilityManager {
 		}
 	}
 
+	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
+		// This causes a left click to trigger if clicking a villager or item frame for example
+		MetadataUtils.setMetadata(event.getPlayer(), LEFT_CLICK_TICK_METAKEY, Bukkit.getServer().getCurrentTick() + 1);
+	}
+
 	public void playerInteractEvent(PlayerInteractEvent event, Material blockClicked) {
 		Player player = event.getPlayer();
 		Action action = event.getAction();
 		// Right-clicking sometimes counts as two clicks, so make sure this can only be triggered once per tick
-		// Right clicks also sometimes create an additional left click up to 2 ticks later, thus check within the past 2 ticks.
-		if (action == Action.LEFT_CLICK_AIR
-			    || action == Action.LEFT_CLICK_BLOCK) {
+		// Right clicks also sometimes creates an additional left click up to 2 ticks later, thus check within the past 2 ticks.
+		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
-		} else if (action == Action.RIGHT_CLICK_AIR
-			           || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR)) {
+		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+			if (action == Action.RIGHT_CLICK_BLOCK && ItemUtils.interactableBlocks.contains(blockClicked)) {
+				MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, Bukkit.getServer().getCurrentTick() + 1);
+				return;
+			}
+
 			checkTrigger(player, AbilityTrigger.Key.RIGHT_CLICK);
-		}
-		// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
-		// thus we have to ignore the usual click limiter here.
-		if ((action == Action.RIGHT_CLICK_AIR
-			     || (action == Action.RIGHT_CLICK_BLOCK && !ItemUtils.interactableBlocks.contains(blockClicked) && blockClicked != Material.AIR))
-			    && player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
-			    && player.getCooldown(Material.SHIELD) == 0
-			    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
-			conditionalCast(player, Ability::blockWithShieldEvent);
+
+			// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
+			// thus we have to ignore the usual click limiter here.
+			if (player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
+				    && player.getCooldown(Material.SHIELD) == 0
+				    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
+				conditionalCast(player, Ability::blockWithShieldEvent);
+			}
 		}
 	}
 

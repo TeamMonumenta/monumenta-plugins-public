@@ -349,7 +349,15 @@ public class PlayerListener implements Listener {
 		}
 	}
 
-	// Player interacts with an entity (not triggered on armor stands for some reason)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void playerInteractEntityEventWithCancelled(PlayerInteractEntityEvent event) {
+
+		// Need to ignore the left click that follows this right click, thus handle cancelled events too
+		mPlugin.mAbilityManager.playerInteractEntityEvent(event);
+
+	}
+
+	// Player interacts with an entity (not triggered on armor stands, as those only trigger a PlayerInteractAtEntityEvent)
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Player player = event.getPlayer();
