@@ -809,9 +809,13 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerItemConsumeEvent(player, event);
 
 		if (item.containsEnchantment(Enchantment.ARROW_INFINITE)) {
-			event.setReplacement(item);
-			//Stat tracker for consuming infinity items
-			StatTrackManager.incrementStat(item, player, InfusionType.STAT_TRACK_CONSUMED, 1);
+			// Stat tracker for consuming infinity items
+			// Needs to update the player's active item, not the event item, as that is a copy.
+			ItemStack activeItem = player.getActiveItem();
+			StatTrackManager.getInstance().incrementStatImmediately(activeItem, player, InfusionType.STAT_TRACK_CONSUMED, 1);
+
+			// Set replacement to a copy of the original so it is not consumed (must be a copy as the internal code checks for reference equality)
+			event.setReplacement(ItemUtils.clone(activeItem));
 		}
 
 		ItemStatUtils.applyCustomEffects(mPlugin, player, item);

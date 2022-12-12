@@ -186,7 +186,7 @@ public class PotionConsumeListener implements Listener {
 		if (instantDrink) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			ItemStatUtils.applyCustomEffects(mPlugin, player, item);
-			StatTrackManager.incrementStat(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
+			StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
 
 			//Apply Starvation if applicable
 			Starvation.apply(player, starvation);
@@ -208,7 +208,7 @@ public class PotionConsumeListener implements Listener {
 					if (mTicks >= DRINK_DURATION) {
 						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
 						ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
-						StatTrackManager.incrementStat(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
+						StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
 
 						Starvation.apply(player, starvation);
 

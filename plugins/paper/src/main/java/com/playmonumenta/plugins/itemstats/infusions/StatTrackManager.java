@@ -139,7 +139,7 @@ public class StatTrackManager implements Listener {
 	 * @param enchant the stat option to adjust
 	 * @param amount  the amount to increment the stat
 	 */
-	public void scheduleDelayedStatUpdate(ItemStack item, Player player, InfusionType enchant, int amount) {
+	private void scheduleDelayedStatUpdate(ItemStack item, Player player, InfusionType enchant, int amount) {
 		if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
 			// Creative inventory breaks item tracking, plus also why would you need this? Spectator makes no sense too.
 			return;
@@ -150,6 +150,26 @@ public class StatTrackManager implements Listener {
 			mData.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>()).add(data);
 		}
 		data.mUncommittedAmount += amount;
+	}
+
+	/**
+	 * Immediately applies the given stat track to the item. Only use this if the item is not in the player's hands, or will be updated anyway.
+	 */
+	public void incrementStatImmediately(ItemStack item, Player player, InfusionType enchant, int amount) {
+		List<StatTrackData> dataList = mData.get(player.getUniqueId());
+		if (dataList != null) {
+			for (Iterator<StatTrackData> iterator = dataList.iterator(); iterator.hasNext(); ) {
+				StatTrackData data = iterator.next();
+				if (NmsUtils.getVersionAdapter().isSameItem(data.mItemStack, item)) {
+					int oldStat = ItemStatUtils.getInfusionLevel(item, enchant);
+					ItemStatUtils.addInfusion(item, enchant, oldStat + amount + data.mUncommittedAmount, player.getUniqueId());
+					iterator.remove();
+					return;
+				}
+			}
+		}
+		int oldStat = ItemStatUtils.getInfusionLevel(item, enchant);
+		ItemStatUtils.addInfusion(item, enchant, oldStat + amount, player.getUniqueId());
 	}
 
 	/**

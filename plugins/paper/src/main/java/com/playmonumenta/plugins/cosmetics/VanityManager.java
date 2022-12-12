@@ -213,7 +213,7 @@ public class VanityManager implements Listener {
 			return null;
 		}
 		if (!item.hasItemMeta()) {
-			return item.clone();
+			return ItemUtils.clone(item);
 		}
 		NBTItem nbtItem = new NBTItem(item);
 		if (item.getType() != Material.SHIELD && !ItemUtils.isBanner(item)) {
