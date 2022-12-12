@@ -33,11 +33,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -413,6 +415,7 @@ public final class Grave {
 				if (mGhostGrave) {
 					// Remove one level of shattering from the player's items
 					int unshattered = 0;
+					equipmentLoop:
 					for (ItemStack graveEquipment : mEquipment.values()) {
 						if (ItemStatUtils.getInfusionLevel(graveEquipment, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {
 							continue;
@@ -424,9 +427,34 @@ public final class Grave {
 							if (identifier.isIdentifierFor(playerItem)
 								    && Shattered.unshatterOneLevel(playerItem)) {
 								unshattered++;
-								break;
+								continue equipmentLoop;
 							}
 						}
+						// if the item is not in the player's inventory, try Shulker boxes in the inventory (e.g. Loadout Lockboxes)
+						for (ItemStack item : contents) {
+							if (item != null
+								    && ItemUtils.isShulkerBox(item.getType())
+								    && item.getItemMeta() instanceof BlockStateMeta meta
+								    && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
+								for (ItemStack shulkerItem : shulkerBox.getInventory().getContents()) {
+									if (identifier.isIdentifierFor(shulkerItem)
+										    && Shattered.unshatterOneLevel(shulkerItem)) {
+										unshattered++;
+										meta.setBlockState(shulkerBox);
+										item.setItemMeta(meta);
+										continue equipmentLoop;
+									}
+								}
+							}
+						}
+					}
+					if (unshattered == 0) {
+						player.sendMessage(Component.text("You do not have any items on you that this grave could unshatter. ", NamedTextColor.AQUA)
+							                   .append(Component.text("Click here to delete this grave.", NamedTextColor.RED)
+								                           .hoverEvent(HoverEvent.showText(Component.text("Delete grave", NamedTextColor.RED)))
+								                           .clickEvent(ClickEvent.runCommand("/grave delete " + mUuid))));
+						Phylactery.giveStoredXP(mPlayer);
+						return; // don't delete
 					}
 					player.sendMessage(Component.text("Grave collected! Repaired " + unshattered + " item" + (unshattered == 1 ? "" : "s") + ".", NamedTextColor.AQUA));
 					Plugin.getInstance().mItemStatManager.updateStats(player);

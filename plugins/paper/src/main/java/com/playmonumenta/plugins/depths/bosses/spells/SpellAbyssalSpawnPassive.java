@@ -11,7 +11,6 @@ import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -62,7 +61,6 @@ public class SpellAbyssalSpawnPassive extends Spell {
 			}
 
 			Location loc = vex.getLocation();
-			World world = vex.getWorld();
 
 			for (double deg = 0; deg < 360; deg += 6) {
 				new PartialParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 0, 2 * FastUtils.sinDeg(deg)), 1)
