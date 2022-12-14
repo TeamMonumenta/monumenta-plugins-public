@@ -185,7 +185,7 @@ public final class JunkItemListener implements Listener {
 			}
 
 			// Allow collection of valuable player-dropped items
-			if (GraveManager.isThrownItem(entity) || uuid.equals(entity.getOwner())) {
+			if (GraveManager.isThrownItem(entity)) {
 				return;
 			}
 
