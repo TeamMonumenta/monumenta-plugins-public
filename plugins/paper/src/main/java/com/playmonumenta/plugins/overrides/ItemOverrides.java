@@ -295,6 +295,11 @@ public final class ItemOverrides {
 		mItems.put(Material.SPRUCE_TRAPDOOR, trapdoorOverride);
 		mItems.put(Material.WARPED_TRAPDOOR, trapdoorOverride);
 
+		BaseOverride berryBushOverride = new BerryBushOverride();
+		mItems.put(Material.SWEET_BERRY_BUSH, berryBushOverride);
+		mItems.put(Material.CAVE_VINES, berryBushOverride);
+		mItems.put(Material.CAVE_VINES_PLANT, berryBushOverride);
+
 		BaseOverride doorOverride = new DoorOverride();
 		mItems.put(Material.ACACIA_DOOR, doorOverride);
 		mItems.put(Material.BIRCH_DOOR, doorOverride);
