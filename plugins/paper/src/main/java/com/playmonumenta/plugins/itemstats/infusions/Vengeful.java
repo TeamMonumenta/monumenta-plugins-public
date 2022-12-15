@@ -42,6 +42,9 @@ public class Vengeful implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		if (checkLastDamage(player, enemy)) {
 			event.setDamage(event.getDamage() * getDamageDealtMultiplier(modifiedLevel));

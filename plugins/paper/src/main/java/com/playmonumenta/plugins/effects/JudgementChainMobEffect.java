@@ -72,6 +72,9 @@ public class JudgementChainMobEffect extends Effect {
 
 	@Override
 	public void onHurt(@NotNull LivingEntity entity, @NotNull DamageEvent event) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		List<LivingEntity> e = EntityUtils.getNearbyMobs(entity.getLocation(), 8, entity, true);
 		e.remove(entity);
 		if (!e.isEmpty()) {
@@ -85,6 +88,9 @@ public class JudgementChainMobEffect extends Effect {
 			if (enemy != mPlayer) {
 				event.setDamage(0);
 			} else {
+				if (event.getType() == DamageEvent.DamageType.TRUE) {
+					return;
+				}
 				event.setDamage(event.getDamage() / 2);
 			}
 		}

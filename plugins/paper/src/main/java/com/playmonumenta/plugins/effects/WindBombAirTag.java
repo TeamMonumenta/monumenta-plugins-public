@@ -33,6 +33,9 @@ public class WindBombAirTag extends Effect {
 
 	@Override
 	public void onHurtByEntityWithSource(LivingEntity entity, DamageEvent event, Entity damager, LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (mPlayer.equals(source)) {
 			event.setDamage(event.getDamage() * (1 + mAmount));
 		}

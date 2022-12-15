@@ -149,6 +149,7 @@ public class PhlegmaticResolve extends Ability {
 			    event.getType() != DamageEvent.DamageType.AILMENT &&
 			    event.getType() != DamageEvent.DamageType.POISON &&
 			    event.getType() != DamageEvent.DamageType.OTHER &&
+			    event.getType() != DamageEvent.DamageType.TRUE &&
 			    event.getType() != DamageEvent.DamageType.FALL &&
 			    event.getCause() != EntityDamageEvent.DamageCause.FIRE_TICK &&
 			    !event.isBlocked()) {

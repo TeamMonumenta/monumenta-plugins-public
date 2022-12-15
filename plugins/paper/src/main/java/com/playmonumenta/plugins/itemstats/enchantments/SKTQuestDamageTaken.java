@@ -30,6 +30,9 @@ public class SKTQuestDamageTaken implements Enchantment {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (player.getScoreboardTags().contains("SKTQuest")) {
 			event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
 		}

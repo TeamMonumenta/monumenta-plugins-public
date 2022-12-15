@@ -42,7 +42,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
-		if (event.isBlocked()) {
+		if (event.isBlocked() || event.getType() == DamageType.TRUE) {
 			return;
 		}
 

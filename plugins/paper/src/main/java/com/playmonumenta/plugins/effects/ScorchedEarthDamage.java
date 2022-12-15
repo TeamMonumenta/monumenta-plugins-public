@@ -38,7 +38,7 @@ public class ScorchedEarthDamage extends Effect {
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
 		DamageType type = event.getType();
-		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER && event.getAbility() != ClassAbility.SCORCHED_EARTH
+		if (type != DamageType.AILMENT && type != DamageType.FIRE && type != DamageType.OTHER && type != DamageType.TRUE && event.getAbility() != ClassAbility.SCORCHED_EARTH
 			    && (type != DamageType.MELEE || !(event.getDamager() instanceof Player player) || player.getCooledAttackStrength(0) > 0.5f)) {
 			DamageUtils.damage(mAlchemist, entity, new DamageEvent.Metadata(DamageType.MAGIC, ClassAbility.SCORCHED_EARTH, mStats), mDamage, true, false, false);
 			EntityUtils.applyFire(Plugin.getInstance(), mFireTickDuration, entity, mAlchemist);

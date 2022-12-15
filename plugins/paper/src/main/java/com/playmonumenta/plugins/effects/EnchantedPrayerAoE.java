@@ -56,6 +56,9 @@ public class EnchantedPrayerAoE extends Effect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			World world = entity.getWorld();
 			world.playSound(enemy.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.9f);

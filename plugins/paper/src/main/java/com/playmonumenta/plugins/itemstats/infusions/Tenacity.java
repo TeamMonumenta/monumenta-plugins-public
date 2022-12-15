@@ -25,6 +25,9 @@ public class Tenacity implements Infusion {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		event.setDamage(event.getDamage() * getDamageTakenMultiplier(value));
 	}
 

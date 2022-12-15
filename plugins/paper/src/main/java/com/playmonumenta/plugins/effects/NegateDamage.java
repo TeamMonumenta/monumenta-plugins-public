@@ -40,6 +40,9 @@ public class NegateDamage extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (mCount > 0 && (mAffectedTypes == null || mAffectedTypes.contains(event.getType())) && !event.isCancelled() && !event.isBlockedByShield()) {
 			event.setCancelled(true);
 			World world = entity.getWorld();

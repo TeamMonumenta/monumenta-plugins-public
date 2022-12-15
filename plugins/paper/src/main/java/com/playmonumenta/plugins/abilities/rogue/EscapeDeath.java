@@ -80,7 +80,8 @@ public class EscapeDeath extends Ability {
 		if (mPlugin.mEffectManager.hasEffect(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN)
 			    && !event.isBlocked()
 			    && event.getSource() != null
-			    && EntityUtils.isHostileMob(event.getSource())) {
+			    && EntityUtils.isHostileMob(event.getSource())
+			    && event.getType() != DamageEvent.DamageType.TRUE) {
 			mPlugin.mEffectManager.clearEffects(mPlayer, ESCAPE_DEATH_ENHANCEMENT_REGEN);
 		}
 

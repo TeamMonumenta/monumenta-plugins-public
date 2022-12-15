@@ -156,6 +156,9 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		event.setDamage(event.getDamage() * getDamageResistanceRatio());
 	}
 

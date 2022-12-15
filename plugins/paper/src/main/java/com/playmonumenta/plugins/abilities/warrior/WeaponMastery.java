@@ -86,6 +86,9 @@ public class WeaponMastery extends Ability {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() * (1 - (WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION))));
 		}

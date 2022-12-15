@@ -39,6 +39,9 @@ public class CourageEffect extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			double amount = mAmount;
 

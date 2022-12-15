@@ -81,6 +81,9 @@ public class PercentDamageDealt extends Effect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (mPredicate != null && !mPredicate.test(entity, enemy)) {
 			return;
 		}

@@ -72,11 +72,17 @@ public class Shattered implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		event.setDamage(event.getDamage() * getDamageDealtMultiplier(hasMaxShatteredItemEquipped(player)));
 	}
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		event.setDamage(event.getDamage() * getDamageTakenMultiplier(hasMaxShatteredItemEquipped(player)));
 	}
 

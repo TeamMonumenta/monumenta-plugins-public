@@ -79,6 +79,9 @@ public class TwoHanded implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity target) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (checkForOffhand(plugin, player)) {
 			event.setDamage(event.getDamage() * (1 - PERCENT_DAMAGE_REDUCTION));
 		}

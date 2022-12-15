@@ -32,6 +32,9 @@ public class SanguineHarvestBlight extends Effect {
 
 	@Override
 	public void onHurt(LivingEntity entity, DamageEvent event) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		event.setDamage(event.getDamage() * (1 + mAmount * AbilityUtils.getDebuffCount(mPlugin, entity)));
 	}
 

@@ -147,6 +147,10 @@ public class DamageEvent extends Event implements Cancellable {
 			mBossSpellName = bossSpellName;
 		}
 
+		public DamageType getType() {
+			return mType;
+		}
+
 		public @Nullable String getBossSpellName() {
 			return mBossSpellName;
 		}

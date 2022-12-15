@@ -23,6 +23,9 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (!mHasDoneDamage) {
 			mHasDoneDamage = true;
 			event.setDamage(event.getDamage() * Math.max(0, 1 + mAmount));

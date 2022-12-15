@@ -32,6 +32,9 @@ public class AstralOmenBonusDamage extends Effect {
 
 	@Override
 	public void onHurtByEntityWithSource(LivingEntity entity, DamageEvent event, Entity damager, LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (source == mPlayer) {
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().add(0, 1, 0);

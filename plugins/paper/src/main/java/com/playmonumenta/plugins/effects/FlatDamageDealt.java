@@ -36,6 +36,9 @@ public class FlatDamageDealt extends Effect {
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (mAffectedDamageTypes == null || mAffectedDamageTypes.contains(event.getType())) {
 			event.setDamage(event.getDamage() + mAmount);
 		}

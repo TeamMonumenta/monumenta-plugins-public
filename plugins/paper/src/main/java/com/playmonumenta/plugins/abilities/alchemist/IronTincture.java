@@ -173,6 +173,9 @@ public class IronTincture extends Ability {
 			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {
 				@Override
 				public void onHurt(LivingEntity entity, DamageEvent event) {
+					if (event.getType() == DamageEvent.DamageType.TRUE) {
+						return;
+					}
 					if (entity instanceof Player player) {
 						if (AbsorptionUtils.getAbsorption(player) > 0) {
 							event.setDamage(event.getDamage() * (1 - resistance));

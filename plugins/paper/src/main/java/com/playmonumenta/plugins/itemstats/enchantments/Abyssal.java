@@ -31,6 +31,9 @@ public class Abyssal implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ABYSSAL);
 		if (EntityUtils.isInWater(enemy) || EntityUtils.isInWater(player)) {
 			double multiplier = 1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level);

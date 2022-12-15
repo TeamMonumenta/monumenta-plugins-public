@@ -71,6 +71,9 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
+		if (event.getType() == DamageEvent.DamageType.TRUE) {
+			return;
+		}
 		if (ItemUtils.isHoe(mPlayer.getInventory().getItemInMainHand())) {
 			event.setDamage(event.getDamage() * DAMAGE_MODIFIER);
 		}
