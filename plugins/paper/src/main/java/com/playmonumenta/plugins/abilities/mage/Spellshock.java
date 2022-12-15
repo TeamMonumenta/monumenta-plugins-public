@@ -110,6 +110,7 @@ public class Spellshock extends Ability {
 				}
 			}
 		} else if (event.getAbility() != null
+			           && !event.getAbility().isFake()
 			           && event.getAbility() != ClassAbility.BLIZZARD
 			           && event.getAbility() != ClassAbility.ARCANE_STRIKE
 			           && event.getAbility() != ClassAbility.ARCANE_STRIKE_ENHANCED
