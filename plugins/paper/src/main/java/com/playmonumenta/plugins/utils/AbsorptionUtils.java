@@ -133,7 +133,12 @@ public class AbsorptionUtils {
 		}
 		List<AbsorptionDisplayable> filteredDisplayables = new ArrayList<>();
 		displayables.forEach(d -> {
+			// Add displayables if they are not eclipsed by any we've already added
 			if (filteredDisplayables.stream().noneMatch(d::isEclipsedBy)) {
+				// Remove any that have been added already that d eclipses
+				// If o is equivalent to d, we would not get to this point
+				filteredDisplayables.removeIf(o -> o.isEclipsedBy(d));
+
 				filteredDisplayables.add(d);
 			}
 		});
