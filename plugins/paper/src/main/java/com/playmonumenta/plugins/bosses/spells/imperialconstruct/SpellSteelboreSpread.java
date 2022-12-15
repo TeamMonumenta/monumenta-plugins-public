@@ -55,6 +55,12 @@ public class SpellSteelboreSpread extends Spell {
 		BukkitRunnable testrunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
+				if (mBoss.isDead() || !mBoss.isValid()) {
+					mChargeUp.reset();
+					this.cancel();
+					return;
+				}
+
 				List<Player> players = PlayerUtils.playersInRange(mStartLoc, mRange, true);
 
 				if (mChargeUp.nextTick(2)) {
@@ -82,6 +88,12 @@ public class SpellSteelboreSpread extends Spell {
 
 								@Override
 								public void run() {
+									if (mBoss.isDead() || !mBoss.isValid()) {
+										mChargeUp.reset();
+										this.cancel();
+										return;
+									}
+
 									if (mT >= ANIM_TIME) {
 										if (!p.equals(n)) {
 											BossUtils.bossDamagePercent(mBoss, n, mDamage, ABILITY_NAME);
