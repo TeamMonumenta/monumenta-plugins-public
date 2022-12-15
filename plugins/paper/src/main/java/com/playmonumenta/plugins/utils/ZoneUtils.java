@@ -23,6 +23,7 @@ public class ZoneUtils {
 		SPECTATE_AVAILABLE("Spectate Available"),
 		RESIST_5("Resistance V"),
 		DISABLE_GRAVES("Disable Graves"),
+		DISABLE_REDSTONE_INTERACTIONS("Disable Redstone Interactions"),
 		SPEED_2("Speed II"),
 		SATURATION_2("Saturation II"),
 		MASK_SPEED("Mask Speed"),
@@ -103,10 +104,7 @@ public class ZoneUtils {
 			return false;
 		}
 		if (hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE)) {
-			if (isInPlot(loc)) {
-				return true;
-			}
-			return false;
+			return isInPlot(loc);
 		}
 		return true;
 	}

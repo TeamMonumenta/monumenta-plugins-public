@@ -59,6 +59,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
@@ -203,7 +204,7 @@ public class PlayerListener implements Listener {
 			    && event.getPlayer().isOnline()) {
 			// Check for isOnline() as this event sometimes gets called before the join event,
 			// and updating client mod state causes initialisation of player abilities, which must not happen before login or some abilities break.
-			// Also cannot just remove this, as sometimes the channel is registered after login, so abilities are already instantiated and not sent to the player.
+			// Also, cannot just remove this, as sometimes the channel is registered after login, so abilities are already instantiated and not sent to the player.
 			Bukkit.getScheduler().runTask(mPlugin, () -> ClientModHandler.updateAbilities(event.getPlayer()));
 		}
 	}
@@ -251,12 +252,25 @@ public class PlayerListener implements Listener {
 		Material mat = (block != null) ? block.getType() : Material.AIR;
 
 		// Plot Security: If block is in a plot but the player is in adventure, cancel.
-		if (block != null && player != null && player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(block.getLocation())) {
+		if (block != null && player.getGameMode() == GameMode.ADVENTURE && ZoneUtils.isInPlot(block.getLocation())) {
 			event.setCancelled(true);
 			return;
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE && block != null && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)) {
+		BlockData blockData;
+		if (block == null) {
+			blockData = null;
+		} else {
+			blockData = block.getBlockData();
+		}
+
+		if (player.getGameMode() != GameMode.CREATIVE && block != null && !(blockData instanceof Powerable) && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.RESTRICTED)) {
+			event.setCancelled(true);
+			event.setUseInteractedBlock(Event.Result.DENY);
+			return;
+		}
+
+		if (player.getGameMode() != GameMode.CREATIVE && blockData instanceof Powerable && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.DISABLE_REDSTONE_INTERACTIONS)) {
 			event.setCancelled(true);
 			event.setUseInteractedBlock(Event.Result.DENY);
 			return;
@@ -281,7 +295,7 @@ public class PlayerListener implements Listener {
 
 		// Item Interactions
 		if (event.useItemInHand() != Event.Result.DENY) {
-			if (item != null && ItemUtils.isArmor(item)) {
+			if (ItemUtils.isArmor(item)) {
 				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
 			}
 		}
@@ -375,7 +389,7 @@ public class PlayerListener implements Listener {
 		}
 
 		//Prevent feeding special item lore items to animals (specifically horses)
-		if (clickedEntity instanceof Animals && itemInHand != null && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasLore()) {
+		if (clickedEntity instanceof Animals && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasLore()) {
 			event.setCancelled(true);
 			return;
 		} else if (clickedEntity instanceof ItemFrame frame) {
@@ -394,7 +408,7 @@ public class PlayerListener implements Listener {
 				}
 
 				ItemStack frameItem = frame.getItem();
-				if (frameItem != null && frameItem.getType().equals(Material.FILLED_MAP)) {
+				if (frameItem.getType().equals(Material.FILLED_MAP)) {
 					if (player.getGameMode().equals(GameMode.ADVENTURE)) {
 						ItemStack giveMap = frameItem.clone();
 						ItemMeta mapMeta;
@@ -474,8 +488,7 @@ public class PlayerListener implements Listener {
 	// An entity picked up an item
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityPickupItemEvent(EntityPickupItemEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED) && player.getGameMode() != GameMode.CREATIVE) {
@@ -607,8 +620,7 @@ public class PlayerListener implements Listener {
 	// The player opened an inventory
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryOpenEvent(InventoryOpenEvent event) {
-		if (event.getPlayer() instanceof Player) {
-			Player player = (Player) event.getPlayer();
+		if (event.getPlayer() instanceof Player player) {
 
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
@@ -626,8 +638,8 @@ public class PlayerListener implements Listener {
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
-		if (holder != null && holder instanceof Chest chest) {
-			// Break empty graves or halloween creeper chests in safe zones automatically when closed
+		if (holder instanceof Chest chest) {
+			// Break empty graves or Halloween creeper chests in safe zones automatically when closed
 			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
 			}
@@ -644,8 +656,7 @@ public class PlayerListener implements Listener {
 	// Something interacts with an inventory
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void inventoryInteractEvent(InventoryInteractEvent event) {
-		if (event.getWhoClicked() instanceof Player) {
-			Player player = (Player) event.getWhoClicked();
+		if (event.getWhoClicked() instanceof Player player) {
 
 			/* Don't let the player do this when in a restricted zone */
 			if (ZoneUtils.hasZoneProperty(player, ZoneProperty.RESTRICTED)
@@ -675,7 +686,7 @@ public class PlayerListener implements Listener {
 		    || command.startsWith("nbtp")) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				ItemStack item = player.getEquipment().getItemInMainHand();
-				if (item != null && item.getAmount() > 0) {
+				if (item.getAmount() > 0) {
 					ItemUtils.setPlainTag(item);
 					player.getEquipment().setItemInMainHand(item, true);
 				}
@@ -714,7 +725,7 @@ public class PlayerListener implements Listener {
 
 		InventoryUtils.removeSpecialItems(player, true, false);
 
-		//Cleanse mobs around player in d6ungeon if running solo
+		//Cleanse mobs around player in dungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
 			if (PlayerUtils.otherPlayersInRange(event.getEntity(), 48, true).size() == 0) {
 				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(event.getEntity().getLocation(), 20);
@@ -739,8 +750,9 @@ public class PlayerListener implements Listener {
 		// Give the player a NewDeath score of 1 so the city guides will give items again
 		ScoreboardUtils.setScoreboardValue(player, "NewDeath", 1);
 
-		if (event.deathMessage() != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
-			player.sendMessage(event.deathMessage());
+		Component deathMessage = event.deathMessage();
+		if (deathMessage != null && ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0) != 0) {
+			player.sendMessage(deathMessage);
 			player.sendMessage(Component.text("Only you saw this message. Change this with /deathmsg", NamedTextColor.AQUA));
 			event.deathMessage(null);
 		}
@@ -756,16 +768,13 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		final String name = player.getName();
 
-		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-			@Override
-			public void run() {
-				Player player = Bukkit.getPlayer(name);
-				if (player != null) {
-					mPlugin.mPotionManager.clearAllPotions(player);
-					mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
+		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> {
+			Player player1 = Bukkit.getPlayer(name);
+			if (player1 != null) {
+				mPlugin.mPotionManager.clearAllPotions(player1);
+				mPlugin.mAbilityManager.updatePlayerAbilities(player1, true);
 
-					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
-				}
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player1, event);
 			}
 		}, 0);
 
@@ -822,7 +831,7 @@ public class PlayerListener implements Listener {
 			ItemStack activeItem = player.getActiveItem();
 			StatTrackManager.getInstance().incrementStatImmediately(activeItem, player, InfusionType.STAT_TRACK_CONSUMED, 1);
 
-			// Set replacement to a copy of the original so it is not consumed (must be a copy as the internal code checks for reference equality)
+			// Set replacement to a copy of the original, so it is not consumed (must be a copy as the internal code checks for reference equality)
 			event.setReplacement(ItemUtils.clone(activeItem));
 		}
 
@@ -832,26 +841,14 @@ public class PlayerListener implements Listener {
 
 		for (PotionEffect effect : PotionUtils.getEffects(item)) {
 			// Kill the player if they drink a potion with instant damage 10+
-			if (effect.getType() != null
-			    && effect.getType().equals(PotionEffectType.HARM)
-				&& effect.getAmplifier() >= 9) {
+			PotionEffectType effectType = effect.getType();
+			if (effectType.equals(PotionEffectType.HARM) && effect.getAmplifier() >= 9) {
 
-				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-					@Override
-					public void run() {
-						player.setHealth(0);
-					}
-				}, 0);
-			} else if (effect.getType() != null &&
-					effect.getType().equals(PotionEffectType.SLOW_FALLING)) {
+				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> player.setHealth(0), 0);
+			} else if (effectType.equals(PotionEffectType.SLOW_FALLING)) {
 				//Remove Slow Falling effects
 				player.sendMessage(Component.text("You cannot apply slow falling potion effects, other effects were still applied.", NamedTextColor.RED));
-				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-					@Override
-					public void run() {
-						player.removePotionEffect(PotionEffectType.SLOW_FALLING);
-					}
-				}, 1);
+				player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> player.removePotionEffect(PotionEffectType.SLOW_FALLING), 1);
 			}
 		}
 	}
@@ -868,13 +865,13 @@ public class PlayerListener implements Listener {
 		int newDamage = oldDamage;
 
 		if (ItemUtils.isArmor(item)) {
-			// Players that get resistance from safezones don't take armor damage
+			// Players that get resistance from safe zones don't take armor damage
 			if (oldDamage < 0 || ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 				newDamage = 0;
 			}
 		}
 
-		//Tridents do not take damage in safezones
+		//Tridents do not take damage in safe zones
 		if (item.getType() == Material.TRIDENT && ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_EQUIPMENT_DAMAGE)) {
 			newDamage = 0;
 		}
@@ -974,7 +971,7 @@ public class PlayerListener implements Listener {
 	}
 
 	public void runTeleportRunnable(Player player, Location loc) {
-		// Runnable to make sure that players don't get stuck in the floor too often. That if statement is a testament to never trying to edit how teleporting works, its so easy to break it
+		// Runnable to make sure that players don't get stuck in the floor too often. That if statement is a testament to never trying to edit how teleporting works, it's so easy to break it
 		// Made it only work if you are stuck exactly 2 blocks into the ground or less to prevent exploits, if it ends up being a problem, adding one for 3 blocks shouldn't be too hard
 		new BukkitRunnable() {
 			@Override
@@ -1074,7 +1071,7 @@ public class PlayerListener implements Listener {
 							GameMode mode;
 
 							if (mTicks == 0) {
-								//Set player's spawnpoint back to whatever it was
+								//Set player's spawn point back to whatever it was
 								player.setBedSpawnLocation(oldPlayerSpawn, true);
 							}
 
@@ -1083,7 +1080,7 @@ public class PlayerListener implements Listener {
 								// Get player's current gamemode
 								mode = player.getGameMode();
 
-								// Set player's gamemode to survival so they can be damaged
+								// Set player's gamemode to survival, so they can be damaged
 								player.setGameMode(GameMode.SURVIVAL);
 
 								// Poke the player to eject them from the bed
@@ -1304,9 +1301,7 @@ public class PlayerListener implements Listener {
 		) {
 			Plugin plugin = Plugin.getInstance();
 			if (plugin != null) {
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					plugin.mAbilityManager.updatePlayerAbilities(player, true);
-				}, 0);
+				Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.mAbilityManager.updatePlayerAbilities(player, true), 0);
 			}
 		}
 	}
@@ -1326,13 +1321,10 @@ public class PlayerListener implements Listener {
 		boolean cancel = false;
 
 		boolean gotDye = false;
-		boolean resultIsDyed = false;
-		if (resultMat.equals(Material.FIREWORK_STAR)
+		boolean resultIsDyed = resultMat.equals(Material.FIREWORK_STAR)
 			|| resultMatStr.startsWith("minecraft:leather_")
 			|| resultMatStr.endsWith("_banner")
-			|| resultMatStr.endsWith("_shulker_box")) {
-			resultIsDyed = true;
-		}
+			|| resultMatStr.endsWith("_shulker_box");
 
 		boolean gotBanner = false;
 		boolean gotShield = resultMat.equals(Material.SHIELD);
