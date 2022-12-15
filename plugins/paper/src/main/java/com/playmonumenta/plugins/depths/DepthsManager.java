@@ -742,13 +742,12 @@ public class DepthsManager {
 			return;
 		}
 
-		if (choice.getDisplayName().equals(RandomAspect.ABILITY_NAME)) {
+		if (choice == RandomAspect.INFO) {
 			//Roll random ability if they selected mystery box
 			int[] chances = {40, 40, 20, 0, 0};
 			getRandomAbility(p, dp, chances);
-		} else {
-			setPlayerLevelInAbility(choice.getDisplayName(), p, 1);
 		}
+		setPlayerLevelInAbility(choice.getDisplayName(), p, 1);
 	}
 
 	/**
@@ -1295,47 +1294,50 @@ public class DepthsManager {
 		party.mTreasureScore += treasureScoreIncrease;
 
 		//Check to see if they've finished the run (normal mode) and send to loot rooms
-		if (partyFloor == 3 && !party.mEndlessMode) {
-			List<DepthsPlayer> playersToLoop = new ArrayList<>(party.mPlayersInParty);
-			for (DepthsPlayer playerInParty : playersToLoop) {
-				if (playerInParty.hasDied()) {
-					//The player died before the rest of the party won, and has not yet respawned
-					continue;
+		if (partyFloor == 3) {
+			if (!party.mEndlessMode) {
+				List<DepthsPlayer> playersToLoop = new ArrayList<>(party.mPlayersInParty);
+				for (DepthsPlayer playerInParty : playersToLoop) {
+					if (playerInParty.hasDied()) {
+						//The player died before the rest of the party won, and has not yet respawned
+						continue;
+					}
+					playerInParty.setDeathRoom(30);
+					Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
+					if (player != null) {
+						DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
+						dp.mFinalTreasureScore = party.mTreasureScore;
+						player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
+						getPartyFromId(dp).populateLootRoom(player, false);
+						int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
+						if (depthsWins == 0) {
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						} else {
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+						}
+						//Set score
+						ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
+						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
+					}
 				}
-				playerInParty.setDeathRoom(30);
-				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
-				if (player != null) {
-					DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
-					dp.mFinalTreasureScore = party.mTreasureScore;
-					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-					getPartyFromId(dp).populateLootRoom(player, false);
-					int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
-					if (depthsWins == 0) {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
-					} else {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+				return;
+			} else {
+				for (DepthsPlayer playerInParty : party.mPlayersInParty) {
+					Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
+					if (player == null || !player.isOnline()) {
+						continue;
+					}
+					//Transform mystery box if applicable
+					if (getPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player) > 0) {
+						transformMysteryBox(player);
 					}
 					//Set score
-					ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
+					ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
 					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
 				}
 			}
-			return;
-		} else if (partyFloor == 3) {
-			for (DepthsPlayer playerInParty : party.mPlayersInParty) {
-				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
-				if (player == null || !player.isOnline()) {
-					continue;
-				}
-				//Transform mystery box if applicable
-				if (getPlayerLevelInAbility(RandomAspect.ABILITY_NAME, player) > 0) {
-					transformMysteryBox(player);
-				}
-				//Set score
-				ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
-				Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
-			}
 		}
+
 		//Check to see if we're in endless mode and need to assign delve points to players
 		if (party.mEndlessMode && partyFloor >= 3 && partyFloor <= 14) {
 			int delvePoints = DepthsEndlessDifficulty.DELVE_POINTS_PER_FLOOR[partyFloor - 1];

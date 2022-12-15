@@ -152,11 +152,18 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	 * @return the item to display
 	 */
 	public @Nullable DepthsAbilityItem getAbilityItem(int rarity) {
+		if (rarity <= 0) {
+			//This should never happen
+			return null;
+		}
 		DepthsAbilityItem item = null;
 
 		//Don't crash our abilities because of a null item
 		try {
 			item = new DepthsAbilityItem();
+			if (mDepthsTree == null) {
+				rarity = 1;
+			}
 			item.mRarity = rarity;
 			item.mAbility = getDisplayName();
 			item.mTrigger = mDepthsTrigger;
@@ -165,11 +172,11 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			TextColor color = mDepthsTree == null ? NamedTextColor.WHITE : mDepthsTree.getColor();
 			meta.displayName(Component.text("" + ChatColor.BOLD + getDisplayName(), color).decoration(TextDecoration.ITALIC, false));
-			List<Component> lore = new ArrayList<>();
-			if (rarity > 0 && mDepthsTree != null) {
+			if (mDepthsTree != null) {
+				List<Component> lore = new ArrayList<>();
 				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity));
+				meta.lore(lore);
 			}
-			meta.lore(lore);
 			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE, false);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, getDisplayName());
