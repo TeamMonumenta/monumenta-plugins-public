@@ -87,7 +87,7 @@ public class AvengerBoss extends BossAbilityGroup {
 
 	@Override
 	public void nearbyEntityDeath(EntityDeathEvent event) {
-		if (!event.isCancelled() && mBoss != null) {
+		if (!event.isCancelled() && mBoss != null && !mBoss.isDead()) {
 
 			LivingEntity entity = event.getEntity();
 
