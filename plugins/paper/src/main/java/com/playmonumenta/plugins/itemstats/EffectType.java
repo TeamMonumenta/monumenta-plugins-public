@@ -432,7 +432,7 @@ public enum EffectType {
 			case FIRE_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE)));
 			case FALL_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL)));
 
-			case DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength));
+			case DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getScalableDamageType()));
 			case PROJECTILE_DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE)));
 			case MAGIC_DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC)));
 			case MELEE_DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE)));

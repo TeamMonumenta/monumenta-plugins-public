@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
@@ -102,6 +103,20 @@ public class DamageEvent extends Event implements Cancellable {
 
 		public boolean isDefendable() {
 			return mIsDefendable;
+		}
+
+		public static EnumSet<DamageType> getEnumSet() {
+			return EnumSet.copyOf(List.of(DamageType.values()));
+		}
+
+		public static EnumSet<DamageType> getScalableDamageType() {
+			EnumSet<DamageType> enumSet = getEnumSet();
+			enumSet.removeAll(getUnscalableDamageType());
+			return enumSet;
+		}
+
+		public static EnumSet<DamageType> getUnscalableDamageType() {
+			return EnumSet.of(DamageType.AILMENT, DamageType.POISON, DamageType.FALL, DamageType.OTHER, DamageType.TRUE);
 		}
 
 		public static ParseResult<DamageType> fromReader(StringReader reader, String hoverDescription) {
