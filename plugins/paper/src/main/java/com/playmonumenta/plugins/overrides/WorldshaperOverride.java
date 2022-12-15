@@ -254,7 +254,7 @@ public class WorldshaperOverride {
 
 		boolean blockPlaced = false;
 		for (Location location : blockPlacePattern) {
-			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanInteractWithBlock(player, location, false) || ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
+			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanMineBlock(player, location) || ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
 				continue;
 			}
 

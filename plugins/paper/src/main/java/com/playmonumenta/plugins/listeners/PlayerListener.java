@@ -343,7 +343,7 @@ public class PlayerListener implements Listener {
 		}
 
 		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
-		if (!ZoneUtils.playerCanInteractWithBlock(player, block, true)) {
+		if (!ZoneUtils.playerCanMineBlock(player, block)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -1180,7 +1180,7 @@ public class PlayerListener implements Listener {
 		}
 
 		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
-		if (!ZoneUtils.playerCanInteractWithBlock(player, block, true)) {
+		if (!ZoneUtils.playerCanMineBlock(player, block)) {
 			event.setCancelled(true);
 			return;
 		}

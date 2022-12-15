@@ -143,7 +143,7 @@ public class Excavator implements Enchantment {
 			return false;
 		}
 
-		if (!ZoneUtils.playerCanInteractWithBlock(player, block, false)) {
+		if (!ZoneUtils.playerCanMineBlock(player, block)) {
 			return false;
 		}
 
