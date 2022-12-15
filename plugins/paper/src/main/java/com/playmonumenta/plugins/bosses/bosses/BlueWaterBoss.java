@@ -37,7 +37,7 @@ public class BlueWaterBoss extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellRunAction(() -> {
-				if (mBlueTimeOfDay > 0) {
+				if (!mBoss.isDead() && mBlueTimeOfDay > 0) {
 					mBoss.setHealth(Math.min(mBoss.getHealth() + REGEN_HEAL[mBlueTimeOfDay], EntityUtils.getMaxHealth(mBoss)));
 				}
 			})
