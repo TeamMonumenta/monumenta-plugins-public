@@ -49,6 +49,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PotionConsumeListener implements Listener {
 	private static final int DRINK_TICK_DELAY = 4; //How many ticks between each slurp sound
@@ -123,34 +124,14 @@ public class PotionConsumeListener implements Listener {
 
 		event.setCancelled(true);
 
-		boolean cooldownApplies = false;
-		boolean onlyGlowing = false;
-		for (NBTListCompound effect : customEffects) {
-			if (effect.hasKey(ItemStatUtils.EFFECT_TYPE_KEY)) {
-				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
-				if (type == EffectType.VANILLA_GLOW) {
-					onlyGlowing = true;
-				} else if (type != null) {
-					onlyGlowing = false;
-					if (COOLDOWN_EFFECTS.containsKey(type)) {
-						double amount = COOLDOWN_EFFECTS.get(type);
-						if (amount == 0 || (effect.hasKey(ItemStatUtils.EFFECT_STRENGTH_KEY) && effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY) >= amount)) {
-							cooldownApplies = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !onlyGlowing) {
+		if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !isOnlyGlowing(customEffects)) {
 			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
 			float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
 			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
 			return;
 		}
 
-		if (cooldownApplies && clickedInventory.getType() != InventoryType.CHEST) {
+		if (cooldownApplies(customEffects) && clickedInventory.getType() != InventoryType.CHEST) {
 			if (checkPotionCooldown(player)) {
 				player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -288,7 +269,7 @@ public class PotionConsumeListener implements Listener {
 		}
 
 		ItemStack prevPotion = mPotionsConsumed.get(uuid);
-		if (prevPotion == null || !ItemStatUtils.hasEnchantment(prevPotion, EnchantmentType.INFINITY)) {
+		if (prevPotion == null || ItemStatUtils.hasEnchantment(prevPotion, EnchantmentType.INFINITY)) {
 			return;
 		}
 
@@ -301,10 +282,12 @@ public class PotionConsumeListener implements Listener {
 			prevPotion.setAmount(1);
 			clickedInventory.addItem(prevPotion);
 		}
-		mPotionsConsumed.remove(player.getUniqueId());
-		mCooldowns.remove(player.getUniqueId());
+		mPotionsConsumed.remove(uuid);
+		if (cooldownApplies(prevPotion)) {
+			mCooldowns.remove(uuid);
+		}
 		runnable.cancel();
-		mRunnables.remove(player.getUniqueId());
+		mRunnables.remove(uuid);
 		event.setCancelled(true);
 	}
 
@@ -334,6 +317,43 @@ public class PotionConsumeListener implements Listener {
 	//False if no cooldowns and the quick drink is activatable now
 	private boolean checkPotionCooldown(HumanEntity player) {
 		return mCooldowns.containsKey(player.getUniqueId());
+	}
+
+	private boolean cooldownApplies(ItemStack item) {
+		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
+		return cooldownApplies(customEffects);
+	}
+
+	private boolean cooldownApplies(@Nullable NBTCompoundList customEffects) {
+		if (customEffects == null) {
+			return false;
+		}
+
+		for (NBTListCompound effect : customEffects) {
+			if (effect.hasKey(ItemStatUtils.EFFECT_TYPE_KEY)) {
+				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
+				if (COOLDOWN_EFFECTS.containsKey(type)) {
+					double amount = COOLDOWN_EFFECTS.get(type);
+					if (amount == 0 || (effect.hasKey(ItemStatUtils.EFFECT_STRENGTH_KEY) && effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY) >= amount)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isOnlyGlowing(NBTCompoundList customEffects) {
+		for (NBTListCompound effect : customEffects) {
+			if (effect.hasKey(ItemStatUtils.EFFECT_TYPE_KEY)) {
+				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
+				if (type != EffectType.VANILLA_GLOW) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
