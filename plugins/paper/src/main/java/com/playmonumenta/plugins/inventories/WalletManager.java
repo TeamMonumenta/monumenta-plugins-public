@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
@@ -57,6 +59,8 @@ public class WalletManager implements Listener {
 
 	private static ImmutableList<ItemStack> MANUAL_SORT_ORDER;
 
+	private static ImmutableList<ItemStack> MAIN_CURRENCIES;
+
 	/**
 	 * Compressible currency items.
 	 * If an item has multiple compression levels, they must be ordered from most compressed to least compressed.
@@ -65,31 +69,53 @@ public class WalletManager implements Listener {
 	private static ImmutableList<CompressionInfo> COMPRESSIBLE_CURRENCIES;
 
 	public static void initialize(Location loc) {
-		MANUAL_SORT_ORDER = Stream.of(
+
+		MAIN_CURRENCIES = Stream.of(
 				// r1
 				"epic:r1/items/currency/hyper_experience",
 				"epic:r1/items/currency/concentrated_experience",
 				"epic:r1/items/currency/experience",
-				"epic:r1/items/currency/pulsating_gold",
-				"epic:r1/fragments/royal_dust",
 
 				// r2
 				"epic:r2/items/currency/hyper_crystalline_shard",
 				"epic:r2/items/currency/compressed_crystalline_shard",
 				"epic:r2/items/currency/crystalline_shard",
-				"epic:r2/items/currency/pulsating_emerald",
-				"epic:r2/fragments/gleaming_dust",
 
 				// r3
 				"epic:r3/items/currency/hyperchromatic_archos_ring",
-				"epic:r3/items/currency/archos_ring",
+				"epic:r3/items/currency/archos_ring"
+			).map(path -> InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(path)))
+			                  .collect(ImmutableList.toImmutableList());
+
+		MANUAL_SORT_ORDER = Stream.of(
+				// r1
+				"epic:r1/items/currency/pulsating_gold_bar",
+				"epic:r1/items/currency/pulsating_gold",
+				"epic:r1/fragments/royal_dust",
+				"epic:r1/transmog/rare_frag",
+				"epic:r1/items/currency/pulsating_dust",
+				"epic:r1/items/currency/pulsating_dust_frag",
+
+				// r2
+				"epic:r2/items/currency/pulsating_emerald_block",
+				"epic:r2/items/currency/pulsating_emerald",
+				"epic:r2/fragments/gleaming_dust",
+				"epic:r2/transmog/rare_frag",
+				"epic:r2/transmog/pulsating_powder",
+				"epic:r2/transmog/t5_frag",
+
+				// r3
 				"epic:r3/items/currency/pulsating_diamond",
 				"epic:r3/items/currency/silver_dust",
+				"epic:r3/transmog/melted_candle",
 				"epic:r3/items/currency/alacrity_augment",
 				"epic:r3/items/currency/fortitude_augment",
-				"epic:r3/items/currency/potency_augment"
+				"epic:r3/items/currency/potency_augment",
+				"epic:r3/items/currency/pulsating_shard",
+				"epic:r3/transmog/pulsating_shard_fragment"
 			).map(path -> InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(path)))
 			                    .collect(ImmutableList.toImmutableList());
+
 		COMPRESSIBLE_CURRENCIES = ImmutableList.of(
 			// r1
 			new CompressionInfo("epic:r1/items/currency/hyper_experience",
@@ -352,22 +378,38 @@ public class WalletManager implements Listener {
 				}
 			}
 
-			// Items grouped by region, and sorted by manual order, then location, then compression, then name within a region
+			// Items grouped by region, and sorted within each region
 			Map<ItemStatUtils.Region, List<WalletItem>> items =
 				walletItemsCopy.stream()
-					.sorted(Comparator.comparing((WalletItem item) -> {
-							int index = MANUAL_SORT_ORDER.indexOf(item.mItem);
-							return index < 0 ? Integer.MAX_VALUE : index;
-						})
-						        .thenComparing((WalletItem item) -> ItemStatUtils.getLocation(item.mItem))
-						        .thenComparing((WalletItem item) -> COMPRESSIBLE_CURRENCIES.stream().anyMatch(ci -> ci.mCompressed.isSimilar(item.mItem)) ? 1
-							                                            : COMPRESSIBLE_CURRENCIES.stream().anyMatch(ci -> ci.mBase.isSimilar(item.mItem)) ? 2
-								                                              : 3)
-						        .thenComparing((WalletItem item) -> ItemUtils.getPlainNameIfExists(item.mItem)))
-					.collect(Collectors.groupingBy((WalletItem item) -> ItemStatUtils.getRegion(item.mItem)));
+					.sorted(
+						// sort main currencies to the very front
+						Comparator.comparing((WalletItem item) -> {
+								int index = MAIN_CURRENCIES.indexOf(item.mItem);
+								return index < 0 ? Integer.MAX_VALUE : index;
+							})
+							// then sort by location
+							.thenComparing((WalletItem item) -> ItemStatUtils.getLocation(item.mItem))
+							// then by manual sort order (and manually sorted items are the first in their location)
+							.thenComparing((WalletItem item) -> {
+								int index = MANUAL_SORT_ORDER.indexOf(item.mItem);
+								return index < 0 ? Integer.MAX_VALUE : index;
+							})
+							// sort compressible currencies from most valuable to least valuable
+							.thenComparing((WalletItem item) -> {
+								CompressionInfo compressionInfo = getCompressionInfo(item.mItem);
+								if (compressionInfo != null) {
+									return -compressionInfo.mAmount;
+								}
+								return COMPRESSIBLE_CURRENCIES.stream().anyMatch(ci -> ci.mBase.isSimilar(item.mItem)) ? 0 : 1;
+							})
+							// finally, sort by name
+							.thenComparing((WalletItem item) -> ItemUtils.getPlainNameIfExists(item.mItem)))
+					// group everything by region
+					.collect(Collectors.groupingBy((WalletItem item) -> MAIN_CURRENCIES.contains(item.mItem) ? ItemStatUtils.Region.NONE : ItemStatUtils.getRegion(item.mItem)));
 
 			// Fill GUI with items
 			boolean showAmounts = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_TAG);
+			boolean showAmountsAsStacks = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_AS_STACKS_TAG);
 			int pos = 0;
 			int itemsPerPage = 5 * 8; // top row and left column reserved
 			for (ItemStatUtils.Region region : ItemStatUtils.Region.values()) {
@@ -390,13 +432,31 @@ public class WalletManager implements Listener {
 					ItemStack displayItem = ItemUtils.clone(item.mItem);
 					ItemMeta itemMeta = displayItem.getItemMeta();
 					if (itemMeta != null) {
-						itemMeta.displayName(
-							Component.text(item.mAmount + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
-								.append(itemMeta.hasDisplayName() ? itemMeta.displayName() : item.mItem.displayName()));
+						String amount;
+						if (showAmountsAsStacks && item.mItem.getMaxStackSize() > 1 && item.mAmount >= item.mItem.getMaxStackSize()) {
+							long stacks = item.mAmount / item.mItem.getMaxStackSize();
+							long remaining = item.mAmount % item.mItem.getMaxStackSize();
+							amount = item.mAmount + " (" + stacks + " stack" + (stacks == 1 ? "" : "s") + (remaining == 0 ? "" : " + " + remaining) + ")";
+						} else {
+							amount = "" + item.mAmount;
+						}
+						Component name = Component.text(amount + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
+							                 .append(itemMeta.hasDisplayName() ? itemMeta.displayName() : item.mItem.displayName());
+						for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
+							boolean isBase = compressionInfo.mBase.isSimilar(item.mItem);
+							if (isBase || compressionInfo.mCompressed.isSimilar(item.mItem)) {
+								long count = isBase ? mWallet.count(compressionInfo.mBase) : mWallet.count(compressionInfo.mBase) / compressionInfo.mAmount;
+								if (count != item.mAmount) {
+									name = name.append(Component.text(" (" + count + " total)", NamedTextColor.GOLD));
+								}
+								break;
+							}
+						}
+						itemMeta.displayName(name);
 						displayItem.setItemMeta(itemMeta);
 					}
 					if (showAmounts) {
-						displayItem.setAmount((int) Math.max(1, Math.min(64, item.mAmount)));
+						displayItem.setAmount((int) Math.max(1, Math.min(64, showAmountsAsStacks ? item.mAmount / item.mItem.getMaxStackSize() : item.mAmount)));
 					}
 					setItem(10 + posInPage + posInPage / 8, new GuiItem(displayItem, false))
 						.onClick(event -> {
@@ -425,7 +485,7 @@ public class WalletManager implements Listener {
 										.response((player, lines) -> {
 											double retrievedAmount;
 											try {
-												retrievedAmount = lines[0].isEmpty() ? 0 : Double.parseDouble(lines[0]);
+												retrievedAmount = lines[0].isEmpty() ? 0 : parseDoubleOrCalculation(lines[0]);
 											} catch (NumberFormatException e) {
 												player.sendMessage(Component.text("Please enter a valid number.", NamedTextColor.RED));
 												return false;
@@ -434,7 +494,7 @@ public class WalletManager implements Listener {
 												player.sendMessage(Component.text("Please enter a positive number.", NamedTextColor.RED));
 												return false;
 											}
-											CompressionInfo compressionInfo = getCompressionInfo(movedItem);
+											CompressionInfo compressionInfo = getCompressionInfo(item.mItem);
 											long countInWallet = mWallet.count(compressionInfo == null ? movedItem : compressionInfo.mBase);
 											long desiredAmount = (long) Math.ceil(compressionInfo == null ? retrievedAmount : retrievedAmount * compressionInfo.mAmount);
 
@@ -524,7 +584,9 @@ public class WalletManager implements Listener {
 				ItemMeta itemMeta = infoIcon.getItemMeta();
 				itemMeta.displayName(Component.text("Bag of Hoarding Info", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 				itemMeta.lore(List.of(
-					Component.text("Click here to toggle displaying item counts.", NamedTextColor.WHITE)
+					Component.text("Left click here to toggle displaying item counts.", NamedTextColor.WHITE)
+						.decoration(TextDecoration.ITALIC, false),
+					Component.text("Right click here to toggle showing counts in stacks.", NamedTextColor.WHITE)
 						.decoration(TextDecoration.ITALIC, false),
 					Component.text("Click on currency items in your inventory to store them.", NamedTextColor.GRAY)
 						.decoration(TextDecoration.ITALIC, false),
@@ -543,12 +605,17 @@ public class WalletManager implements Listener {
 						.append(Component.text(" to retrieve everything", NamedTextColor.GRAY)),
 					Component.text(" - ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 						.append(Component.keybind("key.swapOffhand", NamedTextColor.WHITE))
-						.append(Component.text(" to retrieve a custom amount", NamedTextColor.GRAY))
+						.append(Component.text(" to retrieve a custom amount", NamedTextColor.GRAY)),
+					Component.text("   (may be a fraction or simple calculation)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 				));
 				infoIcon.setItemMeta(itemMeta);
 				setItem(4, infoIcon)
 					.onLeftClick(() -> {
 						ScoreboardUtils.toggleTag(mPlayer, CustomContainerItemManager.SHOW_AMOUNTS_TAG);
+						update();
+					})
+					.onRightClick(() -> {
+						ScoreboardUtils.toggleTag(mPlayer, CustomContainerItemManager.SHOW_AMOUNTS_AS_STACKS_TAG);
 						update();
 					});
 			}
@@ -684,7 +751,7 @@ public class WalletManager implements Listener {
 	public static boolean canPutIntoWallet(ItemStack item) {
 		return item != null
 			       && item.getAmount() > 0
-			       && ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY
+			       && (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY || InventoryUtils.testForItemWithLore(item, "Can be put into a Bag of Hoarding."))
 			       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null;
 	}
 
@@ -714,6 +781,29 @@ public class WalletManager implements Listener {
 					Component.text("Wallet of ", NamedTextColor.GOLD).append(viewee.displayName())).open();
 			})
 			.register();
+	}
+
+	private static final Pattern OPERATION_PATTERN = Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*([-+*/])\\s*(\\d+(?:\\.\\d+)?)");
+
+	private static double parseDoubleOrCalculation(String line) throws NumberFormatException {
+		try {
+			return Double.parseDouble(line);
+		} catch (NumberFormatException e) {
+			Matcher matcher = OPERATION_PATTERN.matcher(line);
+			if (matcher.matches()) {
+				double n1 = Double.parseDouble(matcher.group(1));
+				double n2 = Double.parseDouble(matcher.group(3));
+				return switch (matcher.group(2)) {
+					case "-" -> n1 - n2;
+					case "+" -> n1 + n2;
+					case "*" -> n1 * n2;
+					case "/" -> n1 / n2;
+					default -> 0;
+				};
+			} else {
+				throw e;
+			}
+		}
 	}
 
 }
