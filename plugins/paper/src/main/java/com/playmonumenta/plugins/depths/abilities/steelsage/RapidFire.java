@@ -46,7 +46,7 @@ public class RapidFire extends DepthsAbility {
 		new DepthsAbilityInfo<>(RapidFire.class, ABILITY_NAME, RapidFire::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.RAPIDFIRE)
 			.cooldown(COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.REPEATER))
 			.descriptions(RapidFire::getDescription, MAX_RARITY);
