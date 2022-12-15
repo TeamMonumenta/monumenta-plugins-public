@@ -132,20 +132,21 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			if (mDPSCounter10s == -1) {
 				mDPSCounter10s = 0;
 
-				if (mHologram != null) {
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						mDPSDisp10s = mDPSCounter10s / 10;
-						mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							                     .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-							                     .append(Component.text(" (", NamedTextColor.YELLOW))
-							                     .append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-							                     .append(Component.text("/", NamedTextColor.YELLOW))
-							                     .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							                     .append(Component.text(")", NamedTextColor.YELLOW)));
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					if (mHologram == null) {
+						return;
+					}
+					mDPSDisp10s = mDPSCounter10s / 10;
+					mHologram.customName(Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
+						.append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+						.append(Component.text(" (", NamedTextColor.YELLOW))
+						.append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
+						.append(Component.text("/", NamedTextColor.YELLOW))
+						.append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+						.append(Component.text(")", NamedTextColor.YELLOW)));
 
-						mDPSCounter10s = -1;
-					}, 200);
-				}
+					mDPSCounter10s = -1;
+				}, 200);
 			}
 
 			mDPSCounter += damage;
