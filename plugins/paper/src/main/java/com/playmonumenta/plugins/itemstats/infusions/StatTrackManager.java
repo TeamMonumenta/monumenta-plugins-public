@@ -156,19 +156,26 @@ public class StatTrackManager implements Listener {
 	 * Immediately applies the given stat track to the item. Only use this if the item is not in the player's hands, or will be updated anyway.
 	 */
 	public void incrementStatImmediately(ItemStack item, Player player, InfusionType enchant, int amount) {
+		int oldStat = ItemStatUtils.getInfusionLevel(item, enchant);
+		if (oldStat != 0 && !ItemStatUtils.hasInfusion(item, InfusionType.STAT_TRACK)) {
+			// fix broken items from a past bug
+			ItemStatUtils.removeInfusion(item, enchant);
+			return;
+		}
+		if (oldStat == 0 || !isPlayersItem(item, player)) {
+			return;
+		}
 		List<StatTrackData> dataList = mData.get(player.getUniqueId());
 		if (dataList != null) {
 			for (Iterator<StatTrackData> iterator = dataList.iterator(); iterator.hasNext(); ) {
 				StatTrackData data = iterator.next();
 				if (NmsUtils.getVersionAdapter().isSameItem(data.mItemStack, item)) {
-					int oldStat = ItemStatUtils.getInfusionLevel(item, enchant);
 					ItemStatUtils.addInfusion(item, enchant, oldStat + amount + data.mUncommittedAmount, player.getUniqueId());
 					iterator.remove();
 					return;
 				}
 			}
 		}
-		int oldStat = ItemStatUtils.getInfusionLevel(item, enchant);
 		ItemStatUtils.addInfusion(item, enchant, oldStat + amount, player.getUniqueId());
 	}
 

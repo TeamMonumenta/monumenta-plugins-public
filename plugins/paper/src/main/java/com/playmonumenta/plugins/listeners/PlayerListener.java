@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
@@ -60,8 +61,8 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
@@ -820,12 +821,6 @@ public class PlayerListener implements Listener {
 					}
 				}
 			}
-			// Teleport the player to the respawn location after a tick as vanilla might move the player again after this event
-			// (e.g. due to intersecting unbreakable blocks or solid entities like boats).
-			Location finalRealRespawnLocation = realRespawnLocation;
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				player.teleport(finalRealRespawnLocation, TeleportCause.UNKNOWN);
-			});
 		}
 
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
@@ -842,6 +837,13 @@ public class PlayerListener implements Listener {
 
 		mPlugin.mEffectManager.addEffect(player, RespawnStasis.NAME, new RespawnStasis());
 		player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, 0.75f);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerPostRespawnEvent(PlayerPostRespawnEvent event) {
+		// Teleport the player to the respawn location as vanilla might have moved the player again after the respawn event
+		// (e.g. due to intersecting unbreakable blocks or solid entities like boats).
+		event.getPlayer().teleport(event.getRespawnedLocation());
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
