@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.effects;
 
-import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -23,7 +26,7 @@ public class TemporalFlux extends Effect {
 	public static final String effectID = "TemporalFlux";
 	public static final int MAX_TIME = 30 * 20;
 
-	private BossBar mBossBar;
+	private final BossBar mBossBar;
 
 	public TemporalFlux(int duration) {
 		super(duration, effectID);
@@ -49,14 +52,13 @@ public class TemporalFlux extends Effect {
 		if (fourHertz) {
 			double progress = ((double) getDuration() / (double) MAX_TIME);
 			mBossBar.setProgress(progress);
-			mBossBar.setTitle(ChatColor.BLUE + "Paradox expires in " + (getDuration()/ 20) + " seconds!");
+			mBossBar.setTitle(ChatColor.BLUE + "Paradox expires in " + (getDuration() / 20) + " seconds!");
 			if (progress <= 0.01) {
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, "Stasis");
-				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, VoodooBonds.EFFECT_NAME);
-				PlayerUtils.executeCommandOnNearbyPlayers(entity.getLocation(), 30, "kill " + entity.getName());
-				DamageUtils.damage(null, (LivingEntity) entity, DamageEvent.DamageType.OTHER, 999999999, null, true, false, "Temporal Flux");
+				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(entity, Stasis.GENERIC_NAME);
+				DamageUtils.damage(null, (LivingEntity) entity, DamageEvent.DamageType.TRUE, 999999999, null, true, false, "Temporal Flux");
 				mBossBar.setVisible(false);
 				mBossBar.removeAll();
+				return;
 			}
 			if (progress <= 0.25) {
 				mBossBar.setColor(BarColor.RED);

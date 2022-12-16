@@ -68,7 +68,7 @@ public class SpellParadoxSwap extends Spell {
 		PlayerUtils.playersInRange(damager.getLocation(), 50, true).forEach(player -> player.sendMessage(ChatColor.GOLD + "[Temporal Exchanger]" + ChatColor.WHITE + " TEMPORAL ANOMALY TRANSFERRED - ENTERING TEMPORARY ENERGY REGENERATION STATE"));
 		List<Player> nearbyPlayers = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
 		Collections.reverse(nearbyPlayers);
-		nearbyPlayers.remove((Player) damager);
+		nearbyPlayers.remove(damager);
 		for (Player p : nearbyPlayers) {
 			if (p != damager &&
 				    !com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.hasEffect(p, TemporalFlux.class)) {
