@@ -19,17 +19,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 
-public class FestiveTesseractOverride extends BaseOverride {
+public class FestiveTesseractOverride extends BaseOverride implements Listener {
 	private static final String TESSERACT_NAME = "Tesseract of Festivity";
 	private static final String TESSERACT_UPGRADENAME = "Tesseract of Festivity (u)";
 	private static final Particle.DustOptions FESTIVE_RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 98, 71), 1.0f);
@@ -38,6 +43,10 @@ public class FestiveTesseractOverride extends BaseOverride {
 	private static final HashMap<UUID, Integer> PLAYERS_ON_COOLDOWN = new HashMap<>();
 	private static final List<String> STANDARD_SUMMONS = new ArrayList<String>(Arrays.asList("TurretSnowman", "SpeedySnowman", "HeavySnowman", "HoppingSnowman"));
 	private static final List<String> UPGRADE_SUMMONS = new ArrayList<String>(Arrays.asList("SentrySnowman", "SneakySnowman", "TankSnowman", "AgileSnowman"));
+
+	public FestiveTesseractOverride() {
+		Bukkit.getPluginManager().registerEvents(this, Plugin.getInstance());
+	}
 
 	@Override
 	public boolean leftClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
@@ -129,6 +138,7 @@ public class FestiveTesseractOverride extends BaseOverride {
 			}
 		}
 
+		player.setCooldown(Material.ICE, COOLDOWN);
 		PLAYERS_ON_COOLDOWN.put(player.getUniqueId(), Bukkit.getServer().getCurrentTick() + COOLDOWN);
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			PLAYERS_ON_COOLDOWN.remove(player.getUniqueId());
@@ -149,5 +159,14 @@ public class FestiveTesseractOverride extends BaseOverride {
 		}
 		return 0;
 	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onJoin(PlayerJoinEvent event) {
+		Integer cooldownUntil = PLAYERS_ON_COOLDOWN.get(event.getPlayer().getUniqueId());
+		if (cooldownUntil != null && cooldownUntil > Bukkit.getServer().getCurrentTick()) {
+			event.getPlayer().setCooldown(Material.ICE, cooldownUntil - Bukkit.getServer().getCurrentTick());
+		}
+	}
+
 }
 
