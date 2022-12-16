@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -80,6 +81,14 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 		int ticks = Bukkit.getServer().getCurrentTick();
 
+		// Prevent casting if swimming and right-clicking a riptide trident
+		// Has to be above the following check, otherwise it will consume a charge
+		// even if the skill should not be cast.
+		if (mPlayer.isSwimming()
+			&& mPlayer.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.RIPTIDE)
+			&& getCustomTriggers().stream().filter(t -> t.getTrigger().getKey().equals(AbilityTrigger.Key.RIGHT_CLICK) && t.getId().equalsIgnoreCase("castForward")).findFirst().orElse(null) != null) {
+			return;
+		}
 		// Prevent double casting on accident
 		if (ticks - mLastCastTicks <= 10 || !consumeCharge()) {
 			return;
