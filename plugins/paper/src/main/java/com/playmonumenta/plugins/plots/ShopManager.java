@@ -10,6 +10,7 @@ import com.playmonumenta.scriptedquests.quests.QuestNpc;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -67,6 +68,7 @@ public class ShopManager implements Listener {
 	private static final int GUILD_SHOP_WIDTH = 10;
 	private static final String NPC_NAME = "SHOP NPC";
 	private static final String GUILD_NPC_NAME = "GUILD SHOP NPC";
+	private static final String DISABLE_LOCKING_TAG = "DisableLocking";
 
 	// handles cancelled damage events because we're only interested in the left click interaction (and the event is always cancelled on shop shulkers anyway)
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
@@ -200,6 +202,7 @@ public class ShopManager implements Listener {
 		private final @Nullable String mOwnerGuildName;
 		private final UUID mOwnerUUID;
 		private final Material mOriginalEntityMat;
+		private final boolean mLockingEnabled;
 
 		private Shop(Location min, Location max, Shulker entity, String ownerName, @Nullable String ownerGuildName, UUID ownerUUID, Material originalEntityMat) {
 			mMin = min;
@@ -209,6 +212,7 @@ public class ShopManager implements Listener {
 			mOwnerGuildName = ownerGuildName;
 			mOwnerUUID = ownerUUID;
 			mOriginalEntityMat = originalEntityMat;
+			mLockingEnabled = !entity.getScoreboardTags().contains(DISABLE_LOCKING_TAG);
 		}
 
 		protected static Shop fromShopEntity(Entity shopEntity) throws WrapperCommandSyntaxException {
@@ -326,6 +330,18 @@ public class ShopManager implements Listener {
 			return Math.abs(mMax.getBlockX() - mMin.getBlockX()) >= GUILD_SHOP_WIDTH;
 		}
 
+		private boolean isLockingEnabled() {
+			return mLockingEnabled;
+		}
+
+		private void setLockingEnabled(boolean enabled) {
+			if (enabled) {
+				mEntity.getScoreboardTags().remove(DISABLE_LOCKING_TAG);
+			} else {
+				mEntity.getScoreboardTags().add(DISABLE_LOCKING_TAG);
+			}
+		}
+
 		private BoundingBox getExpandedBoundingBox() {
 			return new BoundingBox(mMin.getX() - 1, mMin.getY() - SHOP_DEPTH - 1, mMin.getZ() - 1,
 			                       mMax.getX() + 1, mMax.getY() + SHOP_HEIGHT + 1, mMax.getZ() + 1);
@@ -382,6 +398,27 @@ public class ShopManager implements Listener {
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				shopUnlock((Entity)args[1], (Player)args[2]);
+			})
+			.register();
+
+		/********************* LOCKDISABLE *********************/
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new MultiLiteralArgument("setlockable"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new BooleanArgument("lockable"))
+			.executes((sender, args) -> {
+				setLockable((Entity)args[1], null, (boolean)args[2]);
+			})
+			.register();
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new MultiLiteralArgument("setlockable"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new BooleanArgument("lockable"))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				setLockable((Entity)args[1], (Player)args[3], (boolean)args[2]);
 			})
 			.register();
 
@@ -562,6 +599,26 @@ public class ShopManager implements Listener {
 		});
 	}
 
+	private static void setLockable(Entity shopEntity, @Nullable Player player, boolean lockable) throws WrapperCommandSyntaxException {
+		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
+			CommandAPI.fail("This command can only be used within a Shops Possible zone");
+		}
+
+		Shop shop = Shop.fromShopEntity(shopEntity);
+
+		/* Make sure the player (if any) is allowed to change the lock */
+		checkAllowedToChangeLock(shop, player);
+
+		shop.setLockingEnabled(lockable);
+
+		if (player != null) {
+			player.sendMessage(ChatColor.WHITE + "Locking/unlocking your shop is now " + (lockable ? "enabled" : "disabled"));
+		}
+
+		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 1.1f);
+		shop.particles();
+	}
+
 	private static void shopLock(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			CommandAPI.fail("This command can only be used within a Shops Possible zone");
@@ -571,6 +628,13 @@ public class ShopManager implements Listener {
 
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
+
+		if (!shop.isLockingEnabled()) {
+			if (player != null) {
+				player.sendMessage(ChatColor.WHITE + "Locking and unlocking this shop is disabled, change that setting first before trying to lock.");
+			}
+			return;
+		}
 
 		if (player != null) {
 			player.sendMessage(ChatColor.WHITE + "Your shop has been locked.");
@@ -613,6 +677,13 @@ public class ShopManager implements Listener {
 
 		/* Make sure the player (if any) is allowed to change the lock */
 		checkAllowedToChangeLock(shop, player);
+
+		if (!shop.isLockingEnabled()) {
+			if (player != null) {
+				player.sendMessage(ChatColor.WHITE + "Locking and unlocking this shop is disabled, change that setting first before trying to unlock.");
+			}
+			return;
+		}
 
 		if (player != null) {
 			player.sendMessage(ChatColor.WHITE + "Your shop has been unlocked.");
