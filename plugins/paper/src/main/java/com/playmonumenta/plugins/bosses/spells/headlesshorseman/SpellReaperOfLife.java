@@ -18,6 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,11 +48,23 @@ public class SpellReaperOfLife extends Spell {
 	}
 
 	@Override
+	public boolean canRun() {
+		for (LivingEntity entity : mCenter.getNearbyLivingEntities(30)) {
+			//If there exists a magma cube currently alive in the fight, return and do not run this spell.
+			if (entity.getType() == EntityType.MAGMA_CUBE) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
 	public void run() {
 		World world = mBoss.getWorld();
 		int range = (int) Math.ceil(mRange);
 		Location sLoc = mBoss.getLocation();
 		sLoc.setY(sLoc.getY() + 1.7f);
+
 		try {
 			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.JACK_O_LANTERN.createBlockData());
 			fallingBlock.setDropItem(false);
