@@ -81,9 +81,10 @@ public class DamageEvent extends Event implements Cancellable {
 				case MELTING:
 				case STARVATION:
 				case SUFFOCATION:
-				case SUICIDE:
-				case VOID:
 					return DamageType.OTHER;
+				case VOID:
+				case SUICIDE:
+					return DamageType.TRUE;
 				default:
 					return DamageType.OTHER;
 			}
