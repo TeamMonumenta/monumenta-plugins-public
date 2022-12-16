@@ -25,6 +25,10 @@ public class Stasis extends ZeroArgumentEffect {
 		super(duration, effectID);
 	}
 
+	protected Stasis(int duration, String effectID) {
+		super(duration, effectID);
+	}
+
 	// Most functionality handled in StasisListener
 
 	@Override
@@ -32,13 +36,12 @@ public class Stasis extends ZeroArgumentEffect {
 		if (entity instanceof Player player) {
 			player.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
 			player.addScoreboardTag(Constants.Tags.STASIS);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getDuration(), 100));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, getDuration(), 100));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, getDuration(), 100));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getDuration(), 9));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, getDuration(), 4));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, getDuration(), 1));
 			player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
 			AbilityManager.getManager().updateSilence(player, true);
 		}
-
 	}
 
 	@Override
@@ -50,7 +53,6 @@ public class Stasis extends ZeroArgumentEffect {
 			Location loc = entity.getLocation();
 			new PartialParticle(Particle.END_ROD, loc, 45, 1, 1, 1, .00000001).spawnAsEntityActive(entity);
 		}
-
 	}
 
 	@Override

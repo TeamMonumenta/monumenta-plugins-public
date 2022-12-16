@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -121,6 +122,12 @@ public class Shattered implements Infusion {
 			}
 		}
 		return false;
+	}
+
+	public static int getHighestShatterLevelEquipped(Player player) {
+		return Arrays.stream(EquipmentSlot.values())
+			       .mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), ItemStatUtils.InfusionType.SHATTERED))
+			       .max().orElse(0);
 	}
 
 	public static boolean isMaxShatter(ItemStack item) {

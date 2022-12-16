@@ -319,6 +319,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SpreadEffectOnDeath.effectID, SpreadEffectOnDeath::deserialize);
 		mEffectDeserializer.put(StarCommunion.effectID, StarCommunion::deserialize);
 		mEffectDeserializer.put(Stasis.effectID, Stasis::deserialize);
+		mEffectDeserializer.put(RespawnStasis.effectID, RespawnStasis::deserialize);
 		mEffectDeserializer.put(ThuribleBonusHealing.effectID, ThuribleBonusHealing::deserialize);
 		mEffectDeserializer.put(TuathanBlessing.effectID, TuathanBlessing::deserialize);
 		mEffectDeserializer.put(UnstableAmalgamDisable.effectID, UnstableAmalgamDisable::deserialize);

@@ -379,6 +379,10 @@ public final class Grave {
 		int collected = 0;
 		int remaining = 0;
 		if (mManager.isOwner(player)) {
+			if (mEntity != null && mEntity.getTicksLived() < 5) {
+				// don't allow interacting with a grave just after it has spawned (riptide for example does this)
+				return;
+			}
 			// Clicked by owner
 			Iterator<GraveItem> items = mItems.iterator();
 			while (items.hasNext()) {

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
+import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
@@ -59,6 +60,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
@@ -107,6 +109,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -134,6 +137,8 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
 public class PlayerListener implements Listener {
 
@@ -168,9 +173,6 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
 		DailyReset.handle(mPlugin, player);
-		// This checks to make sure that when you log in you aren't stuck in blocks, just in case the lag that causes you to fall also kicks you. You don't want to be stuck in dirt forever, right?
-		Location loc = player.getLocation();
-		runTeleportRunnable(player, loc);
 
 		// add player to the players team (and create the team if it doesn't exist already)
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -763,23 +765,83 @@ public class PlayerListener implements Listener {
 	}
 
 	// The player has respawned.
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerRespawnEvent(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
-		final String name = player.getName();
+		World world = event.getRespawnLocation().getWorld();
 
-		player.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, () -> {
-			Player player1 = Bukkit.getPlayer(name);
-			if (player1 != null) {
-				mPlugin.mPotionManager.clearAllPotions(player1);
-				mPlugin.mAbilityManager.updatePlayerAbilities(player1, true);
-
-				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player1, event);
+		Location realRespawnLocation = player.getPotentialBedLocation();
+		boolean mightBeBedSpawn = false;
+		if (realRespawnLocation == null || realRespawnLocation.getWorld() != world) {
+			realRespawnLocation = world.getSpawnLocation();
+		} else {
+			mightBeBedSpawn = realRespawnLocation.getBlock().getBlockData() instanceof Bed;
+			if (mightBeBedSpawn) {
+				// Add some y value to not break the bed on respawn (and respawn on top of it instead),
+				// except if the block above is unbreakable.
+				if (realRespawnLocation.clone().add(0, 1, 0).getBlock().getType().getHardness() >= 0) {
+					realRespawnLocation.add(0, 0.6, 0);
+				}
 			}
-		}, 0);
+			realRespawnLocation.setPitch(event.getRespawnLocation().getPitch());
+			realRespawnLocation.setYaw(event.getRespawnLocation().getYaw());
+		}
+		// spawn locations are stored as ints, need to add (0.5, 0, 0.5) to get the center of the block
+		realRespawnLocation.add(0.5, 0, 0.5);
+
+		// If vanilla moved the respawn location, move it back to the real location, as long as that location is in a survival zone,
+		// and break blocks around the respawn location as if broken with an iron pickaxe.
+		// Only breaks block on play for non-creative/spectator players.
+		// (does not check for whether the player is in adventure mode, as a player's game mode is not yet updated)
+		int distanceToCheck = mightBeBedSpawn ? 3 : 1; // bed spawn point may be up to 2 blocks away from the bed
+		if (Math.abs(event.getRespawnLocation().getX() - realRespawnLocation.getX()) < distanceToCheck
+			    && Math.abs(event.getRespawnLocation().getZ() - realRespawnLocation.getZ()) < distanceToCheck
+			    && ZoneUtils.isMineable(realRespawnLocation)) {
+			event.setRespawnLocation(realRespawnLocation);
+			if (Plugin.IS_PLAY_SERVER
+				    && player.getGameMode() != GameMode.CREATIVE
+				    && player.getGameMode() != GameMode.SPECTATOR) {
+				boolean couldNotBreakBlock = false;
+				BoundingBox playerBox = BoundingBox.of(realRespawnLocation.clone().add(-0.3, 0, -0.3), realRespawnLocation.clone().add(0.3, 1.8, 0.3));
+				ItemStack ironPick = new ItemStack(Material.IRON_PICKAXE);
+				for (Block collidingBlock : NmsUtils.getVersionAdapter().getCollidingBlocks(world, playerBox, true)) {
+					if (ZoneUtils.isMineable(collidingBlock.getLocation())
+						    && collidingBlock.getType().getHardness() >= 0) {
+						collidingBlock.breakNaturally(ironPick);
+					} else {
+						couldNotBreakBlock = true;
+					}
+				}
+				if (couldNotBreakBlock) {
+					// Warn about respawning inside solid blocks, but check if the player can crawl in the space first because that won't cause issues
+					BoundingBox crawlingBox = BoundingBox.of(realRespawnLocation.clone().add(-0.3, 0, -0.3), realRespawnLocation.clone().add(0.3, 0.6, 0.3));
+					if (NmsUtils.getVersionAdapter().hasCollisionWithBlocks(player.getWorld(), crawlingBox, true)) {
+						AuditListener.log("Player " + player.getName() + " respawned inside unbreakable blocks at " + realRespawnLocation + "!");
+					}
+				}
+			}
+			// Teleport the player to the respawn location after a tick as vanilla might move the player again after this event
+			// (e.g. due to intersecting unbreakable blocks or solid entities like boats).
+			Location finalRealRespawnLocation = realRespawnLocation;
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				player.teleport(finalRealRespawnLocation, TeleportCause.UNKNOWN);
+			});
+		}
+
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			if (player.isOnline()) {
+				mPlugin.mPotionManager.clearAllPotions(player);
+				mPlugin.mAbilityManager.updatePlayerAbilities(player, true);
+
+				InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, event);
+			}
+		});
 
 		Phylactery.applyStoredEffects(mPlugin, player);
 		mPlugin.mEffectManager.applyEffectsOnRespawn(mPlugin, player);
+
+		mPlugin.mEffectManager.addEffect(player, RespawnStasis.NAME, new RespawnStasis());
+		player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, 0.75f);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -961,40 +1023,62 @@ public class PlayerListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		Location loc = event.getTo();
-
-		if (!cause.equals(TeleportCause.UNKNOWN) && !player.getGameMode().equals(GameMode.SPECTATOR) && !cause.equals(TeleportCause.SPECTATE)) {
-			runTeleportRunnable(player, loc);
-		}
-
 		mPlugin.mAbilityManager.playerTeleportEvent(player, event);
 	}
 
-	public void runTeleportRunnable(Player player, Location loc) {
-		// Runnable to make sure that players don't get stuck in the floor too often. That if statement is a testament to never trying to edit how teleporting works, it's so easy to break it
-		// Made it only work if you are stuck exactly 2 blocks into the ground or less to prevent exploits, if it ends up being a problem, adding one for 3 blocks shouldn't be too hard
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!player.isOnline()) {
-					this.cancel();
+	private static boolean collidesWithUnbreakableBlock(World world, BoundingBox boundingBox) {
+		return NmsUtils.getVersionAdapter().hasCollisionWithBlocks(world, boundingBox, true,
+			mat -> mat.getHardness() < 0);
+	}
+
+	/**
+	 * Cancel player movement into unbreakable blocks (e.g. bedrock or barriers).
+	 */
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerMoveEvent(PlayerMoveEvent event) {
+		if (event instanceof PlayerTeleportEvent
+			    || event.getFrom().getWorld() != event.getTo().getWorld()) {
+			// Teleports handled in teleport listener. Movement between worlds should be a teleport, but better ignore it just in case.
+			return;
+		}
+		Player player = event.getPlayer();
+		if (player.getGameMode() == GameMode.SPECTATOR) {
+			// Spectators can move freely through blocks
+			return;
+		}
+
+		// check collision at target location
+		BoundingBox targetBox = player.getBoundingBox()
+			                        .shift(player.getLocation().multiply(-1))
+			                        .shift(event.getTo())
+			                        .expand(-0.1); // small leeway
+		if (collidesWithUnbreakableBlock(player.getWorld(), targetBox)) {
+			event.setCancelled(true);
+			return;
+		}
+
+		// If moving a lot, check collision on the way.
+		// Only check a small bounding box of 0.2x0.2x0.2 for collision to reduce false positives (e.g. from moving around a corner).
+		// This still prevents moving through solid walls/floors.
+		if (event.getFrom().distanceSquared(event.getTo()) > 1) {
+			double height = player.isSwimming() ? 0.2 : 0.6;
+			BoundingBox movingBox = BoundingBox.of(event.getFrom().clone().add(-0.1, height, -0.1), event.getFrom().clone().add(0.1, height + 0.2, 0.1));
+			// check collision twice per meter
+			int steps = (int) Math.floor(event.getTo().distance(event.getFrom()) * 2) - 1;
+			if (steps > 100) {
+				// >50 meters: just no.
+				event.setCancelled(true);
+				return;
+			}
+			Vector stepDir = event.getTo().clone().subtract(event.getFrom()).toVector().normalize().multiply(0.5);
+			for (int step = 0; step < steps; step++) {
+				movingBox.shift(stepDir);
+				if (collidesWithUnbreakableBlock(player.getWorld(), movingBox)) {
+					event.setCancelled(true);
 					return;
 				}
-
-				Block block = player.getLocation().getBlock();
-				Block blockEye = player.getEyeLocation().getBlock();
-				if ((!block.getType().equals(Material.AIR) || !blockEye.getType().equals(Material.AIR))) {
-					if (player.getLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR) && player.getEyeLocation().add(0, 1, 0).getBlock().getType().equals(Material.AIR)) {
-						player.teleport(loc.add(0, 1, 0));
-					} else if (player.getLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR) && player.getEyeLocation().add(0, 2, 0).getBlock().getType().equals(Material.AIR)) {
-						player.teleport(loc.add(0, 2, 0));
-					}
-					this.cancel();
-				} else if ((block.getType().equals(Material.AIR) || blockEye.getType().equals(Material.AIR)) || player.isOnline() || player.isDead() || !player.isValid()) {
-					this.cancel();
-				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -1122,7 +1206,7 @@ public class PlayerListener implements Listener {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, player, PLAYER_LEFT_BED_TICK_METAKEY)) {
 			Block bed = event.getBed();
 			Location loc = bed.getLocation();
-			player.teleport(loc.add(0.5, 1, 0.5));
+			player.teleport(loc.add(0.5, 0.6, 0.5));
 		}
 	}
 

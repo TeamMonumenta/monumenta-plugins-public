@@ -165,7 +165,7 @@ public class SignOverride extends BaseOverride {
 				}
 			}
 
-			// If clicking with an unnamed feather, allow editing the sign
+			// If clicking with an unnamed book, allow editing the sign
 			if (item.getType().equals(Material.BOOK) && !meta.hasLore()) {
 				boolean isCreative = player.getGameMode().equals(GameMode.CREATIVE);
 				if (isCreative ||

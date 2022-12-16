@@ -315,14 +315,13 @@ public class LocationUtils {
 
 	/**
 	 * Tests if a given bounding box collides with any blocks.
-	 * Uses {@link Block#getBoundingBox()} for the collision check, so may be inaccurate for special blocks.
 	 *
 	 * @param boundingBox The box to check
 	 * @param world       The world to check in
 	 * @return Whether the box collides with any blocks or is in unloaded chunks
 	 */
 	public static boolean collidesWithBlocks(BoundingBox boundingBox, World world) {
-		return NmsUtils.getVersionAdapter().hasCollision(world, boundingBox);
+		return NmsUtils.getVersionAdapter().hasCollisionWithBlocks(world, boundingBox, true);
 	}
 
 	public static boolean travelTillObstructed(

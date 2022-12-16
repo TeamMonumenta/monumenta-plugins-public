@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.adapters;
 
+import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -129,6 +131,21 @@ public interface VersionAdapter {
 	 * Checks if the given bounding box collides with any blocks or "hard-colliding" entities (e.g. boats, shulkers).
 	 */
 	boolean hasCollision(World world, BoundingBox aabb);
+
+	/**
+	 * Checks if the given bounding box collides with any blocks.
+	 */
+	boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks);
+
+	/**
+	 * Checks if the given bounding box collides with any blocks that match the given predicate.
+	 */
+	boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks, Predicate<Material> checkedTypes);
+
+	/**
+	 * Gets all blocks colliding with the given bounding box.
+	 */
+	Set<Block> getCollidingBlocks(World world, BoundingBox aabb, boolean loadChunks);
 
 	/**
 	 * Performs all desired AI changes for the given newly spawned or loaded mob.

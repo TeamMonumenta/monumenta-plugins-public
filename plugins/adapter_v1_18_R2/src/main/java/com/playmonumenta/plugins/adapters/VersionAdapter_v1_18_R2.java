@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.adapters;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -406,6 +408,33 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
 	public boolean hasCollision(World world, BoundingBox aabb) {
 		return !((CraftWorld) world).getHandle().noCollision(new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()));
+	}
+
+	@Override
+	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks) {
+		return io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
+			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), null, loadChunks, false, false, true, null);
+	}
+
+	@Override
+	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks, Predicate<Material> checkedTypes) {
+		return io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
+			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), null, loadChunks, false, false, true,
+			(state, pos) -> checkedTypes.test(state.getBukkitMaterial()));
+	}
+
+	@Override
+	public Set<Block> getCollidingBlocks(World world, BoundingBox aabb, boolean loadChunks) {
+		List<AABB> collisions = new ArrayList<>();
+		io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
+			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), collisions, loadChunks, false, false, false, null);
+		Set<Block> result = new HashSet<>();
+		for (AABB collision : collisions) {
+			// This assumes that block collision centers are within their block.
+			Vec3 center = collision.getCenter();
+			result.add(world.getBlockAt((int) Math.floor(center.x), (int) Math.floor(center.y), (int) Math.floor(center.z)));
+		}
+		return result;
 	}
 
 	private static final Field targetTypeField = getField(NearestAttackableTargetGoal.class, "a"); // unobfuscated field name: targetType

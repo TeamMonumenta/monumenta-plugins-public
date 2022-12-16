@@ -103,10 +103,14 @@ public class ZoneUtils {
 		if (gameMode.equals(GameMode.ADVENTURE) || gameMode.equals(GameMode.SPECTATOR)) {
 			return false;
 		}
-		if (hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE)) {
-			return isInPlot(loc);
-		}
-		return true;
+		return isMineable(loc);
+	}
+
+	/**
+	 * Checks whether the block at the given location can potentially be mined by a player (i.e. is in a survival mode area)
+	 */
+	public static boolean isMineable(Location loc) {
+		return !hasZoneProperty(loc, ZoneProperty.ADVENTURE_MODE) || isInPlot(loc);
 	}
 
 	public static boolean hasZoneProperty(Entity entity, ZoneProperty property) {

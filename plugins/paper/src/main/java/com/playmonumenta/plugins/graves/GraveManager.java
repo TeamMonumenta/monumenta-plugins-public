@@ -194,9 +194,10 @@ public class GraveManager {
 		String shard = ServerProperties.getShardName();
 
 		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
-			.map(Map.Entry::getValue)
-			.allMatch(item -> ItemUtils.isNullOrAir(item)
-				|| ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
+			    .map(Map.Entry::getValue)
+			    .allMatch(item -> ItemUtils.isNullOrAir(item)
+				                      || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE
+				                      || ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
 			// Check Lich infusion
 			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY) == 0
 				    || ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {

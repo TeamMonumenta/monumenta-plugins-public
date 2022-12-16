@@ -1,8 +1,11 @@
 package com.playmonumenta.plugins.adapters;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -118,6 +121,21 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public boolean hasCollision(World world, BoundingBox aabb) {
 		return false;
+	}
+
+	@Override
+	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks) {
+		return false;
+	}
+
+	@Override
+	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks, Predicate<Material> checkedTypes) {
+		return false;
+	}
+
+	@Override
+	public Set<Block> getCollidingBlocks(World world, BoundingBox aabb, boolean loadChunks) {
+		return new HashSet<>();
 	}
 
 	@Override
