@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bukkit.Color;
@@ -42,7 +43,7 @@ public class DelveInfusionUtils {
 		CHOLER("choler", "Choler", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material"), "Yellow"),
 		UNYIELDING("unyielding", "Unyielding", NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil"), "R1Bonus"),
 		USURPER("usurper", "Usurper", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material"), "Corrupted"),
-		VENGEFUL("vengeful", "Vengeful", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinishedN"),
+		VENGEFUL("vengeful", "Vengeful", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinished", "RogFinishedN", "RogFinishedC", "RogFinishedD"),
 
 		EMPOWERED("empowered", "Empowered", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material"), "Lime"),
 		NUTRIMENT("nutriment", "Nutriment", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material"), "Pink"),
@@ -54,7 +55,7 @@ public class DelveInfusionUtils {
 		NATANT("natant", "Natant", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
 		UNDERSTANDING("understanding", "Understanding", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
 
-		REFRESH("refresh", "Refresh", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT"),
+		REFRESH("refresh", "Refresh", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT", "SKTH"),
 		SOOTHING("soothing", "Soothing", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
 		QUENCH("quench", "Quench", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
 		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
@@ -67,13 +68,13 @@ public class DelveInfusionUtils {
 		private final String mLabel;
 		private final String mEnchantName;
 		private final @Nullable NamespacedKey mLootTable;
-		private final @Nullable String mScoreboard;
+		private final @Nullable List<String> mScoreboard;
 
-		DelveInfusionSelection(String label, String enchantName, @Nullable NamespacedKey lootTable, @Nullable String scoreboard) {
+		DelveInfusionSelection(String label, String enchantName, @Nullable NamespacedKey lootTable, @Nullable String... scoreboard) {
 			mLabel = label;
 			mEnchantName = enchantName;
 			mLootTable = lootTable;
-			mScoreboard = scoreboard;
+			mScoreboard = scoreboard == null ? null : Arrays.asList(scoreboard);
 		}
 
 		public static @Nullable DelveInfusionSelection getInfusionSelection(@Nullable String label) {
@@ -101,7 +102,7 @@ public class DelveInfusionUtils {
 		}
 
 		public boolean isUnlocked(Player player) {
-			return mScoreboard == null || ScoreboardUtils.getScoreboardValue(player, mScoreboard).orElse(0) >= 1;
+			return mScoreboard == null || mScoreboard.stream().anyMatch(s -> s == null || ScoreboardUtils.getScoreboardValue(player, s).orElse(0) >= 1);
 		}
 	}
 
