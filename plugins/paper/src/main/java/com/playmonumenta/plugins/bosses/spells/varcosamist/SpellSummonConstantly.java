@@ -77,17 +77,18 @@ public class SpellSummonConstantly extends Spell {
 			for (ArmorStand armorStand : stands) {
 				int numSummoned = 0;
 				for (Vector offset : mLocationOffsets) {
-					Location loc = armorStand.getLocation().add(offset).add(0, 1, 0);
+					Location loc = armorStand.getLocation().add(offset).add(0, 2, 0);
 
 					// Underneath block must be solid
-					if (!loc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
+					if (!loc.clone().add(0, -1, 0).getBlock().isSolid()) {
 						continue;
 					}
 
 					// Blocks above summon-on block must be not solid
-					boolean blockAboveSolid = loc.add(0, 1, 0).getBlock().getType().isSolid();
-					boolean blockTwoAboveSolid = loc.add(0, 1, 0).getBlock().getType().isSolid();
-					if (blockAboveSolid || blockTwoAboveSolid) {
+					boolean blockAboveSolid = loc.clone().add(0, 1, 0).getBlock().isSolid();
+					boolean blockTwoAboveSolid = loc.clone().add(0, 2, 0).getBlock().isSolid();
+					boolean blockIsSolid = loc.getBlock().isSolid();
+					if (blockAboveSolid || blockTwoAboveSolid || blockIsSolid) {
 						continue;
 					}
 
