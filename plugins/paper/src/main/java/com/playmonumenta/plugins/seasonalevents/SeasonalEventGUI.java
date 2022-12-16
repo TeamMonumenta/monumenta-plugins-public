@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
-import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -16,12 +17,11 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class SeasonalEventGUI extends CustomInventory {
+public class SeasonalEventGUI extends Gui {
 
 	private static final int PREV_PAGE_LOC = 45;
 	private static final int NEXT_PAGE_LOC = 53;
@@ -31,9 +31,11 @@ public class SeasonalEventGUI extends CustomInventory {
 	private static final int LEVEL_PROGRESS_START = 18;
 	private static final int REWARD_START = 27;
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
-	private SeasonalPass mSeasonalPass;
-	private int mCurrentPage = 1;
-	private int mWeek;
+
+	private final Player mTargetPlayer;
+	private final SeasonalPass mSeasonalPass;
+	private int mCurrentPage;
+	private final int mWeek;
 
 	public SeasonalEventGUI(SeasonalPass seasonalPass, Player player) {
 		this(seasonalPass, player, player, -1);
@@ -44,40 +46,20 @@ public class SeasonalEventGUI extends CustomInventory {
 	}
 
 	public SeasonalEventGUI(SeasonalPass seasonalPass, Player requestingPlayer, Player targetPlayer, int week) {
-		super(requestingPlayer, 54, seasonalPass.mName);
-		seasonalPass.updatePlayerPassProgress(targetPlayer);
+		super(requestingPlayer, 54, Component.text(seasonalPass.mName, seasonalPass.mNameColor));
+		if (requestingPlayer == targetPlayer && seasonalPass.isActive()) {
+			seasonalPass.updatePlayerPassProgress(targetPlayer);
+		}
 		int level = seasonalPass.getLevelFromMP(seasonalPass.getMP(targetPlayer));
 		mSeasonalPass = seasonalPass;
 		mCurrentPage = Math.max(1, ((level - 1) / 5) + 1);
 		mWeek = week == -1 ? mSeasonalPass.getWeekOfPass() : week;
-		setUpPass(targetPlayer);
+		mTargetPlayer = targetPlayer;
+		setFiller(FILLER);
 	}
 
 	@Override
-	protected void inventoryClick(InventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.getClickedInventory() == mInventory) {
-			//Attempt to switch page if clicked page
-			ItemStack item = event.getCurrentItem();
-			if (item == null || item.getType() == null) {
-				return;
-			}
-			Player p = (Player) event.getWhoClicked();
-			if (event.getSlot() == NEXT_PAGE_LOC && item.getType() == Material.ARROW) {
-				p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
-				mCurrentPage++;
-				setUpPass(p);
-			}
-
-			if (event.getSlot() == PREV_PAGE_LOC && item.getType() == Material.ARROW) {
-				p.playSound(p.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
-				mCurrentPage--;
-				setUpPass(p);
-			}
-		}
-	}
-
-	public Boolean setUpPass(Player targetPlayer) {
+	protected void setup() {
 		List<WeeklyMission> currentMissions;
 		if (mWeek != -1) {
 			currentMissions = mSeasonalPass.getMissionsInWeek(mWeek);
@@ -85,14 +67,9 @@ public class SeasonalEventGUI extends CustomInventory {
 			currentMissions = mSeasonalPass.getActiveMissions();
 		}
 		List<SeasonalReward> rewards = mSeasonalPass.mRewards;
-		int playerMP = mSeasonalPass.getMP(targetPlayer);
+		int playerMP = mSeasonalPass.getMP(mTargetPlayer);
 		int playerLevel = mSeasonalPass.getLevelFromMP(playerMP);
-		int mpToNextLevel = ((playerLevel + 1) * mSeasonalPass.MP_PER_LEVEL) - playerMP;
-
-		//Set inventory to filler to start
-		for (int i = 0; i < 54; i++) {
-			mInventory.setItem(i, new ItemStack(FILLER, 1));
-		}
+		int mpToNextLevel = ((playerLevel + 1) * SeasonalPass.MP_PER_LEVEL) - playerMP;
 
 		//Set up summary
 		ItemStack passSummary = new ItemStack(Material.SOUL_LANTERN, Math.min(64, Math.max(1, playerLevel)));
@@ -110,7 +87,7 @@ public class SeasonalEventGUI extends CustomInventory {
 
 		meta.lore(lore);
 		passSummary.setItemMeta(meta);
-		mInventory.setItem(SUMMARY_LOC, passSummary);
+		setItem(SUMMARY_LOC, passSummary);
 
 		// Set up weekly mission display
 		ItemStack missionSummary = new ItemStack(Material.CLOCK, 1);
@@ -144,14 +121,25 @@ public class SeasonalEventGUI extends CustomInventory {
 		}
 		meta.lore(lore);
 		missionSummary.setItemMeta(meta);
-		mInventory.setItem(WEEKLY_MISSION_LOC, missionSummary);
+		setItem(WEEKLY_MISSION_LOC, missionSummary);
+
+		// Go to repurchase GUI button
+		setItem(0, 2, ItemUtils.modifyMeta(new ItemStack(Material.CARTOGRAPHY_TABLE), m -> {
+			m.displayName(Component.text("Old Season Passes", NamedTextColor.WHITE).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			m.lore(List.of(Component.text("Click to view old passes", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+				Component.text("and purchase rewards from them.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+		}))
+			.onLeftClick(() -> {
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+				new SeasonalEventRepurchaseGUI(mPlayer).open();
+			});
 
 		// Individual weekly mission display
 		for (int i = 0; i < Math.min(3, currentMissions.size()); i++) {
 			try {
 				WeeklyMission mission = currentMissions.get(i);
 				String missionScoreboard = SeasonalEventManager.MISSION_SCOREBOARD + (i + 1);
-				int progress = ScoreboardUtils.getScoreboardValue(targetPlayer.getName(), missionScoreboard);
+				int progress = ScoreboardUtils.getScoreboardValue(mTargetPlayer.getName(), missionScoreboard);
 
 				//Placeholder
 				ItemStack missionItem = new ItemStack(Material.YELLOW_CONCRETE_POWDER, 1);
@@ -175,7 +163,7 @@ public class SeasonalEventGUI extends CustomInventory {
 				}
 				meta.lore(lore);
 				missionItem.setItemMeta(meta);
-				mInventory.setItem(WEEKLY_MISSION_LOC + (i + 1), missionItem);
+				setItem(WEEKLY_MISSION_LOC + (i + 1), missionItem);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -213,13 +201,13 @@ public class SeasonalEventGUI extends CustomInventory {
 				}
 				meta.lore(lore);
 				levelItem.setItemMeta(meta);
-				mInventory.setItem(levelLocation, levelItem);
+				setItem(levelLocation, levelItem);
 
 				//Reward item
 				SeasonalReward reward = rewards.get(level - 1);
 				// If we have a loot table already for the item, just show that
 				if (reward.mLootTable != null) {
-					mInventory.setItem(rewardLocation, reward.mLootTable);
+					setItem(rewardLocation, reward.mLootTable);
 					continue;
 				}
 				ItemStack rewardItem = new ItemStack(reward.mDisplayItem, 1);
@@ -228,7 +216,7 @@ public class SeasonalEventGUI extends CustomInventory {
 				GUIUtils.splitLoreLine(meta, reward.mDescription, 30, GUIUtils.namedTextColorToChatColor(reward.mDescriptionColor), false);
 				rewardItem.setItemMeta(meta);
 
-				mInventory.setItem(rewardLocation, rewardItem);
+				setItem(rewardLocation, rewardItem);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -241,7 +229,12 @@ public class SeasonalEventGUI extends CustomInventory {
 			meta = pageItem.getItemMeta();
 			meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			pageItem.setItemMeta(meta);
-			mInventory.setItem(PREV_PAGE_LOC, pageItem);
+			setItem(PREV_PAGE_LOC, pageItem)
+				.onLeftClick(() -> {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					mCurrentPage--;
+					update();
+				});
 		}
 
 		if (mCurrentPage < (mSeasonalPass.mRewards.size() / LEVELS_PER_PAGE)) {
@@ -250,8 +243,12 @@ public class SeasonalEventGUI extends CustomInventory {
 			meta = pageItem.getItemMeta();
 			meta.displayName(Component.text("Next Page", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			pageItem.setItemMeta(meta);
-			mInventory.setItem(NEXT_PAGE_LOC, pageItem);
+			setItem(NEXT_PAGE_LOC, pageItem)
+				.onLeftClick(() -> {
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					mCurrentPage++;
+					update();
+				});
 		}
-		return true;
 	}
 }

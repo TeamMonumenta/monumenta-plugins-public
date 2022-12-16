@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
@@ -1337,4 +1338,14 @@ public class ItemUtils {
 			return new ItemIdentifier(null, null);
 		}
 	}
+
+	public static ItemStack modifyMeta(ItemStack item, Consumer<ItemMeta> metaFunction) {
+		ItemMeta itemMeta = item.getItemMeta();
+		if (itemMeta != null) {
+			metaFunction.accept(itemMeta);
+			item.setItemMeta(itemMeta);
+		}
+		return item;
+	}
+
 }

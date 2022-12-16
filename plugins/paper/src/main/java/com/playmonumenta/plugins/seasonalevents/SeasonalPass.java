@@ -46,6 +46,8 @@ public class SeasonalPass {
 	// Missions and rewards arrays
 	public final LocalDateTime mPassStart;
 	public String mName;
+	public Material mDisplayItem;
+	public NamedTextColor mNameColor;
 	public int mNumberOfWeeks = 0;
 	public int mTotalMp = 0;
 	public final List<WeeklyMission> mMissions = new ArrayList<>();
@@ -141,6 +143,8 @@ public class SeasonalPass {
 		int numberOfWeeks = 0;
 		String startDateStr = data.get("start_date").getAsString();
 		mName = data.get("pass_name").getAsString();
+		mDisplayItem = Material.getMaterial(data.get("pass_displayitem").getAsString());
+		mNameColor = NamedTextColor.NAMES.value(data.get("pass_namecolor").getAsString());
 		JsonArray missionParse = data.get("missions").getAsJsonArray();
 		for (JsonElement missionElement : missionParse) {
 			try {

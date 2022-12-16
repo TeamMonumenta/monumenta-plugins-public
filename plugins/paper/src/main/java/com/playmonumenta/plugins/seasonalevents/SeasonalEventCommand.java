@@ -105,7 +105,7 @@ public class SeasonalEventCommand extends GenericCommand {
 					player.sendMessage(Component.text("Could not load the current season pass", NamedTextColor.RED));
 					return;
 				}
-				new SeasonalEventGUI(seasonalPass, player).openInventory(player, plugin);
+				new SeasonalEventGUI(seasonalPass, player).open();
 			}).register();
 
 		//GUI command with specific week
@@ -125,7 +125,7 @@ public class SeasonalEventCommand extends GenericCommand {
 					player.sendMessage(Component.text("Could not load the current season pass", NamedTextColor.RED));
 					return;
 				}
-				new SeasonalEventGUI(seasonalPass, player, (int) args[3]).openInventory(player, plugin);
+				new SeasonalEventGUI(seasonalPass, player, (int) args[3]).open();
 			}).register();
 
 		//GUI command with specific date
@@ -153,7 +153,7 @@ public class SeasonalEventCommand extends GenericCommand {
 					return;
 				}
 				int week = seasonalPass.getWeekOfPass(dateTime);
-				new SeasonalEventGUI(seasonalPass, player, week).openInventory(player, plugin);
+				new SeasonalEventGUI(seasonalPass, player, week).open();
 			}).register();
 	}
 }
