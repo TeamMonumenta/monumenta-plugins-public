@@ -1054,17 +1054,21 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		// check collision at target location
-		BoundingBox targetBox = player.getBoundingBox()
-			                        .shift(player.getLocation().multiply(-1))
-			                        .shift(event.getTo())
-			                        .expand(-0.1); // small leeway
-		if (collidesWithUnbreakableBlock(player.getWorld(), targetBox)) {
+		// Don't allow moving into any blocks. Still allows moving within a block if somehow stuck in one.
+		BoundingBox fromBox = player.getBoundingBox()
+			                      .shift(player.getLocation().multiply(-1))
+			                      .shift(event.getFrom());
+		BoundingBox toBox = player.getBoundingBox()
+			                    .shift(player.getLocation().multiply(-1))
+			                    .shift(event.getTo());
+		Set<Block> collidingBlocks = NmsUtils.getVersionAdapter().getCollidingBlocks(player.getWorld(), toBox, true);
+		if (!collidingBlocks.isEmpty()
+			    && !NmsUtils.getVersionAdapter().getCollidingBlocks(player.getWorld(), fromBox, true).containsAll(collidingBlocks)) {
 			event.setCancelled(true);
 			return;
 		}
 
-		// If moving a lot, check collision on the way.
+		// If moving a lot, check collision with unbreakable blocks on the way.
 		// Only check a small bounding box of 0.2x0.2x0.2 for collision to reduce false positives (e.g. from moving around a corner).
 		// This still prevents moving through solid walls/floors.
 		if (event.getFrom().distanceSquared(event.getTo()) > 1) {
