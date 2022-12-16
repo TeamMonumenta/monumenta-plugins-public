@@ -48,7 +48,8 @@ public class ZoneUtils {
 		LAND_BOAT_POSSIBLE("Land Boat Possible"),
 		NO_QUICK_BUILDING("NoQuickBuilding"),
 		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
-		LOOTROOM("Lootroom");
+		LOOTROOM("Lootroom"),
+		MONUMENT("Monument");
 
 		private final String mPropertyName;
 

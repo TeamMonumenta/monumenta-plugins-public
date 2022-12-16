@@ -665,6 +665,18 @@ public class ItemUtils {
 		return mat != null && signs.contains(mat);
 	}
 
+	public static boolean isWool(@Nullable Material mat) {
+		if (mat == null) {
+			return false;
+		}
+		return switch (mat) {
+			case WHITE_WOOL, BLACK_WOOL, BLUE_WOOL, BROWN_WOOL, CYAN_WOOL, GRAY_WOOL, GREEN_WOOL,
+				     LIGHT_BLUE_WOOL, LIGHT_GRAY_WOOL, LIME_WOOL, MAGENTA_WOOL, ORANGE_WOOL,
+				     PINK_WOOL, PURPLE_WOOL, RED_WOOL, YELLOW_WOOL -> true;
+			default -> false;
+		};
+	}
+
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {
 		ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;
 		if (meta instanceof Damageable dMeta && !meta.isUnbreakable()) {

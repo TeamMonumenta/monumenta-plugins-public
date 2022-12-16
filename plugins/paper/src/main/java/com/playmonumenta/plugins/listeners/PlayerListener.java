@@ -359,8 +359,13 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		//Prevent players in survival mode breaking blocks in adventure mode zones not including plots
+		//Prevent players in survival mode placing blocks in adventure mode zones not including plots
 		if (!ZoneUtils.playerCanMineBlock(player, block)) {
+			// But still allow placing wools on a monument
+			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.MONUMENT)
+				    && ItemUtils.isWool(item.getType())) {
+				return;
+			}
 			event.setCancelled(true);
 			return;
 		}
