@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHeal;
+import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
@@ -115,7 +116,7 @@ public class AbilityUtils {
 		if (player == null) {
 			return false;
 		}
-		return INVISIBLE_PLAYERS.containsKey(player);
+		return INVISIBLE_PLAYERS.containsKey(player) || Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class);
 	}
 
 	public static void removeStealth(Plugin plugin, Player player, boolean inflictPenalty) {
