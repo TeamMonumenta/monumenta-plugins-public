@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,24 +35,20 @@ public class SpellSummonConstantly extends Spell {
 	/*
 	 * summoner = the instance of the boss ability that cast this spell
 	 */
-	public SpellSummonConstantly(List<String> mobNames, int duration, int radius, int rangeFromPlayer, int spawnsPerPlayer,
+	public SpellSummonConstantly(List<String> mobNames, int duration, int radius, int rangeFromArmorStand, int baseSpawns,
 	                             Location center, BossAbilityGroup summoner) {
 		mMobNames = mobNames;
 		mDuration = duration;
 		mTimer = mDuration / 3;
 		mCenter = center;
 		mRadius = radius;
-		mBaseSpawns = spawnsPerPlayer;
+		mBaseSpawns = baseSpawns;
 		mSummoner = summoner;
 
-		mLocationOffsets = new ArrayList<Vector>();
-		for (int y = -rangeFromPlayer / 3; y <= rangeFromPlayer / 3; y++) {
-			for (int x = -rangeFromPlayer; x <= rangeFromPlayer; x++) {
-				for (int z = -6; z <= 6; z++) {
-					// Don't spawn very close to the player - no fun
-					if (x > -4 && x < 4 && z > -4 && z < 4) {
-						continue;
-					}
+		mLocationOffsets = new ArrayList<>();
+		for (int x = -rangeFromArmorStand; x <= rangeFromArmorStand; x++) {
+			for (int y = -2; y <= 2; y++) {
+				for (int z = -rangeFromArmorStand; z <= rangeFromArmorStand; z++) {
 					mLocationOffsets.add(new Vector(x + 0.5, y, z + 0.5));
 				}
 			}
@@ -67,7 +64,7 @@ public class SpellSummonConstantly extends Spell {
 			}
 
 			//Hopefully shouldn't break - the idea is that it will refresh how many mobs per player after each death, but it will be based upon a final, unchanging number mBaseSpawns. Also it only changes it when the spell is cast
-			int spawnsPerPlayer = BossUtils.getPlayersInRangeForHealthScaling(mCenter, 50) - 1 + mBaseSpawns;
+			int spawnsPerArmorStand = BossUtils.getPlayersInRangeForHealthScaling(mCenter, 50) - 1 + mBaseSpawns;
 
 			mTimer = mDuration;
 			Collection<ArmorStand> stands = mCenter.getNearbyEntitiesByType(ArmorStand.class, mRadius);
@@ -75,9 +72,13 @@ public class SpellSummonConstantly extends Spell {
 			// Shuffle the list once per run - all players will use same shuffled list
 			Collections.shuffle(mLocationOffsets);
 			for (ArmorStand armorStand : stands) {
+				if (!armorStand.getScoreboardTags().contains("summon_constantly_stand")
+					    && !armorStand.getScoreboardTags().contains("varcosa_center")) {
+					continue;
+				}
 				int numSummoned = 0;
 				for (Vector offset : mLocationOffsets) {
-					Location loc = armorStand.getLocation().add(offset).add(0, 2, 0);
+					Location loc = armorStand.getLocation().add(offset);
 
 					// Underneath block must be solid
 					if (!loc.clone().add(0, -1, 0).getBlock().isSolid()) {
@@ -85,10 +86,13 @@ public class SpellSummonConstantly extends Spell {
 					}
 
 					// Blocks above summon-on block must be not solid
-					boolean blockAboveSolid = loc.clone().add(0, 1, 0).getBlock().isSolid();
-					boolean blockTwoAboveSolid = loc.clone().add(0, 2, 0).getBlock().isSolid();
-					boolean blockIsSolid = loc.getBlock().isSolid();
-					if (blockAboveSolid || blockTwoAboveSolid || blockIsSolid) {
+					if (loc.getBlock().isSolid()
+						    || loc.clone().add(0, 1, 0).getBlock().isSolid()) {
+						continue;
+					}
+
+					// must not be close to a player
+					if (!PlayerUtils.playersInRange(loc, 3, true).isEmpty()) {
 						continue;
 					}
 
@@ -104,10 +108,9 @@ public class SpellSummonConstantly extends Spell {
 						e.printStackTrace();
 					}
 
-
-					// Stop once the right number of mobs have been summoned for this player
+					// Stop once the right number of mobs have been summoned for this armor stand
 					numSummoned++;
-					if (numSummoned >= spawnsPerPlayer) {
+					if (numSummoned >= spawnsPerArmorStand) {
 						break;
 					}
 				}

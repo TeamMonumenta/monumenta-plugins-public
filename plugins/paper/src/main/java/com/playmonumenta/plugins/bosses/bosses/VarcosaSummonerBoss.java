@@ -90,7 +90,7 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(11.5, 0, 0));
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
-		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 5, 2, mCenter, this),
+		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 6, 2, mCenter, this),
 			new SpellJibberJabber(mBoss, speak, radius),
 			action, tooHighAction);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellPurgeNegatives(mBoss, 100)));

@@ -106,7 +106,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 
 		runnable.runTaskTimer(plugin, 20, 20 * 2);
 		List<Spell> passiveSpells = Arrays.asList(
-			new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 4, 2, mCenter, this),
+			new SpellSummonConstantly(mSummonableMobs, 20 * 16, 50, 6, 2, mCenter, this),
 			new SpellJibberJabber(mBoss, mSpeak, detectionRange),
 			new SpellPurgeNegatives(mBoss, 2),
 			new SpellPurgeGlowing(mBoss, 20 * 15),
