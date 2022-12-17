@@ -5,10 +5,8 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.FestiveTesseractSnowmanBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -73,6 +71,10 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		if (checkTesseractName(item) == 0) {
 			return true;
+		}
+		if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.FESTIVE_TESSERACT_DISABLED)) {
+			player.sendMessage(ChatColor.RED + "You can't use this here!");
+			return false;
 		}
 		List<String> currentSummons = STANDARD_SUMMONS;
 

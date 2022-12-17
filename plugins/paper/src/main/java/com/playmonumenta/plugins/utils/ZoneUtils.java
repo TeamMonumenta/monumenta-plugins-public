@@ -49,7 +49,8 @@ public class ZoneUtils {
 		NO_QUICK_BUILDING("NoQuickBuilding"),
 		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
 		LOOTROOM("Lootroom"),
-		MONUMENT("Monument");
+		MONUMENT("Monument"),
+		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled");
 
 		private final String mPropertyName;
 
