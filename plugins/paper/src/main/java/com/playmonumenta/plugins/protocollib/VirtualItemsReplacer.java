@@ -142,6 +142,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 				if (playerModified != null) {
 					playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
+					markVirtual(itemStack);
 				}
 			}
 		}

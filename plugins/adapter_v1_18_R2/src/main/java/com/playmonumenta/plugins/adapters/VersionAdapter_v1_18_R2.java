@@ -412,8 +412,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
 	@Override
 	public boolean hasCollisionWithBlocks(World world, BoundingBox aabb, boolean loadChunks) {
-		return io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
-			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), null, loadChunks, false, false, true, null);
+		return hasCollisionWithBlocks(world, aabb, loadChunks, mat -> mat != Material.SCAFFOLDING);
 	}
 
 	@Override
@@ -427,7 +426,8 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	public Set<Block> getCollidingBlocks(World world, BoundingBox aabb, boolean loadChunks) {
 		List<AABB> collisions = new ArrayList<>();
 		io.papermc.paper.util.CollisionUtil.getCollisionsForBlocksOrWorldBorder(((CraftWorld) world).getHandle(), null,
-			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), collisions, loadChunks, false, false, false, null);
+			new AABB(aabb.getMinX(), aabb.getMinY(), aabb.getMinZ(), aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()), collisions, loadChunks, false, false, false,
+			(state, pos) -> state.getBukkitMaterial() != Material.SCAFFOLDING);
 		Set<Block> result = new HashSet<>();
 		for (AABB collision : collisions) {
 			// This assumes that block collision centers are within their block.
