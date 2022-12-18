@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats.abilities;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -11,6 +12,7 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -107,6 +109,11 @@ public class CharmsGUI extends CustomInventory {
 	public void setCharms() {
 		List<ItemStack> items = CharmManager.getInstance().mPlayerCharms.get(mTargetPlayer.getUniqueId());
 		int totalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, AbilityUtils.CHARM_POWER).orElse(0);
+		if (totalBudget <= 0) {
+			mTargetPlayer.sendMessage(ChatColor.RED + "You have no Charm Power!");
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), this::close);
+			return;
+		}
 
 		for (int i = 0; i < 54; i++) {
 			mInventory.setItem(i, new ItemStack(FILLER, 1));
