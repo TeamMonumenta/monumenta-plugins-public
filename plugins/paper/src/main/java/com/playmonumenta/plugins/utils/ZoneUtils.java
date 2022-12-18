@@ -32,6 +32,7 @@ public class ZoneUtils {
 		NO_NATURAL_SPAWNS("No Natural Spawns"),
 		NO_TRAPDOOR_CLICKS("No Trapdoor Clicks"),
 		NO_BERRY_BUSH_CLICKS("No Berry Bush Clicks"),
+		NO_SLEEPING("No Sleeping"),
 		NO_DOOR_CLICKS("No Door Clicks"),
 		BIG_DOOR_DOWN_CCW("Big Door Down is CCW"),
 		BIG_DOOR_DOWN_CW("Big Door Down is CW"),
