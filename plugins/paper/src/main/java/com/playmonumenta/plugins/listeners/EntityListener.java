@@ -973,7 +973,10 @@ public class EntityListener implements Listener {
 		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)
 			    && event.getEntity() instanceof FallingBlock fallingBlock
 			    && !MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)) {
-			fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(fallingBlock.getBlockData().getMaterial()));
+			Material material = fallingBlock.getBlockData().getMaterial();
+			if (!material.isAir()) { // this can apparently happen
+				fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(material));
+			}
 			fallingBlock.remove();
 			event.setCancelled(true);
 			return;
