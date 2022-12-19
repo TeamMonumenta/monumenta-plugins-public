@@ -1360,4 +1360,23 @@ public class ItemUtils {
 		return item;
 	}
 
+	public static boolean equalIgnoringDurability(@Nullable ItemStack item1, @Nullable ItemStack item2) {
+		if (item1 == null) {
+			return item2 == null;
+		}
+		if (item2 == null || item1.getType() != item2.getType()) {
+			return false;
+		}
+		if (!(item2.getItemMeta() instanceof Damageable damageable2)) {
+			return item1.equals(item2);
+		}
+
+		ItemStack clone1 = clone(item1);
+		if (clone1.getItemMeta() instanceof Damageable damageable1) {
+			damageable1.setDamage(damageable2.getDamage());
+			clone1.setItemMeta(damageable1);
+		}
+		return clone1.equals(item2);
+	}
+
 }

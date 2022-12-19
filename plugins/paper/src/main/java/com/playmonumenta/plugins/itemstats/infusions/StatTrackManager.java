@@ -116,14 +116,14 @@ public class StatTrackManager implements Listener {
 					}
 				}
 				// On quit and on death (and possibly in other cases), items are updated and are no longer the same items,
-				// so check for equality with the initial item stack instead.
+				// so check for equality with the initial item stack instead (ignoring potential durability changes)
 				for (ItemStack item : player.getInventory()) {
-					if (item != null && item.equals(data.mOriginalItemStackClone)) {
+					if (item != null && ItemUtils.equalIgnoringDurability(item, data.mOriginalItemStackClone)) {
 						incrementStat(item, data, player);
 						continue dataLoop;
 					}
 				}
-				MMLog.warning("Could not update stat stack for player " + player.getDisplayName() + ": item='" + ItemUtils.getPlainName(data.mOriginalItemStackClone)
+				MMLog.warning("Could not update stat track for player " + player.getDisplayName() + ": item='" + ItemUtils.getPlainName(data.mOriginalItemStackClone)
 					              + "', infusion='" + data.mInfusion.getName() + "', lost stat track amount=" + data.mUncommittedAmount);
 			}
 		}
