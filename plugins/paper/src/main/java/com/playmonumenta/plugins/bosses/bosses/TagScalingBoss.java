@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
+import java.util.Collections;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,7 +31,7 @@ public class TagScalingBoss extends BossAbilityGroup {
 	public TagScalingBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParams = BossParameters.getParameters(boss, identityTag, new TagScalingBoss.Parameters());
-		super.constructBoss(SpellManager.EMPTY, null, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
 	@Override
