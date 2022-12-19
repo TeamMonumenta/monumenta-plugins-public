@@ -79,7 +79,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 							if (!AbilityUtils.isStealthed(mTarget)) {
 								Set<String> tags = mob.getScoreboardTags();
 								// Don't set target of mobs with this ability, or else infinite loop
-								if (tags == null || (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG))) {
+								if (!tags.contains(identityTag) && !tags.contains(DelvesManager.AVOID_MODIFIERS) && !tags.contains(AbilityUtils.IGNORE_TAG) && !EntityUtils.isBoss(mob)) {
 									mob.setTarget(mTarget);
 									Location loc = mob.getLocation();
 									double distance = loc.distance(locTarget);
