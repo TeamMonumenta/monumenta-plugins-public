@@ -3,12 +3,13 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.DisplayableEffect;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
@@ -19,7 +20,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class AbsorptionUtils {
 
 	private static class AbsorptionInstances {
-		final SortedMap<Double, Integer> mAbsorptionInstances = new TreeMap<Double, Integer>();
+		// Concurrent as the data is read from other threads than the main server thread. Only modified on the main thread.
+		final ConcurrentNavigableMap<Double, Integer> mAbsorptionInstances = new ConcurrentSkipListMap<>();
 
 		private void addAbsorptionInstance(double amount, int duration) {
 			Integer currentDuration = mAbsorptionInstances.get(amount);
@@ -46,7 +48,8 @@ public class AbsorptionUtils {
 		}
 	}
 
-	private static final Map<LivingEntity, AbsorptionInstances> ABSORPTION_INFO_MAPPINGS = new HashMap<LivingEntity, AbsorptionInstances>();
+	// Concurrent as the data is read from other threads than the main server thread. Only modified on the main thread.
+	private static final ConcurrentMap<LivingEntity, AbsorptionInstances> ABSORPTION_INFO_MAPPINGS = new ConcurrentHashMap<>();
 	private static @Nullable BukkitRunnable ABSORPTION_INFO_TRACKER; // Effectively final
 
 	private static final int TRACKER_PERIOD = 20;
