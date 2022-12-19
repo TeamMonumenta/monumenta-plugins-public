@@ -86,7 +86,7 @@ public class CounterStrike extends Ability {
 
 			if (isEnhanced()) {
 				// Remove any old mobs from the list so they don't pile up. There should never be too many at once so this shouldn't be intensive
-				mLastDamageTime.forEach(this::clearIfExpired);
+				mLastDamageTime.entrySet().removeIf(e -> clearIfExpired(e.getKey(), e.getValue()));
 				Integer stacks = mStacks.get(source);
 				Integer lastDamageTime = mLastDamageTime.get(source);
 				if (stacks != null) {
@@ -105,10 +105,11 @@ public class CounterStrike extends Ability {
 		}
 	}
 
-	private void clearIfExpired(LivingEntity mob, Integer time) {
+	private boolean clearIfExpired(LivingEntity mob, Integer time) {
 		if (time < Bukkit.getServer().getCurrentTick() - CharmManager.getDuration(mPlayer, CHARM_DURATION, REDUCTION_DURATION)) {
-			mLastDamageTime.remove(mob);
 			mStacks.remove(mob);
+			return true;
 		}
+		return false;
 	}
 }
