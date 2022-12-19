@@ -298,6 +298,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(InfernoDamage.effectID, InfernoDamage::deserialize);
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
 		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
+		mEffectDeserializer.put(JudgementChainPlayerEffect.effectID, JudgementChainPlayerEffect::deserialize);
 		mEffectDeserializer.put(NegateDamage.effectID, NegateDamage::deserialize);
 		mEffectDeserializer.put(OnHitTimerEffect.effectID, OnHitTimerEffect::deserialize);
 		mEffectDeserializer.put(Paralyze.effectID, Paralyze::deserialize);
