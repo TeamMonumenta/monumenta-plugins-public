@@ -40,6 +40,7 @@ public class CustomRegeneration extends Effect {
 	public JsonObject serialize() {
 		JsonObject object = new JsonObject();
 
+		object.addProperty("effectID", mEffectID);
 		object.addProperty("duration", mDuration);
 		object.addProperty("amount", mAmount);
 

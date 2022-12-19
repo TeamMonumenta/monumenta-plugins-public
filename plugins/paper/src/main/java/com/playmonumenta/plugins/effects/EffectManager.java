@@ -231,7 +231,12 @@ public final class EffectManager implements Listener {
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
 					JsonArray inner = new JsonArray();
 					for (Effect effect : effects.getValue()) {
-						inner.add(effect.serialize());
+						JsonObject serializedEffect = effect.serialize();
+						if (serializedEffect.has("effectID")) {
+							inner.add(serializedEffect);
+						} else {
+							MMLog.severe("Effect " + effect.getClass().getSimpleName() + " did not serialize its effectID!");
+						}
 					}
 					mid.add(effects.getKey(), inner);
 					source.add(effects.getKey());
