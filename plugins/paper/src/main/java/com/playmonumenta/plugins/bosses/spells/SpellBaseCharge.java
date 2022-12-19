@@ -422,7 +422,7 @@ public class SpellBaseCharge extends Spell {
 			}
 
 			for (LivingEntity player : validTargets) {
-				if (player.getLocation().distance(endLoc) < 1.8F) {
+				if (player.getWorld() == charger.getWorld() && player.getLocation().distance(endLoc) < 1.8F) {
 					// Hit player - mark this and continue
 					chargeHitsPlayer = true;
 					switchAggro = player;

@@ -31,6 +31,9 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 			},
 			(unused, targetPlayer) -> {
 				Vector towardsPlayer = targetPlayer.getLocation().subtract(boss.getLocation()).toVector().setY(0).normalize();
+				if (!Double.isFinite(towardsPlayer.getX())) { // boss too close to player (in the x/z plane), causing normalize() to divide by zero
+					towardsPlayer = new Vector(0, boss.getLocation().getY() > targetPlayer.getLocation().getY() ? -1 : 1, 0);
+				}
 				Vector originalVelocity = boss.getVelocity();
 				double scale = 0.5;
 				Vector newVelocity = new Vector();

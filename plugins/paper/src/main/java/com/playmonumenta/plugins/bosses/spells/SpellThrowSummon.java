@@ -89,7 +89,13 @@ public class SpellThrowSummon extends Spell {
 			Location pLoc = target.getLocation();
 			Location tLoc = e.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply(pLoc.distance(tLoc) / 10).setY(0.7f);
+			vect.normalize();
+			if (!Double.isFinite(vect.getX())) {
+				vect.setX(0);
+				vect.setY(tLoc.getY() <= pLoc.getY() ? 1 : -1);
+				vect.setZ(0);
+			}
+			vect.multiply(pLoc.distance(tLoc) / 10).setY(0.7f);
 			e.setVelocity(vect);
 
 		} catch (Exception e) {
