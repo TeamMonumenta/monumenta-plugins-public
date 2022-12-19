@@ -45,11 +45,19 @@ public class Decay implements Enchantment {
 		DamageType type = event.getType();
 		if (AbilityUtils.isAspectTriggeringEvent(event, player)) {
 			int duration = (int) (DURATION * (type == DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
-			apply(plugin, enemy, duration, (int) value, player);
+			apply(plugin, enemy, duration, value, player);
 		}
 	}
 
-	public static void apply(Plugin plugin, LivingEntity enemy, int duration, int decayLevel, Player player) {
-		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime(CharmManager.getDuration(player, CHARM_DURATION, duration), CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1), 40 / decayLevel, player, null));
+	public static void apply(Plugin plugin, LivingEntity enemy, int duration, double decayLevel, Player player) {
+		int finalDuration = CharmManager.getDuration(player, CHARM_DURATION, duration);
+		double desiredPeriod = 40 / decayLevel;
+		if (desiredPeriod > finalDuration) { // Can happen with enchantment reductions from region scaling
+			return;
+		}
+		// The DoT effect only runs every 5 ticks, so select the period as a multiple of 5 ticks and adjust damage instead to match expected DPS
+		int adjustedPeriod = (int) Math.ceil(desiredPeriod / 5) * 5;
+		double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, 1) * adjustedPeriod / desiredPeriod;
+		plugin.mEffectManager.addEffect(enemy, DOT_EFFECT_NAME, new CustomDamageOverTime(finalDuration, damage, adjustedPeriod, player, null));
 	}
 }
