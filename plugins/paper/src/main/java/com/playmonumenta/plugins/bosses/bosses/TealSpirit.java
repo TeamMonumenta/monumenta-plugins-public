@@ -121,10 +121,6 @@ public class TealSpirit extends BossAbilityGroup {
 				new SundialSlash(mBoss, 7 * 20)
 			));
 
-			SpellManager activeDoomsdayPhase = new SpellManager(Arrays.asList(
-				//new DoomsdayClock(mBoss, mSpawnLoc, 11 * 20)
-			));
-
 			List<Spell> passiveSpells = Arrays.asList(
 				//new Rewind(mBoss, mSpawnLoc),
 				new TealSpiritSummon(mSpawnLoc, 40 * 20),
@@ -139,8 +135,6 @@ public class TealSpirit extends BossAbilityGroup {
 			Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
 
 			events.put(25, mBoss -> {
-				changePhase(activeDoomsdayPhase, passiveSpells, null);
-				forceCastSpell(MarchingFate.class);
 				changePhase(activeSpells, passiveSpells, null);
 			});
 
@@ -159,8 +153,6 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(75, mBoss -> {
-				changePhase(activeDoomsdayPhase, passiveSpells, null);
-				forceCastSpell(MarchingFate.class);
 				changePhase(activeSpells, passiveSpells, null);
 			});
 
