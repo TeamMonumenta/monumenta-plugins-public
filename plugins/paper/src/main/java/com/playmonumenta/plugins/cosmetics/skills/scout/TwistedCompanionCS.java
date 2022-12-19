@@ -118,8 +118,10 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).minimumMultiplier(false).spawnAsPlayerActive(player);
 
 		spawnRing(loc, player, 2);
-		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
-			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(summon), player, player);
+		if (player.isOnline() && player.getWorld() == summon.getWorld()) {
+			createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), 1,
+				FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(summon), player, player);
+		}
 	}
 
 	private void spawnRing(Location loc, Player mPlayer, double r) {
