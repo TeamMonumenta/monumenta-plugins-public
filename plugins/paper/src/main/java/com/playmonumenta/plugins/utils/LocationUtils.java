@@ -33,7 +33,11 @@ public class LocationUtils {
 	public static Vector getDirectionTo(Location to, Location from) {
 		Vector vFrom = from.toVector();
 		Vector vTo = to.toVector();
-		return vTo.subtract(vFrom).normalize();
+		Vector diff = vTo.subtract(vFrom);
+		if (diff.lengthSquared() == 0) {
+			return new Vector(0, 1, 0);
+		}
+		return diff.normalize();
 	}
 
 	public static Location getEntityCenter(Entity e) {

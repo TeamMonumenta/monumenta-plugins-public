@@ -26,6 +26,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
@@ -140,7 +141,7 @@ public class RestlessSouls extends Ability {
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
-				Vex mBoss = mVex;
+				final Vex mBoss = mVex;
 				double mRadian = 0;
 				@Override
 				public void run() {
@@ -189,11 +190,13 @@ public class RestlessSouls extends Ability {
 						mBoss.setCharging(true);
 						//choose vehicle mob for speed (bee mount mobs do not have speed, but bees do)
 						//sometimes rider have speed, choose fastest
-						LivingEntity mob = mTarget;
-						double speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue();
-						while (mob.isInsideVehicle()) {
-							mob = (LivingEntity) mob.getVehicle();
-							speed = Math.max(speed, mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue());
+						double speed = 0;
+						Entity vehicle = mTarget;
+						while (vehicle != null) {
+							if (vehicle instanceof LivingEntity livingEntity) {
+								speed = Math.max(speed, EntityUtils.getAttributeBaseOrDefault(livingEntity, Attribute.GENERIC_MOVEMENT_SPEED, 0));
+							}
+							vehicle = vehicle.getVehicle();
 						}
 						Vector direction = LocationUtils.getDirectionTo(mTarget.getLocation(), vexLoc);
 						//0.2x distance for vertical movement for flying mobs
