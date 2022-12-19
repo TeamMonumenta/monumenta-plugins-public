@@ -214,7 +214,7 @@ public class CharmsGUI extends CustomInventory {
 		mInventory.setItem(EXIT_BUTTON_LOC, item);
 
 		if (charmPower > totalBudget) {
-			for (ItemStack charm : items) {
+			for (ItemStack charm : new ArrayList<>(items)) {
 				if (CharmManager.getInstance().removeCharm(mTargetPlayer, charm)) {
 					InventoryUtils.giveItem(mTargetPlayer, charm);
 				}
