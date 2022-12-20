@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -67,9 +68,8 @@ public class ZoneListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		if (ItemUtils.isSomePotion(event.getItem()) && ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_POTIONS)) {
+		if ((ItemUtils.isSomePotion(event.getItem()) || ItemStatUtils.isConsumable(event.getItem())) && ZoneUtils.hasZoneProperty(event.getPlayer(), ZoneProperty.NO_POTIONS)) {
 			event.setCancelled(true);
-			return;
 		}
 	}
 
