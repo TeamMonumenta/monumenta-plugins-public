@@ -26,6 +26,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.TreeType;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Leaves;
@@ -258,9 +259,10 @@ public class WorldshaperOverride {
 				continue;
 			}
 
-			StructureGrowEvent event = new StructureGrowEvent(location, TreeType.TREE, true, player, List.of(location.getBlock().getState()));
+			ArrayList<BlockState> blockList = new ArrayList<>(List.of(location.getBlock().getState()));
+			StructureGrowEvent event = new StructureGrowEvent(location, TreeType.TREE, true, player, blockList);
 			Bukkit.getPluginManager().callEvent(event);
-			if (!event.isCancelled()) {
+			if (!event.isCancelled() && !blockList.isEmpty()) {
 				BlockData blockData = getBlockAndSubtract(item);
 				if (blockData != null) {
 					location.getBlock().setBlockData(blockData);
