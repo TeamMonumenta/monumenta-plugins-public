@@ -372,14 +372,14 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			//Start point of projectiles
-			Location mLocation = mBoss.getEyeLocation().add(VectorUtils.rotateYAxis(
+			final Location mLocation = mBoss.getEyeLocation().add(VectorUtils.rotateYAxis(
 				VectorUtils.rotateXAxis(new Vector(offsetX, offsetY, offsetZ), mBoss.getLocation().getPitch()),
 				mBoss.getLocation().getYaw()));
-			BoundingBox mHitbox = BoundingBox.of(mLocation, mHitboxLength / 2, mHitboxLength / 2, mHitboxLength / 2);
-			V mTarget = target;
+			final BoundingBox mHitbox = BoundingBox.of(mLocation, mHitboxLength / 2, mHitboxLength / 2, mHitboxLength / 2);
+			final V mTarget = target;
 			//Base direction of projectiles
-			Vector mBaseDir = !fixed ? targetLoc.clone().subtract(mLocation).toVector().normalize() :
-				                  VectorUtils.rotationToVector(fYaw + mBoss.getLocation().getYaw(), fPitch);
+			final Vector mBaseDir = !fixed ? targetLoc.clone().subtract(mLocation).toVector().normalize() :
+				                        VectorUtils.rotationToVector(fYaw + mBoss.getLocation().getYaw(), fPitch);
 			//Hint: Clone is important for multiple launching
 			//Vector mDirection = targetLoc.clone().subtract(mLocation).toVector().normalize();
 			Vector mDirection = VectorUtils.rotateTargetDirection(
@@ -393,7 +393,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 				mTicks++;
 				mCollisionDelayTicks--;
 
-				if (mTarget != null && (!mTarget.isValid() || mTarget.isDead())) {
+				if ((mTarget != null && (!mTarget.isValid() || mTarget.isDead()))
+					    || !Double.isFinite(mDirection.getX())) {
 					this.cancel();
 					if (!mLingers) {
 						mActiveRunnables.remove(this);
@@ -413,6 +414,9 @@ public class SpellBaseSeekingProjectile extends Spell {
 						return;
 					}
 					newDirection.normalize();
+					if (!Double.isFinite(newDirection.getX())) {
+						newDirection = mDirection;
+					}
 					// Because of double rounding errors, the dot product could be something stupid like 1.0000000000000002 (true story), so pre-process it before taking acos()
 					double newAngle = Math.acos(Math.max(-1, Math.min(1, mDirection.dot(newDirection))));
 
@@ -425,11 +429,17 @@ public class SpellBaseSeekingProjectile extends Spell {
 						// Only do calculations if there's actually a direction change
 						if (halfEndpointDistance != 0) {
 							double scalar = (halfEndpointDistance + FastUtils.sin(mTurnRadius - newAngle / 2)) / (2 * halfEndpointDistance);
-							mDirection.add(newDirection.subtract(mDirection).multiply(scalar)).normalize();
+							Vector newerDirection = mDirection.clone().add(newDirection.subtract(mDirection).multiply(scalar)).normalize();
+							if (Double.isFinite(newerDirection.getX())) {
+								mDirection = newerDirection;
+							}
 						}
 					}
 				}
 
+				if (!Double.isFinite(mDirection.getX())) {
+					mDirection = new Vector(0, 1, 0);
+				}
 				Vector shift = mDirection.clone().multiply(mSpeed);
 
 				Block block = mLocation.getBlock();
