@@ -103,7 +103,7 @@ public class OrinCustomInventory extends CustomInventory {
 	static {
 		//R1 Page
 		ORIN_ITEMS.add(new TeleportEntry(1, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/sierhaven_to_plots"));
-		ORIN_ITEMS.add(new TeleportEntry(1, 27, "Player Plot", "Click to teleport!", Material.PLAYER_HEAD, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(1, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "tp @S -765.5 107.0625 70.5 180 0", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(1, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S run function monumenta:mechanisms/teleporters/goto/ring", "instancebot ring"));
@@ -112,7 +112,7 @@ public class OrinCustomInventory extends CustomInventory {
 
 		//R2 Page
 		ORIN_ITEMS.add(new TeleportEntry(2, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/mistport_to_plots"));
-		ORIN_ITEMS.add(new TeleportEntry(2, 27, "Player Plot", "Click to teleport!", Material.PLAYER_HEAD, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(2, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "tp @S -762.5 70.1 1344.5 180 0", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(2, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/ring", "instancebot ring"));
@@ -121,7 +121,7 @@ public class OrinCustomInventory extends CustomInventory {
 
 		//R3 Page
 		ORIN_ITEMS.add(new TeleportEntry(3, 9, "Plots", "Click to teleport!", Material.LIGHT_BLUE_CONCRETE, null, 0, "execute as @S run function monumenta:mechanisms/teleporters/tp/galengarde_to_plots"));
-		ORIN_ITEMS.add(new TeleportEntry(3, 27, "Player Plot", "Click to teleport!", Material.PLAYER_HEAD, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
+		ORIN_ITEMS.add(new TeleportEntry(3, 27, "Player Plot", "Click to teleport!", Material.GRASS_BLOCK, "CurrentPlot", 1, "plot send @S", "plot gui @S"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 12, "Sierhaven", "Left Click to be sorted to a shard, right click to choose the shard.", Material.GREEN_CONCRETE, null, 0, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/valley", "instancebot valley"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 15, "Mistport", "Left Click to be sorted to a shard, right click to choose the shard.", Material.SAND, "Quest101", 13, "execute as @S at @s run function monumenta:mechanisms/teleporters/shards/isles", "instancebot isles"));
 		ORIN_ITEMS.add(new TeleportEntry(3, 39, "Galengarde", "Left click to be sorted to a shard, right click to choose a shard.", Material.RED_MUSHROOM_BLOCK, "R3Access", 1, "tp @S -303.5 83 -654.5 90 0", "instancebot ring"));
