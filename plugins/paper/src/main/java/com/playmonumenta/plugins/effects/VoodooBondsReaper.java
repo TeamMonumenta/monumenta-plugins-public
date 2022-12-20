@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -37,7 +36,6 @@ public class VoodooBondsReaper extends Effect {
 	private final Plugin mPlugin;
 
 	private @Nullable VoodooBonds mVoodooBonds;
-	private int mScore;
 	private boolean mDone = false;
 
 	public VoodooBondsReaper(int duration, Player player, double damageTaken, double damagePercent, Plugin plugin) {
@@ -47,20 +45,17 @@ public class VoodooBondsReaper extends Effect {
 		mDamagePercent = damagePercent;
 		mPlugin = plugin;
 
-		if (mPlayer != null) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				mVoodooBonds = AbilityManager.getManager().getPlayerAbility(mPlayer, VoodooBonds.class);
-				mScore = mVoodooBonds != null ? Math.min(mVoodooBonds.getAbilityScore(), 2) : 0;
-			});
-		}
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			mVoodooBonds = mPlugin.mAbilityManager.getPlayerAbility(mPlayer, VoodooBonds.class);
+		});
 	}
 
 	@Override
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
-		if (mScore == 0) {
+		if (mVoodooBonds == null) {
 			return;
 		}
-		double percent = CharmManager.getLevelPercentDecimal(mPlayer, VoodooBonds.CHARM_TRANSFER_DAMAGE) + (mScore == 1 ? PERCENT_1 : PERCENT_2);
+		double percent = CharmManager.getLevelPercentDecimal(mPlayer, VoodooBonds.CHARM_TRANSFER_DAMAGE) + (mVoodooBonds.isLevelOne() ? PERCENT_1 : PERCENT_2);
 		if (!EntityUtils.isBoss(enemy)) {
 			event.setDamage(event.getDamage() + mDamageTaken * percent);
 		}

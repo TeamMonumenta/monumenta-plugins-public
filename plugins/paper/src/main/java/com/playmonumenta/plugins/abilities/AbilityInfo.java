@@ -188,14 +188,21 @@ public class AbilityInfo<T extends Ability> {
 	// other methods
 
 	public int getBaseCooldown(int score) {
-		return mCooldowns == null ? 0 : mCooldowns.get(Math.min(score - 1, mCooldowns.size() - 1));
+		if (mCooldowns == null) {
+			return 0;
+		}
+		if (!ServerProperties.getAbilityEnhancementsEnabled() && score > 2) {
+			score -= 2;
+		}
+		return mCooldowns.get(Math.min(score - 1, mCooldowns.size() - 1));
 	}
 
 	public int getModifiedCooldown(Player player, int score) {
+		int baseCooldown = getBaseCooldown(score);
 		if (mCharmCooldown != null) {
-			return CharmManager.getCooldown(player, mCharmCooldown, getBaseCooldown(score));
+			return CharmManager.getCooldown(player, mCharmCooldown, baseCooldown);
 		}
-		return getBaseCooldown(score);
+		return baseCooldown;
 	}
 
 	public double getPriorityAmount() {
