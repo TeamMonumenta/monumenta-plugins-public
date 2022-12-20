@@ -106,7 +106,7 @@ public class DepthsVolley extends DepthsAbility {
 							arrow.setFireTicks(fireticks);
 						}
 
-						arrow.setCritical(arrow.isCritical());
+						arrow.setCritical(projectile instanceof AbstractArrow projectileArrow && projectileArrow.isCritical());
 						arrow.setPierceLevel(arrow.getPierceLevel());
 
 						// If the base arrow's potion data is still stored, apply it to the new arrows
