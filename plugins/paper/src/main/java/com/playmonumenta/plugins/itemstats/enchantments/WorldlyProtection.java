@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import java.util.EnumSet;
@@ -12,19 +13,20 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-public class ProtectionOfTheDepths implements Enchantment {
+public class WorldlyProtection implements Enchantment {
 
-	private static final double DAMAGE_MULTIPLIER_R1 = 0.85; // 15% reduction for region 1
-	private static final double DAMAGE_MULTIPLIER_R2 = 0.75; // 25% reduction for region 2
+	private static final double DAMAGE_MULTIPLIER_R1 = 0.05; // 5% reduction for region 1
+	private static final double DAMAGE_MULTIPLIER_R2 = 0.0725; // 7.25% reduction for region 2
+	private static final double DAMAGE_MULTIPLIER_R3 = 0.1; // 10% reduction for region 3
 
 	@Override
 	public String getName() {
-		return "Protection of the Depths";
+		return "Worldly Protection";
 	}
 
 	@Override
 	public EnchantmentType getEnchantmentType() {
-		return EnchantmentType.PROTECTION_OF_THE_DEPTHS;
+		return EnchantmentType.WORLDLY_PROTECTION;
 	}
 
 	@Override
@@ -37,10 +39,15 @@ public class ProtectionOfTheDepths implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		event.setDamage(event.getDamage() * getDamageMultiplier(ServerProperties.getClassSpecializationsEnabled()));
+		event.setDamage(event.getDamage() * getDamageMultiplier(value, ServerProperties.getRegion()));
 	}
 
-	public static double getDamageMultiplier(boolean region2) {
-		return region2 ? DAMAGE_MULTIPLIER_R2 : DAMAGE_MULTIPLIER_R1;
+	public static double getDamageMultiplier(double level, ItemStatUtils.Region region) {
+		return switch (region) {
+			case RING -> 1 - level * DAMAGE_MULTIPLIER_R3;
+			case ISLES -> 1 - level * DAMAGE_MULTIPLIER_R2;
+			default -> 1 - level * DAMAGE_MULTIPLIER_R1;
+		};
 	}
+
 }

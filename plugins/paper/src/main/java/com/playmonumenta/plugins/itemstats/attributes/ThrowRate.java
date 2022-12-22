@@ -40,7 +40,7 @@ public class ThrowRate implements Attribute {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
 		Quickdraw quickdraw = AbilityManager.getManager().getPlayerAbility(player, Quickdraw.class);
 		boolean isQuickdraw = quickdraw != null && quickdraw.isQuickDraw(proj);
 

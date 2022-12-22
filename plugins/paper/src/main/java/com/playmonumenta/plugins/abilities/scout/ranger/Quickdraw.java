@@ -20,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Arrow;
@@ -117,7 +116,7 @@ public class Quickdraw extends Ability {
 
 		proj.setShooter(mPlayer);
 		if (proj instanceof AbstractArrow arrow) {
-			arrow.setPierceLevel(inMainHand.getEnchantmentLevel(Enchantment.PIERCING) + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING));
+			arrow.setPierceLevel((int) CharmManager.getLevel(mPlayer, CHARM_PIERCING));
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 		}

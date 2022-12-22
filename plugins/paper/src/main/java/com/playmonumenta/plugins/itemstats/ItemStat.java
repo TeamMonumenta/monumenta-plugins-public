@@ -115,7 +115,7 @@ public interface ItemStat {
 	 * @param event      the associated ProjectileLaunchEvent
 	 * @param projectile the Projectile being launched
 	 */
-	default void onLaunchProjectile(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+	default void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 
 	}
 

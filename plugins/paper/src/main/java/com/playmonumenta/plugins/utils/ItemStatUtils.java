@@ -403,7 +403,6 @@ public class ItemStatUtils {
 		RIPTIDE(Enchantment.RIPTIDE, "Riptide", true, false, false, false),
 		PUNCH(Enchantment.ARROW_KNOCKBACK, "Punch", true, false, false, false),
 		QUICK_CHARGE(Enchantment.QUICK_CHARGE, "Quick Charge", true, false, false, false),
-		PIERCING(Enchantment.PIERCING, "Piercing", true, false, false, false),
 		MULTISHOT(Enchantment.MULTISHOT, "Multishot", false, false, false, false),
 		INFINITY(Enchantment.ARROW_INFINITE, "Infinity", false, false, false, false),
 		EFFICIENCY(Enchantment.DIG_SPEED, "Efficiency", true, false, false, false),
@@ -469,8 +468,8 @@ public class ItemStatUtils {
 		RADIANT(new Radiant(), false, false, false, false),
 		REGENERATION(new Regeneration(), true, false, false, true),
 		POINT_BLANK(new PointBlank(), true, false, false, true),
-		PROTECTION_OF_THE_DEPTHS(new ProtectionOfTheDepths(), false, false, false, false),
-		PROTECTION_OF_THE_WORLD(new ProtectionOfTheWorld(), true, false, false, false),
+		PIERCING(new Piercing(), true, false, false, true),
+		WORLDLY_PROTECTION(new WorldlyProtection(), true, false, false, false),
 		QUAKE(new Quake(), true, false, false, true),
 		RAGE_OF_THE_KETER(new RageOfTheKeter(), false, false, false, false),
 		RECOIL(new Recoil(), true, false, false, false),
@@ -524,11 +523,12 @@ public class ItemStatUtils {
 		ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false),
 		//Random Stuff
 		PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true, false),
-		// Crit Calcs (defaults to value of 1, always active. DO NOT GIVE TO PLAYERS VIA ENCHANT)
+		// Hidden enchantments that affect display
 		HIDE_ATTRIBUTES(new HideAttributes(), false, false, false, false),
 		HIDE_ENCHANTS(new HideEnchants(), false, false, false, false),
 		HIDE_INFO(new HideInfo(), false, false, false, false),
 		NO_GLINT(new NoGlint(), false, false, false, false),
+		// Crit Calcs (defaults to value of 1, always active. DO NOT GIVE TO PLAYERS VIA ENCHANT)
 		ANTI_CRIT_SCALING(new AntiCritScaling(), false, false, false, false),
 		CRIT_SCALING(new CritScaling(), false, false, false, false),
 		STRENGTH_APPLY(new StrengthApply(), false, false, false, false),

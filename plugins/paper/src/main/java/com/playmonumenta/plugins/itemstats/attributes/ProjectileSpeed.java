@@ -24,7 +24,7 @@ public class ProjectileSpeed implements Attribute {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
 		// If the level is 0, then it's just a vanilla item with no modifiers.
 		// For some reason arrows need the value to be one less than snowballs, potions, ender pearls, etc.
 		if (proj instanceof AbstractArrow) {

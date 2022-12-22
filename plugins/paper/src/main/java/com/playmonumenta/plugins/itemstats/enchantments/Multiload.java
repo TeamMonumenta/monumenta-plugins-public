@@ -16,7 +16,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Multiload implements Enchantment {
 
@@ -43,18 +42,16 @@ public class Multiload implements Enchantment {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile projectile) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile projectile) {
 		ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
 
 		if (itemInMainHand.getType() == Material.CROSSBOW &&
 			projectile instanceof AbstractArrow arrow) {
-			new BukkitRunnable() {
-				@Override public void run() {
-					updateItemStack(itemInMainHand, arrow);
-					player.updateInventory();
-					player.sendActionBar(Component.text("Ammo: " + getAmmoCount(itemInMainHand) + " / " + ((int) level + 1), NamedTextColor.YELLOW));
-				}
-			}.runTaskLater(plugin, 1);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				updateItemStack(itemInMainHand, arrow);
+				player.updateInventory();
+				player.sendActionBar(Component.text("Ammo: " + getAmmoCount(itemInMainHand) + " / " + ((int) level + 1), NamedTextColor.YELLOW));
+			}, 1);
 		}
 	}
 

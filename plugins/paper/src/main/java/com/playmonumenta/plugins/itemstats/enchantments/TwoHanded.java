@@ -55,7 +55,7 @@ public class TwoHanded implements Enchantment {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile proj) {
 		//This handles all launched projectiles besides Tridents (because they're quirky and not like the other projectiles).
 		//Tridents are handled in AttributeThrowRate.java
 		if (checkForOffhand(plugin, player)) {

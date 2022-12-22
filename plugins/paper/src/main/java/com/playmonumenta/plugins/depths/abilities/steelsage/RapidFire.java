@@ -81,6 +81,7 @@ public class RapidFire extends DepthsAbility {
 					Vector direction = mPlayer.getLocation().getDirection();
 					AbstractArrow arrow = world.spawnArrow(eyeLoc, direction, 3.0f, 0, Arrow.class);
 					arrow.setCritical(true);
+					arrow.setPierceLevel(0);
 					arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 
 					arrow.setShooter(mPlayer);

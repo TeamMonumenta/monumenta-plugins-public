@@ -33,7 +33,7 @@ public class Recoil implements Enchantment {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
 		if (player.isSneaking()) {
 			Material type = player.getInventory().getItemInMainHand().getType();
 			if (player.getCooldown(type) < 10) {

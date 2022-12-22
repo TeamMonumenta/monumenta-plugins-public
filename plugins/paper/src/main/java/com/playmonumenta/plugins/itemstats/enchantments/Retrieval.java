@@ -29,7 +29,7 @@ public class Retrieval implements Enchantment {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double level, ProjectileLaunchEvent event, Projectile proj) {
 		double chance = (RETRIEVAL_CHANCE * level) + CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE);
 		if ((proj.getType() == EntityType.ARROW || proj.getType() == EntityType.SPECTRAL_ARROW) && FastUtils.RANDOM.nextDouble() < chance) {
 			boolean refunded = AbilityUtils.refundArrow(player, (AbstractArrow) proj);

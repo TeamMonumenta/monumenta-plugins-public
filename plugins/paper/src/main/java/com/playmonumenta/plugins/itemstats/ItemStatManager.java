@@ -602,7 +602,7 @@ public class ItemStatManager implements Listener {
 	public void onLaunchProjectile(Plugin plugin, Player player, ProjectileLaunchEvent event, Projectile projectile) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
-				entry.getKey().onLaunchProjectile(plugin, player, entry.getValue(), event, projectile);
+				entry.getKey().onProjectileLaunch(plugin, player, entry.getValue(), event, projectile);
 			}
 		}
 	}

@@ -70,7 +70,7 @@ public class FireAspect implements Enchantment {
 	}
 
 	@Override
-	public void onLaunchProjectile(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+	public void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
 		if (projectile instanceof Arrow || projectile instanceof SpectralArrow) {
 			// Set the arrow on fire like vanilla flame so it activates tnt
 			// This fire is overwritten by the fire from the enchant, which is equal but applies inferno, etc. properly

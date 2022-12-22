@@ -574,11 +574,6 @@ public class EntityListener implements Listener {
 					}
 				}
 			} else if (event.getEntity() instanceof AbstractArrow arrow) {
-				// Sets piercing on Arrows, even if source comes from bows.
-				if (ItemStatUtils.getEnchantmentLevel(player.getActiveItem(), EnchantmentType.PIERCING) > 0 && arrow.getPierceLevel() == 0) {
-					arrow.setPierceLevel(ItemStatUtils.getEnchantmentLevel(player.getActiveItem(), EnchantmentType.PIERCING));
-				}
-
 				// Includes arrows and spectral arrows
 				// Tridents are handled in ThrowRate
 				if (!mAbilities.playerShotProjectileEvent(player, arrow)) {

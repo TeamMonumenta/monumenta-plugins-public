@@ -3,8 +3,7 @@ package com.playmonumenta.plugins.itemstats.gui;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheDepths;
-import com.playmonumenta.plugins.itemstats.enchantments.ProtectionOfTheWorld;
+import com.playmonumenta.plugins.itemstats.enchantments.WorldlyProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
@@ -197,11 +196,7 @@ class PSGUIStats {
 			damageMultiplier *= SecondWind.getDamageMultiplier(get(ItemStatUtils.EnchantmentType.SECOND_WIND));
 		}
 
-		if (get(ItemStatUtils.EnchantmentType.PROTECTION_OF_THE_DEPTHS) > 0) {
-			damageMultiplier *= ProtectionOfTheDepths.getDamageMultiplier(region2);
-		}
-
-		damageMultiplier *= ProtectionOfTheWorld.getDamageMultiplier(get(ItemStatUtils.EnchantmentType.PROTECTION_OF_THE_WORLD), mPlayerItemStats.getRegion());
+		damageMultiplier *= WorldlyProtection.getDamageMultiplier(get(ItemStatUtils.EnchantmentType.WORLDLY_PROTECTION), mPlayerItemStats.getRegion());
 
 		if (protection == null || protection.getEnchantmentType() != ItemStatUtils.EnchantmentType.FEATHER_FALLING) {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER[getRegionScaling(mPlayer, false)];

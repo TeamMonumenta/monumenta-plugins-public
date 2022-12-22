@@ -119,7 +119,7 @@ public class Volley extends Ability {
 					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 5, arrowSpeed, 360.0 / (mArrows * 5), projectile.getClass());
 				}
 
-				int piercing = (projectile instanceof AbstractArrow arrow) ? arrow.getPierceLevel() + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
+				int piercing = (projectile instanceof AbstractArrow) ? (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
 
 				for (Projectile proj : projectiles) {
 
