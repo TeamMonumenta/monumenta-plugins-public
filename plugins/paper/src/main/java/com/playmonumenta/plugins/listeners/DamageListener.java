@@ -47,6 +47,15 @@ public class DamageListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void entityDamageEvent(EntityDamageEvent event) {
 		if (event instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {
+			// don't allow dealing damage across worlds, no matter how (can e.g. happen via damage over time effects or delayed damage)
+			if (event.getEntity().getWorld() != entityDamageByEntityEvent.getDamager().getWorld()
+				    || (entityDamageByEntityEvent.getDamager() instanceof Projectile projectile
+					        && projectile.getShooter() instanceof Entity shooter
+					        && event.getEntity().getWorld() != shooter.getWorld())) {
+				event.setCancelled(true);
+				return;
+			}
+
 			if (event.getCause().equals(DamageCause.ENTITY_EXPLOSION)
 				    && event.getEntity() instanceof LivingEntity le) {
 				Entity damager = entityDamageByEntityEvent.getDamager();
