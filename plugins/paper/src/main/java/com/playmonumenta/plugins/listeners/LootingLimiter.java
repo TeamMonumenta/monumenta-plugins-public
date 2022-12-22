@@ -97,7 +97,8 @@ public class LootingLimiter implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void blockBreakEventEarly(BlockBreakEvent event) {
-		if (ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0) {
+		if ((ServerProperties.getLootingLimiterSpawners() <= 0 && ServerProperties.getLootingLimiterMobKills() <= 0)
+			    || ServerProperties.getLootingLimiterIgnoreBreakingChests()) {
 			return;
 		}
 		if (!checkChest(event.getBlock(), event.getPlayer())) {

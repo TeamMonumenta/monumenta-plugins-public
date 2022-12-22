@@ -50,6 +50,7 @@ public class ServerProperties {
 	private final List<NamespacedKey> mEggifySpawnEggs = new ArrayList<>();
 	private int mLootingLimiterMobKills = 0;
 	private int mLootingLimiterSpawners = 0;
+	private boolean mLootingLimiterIgnoreBreakingChests = false;
 	private boolean mDepthsEnabled = false;
 	private boolean mTrickyCreepersEnabled = true;
 
@@ -140,6 +141,10 @@ public class ServerProperties {
 		return INSTANCE.mLootingLimiterSpawners;
 	}
 
+	public static boolean getLootingLimiterIgnoreBreakingChests() {
+		return INSTANCE.mLootingLimiterIgnoreBreakingChests;
+	}
+
 	public static boolean getDepthsEnabled() {
 		return INSTANCE.mDepthsEnabled;
 	}
@@ -180,6 +185,7 @@ public class ServerProperties {
 
 			mLootingLimiterMobKills = getPropertyValueInt(object, "lootingLimiterMobKills", mLootingLimiterMobKills);
 			mLootingLimiterSpawners = getPropertyValueInt(object, "lootingLimiterSpawners", mLootingLimiterSpawners);
+			mLootingLimiterIgnoreBreakingChests = getPropertyValueBool(object, "lootingLimiterIgnoreBreakingChests", mLootingLimiterIgnoreBreakingChests);
 
 			mDepthsEnabled = getPropertyValueBool(object, "depthsEnabled", mDepthsEnabled);
 			mTrickyCreepersEnabled = getPropertyValueBool(object, "trickyCreepersEnabled", mTrickyCreepersEnabled);
@@ -228,6 +234,7 @@ public class ServerProperties {
 
 		out.add("lootingLimiterMobKills = " + mLootingLimiterMobKills);
 		out.add("lootingLimiterSpawners = " + mLootingLimiterSpawners);
+		out.add("lootingLimiterIgnoreBreakingChests = " + mLootingLimiterIgnoreBreakingChests);
 
 		out.add("depthsEnabled = " + mDepthsEnabled + " (NB: changing this requires a restart)");
 

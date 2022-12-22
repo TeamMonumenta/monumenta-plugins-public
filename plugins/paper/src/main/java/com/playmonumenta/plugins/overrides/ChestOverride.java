@@ -151,7 +151,8 @@ public class ChestOverride extends BaseOverride {
 			return false;
 		} else if (!breakable(block)) {
 			return false;
-		} else if (!LootingLimiter.checkChest(block, null)) { // must be the last check, as this subtracts from players' activity scores if successful
+		} else if (!ServerProperties.getLootingLimiterIgnoreBreakingChests()
+			           && !LootingLimiter.checkChest(block, null)) { // must be the last check, as this subtracts from players' activity scores if successful
 			return false;
 		}
 
