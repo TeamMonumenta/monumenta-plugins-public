@@ -111,7 +111,8 @@ public class DelvesUtils {
 			}
 		}
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
-		return nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		// return nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		return DelvesModifier.rotatingDelveModifiers();
 	}
 
 	public static ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
