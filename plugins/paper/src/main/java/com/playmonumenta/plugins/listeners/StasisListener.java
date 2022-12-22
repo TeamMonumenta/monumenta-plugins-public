@@ -24,6 +24,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -192,8 +193,19 @@ public class StasisListener implements Listener {
 		if (event.getAction() == Action.PHYSICAL) {
 			return;
 		}
-		// Allow "respawning" after 1 second (to prevent accidental instant respawns)
-		endRespawnStasis(event.getPlayer(), false);
+		if (isInRespawnStasis(event.getPlayer())) {
+			event.setCancelled(true);
+			// Allow "respawning" after 1 second (to prevent accidental instant respawns)
+			endRespawnStasis(event.getPlayer(), false);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	public void playerAnimationEvent(PlayerAnimationEvent event) {
+		if (isInRespawnStasis(event.getPlayer())) {
+			event.setCancelled(true);
+			endRespawnStasis(event.getPlayer(), false);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
