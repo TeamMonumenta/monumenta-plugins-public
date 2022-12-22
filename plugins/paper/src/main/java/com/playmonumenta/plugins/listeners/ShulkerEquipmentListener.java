@@ -347,8 +347,6 @@ public class ShulkerEquipmentListener implements Listener {
 	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {
 		ItemStack fromItem = from.getItem(fromSlot);
 		ItemStack toItem = to.getItem(toSlot);
-		ItemStatUtils.generateItemStats(fromItem);
-		ItemStatUtils.generateItemStats(toItem);
 		from.setItem(fromSlot, toItem);
 		to.setItem(toSlot, fromItem);
 	}
@@ -359,11 +357,11 @@ public class ShulkerEquipmentListener implements Listener {
 			return;
 		}
 		NBTItem nbt = new NBTItem(shulkerBox, true);
+		NBTCompound vanityItems = ItemStatUtils.addPlayerModified(nbt).addCompound(ItemStatUtils.VANITY_ITEMS_KEY);
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			if (slot == EquipmentSlot.HAND) {
 				continue;
 			}
-			NBTCompound vanityItems = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY).addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).addCompound(ItemStatUtils.VANITY_ITEMS_KEY);
 			String slotKey = slot.name().toLowerCase(Locale.ROOT);
 			ItemStack newVanity = vanityItems.hasKey(slotKey) ? vanityItems.getItemStack(slotKey) : null;
 			if (newVanity != null && (newVanity.getType() == Material.AIR || !VanityManager.isValidVanityItem(player, newVanity, slot))) {
