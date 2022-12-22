@@ -187,6 +187,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class AbilityManager {
@@ -900,8 +901,14 @@ public class AbilityManager {
 			if (key == AbilityTrigger.Key.LEFT_CLICK) {
 				MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick);
 			} else {
-				ItemStack mainHand = player.getInventory().getItemInMainHand();
-				if (ItemUtils.isSomePotion(mainHand) || ItemUtils.isProjectileWeapon(mainHand) || mainHand.getType().isBlock()) {
+				// If right-clicking with a "useable" item, the client will send a left click soon after, so need to ignore that click when it happens
+				// Need to also check vanity, as the item type on the client is what matters
+				List<@org.jetbrains.annotations.Nullable ItemStack> potentiallyUseableItems = Arrays.asList(player.getInventory().getItemInMainHand(),
+					player.getInventory().getItemInOffHand(),
+					mPlugin.mVanityManager.getData(player).getEquipped(EquipmentSlot.OFF_HAND));
+				if (potentiallyUseableItems.stream()
+					    .anyMatch(item -> item != null && (ItemUtils.isSomePotion(item) || ItemUtils.isProjectileWeapon(item) || item.getType().isBlock()
+						                                       || item.getType() == Material.ENDER_PEARL || item.getType() == Material.ENDER_EYE))) {
 					MetadataUtils.setMetadata(player, RIGHT_CLICK_TICK_METAKEY, currentTick);
 					MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, currentTick + 2);
 				} else {
