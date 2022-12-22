@@ -38,7 +38,7 @@ public class Astral {
 
 
 	static {
-		MOB_POOL = Arrays.asList("PillarAlpha", "PillarBeta", "PillarGamma");
+		MOB_POOL = Arrays.asList("PillarAlpha", "PillarBeta", "PillarGamma", "PillarDelta", "PillarEpsilon", "PillarNu");
 	}
 
 	private static void summonAstral(Block block) {

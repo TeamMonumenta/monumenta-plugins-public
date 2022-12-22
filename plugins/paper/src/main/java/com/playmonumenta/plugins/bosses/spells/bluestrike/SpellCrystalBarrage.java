@@ -38,12 +38,12 @@ public class SpellCrystalBarrage extends Spell {
 	private int mPhase;
 
 	private static final int NUM_BULLETS = 60;
-
+	private final double ARMOR_STAND_HEAD_OFFSET = 1.6875;
 	private static final double DIRECT_HIT_DAMAGE = 60;
 	private static final String SPELL_NAME = "Crystal Barrage";
 	private static final int BULLET_DURATION = 5 * 20;
 	private static final Material BULLET_MATERIAL = Material.AMETHYST_BLOCK;
-	private static final double HITBOX = 0.25;
+	private static final double HITBOX = 0.3125;
 
 	private PartialParticle mPHit;
 	private List<Player> mHitPlayers;
@@ -125,7 +125,7 @@ public class SpellCrystalBarrage extends Spell {
 					double r = 25;
 					double angle = (360.0 / NUM_BULLETS) * mBullets;
 					double radians = Math.toRadians(angle);
-					Location loc = mCenter.clone().add(r * Math.cos(radians), 1, r * Math.sin(radians));
+					Location loc = mCenter.clone().add(r * Math.cos(radians), 1.1875, r * Math.sin(radians));
 					Vector dir = LocationUtils.getVectorTo(mCenter, loc).setY(0).normalize();
 					int timeStart = castTime() - mT;
 					launchAcceleratingBullet(loc, dir, timeStart);
@@ -140,7 +140,7 @@ public class SpellCrystalBarrage extends Spell {
 					double r = 25;
 					double angle = (360.0 / NUM_BULLETS) * mBullets;
 					double radians = Math.toRadians(angle);
-					Location loc = mCenter.clone().add(r * Math.cos(radians), 1, r * Math.sin(radians));
+					Location loc = mCenter.clone().add(r * Math.cos(radians), 1.1875, r * Math.sin(radians));
 					Vector dir = LocationUtils.getVectorTo(mCenter, loc).setY(0).normalize();
 					int timeStart = castTime() - mT;
 					launchAcceleratingBullet(loc, dir, timeStart);
@@ -148,7 +148,7 @@ public class SpellCrystalBarrage extends Spell {
 
 					angle = (360.0 / NUM_BULLETS) * mBullets;
 					radians = Math.toRadians(angle);
-					loc = mCenter.clone().add(r * Math.cos(radians), 1, r * Math.sin(radians));
+					loc = mCenter.clone().add(r * Math.cos(radians), 1.1875, r * Math.sin(radians));
 					dir = LocationUtils.getVectorTo(mCenter, loc).setY(0).normalize();
 					timeStart = castTime() - mT;
 					launchAcceleratingBullet(loc, dir, timeStart);
@@ -170,7 +170,7 @@ public class SpellCrystalBarrage extends Spell {
 	private void launchAcceleratingBullet(Location detLoc, Vector dir, int accelStart) {
 		List<Player> players = PlayerUtils.playersInRange(detLoc, 75, false);
 
-		ArmorStand bullet = mBoss.getWorld().spawn(detLoc.clone().add(0, -1.5, 0), ArmorStand.class);
+		ArmorStand bullet = mBoss.getWorld().spawn(detLoc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET, 0), ArmorStand.class);
 		bullet.setVisible(false);
 		bullet.setGravity(false);
 		bullet.setMarker(true);
@@ -200,7 +200,7 @@ public class SpellCrystalBarrage extends Spell {
 				}
 				Location loc = mBox.getCenter().toLocation(mBoss.getWorld());
 				mTicks++;
-				bullet.teleport(loc.clone().add(0, -1.5, 0));
+				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET, 0));
 				if (mTicks >= BULLET_DURATION + accelStart || mBoss == null || mBoss.isDead() || mPhase != mSamwell.mPhase) {
 					bullet.remove();
 					this.cancel();

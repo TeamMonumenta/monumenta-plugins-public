@@ -44,7 +44,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 		@BossParam(help = "Bullet duration (120 for sanae, 40 for junko and border)")
 		public int BULLET_DURATION = 120;
 		@BossParam(help = "Bullet size")
-		public double HITBOX_RADIUS = 0.25;
+		public double HITBOX_RADIUS = 0.3125;
 		@BossParam(help = "Bullet material")
 		public Material MATERIAL = Material.PURPUR_BLOCK;
 		@BossParam(help = "Bullet emission sound")
