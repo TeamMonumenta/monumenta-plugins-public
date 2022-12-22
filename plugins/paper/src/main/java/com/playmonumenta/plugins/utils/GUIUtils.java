@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -70,6 +71,16 @@ public class GUIUtils {
 
 	public static ChatColor namedTextColorToChatColor(NamedTextColor color) {
 		return ChatColor.of(color.toString());
+	}
+
+	/**
+	 * Sets a tag in the "GUI" tag on the item. This allows resource packs to style icons differently even if the name is the same
+	 * without having to rely on lore that may change often.
+	 */
+	public static void setGuiNbtTag(ItemStack item, String tagName, String value) {
+		new NBTItem(item, true)
+			.addCompound("GUI")
+			.setString(tagName, value);
 	}
 
 }

@@ -247,13 +247,21 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != 0) {
 			ItemStack resetItem = createBasicItem(Material.CYAN_BED, "Reset Your Class", NamedTextColor.WHITE, false,
 				"Click here to reset your class, allowing access to other choices.", ChatColor.LIGHT_PURPLE);
+			if (playerClass != null) {
+				GUIUtils.setGuiNbtTag(resetItem, "Class", playerClass.mClassName);
+			}
 			mInventory.setItem(P1_RESET_CLASS_LOC, resetItem);
 		}
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
+		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		if (spec != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization, allowing access to choose either specialization.", ChatColor.LIGHT_PURPLE);
+			if (playerClass != null) {
+				GUIUtils.setGuiNbtTag(specItem, "Spec",
+					(spec == playerClass.mSpecOne.mSpecialization ? playerClass.mSpecOne : playerClass.mSpecTwo).mSpecName);
+			}
 			mInventory.setItem(P1_RESET_SPEC_LOC, specItem);
 		}
 
@@ -293,20 +301,23 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		//summary
 		if (userClass.mDisplayItem != null) {
-			ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), "Class Skills", NamedTextColor.WHITE, false,
+			ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), userClass.mClassName + " Class Skills", NamedTextColor.WHITE, false,
 				"Pick your skills and, if unlocked, your specialization.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 		}
 
 		//back button
 		ItemStack backButton = createBasicItem(Material.ARROW, "Back",
-				NamedTextColor.GRAY, false, "Return to the class selection page.", ChatColor.GRAY);
+			NamedTextColor.GRAY, false, "Return to the class selection page.", ChatColor.GRAY);
 		mInventory.setItem(COMMON_BACK_LOC, backButton);
 
 		//possibly create reset spec item
-		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
+		int spec = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME);
+		if (spec != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", ChatColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(specItem, "Spec",
+				(spec == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
 
@@ -323,10 +334,13 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			ItemStack item = createAbilityItem(userClass, ability);
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator), item);
 			ItemStack levelOne = createLevelItem(userClass, ability, 1, player);
+			GUIUtils.setGuiNbtTag(levelOne, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 1, levelOne);
 			ItemStack levelTwo = createLevelItem(userClass, ability, 2, player);
+			GUIUtils.setGuiNbtTag(levelTwo, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator) + 2, levelTwo);
 			ItemStack enhanceItem = createEnhanceItem(userClass, ability, player);
+			GUIUtils.setGuiNbtTag(enhanceItem, "Skill", ability.getDisplayName());
 			mInventory.setItem(P3_ABILITY_LOCS.get(iterator++) + 3, enhanceItem);
 		}
 
@@ -337,7 +351,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		//summary
 		if (userClass.mDisplayItem != null) {
-			ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), "Class Skills", NamedTextColor.WHITE, false,
+			ItemStack summaryItem = createBasicItem(userClass.mDisplayItem.getType(), userClass.mClassName + " Class Skills", NamedTextColor.WHITE, false,
 				"Pick your skills and, if unlocked, your specialization.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 		}
@@ -351,6 +365,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) != 0) {
 			ItemStack specItem = createBasicItem(Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
 				"Click here to reset your specialization to select a new one.", ChatColor.LIGHT_PURPLE);
+			GUIUtils.setGuiNbtTag(specItem, "Spec",
+				(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == userClass.mSpecOne.mSpecialization ? userClass.mSpecOne : userClass.mSpecTwo).mSpecName);
 			mInventory.setItem(SKILL_PAGE_RESET_SPEC_LOC, specItem);
 		}
 
@@ -373,7 +389,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 		//summary
 		if (spec.mDisplayItem != null) {
-			ItemStack summaryItem = createBasicItem(spec.mDisplayItem.getType(), "Specialization Skills", NamedTextColor.WHITE, false,
+			ItemStack summaryItem = createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName + " Specialization Skills", NamedTextColor.WHITE, false,
 				"Pick your specialization skills.", ChatColor.LIGHT_PURPLE);
 			mInventory.setItem(COMMON_SUMMARY_LOC, summaryItem);
 		}
