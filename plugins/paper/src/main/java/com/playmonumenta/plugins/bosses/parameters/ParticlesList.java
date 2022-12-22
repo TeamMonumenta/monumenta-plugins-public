@@ -215,6 +215,9 @@ public class ParticlesList {
 			 * (<any other>,count=1,dx=0,dy=0,dz=0,velocity=1)
 			 */
 			if (!reader.advance(",")) {
+				if (PARTICLES_WITH_PARAMETERS.contains(particle)) {
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify count, variance, velocity, and particle-specific parameters")));
+				}
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
 						Tooltip.of(reader.readSoFar() + ",", "Specify count, variance, velocity, and particle-specific parameters"),
@@ -232,6 +235,9 @@ public class ParticlesList {
 			}
 
 			if (!reader.advance(",")) {
+				if (PARTICLES_WITH_PARAMETERS.contains(particle)) {
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify variance, velocity and particle-specific parameters")));
+				}
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
 						Tooltip.of(reader.readSoFar() + ",", "Specify variance, velocity and particle-specific parameters"),
@@ -263,6 +269,9 @@ public class ParticlesList {
 			}
 
 			if (!reader.advance(",")) {
+				if (PARTICLES_WITH_PARAMETERS.contains(particle)) {
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify velocity and particle-specific parameters")));
+				}
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
 						Tooltip.of(reader.readSoFar() + ",", "Specify velocity and particle-specific parameters"),
@@ -289,15 +298,7 @@ public class ParticlesList {
 				continue;
 			} else {
 				if (!reader.advance(",")) {
-					if (!reader.advance(")")) {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.of(reader.readSoFar() + ",", "Specify particle-specific parameters"),
-							Tooltip.of(reader.readSoFar() + ")", "Use default particle parameters")
-						));
-					}
-					// End of this particle, loop to next
-					particlesList.add(new CParticle(particle, count.intValue(), dx, dy, dz, velocity));
-					continue;
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify particle-specific parameters")));
 				}
 
 				if (particle.equals(Particle.REDSTONE)) {
