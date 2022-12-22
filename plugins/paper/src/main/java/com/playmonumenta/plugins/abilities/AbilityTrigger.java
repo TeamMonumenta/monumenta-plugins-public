@@ -4,10 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -67,9 +65,11 @@ public class AbilityTrigger {
 			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD),
 		NO_BLOCKS("not holding blocks", "may be holding blocks",
 			player -> !player.getInventory().getItemInMainHand().getType().isBlock()),
-		NO_MISC("not holding a compass or multitool", "may be holding a compass or multitool",
+		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming",
 			player -> !(player.getInventory().getItemInMainHand().getType() == Material.COMPASS
-				|| Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0)),
+				|| Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0
+				|| (LocationUtils.isLocationInWater(player.getLocation()) && ItemStatUtils.hasEnchantment(player.getInventory().getItemInMainHand(), ItemStatUtils.EnchantmentType.RIPTIDE)))
+			),
 		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe",
 			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
 		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield",
