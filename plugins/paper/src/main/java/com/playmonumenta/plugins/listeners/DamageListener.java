@@ -118,6 +118,11 @@ public class DamageListener implements Listener {
 				event.setDamage(0);
 			}
 		}
+
+		// Damaging a dead entity can make it immortal, so prevent that
+		if (!event.getEntity().isValid()) {
+			event.setCancelled(true);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
