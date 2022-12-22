@@ -861,7 +861,7 @@ public class AbilityManager {
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 			checkTrigger(player, AbilityTrigger.Key.LEFT_CLICK);
 		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			if (action == Action.RIGHT_CLICK_BLOCK && ItemUtils.interactableBlocks.contains(blockClicked)) {
+			if (action == Action.RIGHT_CLICK_BLOCK && (ItemUtils.interactableBlocks.contains(blockClicked) || blockClicked == Material.AIR)) {
 				MetadataUtils.setMetadata(player, LEFT_CLICK_TICK_METAKEY, Bukkit.getServer().getCurrentTick() + 1);
 				return;
 			}
@@ -878,7 +878,7 @@ public class AbilityManager {
 		}
 	}
 
-	private ConcurrentSkipListSet<UUID> mDropKeyDisabledLeftClicks = new ConcurrentSkipListSet<>();
+	private final ConcurrentSkipListSet<UUID> mDropKeyDisabledLeftClicks = new ConcurrentSkipListSet<>();
 
 	// Called asynchronously by the drop key packet listener, thus cannot use most of the Bukkit API
 	public void preDropKey(Player player) {

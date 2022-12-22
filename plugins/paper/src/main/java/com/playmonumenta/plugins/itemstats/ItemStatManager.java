@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
-import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -31,12 +30,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
@@ -237,7 +238,9 @@ public class ItemStatManager implements Listener {
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-					double regionScaling = getRegionScaling(player, ItemStatUtils.getRegion(item), mRegion, 1, 0.5, 0.25);
+					ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
+					double regionScaling = getRegionScaling(player, region, mRegion, 1, 0.5, 0.25);
+					boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
 
 					for (ItemStat stat : ITEM_STATS) {
 						if (stat instanceof Attribute attribute) {
@@ -253,11 +256,10 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment, 0), getRegionScaling(player, ItemStatUtils.getRegion(item), mRegion, 0, 1, 2)));
+								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment, 0), getRegionScaling(player, region, mRegion, 0, 1, 2)));
 							}
 						} else if (stat instanceof Infusion infusion) {
-							double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
-							multiplier = infusion.getInfusionType().isRegionScaled() && Shattered.isShattered(item) ? 0 : multiplier;
+							double multiplier = infusion.getInfusionType().isRegionScaled() ? (shattered ? 0 : regionScaling) : 1.0;
 							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
 					}
@@ -273,7 +275,8 @@ public class ItemStatManager implements Listener {
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-				double regionScaling = getRegionScaling(player, ItemStatUtils.getRegion(mainhand), mRegion, 1, 0.5, 0.25);
+				ItemStatUtils.Region region = ItemStatUtils.getRegion(mainhand);
+				double regionScaling = getRegionScaling(player, region, mRegion, 1, 0.5, 0.25);
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
@@ -289,7 +292,7 @@ public class ItemStatManager implements Listener {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 						}
 						if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
-							newMainhandAddStats.add(stat, getRegionScaling(player, ItemStatUtils.getRegion(mainhand), mRegion, 0, 1, 2));
+							newMainhandAddStats.add(stat, getRegionScaling(player, region, mRegion, 0, 1, 2));
 						}
 					} else if (stat instanceof Infusion infusion) {
 						double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
@@ -398,15 +401,21 @@ public class ItemStatManager implements Listener {
 		return mPlayerItemStatsMappings;
 	}
 
+	private static final Set<Player> mUpdateStatsDelayed = new HashSet<>();
+
 	private void updateStatsDelayed(Player player) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-					mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
+		if (mUpdateStatsDelayed.isEmpty()) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				for (Player p : mUpdateStatsDelayed) {
+					PlayerItemStats playerItemStats = mPlayerItemStatsMappings.get(p.getUniqueId());
+					if (playerItemStats != null) {
+						playerItemStats.updateStats(p, true, p.getMaxHealth(), true);
+					}
 				}
-			}
-		}.runTaskLater(mPlugin, 0);
+				mUpdateStatsDelayed.clear();
+			});
+		}
+		mUpdateStatsDelayed.add(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
