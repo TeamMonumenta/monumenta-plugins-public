@@ -4,10 +4,12 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.RemoteDataAPI;
 import com.playmonumenta.worlds.paper.MonumentaWorldManagementAPI;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -73,10 +75,7 @@ public class PlotManager {
 					.withArguments(new StringArgument("name"))
 					.executes((sender, args) -> {
 						String name = (String) args[0];
-						UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
-						if (uuid == null) {
-							CommandAPI.fail("Can't find player '" + name + "' - perhaps incorrect capitalization or spelled wrong?");
-						}
+						UUID uuid = resolveUUID(name);
 						getPlotInfo(uuid).whenComplete((info, ex) -> {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + name + " : " + ex.getMessage());
@@ -90,25 +89,36 @@ public class PlotManager {
 					}))
 				/***** ADD *****/
 				.withSubcommand(new CommandAPICommand("add")
-					.withArguments(new StringArgument("name").replaceSuggestions((info) -> {
-						return Bukkit.getOnlinePlayers().stream().filter((player) -> !Objects.equals(player, info.sender())).map((player) -> player.getName()).toArray(String[]::new);
-					}))
+					.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
+						.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+						.map((player) -> player.getName()).toArray(String[]::new)))
 					.executesPlayer((player, args) -> {
-						plotAccessAdd(player, (String)args[0], null);
+						plotAccessAdd(player, (String) args[0], null);
 					}))
 				.withSubcommand(new CommandAPICommand("add")
-					.withArguments(new StringArgument("name").replaceSuggestions((info) -> {
-						return Bukkit.getOnlinePlayers().stream().filter((player) -> !Objects.equals(player, info.sender())).map((player) -> player.getName()).toArray(String[]::new);
-					}))
+					.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
+						.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+						.map((player) -> player.getName()).toArray(String[]::new)))
 					.withArguments(new StringArgument("duration"))
 					.executesPlayer((player, args) -> {
-						plotAccessAdd(player, (String)args[0], (String)args[1]);
+						plotAccessAdd(player, (String) args[0], (String) args[1]);
 					}))
 				/***** REMOVE *****/
 				.withSubcommand(new CommandAPICommand("remove")
 					.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
 					.executesPlayer((player, args) -> {
-						plotAccessRemove(player, (String)args[0]);
+						plotAccessRemove(player, (String) args[0]);
+					}))
+				/***** MODERATOR REMOVE *****/
+				.withSubcommand(new CommandAPICommand("remove_other")
+					.withPermission("monumenta.command.plot.remove.others")
+					.withArguments(
+						new StringArgument("plot owner"),
+						new StringArgument("other player"))
+					.executes((sender, args) -> {
+						UUID ownerUUID = resolveUUID((String) args[0]);
+						UUID otherPlayerUUID = resolveUUID((String) args[1]);
+						plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
 					}))
 			)
 			/********************* SEND *********************/
@@ -236,7 +246,7 @@ public class PlotManager {
 									ex.printStackTrace();
 								} else {
 									for (UUID otherUUID : info.mOtherAccessToOwnerPlot.keySet()) {
-										plotAccessRemove(player.getUniqueId(), otherUUID);
+										plotAccessRemove(player, player.getUniqueId(), otherUUID);
 									}
 								}
 							});
@@ -300,10 +310,7 @@ public class PlotManager {
 	}
 
 	private static void plotAccessAdd(Player owner, String addedName, @Nullable String duration) throws WrapperCommandSyntaxException {
-		UUID addedUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(addedName);
-		if (addedUUID == null) {
-			CommandAPI.fail("Can't find player '" + addedName + "' - perhaps incorrect capitalization or spelled wrong?");
-		}
+		UUID addedUUID = resolveUUID(addedName);
 
 		long expiration = -1;
 		if (duration != null) {
@@ -352,20 +359,34 @@ public class PlotManager {
 	/* Maybe when player joins, fetch their access and see if it's currently expired? And boot them to their own plot if so?  */
 
 	private static void plotAccessRemove(Player owner, String removedName) throws WrapperCommandSyntaxException {
-		UUID removedUUID = MonumentaRedisSyncIntegration.cachedNameToUuid(removedName);
-		if (removedUUID == null) {
-			CommandAPI.fail("Can't find player '" + removedName + "' - perhaps incorrect capitalization or spelled wrong?");
-		}
+		UUID removedUUID = resolveUUID(removedName);
 
-		plotAccessRemove(owner.getUniqueId(), removedUUID);
-
-		owner.sendMessage(ChatColor.GREEN + "Player '" + removedName + "' no longer has access to your plot");
+		plotAccessRemove(owner, owner.getUniqueId(), removedUUID);
 	}
 
-	private static void plotAccessRemove(UUID ownerUUID, UUID otherUUID) {
-		/* TODO: Someday would be nice to actually check these succeeded */
-		MonumentaRedisSyncAPI.remoteDataDel(ownerUUID, "myplotaccess|" + otherUUID);
-		MonumentaRedisSyncAPI.remoteDataDel(otherUUID, "otherplotaccess|" + ownerUUID);
+	private static void plotAccessRemove(@Nullable CommandSender sender, UUID ownerUUID, UUID otherUUID) {
+		CompletableFuture<Boolean> future1 = RemoteDataAPI.del(ownerUUID, "myplotaccess|" + otherUUID);
+		CompletableFuture<Boolean> future2 = RemoteDataAPI.del(otherUUID, "otherplotaccess|" + ownerUUID);
+		if (sender != null) {
+			future1.thenAccept(success1 -> {
+				future2.thenAccept(success2 -> {
+					String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
+					if (otherName == null) {
+						otherName = otherUUID.toString();
+					}
+					String ownerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
+					if (ownerName == null) {
+						ownerName = ownerUUID.toString();
+					}
+					String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
+					if (success1 && success2) {
+						sender.sendMessage(Component.text(otherName + " can no longer access " + plotName + ".", NamedTextColor.GREEN));
+					} else {
+						sender.sendMessage(Component.text(otherName + " did not have access to " + plotName + "!", NamedTextColor.RED));
+					}
+				});
+			});
+		}
 	}
 
 	public static void sendPlayerToPlot(Player player) {
@@ -512,7 +533,7 @@ public class PlotManager {
 							otherUUID = UUID.fromString(key.substring("myplotaccess|".length()));
 							expiration = Long.parseLong(value);
 							if (plotAccessIsExpired(expiration)) {
-								plotAccessRemove(ownerUUID, otherUUID);
+								plotAccessRemove(null, ownerUUID, otherUUID);
 							} else {
 								otherAccessToOwnerPlot.put(otherUUID, expiration);
 							}
@@ -522,7 +543,7 @@ public class PlotManager {
 							int plotId = Integer.parseInt(split[0]);
 							expiration = Long.parseLong(split[1]);
 							if (plotAccessIsExpired(expiration)) {
-								plotAccessRemove(otherUUID, ownerUUID);
+								plotAccessRemove(null, otherUUID, ownerUUID);
 							} else {
 								ownerAccessToOtherPlots.put(otherUUID, new PlotInfo.OtherAccessRecord(plotId, expiration));
 							}
@@ -544,5 +565,17 @@ public class PlotManager {
 		});
 
 		return future;
+	}
+
+	private static UUID resolveUUID(String name) throws WrapperCommandSyntaxException {
+		try {
+			return UUID.fromString(name);
+		} catch (IllegalArgumentException e) {
+			UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
+			if (uuid == null) {
+				CommandAPI.fail("Can't find player '" + name + "' - perhaps incorrect capitalization or spelled wrong?");
+			}
+			return uuid;
+		}
 	}
 }
