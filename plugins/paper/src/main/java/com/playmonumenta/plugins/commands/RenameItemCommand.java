@@ -81,7 +81,7 @@ public class RenameItemCommand {
 					                }
 					                SignUtils.newMenu(List.of(existingName.substring(0, spaceIndex).trim(), existingName.substring(spaceIndex).trim(), "~~~~~~~~~~~", "Enter new name")).reopenIfFail(true).response(
 						                (p, text) -> {
-							                String name = StringUtils.substring(text[0], 0, 24).trim() + " " + StringUtils.substring(text[1], 0, 24).trim();
+							                String name = (StringUtils.substring(text[0], 0, 24).trim() + " " + StringUtils.substring(text[1], 0, 24).trim()).trim();
 							                rename(p, name);
 							                return true;
 						                }
