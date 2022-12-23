@@ -122,7 +122,7 @@ public class RenameItemCommand {
 		player.updateInventory();
 		String baseName = ItemUtils.getPlainNameIfExists(itemStack);
 		if (!name.isEmpty()) {
-			AuditListener.log("Item rename: " + player.getName() + " renamed a " + (baseName == null ? "Shulker Box" : baseName) + " to '" + name + "'");
+			AuditListener.log("Item rename: " + player.getName() + " renamed a " + (baseName.isEmpty() ? "Shulker Box" : baseName) + " to '" + name + "'");
 		}
 	}
 

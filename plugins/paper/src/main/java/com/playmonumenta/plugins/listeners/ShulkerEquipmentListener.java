@@ -346,9 +346,13 @@ public class ShulkerEquipmentListener implements Listener {
 		PlayerUtils.resetAttackCooldown(player);
 	}
 
-	private void swapItem(Inventory from, Inventory to, int fromSlot, int toSlot) {
+	private void swapItem(PlayerInventory from, Inventory to, int fromSlot, int toSlot) {
 		ItemStack fromItem = from.getItem(fromSlot);
 		ItemStack toItem = to.getItem(toSlot);
+		if (!ItemStatUtils.isClean(toItem)) {
+			ItemStatUtils.generateItemStats(toItem);
+			ItemStatUtils.markClean(toItem);
+		}
 		from.setItem(fromSlot, toItem);
 		to.setItem(toSlot, fromItem);
 	}
