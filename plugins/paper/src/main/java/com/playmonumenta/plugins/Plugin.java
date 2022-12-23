@@ -243,6 +243,7 @@ public class Plugin extends JavaPlugin {
 		WalletManager.registerCommand();
 		CoreProtectLogCommand.register();
 		UpdateStrikeChests.register();
+		RenameItemCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

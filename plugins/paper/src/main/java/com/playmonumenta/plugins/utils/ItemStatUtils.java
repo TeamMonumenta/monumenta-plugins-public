@@ -106,6 +106,8 @@ public class ItemStatUtils {
 	static final String CHARGES_KEY = "Charges";
 	public static final String ITEMS_KEY = "Items";
 	public static final String VANITY_ITEMS_KEY = "VanityItems";
+	public static final String PLAYER_CUSTOM_NAME_KEY = "PlayerCustomName";
+	public static final String CUSTOM_SKIN_KEY = "CustomSkin";
 
 	static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 

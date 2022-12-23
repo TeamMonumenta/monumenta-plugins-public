@@ -279,30 +279,32 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
-	public static boolean isEquipmentBox(@Nullable ItemStack sboxItem) {
+	private static String getShulkerLock(@Nullable ItemStack sboxItem) {
 		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
 				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {
-					if (sbox.isLocked() && (sbox.getLock().equals(LOCK_STRING) || sbox.getLock().equals(PORTAL_EPIC_STRING))) {
-						return true;
+					if (sbox.isLocked()) {
+						return sbox.getLock();
 					}
 				}
 			}
 		}
-		return false;
+		return null;
+	}
+
+	public static boolean isOmnilockbox(@Nullable ItemStack sboxItem) {
+		String lock = getShulkerLock(sboxItem);
+		return lock != null && lock.equals(PORTAL_EPIC_STRING);
+	}
+
+	public static boolean isEquipmentBox(@Nullable ItemStack sboxItem) {
+		String lock = getShulkerLock(sboxItem);
+		return lock != null && (lock.equals(LOCK_STRING) || lock.equals(PORTAL_EPIC_STRING));
 	}
 
 	public static boolean isCharmBox(@Nullable ItemStack sboxItem) {
-		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
-			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
-				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {
-					if (sbox.isLocked() && (sbox.getLock().equals(CHARM_STRING) || sbox.getLock().equals(PORTAL_EPIC_STRING))) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+		String lock = getShulkerLock(sboxItem);
+		return lock != null && (lock.equals(CHARM_STRING) || lock.equals(PORTAL_EPIC_STRING));
 	}
 
 	public static @Nullable Integer getShulkerSlot(int playerInventorySlot) {

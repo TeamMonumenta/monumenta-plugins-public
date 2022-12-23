@@ -10,11 +10,13 @@ import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
 import com.playmonumenta.plugins.parrots.ParrotManager.PlayerShoulder;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import de.tr7zw.nbtapi.NBTItem;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -303,7 +305,9 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack lockboxSwapEnabled = buildItem(Material.GRAY_SHULKER_BOX, "Swapping Parrots with Lockboxes: Enabled", List.of());
-		ItemUtils.setPlainName(lockboxSwapEnabled, "Loadout: Alchemist");
+		ItemUtils.setPlainName(lockboxSwapEnabled, "Loadout Lockbox");
+		ItemStatUtils.addPlayerModified(new NBTItem(lockboxSwapEnabled, true))
+			.setString(ItemStatUtils.CUSTOM_SKIN_KEY, "Alchemist");
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 7, lockboxSwapEnabled,
 			(player, inv) -> player.getScoreboardTags().contains(ParrotManager.PARROT_LOCKBOX_SWAP_TAG),
 			(player, inv) -> {
@@ -312,7 +316,9 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		ItemStack lockboxSwapDisabled = buildItem(Material.GRAY_SHULKER_BOX, "Swapping Parrots with Lockboxes: Disabled", List.of());
-		ItemUtils.setPlainName(lockboxSwapDisabled, "Loadout: Warrior");
+		ItemUtils.setPlainName(lockboxSwapDisabled, "Loadout Lockbox");
+		ItemStatUtils.addPlayerModified(new NBTItem(lockboxSwapDisabled, true))
+			.setString(ItemStatUtils.CUSTOM_SKIN_KEY, "Warrior");
 		GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.OTHERS.mNum, ROWS * COLUMNS - 7, lockboxSwapDisabled,
 			(player, inv) -> !player.getScoreboardTags().contains(ParrotManager.PARROT_LOCKBOX_SWAP_TAG),
 			(player, inv) -> {

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -189,7 +190,9 @@ public class VanityGUI extends Gui {
 				Component.text("swap vanity along with equipment.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			lockboxVanityToggle.setItemMeta(meta);
 			ItemUtils.setPlainTag(lockboxVanityToggle);
-			ItemUtils.setPlainName(lockboxVanityToggle, vanityData.mLockboxSwapEnabled ? "Loadout: Alchemist" : "Loadout: Warrior");
+			ItemUtils.setPlainName(lockboxVanityToggle, "Loadout Lockbox");
+			ItemStatUtils.addPlayerModified(new NBTItem(lockboxVanityToggle, true))
+				.setString(ItemStatUtils.CUSTOM_SKIN_KEY, vanityData.mLockboxSwapEnabled ? "Alchemist" : "Warrior");
 			setItem(4, 5, new GuiItem(lockboxVanityToggle, false)).onLeftClick(() -> {
 				mPlugin.mVanityManager.toggleLockboxSwap(mPlayer);
 				update();

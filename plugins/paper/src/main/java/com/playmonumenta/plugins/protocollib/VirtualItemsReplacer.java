@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
+import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -24,6 +25,10 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -61,77 +66,75 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		PacketContainer packet = event.getPacket();
 		if (packet.getType().equals(PacketType.Play.Server.WINDOW_ITEMS)) {
 			PacketPlayOutWindowItemsHandle handle = PacketPlayOutWindowItemsHandle.createHandle(packet.getHandle());
-			if (handle.getWindowId() != 0) { //  0 = player inventory
-				return;
-			}
+			boolean isPlayerInventory = handle.getWindowId() == 0;
 			List<ItemStack> items = handle.getItems();
 			for (int i = 0; i < items.size(); i++) {
 				ItemStack item = items.get(i);
-				processItem(item, i, player);
+				processItem(item, i, player, isPlayerInventory);
 			}
 		} else { // PacketType.Play.Server.SET_SLOT
 			PacketPlayOutSetSlotHandle handle = PacketPlayOutSetSlotHandle.createHandle(packet.getHandle());
-			if (handle.getWindowId() != 0) { //  0 = player inventory
-				return;
-			}
-			processItem(handle.getItem(), handle.getSlot(), player);
+			boolean isPlayerInventory = handle.getWindowId() == 0;
+			processItem(handle.getItem(), handle.getSlot(), player, isPlayerInventory);
 		}
 	}
 
-	private void processItem(ItemStack itemStack, int slot, Player player) {
+	private void processItem(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return;
 		}
 
-		// Virtual Firmament
-		if (36 <= slot && slot < 46 // hotbar or offhand
-			    && ItemUtils.isShulkerBox(itemStack.getType())
-			    && VirtualFirmament.isEnabled(player)) {
-			String plainName = ItemUtils.getPlainNameIfExists(itemStack);
-			if ("Firmament".equals(plainName)) {
-				itemStack.setType(Material.PRISMARINE);
-				itemStack.setAmount(64);
-				markVirtual(itemStack);
-				return;
-			} else if ("Doorway from Eternity".equals(plainName)) {
-				itemStack.setType(Material.BLACKSTONE);
-				itemStack.setAmount(64);
-				markVirtual(itemStack);
-				return;
+		if (isPlayerInventory) {
+			// Virtual Firmament
+			if (36 <= slot && slot < 46 // hotbar or offhand
+				    && ItemUtils.isShulkerBox(itemStack.getType())
+				    && VirtualFirmament.isEnabled(player)) {
+				String plainName = ItemUtils.getPlainNameIfExists(itemStack);
+				if ("Firmament".equals(plainName)) {
+					itemStack.setType(Material.PRISMARINE);
+					itemStack.setAmount(64);
+					markVirtual(itemStack);
+					return;
+				} else if ("Doorway from Eternity".equals(plainName)) {
+					itemStack.setType(Material.BLACKSTONE);
+					itemStack.setAmount(64);
+					markVirtual(itemStack);
+					return;
+				}
 			}
-		}
 
-		// Virtual cooldown items for Infinity food
-		for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
-			if (ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0
-				&& mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey()))) {
+			// Virtual cooldown items for Infinity food
+			for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
+				if (ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0
+					    && mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey()))) {
+					// Then we need to replace the item in the packet.
+					itemStack.setType(entry.getValue());
+					markVirtual(itemStack);
+					return;
+				}
+			}
+
+			if (WorldshaperOverride.isWorldshaperItem(itemStack)
+				    && mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE)) {
 				// Then we need to replace the item in the packet.
-				itemStack.setType(entry.getValue());
+				itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
 				markVirtual(itemStack);
 				return;
 			}
-		}
 
-		if (WorldshaperOverride.isWorldshaperItem(itemStack)
-			&& mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE)) {
-			// Then we need to replace the item in the packet.
-			itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
-			markVirtual(itemStack);
-			return;
-		}
-
-		// Vanity
-		if ((5 <= slot && slot <= 8) || slot == 45) { // armor or offhand
-			VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
-			if (vanityData != null && vanityData.mSelfVanityEnabled) {
-				EquipmentSlot equipmentSlot = switch (slot) {
-					case 5 -> EquipmentSlot.HEAD;
-					case 6 -> EquipmentSlot.CHEST;
-					case 7 -> EquipmentSlot.LEGS;
-					case 8 -> EquipmentSlot.FEET;
-					default -> EquipmentSlot.OFF_HAND;
-				};
-				VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
+			// Vanity
+			if ((5 <= slot && slot <= 8) || slot == 45) { // armor or offhand
+				VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
+				if (vanityData != null && vanityData.mSelfVanityEnabled) {
+					EquipmentSlot equipmentSlot = switch (slot) {
+						case 5 -> EquipmentSlot.HEAD;
+						case 6 -> EquipmentSlot.CHEST;
+						case 7 -> EquipmentSlot.LEGS;
+						case 8 -> EquipmentSlot.FEET;
+						default -> EquipmentSlot.OFF_HAND;
+					};
+					VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
+				}
 			}
 		}
 
@@ -143,6 +146,42 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				if (playerModified != null) {
 					playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
 					markVirtual(itemStack);
+				}
+			}
+		}
+
+		// Custom shulker names
+		if (ItemUtils.isShulkerBox(itemStack.getType())) {
+			String prefix;
+			String suffix;
+			if (ItemStatUtils.getRegion(itemStack) == ItemStatUtils.Region.SHULKER_BOX) {
+				prefix = "`";
+				suffix = "´";
+			} else if (ShulkerEquipmentListener.isOmnilockbox(itemStack)) {
+				prefix = "Omnilockbox: ";
+				suffix = "";
+			} else if (ShulkerEquipmentListener.isEquipmentBox(itemStack)) {
+				prefix = "Loadout: ";
+				suffix = "";
+			} else if (ShulkerEquipmentListener.isCharmBox(itemStack)) {
+				prefix = "C.H.A.R.M.: ";
+				suffix = "";
+			} else {
+				prefix = null;
+				suffix = null;
+			}
+			if (prefix != null) {
+				NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(itemStack));
+				if (playerModified != null) {
+					String customName = playerModified.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
+					if (customName != null && !customName.isEmpty()) {
+						ItemUtils.modifyMeta(itemStack, meta -> {
+							Component existingName = meta.displayName();
+							meta.displayName(Component.text(prefix + customName + suffix,
+								existingName == null ? Style.style(NamedTextColor.WHITE, TextDecoration.BOLD, TextDecoration.ITALIC) : existingName.style()));
+						});
+						markVirtual(itemStack);
+					}
 				}
 			}
 		}
