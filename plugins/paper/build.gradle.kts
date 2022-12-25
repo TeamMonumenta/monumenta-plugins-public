@@ -266,7 +266,6 @@ tasks.create("build-deploy") {
             session(adminssh) {
                 put(shadowJar.archiveFile.get().getAsFile(), "/home/epic/project_epic/server_config/plugins")
                 execute("cd /home/epic/project_epic/server_config/plugins && rm -f Monumenta.jar && ln -s " + shadowJar.archiveFileName.get() + " Monumenta.jar")
-                execute("cd /home/epic/project_epic/mobs/plugins && rm -rf Monumenta*.jar && ln -s ../../server_config/plugins/Monumenta.jar")
             }
         }
     }
