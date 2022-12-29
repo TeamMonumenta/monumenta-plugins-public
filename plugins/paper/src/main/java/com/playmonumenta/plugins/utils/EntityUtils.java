@@ -1456,4 +1456,29 @@ public class EntityUtils {
 		return false;
 	}
 
+	public static LivingEntity copyMob(LivingEntity entity) {
+		LivingEntity newSpawn = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+		newSpawn.getEquipment().setBoots(entity.getEquipment().getBoots());
+		newSpawn.getEquipment().setLeggings(entity.getEquipment().getLeggings());
+		newSpawn.getEquipment().setChestplate(entity.getEquipment().getChestplate());
+		newSpawn.getEquipment().setHelmet(entity.getEquipment().getHelmet());
+		newSpawn.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
+		newSpawn.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
+		newSpawn.setCustomName(entity.getCustomName());
+		if (newSpawn instanceof Slime newSlime && entity instanceof Slime slime) {
+			newSlime.setSize(slime.getSize());
+		} else if (newSpawn instanceof MagmaCube newCube && entity instanceof MagmaCube cube) {
+			newCube.setSize(cube.getSize());
+		} else if (newSpawn instanceof Phantom newPhantom && entity instanceof Phantom phantom) {
+			newPhantom.setSize(phantom.getSize());
+		} else if (newSpawn instanceof Creeper newCreeper && entity instanceof Creeper creeper) {
+			newCreeper.setPowered(creeper.isPowered());
+		} else if (newSpawn instanceof Zombie newZombie && entity instanceof Zombie zombie) {
+			newZombie.setBaby(zombie.isBaby());
+		} else if (newSpawn instanceof Shulker newShulker && entity instanceof Shulker shulker) {
+			newShulker.setColor(shulker.getColor());
+		}
+		return newSpawn;
+	}
+
 }

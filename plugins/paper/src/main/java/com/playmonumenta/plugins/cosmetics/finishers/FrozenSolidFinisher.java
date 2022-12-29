@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,28 +29,20 @@ public class FrozenSolidFinisher implements EliteFinisher {
 			int mTicks = 0;
 			HashMap<Integer, ArrayList<Location>> mIceDelays = new HashMap<>();
 			ArrayList<ArmorStand> mArmorStands = new ArrayList<>();
+			LivingEntity mClonedKilledMob;
 			@Override
 			public void run() {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
-					((LivingEntity) killedMob).setHealth(1);
-					killedMob.setInvulnerable(true);
-					killedMob.setGravity(false);
-					((LivingEntity) killedMob).setCollidable(false);
-					((LivingEntity) killedMob).setAI(false);
-					killedMob.addScoreboardTag(AbilityUtils.IGNORE_TAG);
-					killedMob.setSilent(true);
-					EntityUtils.applySilence(Plugin.getInstance(), 50, (LivingEntity) killedMob);
-					for (Entity passenger : killedMob.getPassengers()) {
-						killedMob.removePassenger(passenger);
-					}
-					if (killedMob instanceof Creeper creeper) {
-						creeper.setMaxFuseTicks(4444);
-					}
-					killedMob.leaveVehicle();
-					killedMob.setVelocity(new Vector());
+					killedMob.remove();
+					mClonedKilledMob = EntityUtils.copyMob((LivingEntity)killedMob);
+					mClonedKilledMob.setHealth(1);
+					mClonedKilledMob.setInvulnerable(true);
+					mClonedKilledMob.setGravity(false);
+					mClonedKilledMob.setCollidable(false);
+					mClonedKilledMob.setAI(false);
 					// Figure out where and when to generate ice
-					BoundingBox box = killedMob.getBoundingBox();
+					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {
 						for (double y = box.getMinY(); y <= box.getMaxY(); y += 0.6) {
 							for (double z = box.getMinZ(); z <= box.getMaxZ(); z += 0.6) {
@@ -81,7 +71,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					}
 				} else if (mTicks == 29) {
 					// Remove the mob a tick before the finisher is done
-					killedMob.remove();
+					mClonedKilledMob.remove();
 				} else if (mTicks == 30) {
 					// Break the ice with particles and play the sound
 					for (ArmorStand ice : mArmorStands) {
