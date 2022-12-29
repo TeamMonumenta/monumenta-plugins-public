@@ -5,13 +5,17 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
@@ -177,7 +181,7 @@ public class RepairExplosionsListener implements Listener {
 	);
 
 	/* A hash table that stores the list of blocks to restore for each chunk */
-	private final LongHashMap<List<BlockState>> mBlocksToRepair = new LongHashMap<>();
+	private final Map<UUID, LongHashMap<List<BlockState>>> mBlocksToRepair = new HashMap<>();
 
 	private final Plugin mPlugin;
 
@@ -215,10 +219,11 @@ public class RepairExplosionsListener implements Listener {
 		/* Initialize the tracking variables for the first block */
 		Chunk currentChunk = blocks.get(0).getChunk();
 		long currentChunkKey = currentChunk.getChunkKey();
-		List<BlockState> chunkBlocks = mBlocksToRepair.get(currentChunkKey);
+		LongHashMap<List<BlockState>> worldBlocks = mBlocksToRepair.computeIfAbsent(blocks.get(0).getWorld().getUID(), key -> new LongHashMap<>());
+		List<BlockState> chunkBlocks = worldBlocks.get(currentChunkKey);
 		if (chunkBlocks == null) {
 			chunkBlocks = new ArrayList<>(blocks.size());
-			mBlocksToRepair.put(currentChunkKey, chunkBlocks);
+			worldBlocks.put(currentChunkKey, chunkBlocks);
 		}
 
 		for (Block block : blocks) {
@@ -230,10 +235,10 @@ public class RepairExplosionsListener implements Listener {
 				/* We've moved into a new chunk in the list, update variables */
 				currentChunk = chunk;
 				currentChunkKey = currentChunk.getChunkKey();
-				chunkBlocks = mBlocksToRepair.get(currentChunkKey);
+				chunkBlocks = worldBlocks.get(currentChunkKey);
 				if (chunkBlocks == null) {
 					chunkBlocks = new ArrayList<>(blocks.size());
-					mBlocksToRepair.put(currentChunkKey, chunkBlocks);
+					worldBlocks.put(currentChunkKey, chunkBlocks);
 				}
 			}
 
@@ -244,7 +249,7 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		if (!ServerProperties.getRepairExplosions()) {
+		if (!isEnabled(event.getLocation().getWorld())) {
 			return;
 		}
 
@@ -253,7 +258,7 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
-		if (!ServerProperties.getRepairExplosions()) {
+		if (!isEnabled(event.getBlock().getWorld())) {
 			return;
 		}
 
@@ -262,7 +267,7 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void structureGrowEvent(StructureGrowEvent event) {
-		if (!ServerProperties.getRepairExplosions()) {
+		if (!isEnabled(event.getWorld())) {
 			return;
 		}
 
@@ -284,7 +289,7 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockPlaceEvent(BlockPlaceEvent event) {
-		if (!ServerProperties.getRepairExplosions() || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+		if (!isEnabled(event.getBlock().getWorld()) || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
 			return;
 		}
 
@@ -300,7 +305,7 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		if (!ServerProperties.getRepairExplosions() || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+		if (!isEnabled(event.getBlock().getWorld()) || !ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
 			return;
 		}
 
@@ -309,7 +314,7 @@ public class RepairExplosionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
-		if (!ServerProperties.getRepairExplosions()) {
+		if (!isEnabled(event.getWorld())) {
 			return;
 		}
 
@@ -317,40 +322,48 @@ public class RepairExplosionsListener implements Listener {
 		 * When a chunk is about to unload, check if there were blocks that exploded in it
 		 * If so, restore each of those blocks if they are still currently air
 		 */
+		LongHashMap<List<BlockState>> worldBlocks = mBlocksToRepair.get(event.getChunk().getWorld().getUID());
+		if (worldBlocks == null) {
+			return;
+		}
+		List<BlockState> chunkBlocks = worldBlocks.remove(event.getChunk().getChunkKey());
+		if (chunkBlocks == null) {
+			return;
+		}
+		if (worldBlocks.size() == 0) {
+			mBlocksToRepair.remove(event.getChunk().getWorld().getUID());
+		}
 		boolean needsSave = false;
-		List<BlockState> chunkBlocks = mBlocksToRepair.remove(event.getChunk().getChunkKey());
-		if (chunkBlocks != null) {
-			for (BlockState state : chunkBlocks) {
-				Material currentType = state.getLocation().getBlock().getType();
-				if (REPLACEABLE_MATERIALS.contains(currentType)) {
-					mPlugin.getLogger().fine("Repairing block " + state.getType() + " at " + state.getLocation());
-					needsSave = true;
-					state.update(true, false);
+		for (BlockState state : chunkBlocks) {
+			Material currentType = state.getLocation().getBlock().getType();
+			if (REPLACEABLE_MATERIALS.contains(currentType)) {
+				mPlugin.getLogger().fine("Repairing block " + state.getType() + " at " + state.getLocation());
+				needsSave = true;
+				state.update(true, false);
 
-					if (state.getType().equals(Material.GRASS_BLOCK) && state.getBlockData() instanceof Snowable && ((Snowable)state.getBlockData()).isSnowy()) {
-						Block blockAbove = state.getLocation().add(0, 1, 0).getBlock();
-						if (blockAbove.getType().isAir()) {
-							blockAbove.setType(Material.SNOW);
-							Snow snow = (Snow)Material.SNOW.createBlockData();
-							snow.setLayers(snow.getMinimumLayers());
-							blockAbove.setBlockData(snow);
-						}
-					} else if (state.getType().equals(Material.SNOW)) {
-						Block blockBelow = state.getLocation().subtract(0, 1, 0).getBlock();
-						if (!blockBelow.getType().equals(Material.GRASS_BLOCK)) {
-							BlockData blockBelowData = blockBelow.getBlockData();
-							if (blockBelowData instanceof Snowable) {
-								((Snowable)blockBelowData).setSnowy(true);
-								blockBelow.setBlockData(blockBelowData);
-							}
+				if (state.getType().equals(Material.GRASS_BLOCK) && state.getBlockData() instanceof Snowable && ((Snowable) state.getBlockData()).isSnowy()) {
+					Block blockAbove = state.getLocation().add(0, 1, 0).getBlock();
+					if (blockAbove.getType().isAir()) {
+						blockAbove.setType(Material.SNOW);
+						Snow snow = (Snow) Material.SNOW.createBlockData();
+						snow.setLayers(snow.getMinimumLayers());
+						blockAbove.setBlockData(snow);
+					}
+				} else if (state.getType().equals(Material.SNOW)) {
+					Block blockBelow = state.getLocation().subtract(0, 1, 0).getBlock();
+					if (!blockBelow.getType().equals(Material.GRASS_BLOCK)) {
+						BlockData blockBelowData = blockBelow.getBlockData();
+						if (blockBelowData instanceof Snowable) {
+							((Snowable) blockBelowData).setSnowy(true);
+							blockBelow.setBlockData(blockBelowData);
 						}
 					}
-				} else {
-					// Replace non-air blocks (placed blocks)
-					mPlugin.getLogger().fine("Repairing block " + state.getType() + " at " + state.getLocation());
-					needsSave = true;
-					state.update(true, false);
 				}
+			} else {
+				// Replace non-air blocks (placed blocks)
+				mPlugin.getLogger().fine("Repairing block " + state.getType() + " at " + state.getLocation());
+				needsSave = true;
+				state.update(true, false);
 			}
 		}
 		if (needsSave) {
@@ -363,25 +376,30 @@ public class RepairExplosionsListener implements Listener {
 	 * deathLoc
 	 */
 	private void removeRepairBlocksNear(Chunk chunk, Location deathLoc) {
-		List<BlockState> chunkBlocks = mBlocksToRepair.get(chunk.getChunkKey());
-		if (chunkBlocks != null) {
-			Iterator<BlockState> iter = chunkBlocks.iterator();
-			while (iter.hasNext()) {
-				BlockState state = iter.next();
-				if (state.getLocation().distanceSquared(deathLoc) <= 144) {
-					mPlugin.getLogger().fine("Removing repair block " + state.getType() + " at " + state.getLocation() + " due to death");
-					iter.remove();
-				}
+		LongHashMap<List<BlockState>> worldBlocks = mBlocksToRepair.get(chunk.getWorld().getUID());
+		if (worldBlocks == null) {
+			return;
+		}
+		List<BlockState> chunkBlocks = worldBlocks.get(chunk.getChunkKey());
+		if (chunkBlocks == null) {
+			return;
+		}
+		Iterator<BlockState> iter = chunkBlocks.iterator();
+		while (iter.hasNext()) {
+			BlockState state = iter.next();
+			if (state.getLocation().distanceSquared(deathLoc) <= 144) {
+				mPlugin.getLogger().fine("Removing repair block " + state.getType() + " at " + state.getLocation() + " due to death");
+				iter.remove();
 			}
-			if (chunkBlocks.isEmpty()) {
-				mBlocksToRepair.remove(chunk.getChunkKey());
-			}
+		}
+		if (chunkBlocks.isEmpty()) {
+			worldBlocks.remove(chunk.getChunkKey());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {
-		if (!ServerProperties.getRepairExplosions()) {
+		if (!isEnabled(event.getPlayer().getWorld())) {
 			return;
 		}
 
@@ -401,4 +419,10 @@ public class RepairExplosionsListener implements Listener {
 			removeRepairBlocksNear(deathLoc.clone().add(-7, 0, -7).getChunk(), deathLoc);
 		});
 	}
+
+	private static boolean isEnabled(World world) {
+		return ServerProperties.getRepairExplosions()
+				&& (ServerProperties.getRepairExplosionsWorldPattern() == null || ServerProperties.getRepairExplosionsWorldPattern().matcher(world.getName()).matches());
+	}
+
 }

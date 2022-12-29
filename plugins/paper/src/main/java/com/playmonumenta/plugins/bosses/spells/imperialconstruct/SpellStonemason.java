@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.ChatColor;
@@ -97,29 +96,6 @@ public class SpellStonemason extends Spell {
 							MovementUtils.knockAway(loc, p, 0f, 1f, false);
 							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1.5f, 1);
 						}
-
-						BukkitRunnable runnable2 = new BukkitRunnable() {
-							int mTicks = 0;
-
-							@Override
-							public void run() {
-								if (mTicks > 10) {
-									this.cancel();
-									return;
-								}
-
-								try {
-									GrowableAPI.grow("constructpillar", loc, 1, 7, true);
-								} catch (Exception e) {
-									mPlugin.getLogger().warning("Failed to grow scripted quests structure 'constructpillar': " + e.getMessage());
-									e.printStackTrace();
-								}
-
-								mTicks += 1;
-							}
-						};
-						runnable2.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnable2);
 					}
 
 					this.cancel();

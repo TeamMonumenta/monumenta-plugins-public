@@ -14,7 +14,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -155,6 +161,10 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 				mT++;
 
 				Location to = mPlayer.getLocation().add(0, 1, 0);
+				if (to.getWorld() != world) {
+					cancel();
+					return;
+				}
 
 				for (int i = 0; i < 3; i++) {
 					if (mT <= 5) {

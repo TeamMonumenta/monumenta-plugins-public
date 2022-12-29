@@ -245,7 +245,11 @@ public class DamageEvent extends Event implements Cancellable {
 
 	public void setDamage(double damage) {
 		if (damage < 0) {
-			Plugin.getInstance().getLogger().log(Level.INFO, "Negative damage dealt: " + damage, new Exception());
+			Plugin.getInstance().getLogger().log(Level.WARNING, "Negative damage dealt: " + damage, new Exception());
+		}
+		if (!Double.isFinite(damage)) {
+			Plugin.getInstance().getLogger().log(Level.WARNING, "Non-finite damage dealt: " + damage, new Exception());
+			damage = 0;
 		}
 
 		// Never set damage above 1000000 (arbitrary high amount) so that it doesn't go over the limit of what can actually be dealt

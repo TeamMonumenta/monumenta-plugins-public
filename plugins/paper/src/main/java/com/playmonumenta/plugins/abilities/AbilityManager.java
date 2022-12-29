@@ -724,7 +724,7 @@ public class AbilityManager {
 		if (!entity.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 			conditionalCast(player, (ability) -> {
 				Location center = ability.entityDeathRadiusCenterLocation();
-				if (center != null && entity.getLocation().distance(center) <= ability.entityDeathRadius()) {
+				if (center != null && entity.getWorld() == center.getWorld() && entity.getLocation().distance(center) <= ability.entityDeathRadius()) {
 					ability.entityDeathRadiusEvent(event, shouldGenDrops);
 				}
 			});

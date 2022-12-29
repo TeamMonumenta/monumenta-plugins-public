@@ -52,12 +52,13 @@ public class Taboo extends Ability {
 			.scoreboardId("Taboo")
 			.shorthandName("Tb")
 			.descriptions(
-				"Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. Drinking the potion causes you to recharge potions 0.5s faster and deal +15% magic damage. " +
-					"However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. " +
-					"Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. " +
-					"Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.",
-				"Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag " +
-					"to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.")
+					"Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. " +
+							"Drinking the potion causes you to recharge potions 0.5s faster, deal +15% magic damage, and gain 50% knockback resistance. " +
+							"However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. " +
+							"Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. " +
+							"Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.",
+					"Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag " +
+							"to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("heal", "heal", Taboo::heal, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
 				                                                                  .lookDirections(AbilityTrigger.LookDirection.DOWN),
@@ -153,9 +154,10 @@ public class Taboo extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mActive) {
 			if (oneSecond) {
-				double selfDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_DAMAGE);
+				double maxHealth = EntityUtils.getMaxHealth(mPlayer);
+				double selfDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SELF_DAMAGE, maxHealth * PERCENT_HEALTH_DAMAGE);
 				if (mPlayer.getHealth() > selfDamage) {
-					mPlayer.setHealth(mPlayer.getHealth() - selfDamage);
+					mPlayer.setHealth(Math.min(mPlayer.getHealth(), maxHealth) - selfDamage); // Health is sometimes lower than max for whatever reason, raising an exception
 					mPlayer.damage(0);
 					new PartialParticle(Particle.DAMAGE_INDICATOR, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(mPlayer);
 					new PartialParticle(Particle.SQUID_INK, mPlayer.getEyeLocation(), 1, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(mPlayer);

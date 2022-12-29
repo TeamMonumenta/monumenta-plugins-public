@@ -26,14 +26,14 @@ public class BlockLockBoss extends BossAbilityGroup {
 		mLoc = new Location(mBoss.getWorld(), mParam.X, mParam.Y, mParam.Z);
 		Block block = mLoc.getBlock();
 		if (!block.hasMetadata("Unbreakable")) {
-			block.setMetadata("Unbreakable", new FixedMetadataValue(Plugin.getInstance(), true));
+			block.setMetadata("Unbreakable", new FixedMetadataValue(plugin, true));
 		}
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 40, null);
 	}
 
 	@Override
 	public void unload() {
-		mLoc.getBlock().removeMetadata("Unbreakable", Plugin.getInstance());
+		mLoc.getBlock().removeMetadata("Unbreakable", mPlugin);
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {

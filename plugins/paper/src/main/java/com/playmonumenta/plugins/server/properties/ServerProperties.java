@@ -13,8 +13,12 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -35,6 +39,7 @@ public class ServerProperties {
 	private boolean mAbilityEnhancementsEnabled = false;
 	private boolean mAuditMessagesEnabled = true;
 	private boolean mRepairExplosions = false;
+	private @Nullable Pattern mRepairExplosionsWorldPattern = null;
 	private boolean mPreventDungeonItemTransfer = true;
 	private boolean mReplaceSpawnerEntities = true;
 	private boolean mInfusionsEnabled = true;
@@ -91,6 +96,10 @@ public class ServerProperties {
 
 	public static boolean getRepairExplosions() {
 		return INSTANCE.mRepairExplosions;
+	}
+
+	public static @Nullable Pattern getRepairExplosionsWorldPattern() {
+		return INSTANCE.mRepairExplosionsWorldPattern;
 	}
 
 	public static boolean getPreventDungeonItemTransfer() {
@@ -169,6 +178,18 @@ public class ServerProperties {
 			mAbilityEnhancementsEnabled = getPropertyValueBool(object, "abilityEnhancementsEnabled", mAbilityEnhancementsEnabled);
 			mAuditMessagesEnabled = getPropertyValueBool(object, "auditMessagesEnabled", mAuditMessagesEnabled);
 			mRepairExplosions = getPropertyValueBool(object, "repairExplosions", mRepairExplosions);
+			String repairExplosionsWorldPattern = getPropertyValueString(object, "repairExplosionsWorldPattern", null);
+			if (repairExplosionsWorldPattern != null) {
+				try {
+					mRepairExplosionsWorldPattern = Pattern.compile(repairExplosionsWorldPattern);
+				} catch (PatternSyntaxException e) {
+					String error = "Error in repairExplosionsWorldPattern: " + e.getMessage();
+					plugin.getLogger().warning(error);
+					if (sender != null) {
+						sender.sendMessage(Component.text(error, NamedTextColor.RED));
+					}
+				}
+			}
 			mPreventDungeonItemTransfer = getPropertyValueBool(object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
 			mReplaceSpawnerEntities = getPropertyValueBool(object, "replaceSpawnerEntities", mReplaceSpawnerEntities);
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
@@ -218,6 +239,7 @@ public class ServerProperties {
 		out.add("abilityEnhancementsEnabled = " + mAbilityEnhancementsEnabled);
 		out.add("auditMessagesEnabled = " + mAuditMessagesEnabled);
 		out.add("repairExplosions = " + mRepairExplosions);
+		out.add("repairExplosionsWorldPattern = " + (mRepairExplosionsWorldPattern == null ? null : mRepairExplosionsWorldPattern.pattern()));
 		out.add("preventDungeonItemTransfer = " + mPreventDungeonItemTransfer);
 		out.add("replaceSpawnerEntities = " + mReplaceSpawnerEntities);
 		out.add("infusionsEnabled = " + mInfusionsEnabled);

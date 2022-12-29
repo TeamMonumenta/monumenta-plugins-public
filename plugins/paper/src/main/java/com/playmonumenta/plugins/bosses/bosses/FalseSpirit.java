@@ -48,7 +48,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
@@ -333,15 +332,6 @@ public final class FalseSpirit extends BossAbilityGroup {
 
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				for (Item item : mBoss.getWorld().getNearbyEntitiesByType(Item.class, event.getEntity().getLocation(), 10)) {
-					item.setInvulnerable(true);
-				}
-			}
-		}.runTaskLater(mPlugin, 0);
-
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 
