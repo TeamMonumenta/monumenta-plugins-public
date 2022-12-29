@@ -22,11 +22,9 @@ public class ForceCastAction implements Action {
 		BossManager manager = BossManager.getInstance();
 		if (manager != null) {
 			List<BossAbilityGroup> abilityList = manager.getAbilities(boss);
-			if (abilityList != null) {
-				for (BossAbilityGroup ability : abilityList) {
-					if (ability.getIdentityTag().equals(mAbility)) {
-						ability.forceCastRandomSpell();
-					}
+			for (BossAbilityGroup ability : abilityList) {
+				if (ability.getIdentityTag().equals(mAbility)) {
+					ability.forceCastRandomSpell();
 				}
 			}
 		}

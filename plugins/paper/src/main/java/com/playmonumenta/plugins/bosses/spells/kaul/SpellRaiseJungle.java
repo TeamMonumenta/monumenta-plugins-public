@@ -86,7 +86,7 @@ public class SpellRaiseJungle extends Spell {
 			num += 3 * players.size();
 		} else if (players.size() < 11) {
 			num += 12 + (2 * (players.size() - 4));
-		} else if (players.size() >= 11) {
+		} else {
 			num += 24 + (1 * (players.size() - 10));
 		}
 		int amt = num;
@@ -99,7 +99,8 @@ public class SpellRaiseJungle extends Spell {
 					double z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 					Location sLoc = loc.clone().add(x, 0, z);
 					sLoc.setY(ARENA_FLOOR + 0.25); //so that they do not summon midair if Kaul/Primordial happens to be above the floor
-					while (sLoc.getBlock().getType().isSolid() || sLoc.getBlock().isLiquid()) { // cannot spawn in a location where after raising is in a block or a liquid
+					for (int j = 0; j < 100 && (sLoc.getBlock().getType().isSolid() || sLoc.getBlock().isLiquid()); j++) {
+						// cannot spawn in a location where after raising is in a block or a liquid
 						x = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 						z = FastUtils.randomDoubleInRange(-mSummonRange, mSummonRange);
 						sLoc = loc.clone().add(x, 0, z);

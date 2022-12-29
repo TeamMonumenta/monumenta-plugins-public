@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -41,14 +43,16 @@ public class SpellPutridPlague extends Spell {
 	private static final String PUTRID_PLAGUE_TAG_BLUE = "KaulPutridPlagueBlue";
 	private static final String PUTRID_PLAGUE_TAG_YELLOW = "KaulPutridPlagueYellow";
 	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
-	private boolean mPhase3;
+
 	private static boolean mPlagueActive;
-	private int mTime;
-	private Location mCenter;
-	private ChargeUpManager mChargeUp;
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
+	private final boolean mPhase3;
+	private final int mTime;
+	private final Location mCenter;
+	private final ChargeUpManager mChargeUp;
 
 	public static boolean getPlagueActive() {
 		return mPlagueActive;
@@ -140,10 +144,10 @@ public class SpellPutridPlague extends Spell {
 			List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 			players.removeIf(p -> p.getLocation().getY() >= 61);
 			new BukkitRunnable() {
-				Location mPoint1 = point.getLocation().add(4, 6, 4);
-				Location mPoint2 = point.getLocation().add(-4, 6, -4);
-				Location mPoint3 = point.getLocation().add(4, 6, -4);
-				Location mPoint4 = point.getLocation().add(-4, 6, 4);
+				final Location mPoint1 = point.getLocation().add(4, 6, 4);
+				final Location mPoint2 = point.getLocation().add(-4, 6, -4);
+				final Location mPoint3 = point.getLocation().add(4, 6, -4);
+				final Location mPoint4 = point.getLocation().add(-4, 6, 4);
 
 				@Override
 				public void run() {
@@ -151,22 +155,17 @@ public class SpellPutridPlague extends Spell {
 					for (Player player : players) {
 						// Spawn the particles for players so that way there
 						// isn't as much particle lag
-						new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation(), 60, 15, 0, 15, 0)
+							.spawnForPlayer(ParticleCategory.BOSS, player);
 					}
 
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45, 0, null, true).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7, 0, null, true).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint1, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint2, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint3, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7).spawnAsEntityActive(mBoss);
 
-					Location cLoc = point.getLocation();
-					for (double rotation = 0; rotation < 360; rotation += 6) {
-						double radian = Math.toRadians(rotation);
-						cLoc.add(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
-						new PartialParticle(Particle.SPELL_INSTANT, cLoc, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
-						cLoc.subtract(FastUtils.cos(radian) * 7, 0, FastUtils.sin(radian) * 7);
-					}
+					new PPCircle(Particle.SPELL_INSTANT, point.getLocation(), 7).count(60).ringMode(true).spawnAsEntityActive(mBoss);
 
 					if (mChargeUp.nextTick(2)) {
 						this.cancel();

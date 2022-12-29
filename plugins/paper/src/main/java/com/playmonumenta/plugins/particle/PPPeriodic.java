@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Same as {@link PartialParticle}, except that when the particles count is lowered below 1, it will periodically spawn a particle instead of randomly.
- * For this to work this PartialParticle must be saves (as a field) and re-used!
+ * For this to work this PartialParticle must be saved (as a field) and re-used!
  */
 public class PPPeriodic extends AbstractPartialParticle<PPPeriodic> {
 

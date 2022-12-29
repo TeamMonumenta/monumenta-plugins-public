@@ -168,35 +168,28 @@ public class SpellVolcanicDemise extends Spell {
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
 
 				mY -= 1;
-				if ((int) mY % 5 == 0) {
-					double distMin = 100;
-					for (Player player : players) {
-						double dist = player.getLocation().distance(mLoc);
-						distMin = dist < distMin ? dist : distMin;
-					}
-					// Closer the closet player is, more particles are shown.
-					int count = distMin < 10 ? 12 : (distMin < 15 ? 6 : 4);
-					double size = 0.5 + 0.5 * (spawnY - mY) / spawnY;
-					new PPCircle(Particle.FLAME, mLoc, size * HIT_RADIUS)
-						.ringMode(true)
-						.count(count * 2)
-						.spawnAsBoss();
-					new PPCircle(Particle.LANDING_LAVA, mLoc, size * DEATH_RADIUS)
+				if (mY > 0 && (int) mY % 3 == 0) {
+					new PPCircle(Particle.LAVA, mLoc, DEATH_RADIUS / 2)
 						.ringMode(false)
-						.count(count)
+						.count(10)
+						.distanceFalloff(20)
 						.spawnAsBoss();
 				}
 				Location particle = mLoc.clone().add(0, mY, 0);
-				new PartialParticle(Particle.FLAME, particle, 2, 0.2f, 0.2f, 0.2f, 0.05).spawnAsBoss();
+				new PartialParticle(Particle.FLAME, particle, 2, 0.2f, 0.2f, 0.2f, 0.05)
+					.distanceFalloff(20).spawnAsBoss();
 				if (FastUtils.RANDOM.nextBoolean()) {
-					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0).spawnAsBoss();
+					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0)
+						.distanceFalloff(20).spawnAsBoss();
 				}
 				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175).spawnAsBoss();
-					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25).spawnAsBoss();
+					new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175)
+						.distanceFalloff(20).spawnAsBoss();
+					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25)
+						.distanceFalloff(20).spawnAsBoss();
 					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					Hitbox deathBox = new Hitbox.UprightCylinderHitbox(mLoc, 7, DEATH_RADIUS);
 					Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLoc, 15, HIT_RADIUS);

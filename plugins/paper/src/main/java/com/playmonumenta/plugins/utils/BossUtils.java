@@ -376,11 +376,9 @@ public class BossUtils {
 		BossManager bossManager = BossManager.getInstance();
 		if (bossManager != null) {
 			List<BossAbilityGroup> abilities = BossManager.getInstance().getAbilities(entity);
-			if (abilities != null) {
-				for (BossAbilityGroup ability : abilities) {
-					if (ability.getClass() == cls) {
-						return (T) ability;
-					}
+			for (BossAbilityGroup ability : abilities) {
+				if (ability.getClass() == cls) {
+					return (T) ability;
 				}
 			}
 		}

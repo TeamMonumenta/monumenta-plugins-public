@@ -125,12 +125,10 @@ public class DummyDecoy extends DepthsAbility {
 		BossManager bossManager = BossManager.getInstance();
 		if (bossManager != null) {
 			List<BossAbilityGroup> abilities = bossManager.getAbilities(e);
-			if (abilities != null) {
-				for (BossAbilityGroup ability : abilities) {
-					if (ability instanceof DummyDecoyBoss dummyDecoyBoss) {
-						dummyDecoyBoss.spawn(STUN_TICKS[mRarity - 1]);
-						break;
-					}
+			for (BossAbilityGroup ability : abilities) {
+				if (ability instanceof DummyDecoyBoss dummyDecoyBoss) {
+					dummyDecoyBoss.spawn(STUN_TICKS[mRarity - 1]);
+					break;
 				}
 			}
 		}

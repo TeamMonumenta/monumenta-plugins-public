@@ -51,6 +51,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1103,12 +1104,12 @@ public class BossManager implements Listener {
 	 * Public Methods
 	 *******************************************************************************/
 
-	public @Nullable List<BossAbilityGroup> getAbilities(Entity entity) {
+	public List<BossAbilityGroup> getAbilities(Entity entity) {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			return boss.getAbilities();
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	/*

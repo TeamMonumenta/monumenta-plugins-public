@@ -50,6 +50,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 */
 	public boolean mMinimumMultiplier = true;
 
+	public double mDistanceFalloff = 0;
+
 	/*
 	 * Whether to randomise between negative mDelta or 0, and 0 or mDelta,
 	 * for each axis, for individual particles' mDelta values.
@@ -215,6 +217,16 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return getSelf();
 	}
 
+	/**
+	 * Reduces number of particles with distance, up to no particles at the given distance
+	 */
+	public SelfT distanceFalloff(double distanceFalloff) {
+		mDistanceFalloff = distanceFalloff;
+		return getSelf();
+	}
+
+	// spawn methods
+
 	public SelfT spawnAsPlayerActive(Player sourcePlayer) {
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_ACTIVE, ParticleCategory.OTHER_ACTIVE);
 	}
@@ -244,7 +256,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		prepareSpawn();
 		return forEachNearbyPlayer(
 			(Player player) -> {
-				spawnForPlayer(player, player == sourcePlayer ? ownCategory : othersCategory);
+				spawnForPlayerInternal(player, player == sourcePlayer ? ownCategory : othersCategory);
 			}
 		);
 	}
@@ -379,11 +391,17 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		}
 	}
 
-	private SelfT spawnForPlayers(ParticleCategory source) {
+	public SelfT spawnForPlayers(ParticleCategory source) {
 		prepareSpawn();
 		return forEachNearbyPlayer(
-			(Player player) -> spawnForPlayer(player, source)
+			(Player player) -> spawnForPlayerInternal(player, source)
 		);
+	}
+
+	public SelfT spawnForPlayer(ParticleCategory source, Player player) {
+		prepareSpawn();
+		spawnForPlayerInternal(player, source);
+		return getSelf();
 	}
 
 	protected void prepareSpawn() {
@@ -392,17 +410,24 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	private SelfT forEachNearbyPlayer(Consumer<Player> playerAction) {
 		for (Player player : mLocation.getWorld().getPlayers()) {
 			if (player.getLocation().distanceSquared(mLocation) < PARTICLE_SPAWN_DISTANCE_SQUARED
-				    && (mPlayerCondition == null || mPlayerCondition.test(player))) {
+				&& (mPlayerCondition == null || mPlayerCondition.test(player))) {
 				playerAction.accept(player);
 			}
 		}
 		return getSelf();
 	}
 
-	private void spawnForPlayer(Player player, ParticleCategory source) {
+	private void spawnForPlayerInternal(Player player, ParticleCategory source) {
 		double multipliedCount = mCount * PlayerData.getParticleMultiplier(player, source);
 		if (multipliedCount == 0) {
 			return;
+		}
+		if (mDistanceFalloff != 0) {
+			double distance = mLocation.distance(player.getLocation());
+			if (distance > mDistanceFalloff) {
+				return;
+			}
+			multipliedCount *= 1 - distance / mDistanceFalloff;
 		}
 
 		int partialCount = getPartialCount(multipliedCount, player, source);
@@ -416,6 +441,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		packagedValues.offset(mDeltaX, mDeltaY, mDeltaZ);
 		packagedValues.extra(mExtra);
 		packagedValues.data(mData);
+		packagedValues.force(true);
 
 		packagedValues.receivers(player);
 

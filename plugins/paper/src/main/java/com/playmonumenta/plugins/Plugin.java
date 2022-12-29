@@ -244,6 +244,7 @@ public class Plugin extends JavaPlugin {
 		CoreProtectLogCommand.register();
 		UpdateStrikeChests.register();
 		RenameItemCommand.register();
+		ForceCastSpell.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
