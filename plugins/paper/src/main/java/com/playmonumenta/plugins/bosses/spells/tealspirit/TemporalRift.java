@@ -65,6 +65,7 @@ public class TemporalRift extends Spell {
 
 	@Override
 	public void run() {
+		mChargeUp.reset();
 
 		Plugin plugin = Plugin.getInstance();
 		World world = mBoss.getWorld();
