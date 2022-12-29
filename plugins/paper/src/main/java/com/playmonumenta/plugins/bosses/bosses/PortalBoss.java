@@ -34,6 +34,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -44,7 +45,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public final class PortalBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_portalfight";
@@ -125,7 +125,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			music
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(66, (mBoss) -> {
 			mCooldownTicks -= 30;
@@ -136,8 +136,8 @@ public final class PortalBoss extends BossAbilityGroup {
 		});
 		events.put(50, (mBoss) -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM…INF\",\"color\":\"red\"},{\"text\":\"69\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"IN\",\"color\":\"red\"},{\"text\":\"  8\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"ITE.\",\"color\":\"red\"}]");
-			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(new Vector(10, 1, 10)), ELITE_LOS);
-			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(new Vector(-10, 1, -10)), ELITE_LOS);
+			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(10, 1, 10), ELITE_LOS);
+			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-10, 1, -10), ELITE_LOS);
 
 		});
 		events.put(25, (mBoss) -> {
@@ -147,8 +147,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			mPhase = 3;
 			//Clear portals
 			for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-				PortalManager.clearPortal(p, 1);
-				PortalManager.clearPortal(p, 2);
+				PortalManager.clearAllPortals(p);
 			}
 			World world = mBoss.getWorld();
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
@@ -169,14 +168,7 @@ public final class PortalBoss extends BossAbilityGroup {
 		mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 		mIsHidden = false;
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				hide();
-			}
-
-		}.runTaskLater(mPlugin, 20 * 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, this::hide, 20 * 20);
 	}
 
 	public void hide() {
@@ -219,47 +211,42 @@ public final class PortalBoss extends BossAbilityGroup {
 	}
 
 	public void honeyify() {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				for (int x = -30; x < 30; x++) {
-					for (int y = -3; y < 20; y++) {
-						for (int z = -30; z < 30; z++) {
-							Location loc = new Location(mBoss.getWorld(), mSpawnLoc.getX() + x, mSpawnLoc.getY() + y, mSpawnLoc.getZ() + z);
-							if (mBoss.getWorld().getBlockAt(loc).getType() == Material.SMOOTH_STONE && FastUtils.RANDOM.nextBoolean() && FastUtils.RANDOM.nextBoolean()) {
-								mBoss.getWorld().getBlockAt(loc).setType(Material.HONEY_BLOCK);
-								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
-								mReplaceBlocks.add(loc);
-							}
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			for (int x = -30; x < 30; x++) {
+				for (int y = -3; y < 20; y++) {
+					for (int z = -30; z < 30; z++) {
+						Location loc = mSpawnLoc.clone().add(x, y, z);
+						Block block = loc.getBlock();
+						if (block.getType() == Material.SMOOTH_STONE && FastUtils.RANDOM.nextBoolean() && FastUtils.RANDOM.nextBoolean()) {
+							block.setType(Material.HONEY_BLOCK);
+							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+							mReplaceBlocks.add(loc);
 						}
 					}
 				}
 			}
-		}.runTask(mPlugin);
+		});
 	}
 
 	@Override
 	public void init() {
 		mBoss.setAI(false);
 
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		int playerCount = players.size();
 		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
 
 		mBoss.setPersistent(true);
 
 		//Clear portals
-		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			PortalManager.clearPortal(p, 1);
-			PortalManager.clearPortal(p, 2);
-		}
+		players.forEach(PortalManager::clearAllPortals);
 
 		new BukkitRunnable() {
-
 			int mTicks = 0;
 
 			@Override
@@ -272,9 +259,9 @@ public final class PortalBoss extends BossAbilityGroup {
 					this.cancel();
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Iota", ChatColor.DARK_RED + "Corrupted Construct");
-						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\", \"color\":\"gold\"},{\"text\":\" INTRUSION DETECTED -- INTRUDERS ENTERING INNER CHAMBER. RIFT PROXIMITY… 100%\",\"color\":\"red\"}]");
-						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\", \"color\":\"gold\"},{\"text\":\" DELETION PROTOCOL COMMENCING. INTRUDERS ARE FRAIL: CHANCE OF SURVIVAL….. 0.00001%.\",\"color\":\"red\"}]");
-						PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\", \"color\":\"gold\"},{\"text\":\" BRING IT ON.\",\"bold\":\"true\",\"color\":\"red\"}]");
+						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + " INTRUSION DETECTED -- INTRUDERS ENTERING INNER CHAMBER. RIFT PROXIMITY… 100%");
+						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + " DELETION PROTOCOL COMMENCING. INTRUDERS ARE FRAIL: CHANCE OF SURVIVAL….. 0.00001%.");
+						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + ChatColor.BOLD + " BRING IT ON.");
 
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
@@ -284,7 +271,6 @@ public final class PortalBoss extends BossAbilityGroup {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 5);
-
 
 	}
 

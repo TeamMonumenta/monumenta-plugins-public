@@ -13,7 +13,6 @@ public class PortalAFKCheck extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		PortalManager.clearPortal(mPlayer, 1);
-		PortalManager.clearPortal(mPlayer, 2);
+		PortalManager.clearAllPortals(mPlayer);
 	}
 }

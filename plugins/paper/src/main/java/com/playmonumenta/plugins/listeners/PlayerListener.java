@@ -221,8 +221,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 
 		/* Remove portals from player */
-		PortalManager.clearPortal(player, 1);
-		PortalManager.clearPortal(player, 2);
+		PortalManager.clearAllPortals(player);
 
 		/* Remove ephemeral items on logout */
 		InventoryUtils.removeSpecialItems(player, true, true);

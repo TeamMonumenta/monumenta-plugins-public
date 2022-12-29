@@ -387,6 +387,11 @@ public class PortalManager implements Listener {
 		portalLog("exit spawnPortal: + spawned portal");
 	}
 
+	public static void clearAllPortals(Player player) {
+		clearPortal(player, 1);
+		clearPortal(player, 2);
+	}
+
 	public static void clearPortal(Player player, int portalNum) {
 		//Don't do anything if the manager isn't loaded
 		if (mPlayerPortal1 == null || mPlayerPortal2 == null) {
