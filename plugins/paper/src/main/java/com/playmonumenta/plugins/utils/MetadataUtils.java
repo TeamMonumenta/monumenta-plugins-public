@@ -6,6 +6,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class MetadataUtils {
 	/* This method can be used to wrap code that should only execute once per tick
@@ -74,7 +75,7 @@ public class MetadataUtils {
 		return value;
 	}
 
-	public static MetadataValue getMetadataValue(Metadatable metadatable, String key) {
+	public static @Nullable MetadataValue getMetadataValue(Metadatable metadatable, String key) {
 		for (MetadataValue value : metadatable.getMetadata(key)) {
 			if (value.getOwningPlugin() instanceof com.playmonumenta.plugins.Plugin) {
 				return value;

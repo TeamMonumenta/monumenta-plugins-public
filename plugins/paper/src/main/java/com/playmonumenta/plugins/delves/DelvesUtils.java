@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.structures.StructuresPlugin;
@@ -404,7 +405,15 @@ public class DelvesUtils {
 					}
 				}
 
-				LibraryOfSoulsIntegration.summon(loc, soulNameBuilder.toString());
+				Entity copy = LibraryOfSoulsIntegration.summon(loc, soulNameBuilder.toString());
+
+				// Copy spawner count to duplicated mob to prevent farming xp/drops
+				if (copy != null) {
+					MetadataValue spawnerCount = MetadataUtils.getMetadataValue(mob, Constants.SPAWNER_COUNT_METAKEY);
+					if (spawnerCount != null) {
+						MetadataUtils.setMetadata(copy, Constants.SPAWNER_COUNT_METAKEY, spawnerCount.value());
+					}
+				}
 			}
 		} finally {
 			IS_SPAWNING = false;

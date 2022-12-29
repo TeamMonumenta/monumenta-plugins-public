@@ -246,12 +246,19 @@ public class MobListener implements Listener {
 
 		// Create new metadata entries
 		spawner.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
-		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
+		tagSpawnCountRecursively(mob, spawnCount);
 
 		// Successful spawn: allow torches to disable the next spawn cycle again, and reset spawn attempt matadata
 		spawner.getBlock().removeMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, mPlugin);
 		spawner.getBlock().setMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, new FixedMetadataValue(mPlugin, Bukkit.getServer().getCurrentTick()));
 		Bukkit.getScheduler().runTask(mPlugin, () -> spawner.getBlock().removeMetadata(SPAWNER_FIRST_SPAWN_ATTEMPT_METADATA_KEY, mPlugin));
+	}
+
+	private void tagSpawnCountRecursively(Entity mob, int spawnCount) {
+		mob.setMetadata(Constants.SPAWNER_COUNT_METAKEY, new FixedMetadataValue(mPlugin, spawnCount));
+		for (Entity passenger : mob.getPassengers()) {
+			tagSpawnCountRecursively(passenger, spawnCount);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
