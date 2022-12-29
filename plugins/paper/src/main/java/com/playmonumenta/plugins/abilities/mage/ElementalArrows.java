@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
+import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -89,7 +91,9 @@ public class ElementalArrows extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (!(event.getDamager() instanceof Projectile proj) || !EntityUtils.isAbilityTriggeringProjectile(proj, true)) {
+		if (!(event.getDamager() instanceof Projectile proj)
+			    || !EntityUtils.isAbilityTriggeringProjectile(proj, true)
+			    || event.getType() != DamageType.PROJECTILE) {
 			return false;
 		}
 		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
@@ -124,15 +128,27 @@ public class ElementalArrows extends Ability {
 				});
 			}
 		}
-		return true; // creates new damage instances
+		return false; // creates new damage instances, but of a type it doesn't handle again
 	}
 
 	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, double multiplier, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, @Nullable Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
-		double damage = playerItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
-		mLastDamage = damage;
+		double baseDamage = playerItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 
-		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage) * multiplier;
-		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, damage * AOE_DAMAGE_MULTIPLIER) * multiplier;
+		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, baseDamage);
+		if (bonusEntity != null && bonusEntity.isInstance(enemy)) {
+			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
+		}
+		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getMainhandAddStats().get(ItemStatUtils.EnchantmentType.POINT_BLANK));
+		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getMainhandAddStats().get(ItemStatUtils.EnchantmentType.SNIPER));
+		targetDamage *= multiplier;
+
+		mLastDamage = targetDamage;
+
+		effectAction.accept(enemy);
+		event.setDamage(0);
+		DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats, NAME), targetDamage, false, true, false);
+
+		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, baseDamage * AOE_DAMAGE_MULTIPLIER) * multiplier;
 		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
 
 		if (isLevelTwo()) {
@@ -143,17 +159,17 @@ public class ElementalArrows extends Ability {
 			}
 		}
 
-		if (enemy.getClass() == bonusEntity) {
-			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
-		}
-
-		effectAction.accept(enemy);
-		event.setDamage(0);
-		DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats), targetDamage, true, true, false);
 	}
 
 	public double getLastDamage() {
 		return mLastDamage;
+	}
+
+	public static boolean isElementalArrowDamage(DamageEvent event) {
+		// Use the "boss spell name" as marker if it's the main projectile damage or AoE damage
+		return (event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_FIRE || event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_ICE)
+			       && event.getBossSpellName() != null
+			       && event.getType() != DamageType.TRUE;
 	}
 
 	@Override

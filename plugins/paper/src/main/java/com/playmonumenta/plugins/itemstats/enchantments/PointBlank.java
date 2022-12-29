@@ -43,20 +43,22 @@ public class PointBlank implements Enchantment {
 	}
 
 	@Override
-	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity target) {
+	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity target) {
 		if (event.getType() == DamageType.PROJECTILE) {
 			if (event.getDamager() instanceof AbstractArrow arrow && !(arrow instanceof Trident) && !arrow.isCritical()) {
 				return;
 			}
 
-			Location loc = player.getLocation();
-
-			if (loc.distance(target.getLocation()) < DISTANCE) {
-				double pbDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, value * DAMAGE_PER_LEVEL);
-				event.setDamage(event.getDamage() + pbDamage);
-				particles(target.getEyeLocation(), player);
-			}
+			event.setDamage(event.getDamage() + apply(player, target, level));
 		}
+	}
+
+	public static double apply(Player player, LivingEntity target, double level) {
+		if (level > 0 && player.getLocation().distance(target.getLocation()) < DISTANCE) {
+			particles(target.getEyeLocation(), player);
+			return CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
+		}
+		return 0;
 	}
 
 	public static void particles(Location loc, Player player) {
