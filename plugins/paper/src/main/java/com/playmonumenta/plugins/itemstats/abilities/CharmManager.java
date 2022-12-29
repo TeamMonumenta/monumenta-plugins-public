@@ -135,6 +135,8 @@ import com.playmonumenta.plugins.itemstats.enchantments.ThunderAspect;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
@@ -146,8 +148,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -938,26 +941,18 @@ public class CharmManager {
 	public void updateCharms(Player p, List<ItemStack> equippedCharms) {
 		//Calculate the map of effects to values
 		Map<String, Double> allEffects = new HashMap<>();
-		//Loop through each effect
-		for (String charmEffect : mCharmEffectList) {
-			double finalValue = 0;
-			double finalValuePct = 0;
-			//Loop through each charm the player has equipped
-			for (ItemStack item : equippedCharms) {
-				if (item == null || item.getType() == Material.AIR) {
+
+		for (ItemStack charm : equippedCharms) {
+			if (charm == null || charm.getType() == Material.AIR) {
+				continue;
+			}
+			for (CharmParsedInfo info : readCharm(charm)) {
+				if (!mCharmEffectList.contains(info.mEffect)) {
+					MMLog.warning("Unknown effect '" + info.mEffect + "' in charm '" + ItemUtils.getPlainName(charm) + "'!");
 					continue;
 				}
-				CharmParsedInfo parsedInfo = getPlayerItemLevel(item, charmEffect);
-				if (parsedInfo.mIsPercent) {
-					finalValuePct += parsedInfo.mValue;
-				} else {
-					finalValue += parsedInfo.mValue;
-				}
+				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, Double::sum);
 			}
-			//Separate out flat and percent values so charm effects can use both
-			allEffects.put(charmEffect, finalValue);
-			allEffects.put(charmEffect + "%", finalValuePct);
-
 		}
 
 		//Store to local map
@@ -967,57 +962,24 @@ public class CharmManager {
 		AbilityManager.getManager().updatePlayerAbilities(p, true);
 	}
 
+	private static final Pattern CHARM_LINE_PATTERN = Pattern.compile("([-+]?\\d+(?:\\.\\d+)?)(%)? (.+)");
+
 	//Helper method to parse item for charm effects
-	private CharmParsedInfo getPlayerItemLevel(ItemStack itemStack, String effect) {
+	private List<CharmParsedInfo> readCharm(ItemStack itemStack) {
+		List<CharmParsedInfo> effects = new ArrayList<>();
 		List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
 		for (String plainLore : plainLoreLines) {
-			if (plainLore.endsWith(effect)) {
-				double value = parseValue(plainLore);
-				if (plainLore.contains("%")) {
-					return new CharmParsedInfo(value, true);
-				} else {
-					return new CharmParsedInfo(value, false);
-				}
+			Matcher matcher = CHARM_LINE_PATTERN.matcher(plainLore);
+			if (!matcher.matches()) {
+				MMLog.warning("Unparseable charm lore line '" + plainLore + "' in charm '" + ItemUtils.getPlainName(itemStack) + "'!");
+				continue;
 			}
+			double value = Double.parseDouble(matcher.group(1));
+			boolean percent = matcher.group(2) != null;
+			String effect = matcher.group(3);
+			effects.add(new CharmParsedInfo(value, percent, effect));
 		}
-		return new CharmParsedInfo(0, false);
-	}
-
-	//Helper method to parse lore line for charm effects
-	private double parseValue(String loreLine) {
-		//Whether effect is being added to or subtracted
-		boolean add = loreLine.contains("+");
-		//Parse the value from the line
-
-		loreLine = loreLine.split("\\+|-")[1];
-
-		//First check for a double value in the lore line
-		String stippedLoreLine = loreLine.replace('%', ' ');
-		@SuppressWarnings("resource")
-		Scanner s = new Scanner(stippedLoreLine);
-		if (s.hasNextDouble()) {
-			double sint = s.nextDouble();
-			//If it's a negative effect
-			if (!add) {
-				sint = sint * -1.0;
-			}
-			s.close();
-			return sint;
-		}
-		s.close();
-		// If no double was found, check for just plain int
-		s = new Scanner(loreLine).useDelimiter("\\D+");
-		if (s.hasNextInt()) {
-			int sint = s.nextInt();
-			//If it's a negative effect
-			if (!add) {
-				sint = sint * -1;
-			}
-			s.close();
-			return sint;
-		}
-		s.close();
-		return 0;
+		return effects;
 	}
 
 	/**
@@ -1264,10 +1226,12 @@ public class CharmManager {
 	private static class CharmParsedInfo {
 		public double mValue;
 		public boolean mIsPercent;
+		public String mEffect;
 
-		public CharmParsedInfo(double value, boolean isPercent) {
+		public CharmParsedInfo(double value, boolean isPercent, String effect) {
 			mValue = value;
 			mIsPercent = isPercent;
+			mEffect = effect;
 		}
 	}
 }
