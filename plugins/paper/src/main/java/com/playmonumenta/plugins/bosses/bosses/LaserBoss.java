@@ -135,7 +135,7 @@ public class LaserBoss extends BossAbilityGroup {
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
 						}
 
 						p.EFFECTS.apply(target, mBoss);

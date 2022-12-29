@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.bosses.bosses.SnowSpirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -27,8 +27,8 @@ import org.bukkit.util.Vector;
 public class DeckTheHalls extends Spell {
 	private static final double DAMAGE = 20;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 
 	//direction is 0 or 180
 	private int mDirection = 0;
@@ -55,7 +55,7 @@ public class DeckTheHalls extends Spell {
 
 				if (mTicks == 26 || mTicks == 50 || mTicks >= 76) {
 					Vector vec;
-					List<BoundingBox> boxes = new ArrayList<BoundingBox>();
+					List<BoundingBox> boxes = new ArrayList<>();
 
 					float pitch = 1;
 					if (mTicks == 26) {
@@ -89,7 +89,8 @@ public class DeckTheHalls extends Spell {
 					for (Player player : PlayerUtils.playersInRange(loc, 40, true)) {
 						for (BoundingBox box : boxes) {
 							if (player.getBoundingBox().overlaps(box)) {
-								BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, DAMAGE, "Deck the Halls", null);
+								DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Deck the Halls");
+								break;
 							}
 						}
 					}

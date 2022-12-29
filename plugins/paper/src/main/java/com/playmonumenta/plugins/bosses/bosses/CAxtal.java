@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -100,7 +101,7 @@ public class CAxtal extends BossAbilityGroup {
 					for (Player p : PlayerUtils.playersInRange(loc, r, true)) {
 						if (p.getLocation().distance(loc) <= r && (LocationUtils.hasLineOfSight(p.getLocation(), loc) || LocationUtils.hasLineOfSight(p.getEyeLocation(), loc))) {
 							double dist = p.getLocation().distance(loc);
-							BossUtils.blockableDamage(mBoss, p, DamageEvent.DamageType.MAGIC, maxdmg * (1 - dist / r), "Corruption Blast", null);
+							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, maxdmg * (1 - dist / r), null, false, true, "Corruption Blast");
 							PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2, 10));
 						}
 					}
@@ -117,7 +118,7 @@ public class CAxtal extends BossAbilityGroup {
 				                                                   b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"At last, the keys are collected. I can be free finally...\",\"color\":\"dark_red\"}]");
 		});

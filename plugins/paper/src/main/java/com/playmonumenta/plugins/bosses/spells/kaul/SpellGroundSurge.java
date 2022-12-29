@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -31,11 +31,11 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellGroundSurge extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
 
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellGroundSurge(Plugin plugin, LivingEntity boss, double range) {
 		mPlugin = plugin;
@@ -70,29 +70,23 @@ public class SpellGroundSurge extends Spell {
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.reset();
-					final int targets;
-					if (players.size() == 0) {
+					if (players.isEmpty()) {
 						return;
 					}
-					if (players.size() <= 1) {
-						targets = 1;
-					} else if (players.size() == 2) {
-						targets = 2;
-					} else if (players.size() == 3) {
-						targets = 3;
-					} else if (players.size() >= 4 && players.size() <= 6) {
-						targets = 4;
-					} else if (players.size() >= 7 && players.size() <= 10) {
-						targets = 5;
-					} else if (players.size() >= 11 && players.size() <= 15) {
-						targets = 6;
-					} else if (players.size() >= 16 && players.size() <= 20) {
-						targets = 7;
-					} else {
-						targets = 8;
+
+					final int targets;
+					switch (players.size()) {
+						case 1 -> targets = 1;
+						case 2 -> targets = 2;
+						case 3 -> targets = 3;
+						case 4, 5, 6 -> targets = 4;
+						case 7, 8, 9, 10 -> targets = 5;
+						case 11, 12, 13, 14, 15 -> targets = 6;
+						case 16, 17, 18, 19, 20 -> targets = 7;
+						default -> targets = 8;
 					}
 
-					List<Player> toHit = new ArrayList<Player>();
+					List<Player> toHit = new ArrayList<>();
 					while (toHit.size() < targets) {
 						Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 						if (!toHit.contains(player)) {
@@ -143,7 +137,7 @@ public class SpellGroundSurge extends Spell {
 								for (Player player : players) {
 									if (player.getBoundingBox().overlaps(mBox)) {
 										this.cancel();
-										BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 24, "Ground Surge", mBoss.getLocation());
+										DamageUtils.damage(mBoss, player, DamageType.BLAST, 24, null, false, true, "Ground Surge");
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1f);
 										new PartialParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
@@ -165,7 +159,7 @@ public class SpellGroundSurge extends Spell {
 											BoundingBox mBox = BoundingBox.of(bLoc, 0.4, 0.4, 0.4);
 											int mTicks = 0;
 											int mHits = 0;
-											List<UUID> mHit = new ArrayList<UUID>();
+											List<UUID> mHit = new ArrayList<>();
 
 											@Override
 											public void run() {
@@ -202,7 +196,7 @@ public class SpellGroundSurge extends Spell {
 														    && !surgePlayer.getUniqueId().equals(player.getUniqueId())
 														    && !mHit.contains(surgePlayer.getUniqueId())) {
 														mHit.add(surgePlayer.getUniqueId());
-														BossUtils.blockableDamage(mBoss, surgePlayer, DamageType.BLAST, 40, "Ground Surge", mBoss.getLocation());
+														DamageUtils.damage(mBoss, surgePlayer, DamageType.BLAST, 40, null, false, true, "Ground Surge");
 														surgePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 2));
 														MovementUtils.knockAway(loc, player, 0.3f, 1f);
 														new PartialParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
@@ -262,9 +256,7 @@ public class SpellGroundSurge extends Spell {
 	public boolean canRun() {
 		if (mBoss instanceof Mob mob) {
 			LivingEntity target = mob.getTarget();
-			if (target != null && target instanceof Player) {
-				return true;
-			}
+			return target instanceof Player;
 		}
 		return false;
 	}

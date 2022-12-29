@@ -78,12 +78,12 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc) -> {
+				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
-						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);
 					}
 				})
 		));

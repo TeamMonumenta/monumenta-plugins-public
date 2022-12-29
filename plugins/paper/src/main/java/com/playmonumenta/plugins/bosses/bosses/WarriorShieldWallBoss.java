@@ -126,12 +126,13 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 										if (!mMobsAlreadyHit.contains(le)) {
 											mMobsAlreadyHit.add(le);
 
+											Location shieldLocation = box.getCenter().toLocation(mWorld);
 											if (p.DAMAGE > 0) {
-												BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+												BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation);
 											}
 
 											if (p.DAMAGE_PERCENTAGE > 0) {
-												BossUtils.bossDamagePercent(mBoss, le, p.DAMAGE_PERCENTAGE, box.getCenter().toLocation(mWorld), p.SPELL_NAME);
+												BossUtils.bossDamagePercent(mBoss, le, p.DAMAGE_PERCENTAGE, shieldLocation, p.SPELL_NAME);
 											}
 
 											p.EFFECTS.apply(le, boss);

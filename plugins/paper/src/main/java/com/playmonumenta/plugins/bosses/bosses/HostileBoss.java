@@ -52,7 +52,7 @@ public class HostileBoss extends BossAbilityGroup {
 					}
 
 					if (p.DAMAGE_PERCENTAGE != 0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation());
 					}
 
 					if (p.SOUNDS != SoundsList.EMPTY) {

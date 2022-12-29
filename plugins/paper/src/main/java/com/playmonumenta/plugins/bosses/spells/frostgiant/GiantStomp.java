@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -74,7 +74,7 @@ public class GiantStomp extends Spell {
 
 						if (mTicks >= 20) {
 							for (Player player : PlayerUtils.playersInRange(loc, radius, true)) {
-								BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 35, "Giant Stomp", null);
+								DamageUtils.damage(mBoss, player, DamageType.MELEE, 35, null, false, true, "Giant Stomp");
 								MovementUtils.knockAway(mBoss.getLocation(), player, 0.5f, 0.1f, true);
 							}
 							this.cancel();

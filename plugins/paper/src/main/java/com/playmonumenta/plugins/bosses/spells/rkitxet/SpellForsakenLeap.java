@@ -61,7 +61,7 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F).spawnAsEntityActive(launcher);
 				new PartialParticle(Particle.FLAME, loc, 3 * (int) (DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0).spawnAsEntityActive(launcher);
 				if (player != null) {
-					BossUtils.blockableDamage(launcher, player, DamageType.BLAST, DAMAGE, "Forsaken Leap", loc);
+					BossUtils.blockableDamage(launcher, player, DamageType.BLAST, DAMAGE, "Forsaken Leap", launcher.getLocation());
 				}
 			});
 

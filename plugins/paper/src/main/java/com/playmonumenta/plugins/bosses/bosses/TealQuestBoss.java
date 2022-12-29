@@ -103,11 +103,11 @@ public class TealQuestBoss extends BossAbilityGroup {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0F, 0F, 0F, 0.3F).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.LAVA, loc, 3 * (int) (DAMAGE_RADIUS * DAMAGE_RADIUS), DAMAGE_RADIUS, 0.25f, DAMAGE_RADIUS, 0).spawnAsEntityActive(boss);
 				if (player != null) {
-					BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT);
+					BossUtils.bossDamagePercent(mBoss, player, DAMAGE_PERCENT, mBoss.getLocation());
 					return;
 				}
 				for (Player players : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
-					BossUtils.bossDamagePercent(mBoss, players, DAMAGE_PERCENT);
+					BossUtils.bossDamagePercent(mBoss, players, DAMAGE_PERCENT, mBoss.getLocation());
 				}
 			}),
 			new SpellBaseAoE(plugin, boss, RADIUS, DURATION, COOLDOWN_SWING, false, Sound.ENTITY_PLAYER_ATTACK_SWEEP) {

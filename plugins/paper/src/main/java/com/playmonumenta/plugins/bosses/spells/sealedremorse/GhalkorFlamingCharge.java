@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.bosses.Ghalkor;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -58,8 +57,7 @@ public class GhalkorFlamingCharge extends SpellBaseCharge {
 					0.4, 0.4, 0.4, Material.REDSTONE_BLOCK.createBlockData()).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 12, 0.4,
 					0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData()).spawnAsEntityActive(boss);
-				BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE * 0.9, "Flaming Charge", null);
-				BossUtils.blockableDamage(boss, player, DamageType.FIRE, DAMAGE * 0.1, "Flaming Charge", null);
+				DamageUtils.damage(boss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Flaming Charge");
 			},
 			// Attack particles
 			(Location loc) -> {

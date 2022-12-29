@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseShatter;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Arrays;
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class ShatterBoss extends BossAbilityGroup {
 					p.PARTICLE_HIT.spawn(bosss, target.getLocation());
 
 					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageEvent.DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, loc);
+						DamageUtils.damage(boss, target, DamageEvent.DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {

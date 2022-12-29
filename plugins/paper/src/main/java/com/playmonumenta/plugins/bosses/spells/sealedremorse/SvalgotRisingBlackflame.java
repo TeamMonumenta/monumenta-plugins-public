@@ -22,10 +22,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class SvalgotRisingBlackflame extends Spell {
 	private static final double DAMAGE = 34;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 
-	private Svalgot mBossClass;
+	private final Svalgot mBossClass;
 
 	public SvalgotRisingBlackflame(Plugin plugin, LivingEntity boss, Svalgot bossClass) {
 		mPlugin = plugin;

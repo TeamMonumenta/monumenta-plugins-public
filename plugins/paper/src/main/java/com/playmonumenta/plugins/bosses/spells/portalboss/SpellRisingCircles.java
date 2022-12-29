@@ -102,7 +102,7 @@ public class SpellRisingCircles extends Spell {
 
 					for (Player p : PlayerUtils.playersInRange(mStartLoc, outerRadius, true)) {
 						if (!PlayerUtils.playersInRange(mStartLoc, innerRadius, true).contains(p)) {
-							BossUtils.bossDamagePercent(mBoss, p, DAMAGE, mStartLoc, "Sector Expunge");
+							BossUtils.bossDamagePercent(mBoss, p, DAMAGE, "Sector Expunge");
 							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "Sector Expunge", new PercentSpeed(2 * 20, -.99, "Rising Circles"));
 							MovementUtils.knockAway(mStartLoc, p, 0, .75f, false);
 						}

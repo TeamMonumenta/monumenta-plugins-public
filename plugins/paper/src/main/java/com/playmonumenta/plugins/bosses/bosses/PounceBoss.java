@@ -110,7 +110,7 @@ public final class PounceBoss extends BossAbilityGroup {
 				}
 
 				if (p.DAMAGE_PERCENT > 0.0) {
-					BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
+					BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT, boss.getLocation());
 				}
 				p.EFFECTS.apply(player, boss);
 
@@ -122,7 +122,7 @@ public final class PounceBoss extends BossAbilityGroup {
 				}
 
 				if (p.DAMAGE_PERCENT > 0.0) {
-					BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
+					BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT, boss.getLocation());
 				}
 				p.EFFECTS.apply(players, boss);
 			}

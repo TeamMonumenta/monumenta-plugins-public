@@ -62,7 +62,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
-	private Player mFuryTarget;
+	private @Nullable Player mFuryTarget = null;
 	private Location mCrystalLoc;
 	private boolean mShielded = true;
 
@@ -84,7 +84,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 		Collection<ArmorStand> nearbyStands = mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), detectionRange);
 		for (ArmorStand stand : nearbyStands) {
-			if (stand.getScoreboardTags() != null && stand.getScoreboardTags().contains(CRYSTAL_TAG)) {
+			if (stand.getScoreboardTags().contains(CRYSTAL_TAG)) {
 				mCrystalLoc = stand.getLocation().getBlock().getLocation();
 				break;
 			}
@@ -130,14 +130,14 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setGlowing(true);
 	}
 
 	@Override
 	public void nearbyBlockBreak(BlockBreakEvent event) {
-		if (mCrystalLoc != null && mCrystalLoc.equals(event.getBlock().getLocation())) {
+		if (mCrystalLoc != null && mFuryTarget == null && mCrystalLoc.equals(event.getBlock().getLocation())) {
 			mFuryTarget = event.getPlayer();
 			activateFury();
 		}
@@ -352,7 +352,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {
 						if (player.hasLineOfSight(tnt)) {
 							double multiplier = (8 - player.getLocation().distance(loc)) / 8;
-							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 32 * multiplier);
+							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 32 * multiplier, tnt.getLocation());
 							player.setFireTicks((int) (20 * 8 * multiplier));
 							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (20 * 8 * multiplier), player, mBoss);
 						}

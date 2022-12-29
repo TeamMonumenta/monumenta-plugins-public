@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 
 public class SpellPortalBullet extends SpellBullet {
 
-	private PortalBoss mPortalBoss;
+	private final PortalBoss mPortalBoss;
 
 	public SpellPortalBullet(Plugin plugin, LivingEntity boss, int cooldownTicks, PortalBoss portalBoss) {
 
@@ -35,9 +35,9 @@ public class SpellPortalBullet extends SpellBullet {
 				}
 			},
 			Material.GOLD_BLOCK,
-			(Player player, Location loc, boolean blocked) -> {
-				if (!blocked) {
-					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.PROJECTILE, 35, false, false, "Thunderstorm", null, 0, 0);
+			(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+				if (player != null && !blocked) {
+					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.PROJECTILE, 35, "Thunderstorm", prevLoc);
 					boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.5f, 0);
 				}
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);

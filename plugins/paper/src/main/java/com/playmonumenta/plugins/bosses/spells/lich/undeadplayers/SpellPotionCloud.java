@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -84,7 +83,7 @@ public class SpellPotionCloud extends Spell {
 					mExpH.location(loc).spawnAsEnemy();
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2f, 1f);
 					for (Player p : PlayerUtils.playersInRange(loc, 3, true)) {
-						BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 35, "Unstable Concoction", loc);
+						DamageUtils.damage(mBoss, p, DamageType.BLAST, 35, null, false, true, "Unstable Concoction");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 10, 2));
 						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 10, 0.25, "Lich");

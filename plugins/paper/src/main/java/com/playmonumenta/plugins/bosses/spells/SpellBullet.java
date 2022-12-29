@@ -31,6 +31,7 @@ public class SpellBullet extends Spell {
 		NUE("nue"),
 		SUWAKO("suwako"),
 		INVALID("invalid");
+
 		public final String mLabel;
 
 		Pattern(String label) {
@@ -59,7 +60,7 @@ public class SpellBullet extends Spell {
 
 	@FunctionalInterface
 	public interface IntersectAction {
-		void run(@Nullable Player player, Location loc, boolean blocked);
+		void run(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc);
 	}
 
 	private final Plugin mPlugin;
@@ -244,11 +245,12 @@ public class SpellBullet extends Spell {
 					mInnerVelocity = mVelocity;
 				}
 				for (int j = 0; j < 2; j++) {
+					Location prevLoc = mBox.getCenter().toLocation(mCaster.getWorld());
 					mBox.shift(mDir.clone().multiply(mInnerVelocity * 0.5));
 					Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(mBox)) {
-							mIntersectAction.run(player, loc, false);
+							mIntersectAction.run(player, loc, false, prevLoc);
 							bullet.remove();
 							this.cancel();
 							return;
@@ -257,13 +259,13 @@ public class SpellBullet extends Spell {
 					if (loc.getBlock().getType().isSolid() && !mPassThrough) {
 						bullet.remove();
 						this.cancel();
-						mIntersectAction.run(null, loc, true);
+						mIntersectAction.run(null, loc, true, prevLoc);
 					}
 				}
 				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 				mTicks++;
 				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET, 0));
-				if (mTicks >= mBulletDuration || mCaster == null || mCaster.isDead()) {
+				if (mTicks >= mBulletDuration || mCaster.isDead()) {
 					bullet.remove();
 					this.cancel();
 				}
@@ -303,11 +305,12 @@ public class SpellBullet extends Spell {
 					mInnerVelocity += 0.025;
 				}
 				for (int j = 0; j < 2; j++) {
+					Location prevLoc = mBox.getCenter().toLocation(mCaster.getWorld());
 					mBox.shift(mDir.clone().multiply(mInnerVelocity * 0.5));
 					Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(mBox)) {
-							mIntersectAction.run(player, loc, false);
+							mIntersectAction.run(player, loc, false, prevLoc);
 							bullet.remove();
 							this.cancel();
 							return;
@@ -316,13 +319,13 @@ public class SpellBullet extends Spell {
 					if (loc.getBlock().getType().isSolid() && !mPassThrough) {
 						bullet.remove();
 						this.cancel();
-						mIntersectAction.run(null, loc, true);
+						mIntersectAction.run(null, loc, true, prevLoc);
 					}
 				}
 				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 				mTicks++;
 				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET, 0));
-				if (mTicks + offsetTicks >= mBulletDuration || mCaster == null || mCaster.isDead()) {
+				if (mTicks + offsetTicks >= mBulletDuration || mCaster.isDead()) {
 					bullet.remove();
 					this.cancel();
 				}
@@ -361,11 +364,12 @@ public class SpellBullet extends Spell {
 			public void run() {
 				// Iterate two times and half the velocity so that way we can have more accurate travel for intersection.
 				for (int j = 0; j < 2; j++) {
+					Location prevLoc = mBox.getCenter().toLocation(mCaster.getWorld());
 					mBox.shift(dir.clone().multiply(mInnerVelocity * 0.5));
 					Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 					for (Player player : players) {
 						if (player.getBoundingBox().overlaps(mBox)) {
-							mIntersectAction.run(player, loc, false);
+							mIntersectAction.run(player, loc, false, prevLoc);
 							bullet.remove();
 							this.cancel();
 							return;
@@ -374,13 +378,13 @@ public class SpellBullet extends Spell {
 					if (loc.getBlock().getType().isSolid() && !mPassThrough) {
 						bullet.remove();
 						this.cancel();
-						mIntersectAction.run(null, loc, true);
+						mIntersectAction.run(null, loc, true, prevLoc);
 					}
 				}
 				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 				mTicks++;
 				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET, 0));
-				if (mTicks >= bulletDuration || mCaster == null || mCaster.isDead()) {
+				if (mTicks >= bulletDuration || mCaster.isDead()) {
 					bullet.remove();
 					this.cancel();
 				}
@@ -394,7 +398,7 @@ public class SpellBullet extends Spell {
 	/* If there are players in range of the attack, put it on cooldown. Otherwise, skip and move on*/
 	@Override
 	public int cooldownTicks() {
-		if (PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).size() > 0) {
+		if (!PlayerUtils.playersInRange(mCaster.getLocation(), mDetectRange, true).isEmpty()) {
 			if (mPattern == Pattern.SANAE) {
 				return mCooldown + mDuration + mDelay + mBulletDuration;
 			}

@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.EarthshakeBoss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -166,7 +167,7 @@ public class SpellEarthshake extends Spell {
 		// Damage and knock up players
 		for (Player p : PlayerUtils.playersInRange(loc, mParameters.RADIUS, true)) {
 			mParameters.SOUND_EXPLOSION_PLAYER.play(p.getLocation());
-			BossUtils.blockableDamage(mLauncher, p, DamageType.BLAST, mParameters.DAMAGE);
+			DamageUtils.damage(mLauncher, p, DamageType.BLAST, mParameters.DAMAGE);
 			double knockupSpeed = mParameters.KNOCK_UP_SPEED + (p.getLocation().distance(loc) <= mParameters.RADIUS / 2.0 ? 0.5 : 0);
 			p.setVelocity(p.getVelocity().add(new Vector(0.0, knockupSpeed, 0.0)));
 		}

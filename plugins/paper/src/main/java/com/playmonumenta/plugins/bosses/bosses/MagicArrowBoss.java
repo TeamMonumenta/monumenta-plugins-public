@@ -74,11 +74,11 @@ public class MagicArrowBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.CRIT_MAGIC, loc, 20, 0.2, 0.2, 0.2, 0.1).spawnAsEntityActive(boss);
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc) -> {
+				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
-						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE);
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);
 					}
 				})
 		));

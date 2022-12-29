@@ -242,7 +242,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 		}
 
 		if (mParams.DAMAGE_PERCENTAGE > 0.0) {
-			BossUtils.bossDamagePercent(mBoss, target, mParams.DAMAGE_PERCENTAGE, mParams.SPELL_NAME);
+			BossUtils.bossDamagePercent(mBoss, target, mParams.DAMAGE_PERCENTAGE, mBoss.getLocation(), mParams.SPELL_NAME);
 		}
 
 		mParams.EFFECTS.apply(target, mBoss);

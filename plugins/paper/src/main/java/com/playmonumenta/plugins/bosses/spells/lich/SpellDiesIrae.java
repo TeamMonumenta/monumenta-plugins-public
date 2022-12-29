@@ -265,7 +265,7 @@ public class SpellDiesIrae extends Spell {
 					List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 					players.removeIf(pl -> SpellDimensionDoor.getShadowed().contains(pl) || pl.getLocation().getY() >= mCenter.getY() + mCeiling);
 					for (Player p : players) {
-						BossUtils.bossDamagePercent(mBoss, p, mCrystalDmg, null, "Dies Irae");
+						BossUtils.bossDamagePercent(mBoss, p, mCrystalDmg, "Dies Irae");
 						AbilityUtils.increaseHealingPlayer(p, debuffTicks, -1.0, "Lich");
 						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.SLOW, debuffTicks, 0));
 						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.WEAKNESS, debuffTicks, 1));

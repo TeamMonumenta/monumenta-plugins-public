@@ -42,7 +42,7 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
 						if (player.hasLineOfSight(tnt)) {
 							double multiplier = (RADIUS - player.getLocation().distance(loc)) / RADIUS;
-							BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier);
+							BossUtils.blockableDamage(boss, player, DamageType.BLAST, POINT_BLANK_DAMAGE * multiplier, tnt.getLocation());
 						}
 					}
 				})

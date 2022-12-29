@@ -241,7 +241,7 @@ public class SpellCrystalBarrage extends Spell {
 
 		if (!mHitPlayers.contains(player)) {
 			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DIRECT_HIT_DAMAGE, null, false, false, SPELL_NAME);
-			BossUtils.bossDamagePercent(mBoss, player, 0.1, null, false, SPELL_NAME);
+			BossUtils.bossDamagePercent(mBoss, player, 0.1, SPELL_NAME);
 			mHitPlayers.add(player);
 		} else {
 			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 40, null, false, false, SPELL_NAME);

@@ -41,9 +41,9 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player player) {
+		if (event.getHitEntity() instanceof Player player) {
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
-				BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, mParams.DAMAGE);
+				BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, mParams.DAMAGE, event.getEntity().getLocation());
 			}
 		}
 	}

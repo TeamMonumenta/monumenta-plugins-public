@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgony;
 import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgonyDamage;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -88,7 +90,7 @@ public class RKitxet extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
-		mAgonyLocations = new ArrayList<Location>();
+		mAgonyLocations = new ArrayList<>();
 
 		mLastUsedSpell = null;
 		mSameSpellUsedTwice = false;
@@ -126,7 +128,7 @@ public class RKitxet extends BossAbilityGroup {
 						//Give 10 seconds at the beginning of the fight before actually damaging
 						if (mBoss.getTicksLived() >= 200) {
 							PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 30 * 20, 2));
-							BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location) null);
+							BossUtils.bossDamagePercent(mBoss, player, 0.1);
 						}
 					} else if (player.isInWaterOrBubbleColumn()) {
 						PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 25 * 20, 2));
@@ -139,20 +141,10 @@ public class RKitxet extends BossAbilityGroup {
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
 
-		//Music runnable
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!mBoss.isValid() || mBoss.isDead()) {
-					this.cancel();
-					return;
-				}
-				PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound epic:music.kaul record @s ~ ~ ~ 2");
-			}
-		}.runTaskTimer(mPlugin, 0, MUSIC_DURATION * 20);
-
 		//The SpellShardShield class stores the information about the shield and handles adding/removing the shield
 		mShieldSpell = new SpellShardShield(mBoss);
+
+		SpellMusic music = new SpellMusic(mBoss, "epic:music.kaul", MUSIC_DURATION * 20, 3 * 20, 0, detectionRange, detectionRange, false, 0);
 
 		//Only change between phase 1 and 2 is the cooldowns of the spells
 		SpellManager phase1Actives = new SpellManager(Arrays.asList(
@@ -173,34 +165,33 @@ public class RKitxet extends BossAbilityGroup {
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
 			new SpellShieldStun(10 * 20),
-			new SpellEndlessAgonyDamage(mBoss, this)
+			new SpellEndlessAgonyDamage(mBoss, this),
+			music
 		);
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellKaulsFury(mPlugin, mBoss, this, 7 * 20, 3 * 20, 10, 7 * 20),
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
 			new SpellShieldStun(10 * 20),
-			new SpellEndlessAgonyDamage(mBoss, this)
+			new SpellEndlessAgonyDamage(mBoss, this),
+			music
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(50, (mBoss) -> {
 
 			Collection<ArmorStand> nearbyStands = mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), detectionRange);
 			for (ArmorStand stand : nearbyStands) {
-				if (stand.getScoreboardTags() != null && stand.getScoreboardTags().contains(GOLEM_TAG)) {
+				if (stand.getScoreboardTags().contains(GOLEM_TAG)) {
 					Entity summon = LibraryOfSoulsIntegration.summon(stand.getLocation(), "DistortedHulk");
 					if (summon instanceof LivingEntity golem) {
 						golem.setPersistent(true);
 						golem.setAI(false);
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								if (golem.isValid() && !golem.isDead()) {
-									golem.setAI(true);
-								}
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+							if (golem.isValid() && !golem.isDead()) {
+								golem.setAI(true);
 							}
-						}.runTaskLater(mPlugin, 10);
+						}, 10);
 					}
 				}
 			}
@@ -232,7 +223,7 @@ public class RKitxet extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				String message = "";
+				String message;
 				if (mCount == 0) {
 					message = "You must leave...";
 				} else if (mCount == 1) {
@@ -283,7 +274,7 @@ public class RKitxet extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				String message = "";
+				String message;
 				if (mCount == 0) {
 					message = "Every shard taken brings it closer...";
 				} else if (mCount == 1) {

@@ -128,11 +128,7 @@ public final class NovaBoss extends BossAbilityGroup {
 						}
 
 						if (p.DAMAGE_PERCENTAGE > 0.0) {
-							if (p.CAN_BLOCK) {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-							} else {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME, false);
-							}
+							BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.CAN_BLOCK ? mBoss.getLocation() : null, p.SPELL_NAME);
 						}
 						p.EFFECTS.apply(target, mBoss);
 					}

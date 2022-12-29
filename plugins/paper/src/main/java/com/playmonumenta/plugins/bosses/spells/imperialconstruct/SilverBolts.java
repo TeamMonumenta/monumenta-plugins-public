@@ -127,11 +127,11 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.ELECTRIC_SPARK, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(boss);
 			},
 			// Hit Action
-			(World world, LivingEntity le, Location loc) -> {
+			(World world, LivingEntity le, Location loc, Location prevLoc) -> {
 				loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1, 0);
 				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsEntityActive(boss);
 				if (le instanceof Player player) {
-					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Silver Bolts", boss.getLocation());
+					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Silver Bolts", prevLoc);
 					cage(player);
 				}
 

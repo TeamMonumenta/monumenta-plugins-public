@@ -138,7 +138,7 @@ public class MarchingFate extends Spell {
 					if (distance < PROXIMITY) {
 						List<Player> players = PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true);
 						for (Player player : players) {
-							BossUtils.bossDamagePercent(mBoss, player, 0.5, null, "Crossed Fates");
+							BossUtils.bossDamagePercent(mBoss, player, 0.5, "Crossed Fates");
 						}
 
 						if (!mSentMessage) {

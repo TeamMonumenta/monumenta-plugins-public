@@ -101,11 +101,11 @@ public final class MimicQueen extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc) -> {
+				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
-						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, DAMAGE);
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, DAMAGE, prevLoc);
 					}
 				})
 		));

@@ -284,7 +284,7 @@ public class LavaCannonBoss extends BossAbilityGroup {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 5, 0.5f);
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5, 0.5f);
 			mHitMap.add(player);
-			BossUtils.bossDamagePercent(mBoss, player, 0.55, null, false, SPELL_NAME);
+			BossUtils.bossDamagePercent(mBoss, player, 0.55, SPELL_NAME);
 		}
 	}
 

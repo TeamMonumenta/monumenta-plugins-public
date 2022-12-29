@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -113,7 +112,7 @@ public class SpellVoidGrenades extends Spell {
 						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
-							BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 35, "Void Grenades", null);
+							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 35, null, false, true, "Void Grenades");
 						}
 
 						Location alternateHeight = loc.clone();

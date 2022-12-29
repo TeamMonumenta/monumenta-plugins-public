@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.shura;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
@@ -108,7 +108,7 @@ public class SpellShuraAS extends Spell {
 				@Override
 				public void run() {
 					mT++;
-					BossUtils.blockableDamage(mBoss, damagee, DamageEvent.DamageType.MAGIC, 10, "Advancing Shadows", null);
+					DamageUtils.damage(mBoss, damagee, DamageEvent.DamageType.MAGIC, 10, null, false, true, "Advancing Shadows");
 					if (mT >= 6) {
 						this.cancel();
 						damagee.removePotionEffect(PotionEffectType.WITHER);

@@ -63,10 +63,11 @@ public class SpellBaseBolt extends Spell {
 		 * User function called when the bolt hits/intersects with a player
 		 *
 		 * @param player  Player being targeted
-		 * @param loc     Location where the laser ends (either at player or occluding block)
+		 * @param loc     Location where the bolt ends (either at player or occluding block)
 		 * @param blocked Whether the laser is obstructed (true) or hits the player (false)
+		 * @param prevLoc Last Location the bolt was in (use to determine direction the player must be facing to shield)
 		 */
-		void run(@Nullable Player player, Location loc, boolean blocked);
+		void run(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc);
 	}
 
 	private final Plugin mPlugin;
@@ -135,7 +136,7 @@ public class SpellBaseBolt extends Spell {
 					mTicks++;
 					mTickAction.run(mCaster, mTicks);
 
-					if (mCaster == null || mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
+					if (mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
 						this.cancel();
 						return;
 					}
@@ -147,21 +148,15 @@ public class SpellBaseBolt extends Spell {
 						if (mPlayerFilter != null) {
 							players.removeIf(mPlayerFilter.negate());
 						}
-						if (players.size() > 0) {
+						if (!players.isEmpty()) {
 							if (mSingleTarget) {
-								if (mCaster instanceof Mob) {
-									Mob mob = (Mob) mCaster;
-									LivingEntity target = mob.getTarget();
-									if (target instanceof Player) {
-										launchBolt((Player) target);
-									} else {
-										Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
-										launchBolt(player);
-									}
+								Player player;
+								if (mCaster instanceof Mob mob && mob.getTarget() instanceof Player p) {
+									player = p;
 								} else {
-									Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
-									launchBolt(player);
+									player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 								}
+								launchBolt(player);
 							} else {
 								for (Player player : players) {
 									launchBolt(player);
@@ -198,11 +193,12 @@ public class SpellBaseBolt extends Spell {
 					public void run() {
 						// Iterate two times and half the velocity so that way we can have more accurate travel for intersection.
 						for (int j = 0; j < 2; j++) {
+							Location prevLoc = mBox.getCenter().toLocation(mCaster.getWorld());
 							mBox.shift(dir.clone().multiply(mVelocity * 0.5));
 							Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 							for (Player player : players) {
 								if (player.getBoundingBox().overlaps(mBox)) {
-									mIntersectAction.run(player, loc, false);
+									mIntersectAction.run(player, loc, false, prevLoc);
 									if (mStopOnFirstHit) {
 										this.cancel();
 										return;
@@ -212,14 +208,14 @@ public class SpellBaseBolt extends Spell {
 
 							if (loc.getBlock().getType().isSolid()) {
 								this.cancel();
-								mIntersectAction.run(null, loc, true);
+								mIntersectAction.run(null, loc, true, prevLoc);
 							}
 						}
 						Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
 						mInnerTicks++;
 						mParticleAction.run(loc);
 
-						if (mInnerTicks >= mDuration || mCaster == null || mCaster.isDead()) {
+						if (mInnerTicks >= mDuration || mCaster.isDead()) {
 							this.cancel();
 						}
 					}

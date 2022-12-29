@@ -36,10 +36,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 		/**
 		 * Called when the projectile intersects a player (or possibly a block)
 		 *
-		 * @param target Player being targeted (null if hit a block)
-		 * @param loc    Location where the projectile hit (either at player or block)
+		 * @param target  Player being targeted (null if hit a block)
+		 * @param loc     Location where the projectile hit (either at player or block)
+		 * @param prevLoc Last Location the projectile was in (use to determine direction the player must be facing to shield)
 		 */
-		void run(World world, @Nullable LivingEntity target, Location loc);
+		void run(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc);
 	}
 
 	private final Plugin mPlugin;
@@ -445,7 +446,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				Block block = mLocation.getBlock();
 				if (mCollidesWithBlocks && mCollisionDelayTicks <= 0) {
 					if (!block.isLiquid() && mHitbox.overlaps(block.getBoundingBox())) {
-						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)));
+						mHitAction.run(mWorld, null, mLocation.subtract(mDirection.multiply(0.5)), null);
 						this.cancel();
 						if (!mLingers) {
 							mActiveRunnables.remove(this);
@@ -463,6 +464,8 @@ public class SpellBaseSeekingProjectile extends Spell {
 						}
 					}
 				}
+
+				Location prevLoc = mLocation.clone();
 				mLocation.add(shift);
 				mHitbox.shift(shift);
 				mProjectileAesthetic.run(mWorld, mLocation, mTicks);
@@ -473,7 +476,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 						Collection<LivingEntity> entities = mLocation.getWorld().getNearbyEntitiesByType(LivingEntity.class, mLocation, mHitboxLength + 2);
 						for (LivingEntity entity : entities) {
 							if (mHitbox.overlaps(entity.getBoundingBox()) && !mBoss.equals(entity) && (mTarget.equals(entity) || mCollidesWithOthers)) {
-								mHitAction.run(mWorld, entity, mLocation);
+								mHitAction.run(mWorld, entity, mLocation, prevLoc);
 								this.cancel();
 								if (!mLingers) {
 									mActiveRunnables.remove(this);
@@ -486,7 +489,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 					for (Player player : PlayerUtils.playersInRange(mLocation, mHitboxLength + 2, true)) {
 						if (mHitbox.overlaps(player.getBoundingBox()) && (player.equals(mTarget) || !mCollidesWithOthers)) {
-							mHitAction.run(mWorld, player, mLocation);
+							mHitAction.run(mWorld, player, mLocation, prevLoc);
 							this.cancel();
 							if (!mLingers) {
 								mActiveRunnables.remove(this);

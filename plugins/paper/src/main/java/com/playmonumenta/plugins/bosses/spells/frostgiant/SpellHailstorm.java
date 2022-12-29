@@ -130,7 +130,7 @@ public class SpellHailstorm extends Spell {
 
 							if (pLocY.distanceSquared(loc) > mRadius * mRadius && mDoDamage) {
 								Vector vel = player.getVelocity();
-								BossUtils.bossDamagePercent(mBoss, player, 0.15, loc, "Hailstorm");
+								BossUtils.bossDamagePercent(mBoss, player, 0.15, "Hailstorm");
 								player.setVelocity(vel);
 								player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 0));
 							} else {

@@ -6,8 +6,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,7 +17,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class JollyBall extends SpellBaseSeekingProjectile {
 
@@ -32,11 +31,10 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 	private static final boolean LINGERS = true;
 	private static final double DAMAGE = 21;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private int mTimer;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final int mTimer;
 	private int mCooldown = 0;
-	private List<Player> mNoTarget = new ArrayList<>();
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(255, 20, 0), 1.0f);
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(75, 200, 0), 1.0f);
@@ -63,12 +61,12 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 				}
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				new PartialParticle(Particle.REDSTONE, loc, 30, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.REDSTONE, loc, 30, 0.5, 0.5, 0.5, 0.25, RED_COLOR).spawnAsEntityActive(boss);
 				if (player != null) {
-					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Jolly Ball", boss.getLocation());
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Jolly Ball", prevLoc);
 				}
 			});
 		mBoss = boss;
@@ -92,23 +90,16 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(mBoss);
 			}
 
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (players.size() > 0) {
-						if (players.size() > 1) {
-							Player playerTwo = players.get(players.size() - 2);
-							if (!mNoTarget.contains(playerTwo)) {
-								launch(playerTwo, playerTwo.getEyeLocation());
-							}
-						}
-						Player playerOne = players.get(players.size() - 1);
-						if (!mNoTarget.contains(playerOne)) {
-							launch(playerOne, playerOne.getEyeLocation());
-						}
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				if (!players.isEmpty()) {
+					if (players.size() > 1) {
+						Player playerTwo = players.get(players.size() - 2);
+						launch(playerTwo, playerTwo.getEyeLocation());
 					}
+					Player playerOne = players.get(players.size() - 1);
+					launch(playerOne, playerOne.getEyeLocation());
 				}
-			}.runTaskLater(mPlugin, 20);
+			}, 20);
 		}
 	}
 

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
@@ -92,7 +93,7 @@ public class BlackflameCharge extends SpellBaseCharge {
 							if (mHitbox.overlaps(player.getBoundingBox())) {
 								world.playSound(mParticleLoc, Sound.ENTITY_BLAZE_HURT, 0.5f, 0f);
 								EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), FIRE_DURATION, player, boss);
-								BossUtils.blockableDamage(boss, player, DamageType.MAGIC, GROUND_DAMAGE, "Blackflame Charge", null);
+								DamageUtils.damage(boss, player, DamageType.MAGIC, GROUND_DAMAGE, null, false, true, "Blackflame Charge");
 							}
 						}
 

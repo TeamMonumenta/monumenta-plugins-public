@@ -70,7 +70,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {
 						if (player.hasLineOfSight(tnt)) {
 							double multiplier = (p.RADIUS - player.getLocation().distance(loc)) / p.RADIUS;
-							BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier, p.SPELL_NAME, boss.getLocation());
+							BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE * multiplier, p.SPELL_NAME, tnt.getLocation());
 							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), (int) (p.FIRE_DURATION * multiplier), player, mBoss);
 						}
 					}

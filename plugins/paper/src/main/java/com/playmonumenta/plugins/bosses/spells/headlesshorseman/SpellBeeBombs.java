@@ -25,12 +25,12 @@ public class SpellBeeBombs extends Spell {
 
 	private static final int DAMAGE = 40;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private int mRange;
-	private int mCount;
-	private int mCooldownTicks = 0;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final int mRange;
+	private final int mCount;
+	private final int mCooldownTicks;
 
 	public SpellBeeBombs(Plugin plugin, LivingEntity entity, int cooldown, Location center, int count, int range) {
 		mPlugin = plugin;
@@ -41,7 +41,7 @@ public class SpellBeeBombs extends Spell {
 		mRange = range;
 	}
 
-	public void spawnBat(Location loc) {
+	public void spawnBee(Location loc) {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -54,7 +54,7 @@ public class SpellBeeBombs extends Spell {
 					this.cancel();
 					new PartialParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125).spawnAsEntityActive(mBoss);
 
-					LivingEntity bat = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ExplosiveDrone");
+					LivingEntity bee = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ExplosiveDrone");
 					new BukkitRunnable() {
 						int mTicks = 0;
 
@@ -62,13 +62,13 @@ public class SpellBeeBombs extends Spell {
 						public void run() {
 							mTicks++;
 							if (mTicks % 2 == 0) {
-								new PartialParticle(Particle.FLAME, bat.getLocation(), 1, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
-								new PartialParticle(Particle.SMOKE_NORMAL, bat.getLocation(), 2, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.FLAME, bee.getLocation(), 1, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.SMOKE_NORMAL, bee.getLocation(), 2, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
 							}
 							if (mTicks >= 20 * 6) {
-								bat.remove();
+								bee.remove();
 								this.cancel();
-								Location loc = bat.getLocation();
+								Location loc = bee.getLocation();
 								new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
@@ -103,7 +103,7 @@ public class SpellBeeBombs extends Spell {
 				mCenter.getY() + FastUtils.randomDoubleInRange(1, 3),
 				mCenter.getZ() + FastUtils.randomDoubleInRange(-15, 15)
 			);
-			spawnBat(loc);
+			spawnBee(loc);
 		}
 
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 3, 1.1f);

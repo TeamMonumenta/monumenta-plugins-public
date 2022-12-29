@@ -148,7 +148,7 @@ public class SpellHellzoneGrenade extends Spell {
 									for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
 										if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.arenaSize && LocationUtils.hasLineOfSight(mBoss, player)) {
 											/* Fire aura can not be blocked */
-											BossUtils.bossDamagePercent(mBoss, player, 0.1, (Location) null, "Hellzone Grenades");
+											BossUtils.bossDamagePercent(mBoss, player, 0.1, "Hellzone Grenades");
 											EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 3, player, mBoss);
 										}
 									}

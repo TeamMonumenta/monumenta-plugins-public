@@ -24,10 +24,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class LapseOfReality extends Spell {
 
-	private SpellBaseSeekingProjectile mMissile;
+	private final SpellBaseSeekingProjectile mMissile;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
 
 	//How fast the bullets shoot
 	private int mDelay = 2;
@@ -67,12 +67,12 @@ public class LapseOfReality extends Spell {
 				new PartialParticle(Particle.SPELL_WITCH, loc, 2, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 				if (player != null) {
-					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Lapse of Reality", mBoss.getLocation());
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Lapse of Reality", prevLoc);
 				}
 			});
 	}

@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -209,21 +209,12 @@ public class SpellMultiEarthshake extends Spell {
 						//Knock up player
 						for (Player p : PlayerUtils.playersInRange(loc, mRadius * 2, true)) {
 							mWorld.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
-							if (p.getLocation().distance(loc) <= mRadius) {
-								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.5, 0.0)));
-								if (mDelve) {
-									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 45, "Earthshake", mBoss.getLocation());
-								} else {
-									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 40, "Earthshake", mBoss.getLocation());
-								}
-							} else {
-								p.setVelocity(p.getVelocity().add(new Vector(0.0, 1.0, 0.0)));
-								if (mDelve) {
-									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 45, "Earthshake", mBoss.getLocation());
-								} else {
-									BossUtils.blockableDamage(mBoss, p, DamageType.BLAST, 40, "Earthshake", mBoss.getLocation());
-								}
-							}
+
+							double yVelocity = p.getLocation().distance(loc) <= mRadius ? 1.5 : 1;
+							p.setVelocity(p.getVelocity().add(new Vector(0.0, yVelocity, 0.0)));
+
+							double damage = mDelve ? 45 : 40;
+							DamageUtils.damage(mBoss, p, DamageType.BLAST, damage, null, false, true, "Earthshake");
 						}
 						//Knock up other mobs because it's fun
 						List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mRadius * 2);
@@ -263,12 +254,7 @@ public class SpellMultiEarthshake extends Spell {
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		mNoTarget.add(event.getEntity());
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mNoTarget.remove(event.getEntity());
-			}
-		}.runTaskLater(mPlugin, 20 * 60);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mNoTarget.remove(event.getEntity()), 20 * 60);
 	}
 
 	@Override

@@ -107,8 +107,8 @@ public class SpellVolcanicDeepmise extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();
 						if (pBox.overlaps(box)) {
-							BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Deepmise", mLoc);
-							if (!BossUtils.bossDamageBlocked(player, mLoc)) {
+							boolean didDamage = BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Deepmise", mLoc);
+							if (didDamage) {
 								MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f, false);
 							}
 						}

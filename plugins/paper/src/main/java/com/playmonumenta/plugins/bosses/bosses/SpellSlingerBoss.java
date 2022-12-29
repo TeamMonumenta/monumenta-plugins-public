@@ -58,11 +58,11 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.END_ROD, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 				},
 				// Hit Action
-				(World world, LivingEntity player, Location loc) -> {
+				(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (player != null) {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE);
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, prevLoc);
 						MovementUtils.knockAway(boss, player, KNOCKBACK_SPEED, false);
 					}
 				})

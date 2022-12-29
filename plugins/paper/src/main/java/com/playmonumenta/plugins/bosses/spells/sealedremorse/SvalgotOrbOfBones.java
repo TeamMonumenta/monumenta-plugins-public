@@ -5,12 +5,12 @@ import com.playmonumenta.plugins.bosses.bosses.Svalgot;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -22,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
 public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
@@ -70,8 +69,8 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.CLOUD, loc, 6, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
-				world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 				new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(boss);
@@ -94,14 +93,7 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 	@Override
 	public <V extends LivingEntity> void launch(V target, Location targetLoc) {
 		mOnCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mOnCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, 20 * 15);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, 20 * 15);
 
 		//List is farthest players in the beginning, and nearest players at the end
 		List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), BeastOfTheBlackFlame.detectionRange);
@@ -122,17 +114,16 @@ public class SvalgotOrbOfBones extends SpellBaseSeekingProjectile {
 
 	@Override
 	protected void onEndAction(Location projLoc, BoundingBox projHitbox) {
-		Location loc = projLoc;
 		World world = mBoss.getWorld();
 
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
-		new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(mBoss);
-		new PartialParticle(Particle.REDSTONE, loc, 40, 0.5, 0.5, 0.5, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f)).spawnAsEntityActive(mBoss);
+		world.playSound(projLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
+		new PartialParticle(Particle.FLAME, projLoc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, projLoc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.CLOUD, projLoc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(mBoss);
+		new PartialParticle(Particle.REDSTONE, projLoc, 40, 0.5, 0.5, 0.5, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f)).spawnAsEntityActive(mBoss);
 
-		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
-			BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, DAMAGE, "Orb of Bones", null);
+		for (Player p : PlayerUtils.playersInRange(projLoc, 6, true)) {
+			DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, false, true, "Orb of Bones");
 			EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, mBoss);
 		}
 	}

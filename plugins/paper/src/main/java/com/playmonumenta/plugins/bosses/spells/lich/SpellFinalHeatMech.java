@@ -159,7 +159,7 @@ public class SpellFinalHeatMech extends Spell {
 			List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 			for (Player p : players) {
 				if (p.getBoundingBox().overlaps(box)) {
-					BossUtils.bossDamagePercent(mBoss, p, 0.5, null, "Malakut's Dynamo");
+					BossUtils.bossDamagePercent(mBoss, p, 0.5, "Malakut's Dynamo");
 					AbilityUtils.increaseHealingPlayer(p, 20 * 30, -0.85, "Lich");
 					MovementUtils.knockAway(mBoss, p, 0.5f, false);
 					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 5 * 20, p, mBoss);

@@ -101,11 +101,12 @@ public class StarfallBoss extends BossAbilityGroup {
 												for (LivingEntity target : p.TARGETS_EXPLOSION.getTargetsListByLocation(mBoss, meteorCenter)) {
 
 													if (p.DAMAGE > 0) {
-														BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+														// Must be looking up to block
+														BossUtils.blockableDamage(mBoss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, meteorCenter);
 													}
 
 													if (p.DAMAGE_PERCENTAGE > 0.0) {
-														BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+														BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, meteorCenter, p.SPELL_NAME);
 													}
 													p.EFFECTS.apply(target, mBoss);
 												}

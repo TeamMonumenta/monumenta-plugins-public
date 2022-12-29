@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseGrenadeLauncher;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -150,7 +151,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
 					}
 
 					p.EFFECTS.apply(target, boss);
@@ -168,22 +169,14 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 					p.PARTICLE_LINGERING_CENTER.spawn(boss, loc, p.EXPLOSION_TARGET.getRange() / 3, 0.2, p.EXPLOSION_TARGET.getRange() / 3, 0.5);
 				},
 				(LivingEntity bosss, LivingEntity target, Location loc) -> {
+					String spellName = p.SPELL_NAME.isEmpty() ? null : p.SPELL_NAME;
 					//hit ring actions
 					if (p.LINGERING_DAMAGE > 0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							//TODO maybe not blockable? not going to worry about it right now
-							BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE);
-						} else {
-							BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE, p.SPELL_NAME, loc);
-						}
+						DamageUtils.damage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE, null, false, false, spellName);
 					}
 
 					if (p.LINGERING_DAMAGE_PERCENTAGE > 0.0) {
-						if (p.SPELL_NAME.isEmpty()) {
-							BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE);
-						} else {
-							BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, p.SPELL_NAME);
-						}
+						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, spellName);
 					}
 
 					p.LINGERING_EFFECTS.apply(target, boss);

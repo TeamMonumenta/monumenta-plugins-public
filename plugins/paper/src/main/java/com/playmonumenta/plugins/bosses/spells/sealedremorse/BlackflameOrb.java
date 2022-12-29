@@ -26,9 +26,9 @@ import org.bukkit.util.BoundingBox;
 
 public class BlackflameOrb extends SpellBaseSeekingProjectile {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private BeastOfTheBlackFlame mBossClass;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final BeastOfTheBlackFlame mBossClass;
 
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = true;
@@ -68,7 +68,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 6, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 				new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
@@ -133,7 +133,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(mBoss);
 
 		for (Player p : PlayerUtils.playersInRange(loc, 6, true)) {
-			BossUtils.bossDamagePercent(mBoss, p, 0.7, null, "Blackflame Orb");
+			BossUtils.bossDamagePercent(mBoss, p, 0.7, "Blackflame Orb");
 			EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, p, mBoss);
 		}
 	}

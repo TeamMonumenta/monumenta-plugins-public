@@ -27,11 +27,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class BlackflameBurst extends Spell {
 
-	private SpellBaseSeekingProjectile mMissile;
+	private final SpellBaseSeekingProjectile mMissile;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private BeastOfTheBlackFlame mBossClass;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final BeastOfTheBlackFlame mBossClass;
 
 	private static final boolean SINGLE_TARGET = true;
 	private static final boolean LAUNCH_TRACKING = false;
@@ -73,11 +73,11 @@ public class BlackflameBurst extends Spell {
 				new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(mBoss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 				loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
 				if (player != null) {
-					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Blackflame Burst", mBoss.getLocation());
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Blackflame Burst", prevLoc);
 					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 4 * 20, player, boss);
 				}
 			});

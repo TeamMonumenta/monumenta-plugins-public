@@ -67,7 +67,7 @@ public class VoidWalkerTowerAbility extends TowerAbility {
 				world.spawnParticle(Particle.CLOUD, loc, 6, 0.5, 0.5, 0.5, 0);
 			},
 			// Hit Action
-			(World world, LivingEntity target, Location loc) -> {
+			(World world, LivingEntity target, Location loc, Location prevLoc) -> {
 				world.spawnParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5);
 				world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5);
 				world.spawnParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5);

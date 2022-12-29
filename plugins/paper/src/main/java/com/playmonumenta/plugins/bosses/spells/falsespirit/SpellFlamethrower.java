@@ -172,14 +172,11 @@ public class SpellFlamethrower extends Spell {
 
 								if (mT % 10 == 0) {
 									//Do damage here
+									double percentDamage = mDelve ? 0.25 : 0.2;
 									for (Player player : players) {
 										if (box.overlaps(player.getBoundingBox()) && !mHitPlayers.contains(player)) {
 											endLoc.getWorld().playSound(endLoc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 1);
-											if (mDelve) {
-												BossUtils.bossDamagePercent(mBoss, player, 0.25, "Flamethrower");
-											} else {
-												BossUtils.bossDamagePercent(mBoss, player, 0.2, "Flamethrower");
-											}
+											BossUtils.bossDamagePercent(mBoss, player, percentDamage, "Flamethrower");
 											mHitPlayers.add(player);
 										}
 									}

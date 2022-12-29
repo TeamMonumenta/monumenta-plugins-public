@@ -167,7 +167,7 @@ public class SpellSoulShackle extends Spell {
 					if (pGroundLoc.distance(pCheckLoc) > 3) {
 						p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
 						world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
-						BossUtils.bossDamagePercent(mBoss, p, 0.15, null, "Soul Shackle");
+						BossUtils.bossDamagePercent(mBoss, p, 0.15, "Soul Shackle");
 						MovementUtils.knockAway(pCheckLoc, p, -0.75f, false);
 					}
 

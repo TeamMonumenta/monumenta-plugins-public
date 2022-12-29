@@ -7,12 +7,12 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,14 +33,14 @@ public class SpellAirGolemStrike extends Spell {
 
 	private static final String GOLEM_NAME = "PermafrostConstruct";
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mStartLoc;
 
 	private boolean mSpellCooldown = false;
 	private boolean mCooldown = false;
 
-	private double mAttackDamage = 35;
+	private final double mAttackDamage = 35;
 
 	public SpellAirGolemStrike(Plugin plugin, LivingEntity boss, Location loc) {
 		mPlugin = plugin;
@@ -51,14 +51,7 @@ public class SpellAirGolemStrike extends Spell {
 	@Override
 	public void run() {
 		mSpellCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mSpellCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, 20 * 24);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mSpellCooldown = false, 20 * 24);
 
 		int count = 0;
 		//List is farthest players in the beginning, and nearest players at the end
@@ -80,7 +73,7 @@ public class SpellAirGolemStrike extends Spell {
 			return;
 		}
 
-		List<Player> targets = new ArrayList<Player>();
+		List<Player> targets = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			targets.add(players.get(i));
 		}
@@ -90,12 +83,11 @@ public class SpellAirGolemStrike extends Spell {
 
 	}
 
-	private void spawnGolems(Location target, List<Player> players) {
-		Location loc = target;
+	private void spawnGolems(Location loc, List<Player> players) {
 		World world = mBoss.getWorld();
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0);
 		//If in air, subtract 1 y value until the block is not air
-		if (target.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+		if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
 			while (loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
 				loc.add(0, -1, 0);
 			}
@@ -142,7 +134,7 @@ public class SpellAirGolemStrike extends Spell {
 					BoundingBox box = BoundingBox.of(loc, 1, 20, 1);
 					for (Player player : players) {
 						if (box.overlaps(player.getBoundingBox())) {
-							BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 45, "Air Golem Strike", mBoss.getLocation());
+							DamageUtils.damage(mBoss, player, DamageType.MELEE, 45, null, false, true, "Air Golem Strike");
 						}
 					}
 					Location particleLoc = loc.clone();
@@ -155,12 +147,7 @@ public class SpellAirGolemStrike extends Spell {
 
 					golem.teleport(loc);
 
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							setGolemAttack(golem);
-						}
-					}.runTaskLater(mPlugin, 30);
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> setGolemAttack(golem), 30);
 
 					this.cancel();
 				}
@@ -198,14 +185,8 @@ public class SpellAirGolemStrike extends Spell {
 
 					if (target.getBoundingBox().overlaps(golem.getBoundingBox().expand(0.4, 0, 0.4)) && !mCooldown && effect == null) {
 						mCooldown = true;
-						new BukkitRunnable() {
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 30);
 
-							@Override
-							public void run() {
-								mCooldown = false;
-							}
-
-						}.runTaskLater(mPlugin, 30);
 						if (target instanceof Player player) {
 							DamageUtils.damage(golem, player, DamageType.MELEE, mAttackDamage, null, false, true, "Air Golem Strike");
 						} else {

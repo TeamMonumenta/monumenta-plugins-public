@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -18,7 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 
@@ -32,11 +32,11 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private int mTimer;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final int mTimer;
 	private int mCooldown = 0;
-	private List<Player> mNoTarget = new ArrayList<>();
+	private final List<Player> mNoTarget = new ArrayList<>();
 
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.0f);
 
@@ -61,15 +61,12 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 				}
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				new PartialParticle(Particle.REDSTONE, loc, 50, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR).spawnAsEntityActive(boss);
 				if (player != null) {
-					if (delve) {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 30, "Nothingness Seeker", boss.getLocation());
-					} else {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 25, "Nothingness Seeker", boss.getLocation());
-					}
+					double damage = delve ? 30 : 25;
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, damage, "Nothingness Seeker", prevLoc);
 				}
 			});
 		mBoss = boss;
@@ -93,23 +90,20 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(mBoss);
 			}
 
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (players.size() > 0) {
-						if (players.size() > 1) {
-							Player playerTwo = players.get(players.size() - 2);
-							if (!mNoTarget.contains(playerTwo)) {
-								launch(playerTwo, playerTwo.getEyeLocation());
-							}
-						}
-						Player playerOne = players.get(players.size() - 1);
-						if (!mNoTarget.contains(playerOne)) {
-							launch(playerOne, playerOne.getEyeLocation());
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				if (!players.isEmpty()) {
+					if (players.size() > 1) {
+						Player playerTwo = players.get(players.size() - 2);
+						if (!mNoTarget.contains(playerTwo)) {
+							launch(playerTwo, playerTwo.getEyeLocation());
 						}
 					}
+					Player playerOne = players.get(players.size() - 1);
+					if (!mNoTarget.contains(playerOne)) {
+						launch(playerOne, playerOne.getEyeLocation());
+					}
 				}
-			}.runTaskLater(mPlugin, 20);
+			}, 20);
 		}
 	}
 
@@ -123,12 +117,7 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 		//If player dies, no targetting for 60 seconds
 		if (damagee instanceof Player player && event.getFinalDamage(true) > player.getHealth()) {
 			mNoTarget.add(player);
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mNoTarget.remove(player);
-				}
-			}.runTaskLater(mPlugin, 20 * 60);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mNoTarget.remove(player), 20 * 60);
 		}
 	}
 }

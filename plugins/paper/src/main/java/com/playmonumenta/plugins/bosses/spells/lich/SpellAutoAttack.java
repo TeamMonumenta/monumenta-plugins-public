@@ -260,41 +260,30 @@ public class SpellAutoAttack extends Spell {
 	}
 
 	private void damage(Player player, boolean melee) {
-		//TODO replace melee with this after dual type damage is fixed
-		/*
-		if (mPhase == 1) {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 20, 0.75, "Death Sweep", mBoss.getLocation());
-			} else if (mPhase == 2) {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 23, 0.75, "Death Sweep", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			} else if (mPhase == 3) {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 26, 0.75, "Death Sweep", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-			} else {
-				BossUtils.dualTypeBlockableDamage(mBoss, player, DamageType.MAGIC, DamageType.MELEE, 29, 0.75, "Death Sweep", mBoss.getLocation());
-				AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-				AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
-			}
-		 */
 		String cause = "Death Bolt";
 		if (melee) {
 			cause = "Death Sweep";
 		}
+		double damage;
+		double damageReceived = 0;
+		double damageDealt = 0;
 		if (mPhase == 1) {
-			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 21, cause, mBoss.getLocation());
+			damage = 21;
 		} else if (mPhase == 2) {
-			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 24, cause, mBoss.getLocation());
-			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
+			damage = 24;
+			damageReceived = 0.2;
 		} else if (mPhase == 3) {
-			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 27, cause, mBoss.getLocation());
-			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			damage = 27;
+			damageReceived = 0.2;
+			damageDealt = -0.2;
 		} else {
-			BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, 30, cause, mBoss.getLocation());
-			AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, 0.2, "Lich");
-			AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, -0.2, "Lich");
+			damage = 30;
+			damageReceived = 0.2;
+			damageDealt = -0.2;
 		}
+		BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, damage, cause, mBoss.getLocation());
+		AbilityUtils.increaseDamageRecievedPlayer(player, 20 * 5, damageReceived, "Lich");
+		AbilityUtils.increaseDamageDealtPlayer(player, 20 * 5, damageDealt, "Lich");
 	}
 
 	@Override

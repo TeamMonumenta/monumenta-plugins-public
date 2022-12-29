@@ -120,9 +120,9 @@ public final class TCalin extends BossAbilityGroup {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.2, 0.2, 0.2, 0.125).spawnAsEntityActive(boss);
 			},
 
-			(Player player, Location loc, boolean blocked) -> {
+			(Player player, Location loc, boolean blocked, Location prevLoc) -> {
 				if (!blocked && player != null) {
-					BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 12);
+					BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 12, prevLoc);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, 1));
 				}
 				new PartialParticle(Particle.BLOCK_CRACK, loc, 125, 0.35, 0.35, 0.35, 1,

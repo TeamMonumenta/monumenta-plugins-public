@@ -73,11 +73,11 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity player, Location loc) -> {
+				(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 					world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
 					new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (player != null) {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE);
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, prevLoc);
 					}
 				})
 		));

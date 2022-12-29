@@ -336,7 +336,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		void launch(LivingEntity boss, LivingEntity target, Location location);
 	}
 
-
 	//Lingering stuff
 	@FunctionalInterface
 	public interface LingeringRingAesthetics {

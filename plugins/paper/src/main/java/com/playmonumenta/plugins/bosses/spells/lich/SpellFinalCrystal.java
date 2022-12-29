@@ -228,7 +228,7 @@ public class SpellFinalCrystal extends Spell {
 										for (Player player : Lich.playersInRange(block.getLocation(), 4, true)) {
 											if (mCenter.distance(player.getLocation()) < mRange) {
 												/* Fire aura can not be blocked */
-												BossUtils.bossDamagePercent(mBoss, player, 0.15, (Location) null, "Souldrain Pool");
+												BossUtils.bossDamagePercent(mBoss, player, 0.15, "Souldrain Pool");
 												AbilityUtils.increaseDamageDealtPlayer(player, 20 * 8, -0.3, "Lich");
 											}
 										}

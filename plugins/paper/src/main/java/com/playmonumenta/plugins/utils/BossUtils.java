@@ -59,31 +59,32 @@ public class BossUtils {
 		return false;
 	}
 
-	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage) {
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage) {
 		Location location = null;
 		if (damager != null) {
 			location = damager.getLocation();
 		}
-		blockableDamage(damager, damagee, type, damage, null, location);
+		return blockableDamage(damager, damagee, type, damage, null, location);
 	}
 
-	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable Location location) {
-		blockableDamage(damager, damagee, type, damage, null, location);
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable Location location) {
+		return blockableDamage(damager, damagee, type, damage, null, location);
 	}
 
-	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location) {
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location) {
 		// One second of cooldown for every 2.5 points of damage
-		blockableDamage(damager, damagee, type, damage, cause, location, (int) (20 * damage / 2.5));
+		return blockableDamage(damager, damagee, type, damage, cause, location, (int) (20 * damage / 2.5));
 	}
 
-	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks) {
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, @Nullable String cause, @Nullable Location location, int stunTicks) {
 		// One shield durability damage for every 5 points of damage
-		blockableDamage(damager, damagee, type, damage, false, true, cause, location, stunTicks, (int) (damage / 5));
+		return blockableDamage(damager, damagee, type, damage, false, true, cause, location, stunTicks, (int) (damage / 5));
 	}
 
-	public static void blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
+	//Returns whether the attack was blocked or otherwise completely negated (true = not blocked)
+	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
 		if (DamageUtils.isImmuneToDamage(damagee)) {
-			return;
+			return false;
 		}
 
 		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
@@ -92,44 +93,15 @@ public class BossUtils {
 				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 			ItemUtils.damageShield(player, durability);
+			return false;
 		} else {
 			DamageUtils.damage(damager, damagee, new DamageEvent.Metadata(type, null, null, cause), damage, bypassIFrames, causeKnockback, false);
 			if (damagee instanceof Player player && Shielding.doesShieldingApply(player, damager) && damage > 0) {
 				Shielding.disable(player);
 			}
+			return true;
 		}
 	}
-
-	/*
-	TODO - fix dualTypeDamage not working
-	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1) {
-		Location location = null;
-		if (damager != null) {
-			location = damager.getLocation();
-		}
-		dualTypeBlockableDamage(damager, damagee, type1, type2, damage, percentType1, null, location);
-	}
-
-	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1, @Nullable String cause, @Nullable Location location) {
-		dualTypeBlockableDamage(damager, damagee, type1, type2, damage, percentType1, false, true, cause, location, (int) (20 * damage / 2.5), (int) (damage / 5));
-	}
-
-	public static void dualTypeBlockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type1, DamageType type2, double damage, double percentType1, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
-		// If they have resistance 5 or are in stasis, do not deal damage or stun shield
-		if ((damagee.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE) && damagee.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE).getAmplifier() >= 4) || StasisListener.isInStasis(damagee)) {
-			return;
-		}
-
-		if (damagee instanceof Player player && bossDamageBlocked(player, location)) {
-			if (stunTicks > 0) {
-				NmsUtils.getVersionAdapter().stunShield(player, stunTicks);
-				damagee.getWorld().playSound(damagee.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			}
-			ItemUtils.damageShield(player, durability);
-		} else {
-			DamageUtils.dualTypeDamage(damager, damagee, type1, type2, damage, percentType1, null, bypassIFrames, causeKnockback, cause);
-		}
-	}*/
 
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, null);
@@ -147,22 +119,14 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, String cause, boolean canBlock) {
-		return bossDamagePercent(boss, target, percentHealth, null, false, canBlock, cause);
-	}
-
 	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, location, false, cause);
-	}
-
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
-		return bossDamagePercent(boss, target, percentHealth, location, raw, true, cause);
 	}
 
 	/*
 	 * Returns whether or not the player survived (true) or was killed (false)
 	 */
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, boolean canBlock, @Nullable String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable Location location, boolean raw, @Nullable String cause) {
 		if (percentHealth <= 0) {
 			return true;
 		}
@@ -173,7 +137,7 @@ public class BossUtils {
 
 		double toTake = raw ? percentHealth : EntityUtils.getMaxHealth(target) * percentHealth;
 
-		if (target instanceof Player player && canBlock && bossDamageBlocked(player, location)) {
+		if (target instanceof Player player && bossDamageBlocked(player, location)) {
 			/*
 			 * One second of cooldown for every 2 points of damage
 			 * Since this is % based, compute cooldown based on "Normal" health

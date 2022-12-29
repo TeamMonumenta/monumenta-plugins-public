@@ -27,7 +27,6 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -67,7 +66,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -1094,30 +1092,26 @@ public final class Lich extends BossAbilityGroup {
 							}
 							new PartialParticle(Particle.VILLAGER_ANGRY, pLoc, 1, 0, 0, 0, 0).spawnAsBoss();
 						}
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								// 10 ticks + final check
-								Vector vector = LocationUtils.getDirectionTo(newloc, loc);
-								for (int i = 0; i < 32; i++) {
-									Location pLoc = mBoss.getEyeLocation();
-									pLoc.add(vector.multiply(i / 2));
-									if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
-										break;
-									}
-									BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
-									for (Player p : playersInRange(mBoss.getLocation(), detectionRange, true)) {
-										if (p.getBoundingBox().overlaps(box)) {
-											BossUtils.blockableDamage(mBoss, p, DamageType.MAGIC, 20);
-										}
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+							// 10 ticks + final check
+							Vector vector = LocationUtils.getDirectionTo(newloc, loc);
+							for (int i = 0; i < 32; i++) {
+								Location pLoc = mBoss.getEyeLocation();
+								pLoc.add(vector.multiply(i / 2));
+								if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
+									break;
+								}
+								BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
+								for (Player p : playersInRange(mBoss.getLocation(), detectionRange, true)) {
+									if (p.getBoundingBox().overlaps(box)) {
+										BossUtils.blockableDamage(mBoss, p, DamageEvent.DamageType.MAGIC, 20);
 									}
 								}
-								world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-								world.playSound(newloc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-								mBoss.teleport(newloc);
-								this.cancel();
 							}
-						}.runTaskLater(mPlugin, 10);
+							world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
+							world.playSound(newloc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
+							mBoss.teleport(newloc);
+						}, 10);
 					}
 				}
 			}
@@ -1133,30 +1127,21 @@ public final class Lich extends BossAbilityGroup {
 		String c = AbilityUtils.getClass(player);
 
 		// set spawn nbt
-		if (c.equals("Mage")) {
-			summonNbt = "MageUndead";
-		} else if (c.equals("Warlock")) {
-			summonNbt = "WarlockUndead";
-		} else if (c.equals("Alchemist")) {
-			summonNbt = "AlchUndead";
-		} else if (c.equals("Cleric")) {
-			summonNbt = "ClericUndead";
-		} else if (c.equals("Warrior")) {
-			summonNbt = "WarriorUndead";
-		} else if (c.equals("Rogue")) {
-			summonNbt = "RogueUndead";
-		} else if (c.equals("Scout")) {
-			summonNbt = "ScoutUndead";
-		} else {
-			summonNbt = "AdventurerUndead";
-		}
+		summonNbt = switch (c) {
+			case "Mage" -> "MageUndead";
+			case "Warlock" -> "WarlockUndead";
+			case "Alchemist" -> "AlchUndead";
+			case "Cleric" -> "ClericUndead";
+			case "Warrior" -> "WarriorUndead";
+			case "Rogue" -> "RogueUndead";
+			case "Scout" -> "ScoutUndead";
+			default -> "AdventurerUndead";
+		};
 
 		// summon undead + get undead
 		LivingEntity undead = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, summonNbt);
 
-		if (!mSummoned.contains(undead.getUniqueId())) {
-			mSummoned.add(undead.getUniqueId());
-		}
+		mSummoned.add(undead.getUniqueId());
 
 		if (summonNbt.equals("AdventurerUndead")) {
 			undead.setCustomName(ChatColor.WHITE + player.getName());
@@ -1200,44 +1185,18 @@ public final class Lich extends BossAbilityGroup {
 				meta.lore(Collections.emptyList());
 			}
 			if (meta.hasEnchants()) {
-				meta.removeEnchant(Enchantment.PROTECTION_ENVIRONMENTAL);
-				meta.removeEnchant(Enchantment.PROTECTION_EXPLOSIONS);
-				meta.removeEnchant(Enchantment.PROTECTION_FALL);
-				meta.removeEnchant(Enchantment.PROTECTION_FIRE);
-				meta.removeEnchant(Enchantment.PROTECTION_PROJECTILE);
 				meta.addEnchant(Enchantment.DURABILITY, 1, true);
-			}
-
-			// remove attributes
-			if (meta.hasAttributeModifiers()) {
-				if (meta.getAttributeModifiers(EquipmentSlot.HEAD) != null) {
-					meta.removeAttributeModifier(EquipmentSlot.HEAD);
-					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
-				}
-				if (meta.getAttributeModifiers(EquipmentSlot.CHEST) != null) {
-					meta.removeAttributeModifier(EquipmentSlot.CHEST);
-					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
-				}
-				if (meta.getAttributeModifiers(EquipmentSlot.LEGS) != null) {
-					meta.removeAttributeModifier(EquipmentSlot.LEGS);
-					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
-				}
-				if (meta.getAttributeModifiers(EquipmentSlot.FEET) != null) {
-					meta.removeAttributeModifier(EquipmentSlot.FEET);
-					meta.addAttributeModifier(Attribute.GENERIC_ARMOR,
-						new AttributeModifier("Armor", 0, AttributeModifier.Operation.ADD_NUMBER));
-				}
 			}
 			item.setItemMeta(meta);
 		}
 
-		undead.getEquipment().setHelmet(helm);
-		undead.getEquipment().setChestplate(chest);
-		undead.getEquipment().setLeggings(legs);
-		undead.getEquipment().setBoots(boots);
+		EntityEquipment equip = undead.getEquipment();
+		if (equip != null) {
+			equip.setHelmet(helm);
+			equip.setChestplate(chest);
+			equip.setLeggings(legs);
+			equip.setBoots(boots);
+		}
 
 		return undead;
 	}

@@ -196,7 +196,7 @@ public class AbilityUtils {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageReceived(duration, damageBoost));
 		if (damageBoost > 0) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.UNLUCK, duration, -1));
-		} else {
+		} else if (damageBoost < 0) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, -1));
 		}
 	}
@@ -206,7 +206,7 @@ public class AbilityUtils {
 		Plugin.getInstance().mEffectManager.addEffect(player, cause, new PercentDamageDealt(duration, damageBoost));
 		if (damageBoost < 0) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, duration, -1));
-		} else {
+		} else if (damageBoost > 0) {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, duration, -1));
 		}
 

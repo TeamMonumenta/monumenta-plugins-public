@@ -11,13 +11,13 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 	private static final Material MATERIAL = Material.TNT;
@@ -29,7 +29,7 @@ public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 	private static final SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");
 	private static final String SPELL_NAME = "Lava Bomb";
 	private boolean mCooldown = false;
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 
 	// Normal Grenade Launcher attack. 3 Lobs of 2 Grenades, which explode.
 	// 55 Damage + 3s Silence Direct
@@ -42,10 +42,10 @@ public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 				List<Player> results = new ArrayList<>();
 
 				// Gets 2 targets
-				if (potentialTargets.size() > 0) {
+				if (!potentialTargets.isEmpty()) {
 					results.add(potentialTargets.remove(0));
 				}
-				if (potentialTargets.size() > 0) {
+				if (!potentialTargets.isEmpty()) {
 					results.add(potentialTargets.remove(0));
 				}
 
@@ -95,14 +95,7 @@ public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 	public void run() {
 		super.run();
 		mCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, cooldownTicks() + 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, cooldownTicks() + 20);
 	}
 
 	private static int getCooldown(int phase) {

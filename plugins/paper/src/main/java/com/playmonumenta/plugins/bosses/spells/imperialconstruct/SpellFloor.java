@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,7 +18,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellFloor extends Spell {
@@ -57,19 +57,14 @@ public class SpellFloor extends Spell {
 				double height = loc.getY();
 
 				if (height - mCurrentLoc.getY() > 7 && p.isOnGround()) {
-					BossUtils.bossDamagePercent(mBoss, p, 0.7, p.getLocation(), "Mechanical Void");
+					BossUtils.bossDamagePercent(mBoss, p, 0.7, "Mechanical Void");
 					Vector dir = mCurrentLoc.toVector().clone().subtract(p.getLocation().toVector());
 					dir.normalize();
 					dir.multiply(1.5f);
 
 					p.setVelocity(dir);
 					mDamaged.add(p);
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							mDamaged.remove(p);
-						}
-					}.runTaskLater(mPlugin, 0);
+					Bukkit.getScheduler().runTask(mPlugin, () -> mDamaged.remove(p));
 				}
 
 				if (p.getLocation().distance(mCurrentLoc) > 31) {
@@ -78,7 +73,7 @@ public class SpellFloor extends Spell {
 					new PartialParticle(Particle.FIREWORKS_SPARK, p.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
 					new PartialParticle(Particle.DRAGON_BREATH, p.getLocation().add(0, 1, 0), 6, 0.4, 0.4, 0.4, 0.2);
 
-					BossUtils.bossDamagePercent(mBoss, p, 0.6, p.getLocation(), "Mechanical Void");
+					BossUtils.bossDamagePercent(mBoss, p, 0.6, "Mechanical Void");
 					Vector dir = mCurrentLoc.toVector().clone().subtract(p.getLocation().toVector());
 					dir.normalize();
 					dir.multiply(1.5f);
@@ -86,12 +81,7 @@ public class SpellFloor extends Spell {
 					p.setVelocity(dir);
 
 					mDamaged.add(p);
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							mDamaged.remove(p);
-						}
-					}.runTaskLater(mPlugin, 0);
+					Bukkit.getScheduler().runTask(mPlugin, () -> mDamaged.remove(p));
 				}
 				if (p.getLocation().getY() - mCurrentLoc.getY() < -6) {
 					p.sendMessage(ChatColor.GRAY + "The mechanical void sends you back up.");
@@ -100,17 +90,12 @@ public class SpellFloor extends Spell {
 					new PartialParticle(Particle.FIREWORKS_SPARK, p.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
 					new PartialParticle(Particle.DRAGON_BREATH, p.getLocation().add(0, 1, 0), 6, 0.4, 0.4, 0.4, 0.2);
 
-					BossUtils.bossDamagePercent(mBoss, p, 0.4, p.getLocation(), "Mechanical Void");
+					BossUtils.bossDamagePercent(mBoss, p, 0.4, "Mechanical Void");
 					p.setVelocity(p.getVelocity().setY(2));
 					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 7, 0, false, true));
 
 					mDamaged.add(p);
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							mDamaged.remove(p);
-						}
-					}.runTaskLater(mPlugin, 2);
+					Bukkit.getScheduler().runTask(mPlugin, () -> mDamaged.remove(p));
 				}
 			}
 		}

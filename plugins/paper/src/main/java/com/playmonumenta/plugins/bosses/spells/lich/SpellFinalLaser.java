@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
@@ -159,7 +159,7 @@ public class SpellFinalLaser extends Spell {
 					mExpL.location(movingLaserBox.getCenter().toLocation(world)).spawnAsBoss();
 					breakBlocks(movingLaserBox.getCenter().toLocation(world));
 					if (movingLaserBox.overlaps(target.getBoundingBox())) {
-						BossUtils.blockableDamage(mBoss, target, DamageType.MAGIC, 50, "Death Laser", null);
+						DamageUtils.damage(mBoss, target, DamageType.MAGIC, 50, null, false, true, "Death Laser");
 						MovementUtils.knockAway(mCenter, target, 3.2f, false);
 						Lich.cursePlayer(mPlugin, target);
 					}

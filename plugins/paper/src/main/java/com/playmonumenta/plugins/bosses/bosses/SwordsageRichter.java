@@ -95,9 +95,9 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					new PartialParticle(Particle.REDSTONE, loc, 40, 0.25, 0.25, 0.25, BOLT_COLOR).spawnAsEntityActive(boss);
 				},
 
-				(Player player, Location loc, boolean blocked) -> {
-					if (!blocked) {
-						BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15);
+				(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+					if (!blocked && player != null) {
+						BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15, prevLoc);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 0));
 					}

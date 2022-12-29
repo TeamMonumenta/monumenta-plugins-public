@@ -109,7 +109,7 @@ public class SpellSwitcheroo extends Spell {
 
 							if (mT % 10 == 0) {
 								for (Player player : PlayerUtils.playersInRange(mobLoc, 3, true)) {
-									BossUtils.bossDamagePercent(le, player, 0.05, (Location) null, "Phantom Snare");
+									BossUtils.bossDamagePercent(le, player, 0.05, "Phantom Snare");
 								}
 							}
 

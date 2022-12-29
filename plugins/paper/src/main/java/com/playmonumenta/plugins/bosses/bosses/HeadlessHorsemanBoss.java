@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -230,12 +231,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(mBoss.getLocation()) <= 2) {
 			if (!mCooldown) {
 				mCooldown = true;
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mCooldown = false;
-					}
-				}.runTaskLater(mPlugin, 20);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 20);
 				UUID uuid = damagee.getUniqueId();
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {

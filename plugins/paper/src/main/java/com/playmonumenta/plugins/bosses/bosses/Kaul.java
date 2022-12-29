@@ -245,18 +245,13 @@ public class Kaul extends BossAbilityGroup {
 					return;
 				}
 				// Damage has no direction so can't be blocked */
-				if (BossUtils.bossDamagePercent(mBoss, player, 0.4, (Location) null)) {
+				if (BossUtils.bossDamagePercent(mBoss, player, 0.4)) {
 					/* Player survived the damage */
 					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
 					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
 					new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 					cd.add(player.getUniqueId());
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							cd.remove(player.getUniqueId());
-						}
-					}.runTaskLater(mPlugin, 10);
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> cd.remove(player.getUniqueId()), 10);
 				}
 				if (player.getLocation().getBlock().isLiquid()) {
 					if (!hit.contains(player.getUniqueId())) {
@@ -845,12 +840,7 @@ public class Kaul extends BossAbilityGroup {
 		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(mBoss.getLocation()) <= 2) {
 			if (!mCooldown) {
 				mCooldown = true;
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						mCooldown = false;
-					}
-				}.runTaskLater(mPlugin, 20);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 20);
 				UUID uuid = damagee.getUniqueId();
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
 					if (!player.getUniqueId().equals(uuid)) {

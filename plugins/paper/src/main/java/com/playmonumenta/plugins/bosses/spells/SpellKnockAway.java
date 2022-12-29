@@ -18,11 +18,11 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 public class SpellKnockAway extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mLauncher;
-	private int mRadius;
-	private int mTime;
-	private float mSpeed;
+	private final Plugin mPlugin;
+	private final LivingEntity mLauncher;
+	private final int mRadius;
+	private final int mTime;
+	private final float mSpeed;
 	private int mWidth;
 
 	public SpellKnockAway(Plugin plugin, LivingEntity launcher, int radius, int time, float speed) {
@@ -46,62 +46,50 @@ public class SpellKnockAway extends Spell {
 	}
 
 	private void deal_damage() {
-		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-		Runnable dealer = new Runnable() {
-			@Override
-			public void run() {
-				for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
-					BossUtils.blockableDamage(mLauncher, player, DamageType.MELEE, 9.0f);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
-					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
+				BossUtils.blockableDamage(mLauncher, player, DamageType.MELEE, 9.0f);
+				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
+				player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));
 
-					Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
-					dir.setY(0.5f);
+				Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
+				dir.setY(0.5f);
 
-					player.setVelocity(dir);
-				}
+				player.setVelocity(dir);
 			}
-		};
-		scheduler.scheduleSyncDelayedTask(mPlugin, dealer, mTime);
+		}, mTime);
 	}
 
 	private void animation(Location loc) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-		Runnable animLoop = new Runnable() {
-			@Override
-			public void run() {
-				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
-				new PartialParticle(Particle.CRIT, centerLoc, 10, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
-				mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 3));
-			}
+		Runnable animLoop = () -> {
+			Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+			mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+			centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
+			new PartialParticle(Particle.CRIT, centerLoc, 10, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
+			mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 3));
 		};
 
-		Runnable animLoop2 = new Runnable() {
-			@Override
-			public void run() {
-				Location lloc = mLauncher.getLocation();
-				double precision = FastUtils.RANDOM.nextInt(50) + 100;
-				double increment = (2 * Math.PI) / precision;
-				Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
-				double rad = (double) (mRadius * mWidth) / 5;
-				double angle = 0;
-				for (int j = 0; j < precision; j++) {
-					angle = j * increment;
-					particleLoc.setX(lloc.getX() + (rad * FastUtils.cos(angle)));
-					particleLoc.setZ(lloc.getZ() + (rad * FastUtils.sin(angle)));
-					particleLoc.setY(lloc.getY() + 1.5);
-					new PartialParticle(Particle.CRIT, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0).spawnAsEntityActive(mLauncher);
-				}
-				if (mWidth == 0) {
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.77F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.5F);
-					particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.65F);
-				}
-				mWidth++;
+		Runnable animLoop2 = () -> {
+			Location lloc = mLauncher.getLocation();
+			double precision = FastUtils.RANDOM.nextInt(50) + 100;
+			double increment = (2 * Math.PI) / precision;
+			Location particleLoc = new Location(lloc.getWorld(), 0, lloc.getY() + 1.5, 0);
+			double rad = (double) (mRadius * mWidth) / 5;
+			for (int j = 0; j < precision; j++) {
+				double angle = j * increment;
+				particleLoc.setX(lloc.getX() + (rad * FastUtils.cos(angle)));
+				particleLoc.setZ(lloc.getZ() + (rad * FastUtils.sin(angle)));
+				particleLoc.setY(lloc.getY() + 1.5);
+				new PartialParticle(Particle.CRIT, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0).spawnAsEntityActive(mLauncher);
 			}
+			if (mWidth == 0) {
+				particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.77F);
+				particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.5F);
+				particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, (float) mRadius / 7, 0.65F);
+			}
+			mWidth++;
 		};
 
 		for (int i = 0; i < mTime; i++) {

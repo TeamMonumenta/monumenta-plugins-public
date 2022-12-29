@@ -86,12 +86,12 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 			new PartialParticle(Particle.LAVA, loc, 3 * (int) (p.DAMAGE_RADIUS * p.DAMAGE_RADIUS), p.DAMAGE_RADIUS, 0.25f, p.DAMAGE_RADIUS, 0).spawnAsEntityActive(boss);
 			if (player != null) {
 				BossUtils.blockableDamage(boss, player, DamageType.BLAST, p.DAMAGE);
-				BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT);
+				BossUtils.bossDamagePercent(boss, player, p.DAMAGE_PERCENT, boss.getLocation());
 				return;
 			}
 			for (Player players : PlayerUtils.playersInRange(loc, p.DAMAGE_RADIUS, true)) {
 				BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
-				BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT);
+				BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT, boss.getLocation());
 			}
 		})));
 		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);

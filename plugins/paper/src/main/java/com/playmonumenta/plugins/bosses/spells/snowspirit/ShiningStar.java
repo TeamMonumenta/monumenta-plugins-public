@@ -25,10 +25,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ShiningStar extends Spell {
 	public static final int DURATION = 20 * 8;
 
-	private SpellBaseSeekingProjectile mMissile;
+	private final SpellBaseSeekingProjectile mMissile;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
 
 	//How fast the bullets shoot
 	private int mDelay = 2;
@@ -68,12 +68,12 @@ public class ShiningStar extends Spell {
 				new PartialParticle(Particle.DOLPHIN, loc, 3, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc) -> {
+			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 				if (player != null) {
-					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", mBoss.getLocation());
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Shining Star", prevLoc);
 				}
 			});
 	}

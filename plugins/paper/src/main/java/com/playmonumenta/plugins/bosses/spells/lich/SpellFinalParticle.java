@@ -88,7 +88,7 @@ public class SpellFinalParticle extends Spell {
 					mWarned.add(p);
 					p.sendMessage(ChatColor.AQUA + "Looks like a dense cloud of miasma formed at the center of the arena.");
 				}
-				BossUtils.bossDamagePercent(mBoss, p, 0.05, null, "Miasma");
+				BossUtils.bossDamagePercent(mBoss, p, 0.05, "Miasma");
 				//death bloom nod >:3
 				p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 15, 2));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 15, 2));

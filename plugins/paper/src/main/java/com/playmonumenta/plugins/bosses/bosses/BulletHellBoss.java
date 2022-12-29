@@ -92,9 +92,9 @@ public class BulletHellBoss extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), p.SHOOT_SOUND, p.SHOOT_VOLUME, 0);
 				},
 				p.MATERIAL,
-				(Player player, Location loc, boolean blocked) -> {
-					if (!blocked) {
-						BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.PROJECTILE, p.DAMAGE);
+				(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+					if (player != null && !blocked) {
+						BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.PROJECTILE, p.DAMAGE, prevLoc);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 				}

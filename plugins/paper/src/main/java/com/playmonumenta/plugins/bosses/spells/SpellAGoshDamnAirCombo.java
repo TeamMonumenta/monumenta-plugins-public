@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -41,75 +42,65 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 			},
 			// Attack hit a player
 			(LivingEntity target) -> {
-				if (target instanceof Player) {
-					Player player = (Player) target;
-					new BukkitRunnable() {
+				if (target instanceof Player player) {
+					Bukkit.getScheduler().runTaskLater(plugin, () -> {
+						new PartialParticle(Particle.LAVA, player.getLocation(), 80, 1.25, 0.1, 1.25, 0).spawnAsEntityActive(boss);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 50, 1.25, 0.1, 1.25, 0).spawnAsEntityActive(boss);
+						boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 1f);
+						BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
+						player.setVelocity(new Vector(0, 1.15, 0));
+						boss.setVelocity(new Vector(0, 1.23, 0));
+						boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
 
-						@Override
-						public void run() {
-							new PartialParticle(Particle.LAVA, player.getLocation(), 80, 1.25, 0.1, 1.25, 0).spawnAsEntityActive(boss);
-							new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 50, 1.25, 0.1, 1.25, 0).spawnAsEntityActive(boss);
-							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 1f);
+						Bukkit.getScheduler().runTaskLater(plugin, () -> {
 							BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
-							player.setVelocity(new Vector(0, 1.15, 0));
-							boss.setVelocity(new Vector(0, 1.23, 0));
-							boss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
+							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 1);
+							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.3F, 0);
+							Location loc = player.getLocation().add(0, 1, 0);
+							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+							new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+							new PartialParticle(Particle.SWEEP_ATTACK, loc, 75, 3, 3, 3, 0).spawnAsEntityActive(boss);
+							MovementUtils.knockAway(boss.getLocation(), player, 0.65f, false);
+							boss.setVelocity(new Vector(0, -5, 0));
 							new BukkitRunnable() {
+								int mTicks = 0;
 
 								@Override
 								public void run() {
-									BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
-									boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 1);
-									boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.3F, 0);
-									Location loc = player.getLocation().add(0, 1, 0);
-									new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-									new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
-									new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-									new PartialParticle(Particle.SWEEP_ATTACK, loc, 75, 3, 3, 3, 0).spawnAsEntityActive(boss);
-									MovementUtils.knockAway(boss.getLocation(), player, 0.65f, false);
-									boss.setVelocity(new Vector(0, -5, 0));
-									new BukkitRunnable() {
-										int mTicks = 0;
+									mTicks++;
 
-										@Override
-										public void run() {
-											mTicks++;
-
-											if (mTicks >= 20 || boss.isOnGround()) {
-												this.cancel();
-												boss.setFallDistance(0);
-												boss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-											}
-										}
-
-									}.runTaskTimer(plugin, 0, 1);
-
-									// Prevent the player from taking fall damage
-									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 1));
-									player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
-									new BukkitRunnable() {
-										int mTicks = 0;
-
-										@Override
-										public void run() {
-											mTicks++;
-
-											if (mTicks >= 20 || player.isOnGround()) {
-												this.cancel();
-												player.setFallDistance(0);
-												player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-											}
-
-										}
-
-									}.runTaskTimer(plugin, 0, 1);
+									if (mTicks >= 20 || boss.isOnGround()) {
+										this.cancel();
+										boss.setFallDistance(0);
+										boss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+									}
 								}
 
-							}.runTaskLater(plugin, 14);
-						}
+							}.runTaskTimer(plugin, 0, 1);
 
-					}.runTaskLater(plugin, 1);
+							// Prevent the player from taking fall damage
+							player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 2));
+							player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 6, 1));
+							player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 10));
+							new BukkitRunnable() {
+								int mTicks = 0;
+
+								@Override
+								public void run() {
+									mTicks++;
+
+									if (mTicks >= 20 || player.isOnGround()) {
+										this.cancel();
+										player.setFallDistance(0);
+										player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+									}
+
+								}
+
+							}.runTaskTimer(plugin, 0, 1);
+						}, 14);
+					}, 1);
 				}
 			},
 			// Attack particles

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -131,7 +132,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 			new SpellBash(plugin, mBoss)
 		));
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(75, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"Do not interfere with my affairs! I will see that crown-head fall and assert myself as King!\",\"color\":\"white\"}]");
 		});
@@ -150,18 +151,18 @@ public class OldLabsBoss extends BossAbilityGroup {
 			try {
 				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				Entity mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSoldier");
-				if (mob instanceof LivingEntity) {
-					((LivingEntity) mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
+				if (mob instanceof LivingEntity le) {
+					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}
 
 				spawnLoc = spawnLoc.add(2, 0, 0);
 				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				mob = LibraryOfSoulsIntegration.summon(spawnLoc, "RebelSlinger");
-				if (mob instanceof LivingEntity) {
-					((LivingEntity) mob).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
+				if (mob instanceof LivingEntity le) {
+					le.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4));
 				}
 			} catch (Exception ex) {
-				mPlugin.getLogger().warning("Failed to spawn labs boss summons");
+				MMLog.warning("Failed to spawn labs boss summons");
 				ex.printStackTrace();
 			}
 		});

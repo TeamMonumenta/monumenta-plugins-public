@@ -68,20 +68,18 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				}
 			},
 
-			(Player player, Location loc, boolean blocked) -> {
+			(Player player, Location loc, boolean blocked, Location prevLoc) -> {
 				if (player == null || player.getLocation().getY() > 60 || (loc != null && loc.getY() > 60)) {
 					return;
 				}
 				if (!blocked) {
-					//TODO no official name for this ability yet so there's no death message
-					BossUtils.blockableDamage(boss, player, DamageType.BLAST, 37);
+					BossUtils.blockableDamage(boss, player, DamageType.BLAST, 37, "Primordial Bolt", prevLoc);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 15, 0));
 				} else {
 					for (Player p : PlayerUtils.playersInRange(loc, 2.5, true)) {
 						if (p.getLocation().getY() <= 60) {
-							BossUtils.blockableDamage(boss, p, DamageType.BLAST, 16 * 0.5);
-							BossUtils.blockableDamage(boss, p, DamageType.MAGIC, 16 * 0.5);
+							BossUtils.blockableDamage(boss, p, DamageType.BLAST, 16, "Primordial Bolt", prevLoc);
 							MovementUtils.knockAway(loc, p, 0.3f, false);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 1));
 							p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 20 * 10, 0));

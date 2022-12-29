@@ -144,7 +144,7 @@ public class ChargerBoss extends BossAbilityGroup {
 					}
 
 					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
 					}
 
 					if (p.CHANGE_TARGET && mBoss instanceof Mob mobAI && !(target instanceof Player player && AbilityUtils.isStealthed(player))) {

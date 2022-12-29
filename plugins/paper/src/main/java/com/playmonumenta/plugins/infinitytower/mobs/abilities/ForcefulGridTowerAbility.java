@@ -72,7 +72,7 @@ public class ForcefulGridTowerAbility extends TowerAbility {
 				}
 			},
 			// Hit Action
-			(World world, LivingEntity target, Location loc) -> {
+			(World world, LivingEntity target, Location loc, Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 				world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
 				if (target != null) {

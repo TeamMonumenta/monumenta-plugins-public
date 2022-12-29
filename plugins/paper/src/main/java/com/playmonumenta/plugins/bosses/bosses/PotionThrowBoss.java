@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import java.util.List;
@@ -178,7 +179,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 			//damage action
 			for (LivingEntity enemy : mParams.ENEMIES_TARGET.getTargetsListByLocation(mBoss, loc)) {
 				if (mParams.DAMAGE > 0) {
-					BossUtils.blockableDamage(mBoss, enemy, mParams.DAMAGE_TYPE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
+					DamageUtils.damage(mBoss, enemy, mParams.DAMAGE_TYPE, mParams.DAMAGE, null, false, true, mParams.SPELL_NAME);
 				}
 
 				if (mParams.DAMAGE_PERCENTAGE > 0.0) {
@@ -213,8 +214,8 @@ public class PotionThrowBoss extends BossAbilityGroup {
 				}.runTaskTimer(mPlugin, 0, 1);
 			}
 
-			for (LivingEntity allay : mParams.ALLY_TARGET.getTargetsListByLocation(mBoss, loc)) {
-				mParams.EFFECTS_ALLY.apply(allay, mBoss);
+			for (LivingEntity ally : mParams.ALLY_TARGET.getTargetsListByLocation(mBoss, loc)) {
+				mParams.EFFECTS_ALLY.apply(ally, mBoss);
 			}
 		}
 

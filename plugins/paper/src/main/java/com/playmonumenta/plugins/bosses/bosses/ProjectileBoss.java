@@ -200,18 +200,18 @@ public class ProjectileBoss extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc) -> {
+				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
 					if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 						p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);
 
 						if (target != null) {
 							if (p.DAMAGE > 0) {
-								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+								BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, p.SPELL_NAME, prevLoc);
 							}
 
 							if (p.DAMAGE_PERCENTAGE > 0.0) {
-								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+								BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, prevLoc, p.SPELL_NAME);
 							}
 							p.EFFECTS.apply(target, boss);
 						}
