@@ -93,7 +93,7 @@ public class PlotManager {
 						.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
 						.map((player) -> player.getName()).toArray(String[]::new)))
 					.executesPlayer((player, args) -> {
-						plotAccessAdd(player, (String) args[0], null);
+						plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), null);
 					}))
 				.withSubcommand(new CommandAPICommand("add")
 					.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
@@ -101,7 +101,29 @@ public class PlotManager {
 						.map((player) -> player.getName()).toArray(String[]::new)))
 					.withArguments(new StringArgument("duration"))
 					.executesPlayer((player, args) -> {
-						plotAccessAdd(player, (String) args[0], (String) args[1]);
+						plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), (String) args[1]);
+					}))
+				/***** MODERATOR ADD *****/
+				.withSubcommand(new CommandAPICommand("add_other")
+					.withPermission("monumenta.command.plot.add.others")
+					.withArguments(
+						new StringArgument("plot owner"),
+						new StringArgument("other player"))
+					.executes((sender, args) -> {
+						UUID ownerUUID = resolveUUID((String) args[0]);
+						UUID otherPlayerUUID = resolveUUID((String) args[1]);
+						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, null);
+					}))
+				.withSubcommand(new CommandAPICommand("add_other")
+					.withPermission("monumenta.command.plot.add.others")
+					.withArguments(
+						new StringArgument("plot owner"),
+						new StringArgument("other player"),
+						new StringArgument("duration"))
+					.executes((sender, args) -> {
+						UUID ownerUUID = resolveUUID((String) args[0]);
+						UUID otherPlayerUUID = resolveUUID((String) args[1]);
+						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, (String) args[2]);
 					}))
 				/***** REMOVE *****/
 				.withSubcommand(new CommandAPICommand("remove")
@@ -309,9 +331,7 @@ public class PlotManager {
 		}
 	}
 
-	private static void plotAccessAdd(Player owner, String addedName, @Nullable String duration) throws WrapperCommandSyntaxException {
-		UUID addedUUID = resolveUUID(addedName);
-
+	private static void plotAccessAdd(CommandSender sender, UUID ownerUUID, UUID otherUUID, @Nullable String duration) throws WrapperCommandSyntaxException {
 		long expiration = -1;
 		if (duration != null) {
 			duration = duration.toUpperCase();
@@ -335,26 +355,66 @@ public class PlotManager {
 			}
 		}
 
-		if (addedUUID.equals(owner.getUniqueId())) {
-			CommandAPI.fail("You can not add yourself to your own plot");
+		if (ownerUUID.equals(otherUUID)) {
+			if (sender instanceof Player player && player.getUniqueId().equals(ownerUUID)) {
+				CommandAPI.fail("You can not add yourself to your own plot");
+			} else {
+				CommandAPI.fail("You can not grant a player access to their own plot");
+			}
 		}
 
-		UUID ownerUUID = owner.getUniqueId();
-		int score = ScoreboardUtils.getScoreboardValue(owner, Constants.Objectives.OWN_PLOT).orElse(0);
-		if (score <= 0) {
-			CommandAPI.fail("You don't currently have a plot to add someone to");
+		Player ownerPlayer = Bukkit.getPlayer(ownerUUID);
+		if (ownerPlayer != null) {
+			int plot = ScoreboardUtils.getScoreboardValue(ownerPlayer, Constants.Objectives.OWN_PLOT).orElse(0);
+			plotAccessAdd(sender, ownerUUID, otherUUID, plot, expiration);
 		} else {
-			/* TODO: Someday would be nice to actually check these succeeded */
-			MonumentaRedisSyncAPI.remoteDataSet(ownerUUID, "myplotaccess|" + addedUUID, Long.toString(expiration));
-			MonumentaRedisSyncAPI.remoteDataSet(addedUUID, "otherplotaccess|" + ownerUUID, Integer.toString(score) + "," + Long.toString(expiration));
-		}
-
-		owner.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.AQUA + addedName + ChatColor.GREEN + " to access your plot");
-		Player added = Bukkit.getPlayer(addedUUID);
-		if (added != null) {
-			added.sendMessage(ChatColor.GREEN + "You now have access to " + ChatColor.AQUA + owner.getName() + ChatColor.GREEN + "'s plot");
+			long finalExpiration = expiration;
+			MonumentaRedisSyncAPI.getPlayerScores(ownerUUID).thenAccept(scores -> {
+				Integer plot = scores.get(Constants.Objectives.OWN_PLOT);
+				plotAccessAdd(sender, ownerUUID, otherUUID, plot == null ? 0 : plot, finalExpiration);
+			});
 		}
 	}
+
+	private static void plotAccessAdd(CommandSender sender, UUID ownerUUID, UUID otherUUID, int plot, long expiration) {
+		if (plot <= 0) {
+			if (sender instanceof Player player && player.getUniqueId().equals(ownerUUID)) {
+				sender.sendMessage(Component.text("You don't currently have a plot to add someone to", NamedTextColor.RED));
+			} else {
+				sender.sendMessage(Component.text(MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID) + " does not have a plot!", NamedTextColor.RED));
+			}
+			return;
+		}
+
+		CompletableFuture<Boolean> futureOwn = RemoteDataAPI.set(ownerUUID, "myplotaccess|" + otherUUID, Long.toString(expiration));
+		CompletableFuture<Boolean> futureOther = RemoteDataAPI.set(otherUUID, "otherplotaccess|" + ownerUUID, plot + "," + expiration);
+		futureOwn.thenAccept(successOwn -> {
+			futureOther.thenAccept(successOther -> {
+
+				String ownerName = MonumentaRedisSyncIntegration.cachedUuidToName(ownerUUID);
+				String otherName = MonumentaRedisSyncIntegration.cachedUuidToName(otherUUID);
+				String plotName = sender instanceof Player player && player.getUniqueId().equals(ownerUUID) ? "your plot" : "the plot of " + ownerName;
+
+				if (successOwn) {
+					sender.sendMessage(ChatColor.GREEN + "Successfully granted " + ChatColor.AQUA + otherName + ChatColor.GREEN + " access to " + plotName);
+				} else {
+					sender.sendMessage(ChatColor.GREEN + "Successfully updated the duration of access of " + ChatColor.AQUA + otherName + ChatColor.GREEN + " to " + plotName);
+				}
+
+				Player ownerPlayer = Bukkit.getPlayer(ownerUUID);
+				if (ownerPlayer != null && ownerPlayer != sender) {
+					ownerPlayer.sendMessage(ChatColor.AQUA + otherName + ChatColor.GREEN + " has been granted access to your plot by a moderator.");
+				}
+				if (successOther) {
+					Player addedPlayer = Bukkit.getPlayer(otherUUID);
+					if (addedPlayer != null) {
+						addedPlayer.sendMessage(ChatColor.GREEN + "You now have access to " + ChatColor.AQUA + ownerName + ChatColor.GREEN + "'s plot");
+					}
+				}
+			});
+		});
+	}
+
 	/* TODO: There needs to be some security mechanism that verifies players still have access to a plot if they last visited it but it expired */
 	/* Maybe when player joins, fetch their access and see if it's currently expired? And boot them to their own plot if so?  */
 
