@@ -70,7 +70,7 @@ public final class MeteorSlam extends Ability {
 			.shorthandName("MS")
 			.descriptions(
 				String.format(
-					"Pressing the swap key grants you Jump Boost %s for %ss instead of doing its vanilla function. Cooldown: %ss. " +
+					"Pressing the swap key grants you Jump Boost %s for %ss. Cooldown: %ss. " +
 						"Falling more than %s blocks passively generates a slam when you land, " +
 						"dealing %s melee damage to all enemies in a %s block radius around you per block fallen for the first %s blocks, " +
 						"and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, " +
