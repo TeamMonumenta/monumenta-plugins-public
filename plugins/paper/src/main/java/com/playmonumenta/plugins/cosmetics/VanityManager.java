@@ -271,7 +271,11 @@ public class VanityManager implements Listener {
 	}
 
 	private static String getCosmeticsName(ItemStack item) {
-		return item.getType().name().toLowerCase(Locale.ROOT) + ":" + ItemUtils.getPlainNameIfExists(item);
+		Material mat = item.getType();
+		if (ItemUtils.isShulkerBox(mat)) {
+			mat = Material.SHULKER_BOX; // ignore dye
+		}
+		return mat.name().toLowerCase(Locale.ROOT) + ":" + ItemUtils.getPlainNameIfExists(item);
 	}
 
 	/**
