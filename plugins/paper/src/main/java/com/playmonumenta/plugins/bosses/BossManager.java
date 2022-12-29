@@ -86,6 +86,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
@@ -795,10 +796,26 @@ public class BossManager implements Listener {
 		}
 	}
 
+	// EntityExplodeEvent is used by various spells like SpellBlockBreak to conditionally destroy blocks.
+	// We don't want those to trigger death events though. So we listen to the ExplosionPrimeEvent event
+	// which precedes every real creeper explosion and only handle explosions after a prime event.
+	// Handling the death in the prime event itself doesn't quite work, as the creeper is still alive and
+	// will explode after the event, damaging any mobs the death handler spawned for example.
+	// Delaying by a tick doesn't work either, as the creeper will be discarded just after the explosion.
+	private @Nullable Creeper mLastPrimedCreeper = null;
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void explosionPrimeEvent(ExplosionPrimeEvent event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof Creeper creeper) {
+			mLastPrimedCreeper = creeper;
+		}
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		Entity entity = event.getEntity();
-		if (entity != null && entity instanceof Creeper) {
+		if (entity == mLastPrimedCreeper) {
 			Boss boss = mBosses.remove(entity.getUniqueId());
 			if (boss != null) {
 				boss.death(null);
