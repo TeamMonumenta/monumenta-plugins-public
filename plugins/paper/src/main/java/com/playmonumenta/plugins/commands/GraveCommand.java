@@ -15,7 +15,6 @@ import dev.jorel.commandapi.executors.CommandExecutor;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -347,12 +346,16 @@ public class GraveCommand {
 			}
 			return;
 		}
-		Optional<Grave> optionalGrave = manager.getGraves().stream().filter(grave -> grave.mUuid.equals(uuid)).findFirst();
-		if (optionalGrave.isEmpty()) {
-			player.sendMessage(Component.text("This grave does not exist. It may have already been collected or deleted.", NamedTextColor.RED));
-			return;
+		Grave grave = manager.getGrave(uuid);
+		if (grave == null) {
+			if (player.hasPermission("monumenta.command.grave.delete.other")) {
+				grave = GraveManager.getGraveFromAnyPlayer(uuid);
+			}
+			if (grave == null) {
+				player.sendMessage(Component.text("This grave does not exist. It may have already been collected or deleted.", NamedTextColor.RED));
+				return;
+			}
 		}
-		Grave grave = optionalGrave.get();
 		if (manager.isDeleteConfirmation(uuid, player.getTicksLived())) {
 			grave.delete();
 			manager.cancelDeletion();
@@ -360,9 +363,9 @@ public class GraveCommand {
 		} else {
 			player.sendMessage(Component.text("Are you sure you want to fully delete this grave? This cannot be undone!", NamedTextColor.RED, TextDecoration.BOLD));
 			player.sendMessage(Component.text("Item" + (grave.getItems().size() > 1 ? "s" : "") + " in the grave: ", NamedTextColor.AQUA)
-				.append(grave.getItemList(true)));
+					.append(grave.getItemList(true)));
 			player.sendMessage(Component.text()
-				.append(Component.text("[DELETE]", NamedTextColor.RED)
+					.append(Component.text("[DELETE]", NamedTextColor.RED)
 					.hoverEvent(HoverEvent.showText(Component.text("Delete the grave. Cannot be undone!", NamedTextColor.RED)))
 					.clickEvent(ClickEvent.runCommand("/grave delete " + uuid)))
 				.append(Component.text("   "))

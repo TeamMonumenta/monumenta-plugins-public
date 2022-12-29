@@ -14,11 +14,14 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
@@ -84,6 +87,10 @@ public class GraveManager {
 
 	public static @Nullable GraveManager getInstance(Player player) {
 		return INSTANCES.get(player.getUniqueId());
+	}
+
+	public static Collection<GraveManager> getAllInstances() {
+		return Collections.unmodifiableCollection(INSTANCES.values());
 	}
 
 	public static void onLogin(Player player) {
@@ -373,17 +380,17 @@ public class GraveManager {
 			.append(Component.text(grave.mShardName, NamedTextColor.WHITE))
 			.append(Component.text(") Loc: (", NamedTextColor.GRAY))
 			.append(Component.text(grave.mLocation.getBlockX() + "," + grave.mLocation.getBlockY() + "," + grave.mLocation.getBlockZ(), NamedTextColor.WHITE))
-			.append(Component.text(") ", NamedTextColor.GRAY))
-			.append(Component.text("Items: (", NamedTextColor.GRAY)
-				.hoverEvent(HoverEvent.showText(itemList)))
-			.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
-				.hoverEvent(HoverEvent.showText(itemList)))
-			.append(Component.text(")", NamedTextColor.GRAY)
-				.hoverEvent(HoverEvent.showText(itemList)))
-			.append(Component.text(" "))
-			.append(Component.text("[X]", NamedTextColor.DARK_RED)
-				.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
-				.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
+				.append(Component.text(") ", NamedTextColor.GRAY))
+				.append(Component.text("Items: (", NamedTextColor.GRAY)
+						.hoverEvent(HoverEvent.showText(itemList)))
+				.append(Component.text(grave.mItems.size(), NamedTextColor.WHITE)
+						.hoverEvent(HoverEvent.showText(itemList)))
+				.append(Component.text(")", NamedTextColor.GRAY)
+						.hoverEvent(HoverEvent.showText(itemList)))
+				.append(Component.text(" "))
+				.append(Component.text("[X]", NamedTextColor.DARK_RED)
+						.hoverEvent(HoverEvent.showText(Component.text("Click to delete", NamedTextColor.RED)))
+						.clickEvent(ClickEvent.runCommand("/grave delete " + grave.mUuid)));
 	}
 
 	public List<Grave> getGraves() {
@@ -392,6 +399,10 @@ public class GraveManager {
 
 	public Grave getGrave(UUID uuid) {
 		return mGraves.stream().filter(grave -> grave.mUuid.equals(uuid)).findFirst().orElse(null);
+	}
+
+	public static Grave getGraveFromAnyPlayer(UUID uuid) {
+		return INSTANCES.values().stream().map(m -> m.getGrave(uuid)).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 
 	private void removeEmptyGraves() {
