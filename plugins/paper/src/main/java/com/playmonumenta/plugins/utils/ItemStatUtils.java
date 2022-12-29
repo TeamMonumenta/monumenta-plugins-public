@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.effects.Effect;
@@ -1374,6 +1375,13 @@ public class ItemStatUtils {
 						return playerClass;
 					}
 				}
+				if (line.contains(playerClass.mClassPassiveName)) {
+					return playerClass;
+				}
+			}
+			// The real ability name is "Alchemist Potions", but charms don't use the "s"
+			if (line.contains("Alchemist Potion")) {
+				return new Alchemist();
 			}
 		}
 		return null;

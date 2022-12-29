@@ -28,7 +28,7 @@ public class Alchemist extends PlayerClass {
 	public static final int HARBINGER_SPEC_ID = 9;
 	public static final int APOTHECARY_SPEC_ID = 10;
 
-	Alchemist() {
+	public Alchemist() {
 		mAbilities.add(GruesomeAlchemy.INFO);
 		mAbilities.add(BrutalAlchemy.INFO);
 		mAbilities.add(IronTincture.INFO);
