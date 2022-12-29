@@ -31,8 +31,8 @@ import org.bukkit.util.Vector;
 
 /*
 Salient of Decay - A straight piercing line appears from the lich at ⅓  targets, after 1 second
-anyone within that line takes 16 damage every second for 6 seconds. Players are
-also unable to heal for 4 seconds.
+anyone within that line takes 3 ailment damage every second for 5 seconds. Players are
+also unable to heal for the duration.
  */
 public class SpellSalientOfDecay extends Spell {
 
@@ -119,8 +119,8 @@ public class SpellSalientOfDecay extends Spell {
 							while (it.hasNext()) {
 								Player p = it.next();
 								if (p.getBoundingBox().overlaps(box)) {
-									AbilityUtils.increaseHealingPlayer(p, 20 * 6, -1.0, "Lich");
-									p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 6, 0));
+									AbilityUtils.increaseHealingPlayer(p, 20 * 5, -1.0, "Lich");
+									p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 5, 0));
 									BukkitRunnable runC = new BukkitRunnable() {
 										int mT = 0;
 
@@ -134,10 +134,11 @@ public class SpellSalientOfDecay extends Spell {
 											int ndt = p.getNoDamageTicks();
 											p.setNoDamageTicks(0);
 											Vector velocity = p.getVelocity();
-											DamageUtils.damage(mBoss, p, DamageType.AILMENT, 3, null, false, true, "Salient of Decay"); //16 dmg every sec, 6 seconds
+											//3 dmg every sec, 5 seconds
+											DamageUtils.damage(mBoss, p, DamageType.AILMENT, 3, null, false, true, "Salient of Decay");
 											p.setVelocity(velocity);
 											p.setNoDamageTicks(ndt);
-											if (mT >= 6 || p.isDead()) {
+											if (mT >= 5 || p.isDead()) {
 												this.cancel();
 											}
 										}

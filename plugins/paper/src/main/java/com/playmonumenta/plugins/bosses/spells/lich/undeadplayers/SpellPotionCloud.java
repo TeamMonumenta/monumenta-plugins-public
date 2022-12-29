@@ -67,7 +67,7 @@ public class SpellPotionCloud extends Spell {
 
 				if (mT % 10 == 0 && mT >= 20 && mT < 20 * 15) {
 					for (Player p : PlayerUtils.playersInRange(loc, 2, true)) {
-						DamageUtils.damage(mBoss, p, DamageType.AILMENT, 9, null, false, true, "Unstable Concoction");
+						DamageUtils.damage(mBoss, p, DamageType.AILMENT, 2, null, false, true, "Unstable Concoction");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 30, 0));
 						AbilityUtils.increaseDamageRecievedPlayer(p, 20 * 30, 0.15, "Lich");
