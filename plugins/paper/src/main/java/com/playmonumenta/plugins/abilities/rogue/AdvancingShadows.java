@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -120,7 +121,7 @@ public class AdvancingShadows extends Ability {
 		RaycastData data = ray.shootRaycast();
 
 		LivingEntity entity = data.getEntities().stream()
-			.filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t))
+			.filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t) && !ScoreboardUtils.checkTag(t, AbilityUtils.IGNORE_TAG))
 			.findFirst()
 			.orElse(null);
 

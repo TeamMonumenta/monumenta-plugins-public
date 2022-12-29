@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.EnumSet;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -68,7 +69,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 		RaycastData data = ray.shootRaycast();
 
 		LivingEntity entity = data.getEntities().stream()
-			                      .filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t))
+			                      .filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t) && !ScoreboardUtils.checkTag(t, AbilityUtils.IGNORE_TAG))
 			                      .findFirst()
 			                      .orElse(null);
 		if (entity == null) {
