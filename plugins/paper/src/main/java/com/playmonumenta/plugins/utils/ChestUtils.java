@@ -656,6 +656,10 @@ public class ChestUtils {
 			       chest.getSeed() == 0 && isChestEmpty(chest);
 	}
 
+	public static boolean isAstrableChest(Block block) {
+		return block.getState() instanceof Chest chest && chest.getLootTable() != null && isChestEmpty(chest);
+	}
+
 	public static boolean isChestEmpty(Chest chest) {
 		for (ItemStack slot : chest.getBlockInventory().getContents()) {
 			if (slot != null && !slot.getType().isAir()) {
