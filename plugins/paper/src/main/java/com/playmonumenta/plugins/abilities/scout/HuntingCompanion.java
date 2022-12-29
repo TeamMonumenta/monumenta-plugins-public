@@ -46,6 +46,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Strider;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -255,6 +256,14 @@ public class HuntingCompanion extends Ability {
 	@Override
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		clearSummons();
+	}
+
+	@Override
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		//Clear summons when teleporting to a different world or more than 100 blocks away
+		if (event.getFrom().getWorld() != event.getTo().getWorld() || event.getFrom().distance(event.getTo()) > 100) {
+			clearSummons();
+		}
 	}
 
 	private void clearSummons() {
