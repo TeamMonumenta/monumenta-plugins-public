@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import de.tr7zw.nbtapi.NBTEntity;
@@ -45,7 +46,10 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class GraveListener implements Listener {
-	Plugin mPlugin;
+
+	private static final String INTERACT_METAKEY = "MonumentaGraveInteract";
+
+	private final Plugin mPlugin;
 
 	public GraveListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -72,25 +76,28 @@ public class GraveListener implements Listener {
 		GraveManager.onSave(event);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerInteractEntity(PlayerInteractEntityEvent event) {
-		if (GraveManager.isGrave(event.getRightClicked())) {
+		if (GraveManager.isGrave(event.getRightClicked())
+			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
 			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
-		if (GraveManager.isGrave(event.getRightClicked())) {
+		if (GraveManager.isGrave(event.getRightClicked())
+			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
 			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-		if (GraveManager.isGrave(event.getRightClicked())) {
+		if (GraveManager.isGrave(event.getRightClicked())
+			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
 			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
 		}
@@ -99,7 +106,10 @@ public class GraveListener implements Listener {
 	// handle cancelled events as we're only interested in the act of clicking/attacking the grave, and not whether the attack was successful
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void entityDamageByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Player player && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && GraveManager.isGrave(event.getEntity())) {
+		if (event.getDamager() instanceof Player player
+			    && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
+			    && GraveManager.isGrave(event.getEntity())
+			    && MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
 			GraveManager.onInteract(player, event.getEntity());
 			event.setCancelled(true);
 		}
