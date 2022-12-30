@@ -279,16 +279,13 @@ public class MasterworkUtils {
 		ItemStack itemA = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(m.getPathA()));
 		ItemStack itemB = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(m.getPathB()));
 
-		if (isRefund) {
-			itemA.setAmount(m.getCostA());
-			itemB.setAmount(48);
+		itemA.setAmount(m.getCostA());
+		itemB.setAmount(m.getCostB());
 
+		if (isRefund) {
 			InventoryUtils.giveItem(p, itemA);
 			InventoryUtils.giveItem(p, itemB);
 		} else {
-			itemA.setAmount(m.getCostA());
-			itemB.setAmount(m.getCostB());
-
 			inventory.removeItem(itemA);
 			inventory.removeItem(itemB);
 		}
@@ -330,6 +327,11 @@ public class MasterworkUtils {
 		return realItems;
 	}
 
+	public static ItemStack getBaseMasterwork(ItemStack item, Player p) {
+		List<ItemStack> allMasterworks = getAllMasterworks(item, p);
+		return allMasterworks.get(0);
+	}
+
 	public static String getNextItemPath(ItemStack item) {
 		Masterwork nextM;
 		Masterwork m = ItemStatUtils.getMasterwork(item);
@@ -348,6 +350,26 @@ public class MasterworkUtils {
 			};
 		}
 		return getItemPath(item, nextM);
+	}
+
+	public static String getPrevItemPath(ItemStack item) {
+		Masterwork prevM;
+		Masterwork m = ItemStatUtils.getMasterwork(item);
+		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING
+			|| m == Masterwork.VIIA || m == Masterwork.VIIB || m == Masterwork.VIIC) {
+			prevM = Masterwork.ERROR;
+		} else {
+			prevM = switch (Objects.requireNonNull(m)) {
+				case VI -> Masterwork.V;
+				case V -> Masterwork.IV;
+				case IV -> Masterwork.III;
+				case III -> Masterwork.II;
+				case II -> Masterwork.I;
+				case I -> Masterwork.ZERO;
+				default -> Masterwork.ZERO;
+			};
+		}
+		return getItemPath(item, prevM);
 	}
 
 	public static String getItemPath(ItemStack item, Masterwork masterwork) {

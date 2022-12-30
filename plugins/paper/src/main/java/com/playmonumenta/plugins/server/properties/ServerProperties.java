@@ -43,6 +43,7 @@ public class ServerProperties {
 	private boolean mPreventDungeonItemTransfer = true;
 	private boolean mReplaceSpawnerEntities = true;
 	private boolean mInfusionsEnabled = true;
+	private boolean mMasterworkRefundEnabled = false;
 	private boolean mLootBoxEnabled = true;
 	private int mHTTPStatusPort = 8000;
 
@@ -162,6 +163,10 @@ public class ServerProperties {
 		return INSTANCE.mTrickyCreepersEnabled;
 	}
 
+	public static boolean getMasterworkRefundEnabled() {
+		return INSTANCE.mMasterworkRefundEnabled;
+	}
+
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		INSTANCE.loadInternal(plugin, sender);
 	}
@@ -193,6 +198,7 @@ public class ServerProperties {
 			mPreventDungeonItemTransfer = getPropertyValueBool(object, "preventDungeonItemTransfer", mPreventDungeonItemTransfer);
 			mReplaceSpawnerEntities = getPropertyValueBool(object, "replaceSpawnerEntities", mReplaceSpawnerEntities);
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
+			mMasterworkRefundEnabled = getPropertyValueBool(object, "masterworkRefundEnabled", mMasterworkRefundEnabled);
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
@@ -243,6 +249,7 @@ public class ServerProperties {
 		out.add("preventDungeonItemTransfer = " + mPreventDungeonItemTransfer);
 		out.add("replaceSpawnerEntities = " + mReplaceSpawnerEntities);
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
+		out.add("masterworkRefundEnabled = " + mMasterworkRefundEnabled);
 		out.add("lootBoxEnabled = " + mLootBoxEnabled);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 

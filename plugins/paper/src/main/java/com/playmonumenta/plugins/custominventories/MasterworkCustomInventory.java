@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -59,6 +60,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 	private static final ItemStack mFullUpgradeB = new ItemStack(Material.LIGHT_BLUE_DYE);
 	private static final ItemStack mFullUpgradeC = new ItemStack(Material.YELLOW_DYE);
 	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
+	private static final ItemStack mBalanceRefundItem = new ItemStack(Material.GRINDSTONE);
 	private static final ItemStack mBackItem = new ItemStack(Material.STRING);
 	private static final ItemStack mPreviewItem = new ItemStack(Material.CHORUS_FLOWER);
 
@@ -129,7 +131,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		limitMeta.displayName(Component.text("Masterwork Limit Reached", TextColor.fromHexString("#5D2D87"))
 			.decoration(TextDecoration.BOLD, true)
 			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(limitMeta, "This item cannot be upgraded at the moment. Come back later.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
+		splitLoreLine(limitMeta, "This item cannot be upgraded at the moment. Click to view previous masterwork levels.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
 		mNoPossibleUpgradeItem.setItemMeta(limitMeta);
 
 		//Max Level Reached A
@@ -151,18 +153,26 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		//Max Level Reached C
 		ItemMeta maxMetaC = mFullUpgradeC.getItemMeta();
 		maxMetaC.displayName(Component.text("Congratulations!", TextColor.fromHexString("#FFFA75"))
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
+				.decoration(TextDecoration.BOLD, true)
+				.decoration(TextDecoration.ITALIC, false));
 		splitLoreLine(maxMetaC, "You've reached the max Masterwork level on this item.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
 		mFullUpgradeC.setItemMeta(maxMetaC);
 
 		//Refund
 		ItemMeta refund = mRefundItem.getItemMeta();
 		refund.displayName(Component.text("Refund Legendary Upgrade", NamedTextColor.GRAY)
-			.decoration(TextDecoration.BOLD, true)
-			.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(refund, "Click to refund Legendary upgrade to Epic level. This refunds 100% of the Location Materials and 75% of the Augments.\n", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
+				.decoration(TextDecoration.BOLD, true)
+				.decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(refund, "Click to refund Legendary upgrade to Epic level. This refunds 100% of the Location Materials and 75% of the Augments.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
 		mRefundItem.setItemMeta(refund);
+
+		//Nerf Refund
+		ItemMeta balancerefund = mBalanceRefundItem.getItemMeta();
+		balancerefund.displayName(Component.text("Refund Upgrade", NamedTextColor.GRAY)
+				.decoration(TextDecoration.BOLD, true)
+				.decoration(TextDecoration.ITALIC, false));
+		splitLoreLine(balancerefund, "Click to refund this item's Masterwork costs. You will get 100% of the materials back.", MAX_LORE_LENGTH, ChatColor.DARK_GRAY);
+		mBalanceRefundItem.setItemMeta(balancerefund);
 
 		mPatternMap.put(0, new int[] {});
 		mPatternMap.put(1, new int[] {22});
@@ -170,11 +180,11 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		mPatternMap.put(3, new int[] {30, 31, 32});
 		mPatternMap.put(4, new int[] {22, 30, 31, 32});
 
+		// Back item
 		ItemMeta backMeta = mBackItem.getItemMeta();
 		backMeta.displayName(Component.text("Back", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
 			.decoration(TextDecoration.BOLD, true));
 		mBackItem.setItemMeta(backMeta);
-
 	}
 
 	private static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
@@ -218,7 +228,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		if (mIsPreview) {
 			setUpPreview(items.get(mMagicRow < mRowSelected ? mMagicRow : mRowSelected), player);
 		} else if (mRowSelected == 99) {
-			loadMasterworkPage(items);
+			loadMasterworkPage(items, player);
 		} else {
 			loadMasterworkPath(items.get(mRowSelected), player);
 		}
@@ -439,7 +449,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		}
 	}
 
-	private void loadMasterworkPage(List<ItemStack> items) {
+	private void loadMasterworkPage(List<ItemStack> items, Player ply) {
 		//load pannels for each item with the corresponding infusions.
 		int row = 0;
 		for (ItemStack item : items) {
@@ -504,7 +514,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 						if (m == Masterwork.VIIA) {
 							mInventory.setItem((row * 9) + 8, mFullUpgradeA);
-							mInventory.setItem((row * 9) + 1, mRefundItem);
+							if (!ServerProperties.getMasterworkRefundEnabled()) {
+								mInventory.setItem((row * 9) + 1, mRefundItem);
+							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
 									InventoryUtils.getItemFromLootTable(player,
@@ -516,7 +528,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 						} else if (m == Masterwork.VIIB) {
 							mInventory.setItem((row * 9) + 8, mFullUpgradeB);
-							mInventory.setItem((row * 9) + 1, mRefundItem);
+							if (!ServerProperties.getMasterworkRefundEnabled()) {
+								mInventory.setItem((row * 9) + 1, mRefundItem);
+							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
 									InventoryUtils.getItemFromLootTable(player,
@@ -528,7 +542,9 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 						} else {
 							mInventory.setItem((row * 9) + 8, mFullUpgradeC);
-							mInventory.setItem((row * 9) + 1, mRefundItem);
+							if (!ServerProperties.getMasterworkRefundEnabled()) {
+								mInventory.setItem((row * 9) + 1, mRefundItem);
+							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
 									InventoryUtils.getItemFromLootTable(player,
@@ -540,6 +556,19 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 						}
 					}
+
+					if (ServerProperties.getMasterworkRefundEnabled() && ItemStatUtils.getMasterwork(item) != ItemStatUtils.getMasterwork(MasterworkUtils.getBaseMasterwork(item, ply))) {
+						mInventory.setItem((row * 9) + 1, mBalanceRefundItem);
+						mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
+							String refundString = ItemStatUtils.getLocation(item).getName() + "_"
+									+ MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
+							ItemStack newItem = MasterworkUtils.preserveModified(item,
+									InventoryUtils.getItemFromLootTable(player,
+											NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(item))));
+							attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(refundString));
+						});
+					}
+
 				} else {
 					ItemStack invalidItem = mInvalidItems.get(row);
 					mInventory.setItem((row * 9), invalidItem);
