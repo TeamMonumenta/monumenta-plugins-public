@@ -168,20 +168,8 @@ public class SpellVolcanicDemise extends Spell {
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
 
 				mY -= 1;
-				if ((int) mY % 5 == 0) {
-					double distMin = 100;
-					for (Player player : players) {
-						double dist = player.getLocation().distance(mLoc);
-						distMin = Math.min(dist, distMin);
-					}
-					// Closer the closet player is, more particles are shown.
-					int count = distMin < 10 ? 12 : (distMin < 15 ? 6 : 4);
-					double size = 0.5 + 0.5 * (spawnY - mY) / spawnY;
-					new PPCircle(Particle.FLAME, mLoc, size * HIT_RADIUS)
-						.ringMode(true)
-						.count(count * 2)
-						.spawnAsBoss();
-					new PPCircle(Particle.LANDING_LAVA, mLoc, size * DEATH_RADIUS)
+				if (mY > 0 && (int) mY % 3 == 0) {
+					new PPCircle(Particle.LAVA, mLoc, DEATH_RADIUS / 2)
 						.ringMode(false)
 						.count(10)
 						.distanceFalloff(20)

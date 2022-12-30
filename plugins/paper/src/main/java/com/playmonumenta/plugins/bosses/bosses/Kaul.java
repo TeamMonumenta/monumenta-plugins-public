@@ -962,8 +962,8 @@ public class Kaul extends BossAbilityGroup {
 				for (int i = 0; i < 36; i++) {
 					double radian1 = Math.toRadians(mRotation + (10 * i));
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
-					new PartialParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null, true).spawnAsBoss();
-					new PartialParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null, true).spawnAsBoss();
+					new PartialParticle(Particle.CLOUD, mLoc, 3, 0.25, 0.25, 0.25, 0.025, null).spawnAsBoss();
+					new PartialParticle(Particle.VILLAGER_HAPPY, mLoc, 5, 0.4, 0.25, 0.4, 0.25, null).spawnAsBoss();
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 1, FastUtils.sin(radian1) * mRadius);
 				}
 				for (Block block : LocationUtils.getEdge(mLoc.clone().subtract(mT, 0, mT), mLoc.clone().add(mT, 0, mT))) {
