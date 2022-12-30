@@ -404,6 +404,7 @@ public class Plugin extends JavaPlugin {
 		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
 		manager.registerEvents(new WalletManager(), this);
 		manager.registerEvents(StatTrackManager.getInstance(), this);
+		manager.registerEvents(new PotionBarrelListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(this), this);

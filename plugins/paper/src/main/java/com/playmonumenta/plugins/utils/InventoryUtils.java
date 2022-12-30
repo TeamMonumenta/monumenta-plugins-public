@@ -495,6 +495,10 @@ public class InventoryUtils {
 		return count;
 	}
 
+	public static int numEmptySlots(Inventory inventory) {
+		return (int) Arrays.stream(inventory.getStorageContents()).filter(ItemUtils::isNullOrAir).count();
+	}
+
 	/**
 	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
 	 */
