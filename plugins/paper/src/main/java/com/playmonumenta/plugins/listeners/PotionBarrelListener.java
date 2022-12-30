@@ -69,9 +69,13 @@ public class PotionBarrelListener implements Listener {
 					// deposit potion
 					event.setCancelled(true);
 					if (clickedItem != null && clickedItem.getType() != Material.AIR) {
-						ItemStack barrelPotion = getBarrelPotion(barrelInventory);
-						if (barrelPotion == null || barrelPotion.isSimilar(clickedItem)) {
-							if (!addToBarrel(barrelInventory, clickedItem)) {
+						if (ItemUtils.isSomePotion(clickedItem)) {
+							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
+							if (barrelPotion == null || barrelPotion.isSimilar(clickedItem)) {
+								if (!addToBarrel(barrelInventory, clickedItem)) {
+									errorSound(player);
+								}
+							} else {
 								errorSound(player);
 							}
 						} else {
@@ -83,13 +87,17 @@ public class PotionBarrelListener implements Listener {
 					// deposit all similar potions
 					event.setCancelled(true);
 					if (clickedItem != null && clickedItem.getType() != Material.AIR) {
-						ItemStack barrelPotion = getBarrelPotion(barrelInventory);
-						if (barrelPotion == null || barrelPotion.isSimilar(clickedItem)) {
-							if (addToBarrel(barrelInventory, clickedItem)) {
-								for (ItemStack playerItem : player.getInventory()) {
-									if (playerItem != null && playerItem.isSimilar(barrelPotion)) {
-										addToBarrel(barrelInventory, playerItem);
+						if (ItemUtils.isSomePotion(clickedItem)) {
+							ItemStack barrelPotion = getBarrelPotion(barrelInventory);
+							if (barrelPotion == null || barrelPotion.isSimilar(clickedItem)) {
+								if (addToBarrel(barrelInventory, clickedItem)) {
+									for (ItemStack playerItem : player.getInventory()) {
+										if (playerItem != null && playerItem.isSimilar(barrelPotion)) {
+											addToBarrel(barrelInventory, playerItem);
+										}
 									}
+								} else {
+									errorSound(player);
 								}
 							} else {
 								errorSound(player);
@@ -222,10 +230,14 @@ public class PotionBarrelListener implements Listener {
 			event.setCancelled(true);
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				ItemStack cursor = player.getItemOnCursor();
-				ItemStack barrelPotion = getBarrelPotion(barrelInventory);
-				if (barrelPotion == null || barrelPotion.isSimilar(cursor)) {
-					if (addToBarrel(barrelInventory, cursor)) {
-						player.setItemOnCursor(cursor);
+				if (ItemUtils.isSomePotion(cursor)) {
+					ItemStack barrelPotion = getBarrelPotion(barrelInventory);
+					if (barrelPotion == null || barrelPotion.isSimilar(cursor)) {
+						if (addToBarrel(barrelInventory, cursor)) {
+							player.setItemOnCursor(cursor);
+						} else {
+							errorSound(player);
+						}
 					} else {
 						errorSound(player);
 					}
@@ -391,7 +403,8 @@ public class PotionBarrelListener implements Listener {
 
 	private static boolean isValidLocation(Location location) {
 		return ServerProperties.getShardName().equals("playerplots")
-				|| (ServerProperties.getShardName().equals("plots") && !ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
+			       || ServerProperties.getShardName().startsWith("dev")
+			       || (ServerProperties.getShardName().equals("plots") && !ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
 	}
 
 }

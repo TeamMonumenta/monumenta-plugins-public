@@ -95,6 +95,7 @@ public final class ItemOverrides {
 	static {
 		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.MAGMA_BLOCK, "Crystallized Lava");
 		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.PACKED_ICE, "Crystallized Water");
+		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.BARREL, "Potion Barrel");
 	}
 
 	public ItemOverrides() {
