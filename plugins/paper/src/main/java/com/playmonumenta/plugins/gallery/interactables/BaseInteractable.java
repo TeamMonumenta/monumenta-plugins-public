@@ -8,6 +8,7 @@ import java.util.Set;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +49,7 @@ public class BaseInteractable {
 		save();
 	}
 
-	public void setShowingText(String text) {
+	public void setShowingText(@Nullable String text) {
 		mShowingText = text;
 		save();
 	}
@@ -66,7 +67,8 @@ public class BaseInteractable {
 	}
 
 	public boolean shouldShowMessage(GalleryPlayer player) {
-		return mIsInteractable && mShowingText != null && player.isOnline() && player.getPlayer().getLocation().distance(this.getLocation()) < 7;
+		Player bukkitPlayer = player.getPlayer();
+		return mIsInteractable && mShowingText != null && bukkitPlayer != null && bukkitPlayer.getLocation().distance(this.getLocation()) < 7;
 	}
 
 	public void showMessage() {
@@ -116,7 +118,7 @@ public class BaseInteractable {
 
 	//----------------Static functions--------------------
 
-	public static BaseInteractable fromEntity(Entity entity) {
+	public static @Nullable BaseInteractable fromEntity(Entity entity) {
 		Set<String> tags = new HashSet<>(entity.getScoreboardTags());
 		try {
 			if (tags.contains(BasePricedInteractable.TAG_STRING)) {

@@ -36,6 +36,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
+import org.jetbrains.annotations.Nullable;
 
 public class ScanChests {
 
@@ -237,7 +238,7 @@ public class ScanChests {
 			                   .append(Component.text(" lootable blocks", NamedTextColor.GOLD)));
 	}
 
-	private static void clearNames(Player player, String matchingName) {
+	private static void clearNames(Player player, @Nullable String matchingName) {
 		AtomicInteger fixed = new AtomicInteger(0);
 		execute(player, tileEntity -> {
 			if (tileEntity instanceof Lootable lootable

@@ -14,6 +14,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class BodkinBlitzCS implements CosmeticSkill {
 
@@ -22,7 +23,7 @@ public class BodkinBlitzCS implements CosmeticSkill {
 		.build();
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -37,7 +38,7 @@ public class BodkinBlitzCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

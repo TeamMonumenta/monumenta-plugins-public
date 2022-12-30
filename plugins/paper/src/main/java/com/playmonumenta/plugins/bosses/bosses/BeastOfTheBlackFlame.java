@@ -41,6 +41,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
@@ -231,7 +232,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
@@ -245,8 +246,10 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 		teleport(mSpawnLoc);
 		World world = mBoss.getWorld();
 
-		event.setCancelled(true);
-		event.setReviveHealth(100);
+		if (event != null) {
+			event.setCancelled(true);
+			event.setReviveHealth(100);
+		}
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"FORGIVE ME SILVER ONES... I HAVE FAILED YOU...\",\"color\":\"dark_red\"}]");
 

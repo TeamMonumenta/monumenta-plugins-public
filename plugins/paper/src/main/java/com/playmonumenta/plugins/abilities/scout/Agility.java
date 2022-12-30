@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.scout.hunter.PredatorStrike;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -80,9 +81,10 @@ public class Agility extends Ability {
 		if (isEnhanced() && event.getBlock().getType() == Material.SPAWNER) {
 			UUID uuid = mPlayer.getUniqueId();
 			for (Ability ability : mScoutAbilities) {
-				if (mPlugin.mTimers.isAbilityOnCooldown(uuid, ability.getInfo().getLinkedSpell())) {
+				ClassAbility linkedSpell = ability.getInfo().getLinkedSpell();
+				if (linkedSpell != null && mPlugin.mTimers.isAbilityOnCooldown(uuid, linkedSpell)) {
 					int cooldownRefresh = (int) (ability.getModifiedCooldown() * ENHANCEMENT_COOLDOWN_REFRESH);
-					mPlugin.mTimers.updateCooldown(mPlayer, ability.getInfo().getLinkedSpell(), cooldownRefresh);
+					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, cooldownRefresh);
 				}
 			}
 		}

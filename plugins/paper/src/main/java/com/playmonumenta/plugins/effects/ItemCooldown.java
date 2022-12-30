@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -12,12 +11,13 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemCooldown extends Effect {
 	public static final String effectID = "ItemCooldown";
 
 	private final String mItemName;
-	private final Material mMaterial; // mMaterial is the "cooldown" item we select.
+	private final @Nullable Material mMaterial; // mMaterial is the "cooldown" item we select.
 	private final Plugin mPlugin;
 
 	public ItemCooldown(int duration, ItemStack item, Plugin plugin) {

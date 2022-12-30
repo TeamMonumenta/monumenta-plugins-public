@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.depths;
 
 import net.md_5.bungee.api.ChatColor;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum DepthsRoomType {
 	ABILITY(DepthsRewardType.ABILITY, "Ability", "Ability"),

@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -30,6 +29,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.Nullable;
 
 public class ScorchedEarth extends MultipleChargeAbility {
 
@@ -128,8 +128,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	@Override
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		if (mPlayer.isSneaking()
-			&& ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
-			&& mAlchemistPotions.isAlchemistPotion(potion)) {
+			    && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
+			    && mAlchemistPotions != null
+			    && mAlchemistPotions.isAlchemistPotion(potion)) {
 
 			int ticks = mPlayer.getTicksLived();
 			// Prevent double casting on accident

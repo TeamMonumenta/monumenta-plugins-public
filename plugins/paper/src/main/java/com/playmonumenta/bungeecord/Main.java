@@ -14,13 +14,14 @@ import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 
 public class Main extends Plugin {
-	private Configuration mConfig = null;
+	private @Nullable Configuration mConfig = null;
 	private Level mLogLevel = Level.INFO;
-	private VoteManager mVoteManager = null;
+	private @Nullable VoteManager mVoteManager = null;
 
-	public String mDefaultServer = null;
+	public @Nullable String mDefaultServer = null;
 	public boolean mJoinMessagesEnabled = true;
 
 	@Override
@@ -36,7 +37,7 @@ public class Main extends Plugin {
 			manager.registerCommand(this, new Proxy());
 		}
 
-		if (!mConfig.contains("voting")) {
+		if (mConfig == null || !mConfig.contains("voting")) {
 			getLogger().warning("No 'voting' section in config file - disabling voting features");
 		} else {
 			try {

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -54,7 +55,7 @@ public class TowerGuiMob extends CustomInventory {
 	private final TowerGame mGame;
 
 	public TowerGuiMob(Player owner, TowerGame game, TowerMob mob) {
-		super(owner, 54, mob.mInfo.mDisplayName);
+		super(owner, 54, Objects.requireNonNullElse(mob.mInfo.mDisplayName, "Unknown Blitz Mob"));
 		mMob = mob;
 		mGame = game;
 		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1, 2);

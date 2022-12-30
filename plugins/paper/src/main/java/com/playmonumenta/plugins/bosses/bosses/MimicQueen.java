@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public final class MimicQueen extends BossAbilityGroup {
 	public static final String identityTag = "boss_mimicqueen";
@@ -101,7 +102,7 @@ public final class MimicQueen extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
+				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
@@ -142,7 +143,7 @@ public final class MimicQueen extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 }

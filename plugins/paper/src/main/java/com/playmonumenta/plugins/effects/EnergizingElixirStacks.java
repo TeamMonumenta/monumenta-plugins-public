@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class EnergizingElixirStacks extends SingleArgumentEffect {
 	public static final String effectID = "EnergizingElixirStacks";

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import java.util.List;
@@ -20,17 +21,18 @@ import org.bukkit.entity.Mob;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class AdvancingShadowTowerAbility extends TowerAbility {
 
-	private LivingEntity mTarget = null;
+	private @Nullable LivingEntity mTarget = null;
 
 	public AdvancingShadowTowerAbility(Plugin plugin, String identityTag, LivingEntity boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
 
 		Spell spell = new Spell() {
 
-			private LivingEntity getTarget() {
+			private @Nullable LivingEntity getTarget() {
 				List<LivingEntity> list = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 				list.removeIf(le -> le.getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE));
 				list.sort((a, b) -> {
@@ -75,8 +77,8 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 									locTest.setY(locTest.getY() + verticalShift);
 									if (canTeleport(locTest) && mGame.isInArena(locTest)) {
 										loc.add(0, mBoss.getHeight() / 2, 0);
-										world.spawnParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1);
-										world.spawnParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125);
+										new PartialParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mBoss);
 
 										mBoss.teleport(locTest);
 										mHasTP = true;
@@ -91,8 +93,8 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 										}
 
 										locTest.add(0, mBoss.getHeight() / 2, 0);
-										world.spawnParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1);
-										world.spawnParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125);
+										new PartialParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mBoss);
 										world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
 
 

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -67,18 +68,18 @@ public class IceLance extends DepthsAbility {
 		box.shift(dir);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 10, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
 
-			world.spawnParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025);
-			world.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, bLoc, 2, 0.05, 0.05, 0.05, 0.025).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, bLoc, 18, 0.35, 0.35, 0.35, MANA_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
 
 			if (bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
-				world.spawnParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125);
+				new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
 				break;
 			}

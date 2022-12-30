@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 
 public class SpellLightningStorm extends Spell {
@@ -41,6 +41,9 @@ public class SpellLightningStorm extends Spell {
 
 	@Override
 	public void run() {
+		if (mCenter == null) {
+			return;
+		}
 		mTicks--;
 		if (mTicks <= 0) {
 			//TODO For now, increased interval a bit to avoid getting lightninged multiple times while unable to descend any faster, especially during lag spikes.

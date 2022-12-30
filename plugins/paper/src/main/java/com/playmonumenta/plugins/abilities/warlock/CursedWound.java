@@ -24,7 +24,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,6 +39,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class CursedWound extends Ability {
 
@@ -169,8 +169,9 @@ public class CursedWound extends Ability {
 
 			mStoredCustomEffects = new HashMap<>();
 			HashMap<String, Effect> customEffects = mPlugin.mEffectManager.getPriorityEffects(entity);
-			for (String source : customEffects.keySet()) {
-				Effect effect = customEffects.get(source);
+			for (Map.Entry<String, Effect> e : customEffects.entrySet()) {
+				String source = e.getKey();
+				Effect effect = e.getValue();
 				if (effect.isDebuff()) {
 					mStoredCustomEffects.put(source, effect);
 				}
@@ -185,7 +186,7 @@ public class CursedWound extends Ability {
 		}
 	}
 
-	private void createOrb(Vector dir, Location loc, Player mPlayer, LivingEntity target, Location optLoc) {
+	private void createOrb(Vector dir, Location loc, Player mPlayer, LivingEntity target, @Nullable Location optLoc) {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
 			final Location mL = target.getLocation().clone();

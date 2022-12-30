@@ -59,7 +59,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -99,6 +98,8 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BossManager implements Listener {
 
@@ -108,17 +109,17 @@ public class BossManager implements Listener {
 
 	@FunctionalInterface
 	public interface StatelessBossConstructor {
-		BossAbilityGroup construct(Plugin plugin, LivingEntity entity) throws Exception;
+		@Nullable BossAbilityGroup construct(Plugin plugin, LivingEntity entity) throws Exception;
 	}
 
 	@FunctionalInterface
 	public interface StatefulBossConstructor {
-		BossAbilityGroup construct(Plugin plugin, LivingEntity entity, Location spawnLoc, Location endLoc);
+		@Nullable BossAbilityGroup construct(Plugin plugin, LivingEntity entity, Location spawnLoc, Location endLoc);
 	}
 
 	@FunctionalInterface
 	public interface BossDeserializer {
-		BossAbilityGroup deserialize(Plugin plugin, LivingEntity entity) throws Exception;
+		@Nullable BossAbilityGroup deserialize(Plugin plugin, LivingEntity entity) throws Exception;
 	}
 
 	/********************************************************************************
@@ -128,7 +129,7 @@ public class BossManager implements Listener {
 	/*
 	 * Holds a static reference to the most recently instantiated boss manager
 	 */
-	private static @Nullable BossManager INSTANCE = null;
+	private static @MonotonicNonNull BossManager INSTANCE = null;
 
 	private static final Map<String, StatelessBossConstructor> mStatelessBosses;
 	private static final Map<String, StatefulBossConstructor> mStatefulBosses;
@@ -138,196 +139,196 @@ public class BossManager implements Listener {
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<String, StatelessBossConstructor>();
-		mStatelessBosses.put(BlockLockBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockLockBoss(p, e));
-		mStatelessBosses.put(ImmortalPassengerBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalPassengerBoss(p, e));
-		mStatelessBosses.put(ChestLockBoss.identityTag, (Plugin p, LivingEntity e) -> new ChestLockBoss(p, e));
-		mStatelessBosses.put(UnyieldingBoss.identityTag, (Plugin p, LivingEntity e) -> new UnyieldingBoss(p, e));
-		mStatelessBosses.put(ToughBoss.identityTag, (Plugin p, LivingEntity e) -> new ToughBoss(p, e));
-		mStatelessBosses.put(UnseenBoss.identityTag, (Plugin p, LivingEntity e) -> new UnseenBoss(p, e));
-		mStatelessBosses.put(WhispersBoss.identityTag, (Plugin p, LivingEntity e) -> new WhispersBoss(p, e));
-		mStatelessBosses.put(GenericBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericBoss(p, e));
-		mStatelessBosses.put(HiddenBoss.identityTag, (Plugin p, LivingEntity e) -> new HiddenBoss(p, e));
-		mStatelessBosses.put(InvisibleBoss.identityTag, (Plugin p, LivingEntity e) -> new InvisibleBoss(p, e));
-		mStatelessBosses.put(FireResistantBoss.identityTag, (Plugin p, LivingEntity e) -> new FireResistantBoss(p, e));
-		mStatelessBosses.put(HungerCloudBoss.identityTag, (Plugin p, LivingEntity e) -> new HungerCloudBoss(p, e));
-		mStatelessBosses.put(BlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockBreakBoss(p, e));
-		mStatelessBosses.put(PulseLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new PulseLaserBoss(p, e));
-		mStatelessBosses.put(ArcaneLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new ArcaneLaserBoss(p, e));
-		mStatelessBosses.put(WeaponSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new WeaponSwitchBoss(p, e));
-		mStatelessBosses.put(ShieldSwitchBoss.identityTag, (Plugin p, LivingEntity e) -> new ShieldSwitchBoss(p, e));
-		mStatelessBosses.put(ChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new ChargerBoss(p, e));
-		mStatelessBosses.put(BlastResistBoss.identityTag, (Plugin p, LivingEntity e) -> new BlastResistBoss(p, e));
-		mStatelessBosses.put(InfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new InfestedBoss(p, e));
-		mStatelessBosses.put(FireballBoss.identityTag, (Plugin p, LivingEntity e) -> new FireballBoss(p, e));
-		mStatelessBosses.put(TpBehindBoss.identityTag, (Plugin p, LivingEntity e) -> new TpBehindBoss(p, e));
-		mStatelessBosses.put(TpBehindTargetedBoss.identityTag, (Plugin p, LivingEntity e) -> new TpBehindTargetedBoss(p, e));
-		mStatelessBosses.put(TpSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new TpSwapBoss(p, e));
-		mStatelessBosses.put(FlameNovaBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameNovaBoss(p, e));
-		mStatelessBosses.put(PlayerTargetBoss.identityTag, (Plugin p, LivingEntity e) -> new PlayerTargetBoss(p, e));
-		mStatelessBosses.put(DamageReducedBoss.identityTag, (Plugin p, LivingEntity e) -> new DamageReducedBoss(p, e));
-		mStatelessBosses.put(WinterSnowmanEventBoss.identityTag, (Plugin p, LivingEntity e) -> new WinterSnowmanEventBoss(p, e));
-		mStatelessBosses.put(TrainingDummyBoss.identityTag, (Plugin p, LivingEntity e) -> new TrainingDummyBoss(p, e));
-		mStatelessBosses.put(FestiveTesseractSnowmanBoss.identityTag, (Plugin p, LivingEntity e) -> new FestiveTesseractSnowmanBoss(p, e));
-		mStatelessBosses.put(CrowdControlImmunityBoss.identityTag, (Plugin p, LivingEntity e) -> new CrowdControlImmunityBoss(p, e));
-		mStatelessBosses.put(FloatBoss.identityTag, (Plugin p, LivingEntity e) -> new FloatBoss(p, e));
-		mStatelessBosses.put(FrostNovaBoss.identityTag, (Plugin p, LivingEntity e) -> new FrostNovaBoss(p, e));
-		mStatelessBosses.put(DebuffHitBoss.identityTag, (Plugin p, LivingEntity e) -> new DebuffHitBoss(p, e));
-		mStatelessBosses.put(IceAspectBoss.identityTag, (Plugin p, LivingEntity e) -> new IceAspectBoss(p, e));
-		mStatelessBosses.put(TsunamiChargerBoss.identityTag, (Plugin p, LivingEntity e) -> new TsunamiChargerBoss(p, e));
-		mStatelessBosses.put(BombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossBoss(p, e));
-		mStatelessBosses.put(BombTossNoBlockBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new BombTossNoBlockBreakBoss(p, e));
-		mStatelessBosses.put(RejuvenationBoss.identityTag, (Plugin p, LivingEntity e) -> new RejuvenationBoss(p, e));
-		mStatelessBosses.put(HandSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new HandSwapBoss(p, e));
-		mStatelessBosses.put(UnstableBoss.identityTag, (Plugin p, LivingEntity e) -> new UnstableBoss(p, e));
-		mStatelessBosses.put(BerserkerBoss.identityTag, (Plugin p, LivingEntity e) -> new BerserkerBoss(p, e));
-		mStatelessBosses.put(SnowballDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new SnowballDamageBoss(p, e));
-		mStatelessBosses.put(CorruptInfestedBoss.identityTag, (Plugin p, LivingEntity e) -> new CorruptInfestedBoss(p, e));
-		mStatelessBosses.put(FlameLaserBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameLaserBoss(p, e));
-		mStatelessBosses.put(SpecterParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new SpecterParticleBoss(p, e));
-		mStatelessBosses.put(DreadnaughtParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadnaughtParticleBoss(p, e));
-		mStatelessBosses.put(DreadlingBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadlingBoss(p, e));
-		mStatelessBosses.put(ProjectileDeflectionBoss.identityTag, (Plugin p, LivingEntity e) -> new ProjectileDeflectionBoss(p, e));
-		mStatelessBosses.put(LivingBladeBoss.identityTag, (Plugin p, LivingEntity e) -> new LivingBladeBoss(p, e));
-		mStatelessBosses.put(PrimordialElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> new PrimordialElementalKaulBoss(p, e));
-		mStatelessBosses.put(ImmortalElementalKaulBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalElementalKaulBoss(p, e));
-		mStatelessBosses.put(CyanSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new CyanSummonBoss(p, e));
-		mStatelessBosses.put(WitherHitBoss.identityTag, (Plugin p, LivingEntity e) -> new WitherHitBoss(p, e));
-		mStatelessBosses.put(VolatileBoss.identityTag, (Plugin p, LivingEntity e) -> new VolatileBoss(p, e));
-		mStatelessBosses.put(SwapOnDismountBoss.identityTag, (Plugin p, LivingEntity e) -> new SwapOnDismountBoss(p, e));
-		mStatelessBosses.put(PlayerDamageOnlyBoss.identityTag, (Plugin p, LivingEntity e) -> new PlayerDamageOnlyBoss(p, e));
-		mStatelessBosses.put(GrayDemonSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayDemonSummoner(p, e));
-		mStatelessBosses.put(GrayGolemSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayGolemSummoner(p, e));
-		mStatelessBosses.put(GrayScarabSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayScarabSummoner(p, e));
-		mStatelessBosses.put(GrayBookSummoner.identityTag, (Plugin p, LivingEntity e) -> new GrayBookSummoner(p, e));
-		mStatelessBosses.put(GraySummoned.identityTag, (Plugin p, LivingEntity e) -> new GraySummoned(p, e));
-		mStatelessBosses.put(IceBreakBoss.identityTag, (Plugin p, LivingEntity e) -> new IceBreakBoss(p, e));
-		mStatelessBosses.put(PunchResistBoss.identityTag, (Plugin p, LivingEntity e) -> new PunchResistBoss(p, e));
-		mStatelessBosses.put(HalloweenCreeperBoss.identityTag, (Plugin p, LivingEntity e) -> new HalloweenCreeperBoss(p, e));
-		mStatelessBosses.put(NoExperienceBoss.identityTag, (Plugin p, LivingEntity e) -> new NoExperienceBoss(p, e));
-		mStatelessBosses.put(FocusFireBoss.identityTag, (Plugin p, LivingEntity e) -> new FocusFireBoss(p, e));
-		mStatelessBosses.put(ForceBoss.identityTag, (Plugin p, LivingEntity e) -> new ForceBoss(p, e));
-		mStatelessBosses.put(AvengerBoss.identityTag, (Plugin p, LivingEntity e) -> new AvengerBoss(p, e));
-		mStatelessBosses.put(RageBoss.identityTag, (Plugin p, LivingEntity e) -> new RageBoss(p, e));
-		mStatelessBosses.put(EarthshakeBoss.identityTag, (Plugin p, LivingEntity e) -> new EarthshakeBoss(p, e));
-		mStatelessBosses.put(MagicArrowBoss.identityTag, (Plugin p, LivingEntity e) -> new MagicArrowBoss(p, e));
-		mStatelessBosses.put(SeekingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new SeekingProjectileBoss(p, e));
-		mStatelessBosses.put(TrackingProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new TrackingProjectileBoss(p, e));
-		mStatelessBosses.put(WrathBoss.identityTag, (Plugin p, LivingEntity e) -> new WrathBoss(p, e));
-		mStatelessBosses.put(LeapBoss.identityTag, (Plugin p, LivingEntity e) -> new LeapBoss(p, e));
-		mStatelessBosses.put(BarrierBoss.identityTag, (Plugin p, LivingEntity e) -> new BarrierBoss(p, e));
-		mStatelessBosses.put(CrowdControlResistanceBoss.identityTag, (Plugin p, LivingEntity e) -> new CrowdControlResistanceBoss(p, e));
-		mStatelessBosses.put(MeteorSlamBoss.identityTag, (Plugin p, LivingEntity e) -> new MeteorSlamBoss(p, e));
-		mStatelessBosses.put(SwingBoss.identityTag, (Plugin p, LivingEntity e) -> new SwingBoss(p, e));
-		mStatelessBosses.put(MistMob.identityTag, (Plugin p, LivingEntity e) -> new MistMob(p, e));
-		mStatelessBosses.put(HookBoss.identityTag, (Plugin p, LivingEntity e) -> new HookBoss(p, e));
-		mStatelessBosses.put(FrostGiantIcicle.identityTag, (Plugin p, LivingEntity e) -> new FrostGiantIcicle(p, e));
-		mStatelessBosses.put(SpellSlingerBoss.identityTag, (Plugin p, LivingEntity e) -> new SpellSlingerBoss(p, e));
-		mStatelessBosses.put(VindictiveBoss.identityTag, (Plugin p, LivingEntity e) -> new VindictiveBoss(p, e));
-		mStatelessBosses.put(ShadowTrailBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadowTrailBoss(p, e));
-		mStatelessBosses.put(KineticProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new KineticProjectileBoss(p, e));
-		mStatelessBosses.put(FlameTrailBoss.identityTag, (Plugin p, LivingEntity e) -> new FlameTrailBoss(p, e));
-		mStatelessBosses.put(ShadeParticleBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadeParticleBoss(p, e));
-		mStatelessBosses.put(FireBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new FireBombTossBoss(p, e));
-		mStatelessBosses.put(CommanderBoss.identityTag, (Plugin p, LivingEntity e) -> new CommanderBoss(p, e));
-		mStatelessBosses.put(ShadePossessedBoss.identityTag, (Plugin p, LivingEntity e) -> new ShadePossessedBoss(p, e));
-		mStatelessBosses.put(TwistedDespairBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedDespairBoss(p, e));
-		mStatelessBosses.put(CoordinatedAttackBoss.identityTag, (Plugin p, LivingEntity e) -> new CoordinatedAttackBoss(p, e));
-		mStatelessBosses.put(AbilitySilenceBoss.identityTag, (Plugin p, LivingEntity e) -> new AbilitySilenceBoss(p, e));
-		mStatelessBosses.put(ShiftingBoss.identityTag, (Plugin p, LivingEntity e) -> new ShiftingBoss(p, e));
-		mStatelessBosses.put(BulletHellBoss.identityTag, (Plugin p, LivingEntity e) -> new BulletHellBoss(p, e));
-		mStatelessBosses.put(CarapaceBoss.identityTag, (Plugin p, LivingEntity e) -> new CarapaceBoss(p, e));
-		mStatelessBosses.put(KamikazeBoss.identityTag, (Plugin p, LivingEntity e) -> new KamikazeBoss(p, e));
-		mStatelessBosses.put(TinyBombTossBoss.identityTag, (Plugin p, LivingEntity e) -> new TinyBombTossBoss(p, e));
-		mStatelessBosses.put(AntiRangeBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeBoss(p, e));
-		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, (Plugin p, LivingEntity e) -> new AntiRangeChivalrousBoss(p, e));
-		mStatelessBosses.put(ImmortalMountBoss.identityTag, (Plugin p, LivingEntity e) -> new ImmortalMountBoss(p, e));
-		mStatelessBosses.put(SilenceOnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new SilenceOnHitBoss(p, e));
-		mStatelessBosses.put(FalseSpiritPortal.identityTag, (Plugin p, LivingEntity e) -> new FalseSpiritPortal(p, e));
-		mStatelessBosses.put(TffBookSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new TffBookSummonBoss(p, e));
-		mStatelessBosses.put(ArcaneProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new ArcaneProjectileBoss(p, e));
-		mStatelessBosses.put(JumpBoss.identityTag, (Plugin p, LivingEntity e) -> new JumpBoss(p, e));
-		mStatelessBosses.put(RebornBoss.identityTag, (Plugin p, LivingEntity e) -> new RebornBoss(p, e));
-		mStatelessBosses.put(NoFireBoss.identityTag, (Plugin p, LivingEntity e) -> new NoFireBoss(p, e));
-		mStatelessBosses.put(DistanceCloserBoss.identityTag, (Plugin p, LivingEntity e) -> new DistanceCloserBoss(p, e));
-		mStatelessBosses.put(WeakHookBoss.identityTag, (Plugin p, LivingEntity e) -> new WeakHookBoss(p, e));
-		mStatelessBosses.put(AuraEffectBoss.identityTag, (Plugin p, LivingEntity e) -> new AuraEffectBoss(p, e));
-		mStatelessBosses.put(DummyDecoyBoss.identityTag, (Plugin p, LivingEntity e) -> new DummyDecoyBoss(p, e));
-		mStatelessBosses.put(LaserBoss.identityTag, (Plugin p, LivingEntity e) -> new LaserBoss(p, e));
-		mStatelessBosses.put(SpinBoss.identityTag, (Plugin p, LivingEntity e) -> new SpinBoss(p, e));
-		mStatelessBosses.put(OnHitBoss.identityTag, (Plugin p, LivingEntity e) -> new OnHitBoss(p, e));
-		mStatelessBosses.put(NovaBoss.identityTag, (Plugin p, LivingEntity e) -> new NovaBoss(p, e));
-		mStatelessBosses.put(ProjectileBoss.identityTag, (Plugin p, LivingEntity e) -> new ProjectileBoss(p, e));
-		mStatelessBosses.put(RainbowParrot.identityTag, (Plugin p, LivingEntity e) -> new RainbowParrot(p, e));
-		mStatelessBosses.put(SpawnMobsBoss.identityTag, (Plugin p, LivingEntity e) -> new SpawnMobsBoss(p, e));
-		mStatelessBosses.put(LandSlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LandSlowBoss(p, e));
-		mStatelessBosses.put(PounceBoss.identityTag, (Plugin p, LivingEntity e) -> new PounceBoss(p, e));
-		mStatelessBosses.put(NoAbilityDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new NoAbilityDamageBoss(p, e));
-		mStatelessBosses.put(NoGlowingBoss.identityTag, (Plugin p, LivingEntity e) -> new NoGlowingBoss(p, e));
-		mStatelessBosses.put(GenericTargetBoss.identityTag, (Plugin p, LivingEntity e) -> new GenericTargetBoss(p, e));
-		mStatelessBosses.put(MobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new MobRisingBoss(p, e));
-		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, (Plugin p, LivingEntity e) -> new GrenadeLauncherBoss(p, e));
-		mStatelessBosses.put(SizeChangerBoss.identityTag, (Plugin p, LivingEntity e) -> new SizeChangerBoss(p, e));
-		mStatelessBosses.put(DelveScalingBoss.identityTag, (Plugin p, LivingEntity e) -> new DelveScalingBoss(p, e));
-		mStatelessBosses.put(DeathSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DeathSummonBoss(p, e));
-		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, (Plugin p, LivingEntity e) -> new SummonOnExplosionBoss(p, e));
-		mStatelessBosses.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> new HostileBoss(p, e));
-		mStatelessBosses.put(StarfallBoss.identityTag, (Plugin p, LivingEntity e) -> new StarfallBoss(p, e));
-		mStatelessBosses.put(ShatterBoss.identityTag, (Plugin p, LivingEntity e) -> new ShatterBoss(p, e));
-		mStatelessBosses.put(StatMultiplierBoss.identityTag, (Plugin p, LivingEntity e) -> new StatMultiplierBoss(p, e));
-		mStatelessBosses.put(SpectralSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new SpectralSummonBoss(p, e));
-		mStatelessBosses.put(DreadfulSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new DreadfulSummonBoss(p, e));
-		mStatelessBosses.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> new FriendlyBoss(p, e));
-		mStatelessBosses.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> new MageCosmicMoonbladeBoss(p, e));
-		mStatelessBosses.put(WarriorShieldWallBoss.identityTag, (Plugin p, LivingEntity e) -> new WarriorShieldWallBoss(p, e));
-		mStatelessBosses.put(DodgeBoss.identityTag, (Plugin p, LivingEntity e) -> new DodgeBoss(p, e));
-		mStatelessBosses.put(BlockPlacerBoss.identityTag, (Plugin p, LivingEntity e) -> new BlockPlacerBoss(p, e));
-		mStatelessBosses.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> new ScoutVolleyBoss(p, e));
-		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, (Plugin p, LivingEntity e) -> new WarlockAmpHexBoss(p, e));
-		mStatelessBosses.put(LimitedLifespanBoss.identityTag, (Plugin p, LivingEntity e) -> new LimitedLifespanBoss(p, e));
-		mStatelessBosses.put(BlueFireBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueFireBoss(p, e));
-		mStatelessBosses.put(BlueEarthBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueEarthBoss(p, e));
-		mStatelessBosses.put(BlueAirBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueAirBoss(p, e));
-		mStatelessBosses.put(BlueWaterBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueWaterBoss(p, e));
-		mStatelessBosses.put(DropShardBoss.identityTag, (Plugin p, LivingEntity e) -> new DropShardBoss(p, e));
-		mStatelessBosses.put(BlueStrikeDaggerCraftingBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeDaggerCraftingBoss(p, e));
-		mStatelessBosses.put(BlueStrikeTargetNPCBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTargetNPCBoss(p, e));
-		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, (Plugin p, LivingEntity e) -> new BlueStrikeTurretBoss(p, e));
-		mStatelessBosses.put(LavaCannonBoss.identityTag, (Plugin p, LivingEntity e) -> new LavaCannonBoss(p, e));
-		mStatelessBosses.put(PhasesManagerBoss.identityTag, (Plugin p, LivingEntity e) -> new PhasesManagerBoss(p, e));
-		mStatelessBosses.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> new SoundBoss(p, e));
-		mStatelessBosses.put(RedstoneBoss.identityTag, (Plugin p, LivingEntity e) -> new RedstoneBoss(p, e));
+		mStatelessBosses.put(BlockLockBoss.identityTag, BlockLockBoss::new);
+		mStatelessBosses.put(ImmortalPassengerBoss.identityTag, ImmortalPassengerBoss::new);
+		mStatelessBosses.put(ChestLockBoss.identityTag, ChestLockBoss::new);
+		mStatelessBosses.put(UnyieldingBoss.identityTag, UnyieldingBoss::new);
+		mStatelessBosses.put(ToughBoss.identityTag, ToughBoss::new);
+		mStatelessBosses.put(UnseenBoss.identityTag, UnseenBoss::new);
+		mStatelessBosses.put(WhispersBoss.identityTag, WhispersBoss::new);
+		mStatelessBosses.put(GenericBoss.identityTag, GenericBoss::new);
+		mStatelessBosses.put(HiddenBoss.identityTag, HiddenBoss::new);
+		mStatelessBosses.put(InvisibleBoss.identityTag, InvisibleBoss::new);
+		mStatelessBosses.put(FireResistantBoss.identityTag, FireResistantBoss::new);
+		mStatelessBosses.put(HungerCloudBoss.identityTag, HungerCloudBoss::new);
+		mStatelessBosses.put(BlockBreakBoss.identityTag, BlockBreakBoss::new);
+		mStatelessBosses.put(PulseLaserBoss.identityTag, PulseLaserBoss::new);
+		mStatelessBosses.put(ArcaneLaserBoss.identityTag, ArcaneLaserBoss::new);
+		mStatelessBosses.put(WeaponSwitchBoss.identityTag, WeaponSwitchBoss::new);
+		mStatelessBosses.put(ShieldSwitchBoss.identityTag, ShieldSwitchBoss::new);
+		mStatelessBosses.put(ChargerBoss.identityTag, ChargerBoss::new);
+		mStatelessBosses.put(BlastResistBoss.identityTag, BlastResistBoss::new);
+		mStatelessBosses.put(InfestedBoss.identityTag, InfestedBoss::new);
+		mStatelessBosses.put(FireballBoss.identityTag, FireballBoss::new);
+		mStatelessBosses.put(TpBehindBoss.identityTag, TpBehindBoss::new);
+		mStatelessBosses.put(TpBehindTargetedBoss.identityTag, TpBehindTargetedBoss::new);
+		mStatelessBosses.put(TpSwapBoss.identityTag, TpSwapBoss::new);
+		mStatelessBosses.put(FlameNovaBoss.identityTag, FlameNovaBoss::new);
+		mStatelessBosses.put(PlayerTargetBoss.identityTag, PlayerTargetBoss::new);
+		mStatelessBosses.put(DamageReducedBoss.identityTag, DamageReducedBoss::new);
+		mStatelessBosses.put(WinterSnowmanEventBoss.identityTag, WinterSnowmanEventBoss::new);
+		mStatelessBosses.put(TrainingDummyBoss.identityTag, TrainingDummyBoss::new);
+		mStatelessBosses.put(FestiveTesseractSnowmanBoss.identityTag, FestiveTesseractSnowmanBoss::new);
+		mStatelessBosses.put(CrowdControlImmunityBoss.identityTag, CrowdControlImmunityBoss::new);
+		mStatelessBosses.put(FloatBoss.identityTag, FloatBoss::new);
+		mStatelessBosses.put(FrostNovaBoss.identityTag, FrostNovaBoss::new);
+		mStatelessBosses.put(DebuffHitBoss.identityTag, DebuffHitBoss::new);
+		mStatelessBosses.put(IceAspectBoss.identityTag, IceAspectBoss::new);
+		mStatelessBosses.put(TsunamiChargerBoss.identityTag, TsunamiChargerBoss::new);
+		mStatelessBosses.put(BombTossBoss.identityTag, BombTossBoss::new);
+		mStatelessBosses.put(BombTossNoBlockBreakBoss.identityTag, BombTossNoBlockBreakBoss::new);
+		mStatelessBosses.put(RejuvenationBoss.identityTag, RejuvenationBoss::new);
+		mStatelessBosses.put(HandSwapBoss.identityTag, HandSwapBoss::new);
+		mStatelessBosses.put(UnstableBoss.identityTag, UnstableBoss::new);
+		mStatelessBosses.put(BerserkerBoss.identityTag, BerserkerBoss::new);
+		mStatelessBosses.put(SnowballDamageBoss.identityTag, SnowballDamageBoss::new);
+		mStatelessBosses.put(CorruptInfestedBoss.identityTag, CorruptInfestedBoss::new);
+		mStatelessBosses.put(FlameLaserBoss.identityTag, FlameLaserBoss::new);
+		mStatelessBosses.put(SpecterParticleBoss.identityTag, SpecterParticleBoss::new);
+		mStatelessBosses.put(DreadnaughtParticleBoss.identityTag, DreadnaughtParticleBoss::new);
+		mStatelessBosses.put(DreadlingBoss.identityTag, DreadlingBoss::new);
+		mStatelessBosses.put(ProjectileDeflectionBoss.identityTag, ProjectileDeflectionBoss::new);
+		mStatelessBosses.put(LivingBladeBoss.identityTag, LivingBladeBoss::new);
+		mStatelessBosses.put(PrimordialElementalKaulBoss.identityTag, PrimordialElementalKaulBoss::new);
+		mStatelessBosses.put(ImmortalElementalKaulBoss.identityTag, ImmortalElementalKaulBoss::new);
+		mStatelessBosses.put(CyanSummonBoss.identityTag, CyanSummonBoss::new);
+		mStatelessBosses.put(WitherHitBoss.identityTag, WitherHitBoss::new);
+		mStatelessBosses.put(VolatileBoss.identityTag, VolatileBoss::new);
+		mStatelessBosses.put(SwapOnDismountBoss.identityTag, SwapOnDismountBoss::new);
+		mStatelessBosses.put(PlayerDamageOnlyBoss.identityTag, PlayerDamageOnlyBoss::new);
+		mStatelessBosses.put(GrayDemonSummoner.identityTag, GrayDemonSummoner::new);
+		mStatelessBosses.put(GrayGolemSummoner.identityTag, GrayGolemSummoner::new);
+		mStatelessBosses.put(GrayScarabSummoner.identityTag, GrayScarabSummoner::new);
+		mStatelessBosses.put(GrayBookSummoner.identityTag, GrayBookSummoner::new);
+		mStatelessBosses.put(GraySummoned.identityTag, GraySummoned::new);
+		mStatelessBosses.put(IceBreakBoss.identityTag, IceBreakBoss::new);
+		mStatelessBosses.put(PunchResistBoss.identityTag, PunchResistBoss::new);
+		mStatelessBosses.put(HalloweenCreeperBoss.identityTag, HalloweenCreeperBoss::new);
+		mStatelessBosses.put(NoExperienceBoss.identityTag, NoExperienceBoss::new);
+		mStatelessBosses.put(FocusFireBoss.identityTag, FocusFireBoss::new);
+		mStatelessBosses.put(ForceBoss.identityTag, ForceBoss::new);
+		mStatelessBosses.put(AvengerBoss.identityTag, AvengerBoss::new);
+		mStatelessBosses.put(RageBoss.identityTag, RageBoss::new);
+		mStatelessBosses.put(EarthshakeBoss.identityTag, EarthshakeBoss::new);
+		mStatelessBosses.put(MagicArrowBoss.identityTag, MagicArrowBoss::new);
+		mStatelessBosses.put(SeekingProjectileBoss.identityTag, SeekingProjectileBoss::new);
+		mStatelessBosses.put(TrackingProjectileBoss.identityTag, TrackingProjectileBoss::new);
+		mStatelessBosses.put(WrathBoss.identityTag, WrathBoss::new);
+		mStatelessBosses.put(LeapBoss.identityTag, LeapBoss::new);
+		mStatelessBosses.put(BarrierBoss.identityTag, BarrierBoss::new);
+		mStatelessBosses.put(CrowdControlResistanceBoss.identityTag, CrowdControlResistanceBoss::new);
+		mStatelessBosses.put(MeteorSlamBoss.identityTag, MeteorSlamBoss::new);
+		mStatelessBosses.put(SwingBoss.identityTag, SwingBoss::new);
+		mStatelessBosses.put(MistMob.identityTag, MistMob::new);
+		mStatelessBosses.put(HookBoss.identityTag, HookBoss::new);
+		mStatelessBosses.put(FrostGiantIcicle.identityTag, FrostGiantIcicle::new);
+		mStatelessBosses.put(SpellSlingerBoss.identityTag, SpellSlingerBoss::new);
+		mStatelessBosses.put(VindictiveBoss.identityTag, VindictiveBoss::new);
+		mStatelessBosses.put(ShadowTrailBoss.identityTag, ShadowTrailBoss::new);
+		mStatelessBosses.put(KineticProjectileBoss.identityTag, KineticProjectileBoss::new);
+		mStatelessBosses.put(FlameTrailBoss.identityTag, FlameTrailBoss::new);
+		mStatelessBosses.put(ShadeParticleBoss.identityTag, ShadeParticleBoss::new);
+		mStatelessBosses.put(FireBombTossBoss.identityTag, FireBombTossBoss::new);
+		mStatelessBosses.put(CommanderBoss.identityTag, CommanderBoss::new);
+		mStatelessBosses.put(ShadePossessedBoss.identityTag, ShadePossessedBoss::new);
+		mStatelessBosses.put(TwistedDespairBoss.identityTag, TwistedDespairBoss::new);
+		mStatelessBosses.put(CoordinatedAttackBoss.identityTag, CoordinatedAttackBoss::new);
+		mStatelessBosses.put(AbilitySilenceBoss.identityTag, AbilitySilenceBoss::new);
+		mStatelessBosses.put(ShiftingBoss.identityTag, ShiftingBoss::new);
+		mStatelessBosses.put(BulletHellBoss.identityTag, BulletHellBoss::new);
+		mStatelessBosses.put(CarapaceBoss.identityTag, CarapaceBoss::new);
+		mStatelessBosses.put(KamikazeBoss.identityTag, KamikazeBoss::new);
+		mStatelessBosses.put(TinyBombTossBoss.identityTag, TinyBombTossBoss::new);
+		mStatelessBosses.put(AntiRangeBoss.identityTag, AntiRangeBoss::new);
+		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, AntiRangeChivalrousBoss::new);
+		mStatelessBosses.put(ImmortalMountBoss.identityTag, ImmortalMountBoss::new);
+		mStatelessBosses.put(SilenceOnHitBoss.identityTag, SilenceOnHitBoss::new);
+		mStatelessBosses.put(FalseSpiritPortal.identityTag, FalseSpiritPortal::new);
+		mStatelessBosses.put(TffBookSummonBoss.identityTag, TffBookSummonBoss::new);
+		mStatelessBosses.put(ArcaneProjectileBoss.identityTag, ArcaneProjectileBoss::new);
+		mStatelessBosses.put(JumpBoss.identityTag, JumpBoss::new);
+		mStatelessBosses.put(RebornBoss.identityTag, RebornBoss::new);
+		mStatelessBosses.put(NoFireBoss.identityTag, NoFireBoss::new);
+		mStatelessBosses.put(DistanceCloserBoss.identityTag, DistanceCloserBoss::new);
+		mStatelessBosses.put(WeakHookBoss.identityTag, WeakHookBoss::new);
+		mStatelessBosses.put(AuraEffectBoss.identityTag, AuraEffectBoss::new);
+		mStatelessBosses.put(DummyDecoyBoss.identityTag, DummyDecoyBoss::new);
+		mStatelessBosses.put(LaserBoss.identityTag, LaserBoss::new);
+		mStatelessBosses.put(SpinBoss.identityTag, SpinBoss::new);
+		mStatelessBosses.put(OnHitBoss.identityTag, OnHitBoss::new);
+		mStatelessBosses.put(NovaBoss.identityTag, NovaBoss::new);
+		mStatelessBosses.put(ProjectileBoss.identityTag, ProjectileBoss::new);
+		mStatelessBosses.put(RainbowParrot.identityTag, RainbowParrot::new);
+		mStatelessBosses.put(SpawnMobsBoss.identityTag, SpawnMobsBoss::new);
+		mStatelessBosses.put(LandSlowBoss.identityTag, LandSlowBoss::new);
+		mStatelessBosses.put(PounceBoss.identityTag, PounceBoss::new);
+		mStatelessBosses.put(NoAbilityDamageBoss.identityTag, NoAbilityDamageBoss::new);
+		mStatelessBosses.put(NoGlowingBoss.identityTag, NoGlowingBoss::new);
+		mStatelessBosses.put(GenericTargetBoss.identityTag, GenericTargetBoss::new);
+		mStatelessBosses.put(MobRisingBoss.identityTag, MobRisingBoss::new);
+		mStatelessBosses.put(GrenadeLauncherBoss.identityTag, GrenadeLauncherBoss::new);
+		mStatelessBosses.put(SizeChangerBoss.identityTag, SizeChangerBoss::new);
+		mStatelessBosses.put(DelveScalingBoss.identityTag, DelveScalingBoss::new);
+		mStatelessBosses.put(DeathSummonBoss.identityTag, DeathSummonBoss::new);
+		mStatelessBosses.put(SummonOnExplosionBoss.identityTag, SummonOnExplosionBoss::new);
+		mStatelessBosses.put(HostileBoss.identityTag, HostileBoss::new);
+		mStatelessBosses.put(StarfallBoss.identityTag, StarfallBoss::new);
+		mStatelessBosses.put(ShatterBoss.identityTag, ShatterBoss::new);
+		mStatelessBosses.put(StatMultiplierBoss.identityTag, StatMultiplierBoss::new);
+		mStatelessBosses.put(SpectralSummonBoss.identityTag, SpectralSummonBoss::new);
+		mStatelessBosses.put(DreadfulSummonBoss.identityTag, DreadfulSummonBoss::new);
+		mStatelessBosses.put(FriendlyBoss.identityTag, FriendlyBoss::new);
+		mStatelessBosses.put(MageCosmicMoonbladeBoss.identityTag, MageCosmicMoonbladeBoss::new);
+		mStatelessBosses.put(WarriorShieldWallBoss.identityTag, WarriorShieldWallBoss::new);
+		mStatelessBosses.put(DodgeBoss.identityTag, DodgeBoss::new);
+		mStatelessBosses.put(BlockPlacerBoss.identityTag, BlockPlacerBoss::new);
+		mStatelessBosses.put(ScoutVolleyBoss.identityTag, ScoutVolleyBoss::new);
+		mStatelessBosses.put(WarlockAmpHexBoss.identityTag, WarlockAmpHexBoss::new);
+		mStatelessBosses.put(LimitedLifespanBoss.identityTag, LimitedLifespanBoss::new);
+		mStatelessBosses.put(BlueFireBoss.identityTag, BlueFireBoss::new);
+		mStatelessBosses.put(BlueEarthBoss.identityTag, BlueEarthBoss::new);
+		mStatelessBosses.put(BlueAirBoss.identityTag, BlueAirBoss::new);
+		mStatelessBosses.put(BlueWaterBoss.identityTag, BlueWaterBoss::new);
+		mStatelessBosses.put(DropShardBoss.identityTag, DropShardBoss::new);
+		mStatelessBosses.put(BlueStrikeDaggerCraftingBoss.identityTag, BlueStrikeDaggerCraftingBoss::construct);
+		mStatelessBosses.put(BlueStrikeTargetNPCBoss.identityTag, BlueStrikeTargetNPCBoss::new);
+		mStatelessBosses.put(BlueStrikeTurretBoss.identityTag, BlueStrikeTurretBoss::new);
+		mStatelessBosses.put(LavaCannonBoss.identityTag, LavaCannonBoss::construct);
+		mStatelessBosses.put(PhasesManagerBoss.identityTag, PhasesManagerBoss::new);
+		mStatelessBosses.put(SoundBoss.identityTag, SoundBoss::new);
+		mStatelessBosses.put(RedstoneBoss.identityTag, RedstoneBoss::new);
 
 
-		mStatelessBosses.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> new LichMageBoss(p, e));
-		mStatelessBosses.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> new LichRogueBoss(p, e));
-		mStatelessBosses.put(LichClericBoss.identityTag, (Plugin p, LivingEntity e) -> new LichClericBoss(p, e));
-		mStatelessBosses.put(LichWarlockBoss.identityTag, (Plugin p, LivingEntity e) -> new LichWarlockBoss(p, e));
-		mStatelessBosses.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> new LichAlchBoss(p, e));
-		mStatelessBosses.put(LichScoutBoss.identityTag, (Plugin p, LivingEntity e) -> new LichScoutBoss(p, e));
-		mStatelessBosses.put(LichWarriorBoss.identityTag, (Plugin p, LivingEntity e) -> new LichWarriorBoss(p, e));
-		mStatelessBosses.put(LichConquestBoss.identityTag, (Plugin p, LivingEntity e) -> new LichConquestBoss(p, e));
-		mStatelessBosses.put(LichDemiseBoss.identityTag, (Plugin p, LivingEntity e) -> new LichDemiseBoss(p, e));
-		mStatelessBosses.put(LichJudgementBoss.identityTag, (Plugin p, LivingEntity e) -> new LichJudgementBoss(p, e));
-		mStatelessBosses.put(LichStrifeBoss.identityTag, (Plugin p, LivingEntity e) -> new LichStrifeBoss(p, e));
-		mStatelessBosses.put(LichCurseBoss.identityTag, (Plugin p, LivingEntity e) -> new LichCurseBoss(p, e));
-		mStatelessBosses.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new LichShieldBoss(p, e));
-		mStatelessBosses.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> new LichKeyGlowBoss(p, e));
-		mStatelessBosses.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> new FestiveTessUpgradeSnowmenBoss(p, e));
-		mStatelessBosses.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> new MetalmancyBoss(p, e));
-		mStatelessBosses.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> new RestlessSoulsBoss(p, e));
-		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> new AlchemicalAberrationBoss(p, e));
-		mStatelessBosses.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> new ThrowSummonBoss(p, e));
-		mStatelessBosses.put(PotionThrowBoss.identityTag, (Plugin p, LivingEntity e) -> new PotionThrowBoss(p, e));
-		mStatelessBosses.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> new TwistedMiniBoss(p, e));
-		mStatelessBosses.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownPositiveBoss(p, e));
-		mStatelessBosses.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownNegativeBoss(p, e));
-		mStatelessBosses.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new BrownMagnetSwapBoss(p, e));
-		mStatelessBosses.put(ParadoxSwapBoss.identityTag, (Plugin p, LivingEntity e) -> new ParadoxSwapBoss(p, e));
-		mStatelessBosses.put(TemporalShieldBoss.identityTag, (Plugin p, LivingEntity e) -> new TemporalShieldBoss(p, e));
-		mStatelessBosses.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> new GalleryMobRisingBoss(p, e));
-		mStatelessBosses.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> new GallerySummonMobBoss(p, e));
-		mStatelessBosses.put(TagScalingBoss.identityTag, (Plugin p, LivingEntity e) -> new TagScalingBoss(p, e));
-		mStatelessBosses.put(CancelDamageBoss.identityTag, (Plugin p, LivingEntity e) -> new CancelDamageBoss(p, e));
+		mStatelessBosses.put(LichMageBoss.identityTag, LichMageBoss::new);
+		mStatelessBosses.put(LichRogueBoss.identityTag, LichRogueBoss::new);
+		mStatelessBosses.put(LichClericBoss.identityTag, LichClericBoss::new);
+		mStatelessBosses.put(LichWarlockBoss.identityTag, LichWarlockBoss::new);
+		mStatelessBosses.put(LichAlchBoss.identityTag, LichAlchBoss::new);
+		mStatelessBosses.put(LichScoutBoss.identityTag, LichScoutBoss::new);
+		mStatelessBosses.put(LichWarriorBoss.identityTag, LichWarriorBoss::new);
+		mStatelessBosses.put(LichConquestBoss.identityTag, LichConquestBoss::new);
+		mStatelessBosses.put(LichDemiseBoss.identityTag, LichDemiseBoss::new);
+		mStatelessBosses.put(LichJudgementBoss.identityTag, LichJudgementBoss::new);
+		mStatelessBosses.put(LichStrifeBoss.identityTag, LichStrifeBoss::new);
+		mStatelessBosses.put(LichCurseBoss.identityTag, LichCurseBoss::new);
+		mStatelessBosses.put(LichShieldBoss.identityTag, LichShieldBoss::new);
+		mStatelessBosses.put(LichKeyGlowBoss.identityTag, LichKeyGlowBoss::new);
+		mStatelessBosses.put(FestiveTessUpgradeSnowmenBoss.identityTag, FestiveTessUpgradeSnowmenBoss::new);
+		mStatelessBosses.put(MetalmancyBoss.identityTag, MetalmancyBoss::new);
+		mStatelessBosses.put(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::new);
+		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::new);
+		mStatelessBosses.put(ThrowSummonBoss.identityTag, ThrowSummonBoss::new);
+		mStatelessBosses.put(PotionThrowBoss.identityTag, PotionThrowBoss::new);
+		mStatelessBosses.put(TwistedMiniBoss.identityTag, TwistedMiniBoss::new);
+		mStatelessBosses.put(BrownPositiveBoss.identityTag, BrownPositiveBoss::new);
+		mStatelessBosses.put(BrownNegativeBoss.identityTag, BrownNegativeBoss::new);
+		mStatelessBosses.put(BrownMagnetSwapBoss.identityTag, BrownMagnetSwapBoss::new);
+		mStatelessBosses.put(ParadoxSwapBoss.identityTag, ParadoxSwapBoss::new);
+		mStatelessBosses.put(TemporalShieldBoss.identityTag, TemporalShieldBoss::new);
+		mStatelessBosses.put(GalleryMobRisingBoss.identityTag, GalleryMobRisingBoss::new);
+		mStatelessBosses.put(GallerySummonMobBoss.identityTag, GallerySummonMobBoss::new);
+		mStatelessBosses.put(TagScalingBoss.identityTag, TagScalingBoss::new);
+		mStatelessBosses.put(CancelDamageBoss.identityTag, CancelDamageBoss::new);
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -555,44 +556,44 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(SoundBoss.identityTag, (Plugin p, LivingEntity e) -> SoundBoss.deserialize(p, e));
 		mBossDeserializers.put(RedstoneBoss.identityTag, (Plugin p, LivingEntity e) -> RedstoneBoss.deserialize(p, e));
 
-		mBossDeserializers.put(Lich.identityTag, (Plugin p, LivingEntity e) -> Lich.deserialize(p, e));
-		mBossDeserializers.put(LichAlchBoss.identityTag, (Plugin p, LivingEntity e) -> LichAlchBoss.deserialize(p, e));
-		mBossDeserializers.put(LichClericBoss.identityTag, (Plugin p, LivingEntity e) -> LichClericBoss.deserialize(p, e));
-		mBossDeserializers.put(LichMageBoss.identityTag, (Plugin p, LivingEntity e) -> LichMageBoss.deserialize(p, e));
-		mBossDeserializers.put(LichRogueBoss.identityTag, (Plugin p, LivingEntity e) -> LichRogueBoss.deserialize(p, e));
-		mBossDeserializers.put(LichScoutBoss.identityTag, (Plugin p, LivingEntity e) -> LichScoutBoss.deserialize(p, e));
-		mBossDeserializers.put(LichWarlockBoss.identityTag, (Plugin p, LivingEntity e) -> LichWarlockBoss.deserialize(p, e));
-		mBossDeserializers.put(LichWarriorBoss.identityTag, (Plugin p, LivingEntity e) -> LichWarriorBoss.deserialize(p, e));
-		mBossDeserializers.put(LichConquestBoss.identityTag, (Plugin p, LivingEntity e) -> LichConquestBoss.deserialize(p, e));
-		mBossDeserializers.put(LichDemiseBoss.identityTag, (Plugin p, LivingEntity e) -> LichDemiseBoss.deserialize(p, e));
-		mBossDeserializers.put(LichJudgementBoss.identityTag, (Plugin p, LivingEntity e) -> LichJudgementBoss.deserialize(p, e));
-		mBossDeserializers.put(LichStrifeBoss.identityTag, (Plugin p, LivingEntity e) -> LichStrifeBoss.deserialize(p, e));
-		mBossDeserializers.put(LichCurseBoss.identityTag, (Plugin p, LivingEntity e) -> LichCurseBoss.deserialize(p, e));
-		mBossDeserializers.put(LichShieldBoss.identityTag, (Plugin p, LivingEntity e) -> LichShieldBoss.deserialize(p, e));
-		mBossDeserializers.put(LichKeyGlowBoss.identityTag, (Plugin p, LivingEntity e) -> LichKeyGlowBoss.deserialize(p, e));
-		mBossDeserializers.put(FestiveTessUpgradeSnowmenBoss.identityTag, (Plugin p, LivingEntity e) -> FestiveTessUpgradeSnowmenBoss.deserialize(p, e));
-		mBossDeserializers.put(MetalmancyBoss.identityTag, (Plugin p, LivingEntity e) -> MetalmancyBoss.deserialize(p, e));
-		mBossDeserializers.put(RestlessSoulsBoss.identityTag, (Plugin p, LivingEntity e) -> RestlessSoulsBoss.deserialize(p, e));
-		mBossDeserializers.put(AlchemicalAberrationBoss.identityTag, (Plugin p, LivingEntity e) -> AlchemicalAberrationBoss.deserialize(p, e));
-		mBossDeserializers.put(ThrowSummonBoss.identityTag, (Plugin p, LivingEntity e) -> ThrowSummonBoss.deserialize(p, e));
-		mBossDeserializers.put(HostileBoss.identityTag, (Plugin p, LivingEntity e) -> HostileBoss.deserialize(p, e));
-		mBossDeserializers.put(FriendlyBoss.identityTag, (Plugin p, LivingEntity e) -> FriendlyBoss.deserialize(p, e));
-		mBossDeserializers.put(PortalBoss.identityTag, (Plugin p, LivingEntity e) -> PortalBoss.deserialize(p, e));
-		mBossDeserializers.put(ImperialConstruct.identityTag, (Plugin p, LivingEntity e) -> ImperialConstruct.deserialize(p, e));
-		mBossDeserializers.put(ScoutVolleyBoss.identityTag, (Plugin p, LivingEntity e) -> ScoutVolleyBoss.deserialize(p, e));
-		mBossDeserializers.put(MageCosmicMoonbladeBoss.identityTag, (Plugin p, LivingEntity e) -> MageCosmicMoonbladeBoss.deserialize(p, e));
-		mBossDeserializers.put(TwistedMiniBoss.identityTag, (Plugin p, LivingEntity e) -> TwistedMiniBoss.deserialize(p, e));
-		mBossDeserializers.put(BrownNegativeBoss.identityTag, (Plugin p, LivingEntity e) -> BrownNegativeBoss.deserialize(p, e));
-		mBossDeserializers.put(BrownPositiveBoss.identityTag, (Plugin p, LivingEntity e) -> BrownPositiveBoss.deserialize(p, e));
-		mBossDeserializers.put(BrownMagnetSwapBoss.identityTag, (Plugin p, LivingEntity e) -> BrownMagnetSwapBoss.deserialize(p, e));
-		mBossDeserializers.put(ParadoxSwapBoss.identityTag, (Plugin p, LivingEntity e) -> ParadoxSwapBoss.deserialize(p, e));
-		mBossDeserializers.put(TealSpirit.identityTag, (Plugin p, LivingEntity e) -> TealSpirit.deserialize(p, e));
-		mBossDeserializers.put(TemporalShieldBoss.identityTag, (Plugin p, LivingEntity e) -> TemporalShieldBoss.deserialize(p, e));
-		mBossDeserializers.put(GalleryMobRisingBoss.identityTag, (Plugin p, LivingEntity e) -> GalleryMobRisingBoss.deserialize(p, e));
-		mBossDeserializers.put(GallerySummonMobBoss.identityTag, (Plugin p, LivingEntity e) -> GallerySummonMobBoss.deserialize(p, e));
-		mBossDeserializers.put(MusicBoss.identityTag, (Plugin p, LivingEntity e) -> MusicBoss.deserialize(p, e));
-		mBossDeserializers.put(TagScalingBoss.identityTag, (Plugin p, LivingEntity e) -> TagScalingBoss.deserialize(p, e));
-		mBossDeserializers.put(CancelDamageBoss.identityTag, (Plugin p, LivingEntity e) -> CancelDamageBoss.deserialize(p, e));
+		mBossDeserializers.put(Lich.identityTag, Lich::deserialize);
+		mBossDeserializers.put(LichAlchBoss.identityTag, LichAlchBoss::deserialize);
+		mBossDeserializers.put(LichClericBoss.identityTag, LichClericBoss::deserialize);
+		mBossDeserializers.put(LichMageBoss.identityTag, LichMageBoss::deserialize);
+		mBossDeserializers.put(LichRogueBoss.identityTag, LichRogueBoss::deserialize);
+		mBossDeserializers.put(LichScoutBoss.identityTag, LichScoutBoss::deserialize);
+		mBossDeserializers.put(LichWarlockBoss.identityTag, LichWarlockBoss::deserialize);
+		mBossDeserializers.put(LichWarriorBoss.identityTag, LichWarriorBoss::deserialize);
+		mBossDeserializers.put(LichConquestBoss.identityTag, LichConquestBoss::deserialize);
+		mBossDeserializers.put(LichDemiseBoss.identityTag, LichDemiseBoss::deserialize);
+		mBossDeserializers.put(LichJudgementBoss.identityTag, LichJudgementBoss::deserialize);
+		mBossDeserializers.put(LichStrifeBoss.identityTag, LichStrifeBoss::deserialize);
+		mBossDeserializers.put(LichCurseBoss.identityTag, LichCurseBoss::deserialize);
+		mBossDeserializers.put(LichShieldBoss.identityTag, LichShieldBoss::deserialize);
+		mBossDeserializers.put(LichKeyGlowBoss.identityTag, LichKeyGlowBoss::deserialize);
+		mBossDeserializers.put(FestiveTessUpgradeSnowmenBoss.identityTag, FestiveTessUpgradeSnowmenBoss::deserialize);
+		mBossDeserializers.put(MetalmancyBoss.identityTag, MetalmancyBoss::deserialize);
+		mBossDeserializers.put(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::deserialize);
+		mBossDeserializers.put(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::deserialize);
+		mBossDeserializers.put(ThrowSummonBoss.identityTag, ThrowSummonBoss::deserialize);
+		mBossDeserializers.put(HostileBoss.identityTag, HostileBoss::deserialize);
+		mBossDeserializers.put(FriendlyBoss.identityTag, FriendlyBoss::deserialize);
+		mBossDeserializers.put(PortalBoss.identityTag, PortalBoss::deserialize);
+		mBossDeserializers.put(ImperialConstruct.identityTag, ImperialConstruct::deserialize);
+		mBossDeserializers.put(ScoutVolleyBoss.identityTag, ScoutVolleyBoss::deserialize);
+		mBossDeserializers.put(MageCosmicMoonbladeBoss.identityTag, MageCosmicMoonbladeBoss::deserialize);
+		mBossDeserializers.put(TwistedMiniBoss.identityTag, TwistedMiniBoss::deserialize);
+		mBossDeserializers.put(BrownNegativeBoss.identityTag, BrownNegativeBoss::deserialize);
+		mBossDeserializers.put(BrownPositiveBoss.identityTag, BrownPositiveBoss::deserialize);
+		mBossDeserializers.put(BrownMagnetSwapBoss.identityTag, BrownMagnetSwapBoss::deserialize);
+		mBossDeserializers.put(ParadoxSwapBoss.identityTag, ParadoxSwapBoss::deserialize);
+		mBossDeserializers.put(TealSpirit.identityTag, TealSpirit::deserialize);
+		mBossDeserializers.put(TemporalShieldBoss.identityTag, TemporalShieldBoss::deserialize);
+		mBossDeserializers.put(GalleryMobRisingBoss.identityTag, GalleryMobRisingBoss::deserialize);
+		mBossDeserializers.put(GallerySummonMobBoss.identityTag, GallerySummonMobBoss::deserialize);
+		mBossDeserializers.put(MusicBoss.identityTag, MusicBoss::deserialize);
+		mBossDeserializers.put(TagScalingBoss.identityTag, TagScalingBoss::deserialize);
+		mBossDeserializers.put(CancelDamageBoss.identityTag, CancelDamageBoss::deserialize);
 
 		/***************************************************
 		 * Boss Parameters
@@ -675,6 +676,7 @@ public class BossManager implements Listener {
 	private boolean mNearbyPlayerDeathEnabled = false;
 
 	public BossManager(Plugin plugin) {
+		INSTANCE = this;
 		mPlugin = plugin;
 		mBosses = new HashMap<UUID, Boss>();
 
@@ -689,7 +691,6 @@ public class BossManager implements Listener {
 			}
 		}
 
-		INSTANCE = this;
 	}
 
 	/********************************************************************************
@@ -1106,7 +1107,7 @@ public class BossManager implements Listener {
 	/********************************************************************************
 	 * Static public methods
 	 *******************************************************************************/
-	public static @Nullable BossManager getInstance() {
+	public static BossManager getInstance() {
 		return INSTANCE;
 	}
 
@@ -1173,7 +1174,14 @@ public class BossManager implements Listener {
 
 		StatelessBossConstructor stateless = mStatelessBosses.get(requestedTag);
 		if (stateless != null) {
-			INSTANCE.createBossInternal(targetEntity, stateless.construct(INSTANCE.mPlugin, targetEntity));
+			BossAbilityGroup bossAbilityGroup = stateless.construct(INSTANCE.mPlugin, targetEntity);
+			if (bossAbilityGroup == null) {
+				if (sender != null) {
+					sender.sendMessage("Could not give '" + requestedTag + "' to mob!");
+				}
+				return;
+			}
+			INSTANCE.createBossInternal(targetEntity, bossAbilityGroup);
 			if (sender != null) {
 				sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
 			}
@@ -1200,7 +1208,14 @@ public class BossManager implements Listener {
 
 		StatefulBossConstructor stateful = INSTANCE.mStatefulBosses.get(requestedTag);
 		if (stateful != null) {
-			INSTANCE.createBossInternal(targetEntity, stateful.construct(INSTANCE.mPlugin, targetEntity, targetEntity.getLocation(), endLoc));
+			BossAbilityGroup bossAbilityGroup = stateful.construct(INSTANCE.mPlugin, targetEntity, targetEntity.getLocation(), endLoc);
+			if (bossAbilityGroup == null) {
+				if (sender != null) {
+					sender.sendMessage("Could not give '" + requestedTag + "' to mob!");
+				}
+				return;
+			}
+			INSTANCE.createBossInternal(targetEntity, bossAbilityGroup);
 			if (sender != null) {
 				sender.sendMessage("Successfully gave '" + requestedTag + "' to mob");
 			}
@@ -1340,6 +1355,9 @@ public class BossManager implements Listener {
 					BossAbilityGroup ability;
 					try {
 						ability = deserializer.deserialize(mPlugin, entity);
+						if (ability == null) {
+							continue;
+						}
 					} catch (Exception ex) {
 						mPlugin.getLogger().log(Level.SEVERE, "Failed to load boss!", ex);
 						continue;

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
@@ -28,14 +29,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class CosmeticsManager implements Listener {
 
 	public static final String KEY_PLUGIN_DATA = "Cosmetics";
 	public static final String KEY_COSMETICS = "cosmetics";
 
-	public static CosmeticsManager mInstance;
+	public static final CosmeticsManager INSTANCE = new CosmeticsManager();
 
 	public Map<UUID, List<Cosmetic>> mPlayerCosmetics;
 
@@ -44,10 +45,7 @@ public class CosmeticsManager implements Listener {
 	}
 
 	public static CosmeticsManager getInstance() {
-		if (mInstance == null) {
-			mInstance = new CosmeticsManager();
-		}
-		return mInstance;
+		return INSTANCE;
 	}
 
 	/**
@@ -206,7 +204,7 @@ public class CosmeticsManager implements Listener {
 	}
 
 	// Get current cosmetic skill of an ability
-	public String getSkillCosmeticName(Player player, ClassAbility ability) {
+	public String getSkillCosmeticName(@Nullable Player player, ClassAbility ability) {
 		if (player == null) {
 			return "";
 		}
@@ -270,7 +268,12 @@ public class CosmeticsManager implements Listener {
 				for (JsonElement cosmeticElement : cosmeticArray) {
 					JsonObject data = cosmeticElement.getAsJsonObject();
 					if (data.has("name") && data.has("type") && data.has("enabled")) {
-						Cosmetic toAdd = new Cosmetic(CosmeticType.getTypeSelection(data.getAsJsonPrimitive("type").getAsString()), data.getAsJsonPrimitive("name").getAsString(),
+						CosmeticType type = CosmeticType.getTypeSelection(data.getAsJsonPrimitive("type").getAsString());
+						if (type == null) {
+							MMLog.warning("Discarding cosmetic of unknown type " + data.getAsJsonPrimitive("type").getAsString());
+							continue;
+						}
+						Cosmetic toAdd = new Cosmetic(type, data.getAsJsonPrimitive("name").getAsString(),
 							data.getAsJsonPrimitive("enabled").getAsBoolean(), null);
 						if (data.has("ability")) {
 							toAdd.mAbility = ClassAbility.getAbility(data.getAsJsonPrimitive("ability").getAsString());

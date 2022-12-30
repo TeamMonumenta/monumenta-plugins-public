@@ -16,6 +16,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author G3m1n1Boy
@@ -78,7 +79,7 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
+				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);

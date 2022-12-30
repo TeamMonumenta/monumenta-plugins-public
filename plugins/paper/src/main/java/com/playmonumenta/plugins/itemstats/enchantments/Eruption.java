@@ -88,7 +88,7 @@ public class Eruption implements Enchantment {
 					if (p == player) {
 						continue;
 					}
-					p.getWorld().spawnParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR);
+					new PartialParticle(Particle.REDSTONE, p.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR).spawnAsPlayerActive(player);
 					double speed = CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_SPEED, Adrenaline.PERCENT_SPEED_PER_LEVEL * adrenaline);
 					int duration = (int) CharmManager.calculateFlatAndPercentValue(player, Adrenaline.CHARM_DURATION, Adrenaline.SPAWNER_DURATION);
 					plugin.mEffectManager.addEffect(p, Adrenaline.PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, speed, Adrenaline.PERCENT_SPEED_EFFECT_NAME));
@@ -115,11 +115,11 @@ public class Eruption implements Enchantment {
 			}
 			if (wind > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
-				player.getWorld().spawnParticle(Particle.CLOUD, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.CLOUD, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (fire > 0 || fire + ice + thunder + decay + bleed + adrenaline + wind == 0) {
 				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
-				player.getWorld().spawnParticle(Particle.LAVA, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.LAVA, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 		}
 	}

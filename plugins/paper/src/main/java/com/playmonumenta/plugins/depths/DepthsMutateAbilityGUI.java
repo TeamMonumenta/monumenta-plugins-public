@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class DepthsMutateAbilityGUI extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
@@ -39,7 +40,7 @@ public class DepthsMutateAbilityGUI extends CustomInventory {
 
 	public static List<TriggerData> TRIGGER_STRINGS = new ArrayList<>();
 
-	private String mAbilityName;
+	private @Nullable String mAbilityName;
 
 	public DepthsMutateAbilityGUI(Player targetPlayer) {
 		super(targetPlayer, 54, "Mutate an Ability Trigger");
@@ -78,7 +79,7 @@ public class DepthsMutateAbilityGUI extends CustomInventory {
 
 		if (clickedItem.getType() == CONFIRM_MAT) {
 			for (DepthsAbilityInfo<?> ability : abilities) {
-				if (ability.getDisplayName() != null && mAbilityName.contains(ability.getDisplayName())) {
+				if (ability.getDisplayName() != null && mAbilityName != null && mAbilityName.contains(ability.getDisplayName())) {
 					DepthsPlayer depthsplayer = instance.mPlayers.get(player.getUniqueId());
 					if (depthsplayer != null && !depthsplayer.mUsedAbilityMutation) {
 						depthsplayer.mUsedAbilityMutation = true;

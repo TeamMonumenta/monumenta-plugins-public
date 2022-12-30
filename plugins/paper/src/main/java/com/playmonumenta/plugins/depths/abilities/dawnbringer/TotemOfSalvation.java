@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -59,7 +60,7 @@ public class TotemOfSalvation extends DepthsAbility {
 			.descriptions(TotemOfSalvation::getDescription, MAX_RARITY);
 
 	private static final Collection<Map.Entry<Double, SpawnParticleAction>> PARTICLES =
-		List.of(new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.4, (Location loc) -> loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0.1, 0.1, 0.1, PARTICLE_COLOR)));
+		List.of(new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.4, (Location loc) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0.1, 0.1, 0.1, PARTICLE_COLOR).spawnAsOtherPlayerActive()));
 
 	public TotemOfSalvation(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

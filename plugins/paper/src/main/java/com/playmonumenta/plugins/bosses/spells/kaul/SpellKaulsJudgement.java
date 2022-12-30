@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,6 +34,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * Kaul’s Judgement: (Stone Brick)Give a Tellraw to ¼ (min 2) of the
@@ -57,11 +58,11 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
 	private static final int KAULS_JUDGEMENT_TIME = 20 * 55;
 
-	private static SpellKaulsJudgement INSTANCE = null;
+	private static @Nullable SpellKaulsJudgement INSTANCE = null;
 
 	private final Plugin mPlugin = Plugin.getInstance();
 	private final Location mBossLoc;
-	private LivingEntity mTp = null;
+	private @Nullable LivingEntity mTp = null;
 	private boolean mOnCooldown = false;
 
 	private final List<Player> mJudgedPlayers = new ArrayList<Player>();
@@ -88,12 +89,13 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	 * If a boss is specified, overwrites the current boss entity
 	 * If no boss is specified (null), does not create an instance
 	 */
+	@Contract("!null -> !null")
 	public static @Nullable SpellKaulsJudgement getInstance(Location bossLoc) {
 		if (INSTANCE == null) {
 			if (bossLoc == null) {
 				return null;
 			} else {
-				INSTANCE = new SpellKaulsJudgement(bossLoc);
+				return INSTANCE = new SpellKaulsJudgement(bossLoc);
 			}
 		}
 		return INSTANCE;
@@ -169,11 +171,15 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 	private void judge() {
 		new BukkitRunnable() {
-			World mWorld = mBossLoc.getWorld();
+			final World mWorld = mBossLoc.getWorld();
 			int mTicks = 0;
 
 			@Override
 			public void run() {
+				if (mTp == null) {
+					cancel();
+					return;
+				}
 				mTicks++;
 
 				if (mTicks < 20 * 2) {

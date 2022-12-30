@@ -18,13 +18,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 class VanityBuyScreen extends Gui {
 	private final ItemStack mItem;
 	private final VanityGUI mVanityGUI;
 
 	private static final NamespacedKey TWISTED_STRAND_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_strand");
-	private static ItemStack mTwistedStrand;
+	private static @Nullable ItemStack mTwistedStrand;
 
 	public VanityBuyScreen(Player player, ItemStack item, VanityGUI vanityGUI) {
 		super(player, 4 * 9, Component.text("Unlock Vanity Item?", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));

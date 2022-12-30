@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashMap;
@@ -63,7 +64,8 @@ public class DepthsRejuvenation extends DepthsAbility {
 						double maxHealth = EntityUtils.getMaxHealth(player);
 						if (player.getHealth() != maxHealth) {
 							PlayerUtils.healPlayer(mPlugin, player, PERCENT_HEAL * maxHealth, mPlayer);
-							player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001);
+							new PartialParticle(Particle.HEART, player.getLocation().add(0, 2, 0), 1, 0.07, 0.07, 0.07, 0.001)
+								.spawnAsPlayerBuff(player);
 						}
 					}
 				}

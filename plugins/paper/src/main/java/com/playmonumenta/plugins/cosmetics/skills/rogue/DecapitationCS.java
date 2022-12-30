@@ -24,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 	//Gallery theme: blood
@@ -37,7 +38,7 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 	private static final double CLEAVE_RADIUS = 2;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"All roads lead to the bloodstained dream.",
 			"Trapped in the nightmare, death is never",
@@ -56,7 +57,7 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

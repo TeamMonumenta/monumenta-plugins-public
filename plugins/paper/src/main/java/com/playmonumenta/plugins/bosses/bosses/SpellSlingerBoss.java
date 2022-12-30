@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellSlingerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_spellslinger";
@@ -58,7 +59,7 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.END_ROD, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 				},
 				// Hit Action
-				(World world, LivingEntity player, Location loc, Location prevLoc) -> {
+				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
 					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (player != null) {

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -143,7 +144,7 @@ public class Haunted {
 				return;
 			}
 		}
-		ArmorStand armorStand = (ArmorStand) LibraryOfSoulsIntegration.summon(loc, "LoomingConsequence");
+		ArmorStand armorStand = Objects.requireNonNull((ArmorStand) LibraryOfSoulsIntegration.summon(loc, "LoomingConsequence"));
 		armorStand.addScoreboardTag(phantomName + p.getUniqueId());
 		followPlayer(p, armorStand);
 	}
@@ -161,7 +162,7 @@ public class Haunted {
 
 				// We found the old "hidden" armor stand, so now we use its location to spawn a fresh Shade, and remove the old one.
 				Location standLoc = stand.getLocation();
-				armorStand = (ArmorStand) LibraryOfSoulsIntegration.summon(standLoc, "LoomingConsequence");
+				armorStand = Objects.requireNonNull((ArmorStand) LibraryOfSoulsIntegration.summon(standLoc, "LoomingConsequence"));
 				armorStand.addScoreboardTag(phantomName + p.getUniqueId());
 
 				stand.remove();

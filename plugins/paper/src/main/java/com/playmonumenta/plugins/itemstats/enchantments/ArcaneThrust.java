@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -62,14 +63,14 @@ public class ArcaneThrust implements Enchantment {
 				box.shift(dir);
 				List<LivingEntity> mobs = EntityUtils.getNearbyMobs(player.getLocation(), 10, player);
 				World world = player.getWorld();
-				world.spawnParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0, 0, 0, 2);
+				new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0, 0, 0, 2).spawnAsPlayerActive(player);
 
 				for (int i = 0; i < 3; i++) {
 					box.shift(dir);
 					Location bLoc = box.getCenter().toLocation(world);
 
-					world.spawnParticle(Particle.SWEEP_ATTACK, bLoc, 1, 0, 0, 0);
-					world.spawnParticle(Particle.REDSTONE, bLoc, 12, 0.4, 0.4, 0.4, COLOR);
+					new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 1, 0, 0, 0).spawnAsPlayerActive(player);
+					new PartialParticle(Particle.REDSTONE, bLoc, 12, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerActive(player);
 
 					Iterator<LivingEntity> iter = mobs.iterator();
 					while (iter.hasNext()) {

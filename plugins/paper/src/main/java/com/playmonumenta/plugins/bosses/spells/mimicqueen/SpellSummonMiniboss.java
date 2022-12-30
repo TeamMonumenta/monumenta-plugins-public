@@ -16,14 +16,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.loot.Lootable;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public class SpellSummonMiniboss extends Spell {
 
-	private LivingEntity mMiniboss;
+	private @Nullable LivingEntity mMiniboss;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
 
 	public SpellSummonMiniboss(Plugin plugin, LivingEntity boss) {
 		mBoss = boss;

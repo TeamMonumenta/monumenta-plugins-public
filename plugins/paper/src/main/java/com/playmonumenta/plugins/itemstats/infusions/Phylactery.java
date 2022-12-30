@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -95,8 +96,8 @@ public class Phylactery implements Infusion {
 		HashMap<PotionManager.PotionID, List<PotionUtils.PotionInfo>> potionEffects = POTION_EFFECTS_MAP.remove(player.getUniqueId());
 		if (potionEffects != null) {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				for (PotionManager.PotionID id : potionEffects.keySet()) {
-					plugin.mPotionManager.addPotionInfos(player, id, potionEffects.get(id));
+				for (Map.Entry<PotionManager.PotionID, List<PotionUtils.PotionInfo>> entry : potionEffects.entrySet()) {
+					plugin.mPotionManager.addPotionInfos(player, entry.getKey(), entry.getValue());
 				}
 			}, 1);
 		}

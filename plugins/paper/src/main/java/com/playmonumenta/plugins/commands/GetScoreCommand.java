@@ -11,13 +11,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.OptionalInt;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class GetScoreCommand {
 	private static final List<String> SELECTORS = Arrays.asList(new String[] {"@a", "@e", "@p", "@r", "@s"});

@@ -13,6 +13,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class DeathMsg {
 	private static final String COMMAND = "deathmsg";
@@ -87,7 +88,7 @@ public class DeathMsg {
 			.register();
 	}
 
-	private static void run(CommandSender sender, DeathMessageState newState) throws WrapperCommandSyntaxException {
+	private static void run(CommandSender sender, @Nullable DeathMessageState newState) throws WrapperCommandSyntaxException {
 		Player player = CommandUtils.getPlayerFromSender(sender);
 
 		if (newState != null) {

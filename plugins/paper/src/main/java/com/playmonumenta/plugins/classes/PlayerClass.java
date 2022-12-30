@@ -4,15 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
-
+@SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
 public abstract class PlayerClass {
 
 	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
@@ -30,24 +27,6 @@ public abstract class PlayerClass {
 	public PlayerSpec mSpecTwo = new PlayerSpec();
 
 	public ImmutableList<AbilityInfo<?>> mTriggerOrder;
-
-	public Boolean getClassAccessPerms(Player player) {
-		return true;
-	}
-
-	public Boolean getSpecAccessToChoose(Player player, PlayerSpec spec) {
-		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
-		int specClassReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
-		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
-		return specQuestReq >= 100 && specClassReq == mClass && specSpecReq == 0;
-	}
-
-	public Boolean getSpecAccessToChange(Player player, PlayerSpec spec) {
-		int specQuestReq = ScoreboardUtils.getScoreboardValue(player, spec.mSpecQuestScoreboard).orElse(0);
-		int specClassReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0);
-		int specSpecReq = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
-		return specQuestReq >= 100 && specClassReq == mClass && specSpecReq == spec.mSpecialization;
-	}
 
 	public JsonObject toJson() {
 		JsonArray abilities = new JsonArray();

@@ -22,7 +22,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,6 +44,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class DepthsUtils {
 
@@ -290,15 +290,16 @@ public class DepthsUtils {
 				abilityObjectInJson.addProperty(ability, dp.mAbilities.get(ability));
 			}
 			JsonArray initialPlayersJsonArray = new JsonArray();
-			if (DepthsManager.getInstance().getPartyFromId(dp).mInitialPlayers == null) {
-		          return;
+			DepthsParty depthsParty = DepthsManager.getInstance().getPartyFromId(dp);
+			if (depthsParty == null || depthsParty.mInitialPlayers == null) {
+				return;
 			}
-			for (String player : DepthsManager.getInstance().getPartyFromId(dp).mInitialPlayers) {
+			for (String player : depthsParty.mInitialPlayers) {
 				initialPlayersJsonArray.add(player);
 			}
 			json.addProperty("PlayerName", Bukkit.getPlayer(dp.mPlayerId).getName());
-			json.addProperty("Room Number", DepthsManager.getInstance().getPartyFromId(dp).getRoomNumber());
-			json.addProperty("Treasure Score", DepthsManager.getInstance().getPartyFromId(dp).mTreasureScore);
+			json.addProperty("Room Number", depthsParty.getRoomNumber());
+			json.addProperty("Treasure Score", depthsParty.mTreasureScore);
 			json.add("Abilities", abilityObjectInJson);
 			json.add("Initial Players", initialPlayersJsonArray);
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() { //run async

@@ -17,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	//Twisted theme
@@ -27,7 +28,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	private static final Color ECHO_COLOR = Color.fromRGB(39, 89, 97);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, GruesomeEchoesCS.NAME, false, this.getAbilityName(),
 			"Infuses your alchemy with",
 			"ghastly and twisted echoes.");
@@ -44,7 +45,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

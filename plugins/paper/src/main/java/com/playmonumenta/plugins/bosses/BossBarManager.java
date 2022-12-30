@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -12,6 +11,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class BossBarManager {
 	@FunctionalInterface

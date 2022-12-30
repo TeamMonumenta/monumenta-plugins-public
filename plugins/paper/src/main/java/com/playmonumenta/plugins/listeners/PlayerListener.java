@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -193,7 +194,7 @@ public class PlayerListener implements Listener {
 		// can be removed after a while
 		if (ScoreboardUtils.checkTag(player, Constants.Tags.NO_SELF_PARTICLES)) {
 			player.removeScoreboardTag(Constants.Tags.NO_SELF_PARTICLES);
-			ScoreboardUtils.setScoreboardValue(player, ParticleCategory.OWN_PASSIVE.mObjectiveName, 0);
+			ScoreboardUtils.setScoreboardValue(player, Objects.requireNonNull(ParticleCategory.OWN_PASSIVE.mObjectiveName), 0);
 		}
 
 		//TODO: Remove this when custom effects logout handling is better dealt with

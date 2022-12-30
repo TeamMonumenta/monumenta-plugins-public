@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -49,7 +50,7 @@ public class FrigidCombos extends DepthsAbility {
 				World world = targetLoc.getWorld();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, RADIUS)) {
 					if (!(mob.getHealth() <= 0 || mob == null)) {
-						world.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65);
+						new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 						EntityUtils.applySlow(mPlugin, TIME, SLOW_AMPLIFIER[mRarity - 1], mob);
 						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
 					}
@@ -61,7 +62,7 @@ public class FrigidCombos extends DepthsAbility {
 				Location playerLoc = mPlayer.getLocation().add(0, 1, 0);
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.65f);
 				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.45f);
-				world.spawnParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65);
+				new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			}
 			return true;
 		}

@@ -21,7 +21,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -31,6 +30,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class RestlessSoulsBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_restlesssouls";
@@ -80,7 +80,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration);
 	}
 
-	public static void attack(com.playmonumenta.plugins.Plugin plugin, Player p, ItemStatManager.PlayerItemStats playerItemStats,
+	public static void attack(com.playmonumenta.plugins.Plugin plugin, @Nullable Player p, @Nullable ItemStatManager.PlayerItemStats playerItemStats,
 	                          LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
 	                          Ability[] abilities, int duration) {
 		if (p != null || playerItemStats != null) {
@@ -99,7 +99,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 			if (!EntityUtils.isBoss(damagee)) {
 				EntityUtils.applySilence(plugin, silenceTime, damagee);
 			}
-			if (!levelOne) {
+			if (!levelOne && p != null) {
 				for (Ability ability : abilities) {
 					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().getLinkedSpell())) {
 						if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {

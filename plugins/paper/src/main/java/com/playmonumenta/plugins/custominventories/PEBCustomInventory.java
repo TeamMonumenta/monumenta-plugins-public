@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
@@ -457,16 +458,17 @@ public class PEBCustomInventory extends CustomInventory {
 	}
 
 	private static PebItem makePartialParticlePebItem(int slot, String name, String description, Material material, ParticleCategory category) {
-		return new PebItem(slot, gui -> name + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, category.mObjectiveName).orElse(100) + "%",
-			gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", ChatColor.GRAY,
-			material, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS)
-			.action((gui, event) -> {
-				int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, category.mObjectiveName).orElse(100);
-				value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
-				value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
-				ScoreboardUtils.setScoreboardValue(gui.mPlayer, category.mObjectiveName, value);
-				gui.setLayout(gui.mCurrentPage); // refresh GUI
-			});
+		String objectiveName = Objects.requireNonNull(category.mObjectiveName);
+		return new PebItem(slot, gui -> name + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
+				gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", ChatColor.GRAY,
+				material, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS)
+				.action((gui, event) -> {
+					int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
+					value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
+					value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
+					ScoreboardUtils.setScoreboardValue(gui.mPlayer, objectiveName, value);
+					gui.setLayout(gui.mCurrentPage); // refresh GUI
+				});
 	}
 
 	private final Player mPlayer;
@@ -492,7 +494,7 @@ public class PEBCustomInventory extends CustomInventory {
 		ItemStack clickedItem = event.getCurrentItem();
 		if (clickedItem != null && clickedItem.getType() != FILLER) {
 			int chosenSlot = event.getSlot();
-			for (PebItem item : PEB_ITEMS.get(mCurrentPage)) {
+			for (PebItem item : PEB_ITEMS.getOrDefault(mCurrentPage, List.of())) {
 				if (item.mSlot == chosenSlot) {
 					if (item.mAction != null) {
 						item.mAction.accept(this, event);
@@ -500,7 +502,7 @@ public class PEBCustomInventory extends CustomInventory {
 					return;
 				}
 			}
-			for (PebItem item : PEB_ITEMS.get(PebPage.COMMON)) {
+			for (PebItem item : PEB_ITEMS.getOrDefault(PebPage.COMMON, List.of())) {
 				if (item.mSlot == chosenSlot) {
 					if (item.mAction != null) {
 						item.mAction.accept(this, event);
@@ -563,10 +565,10 @@ public class PEBCustomInventory extends CustomInventory {
 		mCurrentPage = page;
 
 		mInventory.clear();
-		for (PebItem item : PEB_ITEMS.get(mCurrentPage)) {
+		for (PebItem item : PEB_ITEMS.getOrDefault(mCurrentPage, List.of())) {
 			mInventory.setItem(item.mSlot, createCustomItem(item, mPlayer));
 		}
-		for (PebItem item : PEB_ITEMS.get(PebPage.COMMON)) {
+		for (PebItem item : PEB_ITEMS.getOrDefault(PebPage.COMMON, List.of())) {
 			if (mInventory.getItem(item.mSlot) == null) {
 				mInventory.setItem(item.mSlot, createCustomItem(item, mPlayer));
 			}

@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -90,7 +89,7 @@ public class MagmaShield extends Ability {
 
 	private final MagmaShieldCS mCosmetic;
 
-	public MagmaShield(Plugin plugin, @Nullable Player player) {
+	public MagmaShield(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);

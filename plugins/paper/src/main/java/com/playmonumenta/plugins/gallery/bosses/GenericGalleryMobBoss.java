@@ -18,6 +18,7 @@ import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericGalleryMobBoss extends BossAbilityGroup {
 	public static final String identityTag = "GalleryMobAbility";
@@ -42,7 +43,7 @@ public class GenericGalleryMobBoss extends BossAbilityGroup {
 
 		//Spell that handle the targeting system
 		Spell targetSpell = new Spell() {
-			private LivingEntity mLastTarget = null;
+			private @Nullable LivingEntity mLastTarget = null;
 
 			@Override
 			public void run() {

@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -26,7 +25,7 @@ public class PatronRed extends PatronParticles {
 			})
 			.ignoresSilence(true);
 
-	public PatronRed(Plugin plugin, @Nullable Player player) {
+	public PatronRed(Plugin plugin, Player player) {
 		super(
 			plugin,
 			player,

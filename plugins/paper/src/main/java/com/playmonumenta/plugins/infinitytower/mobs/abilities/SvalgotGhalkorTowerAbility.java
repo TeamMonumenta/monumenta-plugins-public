@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -26,19 +27,19 @@ public class SvalgotGhalkorTowerAbility extends TowerAbility {
 			Location svalgotLoc = mobLoc.clone().add(0, 0, 0.25);
 			Location ghalkorLoc = mobLoc.clone().add(0, 0, -0.25);
 
-			final LivingEntity svalgot = (LivingEntity) LibraryOfSoulsIntegration.summon(svalgotLoc, SVALGOT_LOS);
+			final LivingEntity svalgot = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(svalgotLoc, SVALGOT_LOS));
 			svalgot.setCustomNameVisible(true);
 			svalgot.customName(TowerGameUtils.getMobNameComponent("Svalgot", isPlayerMob));
 
-			final LivingEntity ghalkor = (LivingEntity) LibraryOfSoulsIntegration.summon(ghalkorLoc, GHALKOR_LOS);
+			final LivingEntity ghalkor = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(ghalkorLoc, GHALKOR_LOS));
 			ghalkor.setCustomNameVisible(true);
 			ghalkor.customName(TowerGameUtils.getMobNameComponent("Ghalkor", isPlayerMob));
 
-			svalgot.addScoreboardTag(mMob.mInfo.mMobRarity.getTag() + "_" + mMob.mMobLevel);
-			ghalkor.addScoreboardTag(mMob.mInfo.mMobRarity.getTag() + "_" + mMob.mMobLevel);
+			svalgot.addScoreboardTag(mob.mInfo.mMobRarity.getTag() + "_" + mob.mMobLevel);
+			ghalkor.addScoreboardTag(mob.mInfo.mMobRarity.getTag() + "_" + mob.mMobLevel);
 
-			ghalkor.addScoreboardTag(mMob.mInfo.mMobClass.getTag());
-			svalgot.addScoreboardTag(mMob.mInfo.mMobClass.getTag());
+			ghalkor.addScoreboardTag(mob.mInfo.mMobClass.getTag());
+			svalgot.addScoreboardTag(mob.mInfo.mMobClass.getTag());
 
 			ghalkor.addScoreboardTag(mIsPlayerMob ? TowerConstants.MOB_TAG_PLAYER_TEAM : TowerConstants.MOB_TAG_FLOOR_TEAM);
 			svalgot.addScoreboardTag(mIsPlayerMob ? TowerConstants.MOB_TAG_PLAYER_TEAM : TowerConstants.MOB_TAG_FLOOR_TEAM);
@@ -73,8 +74,5 @@ public class SvalgotGhalkorTowerAbility extends TowerAbility {
 			TowerFileUtils.warning("Catch an exception while spawning Svalgot & Ghalkor. Reason: " + e.getMessage());
 			e.printStackTrace();
 		}
-
-
-
 	}
 }

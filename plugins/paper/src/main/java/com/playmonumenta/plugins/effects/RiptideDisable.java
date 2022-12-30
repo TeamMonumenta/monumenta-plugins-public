@@ -10,11 +10,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 public class RiptideDisable extends ZeroArgumentEffect {
 	public static final String effectID = "RiptideDisable";
 
-	private BukkitTask mTask;
+	private @Nullable BukkitTask mTask;
 
 	public RiptideDisable(int duration) {
 		super(duration, effectID);

@@ -3,8 +3,8 @@ package com.playmonumenta.plugins.itemstats.attributes;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellPower implements Attribute {
 

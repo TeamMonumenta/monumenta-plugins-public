@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -45,12 +46,12 @@ public class Brutalize extends DepthsAbility {
 			Location loc = enemy.getLocation();
 			mPlayer.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
 			mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
-			mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 15, 0.5, 0.2, 0.5, 0.65);
+			new PartialParticle(Particle.SPELL_WITCH, loc, 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, enemy)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, brutalizeDamage, null, false, true);
 				MovementUtils.knockAway(enemy, mob, 0.5f, true);
 
-				mPlayer.getWorld().spawnParticle(Particle.SPELL_WITCH, mob.getLocation(), 10, 0.5, 0.2, 0.5, 0.65);
+				new PartialParticle(Particle.SPELL_WITCH, mob.getLocation(), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 			}
 			return true;
 		}

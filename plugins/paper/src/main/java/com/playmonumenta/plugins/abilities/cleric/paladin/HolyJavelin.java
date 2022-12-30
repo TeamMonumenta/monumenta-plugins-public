@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -30,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 
@@ -151,7 +151,7 @@ public class HolyJavelin extends Ability {
 					EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
 					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 					if (Crusade.applyCrusadeToSlayer(enemy, mCrusade)) {
-						mPlugin.mEffectManager.addEffect(enemy, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+						mPlugin.mEffectManager.addEffect(enemy, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
 					}
 					iterator.remove();
 				}

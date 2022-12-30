@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -105,16 +106,16 @@ public class Earthquake extends DepthsAbility {
 							knockup(player);
 						}
 
-						world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 30, RADIUS / 2, 0.1, RADIUS / 2, 0.1);
-						world.spawnParticle(Particle.LAVA, loc, 20, RADIUS / 2, 0.3, RADIUS / 2, 0.1);
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 30, RADIUS / 2, 0.1, RADIUS / 2, 0.1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.LAVA, loc, 20, RADIUS / 2, 0.3, RADIUS / 2, 0.1).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 3, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1, 1.0f);
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.75f, 1.0f);
 						this.cancel();
 					} else {
-						world.spawnParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.PODZOL));
-						world.spawnParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.GRANITE));
-						world.spawnParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.IRON_ORE));
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.PODZOL)).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.GRANITE)).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.IRON_ORE)).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.75f, 0.5f);
 					}

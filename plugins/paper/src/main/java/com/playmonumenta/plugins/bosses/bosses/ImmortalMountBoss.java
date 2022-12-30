@@ -17,7 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class ImmortalMountBoss extends BossAbilityGroup {
 
@@ -33,7 +33,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 
 	private final boolean mTransferDamage;
 
-	private @Nullable LivingEntity mPassenger;
+	private @MonotonicNonNull LivingEntity mPassenger;
 	private double mMountDamageThisTick = 0;
 	private double mPassengerDamageThisTick = 0;
 
@@ -46,8 +46,6 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		mTransferDamage = p.TRANSFER_DAMAGE;
-
-		mPassenger = null;
 
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {

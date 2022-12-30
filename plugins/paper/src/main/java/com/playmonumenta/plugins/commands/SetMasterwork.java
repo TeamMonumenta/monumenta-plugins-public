@@ -73,6 +73,7 @@ public class SetMasterwork extends GenericCommand {
 		ItemStack newItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(MasterworkUtils.getItemPath(item, level)));
 		if (newItem == null) {
 			CommandAPI.fail("Invalid loot table found! Please submit a bug report.");
+			throw new RuntimeException();
 		}
 
 		newItem = MasterworkUtils.preserveModified(item, newItem);

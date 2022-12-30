@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -34,6 +33,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
+import org.jetbrains.annotations.Nullable;
 
 
 
@@ -106,7 +106,7 @@ public class AuditListener implements Listener {
 
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<>();
 	private final Logger mLogger;
-	private static AuditListener INSTANCE = null;
+	private static @Nullable AuditListener INSTANCE = null;
 
 	public AuditListener(Logger logger) {
 		mLogger = logger;

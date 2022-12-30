@@ -34,6 +34,7 @@ import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
 import de.tr7zw.nbtapi.NBTListCompound;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.SuggestionInfo;
@@ -81,6 +82,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemStatUtils {
@@ -1159,12 +1161,12 @@ public class ItemStatUtils {
 		if (value == 0) {
 			return "0";
 		}
-		int nextNumeralValue = ROMAN_NUMERAL_VALUES.floorKey(value);
-		if (value == nextNumeralValue) {
-			return ROMAN_NUMERAL_VALUES.get(value);
+		Map.Entry<Integer, String> nextNumeralValue = ROMAN_NUMERAL_VALUES.floorEntry(value);
+		if (value == nextNumeralValue.getKey()) {
+			return nextNumeralValue.getValue();
 		}
 
-		return ROMAN_NUMERAL_VALUES.get(nextNumeralValue) + toRomanNumerals(value - nextNumeralValue);
+		return nextNumeralValue.getValue() + toRomanNumerals(value - nextNumeralValue.getKey());
 	}
 
 	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Masterwork masterwork, final Location location) {
@@ -1470,7 +1472,7 @@ public class ItemStatUtils {
 		return true;
 	}
 
-	public static NBTCompoundList getEffects(final NBTItem nbt) {
+	public static @Nullable NBTCompoundList getEffects(final NBTItem nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
 			return null;
@@ -1596,7 +1598,7 @@ public class ItemStatUtils {
 		return modified.getCompound(InfusionType.KEY);
 	}
 
-	public static int getInfusionLevel(final @Nullable ItemStack item, final InfusionType type) {
+	public static int getInfusionLevel(final @Nullable ItemStack item, final @Nullable InfusionType type) {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;
 		}
@@ -1621,7 +1623,7 @@ public class ItemStatUtils {
 		return infusion.getInteger(LEVEL_KEY);
 	}
 
-	public static @Nullable UUID getInfuser(final @Nullable ItemStack item, final InfusionType type) {
+	public static @Nullable UUID getInfuser(final @Nullable ItemStack item, final @Nullable InfusionType type) {
 		if (item == null || item.getType() == Material.AIR || type == null || type.getName() == null) {
 			return null;
 		}
@@ -1687,7 +1689,7 @@ public class ItemStatUtils {
 		return getInfusionLevel(item, type) > 0;
 	}
 
-	public static NBTCompoundList getAttributes(final NBTItem nbt) {
+	public static @Nullable NBTCompoundList getAttributes(final NBTItem nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
 			return null;
@@ -1983,7 +1985,8 @@ public class ItemStatUtils {
 		return isQuiver(item) && "Shaman's Quiver".equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
-	public static ItemStack setArrowTransformMode(@Nullable ItemStack item, QuiverListener.ArrowTransformMode arrowTransformMode) {
+	@Contract("!null, _ -> !null")
+	public static @Nullable ItemStack setArrowTransformMode(@Nullable ItemStack item, QuiverListener.ArrowTransformMode arrowTransformMode) {
 		if (item == null || item.getType() == Material.AIR) {
 			return item;
 		}
@@ -2149,11 +2152,11 @@ public class ItemStatUtils {
 				NBTCompound infusion = infusions.getCompound(type.getName());
 				if (infusion != null) {
 					if (type == InfusionType.STAT_TRACK) {
-						statTrackLater.add(0, type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToName(UUID.fromString(infusion.getString(INFUSER_KEY)))));
+						statTrackLater.add(0, type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					} else if (type.mIsStatTrackOption) {
 						statTrackLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
 					} else if (!type.getMessage().isEmpty()) {
-						infusionTagsLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToName(UUID.fromString(infusion.getString(INFUSER_KEY)))));
+						infusionTagsLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					} else {
 						lore.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
 					}
@@ -2322,11 +2325,12 @@ public class ItemStatUtils {
 						List<NBTListCompound> attributesByType = attributesBySlot.get(attributeType);
 						if (attributesByType != null) {
 							for (NBTListCompound attribute : attributesByType) {
-								if (Operation.getOperation(attribute.getString(Operation.KEY)) != Operation.ADD
-									    && attributeType != AttributeType.PROJECTILE_SPEED) {
+								Operation operation = Operation.getOperation(attribute.getString(Operation.KEY));
+								if (operation == null
+									    || (operation != Operation.ADD && attributeType != AttributeType.PROJECTILE_SPEED)) {
 									continue;
 								}
-								lore.add(AttributeType.getDisplay(attributeType, attribute.getDouble(AMOUNT_KEY), slot, Operation.getOperation(attribute.getString(Operation.KEY))));
+								lore.add(AttributeType.getDisplay(attributeType, attribute.getDouble(AMOUNT_KEY), slot, operation));
 								if (attributeType == AttributeType.ATTACK_DAMAGE_ADD) {
 									needsAttackSpeed = true;
 								} else if (attributeType == AttributeType.ATTACK_SPEED) {
@@ -2501,7 +2505,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
+				playerItemStats.updateStats(player, true, true);
 			}
 		}).register();
 	}
@@ -2893,7 +2897,11 @@ public class ItemStatUtils {
 				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
 				return;
 			}
-			String type = (String) args[0];
+			EffectType type = EffectType.fromType((String) args[0]);
+			if (type == null) {
+				CommandAPI.fail("Invalid effect type " + args[0]);
+				throw new RuntimeException();
+			}
 			int duration = (int) args[1];
 			double strength = (double) args[2];
 			ItemStack item = player.getInventory().getItemInMainHand();
@@ -2902,7 +2910,7 @@ public class ItemStatUtils {
 				return;
 			}
 
-			addConsumeEffect(item, EffectType.fromType(type), strength, duration, null);
+			addConsumeEffect(item, type, strength, duration, null);
 		}).register();
 
 		arguments.clear();
@@ -3008,7 +3016,7 @@ public class ItemStatUtils {
 		generateItemStats(item);
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 		if (playerItemStats != null) {
-			playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
+			playerItemStats.updateStats(player, true, true);
 		}
 	}
 
@@ -3037,7 +3045,15 @@ public class ItemStatUtils {
 			String attribute = (String) args[0];
 			Double amount = (Double) args[1];
 			Operation operation = Operation.getOperation((String) args[2]);
+			if (operation == null) {
+				CommandAPI.fail("Invalid operation " + args[2]);
+				throw new RuntimeException();
+			}
 			Slot slot = Slot.getSlot((String) args[3]);
+			if (slot == null) {
+				CommandAPI.fail("Invalid slot " + args[3]);
+				throw new RuntimeException();
+			}
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
 				player.sendMessage(ChatColor.RED + "Must be holding an item!");
@@ -3065,7 +3081,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
+				playerItemStats.updateStats(player, true, true);
 			}
 		}).register();
 	}
@@ -3104,7 +3120,7 @@ public class ItemStatUtils {
 
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
+				playerItemStats.updateStats(player, true, true);
 			}
 		}).register();
 	}

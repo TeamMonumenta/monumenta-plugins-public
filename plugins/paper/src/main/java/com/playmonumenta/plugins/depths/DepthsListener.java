@@ -45,10 +45,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
 public class DepthsListener implements Listener {
-	Plugin mPlugin = null;
 
-	public DepthsListener(Plugin plugin) {
-		mPlugin = plugin;
+	public DepthsListener() {
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -70,6 +68,9 @@ public class DepthsListener implements Listener {
 			//Sundrops logic
 			//Check if anyone in their party has sundrops levels
 			DepthsParty party = dm.getDepthsParty(player);
+			if (party == null) {
+				return;
+			}
 			int totalChance = 0;
 			for (DepthsPlayer dp : party.mPlayersInParty) {
 				if (dp == null || dp.mAbilities == null || dp.mAbilities.isEmpty()) {
@@ -107,6 +108,9 @@ public class DepthsListener implements Listener {
 
 			//Check if anyone in their party has enlightenment levels
 			DepthsParty party = dm.getDepthsParty(player);
+			if (party == null) {
+				return;
+			}
 			int highestLevel = 0;
 
 			for (DepthsPlayer dp : party.mPlayersInParty) {
@@ -220,10 +224,12 @@ public class DepthsListener implements Listener {
 		DepthsManager dm = DepthsManager.getInstance();
 		Player player = event.getPlayer();
 		DepthsPlayer dp = dm.getDepthsPlayer(player);
-		DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
-		if (dp != null && dm.getPartyFromId(dp) != null) {
+		if (dp != null) {
+			DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
 			DepthsParty party = dm.getPartyFromId(dp);
-			party.populateLootRoom(player, party.mEndlessMode && party.mRoomNumber > 30);
+			if (party != null) {
+				party.populateLootRoom(player, party.mEndlessMode && party.mRoomNumber > 30);
+			}
 		}
 	}
 

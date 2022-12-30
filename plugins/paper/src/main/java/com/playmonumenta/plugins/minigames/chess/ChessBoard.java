@@ -14,6 +14,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ChessBoard {
 
@@ -128,8 +129,8 @@ public class ChessBoard {
 	// list of command to run at the end of the game if the player win and it was a quest version
 	//private List<String> mCommandsToRun = new ArrayList<>(); //used for quest
 
-	private ChessPlayer mWhitePlayer = null;
-	private ChessPlayer mBlackPlayer = null;
+	private @Nullable ChessPlayer mWhitePlayer = null;
+	private @Nullable ChessPlayer mBlackPlayer = null;
 	private BoardState mBoardState;
 
 	//Castle (arrocco)
@@ -751,31 +752,21 @@ public class ChessBoard {
 				continue;
 			} else {
 				if (Character.isDigit(piece)) {
-					pos += Integer.valueOf(piece);
+					pos += Integer.parseInt("" + piece);
 				} else {
 					ChessTeam team = Character.isUpperCase(piece) ? ChessTeam.WHITE : ChessTeam.BLACK;
 					ChessPieceType type = null;
 					switch (Character.toLowerCase(piece)) {
-						case 'k':
-							type = ChessPieceType.KING;
-							break;
-						case 'q':
-							type = ChessPieceType.QUEEN;
-							break;
-						case 'b':
-							type = ChessPieceType.BISHOPS;
-							break;
-						case 'r':
-							type = ChessPieceType.ROOKS;
-							break;
-						case 'n':
-							type = ChessPieceType.KNIGHTS;
-							break;
-						case 'p':
-							type = ChessPieceType.PAWNS;
-							break;
-						default:
-							break;
+						case 'k' -> type = ChessPieceType.KING;
+						case 'q' -> type = ChessPieceType.QUEEN;
+						case 'b' -> type = ChessPieceType.BISHOPS;
+						case 'r' -> type = ChessPieceType.ROOKS;
+						case 'n' -> type = ChessPieceType.KNIGHTS;
+						case 'p' -> type = ChessPieceType.PAWNS;
+						default -> {
+							pos++;
+							continue;
+						}
 					}
 					ChessPiece chessPiece = new ChessPiece(type, team, pos);
 					mBoard[pos] = chessPiece;
@@ -925,7 +916,7 @@ public class ChessBoard {
 		}
 	}
 
-	public ChessPlayer getPlayer(ChessTeam team) {
+	public @Nullable ChessPlayer getPlayer(ChessTeam team) {
 		if (team == ChessTeam.WHITE) {
 			return mWhitePlayer;
 		} else {

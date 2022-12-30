@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeCS {
 
@@ -28,7 +29,7 @@ public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeC
 	private static final Particle.DustOptions WARN_COLOR = new Particle.DustOptions(Color.fromRGB(240, 64, 0), 0.9f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"PIN_DESC"
 		);
@@ -45,7 +46,7 @@ public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeC
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

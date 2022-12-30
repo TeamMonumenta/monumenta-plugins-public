@@ -44,7 +44,8 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 
 public class ItemUtils {
@@ -1094,7 +1095,7 @@ public class ItemUtils {
 
 	public static boolean isInteresting(ItemStack item) {
 		return ServerProperties.getAlwaysPickupMats().contains(item.getType())
-			       || hasLore(item) && ItemStatUtils.getTier(item) != ItemStatUtils.Tier.ZERO
+			       || (hasLore(item) && ItemStatUtils.getTier(item) != ItemStatUtils.Tier.ZERO)
 			       || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
 	}
 
@@ -1104,7 +1105,8 @@ public class ItemUtils {
 	 * @param itemStack The item stack to be cloned, may be null
 	 * @return A completely new item stack that is a clone of the original item stack
 	 */
-	public static ItemStack clone(ItemStack itemStack) {
+	@Contract("!null -> !null")
+	public static @Nullable ItemStack clone(@Nullable ItemStack itemStack) {
 		if (itemStack == null) {
 			return null;
 		}

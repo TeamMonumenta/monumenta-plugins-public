@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class Cosmetic {
 	public String mName;
@@ -21,9 +22,9 @@ public class Cosmetic {
 	public boolean mEquipped;
 
 	//Lazy solution for cosmetic skill system
-	public ClassAbility mAbility;
+	public @Nullable ClassAbility mAbility;
 
-	private String[] mDescription = null;
+	private String @Nullable [] mDescription = null;
 
 	public Cosmetic(CosmeticType type, String name) {
 		mName = name;
@@ -39,12 +40,12 @@ public class Cosmetic {
 		mAbility = null;
 	}
 
-	public Cosmetic(CosmeticType type, String name, boolean isEquipped, ClassAbility ability) {
+	public Cosmetic(CosmeticType type, String name, boolean isEquipped, @Nullable ClassAbility ability) {
 		this(type, name, isEquipped);
 		mAbility = ability;
 	}
 
-	public Cosmetic(CosmeticType type, String name, boolean isEquipped, ClassAbility ability, String... description) {
+	public Cosmetic(CosmeticType type, String name, boolean isEquipped, @Nullable ClassAbility ability, String... description) {
 		this(type, name, isEquipped);
 		mAbility = ability;
 		mDescription = description;
@@ -62,11 +63,11 @@ public class Cosmetic {
 		return mEquipped;
 	}
 
-	public ClassAbility getAbility() {
+	public @Nullable ClassAbility getAbility() {
 		return mAbility;
 	}
 
-	public String[] getDescription() {
+	public String @Nullable [] getDescription() {
 		return mDescription;
 	}
 

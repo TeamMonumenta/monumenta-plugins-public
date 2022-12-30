@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class PercentDamageDealtSingle extends PercentDamageDealt {
 	public static final String effectID = "PercentDamageDealtSingle";
@@ -48,7 +49,7 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 		return object;
 	}
 
-	public static PercentDamageDealtSingle deserialize(JsonObject object, Plugin plugin) {
+	public static @Nullable PercentDamageDealtSingle deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 		double amount = object.get("amount").getAsDouble();
 		boolean hasDoneDamage = object.get("hasDoneDamage").getAsBoolean();

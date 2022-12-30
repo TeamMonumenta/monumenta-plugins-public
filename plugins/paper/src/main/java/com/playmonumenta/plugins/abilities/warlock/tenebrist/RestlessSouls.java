@@ -17,8 +17,8 @@ import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class RestlessSouls extends Ability {
 	private static final int DAMAGE_1 = 10;
@@ -79,9 +80,7 @@ public class RestlessSouls extends Ability {
 	private final int mSilenceTime;
 	private final int mVexCap;
 	private @Nullable Vex mVex;
-	private List<Vex> mVexList = new ArrayList<Vex>();
-	private PartialParticle mParticle1;
-	private PartialParticle mParticle2;
+	private final List<Vex> mVexList = new ArrayList<Vex>();
 
 	public RestlessSouls(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -133,21 +132,22 @@ public class RestlessSouls extends Ability {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 			restlessSoulsBoss.spawn(mPlayer, mDamage, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
 
-			mParticle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
-			mParticle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+			PartialParticle particle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+			PartialParticle particle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VEX_DURATION);
 
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
-				final Vex mBoss = mVex;
+				final Vex mBoss = Objects.requireNonNull(mVex);
 				double mRadian = 0;
+
 				@Override
 				public void run() {
 					Location loc = mBoss.getLocation().add(0, 0.25, 0);
-					mParticle1.location(loc).spawnAsPlayerActive(mPlayer);
-					mParticle2.location(loc).spawnAsPlayerActive(mPlayer);
+					particle1.location(loc).spawnAsPlayerActive(mPlayer);
+					particle2.location(loc).spawnAsPlayerActive(mPlayer);
 
 					boolean isOutOfTime = mTicksElapsed >= duration;
 					if (isOutOfTime || !mBoss.isValid()) {

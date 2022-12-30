@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -37,6 +36,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public abstract class BossAbilityGroup {
@@ -368,7 +368,7 @@ public abstract class BossAbilityGroup {
 	 *
 	 * Useful to use setblock or a command to trigger post-fight logic
 	 */
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 
 	}
 

@@ -33,6 +33,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SilverBolts extends SpellBaseSeekingProjectile {
 
@@ -127,7 +128,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.ELECTRIC_SPARK, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(boss);
 			},
 			// Hit Action
-			(World world, LivingEntity le, Location loc, Location prevLoc) -> {
+			(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {
 				loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1, 0);
 				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsEntityActive(boss);
 				if (le instanceof Player player) {

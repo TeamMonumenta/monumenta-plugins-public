@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GraveItem {
 
@@ -37,6 +37,9 @@ public class GraveItem {
 			if (ItemUtils.isNullOrAir(item)) { // item replacements deleted this item
 				return null;
 			}
+		}
+		if (item == null) {
+			return null;
 		}
 		String oldStatusKey = "status";
 		if (data.has(oldStatusKey) && data.get(oldStatusKey).isJsonPrimitive() && data.getAsJsonPrimitive(oldStatusKey).isString()) {

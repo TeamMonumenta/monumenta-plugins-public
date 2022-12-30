@@ -15,13 +15,14 @@ import java.util.UUID;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class TwistedMiniBoss extends BossAbilityGroup {
 	public static final String identityTag = "TwistedBoss";
 
 	private final Map<UUID, Integer> mCounterMap = new HashMap<>();
 
-	private final String mR3PoiName;
+	private final @Nullable String mR3PoiName;
 	private final boolean mIsR3Overworld;
 
 	public TwistedMiniBoss(Plugin plugin, LivingEntity boss) {

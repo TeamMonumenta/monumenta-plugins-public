@@ -48,6 +48,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public class VanityManager implements Listener {
@@ -184,7 +185,7 @@ public class VanityManager implements Listener {
 			    && offHand.getMaxItemUseDuration() == 0) { // don't update items that have a use time (and the vanity is the same type anyway)
 			VanityData data = getData(player);
 			ItemStack offhandVanity = data.getEquipped(EquipmentSlot.OFF_HAND);
-			if (data.mSelfVanityEnabled && !ItemUtils.isNullOrAir(offhandVanity)) {
+			if (data.mSelfVanityEnabled && offhandVanity != null && !ItemUtils.isNullOrAir(offhandVanity)) {
 				player.updateInventory();
 
 				// For 2-block tall blocks, send a block update for the block 2 above the clicked block to prevent the top half from visually staying
@@ -208,7 +209,8 @@ public class VanityManager implements Listener {
 	 *
 	 * @return A copy of the passed item stack with some data removed
 	 */
-	public static ItemStack cleanCopyForDisplay(ItemStack item) {
+	@Contract("!null -> !null")
+	public static @Nullable ItemStack cleanCopyForDisplay(@Nullable ItemStack item) {
 		if (item == null) {
 			return null;
 		}
@@ -238,7 +240,7 @@ public class VanityManager implements Listener {
 		return nbtItem.getItem();
 	}
 
-	public static boolean isInvisibleVanityItem(ItemStack itemStack) {
+	public static boolean isInvisibleVanityItem(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return false;
 		}

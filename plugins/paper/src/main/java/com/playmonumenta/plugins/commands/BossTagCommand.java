@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
@@ -635,8 +636,8 @@ public class BossTagCommand {
 								}
 							}
 
-							for (String paramKey : param.keySet()) {
-								if (!param.get(paramKey).equals(currentParam.get(paramKey))) {
+							for (Map.Entry<String, String> e : param.entrySet()) {
+								if (!e.getValue().equals(currentParam.get(e.getKey()))) {
 									shouldAdd = false;
 									break;
 								}
@@ -675,6 +676,7 @@ public class BossTagCommand {
 
 		if (souls == null) {
 			CommandAPI.fail("You must use /bosstag seach " + bossTag + " before using this command");
+			throw new RuntimeException();
 		}
 
 		if (souls.size() == 0) {
@@ -842,7 +844,7 @@ public class BossTagCommand {
 					String tagString = (String) tag;
 					for (String bossTag : bossTagList) {
 						if (tagString.startsWith(bossTag + "[")) {
-							BossUtils.addModifiersFromString(paramsMap.get(bossTag), tagString.replace(bossTag, ""));
+							BossUtils.addModifiersFromString(Objects.requireNonNull(paramsMap.get(bossTag)), tagString.replace(bossTag, ""));
 						}
 					}
 				}
@@ -888,10 +890,11 @@ public class BossTagCommand {
 
 		//read parameters and removing from the tag
 		for (int i = nbtTagsList.size() - 1; i >= 0; i--) {
-			for (String bossTag : bossTagParamertersMap.keySet()) {
-				if (((String)nbtTagsList.get(i)).startsWith(bossTag + "[")) {
+			for (Map.Entry<String, Map<String, String>> e : bossTagParamertersMap.entrySet()) {
+				String bossTag = e.getKey();
+				if (((String) nbtTagsList.get(i)).startsWith(bossTag + "[")) {
 					//found some parameters
-					BossUtils.addModifiersFromString(bossTagParamertersMap.get(bossTag), ((String)nbtTagsList.get(i)).replace(bossTag, ""));
+					BossUtils.addModifiersFromString(e.getValue(), ((String) nbtTagsList.get(i)).replace(bossTag, ""));
 					tags.remove(i);
 					break;
 				}
@@ -901,11 +904,12 @@ public class BossTagCommand {
 		//recreate the tags and load back
 		List<String> nextTags = new ArrayList<>();
 		String tag;
-		for (String bossTag : bossTagParamertersMap.keySet()) {
-			if (!bossTagParamertersMap.get(bossTag).isEmpty()) {
+		for (Map.Entry<String, Map<String, String>> e : bossTagParamertersMap.entrySet()) {
+			String bossTag = e.getKey();
+			Map<String, String> parametersMap = e.getValue();
+			if (!parametersMap.isEmpty()) {
 				tag = bossTag + "[";
-				Map<String, String> parametersMap = bossTagParamertersMap.get(bossTag);
-				BossParameters parameters = BossManager.mBossParameters.get(bossTag);
+				BossParameters parameters = Objects.requireNonNull(BossManager.mBossParameters.get(bossTag));
 
 				//following order of implementations inside the class
 				//TODO-we may want to separate in 3 different (generics-sounds-particles)
@@ -983,7 +987,7 @@ public class BossTagCommand {
 						StringReader reader = new StringReader(tag);
 						reader.advance(bossTag);
 
-						ParseResult<?> result = BossParameters.parseParameters(reader, BossManager.mBossParameters.get(bossTag));
+						ParseResult<?> result = BossParameters.parseParameters(reader, Objects.requireNonNull(BossManager.mBossParameters.get(bossTag)));
 
 						if (result.getResult() == null || result.mContainsDeprecated) {
 							//we get a deprecated tag somehow

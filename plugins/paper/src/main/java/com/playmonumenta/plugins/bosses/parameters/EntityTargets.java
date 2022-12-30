@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityTargets implements Cloneable {
 
@@ -395,7 +397,7 @@ public class EntityTargets implements Cloneable {
 				public <V extends Entity> void sort(Location loc, List<V> list) {
 					Collections.sort(list, (e1, e2) -> {
 						if (e1 instanceof LivingEntity && e2 instanceof LivingEntity) {
-							return (int) ((((LivingEntity)e1).getHealth() - ((LivingEntity)e2).getHealth()) * -1);
+							return (int) ((((LivingEntity) e1).getHealth() - ((LivingEntity) e2).getHealth()) * -1);
 						}
 						return 0;
 					});
@@ -403,9 +405,9 @@ public class EntityTargets implements Cloneable {
 			};
 		}
 
-		private LIMITSENUM mLimitEnum;
-		private SORTING mSorting;
-		private int mNumb;
+		private final @Nullable LIMITSENUM mLimitEnum;
+		private final SORTING mSorting;
+		private final int mNumb;
 
 		public Limit(LIMITSENUM limit) {
 			this(limit, SORTING.RANDOM);
@@ -505,7 +507,7 @@ public class EntityTargets implements Cloneable {
 			}
 
 			if (limit == null) {
-				return ParseResult.of(new Limit(number.intValue(), sort));
+				return ParseResult.of(new Limit(Objects.requireNonNull(number).intValue(), sort));
 			} else {
 				return ParseResult.of(new Limit(limit, sort));
 			}
@@ -732,13 +734,13 @@ public class EntityTargets implements Cloneable {
 				Tooltip.of(reader.readSoFar() + FILTERS_STRING, hoverDescription)));
 		}
 
-		Limit limit = null;
+		Limit limit;
 		List<EntityFilter> filters = new ArrayList<>(4);
 
 		if (foundLimits) {
 			ParseResult<Limit> parseLimit = Limit.fromReader(reader, hoverDescription);
 			if (parseLimit.getResult() == null) {
-				return ParseResult.of(parseLimit.getTooltip());
+				return ParseResult.of(Objects.requireNonNull(parseLimit.getTooltip()));
 			}
 
 			if (!reader.advance(",")) {
@@ -933,9 +935,10 @@ public class EntityTargets implements Cloneable {
 
 			ParseResult<Limit> parseLimit = Limit.fromReader(reader, hoverDescription);
 			limit = parseLimit.getResult();
+			if (limit == null) {
+				return ParseResult.of(Objects.requireNonNull(parseLimit.getTooltip()));
+			}
 		}
-
-
 
 		if (!reader.advance(",")) {
 			if (!reader.advance("]")) {
@@ -955,15 +958,14 @@ public class EntityTargets implements Cloneable {
 		}
 
 		ParseResult<TagsListFiter> parseTags = TagsListFiter.parseResult(reader, hoverDescription);
-		if (parseTags.getResult() == null) {
-			return ParseResult.of(parseTags.getTooltip());
-		}
-
 		TagsListFiter tags = parseTags.getResult();
+		if (tags == null) {
+			return ParseResult.of(Objects.requireNonNull(parseTags.getTooltip()));
+		}
 
 		if (!reader.advance("]")) {
 			return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+				Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
 		}
 
 		return ParseResult.of(new EntityTargets(target, range, optional, limit, filters, tags));

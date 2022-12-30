@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.particle;
 
 import com.playmonumenta.plugins.Constants;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum ParticleCategory {
 

@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -51,15 +52,15 @@ public class SpellEvolutionSeeds extends Spell {
 				String evolvedType = "Elder" + currentPlantType;
 
 				//Get hp difference on old plant to conserve player damage dealt
-				double hpDealt = currentPlant.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() - currentPlant.getHealth();
+				double hpDealt = EntityUtils.getMaxHealth(currentPlant) - currentPlant.getHealth();
 
 				//Kill existing plant
 				currentPlant.teleport(new Location(currentPlant.getWorld(), currentPlant.getLocation().getX(), -100, currentPlant.getLocation().getZ()));
 
-				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, evolvedType);
+				LivingEntity newPlant = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, evolvedType));
 
 				//Damage plant as much as old plant was damaged
-				newPlant.setHealth(newPlant.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() - hpDealt);
+				newPlant.setHealth(EntityUtils.getMaxHealth(newPlant) - hpDealt);
 
 				mPlantTypes.put(loc, evolvedType);
 				mPlants.put(loc, newPlant);

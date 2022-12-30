@@ -208,7 +208,7 @@ public class JudgementChain extends Ability {
 
 			new BukkitRunnable() {
 				final int mRunnableDuration = DURATION;
-				final double mWidth = mTarget.getWidth() / 2;
+				final double mWidth = e.getWidth() / 2;
 				int mT = 0;
 
 				@Override

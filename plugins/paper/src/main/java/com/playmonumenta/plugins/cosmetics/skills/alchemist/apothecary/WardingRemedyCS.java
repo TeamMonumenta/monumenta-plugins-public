@@ -16,6 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class WardingRemedyCS implements CosmeticSkill {
 
@@ -27,7 +28,7 @@ public class WardingRemedyCS implements CosmeticSkill {
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -42,7 +43,7 @@ public class WardingRemedyCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

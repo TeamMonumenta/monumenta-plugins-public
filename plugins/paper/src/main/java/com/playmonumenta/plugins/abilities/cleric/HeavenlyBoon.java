@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +29,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
@@ -171,6 +171,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));
 			ItemStack potion = InventoryUtils.getItemFromLootTable(mPlayer, lootTable);
+			if (potion == null) {
+				return;
+			}
 			Location pos = mPlayer.getLocation().add(0, 1, 0);
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potion, pos);
 

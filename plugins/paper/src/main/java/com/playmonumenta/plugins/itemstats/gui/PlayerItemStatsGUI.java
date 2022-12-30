@@ -205,13 +205,13 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		stats.mDisplayedEquipment.put(slot, getPlayerItemWithVanity(player, slot.mEquipmentSlot));
 	}
 
-	private @Nullable ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot) {
+	private ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot) {
 		return getPlayerItemWithVanity(player, slot, mShowVanity);
 	}
 
-	public static @Nullable ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot, boolean withVanity) {
+	public static ItemStack getPlayerItemWithVanity(Player player, EquipmentSlot slot, boolean withVanity) {
 		ItemStack item = player.getInventory().getItem(slot);
-		if (item != null && item.getType() != Material.AIR && withVanity) {
+		if (item.getType() != Material.AIR && withVanity) {
 			VanityManager.VanityData vanityData = Plugin.getInstance().mVanityManager.getData(player);
 			if (vanityData.getEquipped(slot) != null) {
 				ItemStack vanityItem = ItemUtils.clone(item);

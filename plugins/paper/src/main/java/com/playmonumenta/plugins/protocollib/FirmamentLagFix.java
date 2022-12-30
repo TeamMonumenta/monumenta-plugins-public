@@ -8,6 +8,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Cancels the block update packets for neighboring blocks of a placed Firmament.
@@ -15,7 +16,7 @@ import org.bukkit.block.Block;
  */
 public class FirmamentLagFix extends PacketAdapter {
 
-	private static Block mFirmamentBlock;
+	private static @Nullable Block mFirmamentBlock;
 
 	public FirmamentLagFix(Plugin plugin) {
 		super(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.BLOCK_CHANGE);

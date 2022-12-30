@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellBaseAura extends Spell {
 	@FunctionalInterface

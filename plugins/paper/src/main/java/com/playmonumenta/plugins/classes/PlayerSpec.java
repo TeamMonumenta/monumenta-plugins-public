@@ -4,19 +4,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
-import javax.annotation.Nullable;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
+@SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
 public class PlayerSpec {
 	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 
 	public @Nullable String mSpecQuestScoreboard;
 
-	public @Nullable String mSpecName;
+	public String mSpecName;
 	public int mSpecialization;
-	public @Nullable ItemStack mDisplayItem;
-	public @Nullable String mDescription;
+	public ItemStack mDisplayItem;
+	public String mDescription;
 
 	public JsonObject toJson() {
 		JsonArray abilities = new JsonArray();

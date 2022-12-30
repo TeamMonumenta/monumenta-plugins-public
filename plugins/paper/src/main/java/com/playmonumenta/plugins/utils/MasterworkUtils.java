@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class MasterworkUtils {
 
@@ -271,13 +272,13 @@ public class MasterworkUtils {
 	public static void payCost(MasterworkCost m, Player p, boolean isRefund) {
 		//if the player is in creative -> free upgrade
 		if (p.getGameMode() == GameMode.CREATIVE) {
-			Plugin.getInstance().getLogger().warning("[Masterwork] Player: " + p.getName() + " upgraded an item while be on creative mode!");
+			AuditListener.log("[Masterwork] Player " + p.getName() + (isRefund ? " downgraded" : " upgraded") + " an item in creative mode (cost=" + m.mLabel + ")");
 			return;
 		}
 
 		PlayerInventory inventory = p.getInventory();
-		ItemStack itemA = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(m.getPathA()));
-		ItemStack itemB = InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(m.getPathB()));
+		ItemStack itemA = InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(m.getPathA()));
+		ItemStack itemB = InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(), NamespacedKeyUtils.fromString(m.getPathB()));
 
 		itemA.setAmount(m.getCostA());
 		itemB.setAmount(m.getCostB());
@@ -296,8 +297,8 @@ public class MasterworkUtils {
 		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING) {
 			return false;
 		} else if (m == Masterwork.ZERO || m == Masterwork.I || m == Masterwork.II || m == Masterwork.III
-			|| m == Masterwork.IV || m == Masterwork.V || m == Masterwork.VI || m == Masterwork.VIIA
-			|| m == Masterwork.VIIB || m == Masterwork.VIIC) {
+			                                                                                                                      || m == Masterwork.IV || m == Masterwork.V || m == Masterwork.VI || m == Masterwork.VIIA
+			                                                                                                                      || m == Masterwork.VIIB || m == Masterwork.VIIC) {
 			return true;
 		}
 		return false;
@@ -322,8 +323,8 @@ public class MasterworkUtils {
 
 		//TODO: Replace with next max level
 		List<ItemStack> realItems = paths.stream().filter(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s)) != null)
-			.filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[0123]"))
-			.map(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s))).collect(Collectors.toList());
+			                            .filter(s -> s.substring(s.lastIndexOf('m') + 1).matches("[0123]"))
+			                            .map(s -> InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(s))).collect(Collectors.toList());
 		return realItems;
 	}
 
@@ -416,11 +417,11 @@ public class MasterworkUtils {
 
 		Masterwork m = ItemStatUtils.getMasterwork(item);
 		if (m == Masterwork.ERROR || m == Masterwork.NONE || ItemStatUtils.getRegion(item) != Region.RING
-			|| (sevenSelection != Masterwork.VIIA && sevenSelection != Masterwork.VIIB && sevenSelection != Masterwork.VIIC)) {
+			    || (sevenSelection != Masterwork.VIIA && sevenSelection != Masterwork.VIIB && sevenSelection != Masterwork.VIIC)) {
 			path += "/invalid_masterwork_selection";
 		} else {
 			path += "/" + toCleanPathName(ItemUtils.getPlainName(item)) + "/"
-				+ toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + sevenSelection.getName();
+				        + toCleanPathName(ItemUtils.getPlainName(item)) + "_m" + sevenSelection.getName();
 		}
 
 		return path;

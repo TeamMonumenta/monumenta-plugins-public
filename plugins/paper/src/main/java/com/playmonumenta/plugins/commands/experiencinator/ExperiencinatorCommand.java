@@ -15,7 +15,9 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -94,7 +96,8 @@ public class ExperiencinatorCommand {
 			               new EntitySelectorArgument("items", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
 			               new StringArgument("conversionName")
 				               .replaceSuggestions(info -> {
-					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : null);
+					               Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
 					               return config != null ? config.getConversionNames().toArray(new String[0]) : new String[0];
 				               }),
 			               new StringArgument("conversionResultName")
@@ -103,7 +106,8 @@ public class ExperiencinatorCommand {
 					               if (conversionName == null) {
 						               return new String[0];
 					               }
-					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : null);
+					               Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
 					               if (config == null) {
 						               return new String[0];
 					               }

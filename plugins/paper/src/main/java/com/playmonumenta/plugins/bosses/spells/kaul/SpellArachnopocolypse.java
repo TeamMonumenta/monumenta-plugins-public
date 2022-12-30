@@ -97,8 +97,10 @@ public class SpellArachnopocolypse extends Spell {
 		world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
 		new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 		Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), los);
-		EntityUtils.setAttributeBase(spider, Attribute.GENERIC_MAX_HEALTH, health);
-		spider.setHealth(health);
+		if (spider != null) {
+			EntityUtils.setAttributeBase(spider, Attribute.GENERIC_MAX_HEALTH, health);
+			spider.setHealth(health);
+		}
 	}
 
 	@Override

@@ -93,7 +93,12 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 		int[] unpaidLocations = {10, 13, 16};
 		int[] chosenArray;
 
-		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
+		DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+		if (depthsPlayer == null) {
+			close();
+			return;
+		}
+		List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = depthsPlayer.mWeaponOfferings;
 		List<DepthsAbilityItem> items = new ArrayList<>();
 
 		if (weapons == null || weapons.size() == 0) {

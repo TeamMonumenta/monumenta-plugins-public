@@ -146,7 +146,7 @@ public class PotionManager {
 		if (playerPotionInfo != null) {
 			for (PotionMap potionMap : playerPotionInfo.getAllPotionMaps()) {
 				for (PotionID id : PotionID.values()) {
-					infos.get(id).addAll(potionMap.getPotionInfos(id));
+					infos.computeIfAbsent(id, key -> new ArrayList<>()).addAll(potionMap.getPotionInfos(id));
 				}
 			}
 		}

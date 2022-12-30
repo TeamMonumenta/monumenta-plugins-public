@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 	/**
@@ -29,7 +30,8 @@ public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 		mTimer--;
 	}
 
-	@Override public void onPlayerHurt(GalleryPlayer player, DamageEvent event, LivingEntity enemy) {
+	@Override
+	public void onPlayerHurt(GalleryPlayer player, DamageEvent event, @Nullable LivingEntity enemy) {
 		if (mTimer <= 0 && enemy != null) {
 			new PartialParticle(Particle.SOUL, player.getPlayer().getEyeLocation()).delta(3, 1, 3).count(50).spawnAsPlayerBuff(player.getPlayer());
 			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, 0.64f, 0.5f);

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.particle;
 
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.jetbrains.annotations.Nullable;
 
 
 public class PartialParticle extends AbstractPartialParticle<PartialParticle> {

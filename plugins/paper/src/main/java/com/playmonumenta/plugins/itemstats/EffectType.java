@@ -213,7 +213,7 @@ public enum EffectType {
 		return mIsVanilla;
 	}
 
-	public static EffectType fromType(String type) {
+	public static @Nullable EffectType fromType(String type) {
 		for (EffectType effectType : values()) {
 			if (effectType.mType.equals(type)) {
 				return effectType;

@@ -15,6 +15,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class CholericFlamesCS implements CosmeticSkill {
 
@@ -23,7 +24,7 @@ public class CholericFlamesCS implements CosmeticSkill {
 		.build();
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -38,7 +39,7 @@ public class CholericFlamesCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

@@ -2,14 +2,14 @@ package com.playmonumenta.plugins.minigames.chess.events;
 
 import com.playmonumenta.plugins.minigames.chess.ChessBoard;
 import com.playmonumenta.plugins.minigames.chess.ChessPlayer;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class EndGameChessEvent extends ChessEvent {
 
 	private float mEndGameScore = -1;
 	//0 if white win, 1 if black win, 0.5 draw
 
-	public EndGameChessEvent(ChessBoard board, ChessPlayer white, ChessPlayer black) {
+	public EndGameChessEvent(ChessBoard board, @Nullable ChessPlayer white, @Nullable ChessPlayer black) {
 		super(board, white, black);
 	}
 

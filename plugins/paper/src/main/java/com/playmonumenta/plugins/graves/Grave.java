@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
@@ -42,7 +43,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public final class Grave {
 	private static final String KEY_TIME = "time";
@@ -74,9 +75,7 @@ public final class Grave {
 	private static final List<String> KEYS_POSE_PARTS = Arrays.asList(KEY_POSE_HEAD, KEY_POSE_BODY, KEY_POSE_LEFT_ARM, KEY_POSE_RIGHT_ARM, KEY_POSE_LEFT_LEG, KEY_POSE_RIGHT_LEG);
 	private static final List<String> KEYS_EQUIPMENT_PARTS = Arrays.asList(KEY_EQUIPMENT_HEAD, KEY_EQUIPMENT_BODY, KEY_EQUIPMENT_LEGS, KEY_EQUIPMENT_FEET, KEY_EQUIPMENT_HAND, KEY_EQUIPMENT_OFF_HAND);
 
-	// TODO add UUID and use that for the delete command
-
-	private BukkitRunnable mRunnable = null;
+	private @Nullable BukkitRunnable mRunnable = null;
 	GraveManager mManager;
 	Player mPlayer;
 	public final UUID mUuid;
@@ -98,7 +97,7 @@ public final class Grave {
 
 	// For deserializing a grave from data
 	private Grave(GraveManager manager, Player player, UUID uuid, String shard,
-	              Instant time, boolean small, Location location, boolean isGhost, @Nullable HashMap<String, EulerAngle> pose,
+	              Instant time, boolean small, Location location, boolean isGhost, HashMap<String, EulerAngle> pose,
 	              HashMap<String, ItemStack> equipment, JsonArray items) {
 		mManager = manager;
 		mPlayer = player;
@@ -402,7 +401,7 @@ public final class Grave {
 
 			Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = Plugin.getInstance().mItemStatManager.getPlayerItemStatsMappings();
 			if (itemStatsMap.containsKey(player.getUniqueId())) {
-				itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), false);
+				itemStatsMap.get(player.getUniqueId()).updateStats(player, true, false);
 			}
 
 			if (collected > 0) {
@@ -531,7 +530,7 @@ public final class Grave {
 		}
 	}
 
-	static Grave deserialize(GraveManager manager, Player player, JsonObject data) {
+	static @Nullable Grave deserialize(GraveManager manager, Player player, JsonObject data) {
 		UUID uuid = null;
 		String shard = null;
 		Instant time = null;
@@ -575,13 +574,13 @@ public final class Grave {
 				if (poseData.has(key) && poseData.get(key).isJsonObject()) {
 					JsonObject obj = poseData.getAsJsonObject(key);
 					if (obj.has(KEY_X) && obj.get(KEY_X).isJsonPrimitive() && obj.getAsJsonPrimitive(KEY_X).isNumber()) {
-						pose.get(key).setX(obj.getAsJsonPrimitive(KEY_X).getAsDouble());
+						pose.computeIfAbsent(key, k -> new EulerAngle(0, 0, 0)).setX(obj.getAsJsonPrimitive(KEY_X).getAsDouble());
 					}
 					if (obj.has(KEY_Y) && obj.get(KEY_Y).isJsonPrimitive() && obj.getAsJsonPrimitive(KEY_Y).isNumber()) {
-						pose.get(key).setY(obj.getAsJsonPrimitive(KEY_Y).getAsDouble());
+						pose.computeIfAbsent(key, k -> new EulerAngle(0, 0, 0)).setY(obj.getAsJsonPrimitive(KEY_Y).getAsDouble());
 					}
 					if (obj.has(KEY_Z) && obj.get(KEY_Z).isJsonPrimitive() && obj.getAsJsonPrimitive(KEY_Z).isNumber()) {
-						pose.get(key).setZ(obj.getAsJsonPrimitive(KEY_Z).getAsDouble());
+						pose.computeIfAbsent(key, k -> new EulerAngle(0, 0, 0)).setZ(obj.getAsJsonPrimitive(KEY_Z).getAsDouble());
 					}
 				}
 			}
@@ -598,6 +597,10 @@ public final class Grave {
 			items.addAll(data.getAsJsonArray(KEY_ITEMS));
 		}
 		boolean isGhost = data.has(KEY_GHOST) && data.get(KEY_GHOST).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_GHOST).isBoolean() && data.getAsJsonPrimitive(KEY_GHOST).getAsBoolean();
+		if (location == null || time == null || shard == null) {
+			MMLog.severe("Unable to load grave for player " + player.getName() + "; JSON=" + data);
+			return null;
+		}
 		return new Grave(manager, player, uuid, shard, time, small, location, isGhost, pose, equipment, items);
 	}
 

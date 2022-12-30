@@ -55,9 +55,9 @@ public class DodgeBoss extends BossAbilityGroup {
 		event.setCancelled(true);
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation().add(0, 1, 0);
-		Entity damgaer = event.getDamager();
-		if (damgaer != null) {
-			Vector direction = event.getDamager().getLocation().subtract(loc).toVector().setY(0).normalize();
+		Entity damager = event.getDamager();
+		if (damager != null) {
+			Vector direction = damager.getLocation().subtract(loc).toVector().setY(0).normalize();
 			if (!Double.isFinite(direction.getX())) {
 				direction = new Vector(0, 1, 0);
 			}

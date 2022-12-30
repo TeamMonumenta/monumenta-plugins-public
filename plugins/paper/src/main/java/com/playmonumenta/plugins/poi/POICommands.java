@@ -1,12 +1,13 @@
 package com.playmonumenta.plugins.poi;
 
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ public class POICommands {
 	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.weeklypoi");
-		String[] pois = Arrays.stream(POI.values()).map(POI::getName).toArray(String[]::new);
+		String[] poiNames = Arrays.stream(POI.values()).map(POI::getName).toArray(String[]::new);
 
 		// CONQUER POI COMMAND
 		new CommandAPICommand("weeklypoi")
@@ -23,13 +24,18 @@ public class POICommands {
 			.withArguments(
 				new LiteralArgument("conquer"),
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-				new MultiLiteralArgument(pois))
+				new MultiLiteralArgument(poiNames))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				String poiName = (String) args[1];
-				boolean added = POIManager.getInstance().completePOI(player, poiName);
+				POI poi = POI.getPOI(poiName);
+				if (poi == null || poi == POI.NONE) {
+					CommandAPI.fail("Invalid POI name " + poiName);
+					throw new RuntimeException();
+				}
+				boolean added = POIManager.getInstance().completePOI(player, poi);
 				if (added) {
-					player.sendMessage(Component.text("You've conquered " + POI.getPOI(poiName).getCleanName() + " for the first time this week, earning you bonus loot!", NamedTextColor.GOLD));
+					player.sendMessage(Component.text("You've conquered " + poi.getCleanName() + " for the first time this week, earning you bonus loot!", NamedTextColor.GOLD));
 				}
 			})
 			.register();
@@ -42,19 +48,13 @@ public class POICommands {
 				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				List<POICompletion> poiList = POIManager.getInstance().mPlayerPOI.get(player.getUniqueId());
-				if (poiList != null) {
-					player.sendMessage(Component.text("Uncleared Points of Interest are displayed below in red. Your first clear of each this week will earn you bonus loot!", NamedTextColor.GOLD));
-					for (POICompletion p : poiList) {
-						if (p.getPOI().getName().equals("none")) {
-							continue;
-						}
-						if (p.isCompleted()) {
-							player.sendMessage(Component.text(" - " + p.getPOI().getCleanName(), NamedTextColor.GREEN));
-						} else {
-							player.sendMessage(Component.text(" - " + p.getPOI().getCleanName(), NamedTextColor.RED));
-						}
+				Set<POI> pois = POIManager.getInstance().mPlayerPOI.get(player.getUniqueId());
+				player.sendMessage(Component.text("Uncleared Points of Interest are displayed below in red. Your first clear of each this week will earn you bonus loot!", NamedTextColor.GOLD));
+				for (POI poi : POI.values()) {
+					if (poi == POI.NONE) {
+						continue;
 					}
+					player.sendMessage(Component.text(" - " + poi.getCleanName(), pois != null && pois.contains(poi) ? NamedTextColor.GREEN : NamedTextColor.RED));
 				}
 			})
 			.register();

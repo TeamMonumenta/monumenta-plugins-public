@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -22,6 +23,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.jetbrains.annotations.Nullable;
 
 public class ForcefulGridTowerAbility extends TowerAbility {
 	public ForcefulGridTowerAbility(Plugin plugin, String identityTag, LivingEntity boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
@@ -60,21 +62,21 @@ public class ForcefulGridTowerAbility extends TowerAbility {
 			},
 			// Launch Aesthetic
 			(World world, Location loc, int ticks) -> {
-				world.spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
+				new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 				world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 2f, 0.5f);
 			},
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {
-				world.spawnParticle(Particle.CRIT, loc, 3, 0, 0, 0, 0.1);
-				world.spawnParticle(Particle.SMOKE_LARGE, loc, 4, 0.25, 0.25, 0.25, 0);
+				new PartialParticle(Particle.CRIT, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 4, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 				if (ticks % 40 == 0) {
 					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 2f, 0.2f);
 				}
 			},
 			// Hit Action
-			(World world, LivingEntity target, Location loc, Location prevLoc) -> {
+			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
-				world.spawnParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25);
+				new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 				if (target != null) {
 					DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, 15);
 					MovementUtils.pullTowards(boss, target, 1);

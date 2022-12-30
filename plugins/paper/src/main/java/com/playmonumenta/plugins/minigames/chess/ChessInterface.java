@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -26,7 +25,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("NullAway")
 public class ChessInterface {
 	public enum InterfaceType {
 		WHITEPLAYER,
@@ -182,7 +183,7 @@ public class ChessInterface {
 	private final Map<Integer, ItemFrame> mFrames;
 	protected final InterfaceType mType;
 
-	private Set<Integer> mPossibleMoves = null;
+	private @Nullable Set<Integer> mPossibleMoves = null;
 	private int mPieceSelected;
 	private @Nullable Boolean mPlayerTurn;
 	private @Nullable BukkitRunnable mParticleRunnable;
@@ -198,7 +199,7 @@ public class ChessInterface {
 	public void buildBoard(Location startingPoint, FacingPosition facing) {
 		World world = startingPoint.getWorld();
 		for (int y = 0; y < 8; y++) {
-				for (int x = 8 * y; x < 8 * (y + 1); x++) {
+			for (int x = 8 * y; x < 8 * (y + 1); x++) {
 				ItemFrame itemFrame = (ItemFrame) world.spawn(startingPoint.clone().add((7 * facing.mX) + (x % 8) * facing.mX2, y, 0 * facing.mZ), ItemFrame.class);
 				itemFrame.addScoreboardTag(mBoard.getName());
 				itemFrame.addScoreboardTag(ITEM_FRAME_TAG);
@@ -225,7 +226,7 @@ public class ChessInterface {
 			to = 63 - to;
 		}
 		boolean fromSetWhite = ((from / 8) % 2 == 0 && from % 2 == 0) || ((from / 8) % 2 == 1 && from % 2 == 1);
-		Boolean toSetWhite = ((to / 8) % 2 == 0 && to % 2 == 0) || ((to / 8) % 2 == 1 && to % 2 == 1);
+		boolean toSetWhite = ((to / 8) % 2 == 0 && to % 2 == 0) || ((to / 8) % 2 == 1 && to % 2 == 1);
 		mFrames.get(from).setItem(MAP_BOARD.get(fromSetWhite ? 0 : 1), false);
 		mFrames.get(to).setItem(MAP_PIECES.get(movedPiece.getPieceType()).get(movedPiece.getPieceTeam()).get(toSetWhite ? 0 : 1), false);
 

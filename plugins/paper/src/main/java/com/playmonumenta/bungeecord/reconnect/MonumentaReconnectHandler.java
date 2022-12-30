@@ -4,11 +4,11 @@ import com.playmonumenta.redissync.ConfigAPI;
 import com.playmonumenta.redissync.RedisAPI;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ReconnectHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.jetbrains.annotations.Nullable;
 
 public class MonumentaReconnectHandler implements ReconnectHandler {
 
@@ -19,7 +19,7 @@ public class MonumentaReconnectHandler implements ReconnectHandler {
 	}
 
 	@Override
-	public ServerInfo getServer(ProxiedPlayer player) {
+	public @Nullable ServerInfo getServer(ProxiedPlayer player) {
 		ServerInfo server = null;
 
 		String storedServerName = null;

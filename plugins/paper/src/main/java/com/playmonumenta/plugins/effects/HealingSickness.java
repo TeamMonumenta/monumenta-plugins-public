@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class HealingSickness extends Effect {
 	public static final String effectID = "HealingSickness";

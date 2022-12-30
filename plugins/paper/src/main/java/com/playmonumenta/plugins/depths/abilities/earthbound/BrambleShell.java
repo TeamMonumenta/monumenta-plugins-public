@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class BrambleShell extends DepthsAbility {
 
@@ -43,7 +44,7 @@ public class BrambleShell extends DepthsAbility {
 			    && !event.isBlocked()) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
-			world.spawnParticle(Particle.BLOCK_CRACK, loc.add(0, source.getHeight() / 2, 0), 25, 0.5, 0.5, 0.5, 0.125, Bukkit.createBlockData(Material.SWEET_BERRY_BUSH));
+			new PartialParticle(Particle.BLOCK_CRACK, loc.add(0, source.getHeight() / 2, 0), 25, 0.5, 0.5, 0.5, 0.125, Bukkit.createBlockData(Material.SWEET_BERRY_BUSH)).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1, 0.8f);
 
 			DamageUtils.damage(mPlayer, source, DamageType.MELEE_SKILL, BRAMBLE_DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);

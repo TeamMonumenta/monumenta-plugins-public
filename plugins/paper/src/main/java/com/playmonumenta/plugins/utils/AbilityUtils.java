@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -53,6 +52,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class AbilityUtils {
 
@@ -515,17 +515,26 @@ public class AbilityUtils {
 		for (PlayerClass mClass : mClasses.mClasses) {
 			if (playerClass != mClass.mClass) {
 				for (AbilityInfo<?> ability : mClass.mAbilities) {
-					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
+					String scoreboard = ability.getScoreboard();
+					if (scoreboard != null) {
+						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
+					}
 				}
 			}
 			if (playerSpec != mClass.mSpecOne.mSpecialization) {
 				for (AbilityInfo<?> ability : mClass.mSpecOne.mAbilities) {
-					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
+					String scoreboard = ability.getScoreboard();
+					if (scoreboard != null) {
+						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
+					}
 				}
 			}
 			if (playerSpec != mClass.mSpecTwo.mSpecialization) {
 				for (AbilityInfo<?> ability : mClass.mSpecTwo.mAbilities) {
-					ScoreboardUtils.setScoreboardValue(player, ability.getScoreboard(), 0);
+					String scoreboard = ability.getScoreboard();
+					if (scoreboard != null) {
+						ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
+					}
 				}
 			}
 		}
@@ -543,7 +552,11 @@ public class AbilityUtils {
 				// Loop over base abilities
 				for (AbilityInfo<?> ability : abilities) {
 					// Enhanced ability
-					int score = ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard()).orElse(0);
+					String scoreboard = ability.getScoreboard();
+					if (scoreboard == null) {
+						continue;
+					}
+					int score = ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0);
 					if (score > 2) {
 						remainingEnhancementPoints--;
 						remainingSkillPoints -= score - 2;
@@ -553,7 +566,11 @@ public class AbilityUtils {
 				}
 				// Loop over specs
 				for (AbilityInfo<?> specAbility : specAbilities) {
-					remainingSpecPoints -= ScoreboardUtils.getScoreboardValue(player, specAbility.getScoreboard()).orElse(0);
+					String scoreboard = specAbility.getScoreboard();
+					if (scoreboard == null) {
+						continue;
+					}
+					remainingSpecPoints -= ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0);
 				}
 			}
 		}

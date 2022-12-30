@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class FrozenSolidFinisher implements EliteFinisher {
 	public static final String NAME = "Frozen Solid";
@@ -27,15 +29,16 @@ public class FrozenSolidFinisher implements EliteFinisher {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-			HashMap<Integer, ArrayList<Location>> mIceDelays = new HashMap<>();
-			ArrayList<ArmorStand> mArmorStands = new ArrayList<>();
-			LivingEntity mClonedKilledMob;
+			final HashMap<Integer, ArrayList<Location>> mIceDelays = new HashMap<>();
+			final ArrayList<ArmorStand> mArmorStands = new ArrayList<>();
+			@Nullable LivingEntity mClonedKilledMob;
+
 			@Override
 			public void run() {
 				if (mTicks == 0) {
 					// Let's let the mob freeze
 					killedMob.remove();
-					mClonedKilledMob = EntityUtils.copyMob((LivingEntity)killedMob);
+					mClonedKilledMob = EntityUtils.copyMob((LivingEntity) killedMob);
 					mClonedKilledMob.setHealth(1);
 					mClonedKilledMob.setInvulnerable(true);
 					mClonedKilledMob.setGravity(false);
@@ -49,8 +52,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 								// No need to fill the ice inside, we just need the surface
 								if (!(x > box.getMinX() && x <= box.getMaxX() - 1 && y > box.getMinY() && y <= box.getMaxY() - 1 && z > box.getMinZ() && z <= box.getMaxZ() - 1)) {
 									int delay = (int) (Math.random() * 20) + 1;
-									mIceDelays.putIfAbsent(delay, new ArrayList<>());
-									mIceDelays.get(delay).add(new Location(loc.getWorld(), x, y - 1.5, z));
+									mIceDelays.computeIfAbsent(delay, key -> new ArrayList<>()).add(new Location(loc.getWorld(), x, y - 1.5, z));
 								}
 							}
 						}
@@ -71,12 +73,14 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					}
 				} else if (mTicks == 29) {
 					// Remove the mob a tick before the finisher is done
-					mClonedKilledMob.remove();
+					if (mClonedKilledMob != null) {
+						mClonedKilledMob.remove();
+					}
 				} else if (mTicks == 30) {
 					// Break the ice with particles and play the sound
 					for (ArmorStand ice : mArmorStands) {
 						ice.remove();
-						loc.getWorld().spawnParticle(Particle.BLOCK_DUST, ice.getLocation().add(0, 1.5, 0), 5, Bukkit.createBlockData(Material.ICE));
+						new PartialParticle(Particle.BLOCK_DUST, ice.getLocation().add(0, 1.5, 0), 5, Bukkit.createBlockData(Material.ICE)).spawnAsPlayerActive(p);
 					}
 					loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 2f, Constants.NotePitches.F11);
 				}

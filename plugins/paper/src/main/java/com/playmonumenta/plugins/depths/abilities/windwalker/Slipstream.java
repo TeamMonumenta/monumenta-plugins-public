@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -67,8 +68,7 @@ public class Slipstream extends DepthsAbility {
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_AMPLIFIER));
 		}
 		Location loc = mPlayer.getEyeLocation();
-		Location pLoc = loc;
-		pLoc.add(0, -0.75, 0);
+		loc.add(0, -0.75, 0);
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
 
@@ -79,10 +79,10 @@ public class Slipstream extends DepthsAbility {
 				mRadius += 1.25;
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
-					pLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.CLOUD, pLoc, 3, 0, 0, 0, 0.125);
-					world.spawnParticle(Particle.EXPLOSION_NORMAL, pLoc, 1, 0, 0, 0, 0.15);
-					pLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
+					loc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
+					new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 1, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
+					loc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 				if (mRadius >= RADIUS + 1) {
 					this.cancel();

@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -43,6 +42,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class AlchemicalArtillery extends PotionAbility {
@@ -173,7 +173,7 @@ public class AlchemicalArtillery extends PotionAbility {
 				world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 0.8f);
 
 				List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
-				double damage = (mAlchemistPotions.getDamage() + MetadataUtils.getMetadata(potion, AlchemicalArtillery.ARTILLERY_POTION_TAG, 0.0)) * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));
+				double damage = ((mAlchemistPotions == null ? 0 : mAlchemistPotions.getDamage()) + MetadataUtils.getMetadata(potion, AlchemicalArtillery.ARTILLERY_POTION_TAG, 0.0)) * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));
 				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, ENHANCEMENT_EXPLOSION_KNOCK_UP);
 				for (LivingEntity mob : mobs) {
 					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);

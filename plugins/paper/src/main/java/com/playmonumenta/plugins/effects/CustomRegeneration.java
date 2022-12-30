@@ -5,9 +5,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class CustomRegeneration extends Effect {
 	public static final String effectID = "CustomRegeneration";

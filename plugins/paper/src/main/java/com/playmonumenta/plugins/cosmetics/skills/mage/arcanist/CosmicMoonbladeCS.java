@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class CosmicMoonbladeCS implements CosmeticSkill {
 
@@ -29,7 +30,7 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -44,7 +45,7 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

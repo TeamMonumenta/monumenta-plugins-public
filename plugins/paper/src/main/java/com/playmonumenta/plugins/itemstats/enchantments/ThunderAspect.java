@@ -150,9 +150,9 @@ public class ThunderAspect implements Enchantment {
 				World world = enemy.getWorld();
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
 				loc = loc.add(0, 1, 0);
-				world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_YELLOW);
-				world.spawnParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_FAINT_YELLOW);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15);
+				new PartialParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_YELLOW).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_FAINT_YELLOW).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.15).spawnAsPlayerActive(player);
 			}
 		}
 	}

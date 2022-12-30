@@ -15,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements PrestigeCS {
 
@@ -31,7 +32,7 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 	};
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"ESOTERIC_DESC"
 		);
@@ -48,7 +49,7 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

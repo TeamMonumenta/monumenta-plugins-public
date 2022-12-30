@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -43,7 +44,7 @@ public class Riftborn {
 		}
 		if (validSpawnLocs.size() > 0) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
-			LivingEntity boss = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "VoidGate");
+			LivingEntity boss = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "VoidGate"));
 			boss.addScoreboardTag(BlockLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
 			new BukkitRunnable() {
 				int mTicks = 0;

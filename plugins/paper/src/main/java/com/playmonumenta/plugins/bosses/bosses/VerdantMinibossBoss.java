@@ -21,7 +21,7 @@ import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,6 +45,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class VerdantMinibossBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_verdantmini";
@@ -63,7 +64,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	private @Nullable Player mFuryTarget = null;
-	private Location mCrystalLoc;
+	private @Nullable Location mCrystalLoc;
 	private boolean mShielded = true;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -152,7 +153,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (!mShielded || !mBoss.isValid() || mBoss.isDead()) {
+				if (!mShielded || !mBoss.isValid() || mBoss.isDead() || mFuryTarget == null) {
 					this.cancel();
 					return;
 				}
@@ -163,12 +164,15 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 				new BukkitRunnable() {
 					int mT = 0;
-					Location mLocation = mFuryTarget.getLocation().clone().add(0, HEIGHT, 0);
+					Location mLocation = Objects.requireNonNull(mFuryTarget).getLocation().clone().add(0, HEIGHT, 0);
 
 					@Override
 					public void run() {
 						if (mFuryTarget == null || !mFuryTarget.isOnline() || mFuryTarget.isDead() || mFuryTarget.getLocation().distance(mBoss.getLocation()) > detectionRange) {
 							mFuryTarget = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
+							if (mFuryTarget == null) {
+								return;
+							}
 						}
 
 						if (!mShielded || !mBoss.isValid() || mBoss.isDead()) {
@@ -279,7 +283,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 

@@ -104,13 +104,13 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		}
 		if (event.getSlot() == 11) {
 			close();
-			ExperiencinatorSettingsGui.showConfig(mPlayer, getPlugin(), mExperiencinator, mExperiencinatorItem);
+			ExperiencinatorSettingsGui.showConfig(mPlayer, com.playmonumenta.scriptedquests.Plugin.getInstance(), mExperiencinator, mExperiencinatorItem);
 		} else if (event.getSlot() == 13) {
 			close();
 			ExperiencinatorUtils.useExperiencinator(mExperiencinator, mExperiencinatorItem, mPlayer);
 		} else if (event.getSlot() == 15) {
 			close();
-			ExperiencinatorSelectiveConvertGui.show(mPlayer, getPlugin(), mExperiencinator, mExperiencinatorItem);
+			ExperiencinatorSelectiveConvertGui.show(mPlayer, com.playmonumenta.scriptedquests.Plugin.getInstance(), mExperiencinator, mExperiencinatorItem);
 		}
 
 	}

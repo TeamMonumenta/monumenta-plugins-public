@@ -19,7 +19,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class EnchantedPrayerAoE extends Effect {
 	public static final String effectID = "EnchantedPrayerAoE";
@@ -68,7 +68,7 @@ public class EnchantedPrayerAoE extends Effect {
 			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mEffectSize).getHitMobs()) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
 				if (Crusade.applyCrusadeToSlayer(le, mCrusade)) {
-					mPlugin.mEffectManager.addEffect(le, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+					mPlugin.mEffectManager.addEffect(le, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
 				}
 			}
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);

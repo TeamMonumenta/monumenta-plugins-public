@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -54,7 +55,7 @@ public class VolcanicCombos extends DepthsAbility {
 					double rad = Math.toRadians(i);
 					Location locationDelta = new Location(world, RADIUS / 2 * FastUtils.cos(rad), 0.5, RADIUS / 2 * FastUtils.sin(rad));
 					location.add(locationDelta);
-					world.spawnParticle(Particle.FLAME, location, 1);
+					new PartialParticle(Particle.FLAME, location, 1).spawnAsPlayerActive(mPlayer);
 					location.subtract(locationDelta);
 				}
 				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, 0.5f, 1);

@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellBaseSeekingProjectile extends Spell {
 
@@ -75,7 +76,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 	private final HitAction mHitAction;
 	private final int mCollisionCheckDelay;
 	private final boolean mCollidesWithOthers;
-	private final GetSpellTargets<LivingEntity> mGetSpellTargets;
+	private final @Nullable GetSpellTargets<LivingEntity> mGetSpellTargets;
 
 	private final boolean mFixed;
 	private int mChargeRemain;
@@ -282,7 +283,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 						for (Player player : mPlayers) {
 							if (LocationUtils.hasLineOfSight(mBoss, player)) {
 								if (!mLaunchTracking) {
-									launchDX(player, mLocations.get(player), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+									launchDX(player, Objects.requireNonNull(mLocations.get(player)), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								} else {
 									launchDX(player, player.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								}

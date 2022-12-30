@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -38,6 +37,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class Ghalkor extends BossAbilityGroup {
 
@@ -233,7 +233,7 @@ public final class Ghalkor extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if ((mSvalgot == null || mSvalgot.isDead() || !mSvalgot.isValid()) && (mSvalgotBoss == null || !mSvalgotBoss.mSummonedFinalBoss)) {
 			mSummonedFinalBoss = true;
 

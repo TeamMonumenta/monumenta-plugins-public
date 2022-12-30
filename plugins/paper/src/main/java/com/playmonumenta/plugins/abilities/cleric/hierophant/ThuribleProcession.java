@@ -28,6 +28,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
 
@@ -83,7 +84,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	}
 
 	@Override
-	public void onHurt(DamageEvent event, Entity damager, LivingEntity source) {
+	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (mBuffs > 0 && mPlayer.getHealth() - event.getFinalDamage(true) <= EntityUtils.getMaxHealth(mPlayer) * DAMAGE_BREAK_PERCENT) {
 			updateBuffs();
 

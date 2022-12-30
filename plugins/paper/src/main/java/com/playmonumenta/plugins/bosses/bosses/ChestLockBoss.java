@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class ChestLockBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lock_chest";
@@ -32,7 +33,7 @@ public class ChestLockBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (mLoc.getBlock().getState() instanceof Chest chest) {
 			chest.setLock(null);
 			chest.update();

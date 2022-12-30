@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellPrimordialBolt extends SpellBaseBolt {
 
@@ -68,7 +69,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				}
 			},
 
-			(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+			(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 				if (player == null || player.getLocation().getY() > 60 || (loc != null && loc.getY() > 60)) {
 					return;
 				}

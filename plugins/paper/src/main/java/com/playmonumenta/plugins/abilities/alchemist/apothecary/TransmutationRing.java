@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +27,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class TransmutationRing extends PotionAbility {
 	private static final int TRANSMUTATION_RING_1_COOLDOWN = 25 * 20;
@@ -87,6 +87,7 @@ public class TransmutationRing extends PotionAbility {
 		if (!isOnCooldown()
 			    && mPlayer.isSneaking()
 			    && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
+			    && mAlchemistPotions != null
 			    && mAlchemistPotions.isAlchemistPotion(potion)) {
 			putOnCooldown();
 			potion.setMetadata(TRANSMUTATION_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));

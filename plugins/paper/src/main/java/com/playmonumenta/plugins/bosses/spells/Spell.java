@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Spell implements Cloneable {
 	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();
@@ -98,7 +99,7 @@ public abstract class Spell implements Cloneable {
 
 	}
 
-	public void onDeath(EntityDeathEvent event) {
+	public void onDeath(@Nullable EntityDeathEvent event) {
 
 	}
 

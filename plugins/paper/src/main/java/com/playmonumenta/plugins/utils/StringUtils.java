@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import java.util.TreeMap;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class StringUtils {
 

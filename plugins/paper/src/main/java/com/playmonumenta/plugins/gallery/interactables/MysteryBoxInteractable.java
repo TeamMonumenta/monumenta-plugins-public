@@ -18,9 +18,9 @@ public class MysteryBoxInteractable extends BasePricedInteractable {
 
 	private boolean mValidBox = true;
 	//command that should be used when a Mbox is moved from this location
-	private final String mCommandRemove;
+	private final @Nullable String mCommandRemove;
 	//command that should be used when a Mbox is moved to this location
-	private final String mCommandPlace;
+	private final @Nullable String mCommandPlace;
 
 	public MysteryBoxInteractable(
 		@NotNull String name,

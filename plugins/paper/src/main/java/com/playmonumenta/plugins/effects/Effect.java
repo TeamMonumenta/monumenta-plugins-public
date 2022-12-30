@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /* NOTE:
  *
@@ -133,7 +133,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	// Deserialize effects from JSON to create a new Effect Object, to be added on login.
 	// If we don't want the effect to be loaded on login, leave this be.
-	public static Effect deserialize(JsonObject object, Plugin plugin) {
+	public static @Nullable Effect deserialize(JsonObject object, Plugin plugin) {
 		return null;
 	}
 

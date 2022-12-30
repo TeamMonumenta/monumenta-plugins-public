@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.integrations.luckperms;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.messaging.MessagingService;
@@ -18,11 +17,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LuckPermsIntegration {
-	protected static LuckPerms LP = null;
-	protected static UserManager UM = null;
-	protected static GroupManager GM = null;
+	protected static @MonotonicNonNull LuckPerms LP = null;
+	protected static @MonotonicNonNull UserManager UM = null;
+	protected static @MonotonicNonNull GroupManager GM = null;
 
 	public LuckPermsIntegration(Plugin plugin) {
 		plugin.getLogger().info("Enabling LuckPerms integration");
@@ -41,6 +42,9 @@ public class LuckPermsIntegration {
 
 	public static @Nullable Group getGuild(Player player) {
 		User user = UM.getUser(player.getUniqueId());
+		if (user == null) {
+			return null;
+		}
 		for (Group group : user.getInheritedGroups(QueryOptions.nonContextual())) {
 			for (MetaNode node : group.getNodes(NodeType.META)) {
 				if (node.getMetaKey().equals("guildname")) {

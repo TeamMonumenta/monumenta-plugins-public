@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class WrathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_wrath";
@@ -68,11 +69,11 @@ public class WrathBoss extends BossAbilityGroup {
 				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 			},
 			// Hit Action
-			(World world, Player player, Location loc, Vector dir) -> {
+			(World world, @Nullable Player player, Location loc, Vector dir) -> {
 				new BukkitRunnable() {
-					World mWorld = world;
-					Location mLocation = loc;
-					Vector mDirection = dir;
+					final World mWorld = world;
+					final Location mLocation = loc;
+					final Vector mDirection = dir;
 					int mTime = 0;
 
 					@Override

@@ -4,14 +4,15 @@ import com.playmonumenta.plugins.minigames.chess.ChessBoard;
 import com.playmonumenta.plugins.minigames.chess.ChessPlayer;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Nullable;
 
 public class ChessEvent extends Event {
 
 	protected final ChessBoard mBoard;
-	protected final ChessPlayer mWhitePlayer;
-	protected final ChessPlayer mBlackPlayer;
+	protected final @Nullable ChessPlayer mWhitePlayer;
+	protected final @Nullable ChessPlayer mBlackPlayer;
 
-	public ChessEvent(ChessBoard board, ChessPlayer whitePlayer, ChessPlayer blackPlayer) {
+	public ChessEvent(ChessBoard board, @Nullable ChessPlayer whitePlayer, @Nullable ChessPlayer blackPlayer) {
 		mBoard = board;
 		mWhitePlayer = whitePlayer;
 		mBlackPlayer = blackPlayer;
@@ -21,11 +22,11 @@ public class ChessEvent extends Event {
 		return mBoard;
 	}
 
-	public ChessPlayer getBlackPlayer() {
+	public @Nullable ChessPlayer getBlackPlayer() {
 		return mBlackPlayer;
 	}
 
-	public ChessPlayer getWhitePlayer() {
+	public @Nullable ChessPlayer getWhitePlayer() {
 		return mWhitePlayer;
 	}
 

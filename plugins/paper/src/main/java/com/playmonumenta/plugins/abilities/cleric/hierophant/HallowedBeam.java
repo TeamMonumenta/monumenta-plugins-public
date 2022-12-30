@@ -213,13 +213,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 	public void swapMode() {
 		if (mMode == Mode.DEFAULT) {
 			mMode = Mode.HEALING;
-			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " Mode: " + "Healing");
+			MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + "Healing");
 		} else if (mMode == Mode.HEALING) {
 			mMode = Mode.ATTACK;
-			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " Mode: " + "Attack");
+			MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + "Attack");
 		} else {
 			mMode = Mode.DEFAULT;
-			MessagingUtils.sendActionBarMessage(mPlayer, mInfo.getLinkedSpell().getName() + " Mode: " + "Default");
+			MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + "Default");
 		}
 		ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.ordinal());
 		ClientModHandler.updateAbility(mPlayer, this);

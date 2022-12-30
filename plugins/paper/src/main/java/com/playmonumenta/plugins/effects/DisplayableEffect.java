@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface DisplayableEffect {
 

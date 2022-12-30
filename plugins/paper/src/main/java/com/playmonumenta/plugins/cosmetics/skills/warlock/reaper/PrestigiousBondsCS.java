@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 
@@ -30,7 +31,7 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"BONDS_DESC"
 		);
@@ -47,7 +48,7 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

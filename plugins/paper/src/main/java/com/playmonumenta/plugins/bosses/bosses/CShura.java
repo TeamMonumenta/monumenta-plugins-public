@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -45,16 +44,17 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class CShura extends BossAbilityGroup {
 	public static final String identityTag = "boss_cshura";
 	public static final int detectionRange = 50;
 	private static final String START_TAG = "shuraCenter";
+	private static final int DODGE_CD = 5;
 
-	private @Nullable LivingEntity mStart;
+	private LivingEntity mStart;
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private int mDodgeCD = 5;
 	private boolean mDodge = false;
 	private boolean mCutscene = false;
 
@@ -190,7 +190,7 @@ public class CShura extends BossAbilityGroup {
 			dodge(event);
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				mDodge = false;
-			}, mDodgeCD * 20);
+			}, DODGE_CD * 20);
 		}
 	}
 
@@ -198,9 +198,9 @@ public class CShura extends BossAbilityGroup {
 		event.setCancelled(true);
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation().add(0, 1, 0);
-		Entity damgaer = event.getDamager();
-		if (damgaer != null) {
-			Vector direction = event.getDamager().getLocation().subtract(loc).toVector().setY(0).normalize();
+		Entity damager = event.getDamager();
+		if (damager != null) {
+			Vector direction = damager.getLocation().subtract(loc).toVector().setY(0).normalize();
 			Vector sideways = new Vector(direction.getZ(), 0, -direction.getX());
 			sideways.subtract(direction.multiply(0.25));
 			if (FastUtils.RANDOM.nextBoolean()) {
@@ -223,7 +223,7 @@ public class CShura extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		// win resistance
 		for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.REGENERATION, 12 * 20, 2));

@@ -10,12 +10,12 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class GruesomeAlchemy extends PotionAbility {
 	private static final int GRUESOME_ALCHEMY_DURATION = 8 * 20;

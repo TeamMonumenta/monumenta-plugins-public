@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.adapters;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class VersionAdapter_unsupported implements VersionAdapter {
 
@@ -148,7 +148,7 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	public boolean isSameItem(ItemStack item1, ItemStack item2) {
+	public boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2) {
 		return item1 == item2;
 	}
 

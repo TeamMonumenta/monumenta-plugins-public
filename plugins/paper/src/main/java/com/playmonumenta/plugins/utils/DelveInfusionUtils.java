@@ -8,7 +8,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class DelveInfusionUtils {
 
@@ -36,43 +37,43 @@ public class DelveInfusionUtils {
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
-		PENNATE("pennate", "Pennate", NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material"), "White"),
-		CARAPACE("carapace", "Carapace", NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material"), "Orange"),
-		AURA("aura", "Aura", NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material"), "Magenta"),
-		EXPEDITE("expedite", "Expedite", NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material"), "LightBlue"),
-		CHOLER("choler", "Choler", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material"), "Yellow"),
-		UNYIELDING("unyielding", "Unyielding", NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil"), "R1Bonus"),
-		USURPER("usurper", "Usurper", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material"), "Corrupted"),
-		VENGEFUL("vengeful", "Vengeful", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinished", "RogFinishedN", "RogFinishedC", "RogFinishedD"),
+		PENNATE("pennate", InfusionType.PENNATE, NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material"), "White"),
+		CARAPACE("carapace", InfusionType.CARAPACE, NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material"), "Orange"),
+		AURA("aura", InfusionType.AURA, NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material"), "Magenta"),
+		EXPEDITE("expedite", InfusionType.EXPEDITE, NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material"), "LightBlue"),
+		CHOLER("choler", InfusionType.CHOLER, NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material"), "Yellow"),
+		UNYIELDING("unyielding", InfusionType.UNYIELDING, NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil"), "R1Bonus"),
+		USURPER("usurper", InfusionType.USURPER, NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material"), "Corrupted"),
+		VENGEFUL("vengeful", InfusionType.VENGEFUL, NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinished", "RogFinishedN", "RogFinishedC", "RogFinishedD"),
 
-		EMPOWERED("empowered", "Empowered", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material"), "Lime"),
-		NUTRIMENT("nutriment", "Nutriment", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material"), "Pink"),
-		EXECUTION("execution", "Execution", NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material"), "Gray"),
-		REFLECTION("reflection", "Reflection", NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material"), "LightGray"),
-		MITOSIS("mitosis", "Mitosis", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
-		ARDOR("ardor", "Ardor", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
-		EPOCH("epoch", "Epoch", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
-		NATANT("natant", "Natant", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
-		UNDERSTANDING("understanding", "Understanding", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
+		EMPOWERED("empowered", InfusionType.EMPOWERED, NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material"), "Lime"),
+		NUTRIMENT("nutriment", InfusionType.NUTRIMENT, NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material"), "Pink"),
+		EXECUTION("execution", InfusionType.EXECUTION, NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material"), "Gray"),
+		REFLECTION("reflection", InfusionType.REFLECTION, NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material"), "LightGray"),
+		MITOSIS("mitosis", InfusionType.MITOSIS, NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
+		ARDOR("ardor", InfusionType.ARDOR, NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
+		EPOCH("epoch", InfusionType.EPOCH, NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
+		NATANT("natant", InfusionType.NATANT, NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
+		UNDERSTANDING("understanding", InfusionType.UNDERSTANDING, NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
 
-		REFRESH("refresh", "Refresh", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT", "SKTH"),
-		SOOTHING("soothing", "Soothing", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
-		QUENCH("quench", "Quench", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
-		GRACE("grace", "Grace", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
-		GALVANIC("galvanic", "Galvanic", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
-		DECAPITATION("decapitation", "Decapitation", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
-		FUELED("fueled", "Fueled", NamespacedKeyUtils.fromString("epic:r3/items/currency/broken_god_gearframe"), "Brown"),
+		REFRESH("refresh", InfusionType.REFRESH, NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT", "SKTH"),
+		SOOTHING("soothing", InfusionType.SOOTHING, NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
+		QUENCH("quench", InfusionType.QUENCH, NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		GRACE("grace", InfusionType.GRACE, NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		GALVANIC("galvanic", InfusionType.GALVANIC, NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
+		DECAPITATION("decapitation", InfusionType.DECAPITATION, NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
+		FUELED("fueled", InfusionType.FUELED, NamespacedKeyUtils.fromString("epic:r3/items/currency/broken_god_gearframe"), "Brown"),
 
-		REFUND("refund", "refund", null, null);
+		REFUND("refund", null, null, (String[]) null);
 
 		private final String mLabel;
-		private final String mEnchantName;
+		private final @Nullable InfusionType mInfusionType;
 		private final @Nullable NamespacedKey mLootTable;
 		private final @Nullable List<String> mScoreboard;
 
-		DelveInfusionSelection(String label, String enchantName, @Nullable NamespacedKey lootTable, @Nullable String... scoreboard) {
+		DelveInfusionSelection(String label, @Nullable InfusionType infusionType, @Nullable NamespacedKey lootTable, @Nullable String... scoreboard) {
 			mLabel = label;
-			mEnchantName = enchantName;
+			mInfusionType = infusionType;
 			mLootTable = lootTable;
 			mScoreboard = scoreboard == null ? null : Arrays.asList(scoreboard);
 		}
@@ -93,8 +94,8 @@ public class DelveInfusionUtils {
 			return mLabel;
 		}
 
-		public String getEnchantName() {
-			return mEnchantName;
+		public @Nullable InfusionType getInfusionType() {
+			return mInfusionType;
 		}
 
 		public @Nullable NamespacedKey getLootTable() {
@@ -106,18 +107,23 @@ public class DelveInfusionUtils {
 		}
 	}
 
-	public static void infuseItem(Player player, ItemStack item, DelveInfusionSelection selection) throws Exception {
+	public static void infuseItem(Player player, ItemStack item, DelveInfusionSelection selection) {
 		if (selection.equals(DelveInfusionSelection.REFUND)) {
 			refundInfusion(item, player);
 			return;
 		}
 
-		//Assume the player has already paid for this infusion
-		int prevLvl = ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
-		if (prevLvl > 0) {
-			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), false);
+		InfusionType infusionType = selection.getInfusionType();
+		if (infusionType == null) {
+			return;
 		}
-		ItemStatUtils.addInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), prevLvl + 1, player.getUniqueId());
+
+		//Assume the player has already paid for this infusion
+		int prevLvl = ItemStatUtils.getInfusionLevel(item, infusionType);
+		if (prevLvl > 0) {
+			ItemStatUtils.removeInfusion(item, infusionType, false);
+		}
+		ItemStatUtils.addInfusion(item, infusionType, prevLvl + 1, player.getUniqueId());
 
 		animate(player);
 	}
@@ -127,13 +133,18 @@ public class DelveInfusionUtils {
 		if (infusion == null) {
 			return;
 		}
+		InfusionType infusionType = infusion.getInfusionType();
+		if (infusionType == null) {
+			return;
+		}
+
 		int level = getInfuseLevel(item) - 1;
 		int levelXp = level;
 
-		ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(infusion.getEnchantName()));
+		ItemStatUtils.removeInfusion(item, infusionType);
 		ItemStatUtils.generateItemStats(item);
 
-		List<ItemStack> mats = null;
+		List<ItemStack> mats;
 
 		/* Audit */
 		String matStr = "";
@@ -194,7 +205,7 @@ public class DelveInfusionUtils {
 	private static int getInfuseLevel(ItemStack item) {
 		int level = 0;
 		for (DelveInfusionSelection d : DelveInfusionSelection.values()) {
-			level += ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(d.getEnchantName()));
+			level += ItemStatUtils.getInfusionLevel(item, d.getInfusionType());
 		}
 		return level;
 	}
@@ -254,12 +265,12 @@ public class DelveInfusionUtils {
 		List<ItemStack> cost = new ArrayList<>();
 
 		//Get delve mat loot table
-		ItemStack delveMats = InventoryUtils.getItemFromLootTable(p, selection.mLootTable).clone();
+		ItemStack delveMats = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(p, Objects.requireNonNull(selection.mLootTable)));
 		delveMats.setAmount(MAT_COST_PER_INFUSION[level] * item.getAmount());
 		cost.add(delveMats);
 
 		//Get depth mat loot table
-		ItemStack depthMats = InventoryUtils.getItemFromLootTable(p, DEPTHS_MAT_LOOT_TABLE).clone();
+		ItemStack depthMats = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(p, DEPTHS_MAT_LOOT_TABLE));
 		depthMats.setAmount(MAT_DEPTHS_COST_PER_INFUSION[level] * item.getAmount());
 		cost.add(depthMats);
 		return cost;
@@ -279,7 +290,7 @@ public class DelveInfusionUtils {
 
 	public static @Nullable DelveInfusionSelection getCurrentInfusion(ItemStack item) {
 		for (DelveInfusionSelection infusionSelection : DelveInfusionSelection.values()) {
-			if (ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(infusionSelection.getEnchantName())) > 0) {
+			if (ItemStatUtils.getInfusionLevel(item, infusionSelection.getInfusionType()) > 0) {
 				return infusionSelection;
 			}
 		}
@@ -287,7 +298,7 @@ public class DelveInfusionUtils {
 	}
 
 	public static int getInfusionLevel(ItemStack item, DelveInfusionSelection selection) {
-		return ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
+		return ItemStatUtils.getInfusionLevel(item, selection.getInfusionType());
 	}
 
 	public static int getExpLvlInfuseCost(ItemStack item) {

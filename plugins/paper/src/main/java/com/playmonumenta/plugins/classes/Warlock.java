@@ -15,10 +15,8 @@ import com.playmonumenta.plugins.abilities.warlock.reaper.VoodooBonds;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.HauntingShades;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.RestlessSouls;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 
@@ -81,8 +79,4 @@ public class Warlock extends PlayerClass {
 		);
 	}
 
-	@Override
-	public Boolean getClassAccessPerms(Player player) {
-		return ScoreboardUtils.getScoreboardValue(player, "Quest13").orElse(0) >= 1;
-	}
 }

@@ -10,7 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class StarCommunion extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "StarCommunion";

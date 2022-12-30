@@ -33,7 +33,7 @@ public class LichCurseBoss extends BossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (damagee instanceof Player player) {
-			event.getDamager().remove();
+			mBoss.remove();
 			Lich.cursePlayer(mPlugin, player, 120);
 		}
 	}

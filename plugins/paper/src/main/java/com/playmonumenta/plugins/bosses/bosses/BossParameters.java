@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -143,7 +144,7 @@ public abstract class BossParameters {
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 				} else {
 					// This hashmap get must succeed or there is a bug in the Reader
-					TypeAndDesc validType = validParams.get(validKey);
+					TypeAndDesc validType = Objects.requireNonNull(validParams.get(validKey));
 					if (!reader.advance("=")) {
 						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "=", validType.getDesc())));
 					}
@@ -291,7 +292,7 @@ public abstract class BossParameters {
 						if (result.getTooltip() != null) {
 							return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "USE: /bosstag phase add ---", "DUMP")));
 						}
-						((BossPhasesList) validType.getField().get(parameters)).addBossPhases(result.getResult());
+						((BossPhasesList) validType.getField().get(parameters)).addBossPhases(Objects.requireNonNull(result.getResult()));
 					} else if (Enum.class.isAssignableFrom(validTypeClass)) {
 						Object val = reader.readEnum(((Class<? extends Enum>) validTypeClass).getEnumConstants());
 						if (val == null) {

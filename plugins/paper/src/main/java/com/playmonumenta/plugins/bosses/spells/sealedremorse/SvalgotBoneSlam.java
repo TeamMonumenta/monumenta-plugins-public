@@ -24,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SvalgotBoneSlam extends SpellBaseSlam {
 
@@ -52,7 +53,7 @@ public class SvalgotBoneSlam extends SpellBaseSlam {
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(boss);
 			}, (World world, Location loc) -> {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
-			}, (World world, Player player, Location loc, Vector dir) -> {
+			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 					Arrays.asList(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {

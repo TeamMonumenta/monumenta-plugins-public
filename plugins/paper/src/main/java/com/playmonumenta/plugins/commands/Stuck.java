@@ -9,24 +9,20 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Stuck {
 	public static String COMMAND = "stuck";
-	private static Plugin mPlugin;
 
-	public static void register(Plugin plugin) {
+	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.stuck");
-		mPlugin = plugin;
-
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.executesPlayer((player, args) -> {
 				if (!ServerProperties.getShardName().equals("plots") && !ServerProperties.getShardName().equals("dev1")) {
 					player.sendMessage(Component.text("Stuck is not available on this shard, contact a moderator to be unstuck.", NamedTextColor.RED)
-							.decoration(TextDecoration.ITALIC, false));
+						                   .decoration(TextDecoration.ITALIC, false));
 					return;
 				}
 				player.sendMessage(Component.text("Teleporting in 10 seconds, please stand still!", NamedTextColor.RED)
@@ -56,16 +52,16 @@ public class Stuck {
 							mTarget.sendMessage(Component.text("Teleporting in " + mTime + " seconds, please stand still!", NamedTextColor.RED)
 									.decoration(TextDecoration.ITALIC, false));
 							break;
-						case 0:
-							mTarget.teleport(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
-							this.cancel();
-							return;
-						default:
-							// Wait
+							case 0:
+								mTarget.teleport(player.getWorld().getSpawnLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+								this.cancel();
+								return;
+							default:
+								// Wait
 						}
 						mTime--;
 					}
-				}.runTaskTimer(mPlugin, 20 * 1, 20 * 1);
+				}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 1, 20 * 1);
 			})
 			.register();
 	}

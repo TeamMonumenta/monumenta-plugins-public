@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerMobInfo {
 
@@ -27,11 +28,11 @@ public class TowerMobInfo {
 
 
 	//there are only used for the item
-	public String mDisplayName;
+	public @Nullable String mDisplayName;
 
-	public String mLore;
+	public @Nullable String mLore;
 
-	public ItemStack mBaseItem;
+	public @Nullable ItemStack mBaseItem;
 
 
 	public TowerMobRarity mMobRarity = TowerMobRarity.COMMON;
@@ -98,10 +99,11 @@ public class TowerMobInfo {
 		obj.add("BaseStats", mMobStats.toJson());
 		obj.addProperty("DisplayName", mDisplayName);
 		obj.addProperty("Lore", mLore);
-		obj.addProperty("ItemMaterial", mBaseItem.getType().name());
-
-		if (mBaseItem.getType() == Material.PLAYER_HEAD) {
-			obj.addProperty("HeadTexture", TowerFileUtils.getHeadTexture(mBaseItem));
+		if (mBaseItem != null) {
+			obj.addProperty("ItemMaterial", mBaseItem.getType().name());
+			if (mBaseItem.getType() == Material.PLAYER_HEAD) {
+				obj.addProperty("HeadTexture", TowerFileUtils.getHeadTexture(mBaseItem));
+			}
 		}
 
 		obj.addProperty("Rarity", mMobRarity.getName());
@@ -119,7 +121,7 @@ public class TowerMobInfo {
 		return obj;
 	}
 
-	public static TowerMobInfo fromJson(JsonObject obj) {
+	public static @Nullable TowerMobInfo fromJson(JsonObject obj) {
 		if (obj == null) {
 			return null;
 		}
@@ -212,7 +214,7 @@ public class TowerMobInfo {
 		return stack;
 	}
 
-	public static ItemStack buildSpellItem(TowerMobInfo info, int index) {
+	public static @Nullable ItemStack buildSpellItem(TowerMobInfo info, int index) {
 		if (index >= info.mAbilities.size()) {
 			return null;
 		}

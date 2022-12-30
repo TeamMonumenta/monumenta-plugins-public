@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class ShadePossessedBoss extends BossAbilityGroup {
 
@@ -36,7 +37,7 @@ public class ShadePossessedBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 

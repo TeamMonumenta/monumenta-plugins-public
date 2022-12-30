@@ -180,7 +180,7 @@ public class EntityUtils {
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
-	private static BukkitRunnable mobsTracker = null;
+	private static @Nullable BukkitRunnable mobsTracker = null;
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions SILENCE_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
@@ -987,8 +987,8 @@ public class EntityUtils {
 	}
 
 	public static void amplifyDamageOverTime(Plugin plugin, LivingEntity en, String source, int ampAmount, int ampCap) {
-		if (EffectManager.getInstance().hasEffect(en, source)) {
-			Effect dot = EffectManager.getInstance().getActiveEffect(en, source);
+		Effect dot = EffectManager.getInstance().getActiveEffect(en, source);
+		if (dot != null) {
 			int duration = dot.getDuration();
 			double level = dot.getMagnitude();
 			double ampLvl = level + ampAmount;
@@ -1405,17 +1405,11 @@ public class EntityUtils {
 
 	public static boolean isAbilityTriggeringProjectile(Projectile proj, boolean requireCritical) {
 		if (proj instanceof AbstractArrow arrow) {
-			if (!requireCritical) {
-				return true;
-			} else if (arrow.isCritical()) {
-				return true;
-			} else if (arrow instanceof Trident) {
-				return true;
-			}
-		} else if (proj instanceof Snowball
-			           && DamageListener.getProjectileItemStats(proj) != null
-			           && DamageListener.getProjectileItemStats(proj).getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat(), 0) > 0) {
-			return true;
+			return !requireCritical || arrow.isCritical() || arrow instanceof Trident;
+		} else if (proj instanceof Snowball) {
+			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
+			return projectileItemStats != null
+				       && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat(), 0) > 0;
 		}
 		return false;
 	}

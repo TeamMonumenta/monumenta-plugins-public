@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class SpectralSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "Spectral";
@@ -44,7 +45,7 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (event != null && !EntityUtils.isElite(mBoss) && !EntityUtils.isBoss(mBoss) && !DelvesUtils.isDelveMob(mBoss) && EntityUtils.isHostileMob(mBoss)) {
 			double chance = FastUtils.RANDOM.nextDouble();
 			if (chance < mParam.SPAWN_CHANCE) {

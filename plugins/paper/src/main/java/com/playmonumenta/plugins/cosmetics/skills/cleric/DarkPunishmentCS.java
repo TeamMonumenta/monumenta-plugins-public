@@ -22,6 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
@@ -44,7 +45,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 	private static final float[] SWEEP_PITCH = {0.75f, 0.9f, 0.55f};
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"The light has betrayed you.",
 			"So abandon your righteous ethics,",
@@ -62,7 +63,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

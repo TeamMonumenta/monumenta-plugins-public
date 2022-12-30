@@ -25,7 +25,7 @@ public class CornucopiaFinisher implements EliteFinisher {
 
 	public static final String NAME = "Cornucopia";
 
-	private static HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
+	private static final HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
 	public static final Material[] foodList = {
 		Material.BAKED_POTATO,
 		Material.BREAD,
@@ -39,8 +39,7 @@ public class CornucopiaFinisher implements EliteFinisher {
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
 
-		mMobsKilled.putIfAbsent(p.getUniqueId(), 1);
-		int mobsKilled = mMobsKilled.get(p.getUniqueId());
+		int mobsKilled = mMobsKilled.computeIfAbsent(p.getUniqueId(), key -> 1);
 
 		throwFood(0, loc);
 		new BukkitRunnable() {

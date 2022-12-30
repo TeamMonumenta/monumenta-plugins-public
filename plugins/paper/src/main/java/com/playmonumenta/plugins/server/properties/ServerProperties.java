@@ -16,13 +16,14 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public class ServerProperties {
 
@@ -294,7 +295,8 @@ public class ServerProperties {
 		return value;
 	}
 
-	private String getPropertyValueString(JsonObject object, String propertyName, String defaultVal) {
+	@Contract("_, _, !null -> !null")
+	private @Nullable String getPropertyValueString(JsonObject object, String propertyName, @Nullable String defaultVal) {
 		String value = defaultVal;
 
 		JsonElement element = object.get(propertyName);

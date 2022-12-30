@@ -9,9 +9,16 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import org.apache.commons.math3.util.FastMath;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 	// Windy advancing shadow. Depth set: wind
@@ -20,7 +27,7 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 	private static final Color TRAIL_COLOR_BRIGHT = Color.fromRGB(227, 255, 234);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Let a single step move you",
 			"as swiftly as a violent vortex.");
@@ -37,7 +44,7 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

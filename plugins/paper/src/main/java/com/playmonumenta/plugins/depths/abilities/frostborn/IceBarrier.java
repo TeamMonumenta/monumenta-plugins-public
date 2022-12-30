@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.ArrayList;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -69,8 +70,8 @@ public class IceBarrier extends DepthsAbility {
 
 		if (block.getType() != Material.AIR && block.getType() != Material.BEDROCK && validLength) {
 			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
-			world.spawnParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f);
-			world.spawnParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f);
+			new PartialParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1.4f);
 			if (!mIsPrimed || mPrimedLoc == null) {
 				mIsPrimed = true;
@@ -86,7 +87,7 @@ public class IceBarrier extends DepthsAbility {
 							mPrimedLoc = null;
 							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 0.5f);
 							//Reset cd
-							mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
+							mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
 						}
 					}
 
@@ -110,8 +111,8 @@ public class IceBarrier extends DepthsAbility {
 
 				for (Block b : blocksToIce) {
 					DepthsUtils.spawnIceTerrain(b.getRelative(BlockFace.UP).getLocation(), ICE_TICKS[mRarity - 1], mPlayer, Boolean.TRUE);
-					world.spawnParticle(Particle.CRIT, b.getLocation(), 15, 0, 0, 0, 0.6f);
-					world.spawnParticle(Particle.CRIT_MAGIC, b.getLocation(), 15, 0, 0, 0, 0.6f);
+					new PartialParticle(Particle.CRIT, b.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CRIT_MAGIC, b.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 				}
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 2.0f);
 				mPrimedLoc = null;

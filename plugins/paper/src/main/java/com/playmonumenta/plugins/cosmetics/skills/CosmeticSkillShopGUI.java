@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -30,6 +29,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class CosmeticSkillShopGUI extends CustomInventory {
 	//Price constants
@@ -101,7 +101,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final int GALLERY_ENTRY_LOC = 23;
 
 	private final Plugin mPlugin;
-	private CSGUIPage mCurrentPage;
+	private CSGUIPage mCurrentPage = CSGUIPage.Home;
 	private int mPageNumber = 1;
 
 	private enum CSGUIPage {
@@ -132,7 +132,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	public CosmeticSkillShopGUI(Plugin plugin, Player player) {
 		super(player, 9*LINE, Component.text("Cosmetic Skill Shop", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		mPlugin = plugin;
-		loadPage(0, player);
+		loadPage(CSGUIPage.Home, player);
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			// General: if not home page, back to shop home
 			if (slot == BACK_LOC) {
 				if (mCurrentPage != CSGUIPage.Home) {
-					loadPage(0, player);
+					loadPage(CSGUIPage.Home, player);
 					return;
 				} else {
 					close();
@@ -443,19 +443,19 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					//Home page, choose skin set
 					if (slot == DEPTH_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Depth.mNum, player);
+						loadPage(CSGUIPage.Depth, player);
 						return;
 					} else if (slot == DELVE_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Delve.mNum, player);
+						loadPage(CSGUIPage.Delve, player);
 						return;
 					} else if (slot == PRESTIGE_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Prestige.mNum, player);
+						loadPage(CSGUIPage.Prestige, player);
 						return;
 					} else if (slot == GALLERY_ENTRY_LOC) {
 						mPageNumber = 1;
-						loadPage(CSGUIPage.Gallery.mNum, player);
+						loadPage(CSGUIPage.Gallery, player);
 						return;
 					}
 			}
@@ -463,11 +463,11 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	}
 
 	private void reloadPage(Player player) {
-		loadPage(mCurrentPage.mNum, player);
+		loadPage(mCurrentPage, player);
 	}
 
-	private void loadPage(int pageNum, Player player) {
-		mCurrentPage = CSGUIPage.valueOfPage(pageNum) == null ? CSGUIPage.Home : CSGUIPage.valueOfPage(pageNum);
+	private void loadPage(CSGUIPage page, Player player) {
+		mCurrentPage = page;
 		player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
 		// Set filler to start
 		mInventory.clear();

@@ -13,8 +13,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class Spawner {
+public class GallerySpawner {
 	public static final String TAG_STRING = "GallerySpawner";
 
 	private final @NotNull Entity mArmorStandSpawner;
@@ -26,7 +27,7 @@ public class Spawner {
 
 	private int mLastTimeSpawned = 0;
 
-	public Spawner(@NotNull Entity armorStand, @NotNull SpawnerDirection direction, @NotNull String name, boolean active) {
+	public GallerySpawner(@NotNull Entity armorStand, @NotNull SpawnerDirection direction, @NotNull String name, boolean active) {
 		mArmorStandSpawner = armorStand;
 		mSpawningDirection = direction;
 		mSpawningLocation = armorStand.getLocation();
@@ -52,7 +53,7 @@ public class Spawner {
 		return mActivated;
 	}
 
-	public LivingEntity spawn(String pool, float velocity, boolean shouldGiveTag) {
+	public @Nullable LivingEntity spawn(String pool, float velocity, boolean shouldGiveTag) {
 		final Location loc = mSpawningLocation.clone().add(mSpawningDirection.getOffset().clone().multiply(3));
 		LivingEntity mobSpawned = null;
 		Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
@@ -66,6 +67,9 @@ public class Spawner {
 				break;
 			}
 		}
+		if (mobSpawned == null) {
+			return null;
+		}
 		LivingEntity finalMobSpawned = mobSpawned;
 		int delay = 0;
 		while (mLastTimeSpawned >= GalleryManager.ticks + delay) {
@@ -75,22 +79,19 @@ public class Spawner {
 		new BukkitRunnable() {
 			final Location mLoc = loc;
 			final double mDistancePerTick = mSpawningLocation.distance(mLoc) / ((20 * 1.5) / velocity) * 1.5;
-			final double mMAXTicks = ((20 * 1.5) / velocity);
-			final LivingEntity mMobSpawned = finalMobSpawned;
+			final double mMaxTicks = ((20 * 1.5) / velocity);
 			int mTimes = 0;
 
 			@Override
 			public void run() {
-				if (mMobSpawned != null) {
-					mLoc.add(mSpawningDirection.getOffset().clone().multiply(-mDistancePerTick));
-					mLoc.setDirection(mSpawningDirection.getOffset().clone().multiply(-1));
-					mMobSpawned.teleport(mLoc);
-				}
+				mLoc.add(mSpawningDirection.getOffset().clone().multiply(-mDistancePerTick));
+				mLoc.setDirection(mSpawningDirection.getOffset().clone().multiply(-1));
+				finalMobSpawned.teleport(mLoc);
 
-				if (mTimes >= mMAXTicks) {
-					mMobSpawned.setAI(true);
+				if (mTimes >= mMaxTicks) {
+					finalMobSpawned.setAI(true);
 					try {
-						BossManager.getInstance().createBossInternal(mMobSpawned, new GenericGalleryMobBoss(GalleryManager.mPlugin, mMobSpawned));
+						BossManager.getInstance().createBossInternal(finalMobSpawned, new GenericGalleryMobBoss(GalleryManager.mPlugin, finalMobSpawned));
 					} catch (Exception e) {
 						//this SHOULD NEVER happen
 						GalleryUtils.printDebugMessage("Catch an exception while creating GenericGalleryMobBoss. Reason: " + e.getMessage());
@@ -120,7 +121,7 @@ public class Spawner {
 	}
 
 
-	public static Spawner fromEntity(Entity entity) {
+	public static @Nullable GallerySpawner fromEntity(Entity entity) {
 		try {
 			for (String tag : entity.getScoreboardTags()) {
 				if (tag.startsWith(TAG_STRING + "-")) {
@@ -128,7 +129,7 @@ public class Spawner {
 					String name = split[1];
 					SpawnerDirection direction = SpawnerDirection.valueOf(split[2]);
 					boolean active = split[3].equalsIgnoreCase("active");
-					return new Spawner(entity, direction, name, active);
+					return new GallerySpawner(entity, direction, name, active);
 				}
 			}
 		} catch (Exception e) {

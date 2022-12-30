@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ScoreboardUtils {
 	public static OptionalInt getScoreboardValue(String scoreHolder, String objectiveName) {

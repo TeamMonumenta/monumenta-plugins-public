@@ -17,6 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class JumpBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_jump";
@@ -76,7 +77,7 @@ public class JumpBoss extends BossAbilityGroup {
 			p.PARTICLE_START_GROUND.spawn(boss, loc, 1, 0, 1);
 		}, (World world, Location loc) -> {
 			p.PARTICLE_AIR.spawn(boss, loc, 4, 0.5, 0.5);
-		}, (World world, Player player, Location loc, Vector dir) -> {
+		}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 				Arrays.asList(
 					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {

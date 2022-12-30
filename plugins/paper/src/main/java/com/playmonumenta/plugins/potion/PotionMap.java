@@ -13,10 +13,10 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.ToIntFunction;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class PotionMap {
 	// PotionID is the type (safezone, item, etc.)
@@ -49,18 +49,21 @@ public class PotionMap {
 
 			// If the current "best" negative effect is less than this new one, track it
 			// Make sure the last effect has had a chance to trigger before refreshing it
+			PotionEffectType newPotionType = newPotionInfo.mType;
 			if (bestEffect == null
-			    || bestEffect.mAmplifier < newPotionInfo.mAmplifier
-			    || (bestEffect.mAmplifier == newPotionInfo.mAmplifier
-			        && bestEffect.mDuration < newPotionInfo.mDuration
-			        && (!newPotionInfo.mType.equals(PotionEffectType.POISON)
-			            || newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
-			        && (!newPotionInfo.mType.equals(PotionEffectType.WITHER)
-			            || newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
+				    || bestEffect.mAmplifier < newPotionInfo.mAmplifier
+				    || (bestEffect.mAmplifier == newPotionInfo.mAmplifier
+					&& bestEffect.mDuration < newPotionInfo.mDuration
+					&& (!PotionEffectType.POISON.equals(newPotionType)
+					|| newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
+					&& (!PotionEffectType.WITHER.equals(newPotionType)
+					|| newPotionInfo.mDuration - bestEffect.mDuration >= 40 / (bestEffect.mAmplifier + 1) + 1))) {
 
 				// remove any other (lower level/duration) effects
-				for (TreeMap<Integer, PotionInfo> infoMap : mPotionMap.values()) {
-					infoMap.values().removeIf(info -> newPotionInfo.mType.equals(info.mType));
+				if (newPotionType != null) {
+					for (TreeMap<Integer, PotionInfo> infoMap : mPotionMap.values()) {
+						infoMap.values().removeIf(info -> newPotionType.equals(info.mType));
+					}
 				}
 
 				trackedPotionInfo.put(amplifier, newPotionInfo);
@@ -70,7 +73,7 @@ public class PotionMap {
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
 				    || (currentInfo.mDuration < newPotionInfo.mDuration
-					        && (!currentInfo.mType.equals(PotionEffectType.REGENERATION)
+					        && (!PotionEffectType.REGENERATION.equals(currentInfo.mType)
 						            || newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}

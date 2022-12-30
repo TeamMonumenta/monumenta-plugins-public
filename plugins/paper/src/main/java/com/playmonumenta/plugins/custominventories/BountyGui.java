@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -30,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 
 public class BountyGui extends Gui {
@@ -48,10 +48,10 @@ public class BountyGui extends Gui {
 		private final int mID;
 		private final int mLevel;
 		private final Material mMaterial;
-		private final String mScoreboardReq;
+		private final @Nullable String mScoreboardReq;
 		private final int mReqMin;
 
-		BountyData(String name, int id, int level, String material, String scoreboard, int minimumVal) {
+		BountyData(String name, int id, int level, String material, @Nullable String scoreboard, int minimumVal) {
 			mName = name;
 			mID = id;
 			mLevel = level;

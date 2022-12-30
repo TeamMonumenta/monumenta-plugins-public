@@ -10,8 +10,8 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class SteelStallion extends DepthsAbility {
 	public static final String ABILITY_NAME = "Steel Stallion";
@@ -112,16 +113,18 @@ public class SteelStallion extends DepthsAbility {
 			public void run() {
 				boolean isOutOfTime = mTicksElapsed >= DURATION[mRarity - 1];
 				if (isOutOfTime || mHorse == null || mHorse.getHealth() <= 0 || mHorse.getPassengers().size() == 0) {
-					if (isOutOfTime) {
+					if (isOutOfTime && mHorse != null) {
 						Location horseLoc = mHorse.getLocation();
 						World world = horseLoc.getWorld();
 						world.playSound(horseLoc, Sound.ENTITY_HORSE_DEATH, 0.8f, 1.0f);
-						world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, horseLoc, 15);
-						world.spawnParticle(Particle.SMOKE_NORMAL, horseLoc, 20);
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, horseLoc, 15).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, horseLoc, 20).spawnAsPlayerActive(mPlayer);
 					}
 
-					mHorse.remove();
-					mHorse = null;
+					if (mHorse != null) {
+						mHorse.remove();
+						mHorse = null;
+					}
 					this.cancel();
 				}
 				mTicksElapsed += TICK_INTERVAL;
@@ -129,7 +132,7 @@ public class SteelStallion extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, TICK_INTERVAL);
 
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.HEART, loc, 10, 2, 2, 2);
+		new PartialParticle(Particle.HEART, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.5f);
 

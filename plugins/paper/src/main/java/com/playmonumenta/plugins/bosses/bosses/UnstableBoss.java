@@ -5,6 +5,7 @@ import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class UnstableBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_unstable";
@@ -30,9 +31,9 @@ public class UnstableBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		// The cause of death is NOT equal to a player attack
-		if (event.getEntity().getKiller() == null) {
+		if (event == null || event.getEntity().getKiller() == null) {
 			mBoss.getLocation().getWorld().createExplosion(mBoss, mPFinal.EXPLOSION_POWER, mPFinal.SET_FIRE,
 				mPFinal.BREAK_BLOCK);
 		}

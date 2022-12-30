@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.depths.bosses.spells.SpellIvyGarden;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellLeafNova;
 import com.playmonumenta.plugins.depths.bosses.spells.SpellPassiveGarden;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -29,12 +30,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -48,6 +49,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Hedera extends BossAbilityGroup {
 	public static final String identityTag = "boss_hedera";
@@ -193,7 +195,7 @@ public class Hedera extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" No! No! This cannot be! The Broken Beyond must let me flee!\",\"color\":\"dark_green\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
@@ -225,7 +227,10 @@ public class Hedera extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange));
+				Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
+				if (nearestPlayer != null) {
+					DepthsManager.getInstance().goToNextFloor(nearestPlayer);
+				}
 			}
 
 		}.runTaskLater(mPlugin, 20);
@@ -233,7 +238,7 @@ public class Hedera extends BossAbilityGroup {
 
 	@Override
 	public void onHurt(DamageEvent event) {
-		boolean plantsAlive = mPlants.values().size() > 0;
+		boolean plantsAlive = !mPlants.isEmpty();
 
 		//Prevents bypassing plants if a single high-damage hit is done
 		if (event.getFinalDamage(true) >= mBoss.getHealth() && plantsAlive) {
@@ -254,7 +259,7 @@ public class Hedera extends BossAbilityGroup {
 			Collections.shuffle(plants);
 			Location unluckyPlant = plants.get(0);
 
-			mPlants.get(unluckyPlant).damage(10000);
+			Objects.requireNonNull(mPlants.get(unluckyPlant)).damage(10000);
 			mPlants.remove(unluckyPlant);
 			mPlantTypes.remove(unluckyPlant);
 			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Consumeth me mine hydrophytes, the vines begone now give me life!\",\"color\":\"dark_green\"}]");
@@ -264,7 +269,6 @@ public class Hedera extends BossAbilityGroup {
 			mTimesHealed++;
 
 			//Particles from consumed plant to Hedera
-			World world = mBoss.getWorld();
 			new BukkitRunnable() {
 				int mCount = 0;
 				final int mMaxCount = Math.max(15, (int) mBoss.getEyeLocation().distance(unluckyPlant));
@@ -276,8 +280,8 @@ public class Hedera extends BossAbilityGroup {
 
 					Location bossEyeLoc = mBoss.getEyeLocation();
 					Vector particleVector = bossEyeLoc.subtract(unluckyPlant).toVector().multiply(((double) mCount) / mMaxCount);
-					world.spawnParticle(Particle.VILLAGER_HAPPY, unluckyPlant.add(particleVector), 5);
-					world.spawnParticle(Particle.SPELL_WITCH, unluckyPlant.add(particleVector), 5);
+					new PartialParticle(Particle.VILLAGER_HAPPY, unluckyPlant.add(particleVector), 5).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_WITCH, unluckyPlant.add(particleVector), 5).spawnAsEntityActive(mBoss);
 
 					mCount++;
 				}

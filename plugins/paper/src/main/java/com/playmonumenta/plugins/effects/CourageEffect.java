@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 // Reduce incoming damage based on charges
 public class CourageEffect extends Effect {

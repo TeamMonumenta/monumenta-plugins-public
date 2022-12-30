@@ -21,12 +21,12 @@ import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Nullable;
 
 // Mobs with this tag move towards closest DaggerCraftingBoss, and disrupts crafting if not killed.
 public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bluestriketargetnpc";
-	public LivingEntity mTarget;
-	public LivingEntity mSamwell;
+	public @Nullable LivingEntity mTarget;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BlueStrikeTargetNPCBoss(plugin, boss);
@@ -53,20 +53,6 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 			}
 		}
 
-		// Get nearest entity called Samwell.
-		List<LivingEntity> witherSkeletons = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.WITHER_SKELETON));
-		for (LivingEntity mob : witherSkeletons) {
-			if (mob.getScoreboardTags().contains(Samwell.identityTag)) {
-				mSamwell = mob;
-				break;
-			}
-		}
-
-		if (mSamwell == null) {
-			MMLog.warning("TargetNPCBoss: Samwell wasn't found! (This is a bug)");
-			return;
-		}
-
 		if (mTarget == null) {
 			MMLog.warning("TargetNPCBoss: Didn't find NPC! (Likely bug)");
 		} else {
@@ -76,7 +62,7 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 
 		List<Spell> passiveList = List.of(
 			new SpellRunAction(() -> {
-				if (mBoss.getLocation().distance(mTarget.getLocation()) < 2) {
+				if (mTarget != null && mBoss.getLocation().distance(mTarget.getLocation()) < 2) {
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.8f);
 					PartialParticle particles = new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 10, 1, 1, 1);
 					particles.spawnAsEnemy();

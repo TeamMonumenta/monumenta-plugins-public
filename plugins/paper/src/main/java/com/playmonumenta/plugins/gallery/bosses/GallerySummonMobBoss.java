@@ -41,20 +41,18 @@ public class GallerySummonMobBoss extends BossAbilityGroup {
 		return new GallerySummonMobBoss(plugin, boss);
 	}
 
-	private final GalleryGame mGame;
-
 	public GallerySummonMobBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		mGame = GalleryUtils.getGame(boss.getLocation());
+		GalleryGame game = GalleryUtils.getGame(boss.getLocation());
 
 		SpellManager activeSpells = new SpellManager(List.of(
 			new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.MOB_CAP) {
 				@Override public void summonPlugins(@NotNull Entity summon) {
-					if (summon instanceof LivingEntity livingEntity && !GalleryUtils.ignoreScaling(livingEntity) && mGame != null) {
-						mGame.scaleMob(livingEntity);
+					if (summon instanceof LivingEntity livingEntity && !GalleryUtils.ignoreScaling(livingEntity) && game != null) {
+						game.scaleMob(livingEntity);
 					}
 				}
 			}

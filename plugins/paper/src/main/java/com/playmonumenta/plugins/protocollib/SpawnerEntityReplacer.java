@@ -9,7 +9,7 @@ import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import com.playmonumenta.plugins.Plugin;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class SpawnerEntityReplacer extends PacketAdapter {
 
@@ -60,13 +60,12 @@ public class SpawnerEntityReplacer extends PacketAdapter {
 	}
 
 	private void replaceSpawnDataSameId(NbtCompound spawnData, NbtCompound entityData, String id) {
-		updateSpawnDataReplacement(entityData);
-		NbtCompound replacement = (NbtCompound) mSpawnDataReplacement.deepClone();
+		NbtCompound replacement = (NbtCompound) getOrCreateSpawnDataReplacement(entityData).deepClone();
 		replacement.put("id", id);
 		spawnData.put("entity", replacement);
 	}
 
-	private void updateSpawnDataReplacement(NbtCompound entityData) {
+	private NbtCompound getOrCreateSpawnDataReplacement(NbtCompound entityData) {
 		if (mSpawnDataReplacement == null) {
 			/* No cached NbtCompound - need to clean this one out and cache it */
 			mSpawnDataReplacement = (NbtCompound) entityData.deepClone();
@@ -77,6 +76,7 @@ public class SpawnerEntityReplacer extends PacketAdapter {
 			}
 			mSpawnDataReplacement.put("id", "minecraft:ender_pearl");
 		}
+		return mSpawnDataReplacement;
 	}
 
 }

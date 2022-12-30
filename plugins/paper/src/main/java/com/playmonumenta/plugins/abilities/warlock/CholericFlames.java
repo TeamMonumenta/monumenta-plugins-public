@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -101,7 +102,7 @@ public class CholericFlames extends Ability {
 			if (isEnhanced()) {
 				int debuffs = Math.min(AbilityUtils.getDebuffCount(mPlugin, mob), maxDebuffs);
 				if (debuffs > 0) {
-					playerItemStats.getItemStats().add(ItemStatUtils.EnchantmentType.INFERNO.getItemStat(), debuffs);
+					playerItemStats.getItemStats().add(Objects.requireNonNull(ItemStatUtils.EnchantmentType.INFERNO.getItemStat()), debuffs);
 				}
 				mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, spreadRadius, SPREAD_EFFECT_DURATION_APPLIED, false));
 			}

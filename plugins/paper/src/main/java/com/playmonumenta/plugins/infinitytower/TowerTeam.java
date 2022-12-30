@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.infinitytower;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
@@ -56,7 +57,7 @@ public class TowerTeam {
 		try {
 			for (TowerMob mob : mMobs) {
 				LivingEntity mobSpawned = mob.spawn(game, playerSummon);
-				if (game.isGameEnded()) {
+				if (game.isGameEnded() || mobSpawned == null) {
 					return;
 				}
 				TowerGameUtils.startMob(mobSpawned, mob, game, playerSummon);
@@ -100,7 +101,12 @@ public class TowerTeam {
 		List<TowerMob> mobs = new ArrayList<>();
 		if (arr != null) {
 			for (int i = 0; i < arr.size(); i++) {
-				mobs.add(TowerMob.fromJson((JsonObject) arr.get(i)));
+				TowerMob towerMob = TowerMob.fromJson((JsonObject) arr.get(i));
+				if (towerMob != null) {
+					mobs.add(towerMob);
+				} else {
+					MMLog.severe("Could not load Blitz mob from JSON: " + arr.get(i));
+				}
 			}
 		}
 

@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class InfernalFlamesCS extends CholericFlamesCS {
 	//Twisted theme
@@ -28,7 +29,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 	private static final Color TWIST_COLOR_TIP = Color.fromRGB(127, 0, 0);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"This infernal flame was ignited",
 			"by your burning, twisted desires.");
@@ -45,7 +46,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

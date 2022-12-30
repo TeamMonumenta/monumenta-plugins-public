@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.integrations;
 import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class MonumentaNetworkRelayIntegration {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";

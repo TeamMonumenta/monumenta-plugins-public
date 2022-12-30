@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class TouchOfEntropyCS extends HandOfLightCS {
 	//Twisted theme
@@ -31,7 +32,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	private static final Color DRAIN_COLOR_LIGHT = Color.fromRGB(235, 209, 215);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Cleanse your allies with harmony.",
 			"Drain your enemies with dissonance.");
@@ -49,7 +50,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 
@@ -149,7 +150,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-	private void createOrb(Vector dir, Location loc, Player mPlayer, LivingEntity target, Location optLoc, boolean damage) {
+	private void createOrb(Vector dir, Location loc, Player mPlayer, LivingEntity target, @Nullable Location optLoc, boolean damage) {
 		World world = loc.getWorld();
 		new BukkitRunnable() {
 			final Location mL = loc.clone();

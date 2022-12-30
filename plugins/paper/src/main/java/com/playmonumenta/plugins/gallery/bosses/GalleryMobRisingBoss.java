@@ -42,8 +42,6 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 
 	}
 
-	private final GalleryGame mGame;
-
 	public static BossAbilityGroup deserialize(com.playmonumenta.plugins.Plugin plugin, LivingEntity boss) throws Exception {
 		return new GalleryMobRisingBoss(plugin, boss);
 	}
@@ -52,8 +50,8 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		final Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		mGame = GalleryUtils.getGame(boss.getLocation());
-		if (p.MOB_POOL != LoSPool.EMPTY && mGame != null) {
+		GalleryGame game = GalleryUtils.getGame(boss.getLocation());
+		if (p.MOB_POOL != LoSPool.EMPTY && game != null) {
 			SpellManager activeSpells = new SpellManager(List.of(
 				new SpellBaseSummon(
 					plugin,
@@ -70,7 +68,7 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 					(Location loc, int times) -> {
 						Entity entity = p.MOB_POOL.spawn(loc);
 						if (entity instanceof LivingEntity livingEntity && !GalleryUtils.ignoreScaling(livingEntity)) {
-							mGame.scaleMob(livingEntity);
+							game.scaleMob(livingEntity);
 						}
 						return entity;
 					},

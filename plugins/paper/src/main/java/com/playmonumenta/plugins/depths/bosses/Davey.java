@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,6 +49,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class Davey extends BossAbilityGroup {
 	public static final String identityTag = "boss_davey";
@@ -166,7 +168,7 @@ public class Davey extends BossAbilityGroup {
 		Location vex2 = spawnLoc.clone().add(-5, 3, -5);
 
 		if (vex1.isChunkLoaded()) {
-			LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS);
+			LivingEntity vex = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS));
 			mVexes.add(vex);
 			spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
 		} else {
@@ -176,7 +178,7 @@ public class Davey extends BossAbilityGroup {
 				@Override
 				public void run() {
 					if (vex1.isChunkLoaded()) {
-						LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS);
+						LivingEntity vex = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(vex1, VEX_LOS));
 						mVexes.add(vex);
 						spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
 						changePhase(new SpellManager(spells), passiveSpells, null);
@@ -187,7 +189,7 @@ public class Davey extends BossAbilityGroup {
 		}
 
 		if (vex2.isChunkLoaded()) {
-			LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS);
+			LivingEntity vex = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS));
 			mVexes.add(vex);
 			spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
 		} else {
@@ -197,7 +199,7 @@ public class Davey extends BossAbilityGroup {
 				@Override
 				public void run() {
 					if (vex2.isChunkLoaded()) {
-						LivingEntity vex = (LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS);
+						LivingEntity vex = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(vex2, VEX_LOS));
 						mVexes.add(vex);
 						spells.add(new SpellVoidBlast(plugin, vex, mCooldownTicks / 2));
 						changePhase(new SpellManager(spells), passiveSpells, null);
@@ -231,7 +233,7 @@ public class Davey extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Nay... I'll sink to ye, God of the Deep. I become a great part of ye ferever...\",\"color\":\"blue\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
@@ -257,7 +259,10 @@ public class Davey extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange));
+				Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
+				if (nearestPlayer != null) {
+					DepthsManager.getInstance().goToNextFloor(nearestPlayer);
+				}
 			}
 
 		}.runTaskLater(mPlugin, 20);

@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class LeapBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_leap";
@@ -55,7 +56,7 @@ public class LeapBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.CLOUD, loc, 1, 0.3, 0.3, 0.3, 0.1).spawnAsEntityActive(boss);
 				},
 				// Hit Action
-				(World world, Player player, Location loc, Vector dir) -> {
+				(World world, @Nullable Player player, Location loc, Vector dir) -> {
 					ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 						Arrays.asList(
 							new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {

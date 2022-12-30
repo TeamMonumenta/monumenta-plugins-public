@@ -9,6 +9,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -22,11 +23,12 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class VoteManager implements Listener {
 	private static final int TICK_PERIOD_SECONDS = 60;
 
-	private static VoteManager MANAGER = null;
+	private static @MonotonicNonNull VoteManager MANAGER = null;
 
 	private final Plugin mPlugin;
 	private final Logger mLogger;
@@ -123,7 +125,7 @@ public class VoteManager implements Listener {
 		for (Map.Entry<String, String> alternate : mAlternateNames.entrySet()) {
 			if (alternate.getKey().toLowerCase().contains(vote.getServiceName().toLowerCase())) {
 				matchingSite = alternate.getValue();
-				cooldown = SITE_TIMERS.get(matchingSite);
+				cooldown = Objects.requireNonNull(SITE_TIMERS.get(matchingSite));
 				break;
 			}
 		}

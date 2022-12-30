@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -82,13 +83,13 @@ public class TowerGuiBuyMob extends CustomInventory {
 
 
 	private List<TowerMobInfo> getItemList() {
+		List<TowerMobInfo> mobs = Objects.requireNonNull(ITEM_MAP.get(mGame));
 		if (ROLL_MAP.get(mGame) != null && ROLL_MAP.get(mGame) == mGame.mRoll) {
-			return ITEM_MAP.get(mGame);
+			return mobs;
 		}
 
 		int currentLvl = mGame.mPlayerLevel;
 		ROLL_MAP.put(mGame, mGame.mRoll);
-		List<TowerMobInfo> mobs = ITEM_MAP.get(mGame);
 		mobs.clear();
 		double rand;
 		for (int i = 0; i < VALID_MOBS_SIZE; i++) {
@@ -96,9 +97,10 @@ public class TowerGuiBuyMob extends CustomInventory {
 			for (TowerMobRarity rarity : TowerMobRarity.values()) {
 				rand -= rarity.getWeight(currentLvl - 1);
 				if (rand <= 0) {
-					TowerMobInfo info = TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).get(FastUtils.RANDOM.nextInt(TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(rarity).size()));
+					TowerMobInfo info = Objects.requireNonNull(TowerFileUtils.getMobsByRarity(rarity))
+						                    .get(FastUtils.RANDOM.nextInt(TowerFileUtils.getMobsByRarity(rarity).size()));
 					if (mGame.mCurrentFloor == 0 && info.mLosName.equals("ITBabyMimic")) {
-						info = TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.COMMON).get(0);
+						info = TowerFileUtils.getMobsByRarity(TowerMobRarity.COMMON).get(0);
 						//at the first round don't take any BabyMimic
 					}
 					mobs.add(info);
@@ -162,7 +164,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 			if (TowerGameUtils.canBuy(info, player)) {
 				if (mGame.canAddWeight(info)) {
 					if (mGame.canAddLimit(info)) {
-						ITEM_MAP.get(mGame).remove(info);
+						Objects.requireNonNull(ITEM_MAP.get(mGame)).remove(info);
 						TowerGameUtils.pay(info, player);
 						mGame.addNewMob(info);
 						player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);

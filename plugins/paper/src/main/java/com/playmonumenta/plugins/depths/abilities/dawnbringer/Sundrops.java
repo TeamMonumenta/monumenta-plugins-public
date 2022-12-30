@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.Component;
@@ -67,7 +68,7 @@ public class Sundrops extends DepthsAbility {
 			@Override
 			public void run() {
 				mT++;
-				world.spawnParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData);
+				new PartialParticle(Particle.FALLING_DUST, item.getLocation(), 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsOtherPlayerActive();
 				//Other player
 				for (Player p : PlayerUtils.playersInRange(item.getLocation(), 1.25, true)) {
 
@@ -81,8 +82,8 @@ public class Sundrops extends DepthsAbility {
 					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
 					world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
-					world.spawnParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.HONEYCOMB_BLOCK.createBlockData());
-					world.spawnParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F);
+					new PartialParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.HONEYCOMB_BLOCK.createBlockData()).spawnAsOtherPlayerActive();
+					new PartialParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F).spawnAsOtherPlayerActive();
 
 					this.cancel();
 					break;

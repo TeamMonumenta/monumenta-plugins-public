@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class Phase {
 
@@ -90,7 +92,7 @@ public class Phase {
 		return false;
 	}
 
-	public boolean onHurt(LivingEntity boss, LivingEntity damager, DamageEvent event) {
+	public boolean onHurt(LivingEntity boss, @Nullable LivingEntity damager, DamageEvent event) {
 		List<Trigger> temp = new ArrayList<>();
 		for (Trigger trigger : mTriggers) {
 			if (trigger.onHurt(boss, damager, event)) {
@@ -257,9 +259,9 @@ public class Phase {
 					}
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 				}
-				ParseResult<Trigger> parseResult = TRIGGER_BUILDER_MAP.get(name).buildTrigger(reader);
+				ParseResult<Trigger> parseResult = Objects.requireNonNull(TRIGGER_BUILDER_MAP.get(name)).buildTrigger(reader);
 				if (parseResult.getResult() == null) {
-					return ParseResult.of(parseResult.getTooltip());
+					return ParseResult.of(Objects.requireNonNull(parseResult.getTooltip()));
 				}
 				trigger = parseResult.getResult();
 				trigger.setNegated(hasReadNegation);
@@ -291,7 +293,7 @@ public class Phase {
 			}
 		}
 
-		while (true) {
+		do {
 			String name = reader.readOneOf(ACTION_BUILDER_MAP.keySet());
 			if (name == null) {
 				List<Tooltip<String>> suggArgs = new ArrayList<>(ACTION_BUILDER_MAP.keySet().size() + 1);
@@ -302,17 +304,14 @@ public class Phase {
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 			}
 
-			ParseResult<Action> parseResult = ACTION_BUILDER_MAP.get(name).buildAction(reader);
+			ParseResult<Action> parseResult = Objects.requireNonNull(ACTION_BUILDER_MAP.get(name)).buildAction(reader);
 			if (parseResult.getResult() == null) {
 				return ParseResult.of(parseResult.getTooltip());
 			}
 
 			actionsList.add(parseResult.getResult());
 
-			if (!reader.advance(",")) {
-				break;
-			}
-		}
+		} while (reader.advance(","));
 
 		return ParseResult.of(new Phase(triggerList, actionsList));
 

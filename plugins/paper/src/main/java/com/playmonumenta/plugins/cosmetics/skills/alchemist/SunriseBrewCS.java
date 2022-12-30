@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 	// Change bezoar item into sun drop style. Depth set: dawnbringer
@@ -39,7 +40,7 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 		new Particle.DustOptions(Color.fromRGB(252, 255, 196), 0.65f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"The purest drops of sunlight.",
 			"Radiant, shining, replenishing.");
@@ -56,7 +57,7 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

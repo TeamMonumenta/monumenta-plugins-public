@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -93,7 +94,7 @@ public class SpellAirGolemStrike extends Spell {
 			}
 		}
 
-		LivingEntity golem = (LivingEntity) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 10, 0), GOLEM_NAME);
+		LivingEntity golem = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 10, 0), GOLEM_NAME));
 
 		new BukkitRunnable() {
 			int mT = 0;

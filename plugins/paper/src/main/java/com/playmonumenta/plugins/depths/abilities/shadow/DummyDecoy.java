@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
+import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -118,7 +119,7 @@ public class DummyDecoy extends DepthsAbility {
 		arrow.removeMetadata(DUMMY_DECOY_ARROW_METADATA, mPlugin);
 		arrow.remove();
 
-		LivingEntity e = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, DUMMY_NAME);
+		LivingEntity e = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, DUMMY_NAME));
 		EntityUtils.setAttributeBase(e, Attribute.GENERIC_MAX_HEALTH, HEALTH[mRarity - 1]);
 		e.setHealth(HEALTH[mRarity - 1]);
 

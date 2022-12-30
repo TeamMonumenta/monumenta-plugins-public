@@ -2,14 +2,16 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellMusic extends Spell {
 	// All times are in ticks
@@ -43,17 +45,20 @@ public class SpellMusic extends Spell {
 	public void run() {
 		if (mT > mDelay) {
 			Location loc = mBoss.getLocation();
-			for (Player player : new ArrayList<>(mListeners.keySet())) {
-				int duration = mListeners.get(player) - 5;
+			for (Iterator<Map.Entry<Player, Integer>> iterator = mListeners.entrySet().iterator(); iterator.hasNext(); ) {
+				Map.Entry<Player, Integer> entry = iterator.next();
+				Player player = entry.getKey();
+				int duration = entry.getValue() - 5;
 				if (duration <= 0 || !player.isOnline()) {
-					mListeners.remove(player);
+					iterator.remove();
 					continue;
 				}
 				if (mClear && player.getLocation().distance(loc) > mRadiusOuter) {
+					iterator.remove();
 					clear(player);
 					continue;
 				}
-				mListeners.put(player, duration);
+				entry.setValue(duration);
 			}
 
 			List<Player> players = PlayerUtils.playersInRange(loc, mRadiusInner, true);
@@ -67,11 +72,12 @@ public class SpellMusic extends Spell {
 	}
 
 	@Override
-	public void onDeath(EntityDeathEvent event) {
+	public void onDeath(@Nullable EntityDeathEvent event) {
 		if (mClear) {
-			for (Player player : new ArrayList<>(mListeners.keySet())) {
+			for (Player player : mListeners.keySet()) {
 				clear(player);
 			}
+			mListeners.clear();
 		}
 	}
 
@@ -86,7 +92,6 @@ public class SpellMusic extends Spell {
 	}
 
 	private void clear(Player player) {
-		mListeners.remove(player);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> stop(player), mClearDelay);
 	}
 

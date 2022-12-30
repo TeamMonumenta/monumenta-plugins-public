@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,6 +31,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public class StatTrackManager implements Listener {
@@ -86,7 +86,7 @@ public class StatTrackManager implements Listener {
 	 * Updates the given item with currently accumulated, but uncommitted stat track info.
 	 */
 	public void update(Player player, @Nullable ItemStack item) {
-		if (ItemUtils.isNullOrAir(item)) {
+		if (item == null || ItemUtils.isNullOrAir(item)) {
 			return;
 		}
 		List<StatTrackData> dataList = mData.get(player.getUniqueId());

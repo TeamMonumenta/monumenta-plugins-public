@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.delves.abilities.Vengeance;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -34,6 +33,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public enum DelvesModifier {
 	ECHOES(1, Echoes::applyModifiers, createIcon(Material.GHAST_TEAR, Component.text("Echoes", NamedTextColor.GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Echoes.DESCRIPTION), Echoes.RANK_DESCRIPTIONS, 1, 1),
@@ -66,13 +66,13 @@ public enum DelvesModifier {
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ECHOES, ASSASSINS, VENGEANCE, UNYIELDING);
 
 	private final int mIndex;
-	private final BiConsumer<LivingEntity, Integer> mApplyFunc;
+	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;
 	private final ItemStack mIcon;
 	private final String[][] mRankDescriptions;
 	private final int mOldColumn;
 	private final int mPointsPerLevel;
 
-	DelvesModifier(int index, BiConsumer<LivingEntity, Integer> applying, ItemStack stack, String[][] rankDescriptions, int column, int pointsPerLevel) {
+	DelvesModifier(int index, @Nullable BiConsumer<LivingEntity, Integer> applying, ItemStack stack, String[][] rankDescriptions, int column, int pointsPerLevel) {
 		mIndex = index;
 		mApplyFunc = applying;
 		ItemMeta meta = stack.getItemMeta();

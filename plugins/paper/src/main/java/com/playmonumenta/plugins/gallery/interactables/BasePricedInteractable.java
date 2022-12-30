@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class BasePricedInteractable extends BaseInteractable {
 	public static final String TAG_STRING = "GalleryPricedInteractable";
 
-	protected final Integer mPrice;
+	protected final @Nullable Integer mPrice;
 
 	public BasePricedInteractable(@NotNull String name, @NotNull Entity entity, @Nullable Integer price, @Nullable String showingText, @Nullable String command) {
 		super(name, entity, showingText, command);
@@ -23,7 +23,9 @@ public class BasePricedInteractable extends BaseInteractable {
 	}
 
 	public void pay(GalleryGame game) {
-		GalleryUtils.pay(game, mPrice);
+		if (mPrice != null) {
+			GalleryUtils.pay(game, mPrice);
+		}
 	}
 
 	public boolean interactWithObjectAfterPay(GalleryPlayer player) {
@@ -55,7 +57,7 @@ public class BasePricedInteractable extends BaseInteractable {
 		mArmorStand.addScoreboardTag(TAG_STRING + "-" + mName + "-" + (mPrice != null ? mPrice : "null") + "-" + (mShowingText != null ? mShowingText : "null") + "-" + (mIsInteractable ? "True" : "False") + "-" + (mCommand != null ? mCommand : "null"));
 	}
 
-	public static BasePricedInteractable fromEntity(Entity entity) {
+	public static @Nullable BasePricedInteractable fromEntity(Entity entity) {
 		BasePricedInteractable interactable = null;
 
 		try {

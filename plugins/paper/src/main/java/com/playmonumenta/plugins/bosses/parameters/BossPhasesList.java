@@ -7,7 +7,9 @@ import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class BossPhasesList {
 
@@ -49,7 +51,7 @@ public class BossPhasesList {
 		}
 	}
 
-	public void onHurt(LivingEntity boss, LivingEntity damager, DamageEvent event) {
+	public void onHurt(LivingEntity boss, @Nullable LivingEntity damager, DamageEvent event) {
 		for (Phase phase : getClonePhaseList()) {
 			if (phase.onHurt(boss, damager, event) && !phase.isReusable()) {
 				mPhases.remove(phase);
@@ -90,7 +92,7 @@ public class BossPhasesList {
 		StringReader reader = new StringReader(info.currentArg());
 		ParseResult<Phase> phaseParseResult = Phase.fromReader(reader);
 		if (phaseParseResult.getResult() == null) {
-			return phaseParseResult.getTooltip();
+			return Objects.requireNonNull(phaseParseResult.getTooltip());
 		}
 
 		return Tooltip.arrayOf();
@@ -128,7 +130,7 @@ public class BossPhasesList {
 
 		ParseResult<Phase> phaseResult = Phase.fromReader(reader);
 		if (phaseResult.getResult() == null) {
-			return ParseResult.of(phaseResult.getTooltip());
+			return ParseResult.of(Objects.requireNonNull(phaseResult.getTooltip()));
 		}
 		Phase phase = phaseResult.getResult();
 		phase.setName(phaseName);

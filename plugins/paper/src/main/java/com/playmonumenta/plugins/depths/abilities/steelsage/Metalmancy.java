@@ -14,13 +14,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,6 +36,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Metalmancy extends DepthsAbility {
 
@@ -109,8 +110,8 @@ public class Metalmancy extends DepthsAbility {
 					if (isOutOfTime && mGolem != null) {
 						Location golemLoc = mGolem.getLocation();
 						world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.8f, 1.0f);
-						world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15);
-						world.spawnParticle(Particle.SMOKE_NORMAL, golemLoc, 20);
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.SMOKE_NORMAL, golemLoc, 20).spawnAsPlayerActive(mPlayer);
 					}
 					if (!(mTarget == null)) {
 						mTarget.removePotionEffect(PotionEffectType.GLOWING);
@@ -126,7 +127,7 @@ public class Metalmancy extends DepthsAbility {
 				if (!(mTarget == null || mTarget.isDead() || mTarget.getHealth() <= 0)) {
 					if (mTarget == mGolem) {
 						mTarget = null;
-					} else {
+					} else if (mGolem != null) {
 						mGolem.setTarget(mTarget);
 					}
 				}
@@ -153,11 +154,10 @@ public class Metalmancy extends DepthsAbility {
 			return false;
 		}
 
-		World world = mPlayer.getWorld();
 		mTarget = enemy;
 		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION[mRarity - 1], 0, true, false));
-		world.spawnParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15);
+		new PartialParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15).spawnAsPlayerActive(mPlayer);
 		return true; // only one retarget per tick
 	}
 

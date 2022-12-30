@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.infinitytower.mobs;
 
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerMobStats {
 
@@ -35,8 +37,8 @@ public class TowerMobStats {
 		return obj;
 	}
 
-
-	public static TowerMobStats fromJson(JsonObject obj) {
+	@Contract("!null -> !null")
+	public static @Nullable TowerMobStats fromJson(JsonObject obj) {
 		if (obj == null) {
 			return null;
 		}

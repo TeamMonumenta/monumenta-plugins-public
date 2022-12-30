@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -58,6 +57,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 public class ShopManager implements Listener {
 	private static final Material SHOP_EMPTY_MAT = Material.BRICKS;

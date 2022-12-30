@@ -15,6 +15,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class AvalanchexCS extends AmplifyingHexCS implements DepthsCS {
 	//Icy amplifying hex. Depth set: frost
@@ -24,7 +25,7 @@ public class AvalanchexCS extends AmplifyingHexCS implements DepthsCS {
 	private static final Particle.DustOptions ICE_PARTICLE_COLOR = new Particle.DustOptions(Color.fromRGB(207, 242, 255), 1.0f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Let everything under your avalanche",
 			"be not above innocence.");
@@ -41,7 +42,7 @@ public class AvalanchexCS extends AmplifyingHexCS implements DepthsCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

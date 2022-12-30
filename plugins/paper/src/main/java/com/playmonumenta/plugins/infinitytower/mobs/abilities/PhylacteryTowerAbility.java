@@ -5,9 +5,11 @@ import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class PhylacteryTowerAbility extends TowerAbility {
 
@@ -20,7 +22,7 @@ public class PhylacteryTowerAbility extends TowerAbility {
 
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		super.death(event);
 
 		List<LivingEntity> mobs = mIsPlayerMob ? mGame.getPlayerMobs() : mGame.getFloorMobs();
@@ -37,9 +39,10 @@ public class PhylacteryTowerAbility extends TowerAbility {
 
 	private void castReborn() {
 		List<LivingEntity> list = new ArrayList<>();
-		mMob.spawnPuppet(mGame, list, mIsPlayerMob);
+		Objects.requireNonNull(mMob).spawnPuppet(mGame, list, mIsPlayerMob);
 		new BukkitRunnable() {
 			int mTimer = 0;
+
 			@Override
 			public void run() {
 				if (mGame.isTurnEnded() || mGame.isGameEnded()) {
@@ -53,9 +56,9 @@ public class PhylacteryTowerAbility extends TowerAbility {
 				if (mTimer >= TIMER_RESPAWN) {
 					cancel();
 					if (mIsPlayerMob) {
-						mGame.mPlayerMobs.add(mMob.spawn(mGame, true));
+						mGame.mPlayerMobs.add(Objects.requireNonNull(mMob).spawn(mGame, true));
 					} else {
-						mGame.mFloorMobs.add(mMob.spawn(mGame, false));
+						mGame.mFloorMobs.add(Objects.requireNonNull(mMob).spawn(mGame, false));
 					}
 				}
 

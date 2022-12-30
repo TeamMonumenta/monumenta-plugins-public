@@ -9,13 +9,13 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,6 +26,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class Apocalypse extends DepthsAbility {
 	public static final String ABILITY_NAME = "Apocalypse";
@@ -86,12 +87,12 @@ public class Apocalypse extends DepthsAbility {
 		AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
 
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2);
-		world.spawnParticle(Particle.FLAME, loc, 100, 3.5, 3.5, 3.5, 0);
+		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 100, 3.5, 3.5, 3.5, 0).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
 
-		world.spawnParticle(Particle.HEART, loc.clone().add(0, 1, 0), count * 7, 0.5, 0.5, 0.5);
+		new PartialParticle(Particle.HEART, loc.clone().add(0, 1, 0), count * 7, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f * count, 1.6f);
 		MessagingUtils.sendActionBarMessage(mPlayer, "Apocalypse has been activated!");
 		event.setCancelled(true);

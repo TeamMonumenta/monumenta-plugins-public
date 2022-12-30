@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -228,7 +229,7 @@ public class ShulkerInventory {
 		if (remaining.isEmpty()) {
 			return 0;
 		}
-		return remaining.get(0).getAmount();
+		return Objects.requireNonNull(remaining.get(0)).getAmount();
 	}
 
 	/**

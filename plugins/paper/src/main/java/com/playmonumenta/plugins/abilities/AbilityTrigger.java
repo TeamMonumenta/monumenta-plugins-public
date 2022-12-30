@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Description of an ability trigger - holds key, if sneaking is required, etc.
@@ -244,7 +245,7 @@ public class AbilityTrigger {
 
 	// other methods
 
-	public static AbilityTrigger fromJson(JsonObject json) {
+	public static @Nullable AbilityTrigger fromJson(JsonObject json) {
 		try {
 			AbilityTrigger trigger = new AbilityTrigger(Key.valueOf(json.get("key").getAsString()));
 			if (json.has("enabled")) { // old triggers didn't have this

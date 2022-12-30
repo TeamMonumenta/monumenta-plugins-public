@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -49,7 +50,7 @@ public class RandomTeleportTowerAbility extends TowerAbility {
 								}
 
 								if (mTimer <= 20) {
-									mLoc.getWorld().spawnParticle(Particle.SOUL, mLoc, 30, 0.2, 1.5, 0.2, 0.05);
+									new PartialParticle(Particle.SOUL, mLoc, 30, 0.2, 1.5, 0.2, 0.05).spawnAsEntityActive(mBoss);
 								} else {
 									mBoss.teleport(mLoc);
 

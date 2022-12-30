@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BrownPolarityDisplay {
 	//This is not an effect, it is simply a class used to display the polarity in brown

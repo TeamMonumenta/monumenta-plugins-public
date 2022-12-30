@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -39,6 +38,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public class DivineJustice extends Ability {
@@ -110,7 +110,7 @@ public class DivineJustice extends Ability {
 	private final DivineJusticeCS mCosmetic;
 
 	private int mComboNumber = 0;
-	private BukkitRunnable mComboRunnable = null;
+	private @Nullable BukkitRunnable mComboRunnable = null;
 
 	private double mPriorAmount = 0;
 

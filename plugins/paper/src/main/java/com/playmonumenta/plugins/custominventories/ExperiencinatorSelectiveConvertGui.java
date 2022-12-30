@@ -182,7 +182,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 		if (clickedInventory == mInventory) {
 			if (slot == 0) {
 				close();
-				ExperiencinatorMainGui.show(mPlayer, getPlugin(), mExperiencinator, mExperiencinatorItem);
+				ExperiencinatorMainGui.show(mPlayer, com.playmonumenta.plugins.Plugin.getInstance(), mExperiencinator, mExperiencinatorItem);
 				return;
 			}
 			int conversionsStartIndex = getConversionsStartIndex();

@@ -23,7 +23,7 @@ public class SpellVolcanicDeepmise extends Spell {
 	public static final double ARENA_SIZE = 30.0;
 	public static final int DAMAGE = 20;
 
-	private Location mCenter;
+	private final Location mCenter;
 	private int mTicks = 0;
 	private final LivingEntity mBoss;
 
@@ -88,7 +88,7 @@ public class SpellVolcanicDeepmise extends Spell {
 						double dist = player.getLocation().distance(mLoc);
 						double step = dist < 10 ? 0.5 : (dist < 15 ? 1 : 3);
 						for (double deg = 0; deg < 360; deg += (step * 30)) {
-							player.spawnParticle(Particle.FLAME, mLoc.clone().add(FastUtils.cos(deg) * 3, 0, FastUtils.sin(deg) * 3), 1, 0.15, 0.15, 0.15, 0);
+							new PartialParticle(Particle.FLAME, mLoc.clone().add(FastUtils.cos(deg) * 3, 0, FastUtils.sin(deg) * 3), 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 						}
 					}
 				}

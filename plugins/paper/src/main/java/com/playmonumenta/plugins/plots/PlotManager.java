@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -39,6 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class PlotManager {
 	public PlotManager() {
@@ -89,19 +89,19 @@ public class PlotManager {
 					}))
 				/***** ADD *****/
 				.withSubcommand(new CommandAPICommand("add")
-					.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
-						.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-						.map((player) -> player.getName()).toArray(String[]::new)))
+						.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
+								.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+								.map((player) -> player.getName()).toArray(String[]::new)))
 					.executesPlayer((player, args) -> {
 						plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), null);
 					}))
 				.withSubcommand(new CommandAPICommand("add")
-					.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
-						.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-						.map((player) -> player.getName()).toArray(String[]::new)))
-					.withArguments(new StringArgument("duration"))
-					.executesPlayer((player, args) -> {
-						plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), (String) args[1]);
+						.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
+								.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+								.map((player) -> player.getName()).toArray(String[]::new)))
+						.withArguments(new StringArgument("duration"))
+						.executesPlayer((player, args) -> {
+							plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), (String) args[1]);
 					}))
 				/***** MODERATOR ADD *****/
 				.withSubcommand(new CommandAPICommand("add_other")
@@ -124,24 +124,24 @@ public class PlotManager {
 						UUID ownerUUID = resolveUUID((String) args[0]);
 						UUID otherPlayerUUID = resolveUUID((String) args[1]);
 						plotAccessAdd(sender, ownerUUID, otherPlayerUUID, (String) args[2]);
-					}))
-				/***** REMOVE *****/
-				.withSubcommand(new CommandAPICommand("remove")
-					.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
-					.executesPlayer((player, args) -> {
-						plotAccessRemove(player, (String) args[0]);
-					}))
-				/***** MODERATOR REMOVE *****/
-				.withSubcommand(new CommandAPICommand("remove_other")
-					.withPermission("monumenta.command.plot.remove.others")
-					.withArguments(
-						new StringArgument("plot owner"),
-						new StringArgument("other player"))
-					.executes((sender, args) -> {
-						UUID ownerUUID = resolveUUID((String) args[0]);
-						UUID otherPlayerUUID = resolveUUID((String) args[1]);
-						plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
-					}))
+						}))
+					/***** REMOVE *****/
+					.withSubcommand(new CommandAPICommand("remove")
+							.withArguments(new StringArgument("name")) // TODO: Suggestions? Annoying to do
+							.executesPlayer((player, args) -> {
+								plotAccessRemove(player, (String) args[0]);
+							}))
+					/***** MODERATOR REMOVE *****/
+					.withSubcommand(new CommandAPICommand("remove_other")
+							.withPermission("monumenta.command.plot.remove.others")
+							.withArguments(
+									new StringArgument("plot owner"),
+									new StringArgument("other player"))
+							.executes((sender, args) -> {
+								UUID ownerUUID = resolveUUID((String) args[0]);
+								UUID otherPlayerUUID = resolveUUID((String) args[1]);
+								plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
+							}))
 			)
 			/********************* SEND *********************/
 			.withSubcommand(new CommandAPICommand("send")
@@ -511,7 +511,10 @@ public class PlotManager {
 			Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 				/* Complete all of the profiles async */
 				for (Map.Entry<UUID, OtherAccessRecord> entry : mOwnerAccessToOtherPlots.entrySet()) {
-					entry.getValue().mProfile.complete();
+					PlayerProfile profile = entry.getValue().mProfile;
+					if (profile != null) {
+						profile.complete();
+					}
 				}
 
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
@@ -634,6 +637,7 @@ public class PlotManager {
 			UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
 			if (uuid == null) {
 				CommandAPI.fail("Can't find player '" + name + "' - perhaps incorrect capitalization or spelled wrong?");
+				throw new RuntimeException();
 			}
 			return uuid;
 		}

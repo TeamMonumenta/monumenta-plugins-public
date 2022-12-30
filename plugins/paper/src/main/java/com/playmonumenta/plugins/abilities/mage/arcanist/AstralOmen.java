@@ -165,9 +165,9 @@ public class AstralOmen extends Ability {
 					if (isLevelTwo()) {
 						MovementUtils.pullTowards(enemy, mob, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_SPEED));
 					}
-					for (Type type : levels.keySet()) {
-						if (levels.get(type) > 0) {
-							new PartialParticle(Particle.REDSTONE, enemy.getLocation(), levels.get(type) * 5, 0.2, 0.2, 0.2, 0.1, type.mColor).spawnAsPlayerActive(mPlayer);
+					for (Map.Entry<Type, Integer> entry : levels.entrySet()) {
+						if (entry.getValue() > 0) {
+							new PartialParticle(Particle.REDSTONE, enemy.getLocation(), entry.getValue() * 5, 0.2, 0.2, 0.2, 0.1, entry.getKey().mColor).spawnAsPlayerActive(mPlayer);
 						}
 					}
 				}
@@ -179,9 +179,9 @@ public class AstralOmen extends Ability {
 
 			Location loc = enemy.getLocation();
 			new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 80, 0, 0, 0, 4).spawnAsPlayerActive(mPlayer);
-			for (Type type : levels.keySet()) {
-				if (levels.get(type) > 0) {
-					new PartialParticle(Particle.REDSTONE, loc, levels.get(type) * 5, 0.2, 0.2, 0.2, 0.1, type.mColor).spawnAsPlayerActive(mPlayer);
+			for (Map.Entry<Type, Integer> e : levels.entrySet()) {
+				if (e.getValue() > 0) {
+					new PartialParticle(Particle.REDSTONE, loc, e.getValue() * 5, 0.2, 0.2, 0.2, 0.1, e.getKey().mColor).spawnAsPlayerActive(mPlayer);
 				}
 			}
 			world.playSound(loc, Sound.ENTITY_BLAZE_HURT, 1.3f, 1.5f);
@@ -192,8 +192,9 @@ public class AstralOmen extends Ability {
 			//
 			// We just work with 1 effect at all times, of the magnitude (level) we want,
 			// which will handle stack decay times appropriately & not have conflicting magnitudes
-			for (Type type : levels.keySet()) {
-				int level = levels.get(type);
+			for (Map.Entry<Type, Integer> e : levels.entrySet()) {
+				Type type = e.getKey();
+				int level = e.getValue();
 				if (level > 0) {
 					Effect effect;
 					switch (type) {

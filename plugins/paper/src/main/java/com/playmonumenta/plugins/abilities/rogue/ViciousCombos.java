@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ViciousCombos extends Ability {
 
@@ -63,7 +64,7 @@ public class ViciousCombos extends Ability {
 					ENHANCEMENT_COOLDOWN_REDUCTION / 20))
 			.displayItem(new ItemStack(Material.ZOMBIE_HEAD, 1));
 
-	private ClassAbility mLastAbility = null;
+	private @Nullable ClassAbility mLastAbility = null;
 	private int mAbilityCastTime = 0;
 
 	private final ViciousCombosCS mCosmetic;

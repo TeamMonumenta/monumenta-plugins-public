@@ -181,7 +181,7 @@ public class LuminousInfusion extends Ability {
 			} else {
 				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1), mInfo.getLinkedSpell());
 				if (Crusade.applyCrusadeToSlayer(e, mCrusade)) {
-					mPlugin.mEffectManager.addEffect(e, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+					mPlugin.mEffectManager.addEffect(e, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
 				}
 			}
 			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);

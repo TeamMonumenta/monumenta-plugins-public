@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class MistMob extends BossAbilityGroup {
 
@@ -24,7 +25,7 @@ public class MistMob extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (event == null || event.getEntity() == null) {
 			//If the mob explodes it hits this method, but the event cannot grab the entity, so to prevent null pointers, this is needed
 			return;

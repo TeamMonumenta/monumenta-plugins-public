@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -13,6 +12,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.loot.LootTable;
+import org.jetbrains.annotations.Nullable;
 
 public class DelveLootTableGroup {
 

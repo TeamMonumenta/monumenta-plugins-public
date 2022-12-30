@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import javax.annotation.Nullable;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class DepthsAbilityItem {
 

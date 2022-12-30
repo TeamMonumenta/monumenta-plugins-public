@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import dev.jorel.commandapi.Tooltip;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class HealthTrigger extends Trigger {
 
@@ -26,7 +27,8 @@ public class HealthTrigger extends Trigger {
 
 	}
 
-	@Override public boolean onHurt(LivingEntity boss, LivingEntity damager, DamageEvent event) {
+	@Override
+	public boolean onHurt(LivingEntity boss, @Nullable LivingEntity damager, DamageEvent event) {
 		double maxHealth = EntityUtils.getMaxHealth(boss);
 		double currentHealth = boss.getHealth();
 

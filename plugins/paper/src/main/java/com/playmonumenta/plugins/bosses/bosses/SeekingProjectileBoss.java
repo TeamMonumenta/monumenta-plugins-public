@@ -18,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 @Deprecated
 public class SeekingProjectileBoss extends BossAbilityGroup {
@@ -79,7 +80,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
+				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
 					new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {

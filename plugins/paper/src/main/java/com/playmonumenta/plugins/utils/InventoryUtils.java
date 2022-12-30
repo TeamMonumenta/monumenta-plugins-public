@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -33,6 +32,7 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 
@@ -156,7 +156,11 @@ public class InventoryUtils {
 		return dropped;
 	}
 
-	private static int removeSpecialItemsFromInventory(final @Nullable ItemStack[] items, final Location loc, final boolean ephemeralOnly, final boolean includeSubInventories) {
+	private static int removeSpecialItemsFromInventory(final @Nullable ItemStack @Nullable [] items, final Location loc, final boolean ephemeralOnly, final boolean includeSubInventories) {
+		if (items == null) {
+			return 0;
+		}
+
 		int dropped = 0;
 
 		for (int i = 0; i < items.length; i++) {
@@ -420,6 +424,13 @@ public class InventoryUtils {
 			return item;
 		}
 		return null;
+	}
+
+	public static ItemStack getItemFromLootTableOrThrow(Location loc, NamespacedKey key) throws IllegalStateException {
+		for (ItemStack item : getItemsFromLootTable(loc, key)) {
+			return item;
+		}
+		throw new IllegalStateException("Could not find item from loot table " + key);
 	}
 
 	public static Collection<ItemStack> getItemsFromLootTable(Location loc, NamespacedKey key) {

@@ -60,6 +60,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public final class FalseSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
@@ -365,7 +366,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setHealth(100);
@@ -377,8 +378,10 @@ public final class FalseSpirit extends BossAbilityGroup {
 		teleport(mSpawnLoc);
 		World world = mBoss.getWorld();
 
-		event.setCancelled(true);
-		event.setReviveHealth(100);
+		if (event != null) {
+			event.setCancelled(true);
+			event.setReviveHealth(100);
+		}
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The Tree of Life calls. I only wish to answer...\",\"color\":\"dark_red\"}]");
 

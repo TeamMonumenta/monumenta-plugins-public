@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerGameUtils {
 
@@ -190,6 +190,9 @@ public class TowerGameUtils {
 	}
 
 	public static Component getMobNameComponent(TowerMob towerMob, boolean playerMob) {
+		if (towerMob.mInfo == null || towerMob.mInfo.mDisplayName == null) {
+			return Component.text("ERROR");
+		}
 		return getMobNameComponent(towerMob.mInfo.mDisplayName, playerMob);
 	}
 
@@ -397,7 +400,7 @@ public class TowerGameUtils {
 
 	}
 
-	public static void startMob(LivingEntity mobSpawned, TowerMob mob, TowerGame game, boolean playerSummon) throws Exception {
+	public static void startMob(LivingEntity mobSpawned, @Nullable TowerMob mob, TowerGame game, boolean playerSummon) throws Exception {
 		if (BossManager.getInstance() != null) {
 			BossManager.getInstance().createBossInternal(mobSpawned, new GenericTowerMob(TowerManager.mPlugin, mobSpawned.getName(), (Mob) mobSpawned, game, mob, playerSummon));
 		}

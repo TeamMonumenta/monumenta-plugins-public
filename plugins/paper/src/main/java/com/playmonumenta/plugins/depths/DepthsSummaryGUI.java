@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class DepthsSummaryGUI extends CustomInventory {
 	public static final ArrayList<Integer> HEAD_LOCATIONS = new ArrayList<>(Arrays.asList(47, 48, 50, 51, 46, 52, 45, 53));
@@ -28,7 +29,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final int REWARD_LOCATION = 49;
 	private Boolean mDebugVersion = false;
-	private DepthsParty mDepthsParty;
+	private @Nullable DepthsParty mDepthsParty;
 	private final DepthsPlayer mRequestingPlayer;
 
 	static class TriggerData {
@@ -75,8 +76,10 @@ public class DepthsSummaryGUI extends CustomInventory {
 			if (playerParty != null && playerParty.mPlayersInParty != null) {
 				mDepthsParty = playerParty;
 			}
+		} else {
+			throw new IllegalArgumentException("Player " + targetPlayer.getName() + " not in depths system!");
 		}
-		mRequestingPlayer = DepthsManager.getInstance().mPlayers.get(targetPlayer.getUniqueId());
+		mRequestingPlayer = playerInstance;
 
 		setAbilities(targetPlayer);
 	}
@@ -213,6 +216,9 @@ public class DepthsSummaryGUI extends CustomInventory {
 	}
 
 	private void updatePlayerHeads(Player targetPlayer) {
+		if (mDepthsParty == null) {
+			return;
+		}
 		for (int i = 0; i < mDepthsParty.mPlayersInParty.size(); i++) {
 			DepthsPlayer player = mDepthsParty.mPlayersInParty.get(i);
 			if (player == null) {

@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class PhasesManagerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_phases_manager";
@@ -53,7 +54,7 @@ public class PhasesManagerBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mParam.PHASES.onDeath(mBoss);
 	}
 

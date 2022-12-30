@@ -107,7 +107,7 @@ public class CharmsGUI extends CustomInventory {
 	}
 
 	public void setCharms() {
-		List<ItemStack> items = CharmManager.getInstance().mPlayerCharms.get(mTargetPlayer.getUniqueId());
+		List<ItemStack> items = CharmManager.getInstance().mPlayerCharms.getOrDefault(mTargetPlayer.getUniqueId(), new ArrayList<>());
 		int totalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, AbilityUtils.CHARM_POWER).orElse(0);
 		if (totalBudget <= 0) {
 			mTargetPlayer.sendMessage(ChatColor.RED + "You have no Charm Power!");

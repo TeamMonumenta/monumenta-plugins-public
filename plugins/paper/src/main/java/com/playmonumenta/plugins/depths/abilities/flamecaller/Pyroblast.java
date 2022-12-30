@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
@@ -81,9 +82,9 @@ public class Pyroblast extends DepthsAbility {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 			}
 			World world = proj.getWorld();
-			world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
-			world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0);
-			world.spawnParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0);
+			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 			proj.remove();
 		}

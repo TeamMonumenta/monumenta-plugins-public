@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -45,6 +44,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class UnstableAmalgam extends Ability {
 
@@ -271,7 +271,7 @@ public class UnstableAmalgam extends Ability {
 				for (LivingEntity mob : new ArrayList<>(mobs)) {
 					new PartialParticle(Particle.REDSTONE, mob.getEyeLocation(), 12, 0.5, 0.5, 0.5, 0.3, new Particle.DustOptions(Color.WHITE, 0.8f)).spawnAsPlayerActive(mPlayer);
 
-					if (mob.isDead()) {
+					if (mob.isDead() && mPlayerItemStats != null) {
 						mobs.remove(mob);
 						ThrownPotion potion = mPlayer.launchProjectile(ThrownPotion.class);
 						potion.teleport(mob.getEyeLocation());
@@ -289,7 +289,9 @@ public class UnstableAmalgam extends Ability {
 
 	public void setEnhancementThrownPotion(ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 		mEnhancementPotionPlayerStat.put(potion, playerItemStats);
-		mAlchemistPotions.setPotionAlchemistPotionAesthetic(potion);
+		if (mAlchemistPotions != null) {
+			mAlchemistPotions.setPotionAlchemistPotionAesthetic(potion);
+		}
 	}
 
 	@Override
@@ -313,9 +315,11 @@ public class UnstableAmalgam extends Ability {
 	}
 
 	private void applyEffects(LivingEntity entity) {
-		if (mHasGruesome) {
-			mAlchemistPotions.applyEffects(entity, true, mPlayerItemStats);
+		if (mAlchemistPotions != null && mPlayerItemStats != null) {
+			if (mHasGruesome) {
+				mAlchemistPotions.applyEffects(entity, true, mPlayerItemStats);
+			}
+			mAlchemistPotions.applyEffects(entity, false, mPlayerItemStats);
 		}
-		mAlchemistPotions.applyEffects(entity, false, mPlayerItemStats);
 	}
 }

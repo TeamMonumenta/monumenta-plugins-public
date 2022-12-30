@@ -2,13 +2,13 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsRoom.RoomDirection;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.structures.StructuresAPI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class contains hard coded information about all the rooms possible in the system, including type, spawner count, load paths, etc.
@@ -270,6 +271,9 @@ public class DepthsRoomRepository {
 	public DepthsRoom summonRoom(Location spawnPoint, DepthsRoomType roomType, DepthsParty party) {
 		//Get a valid room from the options available to the party
 		DepthsRoom room = getValidRoom(roomType, party, spawnPoint.getY());
+		if (room == null) {
+			throw new IllegalStateException("No valid room found to spawn!");
+		}
 		room.mRoomType = roomType;
 		//Gets the point in the world to load it and physically summons it
 		Location spawn = spawnPoint.clone().add(room.mEntry);
@@ -407,6 +411,10 @@ public class DepthsRoomRepository {
 			Plugin.getInstance().getLogger().info("Got null world from party's id - DepthsRoomRepository");
 			return;
 		}
+		if (party.mFloorLobbyLoadPoint == null) {
+			MMLog.severe("Depths party's mFloorLobbyLoadPoint not set, cannot go to next floor!");
+			return;
+		}
 		Location loc = new Location(world, party.mFloorLobbyLoadPoint.getX(), party.mFloorLobbyLoadPoint.getY(), party.mFloorLobbyLoadPoint.getZ());
 
 		//Separate rooms by floor here
@@ -428,6 +436,10 @@ public class DepthsRoomRepository {
 					}
 				}
 			} else {
+				if (party.mFloorLobbyLoadPlayerTpPoint == null) {
+					MMLog.severe("Depths party's mFloorLobbyLoadPlayerTpPoint is not set, cannot go to next floor!");
+					return;
+				}
 				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ(), 270.0f, 0.0f);
 				//Tp all the players to it
 				for (DepthsPlayer dp : party.mPlayersInParty) {

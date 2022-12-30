@@ -27,7 +27,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GalleryManager implements Listener {
 
@@ -38,9 +38,10 @@ public class GalleryManager implements Listener {
 	public static final String TAG_SPAWNING_LOC = "GalleryUtilSpawn";
 	public static final String TAG_DEAD_BOX_LOC = "GalleryUtilDeadBox";
 	protected static final Map<UUID, GalleryGame> GAMES = new HashMap<>();
+	@SuppressWarnings("NullAway.Init")
 	public static Plugin mPlugin;
 
-	private static BukkitRunnable mRunnable = null;
+	private static @Nullable BukkitRunnable mRunnable = null;
 
 	public GalleryManager(Plugin plugin) {
 		mPlugin = plugin;
@@ -149,16 +150,18 @@ public class GalleryManager implements Listener {
 							game.tick(oneHertz, twoHertz, ticks);
 						}
 					} catch (Exception e) {
-						//GalleryGame.tick(..) should not throws any exception.
-						//but if it throws any, means something HARD BROKE!
-						//print all the info about what game broke and what its status then stop that game.
-						GalleryUtils.printDebugMessage("GalleryGame.tick(..) BROKE! saving game status to: " + crashedGame.mUUIDGame.toString() + ".json");
-						e.printStackTrace();
-						removeGame(crashedGame);
-						try {
-							FileUtils.writeJson(mPlugin.getDataFolder() + "/Gallery/Crashed/" + crashedGame.mUUIDGame + ".json", crashedGame.toJson());
-						} catch (IOException ex) {
-							ex.printStackTrace();
+						if (crashedGame != null) {
+							//GalleryGame.tick(..) should not throws any exception.
+							//but if it throws any, means something HARD BROKE!
+							//print all the info about what game broke and what its status then stop that game.
+							GalleryUtils.printDebugMessage("GalleryGame.tick(..) BROKE! saving game status to: " + crashedGame.mUUIDGame.toString() + ".json");
+							e.printStackTrace();
+							removeGame(crashedGame);
+							try {
+								FileUtils.writeJson(mPlugin.getDataFolder() + "/Gallery/Crashed/" + crashedGame.mUUIDGame + ".json", crashedGame.toJson());
+							} catch (IOException ex) {
+								ex.printStackTrace();
+							}
 						}
 					}
 

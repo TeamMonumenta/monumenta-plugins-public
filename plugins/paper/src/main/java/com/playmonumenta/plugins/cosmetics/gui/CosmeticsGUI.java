@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -30,6 +31,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 
 public class CosmeticsGUI extends CustomInventory {
@@ -50,14 +52,14 @@ public class CosmeticsGUI extends CustomInventory {
 	static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 
 	private final Plugin mPlugin;
-	private CosmeticType mDisplayPage = null;
+	private @Nullable CosmeticType mDisplayPage = null;
 	private int mPageNumber = 1;
 	private boolean mCosmeticSkillChanged = false;
 
 	// for cosmetic skill paging
-	private PlayerClass mCurrentClass = null;
-	private PlayerSpec mCurrentSpec = null;
-	private AbilityInfo<?> mCurrentAbility = null;
+	private @Nullable PlayerClass mCurrentClass = null;
+	private @Nullable PlayerSpec mCurrentSpec = null;
+	private @Nullable AbilityInfo<?> mCurrentAbility = null;
 
 	public CosmeticsGUI(Plugin plugin, Player player) {
 		super(player, 6 * 9, Component.text("Cosmetics Manager", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
@@ -123,7 +125,7 @@ public class CosmeticsGUI extends CustomInventory {
 						return;
 					}
 				}
-			} else if (mCurrentSpec == null && mCurrentAbility == null) {
+			} else if (mCurrentSpec == null && mCurrentAbility == null && mCurrentClass != null) {
 				// Choose skill
 				for (int i = 0; i < CosmeticSkillGUIConfig.SKILL_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.SKILL_LOCS[i]) {
@@ -154,7 +156,7 @@ public class CosmeticsGUI extends CustomInventory {
 					setUpClassSelectionPage();
 					return;
 				}
-			} else if (mCurrentAbility == null) {
+			} else if (mCurrentAbility == null && mCurrentSpec != null) {
 				// Choose spec skills
 				for (int i = 0; i < CosmeticSkillGUIConfig.SPEC_SKILL_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.SPEC_SKILL_LOCS[i]) {
@@ -475,6 +477,8 @@ public class CosmeticsGUI extends CustomInventory {
 		mInventory.clear();
 		GUIUtils.fillWithFiller(mInventory, FILLER);
 
+		Objects.requireNonNull(mCurrentClass);
+
 		//Display intro items
 		{
 			ItemStack pageItem = createBasicItem(mCurrentClass.mDisplayItem.getType(), mCurrentClass.mClassName, mCurrentClass.mClassColor,
@@ -521,6 +525,8 @@ public class CosmeticsGUI extends CustomInventory {
 		mInventory.clear();
 		GUIUtils.fillWithFiller(mInventory, FILLER);
 
+		Objects.requireNonNull(mCurrentSpec);
+
 		//Display intro items
 		{
 			ItemStack pageItem = createBasicItem(mCurrentSpec.mDisplayItem.getType(), mCurrentSpec.mSpecName, NamedTextColor.RED,
@@ -561,11 +567,13 @@ public class CosmeticsGUI extends CustomInventory {
 	}
 
 	private ItemStack createSkillItem(AbilityInfo<?> abilityToItemize) {
+		Objects.requireNonNull(mCurrentClass);
 		return createBasicItem(abilityToItemize.getDisplayItem().getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
 			true, "View cosmetics of this skill!", ChatColor.GRAY);
 	}
 
 	private ItemStack createSkillItemForCosmetic(AbilityInfo<?> abilityToItemize) {
+		Objects.requireNonNull(mCurrentClass);
 		return createBasicItem(abilityToItemize.getDisplayItem().getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
 			true, "Current skill", ChatColor.YELLOW);
 	}

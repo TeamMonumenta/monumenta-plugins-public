@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -43,7 +44,7 @@ public class FrozenDomain extends DepthsAbility {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (twoHertz && isOnIce(mPlayer)) {
-			mPlayer.getLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65);
+			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		}
 		if (oneSecond) {
 			if (mPlayer.isOnGround() && isOnIce(mPlayer)) {
@@ -63,13 +64,13 @@ public class FrozenDomain extends DepthsAbility {
 	}
 
 	public void handleParticles() {
-		mPlayer.getLocation().getWorld().spawnParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.65);
+		new PartialParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 5, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		new BukkitRunnable() {
 			int mCount = 0;
 
 			@Override
 			public void run() {
-				mPlayer.getLocation().getWorld().spawnParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation().add(0, 1, 0), 8, 0, 0, 0, 0.65);
+				new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation().add(0, 1, 0), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 				if (mCount >= 5) {
 					this.cancel();
 				}

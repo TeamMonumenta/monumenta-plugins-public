@@ -16,6 +16,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class Orangyboi extends BossAbilityGroup {
 	public static final String identityTag = "boss_orangyboi";
@@ -67,7 +68,7 @@ public class Orangyboi extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 }

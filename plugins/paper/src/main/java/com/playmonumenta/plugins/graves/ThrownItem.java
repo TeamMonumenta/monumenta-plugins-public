@@ -216,7 +216,7 @@ public class ThrownItem {
 		if (data.has(KEY_NBT) && data.get(KEY_NBT).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_NBT).isString()) {
 			item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_NBT).getAsString()));
 		}
-		if (ItemUtils.isNullOrAir(item)) { // item replacements deleted this item, or bad data
+		if (item == null || ItemUtils.isNullOrAir(item)) { // item replacements deleted this item, or bad data
 			return null;
 		}
 		if (data.has(KEY_SHARD) && data.get(KEY_SHARD).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_SHARD).isString()) {
@@ -240,6 +240,9 @@ public class ThrownItem {
 			velocity = new Vector(x, y, z);
 		}
 
+		if (shard == null || age == null || location == null || velocity == null) {
+			return null;
+		}
 		return new ThrownItem(manager, player, item, shard, location, velocity, age);
 	}
 

@@ -26,6 +26,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class BruteForce extends Ability {
 
@@ -59,7 +60,7 @@ public class BruteForce extends Ability {
 	private final BruteForceCS mCosmetic;
 
 	private int mComboNumber = 0;
-	private BukkitRunnable mComboRunnable = null;
+	private @Nullable BukkitRunnable mComboRunnable = null;
 
 	public BruteForce(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

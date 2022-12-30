@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 //Clone ability of Orb of Bones, just with a different name since the original is bad.
 
@@ -50,8 +52,8 @@ public class VoidWalkerTowerAbility extends TowerAbility {
 			(World world, Location loc, int ticks) -> {
 
 				if (ticks % 2 == 0) {
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2);
-					world.spawnParticle(Particle.FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.FLAME, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
 				}
 			},
 			// Launch Aesthetic
@@ -62,15 +64,15 @@ public class VoidWalkerTowerAbility extends TowerAbility {
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {
 
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 6, 0.5, 0.5, 0.5, 0.1);
-				world.spawnParticle(Particle.FLAME, loc, 8, 1, 1, 1, 0.1);
-				world.spawnParticle(Particle.CLOUD, loc, 6, 0.5, 0.5, 0.5, 0);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 6, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.FLAME, loc, 8, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CLOUD, loc, 6, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(mBoss);
 			},
 			// Hit Action
-			(World world, LivingEntity target, Location loc, Location prevLoc) -> {
-				world.spawnParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5);
-				world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5);
-				world.spawnParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5);
+			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
+				new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CLOUD, loc, 40, 1, 1, 1, 0.5).spawnAsEntityActive(mBoss);
 				if (target != null) {
 					world.playSound(target.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 					BossUtils.bossDamagePercent(mBoss, target, 0.4);

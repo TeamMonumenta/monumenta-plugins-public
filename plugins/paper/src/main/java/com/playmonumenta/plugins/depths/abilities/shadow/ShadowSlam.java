@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -122,9 +123,9 @@ public final class ShadowSlam extends DepthsAbility {
 		float volumeScale = (float) Math.min(0.1 + fallDistance / 16 * 0.9, 1);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 1.3F, 0);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, volumeScale * 2, 1.25F);
-		world.spawnParticle(Particle.SPELL_WITCH, location, 60, 0F, 0F, 0F, 0.2F);
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F);
-		world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, location, 3 * SIZE * SIZE, SIZE, 0.25f, SIZE, 0);
+		new PartialParticle(Particle.SPELL_WITCH, location, 60, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, location, 20, 0F, 0F, 0F, 0.3F).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, location, 3 * SIZE * SIZE, SIZE, 0.25f, SIZE, 0).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override

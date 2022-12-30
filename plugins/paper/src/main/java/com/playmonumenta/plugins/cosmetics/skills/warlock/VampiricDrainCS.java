@@ -25,6 +25,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	// Gallery theme1: blood
@@ -37,7 +38,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	private static final int RING_FRAMES = 7;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"\"Vampires never use the tricks of human.\"",
 			"Compared to souls, blood will always offer",
@@ -56,7 +57,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

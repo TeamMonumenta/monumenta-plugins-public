@@ -15,11 +15,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class EffectsList {
 	public static class Effect {
@@ -142,7 +143,7 @@ public class EffectsList {
 		// Only for custom effects
 		private final float mCustomEffectStrength;
 		private final float mCustomEffectDuration;
-		private final String mCustomEffectSource;
+		private final @Nullable String mCustomEffectSource;
 
 		// This constructor for custom effects used in EFFECT_RUNNER
 		public Effect(String name, float effectStrength) {
@@ -158,7 +159,7 @@ public class EffectsList {
 		}
 
 		// This constructor for custom effects used in CUSTOM_EFFECT_RUNNER
-		public Effect(String name, float effectDuration, float effectStrength, String effectSource) {
+		public Effect(String name, float effectDuration, float effectStrength, @Nullable String effectSource) {
 			mName = name;
 			mCustomEffectDuration = effectDuration;
 			mCustomEffectStrength = effectStrength;
@@ -232,7 +233,7 @@ public class EffectsList {
 
 		@FunctionalInterface
 		private interface CustomEffectRunner {
-			void apply(LivingEntity p, LivingEntity boss, float duration, float strength, String customEffectName);
+			void apply(LivingEntity p, LivingEntity boss, float duration, float strength, @Nullable String customEffectName);
 		}
 	}
 
@@ -321,7 +322,6 @@ public class EffectsList {
 
 			atLeastOneEffectIter = true;
 
-			final boolean foundPotionEffect;
 			final boolean foundCustomPotionEffect;
 			PotionEffectType effect = reader.readPotionEffectType();
 			String customEffect = null;
@@ -347,9 +347,7 @@ public class EffectsList {
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 				}
 				foundCustomPotionEffect = Effect.CUSTOM_EFFECT_RUNNER.get(customEffect) != null;
-				foundPotionEffect = false;
 			} else {
-				foundPotionEffect = true;
 				foundCustomPotionEffect = false;
 			}
 
@@ -359,7 +357,7 @@ public class EffectsList {
 
 			Long durationInTicks = 0L;
 			Double effectStrength = 0d;
-			if (foundPotionEffect || foundCustomPotionEffect) {
+			if (effect != null || foundCustomPotionEffect) {
 				durationInTicks = reader.readLong();
 				if (durationInTicks == null || durationInTicks <= 0) {
 					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "20", "Duration in ticks > 0")));
@@ -371,7 +369,7 @@ public class EffectsList {
 				}
 			}
 
-			if ((!foundPotionEffect && !foundCustomPotionEffect) || !reader.advance(",")) {
+			if ((effect == null && !foundCustomPotionEffect) || !reader.advance(",")) {
 				if (!reader.advance(")")) {
 					if (foundCustomPotionEffect) {
 						return ParseResult.of(Tooltip.arrayOf(
@@ -384,11 +382,11 @@ public class EffectsList {
 					}
 				}
 				// End of this effect, loop to next
-				if (foundPotionEffect) {
+				if (effect != null) {
 					effectsList.add(new Effect(effect, durationInTicks.intValue()));
 				} else {
 					//effect from effectRunner
-					effectsList.add(new Effect(customEffect, effectStrength.floatValue()));
+					effectsList.add(new Effect(Objects.requireNonNull(customEffect), effectStrength.floatValue()));
 				}
 				continue;
 			}
@@ -417,8 +415,8 @@ public class EffectsList {
 					}
 				}
 
-				if (foundCustomPotionEffect) {
-					effectsList.add(new Effect(customEffect, durationInTicks.floatValue(), amplifier.floatValue(), null));
+				if (effect == null) {
+					effectsList.add(new Effect(Objects.requireNonNull(customEffect), durationInTicks.floatValue(), amplifier.floatValue(), null));
 				} else {
 					effectsList.add(new Effect(effect, durationInTicks.intValue(), amplifier.intValue()));
 				}
@@ -436,7 +434,7 @@ public class EffectsList {
 
 
 			// End of this effect, loop to next
-			effectsList.add(new Effect(customEffect, durationInTicks.intValue(), amplifier.floatValue(), source));
+			effectsList.add(new Effect(Objects.requireNonNull(customEffect), durationInTicks.intValue(), amplifier.floatValue(), source));
 		}
 
 		return ParseResult.of(new EffectsList(effectsList));

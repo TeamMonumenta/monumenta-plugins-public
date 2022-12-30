@@ -41,7 +41,7 @@ public class EffectInteractable extends BasePricedInteractable {
 		mArmorStand.addScoreboardTag(TAG_STRING + "-" + mName + "-" + mType.name() + "-" + (mPrice != null ? mPrice : "null") + "-" + (mShowingText != null ? mShowingText : "null") + "-" + (mIsInteractable ? "True" : "False") + "-" + (mCommand != null ? mCommand : "null"));
 	}
 
-	public static EffectInteractable fromEntity(Entity entity) {
+	public static @Nullable EffectInteractable fromEntity(Entity entity) {
 		EffectInteractable interactable = null;
 
 		try {

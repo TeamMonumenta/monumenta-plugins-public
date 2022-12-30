@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -17,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class BossUtils {
 
@@ -115,7 +115,7 @@ public class BossUtils {
 		return bossDamagePercent(boss, target, percentHealth, location, raw, null);
 	}
 
-	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, String cause) {
+	public static boolean bossDamagePercent(@Nullable LivingEntity boss, LivingEntity target, double percentHealth, @Nullable String cause) {
 		return bossDamagePercent(boss, target, percentHealth, null, false, cause);
 	}
 

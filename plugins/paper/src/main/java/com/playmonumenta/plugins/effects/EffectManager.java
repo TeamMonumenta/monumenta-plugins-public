@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
@@ -37,6 +37,7 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class EffectManager implements Listener {
 
@@ -75,8 +76,7 @@ public final class EffectManager implements Listener {
 		}
 
 		public void addEffect(String source, Effect effect) {
-			Map<String, NavigableSet<Effect>> priorityEffects = mPriorityMap.get(effect.getPriority());
-
+			Map<String, NavigableSet<Effect>> priorityEffects = Objects.requireNonNull(mPriorityMap.get(effect.getPriority()));
 			NavigableSet<Effect> effectGroup = priorityEffects.computeIfAbsent(source, k -> new ConcurrentSkipListSet<>());
 
 			if (!effectGroup.isEmpty()) {
@@ -206,13 +206,12 @@ public final class EffectManager implements Listener {
 		}
 
 		public @Nullable String getSource(Effect effect) {
-			for (EffectPriority priority : mPriorityMap.keySet()) {
-				Map<String, NavigableSet<Effect>> sourceMap = mPriorityMap.get(priority);
-				for (String source : sourceMap.keySet()) {
+			for (Map<String, NavigableSet<Effect>> sourceMap : mPriorityMap.values()) {
+				for (Map.Entry<String, NavigableSet<Effect>> e : sourceMap.entrySet()) {
 					// manual loop instead of contains() to check for reference equality
-					for (Effect otherEffect : sourceMap.get(source)) {
+					for (Effect otherEffect : e.getValue()) {
 						if (effect == otherEffect) {
-							return source;
+							return e.getKey();
 						}
 					}
 				}
@@ -261,7 +260,7 @@ public final class EffectManager implements Listener {
 
 	@FunctionalInterface
 	public interface EffectDeserializer {
-		Effect deserialize(JsonObject object, Plugin plugin) throws Exception;
+		@Nullable Effect deserialize(JsonObject object, Plugin plugin) throws Exception;
 	}
 
 	private static final Map<String, EffectDeserializer> mEffectDeserializer;
@@ -341,8 +340,7 @@ public final class EffectManager implements Listener {
 
 	private final HashMap<Entity, Effects> mEntities = new HashMap<>();
 	private final BukkitRunnable mTimer;
-	private static @Nullable
-	EffectManager INSTANCE = null;
+	private static @Nullable EffectManager INSTANCE = null;
 
 	@SuppressWarnings("unchecked")
 	public EffectManager(Plugin plugin) {
@@ -460,7 +458,7 @@ public final class EffectManager implements Listener {
 	}
 
 	public static EffectManager getInstance() {
-		return INSTANCE;
+		return Objects.requireNonNull(INSTANCE);
 	}
 
 	/**
@@ -563,7 +561,7 @@ public final class EffectManager implements Listener {
 		return null;
 	}
 
-	public <T extends Effect> T getActiveEffect(Entity entity, Class<T> cls) {
+	public <T extends Effect> @Nullable T getActiveEffect(Entity entity, Class<T> cls) {
 		NavigableSet<T> effects = getEffects(entity, cls);
 		if (effects != null && effects.size() > 0) {
 			return effects.last();
@@ -892,17 +890,19 @@ public final class EffectManager implements Listener {
 					String source = getSource(player, effect);
 					// Recall Effect Gain Function to regain buffs one tick later.
 					effect.entityLoseEffect(player);
-					Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						NavigableSet<Effect> effectsInSource = getEffects(player, source);
-						// Ensure that:
-						// Effect is still top priority
-						// Effect duration has not run out.
-						// Only then do we re-apply the gain effect (things like speed attribute)
-						// Really, it's more insurance to ensure we don't have another bug in our hands due to all the delay stuff.
-						if (effectsInSource != null && effectsInSource.last() == effect && effectsInSource.last().getDuration() == effect.getDuration() && effect.getDuration() > 0) {
-							effect.entityGainEffect(player);
-						}
-					}, 1);
+					if (source != null) {
+						Bukkit.getScheduler().runTaskLater(plugin, () -> {
+							NavigableSet<Effect> effectsInSource = getEffects(player, source);
+							// Ensure that:
+							// Effect is still top priority
+							// Effect duration has not run out.
+							// Only then do we re-apply the gain effect (things like speed attribute)
+							// Really, it's more insurance to ensure we don't have another bug in our hands due to all the delay stuff.
+							if (effectsInSource != null && effectsInSource.last() == effect && effectsInSource.last().getDuration() == effect.getDuration() && effect.getDuration() > 0) {
+								effect.entityGainEffect(player);
+							}
+						}, 1);
+					}
 				}
 			}
 		}, 1);

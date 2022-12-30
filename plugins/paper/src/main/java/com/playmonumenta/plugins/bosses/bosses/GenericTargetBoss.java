@@ -14,6 +14,7 @@ import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericTargetBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_generictarget";
@@ -26,19 +27,17 @@ public class GenericTargetBoss extends BossAbilityGroup {
 		return new GenericTargetBoss(plugin, boss);
 	}
 
-	private LivingEntity mLastTarget = null;
+	private @Nullable LivingEntity mLastTarget = null;
 
 	public GenericTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
-		if (!(boss instanceof Mob)) {
+		if (!(boss instanceof Mob mob)) {
 			throw new Exception(identityTag + " only works on mobs!");
 		}
 
 		if (boss instanceof Wolf || boss instanceof Golem || boss instanceof Dolphin || boss instanceof Ocelot) {
 			boss.setRemoveWhenFarAway(true);
 		}
-
-		Mob mob = (Mob) boss;
 
 		final Parameters param = BossParameters.getParameters(boss, identityTag, new Parameters());
 

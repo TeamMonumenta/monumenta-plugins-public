@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -79,6 +78,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /* WARNING: Basically all the spell info in the comments is outdated.
  * Please use the Frost Giant Formal Write-up for up to date spell descriptions.
@@ -166,16 +166,14 @@ public class FrostGiant extends BossAbilityGroup {
 	//Range of those who are actively in the fight from the center of the arena
 	public static final int fighterRange = 36;
 
-	public static FrostGiant mInstance = null;
+	public static @Nullable FrostGiant mInstance = null;
 
 	//DO NOT USE - boss spawns 42 blocks above actual arena center
 	private final Location mSpawnLoc;
 
 	private final Location mEndLoc;
 	private static final String START_TAG = "FrostGiantStart";
-	//Giants hitboxes are huge as hell. We need a custom melee method
-	private LivingEntity mStart;
-	private Location mStartLoc;
+	private final Location mStartLoc;
 	private boolean mCutsceneDone = false;
 
 	//If the immune armor is active
@@ -233,7 +231,8 @@ public class FrostGiant extends BossAbilityGroup {
 		World world = boss.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 9999, 0));
-		mStart = null;
+		//Giants hitboxes are huge as hell. We need a custom melee method
+		LivingEntity start = null;
 		mInstance = this;
 
 		//Gets starting position from an armor stand with START_TAG
@@ -246,7 +245,7 @@ public class FrostGiant extends BossAbilityGroup {
 					default:
 						break;
 					case START_TAG:
-						mStart = e;
+						start = e;
 						break;
 					case NORTH:
 						mNorthStand = e;
@@ -264,7 +263,7 @@ public class FrostGiant extends BossAbilityGroup {
 			}
 		}
 
-		mStartLoc = mStart.getLocation();
+		mStartLoc = start != null ? start.getLocation() : boss.getLocation();
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mStartLoc, detectionRange);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
@@ -747,7 +746,7 @@ public class FrostGiant extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() <= 0) {
 			return;
@@ -773,8 +772,10 @@ public class FrostGiant extends BossAbilityGroup {
 		teleport(mStartLoc);
 		World world = mBoss.getWorld();
 
-		event.setCancelled(true);
-		event.setReviveHealth(100);
+		if (event != null) {
+			event.setCancelled(true);
+			event.setReviveHealth(100);
+		}
 
 		for (Player player : players) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);

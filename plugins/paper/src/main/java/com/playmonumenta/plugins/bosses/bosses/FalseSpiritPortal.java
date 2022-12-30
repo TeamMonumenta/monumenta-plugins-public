@@ -47,6 +47,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 public class FalseSpiritPortal extends BossAbilityGroup {
 	public static final String identityTag = "boss_falsespiritportal";
@@ -62,15 +63,15 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 	private int mPlayerCount;
 
-	private ItemStack mTrident = null;
-	private String mTridentName = null;
+	private @Nullable ItemStack mTrident = null;
+	private @Nullable String mTridentName = null;
 
 	private static final String SUMMON_TAG = "GoHSummon";
 	private List<ArmorStand> mGates = new ArrayList<>(2);
 
 	//WARNING: Ceiling Gate also requires normal SUMMON_TAG as well as SUMMON_CEILING_TAG
 	public static final String SUMMON_CEILING_TAG = "CeilingGoHSummon";
-	private LivingEntity mCeilingGate = null;
+	private @Nullable LivingEntity mCeilingGate = null;
 
 	private String mPortalNumTag = "";
 
@@ -385,7 +386,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				if (equalsTrident(item.getItemStack())) {
 					item.remove();
 				}
-			} else if (e instanceof Player player) {
+			} else if (e instanceof Player player && mTridentName != null) {
 				InventoryUtils.removeNamedItems(player, mTridentName);
 			} else if (e instanceof Trident trident) {
 				if (equalsTrident(trident.getItemStack())) {
@@ -436,7 +437,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		closePortal();
 	}
 }

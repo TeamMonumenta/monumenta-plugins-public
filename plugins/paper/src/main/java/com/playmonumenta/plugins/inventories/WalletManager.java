@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,22 +52,23 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 
 public class WalletManager implements Listener {
 
 	private static final String KEY_PLUGIN_DATA = "Wallet";
 
-	private static ImmutableList<ItemStack> MANUAL_SORT_ORDER;
+	private static @MonotonicNonNull ImmutableList<ItemStack> MANUAL_SORT_ORDER;
 
-	private static ImmutableList<ItemStack> MAIN_CURRENCIES;
+	private static @MonotonicNonNull ImmutableList<ItemStack> MAIN_CURRENCIES;
 
 	/**
 	 * Compressible currency items.
 	 * If an item has multiple compression levels, they must be ordered from most compressed to least compressed.
 	 * NB: some code depends on the assumption that only the base currencies have more than 2 tiers of compression.
 	 */
-	private static ImmutableList<CompressionInfo> COMPRESSIBLE_CURRENCIES;
+	private static @MonotonicNonNull ImmutableList<CompressionInfo> COMPRESSIBLE_CURRENCIES;
 
 	public static void initialize(Location loc) {
 
@@ -153,8 +155,8 @@ public class WalletManager implements Listener {
 		private final int mAmount;
 
 		CompressionInfo(String compressed, String base, int amount, Location loc) {
-			mCompressed = InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(compressed));
-			mBase = InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(base));
+			mCompressed = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(compressed)));
+			mBase = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(base)));
 			mAmount = amount;
 		}
 	}

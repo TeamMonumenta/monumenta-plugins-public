@@ -51,9 +51,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -96,6 +96,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * Lich:
@@ -116,11 +117,12 @@ public final class Lich extends BossAbilityGroup {
 	private static final String mShieldCrystal = "DeathCrystal";
 	private static final String mCrystalShield = "CrystalShield";
 	private final String mFinalCrystal = "WarpedCrystal";
-	private @Nullable static LivingEntity mStart;
-	private @Nullable LivingEntity mKey;
-	private final double mL = 26.5;
-	private final double mY = 14.5;
-	private final double mS = 8.5;
+	@SuppressWarnings("NullAway.Init")
+	private static LivingEntity mStart;
+	private final LivingEntity mKey;
+	private static final double mL = 26.5;
+	private static final double mY = 14.5;
+	private static final double mS = 8.5;
 	private int mPhase;
 	private final Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
 	private final List<Location> mCrystalLoc = new ArrayList<Location>();
@@ -167,14 +169,12 @@ public final class Lich extends BossAbilityGroup {
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
+		mStart = boss;
 		for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains(START_TAG) && e instanceof LivingEntity) {
 				mStart = (LivingEntity) e;
 				break;
 			}
-		}
-		if (mStart == null) {
-			return;
 		}
 
 		// load all the crystal spawn locations
@@ -212,18 +212,16 @@ public final class Lich extends BossAbilityGroup {
 		SpellDiesIrae.initDmg(0);
 
 		//summon key mob in shadow realm
-		mKey = (LivingEntity) LibraryOfSoulsIntegration.summon(mStart.getLocation().subtract(0, 41, 0), "ShadowPhylactery");
-		if (mKey != null) {
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty lichphylactery");
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty crystal");
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty Hekawt");
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
-			UUID keyUUID = mKey.getUniqueId();
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
-			mPhylactHealth = PHYLACT_HP * mDefenseScaling;
-			EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
-			mKey.setHealth(mPhylactHealth);
-		}
+		mKey = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(mStart.getLocation().subtract(0, 41, 0), "ShadowPhylactery"));
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty lichphylactery");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty crystal");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty Hekawt");
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
+		UUID keyUUID = mKey.getUniqueId();
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
+		mPhylactHealth = PHYLACT_HP * mDefenseScaling;
+		EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
+		mKey.setHealth(mPhylactHealth);
 
 		mDefeated = false;
 		mActivated = false;
@@ -480,6 +478,11 @@ public final class Lich extends BossAbilityGroup {
 											e.printStackTrace();
 										}
 									}
+									if (mSkull == null) {
+										cancel();
+										return;
+									}
+
 									new PartialParticle(Particle.SOUL_FIRE_FLAME, mSkull.getLocation(), 4, 0, 0, 0,
 										0.03).spawnAsEntityActive(boss);
 
@@ -871,18 +874,15 @@ public final class Lich extends BossAbilityGroup {
 
 	private void switchArmor(String armor) {
 		LivingEntity e = (LivingEntity) LibraryOfSoulsIntegration.summon(mSpawnLoc.clone().subtract(0, 10, 0), armor);
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
+		if (e != null) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				EntityEquipment equip = e.getEquipment();
 				mBoss.getEquipment().setArmorContents(equip.getArmorContents());
 				mBoss.getEquipment().setItemInMainHand(equip.getItemInMainHand());
 				mBoss.getEquipment().setItemInOffHand(equip.getItemInOffHand());
 				e.remove();
-			}
-
-		}.runTaskLater(mPlugin, 1);
+			});
+		}
 	}
 
 	private void knockback(World world, int r) {
@@ -1139,7 +1139,7 @@ public final class Lich extends BossAbilityGroup {
 		};
 
 		// summon undead + get undead
-		LivingEntity undead = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, summonNbt);
+		LivingEntity undead = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, summonNbt));
 
 		mSummoned.add(undead.getUniqueId());
 

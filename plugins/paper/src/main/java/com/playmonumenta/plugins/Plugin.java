@@ -73,7 +73,6 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -85,6 +84,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import org.jetbrains.annotations.Nullable;
 
 public class Plugin extends JavaPlugin {
 	public static final boolean IS_PLAY_SERVER;
@@ -138,7 +138,7 @@ public class Plugin extends JavaPlugin {
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
 	// INSTANCE is set if the plugin is properly enabled
-	@SuppressWarnings("initialization.static.field.uninitialized")
+	@SuppressWarnings({"initialization.static.field.uninitialized", "NullAway.Init"})
 	private static Plugin INSTANCE;
 
 	public static Plugin getInstance() {
@@ -146,7 +146,7 @@ public class Plugin extends JavaPlugin {
 	}
 
 	// fields are set as long as the plugin is properly enabled
-	@SuppressWarnings("initialization.fields.uninitialized")
+	@SuppressWarnings({"initialization.fields.uninitialized", "NullAway.Init"})
 	public Plugin() {
 	}
 
@@ -215,7 +215,7 @@ public class Plugin extends JavaPlugin {
 		GenerateCharms.register();
 		JingleBells.register();
 		Spawn.register();
-		Stuck.register(this);
+		Stuck.register();
 		GlowingCommand.register();
 		VirtualFirmament.register();
 		RocketJump.register();
@@ -391,7 +391,8 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WitchListener(this), this);
 		manager.registerEvents(new SeasonalEventListener(), this);
 		manager.registerEvents(CosmeticsManager.getInstance(), this);
-		manager.registerEvents(new LootTableManager(), this);
+		LootTableManager.INSTANCE.reload();
+		manager.registerEvents(LootTableManager.INSTANCE, this);
 		manager.registerEvents(new CharmListener(this), this);
 		manager.registerEvents(new QuiverListener(), this);
 		manager.registerEvents(new ToggleTrail(), this);
@@ -407,7 +408,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new PotionBarrelListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
-			manager.registerEvents(new DepthsListener(this), this);
+			manager.registerEvents(new DepthsListener(), this);
 		}
 
 		if (ServerProperties.getShardName().contains("gallery")
@@ -547,6 +548,7 @@ public class Plugin extends JavaPlugin {
 
 	//  Logic that is performed upon disabling the plugin.
 	@Override
+	@SuppressWarnings("NullAway") // we set INSTANCE to null to find bugs easier
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
@@ -580,7 +582,7 @@ public class Plugin extends JavaPlugin {
 	}
 
 	/* Sender will be sent debugging info if non-null */
-	public void reloadMonumentaConfig(CommandSender sender) {
+	public void reloadMonumentaConfig(@Nullable CommandSender sender) {
 		ServerProperties.load(this, sender);
 	}
 

@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -26,6 +25,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public class ShieldBash extends Ability {
@@ -86,7 +86,7 @@ public class ShieldBash extends Ability {
 					world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
 					world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
 
-					bash(mob, mInfo.getLinkedSpell());
+					bash(mob, ClassAbility.SHIELD_BASH);
 					if (isLevelTwo()) {
 						Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS));
 						for (LivingEntity le : hitbox.getHitMobs(mob)) {
@@ -114,7 +114,7 @@ public class ShieldBash extends Ability {
 		// And ShieldBash is on CD...
 		if (isEnhanced() && mPlayer.getHandRaisedTime() < ENHANCEMENT_BLOCKING_DURATION && event.isBlockedByShield() && isOnCooldown() && !mIsEnhancementUsed) {
 			// Reduce cooldown by half of shield bash's CD.
-			mPlugin.mTimers.updateCooldown(mPlayer, mInfo.getLinkedSpell(), getModifiedCooldown() / 2);
+			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.SHIELD_BASH, getModifiedCooldown() / 2);
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 2);
 
 			mIsEnhancementUsed = true;

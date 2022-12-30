@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class FlatDamageDealt extends Effect {
 	public static final String effectID = "FlatDamageDealt";

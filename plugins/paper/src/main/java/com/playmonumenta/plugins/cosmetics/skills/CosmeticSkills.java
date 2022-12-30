@@ -42,9 +42,10 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.ColossalBruteCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloryExecutionCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.PrestigiousSlamCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.PrestigiousShieldCS;
+import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class CosmeticSkills {
 
@@ -153,12 +154,12 @@ public class CosmeticSkills {
 			.build();
 	}
 
-	public static Cosmetic getCosmeticByName(String name) {
+	public static @Nullable Cosmetic getCosmeticByName(String name) {
 		CosmeticSkill cs = COSMETIC_SKILLS.getOrDefault(name, null);
 		return cs != null ? cs.getCosmetic() : null;
 	}
 
-	public static CosmeticSkill getCosmeticSkill(String name) {
+	public static @Nullable CosmeticSkill getCosmeticSkill(String name) {
 		return COSMETIC_SKILLS.getOrDefault(name, null);
 	}
 
@@ -187,7 +188,7 @@ public class CosmeticSkills {
 	public static ImmutableList<String> getDepthsNames() {
 		ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
 		for (DepthsCS cs : getDepthsSkins()) {
-			builder.add(((CosmeticSkill) cs).getName());
+			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
 		return builder.build();
 	}
@@ -211,7 +212,7 @@ public class CosmeticSkills {
 	public static ImmutableList<String> getGalleryNames() {
 		ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
 		for (GalleryCS cs : getGallerySkins()) {
-			builder.add(((CosmeticSkill) cs).getName());
+			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
 		return builder.build();
 	}
@@ -223,7 +224,7 @@ public class CosmeticSkills {
 	public static ImmutableList<String> getPrestigeNames() {
 		ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
 		for (PrestigeCS cs : getPrestigeSkins()) {
-			builder.add(((CosmeticSkill) cs).getName());
+			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
 		return builder.build();
 	}

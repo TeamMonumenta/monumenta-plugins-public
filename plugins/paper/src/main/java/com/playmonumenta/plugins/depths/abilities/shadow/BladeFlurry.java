@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -65,7 +66,7 @@ public class BladeFlurry extends DepthsAbility {
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
 
 		new BukkitRunnable() {
-			Vector mEyeDir = loc.getDirection();
+			final Vector mEyeDir = loc.getDirection();
 
 			double mStartAngle = Math.atan(mEyeDir.getZ()/mEyeDir.getX());
 			int mIncrementDegrees = 0;
@@ -81,7 +82,7 @@ public class BladeFlurry extends DepthsAbility {
 				Vector direction = new Vector(Math.cos(mStartAngle - Math.PI * mIncrementDegrees / 180), 0, Math.sin(mStartAngle - Math.PI * mIncrementDegrees / 180));
 				Location bladeLoc = mLoc.clone().add(direction.clone().multiply(3.0));
 
-				mWorld.spawnParticle(Particle.SPELL_WITCH, bladeLoc, 10, 0.35, 0, 0.35, 1);
+				new PartialParticle(Particle.SPELL_WITCH, bladeLoc, 10, 0.35, 0, 0.35, 1).spawnAsPlayerActive(mPlayer);
 				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 
 				if (mIncrementDegrees >= 360) {

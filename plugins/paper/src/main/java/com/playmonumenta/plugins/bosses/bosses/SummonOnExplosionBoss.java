@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class SummonOnExplosionBoss extends BossAbilityGroup {
 
@@ -58,7 +59,7 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (event == null) {
 			//it exploded
 			mParam.PARTICLES.spawn(mBoss, mBoss.getLocation().clone().add(0, 0.5, 0));

@@ -18,11 +18,12 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellFrostGiantBlockBreak extends Spell {
 	private Entity mLauncher;
 	private List<Material> mNoBreak;
-	private Location mStartLoc;
+	private @Nullable Location mStartLoc;
 
 	private int mXRad;
 	private int mYRad;
@@ -40,7 +41,7 @@ public class SpellFrostGiantBlockBreak extends Spell {
 		this(launcher, xRad, yRad, zRad, null, Material.AIR);
 	}
 
-	public SpellFrostGiantBlockBreak(Entity launcher, int xRad, int yRad, int zRad, Location spawn, Material... noBreak) {
+	public SpellFrostGiantBlockBreak(Entity launcher, int xRad, int yRad, int zRad, @Nullable Location spawn, Material... noBreak) {
 		mLauncher = launcher;
 		mXRad = xRad;
 		mYRad = yRad;

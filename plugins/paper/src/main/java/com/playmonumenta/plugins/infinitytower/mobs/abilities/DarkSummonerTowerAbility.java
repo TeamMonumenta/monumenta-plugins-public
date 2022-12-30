@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 
@@ -33,12 +34,11 @@ public class DarkSummonerTowerAbility extends TowerAbility {
 					return;
 				}
 				try {
-					LivingEntity livingEntity = (LivingEntity) LibraryOfSoulsIntegration.summon(mBoss.getLocation(), SUMMONS.get(FastUtils.RANDOM.nextInt(SUMMONS.size())));
-
+					LivingEntity livingEntity = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(mBoss.getLocation(), SUMMONS.get(FastUtils.RANDOM.nextInt(SUMMONS.size()))));
 					String mobName = livingEntity.getName().replace("IT", "");
 					livingEntity.customName(TowerGameUtils.getMobNameComponent(mobName, mIsPlayerMob));
 					livingEntity.setCustomNameVisible(true);
-					livingEntity.addScoreboardTag(mMob.mInfo.mMobRarity.getTag() + "_" + mMob.mMobLevel);
+					livingEntity.addScoreboardTag(mob.mInfo.mMobRarity.getTag() + "_" + mob.mMobLevel);
 					livingEntity.addScoreboardTag(TowerMobClass.SPECIAL.getTag());
 					livingEntity.addScoreboardTag(TowerConstants.MOB_TAG);
 					livingEntity.addScoreboardTag(mIsPlayerMob ? TowerConstants.MOB_TAG_PLAYER_TEAM : TowerConstants.MOB_TAG_FLOOR_TEAM);

@@ -19,6 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -76,8 +77,11 @@ public class SeasonalPass {
 
 				JsonObject toParse = missionElement.getAsJsonObject();
 
-				SeasonalReward reward = new SeasonalReward();
-				reward.mType = SeasonalRewardType.getRewardTypeSelection(toParse.get("type").getAsString());
+				SeasonalRewardType type = SeasonalRewardType.getRewardTypeSelection(toParse.get("type").getAsString());
+				if (type == null) {
+					continue;
+				}
+				SeasonalReward reward = new SeasonalReward(type);
 
 				if (toParse.get("data") != null) {
 					reward.mData = toParse.get("data").getAsString();
@@ -373,13 +377,13 @@ public class SeasonalPass {
 		}
 		switch (reward.mType) {
 			case ELITE_FINISHER:
-				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.ELITE_FINISHER, reward.mData);
+				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.ELITE_FINISHER, Objects.requireNonNull(reward.mData));
 				break;
 			case TITLE:
-				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, reward.mData);
+				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, Objects.requireNonNull(reward.mData));
 				break;
 			case PLOT_BORDER:
-				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.PLOT_BORDER, reward.mData);
+				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.PLOT_BORDER, Objects.requireNonNull(reward.mData));
 				break;
 			case ITEM_SKIN:
 				for (int i = 0; i < amount; i++) {
@@ -398,7 +402,7 @@ public class SeasonalPass {
 				break;
 			case LOOT_TABLE:
 				for (int i = 0; i < amount; i++) {
-					givePlayerLootTable(p, reward.mData);
+					givePlayerLootTable(p, Objects.requireNonNull(reward.mData));
 				}
 				break;
 			case SHULKER_BOX:

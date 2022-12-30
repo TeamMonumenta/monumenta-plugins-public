@@ -156,7 +156,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -189,6 +188,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AbilityManager {
 
@@ -196,7 +197,7 @@ public class AbilityManager {
 	private static final String RIGHT_CLICK_TICK_METAKEY = "IgnoreRightClicksUntil";
 	private static final float DEFAULT_WALK_SPEED = 0.2f;
 
-	private static @Nullable AbilityManager mManager = null;
+	private static @MonotonicNonNull AbilityManager mManager = null;
 
 	private final Plugin mPlugin;
 	private final List<AbilityInfo<?>> mReferenceAbilities;
@@ -1005,16 +1006,24 @@ public class AbilityManager {
 	}
 
 	public @Nullable AbilityTrigger getCustomTrigger(Player player, AbilityInfo<?> ability, String triggerId) {
+		ClassAbility classAbility = ability.getLinkedSpell();
+		if (classAbility == null) {
+			return null;
+		}
 		Map<String, AbilityTrigger> triggerMap = mCustomTriggers.get(player.getUniqueId());
 		if (triggerMap == null) {
 			return null;
 		}
-		return triggerMap.get(ability.getLinkedSpell().name() + "_" + triggerId);
+		return triggerMap.get(classAbility.name() + "_" + triggerId);
 	}
 
 	public void setCustomTrigger(Player player, AbilityInfo<?> ability, String triggerId, @Nullable AbilityTrigger trigger) {
+		ClassAbility classAbility = ability.getLinkedSpell();
+		if (classAbility == null) {
+			return;
+		}
 		Map<String, AbilityTrigger> triggerMap = mCustomTriggers.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
-		String key = ability.getLinkedSpell().name() + "_" + triggerId;
+		String key = classAbility.name() + "_" + triggerId;
 		if (trigger == null) {
 			triggerMap.remove(key);
 		} else {

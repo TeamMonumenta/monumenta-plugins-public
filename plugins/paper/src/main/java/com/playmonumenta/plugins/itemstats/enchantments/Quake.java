@@ -112,7 +112,7 @@ public class Quake implements Enchantment {
 			}
 			if (wind > 0) {
 				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
-				player.getWorld().spawnParticle(Particle.CLOUD, target.getLocation(), 25, 1.5, 1.5, 1.5);
+				new PartialParticle(Particle.CLOUD, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 		}
 	}

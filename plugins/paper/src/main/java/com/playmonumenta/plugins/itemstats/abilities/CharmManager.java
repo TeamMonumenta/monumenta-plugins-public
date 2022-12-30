@@ -159,6 +159,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class CharmManager {
 
@@ -167,7 +168,7 @@ public class CharmManager {
 	public static final String KEY_ITEM = "item";
 	public static final int MAX_CHARM_COUNT = 7;
 
-	public static CharmManager mInstance;
+	public static final CharmManager INSTANCE = new CharmManager();
 
 	public List<String> mCharmEffectList;
 
@@ -177,34 +178,32 @@ public class CharmManager {
 
 	public Map<UUID, Map<String, Double>> mPlayerCharmEffectMap;
 
+	@SuppressWarnings("NullAway.Init") // fields are initialised by called methods
 	private CharmManager() {
 		mPlayerCharms = new HashMap<>();
-		mPlayerCharmEffectMap = new HashMap<UUID, Map<String, Double>>();
+		mPlayerCharmEffectMap = new HashMap<>();
 		loadCharmEffects();
 		loadFlippedColorEffects();
 	}
 
 	public static CharmManager getInstance() {
-		if (mInstance == null) {
-			mInstance = new CharmManager();
-		}
-		return mInstance;
+		return INSTANCE;
 	}
 
 	// Adding new Charm Effects:
 	// Add the string in this list, with other effects from the same ability/enchantment
 	// If it is a "debuff" (i.e. a greater number is worse), then ALSO list it in the next method
-	public void loadCharmEffects() {
+	private void loadCharmEffects() {
 		mCharmEffectList = Arrays.asList(
-			// Custom Enchantments
-			Inferno.CHARM_DAMAGE,
-			ThunderAspect.CHARM_STUN_CHANCE,
-			IceAspect.CHARM_DURATION,
-			IceAspect.CHARM_SLOW,
-			Decay.CHARM_DAMAGE,
-			Decay.CHARM_DURATION,
-			Sapper.CHARM_HEAL,
-			HexEater.CHARM_DAMAGE,
+				// Custom Enchantments
+				Inferno.CHARM_DAMAGE,
+				ThunderAspect.CHARM_STUN_CHANCE,
+				IceAspect.CHARM_DURATION,
+				IceAspect.CHARM_SLOW,
+				Decay.CHARM_DAMAGE,
+				Decay.CHARM_DURATION,
+				Sapper.CHARM_HEAL,
+				HexEater.CHARM_DAMAGE,
 			LifeDrain.CHARM_HEAL,
 			Retrieval.CHARM_CHANCE,
 			Regicide.CHARM_DAMAGE,
@@ -755,17 +754,17 @@ public class CharmManager {
 		);
 	}
 
-	public void loadFlippedColorEffects() {
+	private void loadFlippedColorEffects() {
 		mFlippedColorEffectSubstrings = Arrays.asList(
-			JunglesNourishment.CHARM_COOLDOWN,
-			RageOfTheKeter.CHARM_COOLDOWN,
-			IntoxicatingWarmth.CHARM_COOLDOWN,
-			TemporalBender.CHARM_COOLDOWN,
-			LiquidCourage.CHARM_COOLDOWN,
-			ElementalArrows.CHARM_THUNDER_COOLDOWN,
-			ManaLance.CHARM_COOLDOWN,
-			ThunderStep.CHARM_COOLDOWN,
-			PrismaticShield.CHARM_COOLDOWN,
+				JunglesNourishment.CHARM_COOLDOWN,
+				RageOfTheKeter.CHARM_COOLDOWN,
+				IntoxicatingWarmth.CHARM_COOLDOWN,
+				TemporalBender.CHARM_COOLDOWN,
+				LiquidCourage.CHARM_COOLDOWN,
+				ElementalArrows.CHARM_THUNDER_COOLDOWN,
+				ManaLance.CHARM_COOLDOWN,
+				ThunderStep.CHARM_COOLDOWN,
+				PrismaticShield.CHARM_COOLDOWN,
 			FrostNova.CHARM_COOLDOWN,
 			MagmaShield.CHARM_COOLDOWN,
 			ArcaneStrike.CHARM_COOLDOWN,
@@ -932,10 +931,14 @@ public class CharmManager {
 	}
 
 
-	public boolean clearCharms(Player p) {
-		mPlayerCharms.get(p.getUniqueId()).clear();
-		updateCharms(p, mPlayerCharms.get(p.getUniqueId()));
-		return true;
+	public void clearCharms(Player p) {
+		List<ItemStack> charms = mPlayerCharms.computeIfAbsent(p.getUniqueId(), key -> new ArrayList<>());
+		charms.clear();
+		updateCharms(p, charms);
+	}
+
+	public void updateCharms(Player p) {
+		updateCharms(p, mPlayerCharms.computeIfAbsent(p.getUniqueId(), key -> new ArrayList<>()));
 	}
 
 	public void updateCharms(Player p, List<ItemStack> equippedCharms) {
@@ -1003,16 +1006,16 @@ public class CharmManager {
 		return 0;
 	}
 
-	public String getSummaryOfAllAttributes(Player p) {
+	public @Nullable String getSummaryOfAllAttributes(Player p) {
 		Map<String, Double> allEffects = mPlayerCharmEffectMap.get(p.getUniqueId());
 		if (allEffects != null) {
 			String summary = "";
-			for (String s : allEffects.keySet()) {
-				if (allEffects.get(s) != 0) {
-					if (s.contains("%")) {
-						summary += s + " : " + (allEffects.get(s).toString() + 100) + "%" + "\n";
+			for (Map.Entry<String, Double> e : allEffects.entrySet()) {
+				if (e.getValue() != 0) {
+					if (e.getKey().contains("%")) {
+						summary += e.getKey() + " : " + (e.getValue().toString() + 100) + "%" + "\n";
 					} else {
-						summary += s + " : " + allEffects.get(s).toString() + "\n";
+						summary += e.getKey() + " : " + e.getValue().toString() + "\n";
 					}
 				}
 			}
@@ -1042,15 +1045,16 @@ public class CharmManager {
 
 		List<Component> components = new ArrayList<>();
 		for (String s : orderedEffects) {
-			if (allEffects.get(s) != 0) {
+			Double value = allEffects.getOrDefault(s, 0.0);
+			if (value != 0) {
 
 				// Strip ugly .0s
-				String desc = s + " : " + allEffects.get(s).toString();
+				String desc = s + " : " + value;
 				if (desc.endsWith(".0")) {
 					desc = desc.substring(0, desc.length() - 2);
 				}
 
-				String charmColor = getCharmEffectColor(allEffects.get(s) > 0, s.replace("%", ""));
+				String charmColor = getCharmEffectColor(allEffects.getOrDefault(s, 0.0) > 0, s.replace("%", ""));
 
 				if (s.contains("%")) {
 					desc += "%";
@@ -1076,7 +1080,7 @@ public class CharmManager {
 			summary += ChatColor.YELLOW + "Charm Power: " + powerBudget;
 			return summary;
 		}
-		return null;
+		return ChatColor.GRAY + "no charms";
 	}
 
 	public int getCharmPower(Player p) {
@@ -1210,14 +1214,14 @@ public class CharmManager {
 	public static String getCharmEffectColor(boolean isPositive, String charmEffectName) {
 		String outColor = "#4AC2E5";
 		if (isPositive) {
-			for (String s : mInstance.mFlippedColorEffectSubstrings) {
+			for (String s : INSTANCE.mFlippedColorEffectSubstrings) {
 				if (charmEffectName.endsWith(s)) {
 					outColor = "#D02E28";
 					return outColor;
 				}
 			}
 		} else {
-			for (String s : mInstance.mFlippedColorEffectSubstrings) {
+			for (String s : INSTANCE.mFlippedColorEffectSubstrings) {
 				if (charmEffectName.endsWith(s)) {
 					return outColor;
 				}

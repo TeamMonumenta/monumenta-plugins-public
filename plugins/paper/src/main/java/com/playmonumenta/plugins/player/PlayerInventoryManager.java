@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.Objects;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -21,6 +20,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerInventoryManager {
 	/*
@@ -52,6 +52,7 @@ public class PlayerInventoryManager {
 		updateItemLastCheck(slot, inv[slot]);
 	}
 
+	@SuppressWarnings("NullAway") // nullaway bug - arrays are non-null, elements are nullable
 	public void updateItemLastCheck(int slot, @Nullable ItemStack item) {
 		if (item == null) {
 			mInventoryLastCheck[slot] = null;
@@ -62,10 +63,9 @@ public class PlayerInventoryManager {
 
 	public void updateEquipmentProperties(Plugin plugin, Player player, @Nullable Event event) {
 		// Updates different indexes for custom enchant depending on the event given, if null or not listed, rescan everything
-		if (event instanceof InventoryClickEvent) {
-			InventoryClickEvent invClickEvent = (InventoryClickEvent) event;
+		if (event instanceof InventoryClickEvent invClickEvent) {
 			if (invClickEvent.getSlotType() == InventoryType.SlotType.CRAFTING
-				|| invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
+				    || invClickEvent.isShiftClick() || invClickEvent.getSlot() == -1) {
 				mNeedsUpdate = true;
 				return;
 			} else if (invClickEvent.isRightClick() && ShulkerEquipmentListener.isEquipmentBox(invClickEvent.getCurrentItem())) {
@@ -133,6 +133,7 @@ public class PlayerInventoryManager {
 		if (slot < 0 || slot > 40) {
 			return false;
 		}
+		@SuppressWarnings("NullAway")
 		@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
 		@Nullable ItemStack currentItem = player.getInventory().getContents()[slot];
 		return !Objects.equals(oldItem, currentItem);
@@ -145,6 +146,7 @@ public class PlayerInventoryManager {
 		ItemStack droppedItem = event.getItemDrop().getItemStack();
 
 		for (int slot = 0; slot <= 40; slot++) {
+			@SuppressWarnings("NullAway")
 			@Nullable ItemStack oldItem = mInventoryLastCheck[slot];
 			if (oldItem == null || !droppedItem.isSimilar(oldItem)) {
 				continue;

@@ -3,12 +3,13 @@ package com.playmonumenta.plugins.integrations;
 import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 public class LibraryOfSoulsIntegration {
 	private static boolean ENABLED = false;
@@ -25,45 +26,45 @@ public class LibraryOfSoulsIntegration {
 		return null;
 	}
 
-	public static @Nullable Set<String> getSoulNames() {
+	public static Set<String> getSoulNames() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulNames();
 		}
-		return null;
+		return Collections.emptySet();
 	}
 
-	public static @Nullable Set<String> getSoulLocations() {
+	public static Set<String> getSoulLocations() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulLocations();
 		}
-		return null;
+		return Collections.emptySet();
 	}
 
-	public static @Nullable Set<String> getPoolNames() {
+	public static Set<String> getPoolNames() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulPoolNames();
 		}
-		return null;
+		return Collections.emptySet();
 	}
 
-	public static @Nullable Set<String> getGroupNames() {
+	public static Set<String> getGroupNames() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulGroupNames();
 		}
-		return null;
+		return Collections.emptySet();
 	}
 
-	public static @Nullable Set<String> getPartyNames() {
+	public static Set<String> getPartyNames() {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getSoulPartyNames();
 		}
-		return null;
+		return Collections.emptySet();
 	}
 
-	public static @Nullable Map<Soul, Integer> getPool(String pool) {
+	public static Map<Soul, Integer> getPool(String pool) {
 		if (ENABLED) {
 			return LibraryOfSoulsAPI.getRandomSouls(pool, FastUtils.RANDOM);
 		}
-		return null;
+		return Collections.emptyMap();
 	}
 }

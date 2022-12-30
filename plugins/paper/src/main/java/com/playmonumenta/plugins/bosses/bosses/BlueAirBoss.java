@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class BlueAirBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blueair";
@@ -41,7 +42,7 @@ public class BlueAirBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		double chance = FastUtils.RANDOM.nextDouble();
 
 		if (chance < SPAWN_CHANCE[mBlueTimeOfDay]) {

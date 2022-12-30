@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ThuribleBonusHealing extends SingleArgumentEffect {
 	public static final String effectID = "ThuribleBonusHealing";

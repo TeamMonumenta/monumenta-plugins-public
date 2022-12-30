@@ -31,7 +31,7 @@ public class SpawnerListener implements Listener {
 	private static final int PLAYER_LOGOUT_MOB_PERSIST_TICKS = Constants.TEN_MINUTES;
 
 	private static class MobInfo {
-		private WeakReference<@Nullable LivingEntity> mMob;
+		private WeakReference<LivingEntity> mMob;
 		private UUID mUUID;
 		private boolean mDespawned = false;
 		private boolean mHasTarget = false;
@@ -118,7 +118,7 @@ public class SpawnerListener implements Listener {
 
 					// If the mob has NOT despawned but is dead or was removed, remove this tracker
 					if (!info.checkUpdatePersistent() && !info.isDespawned() && (mob == null || mob.isDead() || !mob.isValid())) {
-						MMLog.fine(() -> "SpawnerListener: Removing non-persistent, non-despawned dead mob from mMobInfos: " + mob.getUniqueId());
+						MMLog.fine(() -> "SpawnerListener: Removing non-persistent, non-despawned dead mob from mMobInfos: " + info.getUniqueId());
 						mobInfoIter.remove();
 					}
 				}
@@ -141,7 +141,7 @@ public class SpawnerListener implements Listener {
 						MMLog.finer(() -> "SpawnerListener:    " + loc.getWorld().getName() + "(" + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + ") " + info.toString());
 
 						if (!info.checkUpdatePersistent() && !info.isDespawned() && (mob == null || mob.isDead() || !mob.isValid())) {
-							MMLog.fine(() -> "SpawnerListener: Removing non-persistent, non-despawned dead mob from mSpawnerInfos: " + mob.getUniqueId());
+							MMLog.fine(() -> "SpawnerListener: Removing non-persistent, non-despawned dead mob from mSpawnerInfos: " + info.getUniqueId());
 							spawnerListIter.remove();
 						}
 					}

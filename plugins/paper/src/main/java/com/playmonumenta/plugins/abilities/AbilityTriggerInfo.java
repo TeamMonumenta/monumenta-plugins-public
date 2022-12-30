@@ -93,7 +93,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 		return mTrigger;
 	}
 
-	public TriggerRestriction getRestriction() {
+	public @Nullable TriggerRestriction getRestriction() {
 		return mRestriction;
 	}
 

@@ -21,6 +21,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class RitualRingCS extends TransmRingCS implements GalleryCS {
 	//Gallery map1: blood theme
@@ -32,7 +33,7 @@ public class RitualRingCS extends TransmRingCS implements GalleryCS {
 	private static final BlockData BLOOD_BLOCK = Bukkit.createBlockData(Material.REDSTONE_BLOCK);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, RitualRingCS.NAME, false, this.getAbilityName(),
 			"An eldritch ritual twisted space. You",
 			"gazed upon unholy sacrifice and felt a",
@@ -51,7 +52,7 @@ public class RitualRingCS extends TransmRingCS implements GalleryCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

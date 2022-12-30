@@ -45,6 +45,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class PortalBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_portalfight";
@@ -275,7 +276,7 @@ public final class PortalBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" DESTR\",\"color\":\"red\"},{\"text\":\"6\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Y... INTRU\",\"color\":\"red\"},{\"text\":\"4\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"DER...\",\"color\":\"red\"},{\"text\":\"65789\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" Thank… you… tell Bermuda… that thing… it broke me… I didn’t mean to…\",\"color\":\"blue\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {

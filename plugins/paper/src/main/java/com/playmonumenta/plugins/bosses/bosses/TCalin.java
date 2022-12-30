@@ -39,6 +39,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class TCalin extends BossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
@@ -120,7 +121,7 @@ public final class TCalin extends BossAbilityGroup {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0.2, 0.2, 0.2, 0.125).spawnAsEntityActive(boss);
 			},
 
-			(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+			(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 				if (!blocked && player != null) {
 					BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 12, prevLoc);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, 1));
@@ -308,7 +309,7 @@ public final class TCalin extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}

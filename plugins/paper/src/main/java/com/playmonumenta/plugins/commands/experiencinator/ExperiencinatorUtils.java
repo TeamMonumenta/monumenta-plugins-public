@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,6 +28,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class ExperiencinatorUtils {
 
@@ -38,7 +40,7 @@ public abstract class ExperiencinatorUtils {
 	private ExperiencinatorUtils() {
 	}
 
-	private static void reloadConfig(Location lootTableLocation) {
+	private static ExperiencinatorConfig reloadConfig(Location lootTableLocation) {
 		try {
 			if (mConfigFile == null) {
 				mConfigFile = new File(Plugin.getInstance().getDataFolder(), "experiencinator_config.json");
@@ -56,15 +58,18 @@ public abstract class ExperiencinatorUtils {
 		if (mConfig == null) { // load blank config on failure if this is the first load, otherwise keep old config
 			mConfig = new ExperiencinatorConfig();
 		}
+		return mConfig;
 	}
 
-	public static ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation) {
+	@Contract("!null -> !null")
+	public static @Nullable ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation) {
 		return getConfig(lootTableLocation, true);
 	}
 
-	public static ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation, boolean reload) {
+	@Contract("!null, _ -> !null")
+	public static @Nullable ExperiencinatorConfig getConfig(@Nullable Location lootTableLocation, boolean reload) {
 		if (lootTableLocation != null && (mConfig == null || reload)) {
-			reloadConfig(lootTableLocation);
+			return reloadConfig(lootTableLocation);
 		}
 		return mConfig;
 	}
@@ -184,8 +189,7 @@ public abstract class ExperiencinatorUtils {
 		int totalValue = sellValue;
 		int remainingValue = sellValue;
 		try {
-			List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
-			assert conversionResults != null : "@AssumeAssertion(nullness): if a sell value is set, a conversion must exist for that value to have been calculated";
+			List<ExperiencinatorConfig.ConversionResult> conversionResults = Objects.requireNonNull(conversion.getConversionResults(region));
 			// sort by value ascending
 			conversionResults.sort(Comparator.comparingInt(ExperiencinatorConfig.ConversionResult::getValue));
 

@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 
@@ -30,7 +31,7 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_TINY = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 0.65f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"RONDE_DESC"
 		);
@@ -47,7 +48,7 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

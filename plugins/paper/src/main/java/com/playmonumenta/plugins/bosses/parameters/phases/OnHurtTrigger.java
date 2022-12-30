@@ -8,11 +8,12 @@ import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class OnHurtTrigger extends Trigger {
 
-	private final ClassAbility mClassAbility;
-	private final DamageEvent.DamageType mDamageType;
+	private final @Nullable ClassAbility mClassAbility;
+	private final @Nullable DamageEvent.DamageType mDamageType;
 	private final Double mTotalDamage;
 	private double mCurrentDamage = 0;
 
@@ -44,7 +45,8 @@ public class OnHurtTrigger extends Trigger {
 		mCurrentDamage = 0;
 	}
 
-	@Override public boolean onHurt(LivingEntity boss, LivingEntity damager, DamageEvent event) {
+	@Override
+	public boolean onHurt(LivingEntity boss, @Nullable LivingEntity damager, DamageEvent event) {
 		if (event.getAbility() == mClassAbility && mClassAbility != null) {
 			mCurrentDamage += event.getFinalDamage(true);
 		} else if (event.getType() == mDamageType) {

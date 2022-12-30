@@ -19,18 +19,21 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerFileUtils {
 
 
 	public static final List<TowerMobInfo> TOWER_MOBS_INFO = new ArrayList<>();
 
-	public static final Map<TowerMobRarity, List<TowerMobInfo>> TOWER_MOBS_RARITY_MAP = new LinkedHashMap<>();
+	private static final Map<TowerMobRarity, List<TowerMobInfo>> TOWER_MOBS_RARITY_MAP = new LinkedHashMap<>();
 
 	public static final List<TowerTeam> DEFAULT_TEAMS = new ArrayList<>();
 
@@ -38,12 +41,8 @@ public class TowerFileUtils {
 
 	public static final Map<Integer, List<TowerFloor>> TOWER_FLOORS_LOCATION_MAP = new LinkedHashMap<>();
 
-
-	static {
-		TOWER_MOBS_RARITY_MAP.put(TowerMobRarity.COMMON, new ArrayList<>());
-		TOWER_MOBS_RARITY_MAP.put(TowerMobRarity.RARE, new ArrayList<>());
-		TOWER_MOBS_RARITY_MAP.put(TowerMobRarity.EPIC, new ArrayList<>());
-		TOWER_MOBS_RARITY_MAP.put(TowerMobRarity.LEGENDARY, new ArrayList<>());
+	public static List<TowerMobInfo> getMobsByRarity(TowerMobRarity rarity) {
+		return TOWER_MOBS_RARITY_MAP.computeIfAbsent(rarity, key -> new ArrayList<>());
 	}
 
 	public static void loadTowerMobsInfo() {
@@ -52,19 +51,21 @@ public class TowerFileUtils {
 
 		try {
 			JsonObject obj = readFile("TowerMobs.json");
-			int size = obj.getAsJsonPrimitive("size").getAsInt();
+			int size = Objects.requireNonNull(obj).getAsJsonPrimitive("size").getAsInt();
 
 			JsonArray arr = obj.getAsJsonArray("mobsinfo");
 			for (int i = 0; i < size; i++) {
 				TowerMobInfo info = TowerMobInfo.fromJson(arr.get(i).getAsJsonObject());
-				TOWER_MOBS_INFO.add(info);
+				if (info != null) {
+					TOWER_MOBS_INFO.add(info);
 
-				if (info.mBuyable) {
-					TOWER_MOBS_RARITY_MAP.get(info.mMobRarity).add(info);
+					if (info.mBuyable) {
+						getMobsByRarity(info.mMobRarity).add(info);
+					}
 				}
 			}
 		} catch (Exception e) {
-			warning(e.getMessage());
+			warning(e.toString());
 			e.printStackTrace();
 			TowerConstants.SHOULD_GAME_START = false;
 		}
@@ -79,14 +80,14 @@ public class TowerFileUtils {
 		JsonObject tower = readFile("InfinityTowerDefault.json");
 		DEFAULT_TEAMS.clear();
 		try {
-			JsonArray teams = tower.getAsJsonArray("DefaultTeams");
+			JsonArray teams = Objects.requireNonNull(tower).getAsJsonArray("DefaultTeams");
 			for (int i = 0; i < teams.size(); i++) {
 				DEFAULT_TEAMS.add(TowerTeam.fromJson((JsonObject) teams.get(i)));
 			}
 			TowerConstants.DESIGNED_FLOORS = teams.size();
 
 		} catch (Exception e) {
-			warning(e.getMessage());
+			warning(e.toString());
 			TowerConstants.SHOULD_GAME_START = false;
 		}
 
@@ -97,6 +98,9 @@ public class TowerFileUtils {
 
 	public static void loadPlayerTeams() {
 		JsonObject tower = readFileRedis("InfinityTowerPlayer.json");
+		if (tower == null) {
+			return;
+		}
 		PLAYERS_DEFENDERS_TEAM.clear();
 		try {
 			JsonArray teams = tower.getAsJsonArray("playersteams");
@@ -107,7 +111,7 @@ public class TowerFileUtils {
 			}
 
 		} catch (Exception e) {
-			warning(e.getMessage());
+			warning(e.toString());
 			//TowerConstants.SHOULD_GAME_START = false; no problem ?
 		}
 
@@ -117,24 +121,24 @@ public class TowerFileUtils {
 		TOWER_FLOORS_LOCATION_MAP.clear();
 		try {
 			JsonObject obj = readFile("InfinityFloors.json");
-			JsonArray arr = obj.getAsJsonArray("floors");
+			JsonArray arr = Objects.requireNonNull(obj).getAsJsonArray("floors");
 			for (int i = 0; i < arr.size(); i++) {
 				int id = ((JsonObject) arr.get(i)).getAsJsonPrimitive("ID").getAsInt();
-				TOWER_FLOORS_LOCATION_MAP.computeIfAbsent(id, k -> new ArrayList<>());
-				TOWER_FLOORS_LOCATION_MAP.get(id).add(TowerFloor.fromJson(((JsonObject) arr.get(i)).getAsJsonObject("floor")));
+				TOWER_FLOORS_LOCATION_MAP.computeIfAbsent(id, k -> new ArrayList<>())
+					.add(TowerFloor.fromJson(((JsonObject) arr.get(i)).getAsJsonObject("floor")));
 			}
 		} catch (Exception e) {
-			warning(e.getMessage());
+			warning(e.toString());
 			TowerConstants.SHOULD_GAME_START = false;
 		}
 	}
 
-	public static TowerTeam getFloorTeam(int floorNum) {
+	public static @Nullable TowerTeam getFloorTeam(int floorNum) {
 		TowerTeam team = PLAYERS_DEFENDERS_TEAM.get(floorNum);
 		return team != null ? team : (DEFAULT_TEAMS.size() > floorNum ? DEFAULT_TEAMS.get(floorNum) : null);
 	}
 
-	public static TowerTeam getDefaultFloorTeam(int floor) {
+	public static @Nullable TowerTeam getDefaultFloorTeam(int floor) {
 		if (DEFAULT_TEAMS.size() > floor) {
 			return DEFAULT_TEAMS.get(floor);
 		} else {
@@ -246,7 +250,7 @@ public class TowerFileUtils {
 		saveFile(obj, "TowerMobs.json");
 	}
 
-	public static TowerFloor getTowerFloor(TowerGame game, int nextFloor) {
+	public static @Nullable TowerFloor getTowerFloor(TowerGame game, int nextFloor) {
 		if (TOWER_FLOORS_LOCATION_MAP.get(game.ID) == null) {
 			return null;
 		}
@@ -259,7 +263,7 @@ public class TowerFileUtils {
 		return null;
 	}
 
-	public static Integer getNextID() {
+	public static @Nullable Integer getNextID() {
 		Set<Integer> keys = new HashSet<>(TOWER_FLOORS_LOCATION_MAP.keySet());
 
 		for (TowerGame game : new ArrayList<>(TowerManager.GAMES.values())) {
@@ -274,7 +278,7 @@ public class TowerFileUtils {
 
 	}
 
-	public static String getHeadTexture(ItemStack item) {
+	public static @Nullable String getHeadTexture(ItemStack item) {
 		if (item == null || item.getType() != Material.PLAYER_HEAD) {
 			return null;
 		}
@@ -286,8 +290,9 @@ public class TowerFileUtils {
 		}
 	}
 
-	public static ItemStack getHeadFromTexture(String texture) {
-		if (texture == null || texture.isEmpty()) {
+	@Contract("!null -> !null")
+	public static @Nullable ItemStack getHeadFromTexture(String texture) {
+		if (texture == null) {
 			return null;
 		}
 
@@ -311,7 +316,7 @@ public class TowerFileUtils {
 
 	}
 
-	public static JsonObject readFile(String fileName) {
+	public static @Nullable JsonObject readFile(String fileName) {
 		try {
 			return FileUtils.readJson(TowerManager.mPlugin.getDataFolder() + File.separator + "InfinityTower" + File.separator + fileName);
 		} catch (Exception e) {
@@ -320,7 +325,7 @@ public class TowerFileUtils {
 		return null;
 	}
 
-	public static JsonObject readFileRedis(String fileName) {
+	public static @Nullable JsonObject readFileRedis(String fileName) {
 		try {
 			String data = RedisAPI.getInstance().async().get(getRedisPath(fileName)).get(15, TimeUnit.SECONDS);
 			if (data == null) {
@@ -349,7 +354,7 @@ public class TowerFileUtils {
 		});
 	}
 
-	public static TowerMobInfo getMobInfo(String losName) {
+	public static @Nullable TowerMobInfo getMobInfo(String losName) {
 		for (TowerMobInfo item : TOWER_MOBS_INFO) {
 			if (item.mLosName.equals(losName)) {
 				return item;
@@ -360,8 +365,8 @@ public class TowerFileUtils {
 
 	public static void removeMobInfo(TowerMobInfo info) {
 		TOWER_MOBS_INFO.remove(info);
-		for (TowerMobRarity rarity : TOWER_MOBS_RARITY_MAP.keySet()) {
-			TOWER_MOBS_RARITY_MAP.get(rarity).remove(info);
+		for (List<TowerMobInfo> rarity : TOWER_MOBS_RARITY_MAP.values()) {
+			rarity.remove(info);
 		}
 		for (TowerTeam team : DEFAULT_TEAMS) {
 			team.removeAll(info);
@@ -370,7 +375,6 @@ public class TowerFileUtils {
 		for (Map.Entry<Integer, TowerTeam> entry : PLAYERS_DEFENDERS_TEAM.entrySet()) {
 			entry.getValue().removeAll(info);
 		}
-
 
 
 	}
@@ -387,7 +391,7 @@ public class TowerFileUtils {
 			if (arr != null) {
 				for (int i = 0; i < size; i++) {
 					TowerMobInfo oldItem = TowerMobInfo.fromJson((JsonObject) arr.get(i));
-					if (oldItem.mLosName.equals(item.mLosName)) {
+					if (oldItem != null && oldItem.mLosName.equals(item.mLosName)) {
 						removed = true;
 						arr.remove(arr.get(i));
 						break;
@@ -404,7 +408,7 @@ public class TowerFileUtils {
 				obj.addProperty("size", size);
 
 				TOWER_MOBS_INFO.add(item);
-				TOWER_MOBS_RARITY_MAP.get(item.mMobRarity).add(item);
+				getMobsByRarity(item.mMobRarity).add(item);
 				TowerGuiShowMobs.MOBS_ITEMS.add(new TowerGuiItem(item.getBuyableItem()));
 			} else {
 				TowerGuiShowMobs.MOBS_ITEMS.clear();

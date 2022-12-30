@@ -15,13 +15,14 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 public class Trivium implements Enchantment {
 
 	private final double DAMAGE_PER_LEVEL = 0.1;
 
 	private HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
-	private BukkitTask mRunDamageTask = null;
+	private @Nullable BukkitTask mRunDamageTask = null;
 
 	@Override
 	public String getName() {

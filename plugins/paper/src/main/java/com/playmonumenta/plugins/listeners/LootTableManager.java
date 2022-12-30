@@ -11,15 +11,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.Nullable;
 
 public class LootTableManager implements Listener {
-	private static LootTableManager INSTANCE = null;
+	public static final LootTableManager INSTANCE = new LootTableManager();
 
 	private static final Set<NamespacedKey> BUILTIN_LOOT_TABLES;
 
@@ -194,11 +194,9 @@ public class LootTableManager implements Listener {
 		}
 	}
 
-	private Map<NamespacedKey, LootTableEntry> mTables;
+	private final Map<NamespacedKey, LootTableEntry> mTables = new HashMap<>();
 
-	public LootTableManager() {
-		INSTANCE = this;
-		reload();
+	private LootTableManager() {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -206,8 +204,8 @@ public class LootTableManager implements Listener {
 		reload();
 	}
 
-	private void reload() {
-		mTables = new HashMap<>();
+	public void reload() {
+		mTables.clear();
 
 		Map<NamespacedKey, Path> datapackFiles = FileUtils.getEnabledDatapackFiles("loot_tables", ".json");
 		if (datapackFiles.size() == 0) {
@@ -254,9 +252,6 @@ public class LootTableManager implements Listener {
 	}
 
 	public static @Nullable LootTableEntry getLootTableEntry(NamespacedKey key) {
-		if (INSTANCE != null) {
-			return INSTANCE.mTables.get(key);
-		}
-		return null;
+		return INSTANCE.mTables.get(key);
 	}
 }

@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 public class KineticProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kineticprojectile";
@@ -63,7 +64,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0.2, 0.2, 0.2, 0.1).spawnAsEntityActive(boss);
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
+				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.5f);
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 

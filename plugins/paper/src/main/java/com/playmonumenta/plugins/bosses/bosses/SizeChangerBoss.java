@@ -16,6 +16,7 @@ import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Slime;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class SizeChangerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_size_changer";
@@ -55,8 +56,8 @@ public class SizeChangerBoss extends BossAbilityGroup {
 	private int mCurrentSize;
 	private int mTimes = 0;
 	private final Parameters mParams;
-	private final Slime mSlime;
-	private final Phantom mPhantom;
+	private final @Nullable Slime mSlime;
+	private final @Nullable Phantom mPhantom;
 
 	public SizeChangerBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
@@ -111,7 +112,7 @@ public class SizeChangerBoss extends BossAbilityGroup {
 			//change the size
 			if (mSlime != null) {
 				mSlime.setSize(mCurrentSize);
-			} else {
+			} else if (mPhantom != null) {
 				mPhantom.setSize(mCurrentSize);
 			}
 

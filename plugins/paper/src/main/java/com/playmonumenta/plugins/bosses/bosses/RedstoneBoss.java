@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class RedstoneBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_redstone";
@@ -45,7 +46,7 @@ public class RedstoneBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mLocation.getBlock().setType(mMaterial);
 	}
 }

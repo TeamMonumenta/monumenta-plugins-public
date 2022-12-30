@@ -25,13 +25,14 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericTowerMob extends TowerAbility {
 
-	public LivingEntity mLastTarget = null;
+	public @Nullable LivingEntity mLastTarget = null;
 	public boolean mCanChangeTarget = true;
 
-	public GenericTowerMob(Plugin plugin, String identityTag, Mob boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
+	public GenericTowerMob(Plugin plugin, String identityTag, Mob boss, TowerGame game, @Nullable TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
 
 		//used a runnable so even if the mob is silenced, this "spell" will still get cast.

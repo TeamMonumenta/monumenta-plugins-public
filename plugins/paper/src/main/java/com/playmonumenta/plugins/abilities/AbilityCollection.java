@@ -71,7 +71,7 @@ public class AbilityCollection {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Ability> T getAbility(Class<T> cls) {
+	public <T extends Ability> @Nullable T getAbility(Class<T> cls) {
 		if (!mIsSilenced) {
 			return (T) mAbilities.get(cls);
 		}

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
@@ -67,25 +68,25 @@ public class EarthquakeTowerAbility extends TowerAbility {
 
 
 							if (mTicks % 2 == 0) {
-								mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mTargetLoc, 1, ((double) RADIUS * 2) / 2, ((double) RADIUS * 2) / 2, ((double) RADIUS * 2) / 2, 0.05);
+								new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mTargetLoc, 1, ((double) RADIUS * 2) / 2, ((double) RADIUS * 2) / 2, ((double) RADIUS * 2) / 2, 0.05).spawnAsEntityActive(mBoss);
 							}
-							mWorld.spawnParticle(Particle.BLOCK_CRACK, mTargetLoc, 2, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, Bukkit.createBlockData(Material.STONE));
+							new PartialParticle(Particle.BLOCK_CRACK, mTargetLoc, 2, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, Bukkit.createBlockData(Material.STONE)).spawnAsEntityActive(mBoss);
 
 
 							if (mTicks % 20 == 0 && mTicks > 0) {
 								mWorld.playSound(mTargetLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 0.5f);
 								mWorld.playSound(mTargetLoc, Sound.BLOCK_GRAVEL_BREAK, 1f, 0.5f);
 								for (int i = 0; i < 360; i += 18) {
-									mWorld.spawnParticle(Particle.SMOKE_NORMAL, mTargetLoc.clone().add(FastUtils.cos(Math.toRadians(i)) * ((double) RADIUS), 0.2, FastUtils.sin(Math.toRadians(i)) * ((double) RADIUS)), 1, 0.1, 0.1, 0.1, 0);
+									new PartialParticle(Particle.SMOKE_NORMAL, mTargetLoc.clone().add(FastUtils.cos(Math.toRadians(i)) * ((double) RADIUS), 0.2, FastUtils.sin(Math.toRadians(i)) * ((double) RADIUS)), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 								}
-								mWorld.spawnParticle(Particle.BLOCK_CRACK, mTargetLoc, 80, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, Bukkit.createBlockData(Material.DIRT));
-								mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mTargetLoc, 8, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0);
+								new PartialParticle(Particle.BLOCK_CRACK, mTargetLoc, 80, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, Bukkit.createBlockData(Material.DIRT)).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mTargetLoc, 8, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0).spawnAsEntityActive(mBoss);
 							}
 
 
 							if (mTicks % 10 == 0) {
-								mWorld.spawnParticle(Particle.LAVA, mTargetLoc, 1, 0.25, 0.25, 0.25, 0.1);
-								mWorld.spawnParticle(Particle.DRIP_LAVA, mBoss.getEyeLocation(), 1, 0.25, 0.45, 0.25, 1);
+								new PartialParticle(Particle.LAVA, mTargetLoc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.DRIP_LAVA, mBoss.getEyeLocation(), 1, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
 							}
 
 							if (mTicks >= DURATION) {
@@ -111,13 +112,13 @@ public class EarthquakeTowerAbility extends TowerAbility {
 										mWorld.playSound(mTargetLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
 										mWorld.playSound(mTargetLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
 
-										mWorld.spawnParticle(Particle.CLOUD, mTargetLoc, 150, 0, 0, 0, 0.5);
-										mWorld.spawnParticle(Particle.LAVA, mTargetLoc, 35, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0);
-										mWorld.spawnParticle(Particle.BLOCK_CRACK, mTargetLoc, 200, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, Bukkit.createBlockData(Material.DIRT));
-										mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, mTargetLoc, 35, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0.1);
+										new PartialParticle(Particle.CLOUD, mTargetLoc, 150, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.LAVA, mTargetLoc, 35, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.BLOCK_CRACK, mTargetLoc, 200, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, Bukkit.createBlockData(Material.DIRT)).spawnAsEntityActive(mBoss);
+										new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mTargetLoc, 35, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0.1).spawnAsEntityActive(mBoss);
 
 										for (int i = 0; i < 100; i++) {
-											mWorld.spawnParticle(Particle.SMOKE_LARGE, mTargetLoc.clone().add(-3 + FastUtils.RANDOM.nextDouble() * 6, 0.1, -3 + FastUtils.RANDOM.nextDouble() * 6), 0, 0, 1, 0, 0.2 + FastUtils.RANDOM.nextDouble() * 0.4);
+											new PartialParticle(Particle.SMOKE_LARGE, mTargetLoc.clone().add(-3 + FastUtils.RANDOM.nextDouble() * 6, 0.1, -3 + FastUtils.RANDOM.nextDouble() * 6), 0, 0, 1, 0, 0.2 + FastUtils.RANDOM.nextDouble() * 0.4).spawnAsEntityActive(mBoss);
 										}
 
 										if (mTimer2 == 0) {

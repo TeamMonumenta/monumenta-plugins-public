@@ -47,7 +47,7 @@ public class GalleryPlayer {
 		return Bukkit.getPlayer(mPlayerUUID);
 	}
 
-	public GalleryGame getGame() {
+	public @Nullable GalleryGame getGame() {
 		return GalleryManager.GAMES.get(mMapUUID);
 	}
 
@@ -86,7 +86,7 @@ public class GalleryPlayer {
 		}
 	}
 
-	public GalleryEffect getEffectOfType(GalleryEffectType type) {
+	public @Nullable GalleryEffect getEffectOfType(GalleryEffectType type) {
 		return mEffects.get(type);
 	}
 
@@ -119,7 +119,7 @@ public class GalleryPlayer {
 
 	protected void printPlayerInfo() {
 		Player player = getPlayer();
-		if (isOnline()) {
+		if (player != null) {
 			GalleryGame game = getGame();
 			player.sendMessage(Component.text("Mobs this round: " + game.mMobsToSpawnThisRound, NamedTextColor.GRAY));
 			player.sendMessage(Component.text("Mobs spawned this round: " + game.mMobsSpawnedThisRound, NamedTextColor.GRAY));
@@ -130,15 +130,15 @@ public class GalleryPlayer {
 	}
 
 	public void sendMessage(String s) {
-		if (isOnline()) {
-			Player player = getPlayer();
+		Player player = getPlayer();
+		if (player != null) {
 			player.sendMessage(Component.text(s, NamedTextColor.GRAY));
 		}
 	}
 
 	public void playSound(Sound sound, float pich, float volume) {
-		if (isOnline()) {
-			Player player = getPlayer();
+		Player player = getPlayer();
+		if (player != null) {
 			player.getWorld().playSound(player.getEyeLocation(), sound, volume, pich);
 		}
 	}
@@ -185,13 +185,13 @@ public class GalleryPlayer {
 	}
 
 
-	public void onPlayerHurtEvent(DamageEvent event, LivingEntity source) {
+	public void onPlayerHurtEvent(DamageEvent event, @Nullable LivingEntity source) {
 		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onPlayerHurt(this, event, source);
 		}
 	}
 
-	public void onPlayerFatalHurtEvent(DamageEvent event, LivingEntity source) {
+	public void onPlayerFatalHurtEvent(DamageEvent event, @Nullable LivingEntity source) {
 		for (GalleryEffect effect : new ArrayList<>(mEffects.values())) {
 			effect.onPlayerFatalHurt(this, event, source);
 		}

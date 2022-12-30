@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
 public class NbtUtils {
@@ -71,7 +72,7 @@ public class NbtUtils {
 			mLastRemoved = false;
 			mLastLocalKey = mNextLocalKey;
 			mLastLocalIt = mNextLocalIt;
-			NBTCompound result = mNextLocalIt.next();
+			NBTCompound result = Objects.requireNonNull(mNextLocalIt).next();
 			mSearchedForNext = false;
 			return result;
 		}
@@ -84,7 +85,7 @@ public class NbtUtils {
 			if (mIt == null) {
 				return new ArrayList<>();
 			}
-			List<String> path = mLastLocalIt.lastPath();
+			List<String> path = Objects.requireNonNull(mLastLocalIt).lastPath();
 			path.add(0, mLastLocalKey);
 			return path;
 		}
@@ -102,7 +103,7 @@ public class NbtUtils {
 			if (mIt == null) {
 				return;
 			}
-			mLastLocalIt.remove();
+			Objects.requireNonNull(mLastLocalIt).remove();
 			if (mSubPathIterables.isEmpty()) {
 				mHere.removeKey(mLastLocalKey);
 				return;

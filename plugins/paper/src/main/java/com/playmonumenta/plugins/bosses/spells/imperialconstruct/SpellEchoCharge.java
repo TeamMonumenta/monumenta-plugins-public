@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -102,8 +103,8 @@ public class SpellEchoCharge extends Spell {
 				}
 
 				if (mChargeUp.nextTick()) {
-					rush(lines.get(lineKeysArray.get(1)), lineKeysArray.get(1));
-					rush(lines.get(lineKeysArray.get(2)), lineKeysArray.get(2));
+					rush(Objects.requireNonNull(lines.get(lineKeysArray.get(1))), lineKeysArray.get(1));
+					rush(Objects.requireNonNull(lines.get(lineKeysArray.get(2))), lineKeysArray.get(2));
 					this.cancel();
 					mChargeUp.setTitle(ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME);
 					// Execute ability after charging
@@ -136,7 +137,7 @@ public class SpellEchoCharge extends Spell {
 								telegraphParticles(0, lines, lineKeysArray);
 							}
 							if (mT >= mExecutionTime) {
-								rush(lines.get(lineKeysArray.get(0)), lineKeysArray.get(0));
+								rush(Objects.requireNonNull(lines.get(lineKeysArray.get(0))), lineKeysArray.get(0));
 								this.cancel();
 								mActiveRunnables.remove(this);
 							}
@@ -164,7 +165,7 @@ public class SpellEchoCharge extends Spell {
 	}
 
 	private void telegraphParticles(int index, HashMap<Location, Location> lines, List<Location> lineKeysArray) {
-		Location startLoc1 = lines.get(lineKeysArray.get(index));
+		Location startLoc1 = Objects.requireNonNull(lines.get(lineKeysArray.get(index)));
 		Location endLoc1 = lineKeysArray.get(index);
 		Vector baseVector1 = endLoc1.clone().subtract(startLoc1).toVector();
 		baseVector1 = baseVector1.normalize().multiply(0.3);

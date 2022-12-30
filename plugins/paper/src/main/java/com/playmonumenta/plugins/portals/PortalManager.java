@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -52,6 +51,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PortalManager implements Listener {
 	public static final Set<Material> TRANSPARENT_BLOCKS_1 = Set.of(
@@ -76,12 +76,12 @@ public class PortalManager implements Listener {
 	public static final String MAP_TAG = "PortalMap";
 
 	private static @Nullable PortalManager INSTANCE = null;
-	public static Map<Player, Portal> mPlayerPortal1 = null;
-	public static Map<Player, Portal> mPlayerPortal2 = null;
-	public static Map<Player, PortalTeleportCheck> mPortalTeleportChecks = null;
-	public static Map<Player, PortalAFKCheck> mPortalAFKChecks = null;
-	public static Map<UUID, Map<Long, Set<Portal>>> mPortalsByChunk = null;
-	public static Set<UUID> mPortalUuids = null;
+	public static final Map<Player, Portal> mPlayerPortal1 = new HashMap<>();
+	public static final Map<Player, Portal> mPlayerPortal2 = new HashMap<>();
+	public static final Map<Player, PortalTeleportCheck> mPortalTeleportChecks = new HashMap<>();
+	public static final Map<Player, PortalAFKCheck> mPortalAFKChecks = new HashMap<>();
+	public static final Map<UUID, Map<Long, Set<Portal>>> mPortalsByChunk = new HashMap<>();
+	public static final Set<UUID> mPortalUuids = new HashSet<>();
 	public static String mCurrentShard = ServerProperties.getShardName();
 
 	//Timer for portals to despawn after placing
@@ -100,15 +100,6 @@ public class PortalManager implements Listener {
 
 	public static void spawnPortal(Player player, int portalNum, int gunId) {
 		portalLog("enter spawnPortal(" + player.getName() + ", " + portalNum + ", " + gunId + ");");
-		//Setup map
-		if (mPortalTeleportChecks == null || mPlayerPortal1 == null || mPlayerPortal2 == null) {
-			mPlayerPortal1 = new HashMap<>();
-			mPlayerPortal2 = new HashMap<>();
-			mPortalTeleportChecks = new HashMap<>();
-			mPortalAFKChecks = new HashMap<>();
-			mPortalsByChunk = new HashMap<>();
-			mPortalUuids = new HashSet<>();
-		}
 
 		//Raycast player eye to block face
 		Location loc = player.getEyeLocation();

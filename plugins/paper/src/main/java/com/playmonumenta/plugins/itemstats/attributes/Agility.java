@@ -10,10 +10,10 @@ import com.playmonumenta.plugins.itemstats.enchantments.Reflexes;
 import com.playmonumenta.plugins.itemstats.enchantments.Tempo;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class Agility implements Attribute {
 

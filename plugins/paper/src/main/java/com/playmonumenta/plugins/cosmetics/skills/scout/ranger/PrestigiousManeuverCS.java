@@ -18,6 +18,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousManeuverCS extends TacticalManeuverCS implements PrestigeCS {
 
@@ -28,7 +29,7 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	private static double START_EFFECT_RADIUS = 2.8;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"MANEUVER_DESC"
 		);
@@ -45,7 +46,7 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

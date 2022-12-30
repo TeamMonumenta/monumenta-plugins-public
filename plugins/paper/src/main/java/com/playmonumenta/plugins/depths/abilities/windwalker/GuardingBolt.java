@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -89,7 +90,7 @@ public class GuardingBolt extends DepthsAbility {
 					Location loc = mPlayer.getEyeLocation();
 					for (int j = 0; j < 45; j++) {
 						loc.add(dir.clone().multiply(0.33));
-						world.spawnParticle(Particle.CLOUD, loc, 4, 0.25, 0.25, 0.25, 0f);
+						new PartialParticle(Particle.CLOUD, loc, 4, 0.25, 0.25, 0.25, 0f).spawnAsPlayerActive(mPlayer);
 						if (loc.distance(bLoc) < 1) {
 							break;
 						}
@@ -101,7 +102,7 @@ public class GuardingBolt extends DepthsAbility {
 						double z = FastUtils.randomDoubleInRange(-3, 3);
 						Location to = player.getLocation().add(x, 0.15, z);
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						world.spawnParticle(Particle.CLOUD, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4));
+						new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4)).spawnAsPlayerActive(mPlayer);
 					}
 
 					// Yellow particles
@@ -110,7 +111,7 @@ public class GuardingBolt extends DepthsAbility {
 						double z = FastUtils.randomDoubleInRange(-3, 3);
 						Location to = player.getLocation().add(x, 0.15, z);
 						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						world.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5), COLOR_YELLOW);
+						new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5), COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
 					}
 
 					Location userLoc = mPlayer.getLocation();
@@ -130,9 +131,9 @@ public class GuardingBolt extends DepthsAbility {
 	private void doDamage(Location location) {
 		World world = mPlayer.getWorld();
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.75f, 1.5f);
-		world.spawnParticle(Particle.REDSTONE, location, 125, RADIUS, RADIUS, RADIUS, 3, COLOR_YELLOW);
-		world.spawnParticle(Particle.REDSTONE, location, 125, RADIUS, RADIUS, RADIUS, 3, COLOR_AQUA);
-		world.spawnParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10);
+		new PartialParticle(Particle.REDSTONE, location, 125, RADIUS, RADIUS, RADIUS, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, location, 125, RADIUS, RADIUS, RADIUS, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
 
 		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, RADIUS);
 		// The more enemies, the less particles for each one
@@ -148,8 +149,8 @@ public class GuardingBolt extends DepthsAbility {
 			}
 
 			Location enemyParticleLocation = enemy.getLocation().add(0, enemy.getHeight() / 2, 0);
-			world.spawnParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
-			world.spawnParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5);
+			new PartialParticle(Particle.CLOUD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.END_ROD, enemyParticleLocation, mobParticles, 0.5, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

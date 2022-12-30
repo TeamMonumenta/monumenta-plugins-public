@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -16,6 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerMob {
 
@@ -82,7 +84,7 @@ public class TowerMob {
 		return TowerMobInfo.buildHPItem(mInfo);
 	}
 
-	public ItemStack buildSpellItem(TowerGame game, int i) {
+	public @Nullable ItemStack buildSpellItem(TowerGame game, int i) {
 		return TowerMobInfo.buildSpellItem(mInfo, i);
 	}
 
@@ -146,7 +148,7 @@ public class TowerMob {
 	}
 
 	public Location getSpawnLocation(TowerGame game) {
-		TowerFloor floor = game.mFloor;
+		TowerFloor floor = Objects.requireNonNull(game.mFloor);
 		double dx = Math.min(floor.mXSize - 0.5, mDx);
 		double dz = Math.min(floor.mZSize - 0.5, mDz);
 		return new Location(game.mPlayer.mPlayer.getWorld(), floor.mVector.getX() + dx, floor.mVector.getY() + mDy, floor.mVector.getZ() + dz);
@@ -173,11 +175,11 @@ public class TowerMob {
 
 	//--------------------------spawn mob-----------------------
 
-	public LivingEntity spawn(TowerGame game, boolean spawnedByPlayer) {
+	public @Nullable LivingEntity spawn(TowerGame game, boolean spawnedByPlayer) {
 		return spawnAtLocation(game, spawnedByPlayer, getSpawnLocation(game));
 	}
 
-	public LivingEntity spawnAtLocation(TowerGame game, boolean spawnedByPlayer, Location loc) {
+	public @Nullable LivingEntity spawnAtLocation(TowerGame game, boolean spawnedByPlayer, Location loc) {
 		if (spawnedByPlayer) {
 			loc.setDirection(new Vector(+1, 0, 0));
 		} else {
@@ -287,9 +289,12 @@ public class TowerMob {
 		return object;
 	}
 
-	public static TowerMob fromJson(JsonObject object) {
+	public static @Nullable TowerMob fromJson(JsonObject object) {
 		String losName = object.getAsJsonPrimitive("LoSName").getAsString();
 		TowerMobInfo info = TowerFileUtils.getMobInfo(losName);
+		if (info == null) {
+			return null;
+		}
 		double dx = object.getAsJsonPrimitive("dx").getAsDouble();
 		double dy = object.getAsJsonPrimitive("dy").getAsDouble();
 		double dz = object.getAsJsonPrimitive("dz").getAsDouble();

@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.gallery;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
- *             Enum of different gallery maps, we can store info unique to each map here
+ * Enum of different gallery maps, we can store info unique to each map here
  */
 public enum GalleryMap {
 	SANGUINE_HALLS(1, "~gallery1all", "~Gallery1Elite", "~galleryphantom");
@@ -34,7 +36,7 @@ public enum GalleryMap {
 		return mSpectersPool;
 	}
 
-	public static GalleryMap fromID(int id) {
+	public static @Nullable GalleryMap fromID(int id) {
 		for (GalleryMap map : values()) {
 			if (map.mIndex == id) {
 				return map;
@@ -43,7 +45,7 @@ public enum GalleryMap {
 		return null;
 	}
 
-	public static GalleryMap fromName(String name) {
+	public static @Nullable GalleryMap fromName(String name) {
 		for (GalleryMap map : values()) {
 			if (map.name().equals(name)) {
 				return map;

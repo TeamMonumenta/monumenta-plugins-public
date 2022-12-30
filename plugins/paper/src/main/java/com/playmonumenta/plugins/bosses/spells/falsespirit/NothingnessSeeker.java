@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 
@@ -61,7 +62,7 @@ public class NothingnessSeeker extends SpellBaseSeekingProjectile {
 				}
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				new PartialParticle(Particle.REDSTONE, loc, 50, 0.5, 0.5, 0.5, 0.25, GREEN_COLOR).spawnAsEntityActive(boss);
 				if (player != null) {

@@ -54,11 +54,12 @@ public class DepthsGUICommands {
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
 						//If the player is not in the system or they already have selected a weapon aspect, return
-						if (!DepthsManager.getInstance().isInSystem(player) || DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mHasWeaponAspect) {
+						DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+						if (depthsPlayer == null || depthsPlayer.mHasWeaponAspect) {
 							return;
 						}
 
-						List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mWeaponOfferings;
+						List<DepthsAbilityInfo<? extends WeaponAspectDepthsAbility>> weapons = depthsPlayer.mWeaponOfferings;
 
 						if (weapons == null || weapons.size() == 0) {
 							return;
@@ -71,7 +72,8 @@ public class DepthsGUICommands {
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
 
-						if (!DepthsManager.getInstance().isInSystem(player) || DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mUsedAbilityDeletion) {
+						DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+						if (depthsPlayer == null || depthsPlayer.mUsedAbilityDeletion) {
 							MessagingUtils.sendActionBarMessage(player, "You've already removed your ability for this floor!");
 							return;
 						}
@@ -83,7 +85,8 @@ public class DepthsGUICommands {
 				.executes((sender, args) -> {
 					Player player = (Player) args[0];
 
-					if (!DepthsManager.getInstance().isInSystem(player) || DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mUsedAbilityMutation) {
+					DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+					if (depthsPlayer == null || depthsPlayer.mUsedAbilityMutation) {
 						MessagingUtils.sendActionBarMessage(player, "You've already mutated an ability on this floor!");
 						return;
 					}
@@ -109,7 +112,10 @@ public class DepthsGUICommands {
 
 		if (items == null || items.size() == 0) {
 			MessagingUtils.sendActionBarMessage(player, "No ability upgrade options to show.");
-			DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mEarnedRewards.poll();
+			DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+			if (depthsPlayer != null) {
+				depthsPlayer.mEarnedRewards.poll();
+			}
 			return;
 		}
 		new DepthsUpgradeGUI(player).openInventory(player, plugin);
@@ -120,7 +126,10 @@ public class DepthsGUICommands {
 
 		if (items == null || items.size() == 0) {
 			MessagingUtils.sendActionBarMessage(player, "No abilities to choose from.");
-			DepthsManager.getInstance().mPlayers.get(player.getUniqueId()).mEarnedRewards.poll();
+			DepthsPlayer depthsPlayer = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
+			if (depthsPlayer != null) {
+				depthsPlayer.mEarnedRewards.poll();
+			}
 			return;
 		}
 		new DepthsAbilitiesGUI(player).openInventory(player, plugin);

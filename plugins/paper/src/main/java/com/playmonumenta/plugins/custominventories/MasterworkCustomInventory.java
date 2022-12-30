@@ -247,12 +247,12 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			String costStringC = ItemStatUtils.getLocation(item).getName() + "_7c";
 
 			// Generate new item
-			ItemStack newItemA = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTable(p,
-				NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIA))));
-			ItemStack newItemB = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTable(p,
-				NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIB))));
-			ItemStack newItemC = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTable(p,
-				NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIC))));
+			ItemStack newItemA = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(),
+					NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIA))));
+			ItemStack newItemB = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(),
+					NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIB))));
+			ItemStack newItemC = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(),
+					NamespacedKeyUtils.fromString(MasterworkUtils.getSevenItemPath(item, Masterwork.VIIC))));
 			mInventory.setItem(39, newItemA);
 			mInventory.setItem(40, newItemB);
 			mInventory.setItem(41, newItemC);
@@ -260,8 +260,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			ItemStack upgradeIconA = new ItemStack(Material.RED_DYE);
 			ItemMeta standardMetaA = upgradeIconA.getItemMeta();
 			standardMetaA.displayName(Component.text("Enhance Item (Fortitude)", TextColor.fromHexString("#D02E28"))
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
+					.decoration(TextDecoration.BOLD, true)
+					.decoration(TextDecoration.ITALIC, false));
 			List<Component> itemLoreA = new ArrayList<>();
 			itemLoreA.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
 				.decoration(TextDecoration.ITALIC, false));
@@ -341,21 +341,21 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			// Generate base item
 			mInventory.setItem(4, item);
 			String costString = ItemStatUtils.getLocation(item).getName() + "_"
-				+ (MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item)) + 1);
+					+ (MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item)) + 1);
 
 			// Generate new item
-			ItemStack newItem = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTable(p,
-				NamespacedKeyUtils.fromString(MasterworkUtils.getNextItemPath(item))));
+			ItemStack newItem = MasterworkUtils.preserveModified(item, InventoryUtils.getItemFromLootTableOrThrow(p.getLocation(),
+					NamespacedKeyUtils.fromString(MasterworkUtils.getNextItemPath(item))));
 			mInventory.setItem(40, newItem);
 			// Fill in mid material + cost
 			ItemStack upgradeIcon = new ItemStack(Material.RAW_IRON);
 			ItemMeta standardMeta = upgradeIcon.getItemMeta();
 			standardMeta.displayName(Component.text("Enhance Item", TextColor.fromHexString("#FFAA00"))
-				.decoration(TextDecoration.BOLD, true)
-				.decoration(TextDecoration.ITALIC, false));
+					.decoration(TextDecoration.BOLD, true)
+					.decoration(TextDecoration.ITALIC, false));
 			List<Component> itemLore = new ArrayList<>();
 			itemLore.add(Component.text("To enhance the selected item, you will need", NamedTextColor.DARK_GRAY)
-				.decoration(TextDecoration.ITALIC, false));
+					.decoration(TextDecoration.ITALIC, false));
 			for (String str : MasterworkUtils.getCostStringList(MasterworkCost.getMasterworkCost(costString), p)) {
 				itemLore.add(Component.text(str, NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 			}
@@ -412,7 +412,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		mInventory.setItem(0, mBackItem);
 
 		int j = 0;
-		for (int i : mPatternMap.get(tiers)) {
+		for (int i : mPatternMap.getOrDefault(tiers, new int[0])) {
 			mInventory.setItem(i, allMasterworks.get(j));
 			j++;
 		}
@@ -519,8 +519,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
-									InventoryUtils.getItemFromLootTable(player,
-										NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
+										InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+												NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
 								attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(costStringA));
 							});
 							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
@@ -533,8 +533,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
-									InventoryUtils.getItemFromLootTable(player,
-										NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
+										InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+												NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
 								attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(costStringB));
 							});
 							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
@@ -547,8 +547,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
-									InventoryUtils.getItemFromLootTable(player,
-										NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
+										InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+												NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
 								attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(costStringC));
 							});
 							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
@@ -563,8 +563,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							String refundString = ItemStatUtils.getLocation(item).getName() + "_"
 									+ MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
 							ItemStack newItem = MasterworkUtils.preserveModified(item,
-									InventoryUtils.getItemFromLootTable(player,
-											NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(item))));
+									InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+										NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(item))));
 							attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(refundString));
 						});
 					}

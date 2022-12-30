@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class CustomLogger extends Logger {
 	private static @Nullable CustomLogger INSTANCE = null;
 
-	private Logger mLogger;
+	private final Logger mLogger;
 	private Level mLevel;
 
 	public CustomLogger(Logger logger, Level level) {
@@ -18,8 +19,8 @@ public class CustomLogger extends Logger {
 		mLevel = level;
 	}
 
-	public static @Nullable CustomLogger getInstance() {
-		return INSTANCE;
+	public static CustomLogger getInstance() {
+		return Objects.requireNonNull(INSTANCE);
 	}
 
 	@Override

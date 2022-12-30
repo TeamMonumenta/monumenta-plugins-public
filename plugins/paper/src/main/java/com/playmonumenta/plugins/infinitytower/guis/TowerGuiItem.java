@@ -2,29 +2,30 @@ package com.playmonumenta.plugins.infinitytower.guis;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerGuiItem {
 	protected final ItemStack mItemStack;
-	protected final Conditions mConds;
-	protected final PostClick mPostClick;
+	protected final @Nullable Conditions mConds;
+	protected final @Nullable PostClick mPostClick;
 
 
 	public TowerGuiItem(ItemStack item) {
 		this(item, null);
 	}
 
-	public TowerGuiItem(ItemStack item, Conditions cond) {
+	public TowerGuiItem(ItemStack item, @Nullable Conditions cond) {
 		this(item, cond, null);
 	}
 
-	public TowerGuiItem(ItemStack item, Conditions cond, PostClick post) {
+	public TowerGuiItem(ItemStack item, @Nullable Conditions cond, @Nullable PostClick post) {
 		mItemStack = item;
 		mConds = cond;
 		mPostClick = post;
 	}
 
 
-	public ItemStack getItem(Player player) {
+	public @Nullable ItemStack getItem(Player player) {
 		if (mConds == null) {
 			return mItemStack;
 		}

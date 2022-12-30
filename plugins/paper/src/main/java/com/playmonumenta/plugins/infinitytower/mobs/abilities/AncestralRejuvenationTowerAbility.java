@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public class AncestralRejuvenationTowerAbility extends TowerAbility {
 					healt = Math.min(maxHealt, healt + mHealAmount);
 					target.setHealth(healt);
 					Location loc = target.getEyeLocation();
-					loc.getWorld().spawnParticle(Particle.HEART, loc, 10, 0.05, 0.02, 0.05, 0.5);
+					new PartialParticle(Particle.HEART, loc, 10, 0.05, 0.02, 0.05, 0.5).spawnAsEntityActive(mBoss);
 				}
 			}
 

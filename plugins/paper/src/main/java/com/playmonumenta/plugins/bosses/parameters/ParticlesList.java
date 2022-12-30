@@ -44,7 +44,7 @@ public class ParticlesList {
 			this(particle, count, dx, dy, dz, extra1, null);
 		}
 
-		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1, Object extra2) {
+		public CParticle(Particle particle, int count, double dx, double dy, double dz, double extra1, @Nullable Object extra2) {
 			mParticle = particle;
 			mCount = count;
 			mDx = dx;
@@ -88,7 +88,7 @@ public class ParticlesList {
 			spawnNow(boss, loc, fdx, fdy, fdz, fVelocity, mExtra2);
 		}
 
-		private void spawnNow(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1, Object extra2) {
+		private void spawnNow(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1, @Nullable Object extra2) {
 			try {
 				new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1, extra2).spawnAsEntityActive(boss);
 			} catch (Exception e) {

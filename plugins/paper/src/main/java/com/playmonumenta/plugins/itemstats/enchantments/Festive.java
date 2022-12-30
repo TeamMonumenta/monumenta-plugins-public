@@ -62,9 +62,9 @@ public class Festive implements Infusion {
 					return;
 				}
 
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR);
-				mWorld.spawnParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR);
-				mWorld.spawnParticle(Particle.SNOWBALL, loc, 3, 0.2, 0.2, 0.2, 0);
+				new PartialParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_RED_COLOR).spawnFull();
+				new PartialParticle(Particle.REDSTONE, loc, 3, 0.2, 0.2, 0.2, FESTIVE_GREEN_COLOR).spawnFull();
+				new PartialParticle(Particle.SNOWBALL, loc, 3, 0.2, 0.2, 0.2, 0).spawnFull();
 
 				// Very infrequently check if the item is still actually there
 				mTicks++;

@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -46,10 +45,11 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemUpdateManager implements Listener {
 	// Updates items if needed as they load.
-	private static @Nullable Plugin mPlugin;
+	private final Plugin mPlugin;
 
 	public ItemUpdateManager(Plugin plugin) {
 		mPlugin = plugin;
@@ -525,14 +525,14 @@ public class ItemUpdateManager implements Listener {
 	}
 
 	public static void logNestedException(List<String> path, Exception e) {
-		mPlugin.getLogger().warning("ItemUpdateManager: An exception occurred:");
+		Plugin.getInstance().getLogger().warning("ItemUpdateManager: An exception occurred:");
 		for (String node : path) {
-			mPlugin.getLogger().warning("ItemUpdateManager: " + node);
+			Plugin.getInstance().getLogger().warning("ItemUpdateManager: " + node);
 		}
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String sStackTrace = sw.toString();
-		mPlugin.getLogger().warning(e.getLocalizedMessage() + "\n" + sStackTrace);
+		Plugin.getInstance().getLogger().warning(e.getLocalizedMessage() + "\n" + sStackTrace);
 	}
 }

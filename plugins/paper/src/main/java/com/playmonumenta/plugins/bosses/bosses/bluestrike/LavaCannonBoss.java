@@ -33,6 +33,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class LavaCannonBoss extends BossAbilityGroup {
 	private static final Particle.DustOptions ORANGE = new Particle.DustOptions(Color.fromRGB(255, 128, 0), 0.5f);
@@ -40,58 +41,59 @@ public class LavaCannonBoss extends BossAbilityGroup {
 	private static final Material WARNING_BLOCK = Material.NETHER_WART_BLOCK;
 
 	public static final String identityTag = "boss_lavacannon";
-	private LivingEntity mSamwellMob;
-	private Samwell mSamwell;
-	private int mPhase;
-	private Player mTarget;
+	private static final String SPELL_NAME = "Lava Cannon";
+
+	private final Samwell mSamwell;
+	private final int mPhase;
 
 	private boolean mShot;
-	private List<Player> mHitMap;
+	private final List<Player> mHitMap = new ArrayList<>();
 
-	private PartialParticle mPWarning;
-	private PartialParticle mPWarningLava;
-	private PartialParticle mPWarning2;
-	private PartialParticle mPWarning3;
-	private PartialParticle mPWarning4;
+	private final PartialParticle mPWarning;
+	private final PartialParticle mPWarningLava;
+	private final PartialParticle mPWarning2;
+	private final PartialParticle mPWarning3;
+	private final PartialParticle mPWarning4;
 	private boolean mLockedTrajectory = false;
 	private boolean mForecastBlocks = false;
-	private Map<Location, Material> mOldBlocks = new HashMap<>();
+	private final Map<Location, Material> mOldBlocks = new HashMap<>();
 
-	private String SPELL_NAME = "Lava Cannon";
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LavaCannonBoss(plugin, boss);
+	public static @Nullable LavaCannonBoss deserialize(Plugin plugin, LivingEntity boss) throws Exception {
+		return construct(plugin, boss);
 	}
 
-	public LavaCannonBoss(Plugin plugin, LivingEntity boss) {
+	public static @Nullable LavaCannonBoss construct(Plugin plugin, LivingEntity boss) {
+		// Get nearest entity called Samwell.
+		Samwell samwell = null;
+		List<LivingEntity> witherSkeletons = EntityUtils.getNearbyMobs(boss.getLocation(), 100, EnumSet.of(EntityType.WITHER_SKELETON));
+		for (LivingEntity mob : witherSkeletons) {
+			if (mob.getScoreboardTags().contains(Samwell.identityTag)) {
+				samwell = BossUtils.getBossOfClass(mob, Samwell.class);
+				break;
+			}
+		}
+		if (samwell == null) {
+			MMLog.warning("LavaCannonBoss: Samwell wasn't found! (This is a bug)");
+			return null;
+		}
+		return new LavaCannonBoss(plugin, boss, samwell);
+	}
+
+	private LavaCannonBoss(Plugin plugin, LivingEntity boss, Samwell samwell) {
 		super(plugin, identityTag, boss);
 		Team darkRedTeam = ScoreboardUtils.getExistingTeamOrCreate("DarkRed", NamedTextColor.DARK_RED);
 		darkRedTeam.addEntry(boss.getUniqueId().toString());
 		boss.setGlowing(true);
 
-		// Get nearest entity called Samwell.
-		List<LivingEntity> witherSkeletons = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.WITHER_SKELETON));
-		for (LivingEntity mob : witherSkeletons) {
-			if (mob.getScoreboardTags().contains(Samwell.identityTag)) {
-				mSamwellMob = mob;
-				mSamwell = BossUtils.getBossOfClass(mSamwellMob, Samwell.class);
-				break;
-			}
-		}
-
-		if (mSamwell == null) {
-			MMLog.warning("LavaCannonBoss: Samwell wasn't found! (This is a bug)");
-			return;
-		}
+		mSamwell = samwell;
 
 		mPhase = mSamwell.mPhase;
-		mTarget = EntityUtils.getNearestPlayer(mBoss.getLocation(), 100);
+		Player target = EntityUtils.getNearestPlayer(mBoss.getLocation(), 100);
 		mPWarning = new PartialParticle(Particle.FLAME, mBoss.getLocation(), 2, 0, 0, 0, 0.01);
 		mPWarningLava = new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0, 0, 0, 0.01);
 		mPWarning2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 2, 0, 0, 0, 0.01);
 		mPWarning3 = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 10, 0.25, 0.25, 0.25, 0, ORANGE);
 		mPWarning4 = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 5, 0.25, 0.25, 0.25, 0);
-		mHitMap = new ArrayList<>();
 
 		List<Spell> passives = Arrays.asList(
 			new SpellBlockBreak(mBoss) // This is going to be interesting
@@ -99,14 +101,22 @@ public class LavaCannonBoss extends BossAbilityGroup {
 
 		super.constructBoss(SpellManager.EMPTY, passives, 100, null);
 
+		if (target == null) {
+			return;
+		}
+
 		new BukkitRunnable() {
 			int mT = 0;
-			Vector mVector;
+			Vector mVector = LocationUtils.getDirectionTo(target.getLocation(), mBoss.getLocation());
 
 			@Override
 			public void run() {
+				if (target.getWorld() != mBoss.getWorld()) {
+					this.cancel();
+					return;
+				}
 				if (mT <= chargeTime(mPhase) * 0.6) {
-					mVector = LocationUtils.getDirectionTo(mTarget.getLocation(), mBoss.getLocation());
+					mVector = LocationUtils.getDirectionTo(target.getLocation(), mBoss.getLocation());
 					Location loc = mBoss.getLocation();
 					loc.setYaw((float) (Math.atan2(mVector.getZ(), mVector.getX()) * 180.0 / Math.PI));
 					mBoss.teleport(loc);
@@ -144,7 +154,7 @@ public class LavaCannonBoss extends BossAbilityGroup {
 
 		new BukkitRunnable() {
 			int mT = 0;
-			BoundingBox mBox = BoundingBox.of(LocationUtils.getEntityCenter(mBoss), hitbox, hitbox + 0.5, hitbox);
+			final BoundingBox mBox = BoundingBox.of(LocationUtils.getEntityCenter(mBoss), hitbox, hitbox + 0.5, hitbox);
 
 			@Override
 			public void run() {

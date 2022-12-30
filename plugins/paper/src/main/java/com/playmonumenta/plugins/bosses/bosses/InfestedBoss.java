@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class InfestedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_infested";
@@ -35,7 +36,7 @@ public class InfestedBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		// Spell triggered when the boss dies
 		new SpellDelayedAction(mPlugin, mBoss.getLocation(), 25,
 			// Sound effect when boss dies

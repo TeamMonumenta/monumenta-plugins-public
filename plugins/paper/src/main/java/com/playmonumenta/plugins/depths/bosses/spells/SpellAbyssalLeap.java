@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellAbyssalLeap extends SpellBaseSlam {
 
@@ -37,15 +38,15 @@ public class SpellAbyssalLeap extends SpellBaseSlam {
 
 	public SpellAbyssalLeap(Plugin plugin, LivingEntity launcher, int cooldown) {
 		super(plugin, launcher, JUMP_HEIGHT, DETECTION, MIN_RANGE, RUN_DISTANCE, cooldown, VELOCITY_MULTIPLIER,
-				(World world, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(launcher);
-				}, (World world, Location loc) -> {
+			(World world, Location loc) -> {
+				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
+				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(launcher);
+			}, (World world, Location loc) -> {
 				world.playSound(loc, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 1, 1);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(launcher);
 			}, (World world, Location loc) -> {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(launcher);
-			}, (World world, Player player, Location loc, Vector dir) -> {
+			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 					Arrays.asList(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {

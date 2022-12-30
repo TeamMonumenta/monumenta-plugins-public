@@ -13,7 +13,7 @@ import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +30,7 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Quickdraw extends Ability {
 
@@ -132,7 +133,7 @@ public class Quickdraw extends Ability {
 		if (stats != null) {
 			ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
 			if (map != null) {
-				ItemStat projDamageAdd = ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat();
+				ItemStat projDamageAdd = Objects.requireNonNull(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 				double damage = map.get(projDamageAdd);
 				map.set(projDamageAdd, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage));
 			}

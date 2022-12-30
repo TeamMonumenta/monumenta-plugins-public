@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -69,7 +70,7 @@ public class EarthenWrath extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 10, 1);
 
-		DepthsParty party = DepthsManager.getInstance().getPartyFromId(DepthsManager.getInstance().mPlayers.get(mPlayer.getUniqueId()));
+		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
 		if (party == null) {
 			return;
 		}
@@ -93,15 +94,15 @@ public class EarthenWrath extends DepthsAbility {
 							for (int deg = 0; deg < 360; deg += 40) {
 								if (FastUtils.RANDOM.nextDouble() > 0.2) {
 									tempLoc.set(loc.getX(), loc.getY(), loc.getZ());
-									world.spawnParticle(Particle.SPELL_INSTANT, tempLoc.add(FastUtils.cos(deg), 0.5, FastUtils.sin(deg)), 1, 0, 0, 0, 0);
-									world.spawnParticle(Particle.SPELL_INSTANT, tempLoc.add(FastUtils.cos(deg), 1.5, FastUtils.sin(deg)), 1, 0, 0, 0, 0);
+									new PartialParticle(Particle.SPELL_INSTANT, tempLoc.add(FastUtils.cos(deg), 0.5, FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+									new PartialParticle(Particle.SPELL_INSTANT, tempLoc.add(FastUtils.cos(deg), 1.5, FastUtils.sin(deg)), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 								}
 							}
 						}
 					}
 
-					world.spawnParticle(Particle.CRIT_MAGIC, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25);
-					world.spawnParticle(Particle.BLOCK_DUST, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25, Material.COARSE_DIRT.createBlockData());
+					new PartialParticle(Particle.CRIT_MAGIC, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.BLOCK_DUST, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 
 					world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 10, mPitch);
 
@@ -120,9 +121,9 @@ public class EarthenWrath extends DepthsAbility {
 						}
 
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-						world.spawnParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData());
-						world.spawnParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25);
-						world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25);
+						new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsPlayerActive(mPlayer);
 					} else {
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1f, 2f);
 					}
@@ -160,15 +161,15 @@ public class EarthenWrath extends DepthsAbility {
 
 			world.playSound(wrathLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 2);
 			world.playSound(otherLoc, Sound.ITEM_SHIELD_BLOCK, 1, 2);
-			world.spawnParticle(Particle.TOTEM, otherLoc, 30, 0.1, 0.1, 0.1, 0.6);
+			new PartialParticle(Particle.TOTEM, otherLoc, 30, 0.1, 0.1, 0.1, 0.6).spawnAsPlayerActive(mPlayer);
 
 			Location pLoc = otherLoc.clone().add(0, 0.5, 0);
 			Vector dir = wrathLoc.toVector().subtract(otherLoc.toVector()).normalize();
 			for (int i = 0; i <= wrathLoc.distance(otherLoc); i++) {
 				pLoc.add(dir);
 
-				world.spawnParticle(Particle.VILLAGER_HAPPY, pLoc, 3, 0.25, 0.25, 0.25, 0);
-				world.spawnParticle(Particle.CLOUD, pLoc, 6, 0.05, 0.05, 0.05, 0.05);
+				new PartialParticle(Particle.VILLAGER_HAPPY, pLoc, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, pLoc, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
 			}
 
 			event.setDamage(0);

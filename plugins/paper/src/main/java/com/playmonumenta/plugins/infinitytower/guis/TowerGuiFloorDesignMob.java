@@ -47,12 +47,16 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 	public static void loadGuiItems() {
 		for (TowerMobInfo item : TowerFileUtils.TOWER_MOBS_INFO) {
 			MOBS_ITEMS.add(new TowerGuiItem(item.getBuyableItem(), player -> true, (p, slot) -> {
-				int x = (int) mInstances.get(p).mVec.getX();
-				int z = (int) mInstances.get(p).mVec.getZ();
-				mInstances.get(p).mTeam.addMob(new TowerMob(item, x, 0, z));
-				TowerFileUtils.saveDefaultTeam(mInstances.get(p).mTeam, mInstances.get(p).mFloor);
+				TowerGuiFloorDesignMob floorDesignMob = mInstances.get(p);
+				if (floorDesignMob == null) {
+					return false;
+				}
+				int x = (int) floorDesignMob.mVec.getX();
+				int z = (int) floorDesignMob.mVec.getZ();
+				floorDesignMob.mTeam.addMob(new TowerMob(item, x, 0, z));
+				TowerFileUtils.saveDefaultTeam(floorDesignMob.mTeam, floorDesignMob.mFloor);
 				p.closeInventory();
-				new TowerGuiFloorDesign(p, mInstances.get(p).mFloor).openInventory(p, TowerManager.mPlugin);
+				new TowerGuiFloorDesign(p, floorDesignMob.mFloor).openInventory(p, TowerManager.mPlugin);
 				return true;
 			}));
 		}
@@ -64,9 +68,12 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 
 		FUNCTIONAL_ITEMS.add(new TowerGuiItem(arrow, (player) -> {
 			TowerGuiFloorDesignMob instance = mInstances.get(player);
-			return instance.mGuiSize >= instance.mOffset + 7;
+			return instance != null && instance.mGuiSize >= instance.mOffset + 7;
 		}, (player, clickedSlot) -> {
-			mInstances.get(player).mOffset += 7;
+			TowerGuiFloorDesignMob instance = mInstances.get(player);
+			if (instance != null) {
+				instance.mOffset += 7;
+			}
 			return true;
 		}));
 
@@ -75,8 +82,14 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 		meta.displayName(Component.empty());
 		arrow.setItemMeta(meta);
 
-		FUNCTIONAL_ITEMS.add(new TowerGuiItem(arrow, player -> mInstances.get(player).mOffset != 0, (player, clickedSlot) -> {
-			mInstances.get(player).mOffset -= 7;
+		FUNCTIONAL_ITEMS.add(new TowerGuiItem(arrow, player -> {
+			TowerGuiFloorDesignMob instance = mInstances.get(player);
+			return instance != null && instance.mOffset != 0;
+		}, (player, clickedSlot) -> {
+			TowerGuiFloorDesignMob instance = mInstances.get(player);
+			if (instance != null) {
+				instance.mOffset -= 7;
+			}
 			return true;
 		}));
 
@@ -171,12 +184,12 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 			return;
 		}
 
-		Player player = ((Player)event.getWhoClicked());
+		Player player = ((Player) event.getWhoClicked());
 		int slot = event.getSlot();
 
-		if (mFunctions.get(slot) != null) {
-
-			mFunctions.get(slot).mPostClick.apply(player, slot);
+		TowerGuiItem towerGuiItem = mFunctions.get(slot);
+		if (towerGuiItem != null && towerGuiItem.mPostClick != null) {
+			towerGuiItem.mPostClick.apply(player, slot);
 			loadInv(player);
 		}
 

@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PercentHeal extends SingleArgumentEffect {
 	public static final String effectID = "PercentHeal";

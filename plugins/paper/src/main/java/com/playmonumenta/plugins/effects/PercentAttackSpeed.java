@@ -8,7 +8,7 @@ import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PercentAttackSpeed extends Effect {
 	public static final String GENERIC_NAME = "PercentAttackSpeed";

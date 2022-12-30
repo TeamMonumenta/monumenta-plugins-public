@@ -55,6 +55,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Nullable;
 
 public class TealSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_tealspirit";
@@ -67,11 +68,11 @@ public class TealSpirit extends BossAbilityGroup {
 
 	private int mInterspellCooldown = 0;
 
-	private List<Entity> mMarchers;
-	private List<Entity> mExchangers = new ArrayList<>();
-	private List<Entity> mShielders = new ArrayList<>();
+	private final List<Entity> mMarchers = new ArrayList<>();
+	private final List<Entity> mExchangers = new ArrayList<>();
+	private final List<Entity> mShielders = new ArrayList<>();
 	private String mEncounterType;
-	private DoomsdayClock mDoomsdayClock = null;
+	private @Nullable DoomsdayClock mDoomsdayClock = null;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -93,7 +94,7 @@ public class TealSpirit extends BossAbilityGroup {
 		Team team = ScoreboardUtils.getExistingTeamOrCreate("TealSpiritVulnerable", NamedTextColor.AQUA);
 		team.addEntity(mBoss);
 
-
+		mEncounterType = "Normal";
 		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 75, true)) {
 			if (p.getGameMode() != GameMode.SPECTATOR) {
 				if (p.getScoreboardTags().contains("SKTQuest")) {
@@ -218,7 +219,9 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(75, mBoss -> {
-				mDoomsdayClock.run();
+				if (mDoomsdayClock != null) {
+					mDoomsdayClock.run();
+				}
 			});
 
 			events.put(70, mBoss -> {
@@ -234,7 +237,9 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(55, mBoss -> {
-				mDoomsdayClock.disableClock();
+				if (mDoomsdayClock != null) {
+					mDoomsdayClock.disableClock();
+				}
 			});
 
 			events.put(50, mBoss -> {
@@ -267,7 +272,9 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				mDoomsdayClock.run();
+				if (mDoomsdayClock != null) {
+					mDoomsdayClock.run();
+				}
 			});
 
 			events.put(25, mBoss -> {
@@ -289,7 +296,9 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(1, mBoss -> {
-				mDoomsdayClock.disableClock();
+				if (mDoomsdayClock != null) {
+					mDoomsdayClock.disableClock();
+				}
 			});
 
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -385,7 +394,9 @@ public class TealSpirit extends BossAbilityGroup {
 				// Cast Rewind without interruptions
 				changePhase(activeRewindPhase, passiveSpells, null);
 				forceCastSpell(Rewind.class);
-				mDoomsdayClock.run();
+				if (mDoomsdayClock != null) {
+					mDoomsdayClock.run();
+				}
 			});
 
 			events.put(20, mBoss -> {
@@ -401,7 +412,9 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(1, mBoss -> {
-				mDoomsdayClock.disableClock();
+				if (mDoomsdayClock != null) {
+					mDoomsdayClock.disableClock();
+				}
 			});
 
 			BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
@@ -431,7 +444,7 @@ public class TealSpirit extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mSpawnLoc, detectionRange)) {
 			mob.remove();
 		}
@@ -454,7 +467,8 @@ public class TealSpirit extends BossAbilityGroup {
 	}
 
 	public void setMarchers(List<Entity> marchers) {
-		mMarchers = marchers;
+		mMarchers.clear();
+		mMarchers.addAll(marchers);
 	}
 
 	public void killMarchers() {

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -114,8 +115,8 @@ public class DepthsFrostNova extends DepthsAbility {
 				for (double j = 0; j < 360; j += 18) {
 					double radian1 = Math.toRadians(j);
 					mLoc.add(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
-					world.spawnParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1);
-					world.spawnParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65);
+					new PartialParticle(Particle.CLOUD, mLoc, 1, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 8, 0, 0, 0, 0.65).spawnAsPlayerActive(mPlayer);
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, 0.15, FastUtils.sin(radian1) * mRadius);
 				}
 
@@ -129,8 +130,8 @@ public class DepthsFrostNova extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
 		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
-		world.spawnParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35);
-		world.spawnParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45);
+		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
 	}
 

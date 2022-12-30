@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -76,6 +75,7 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
@@ -528,7 +528,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	}
 
 	@Override
-	public boolean isSameItem(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2) {
+	public boolean isSameItem(@Nullable org.bukkit.inventory.ItemStack item1, @Nullable org.bukkit.inventory.ItemStack item2) {
 		return item1 == item2
 			       || item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
 				          && craftItem1.handle == craftItem2.handle;

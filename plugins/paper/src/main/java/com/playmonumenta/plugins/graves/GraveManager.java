@@ -39,7 +39,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GraveManager {
 	private static final String KEY_PLUGIN_DATA = "MonumentaGravesV2";
@@ -55,7 +55,7 @@ public class GraveManager {
 	private final ArrayList<Grave> mGraves = new ArrayList<>();
 	private final Player mPlayer;
 	private boolean mLoggedOut = false;
-	private UUID mDeleteAttemptUUID = null;
+	private @Nullable UUID mDeleteAttemptUUID = null;
 	private int mDeleteAttemptTicksLived = -1;
 
 	private GraveManager(Player player) {
@@ -67,7 +67,7 @@ public class GraveManager {
 				for (JsonElement graveData : gravesData) {
 					JsonObject data = graveData.getAsJsonObject();
 					Grave grave = Grave.deserialize(this, mPlayer, data);
-					if (!grave.isEmpty()) {
+					if (grave != null && !grave.isEmpty()) {
 						mGraves.add(grave);
 					}
 				}
@@ -197,7 +197,7 @@ public class GraveManager {
 
 	// Called only on a death that would result in a grave
 	public static void onDeath(Player player, HashMap<EquipmentSlot, ItemStack> equipment) {
-		GraveManager manager = INSTANCES.get(player.getUniqueId());
+		GraveManager manager = INSTANCES.computeIfAbsent(player.getUniqueId(), key -> new GraveManager(player));
 		String shard = ServerProperties.getShardName();
 
 		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
@@ -397,11 +397,11 @@ public class GraveManager {
 		return mGraves;
 	}
 
-	public Grave getGrave(UUID uuid) {
+	public @Nullable Grave getGrave(UUID uuid) {
 		return mGraves.stream().filter(grave -> grave.mUuid.equals(uuid)).findFirst().orElse(null);
 	}
 
-	public static Grave getGraveFromAnyPlayer(UUID uuid) {
+	public static @Nullable Grave getGraveFromAnyPlayer(UUID uuid) {
 		return INSTANCES.values().stream().map(m -> m.getGrave(uuid)).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 

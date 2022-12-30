@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class DreadfulSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "Dreadful";
@@ -41,7 +42,7 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (event != null && EntityUtils.isElite(mBoss) && !DelvesUtils.isDelveMob(mBoss)) {
 			if (FastUtils.RANDOM.nextDouble() < mParam.SPAWN_CHANCE) {
 				Location loc = mBoss.getLocation();

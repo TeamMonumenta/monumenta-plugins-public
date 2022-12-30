@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class DepthsRemoveAbilityGUI extends CustomInventory {
 	private static final int START_OF_PASSIVES = 36;
@@ -40,7 +41,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 
 	public static List<TriggerData> TRIGGER_STRINGS = new ArrayList<>();
 
-	private String mAbilityName;
+	private @Nullable String mAbilityName;
 
 	public DepthsRemoveAbilityGUI(Player targetPlayer) {
 		super(targetPlayer, 54, "Remove an Ability");
@@ -81,7 +82,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 
 		if (clickedItem.getType() == CONFIRM_MAT) {
 			for (DepthsAbilityInfo<?> ability : abilities) {
-				if (ability.getDisplayName() != null && mAbilityName.contains(ability.getDisplayName())) {
+				if (ability.getDisplayName() != null && mAbilityName != null && mAbilityName.contains(ability.getDisplayName())) {
 					DepthsPlayer depthsplayer = instance.mPlayers.get(player.getUniqueId());
 					if (depthsplayer != null && !depthsplayer.mUsedAbilityDeletion) {
 						depthsplayer.mUsedAbilityDeletion = true;

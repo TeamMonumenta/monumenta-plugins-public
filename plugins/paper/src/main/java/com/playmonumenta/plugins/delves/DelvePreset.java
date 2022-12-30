@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.Material;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static java.util.Map.entry;
 
@@ -172,8 +172,8 @@ public enum DelvePreset {
 	}
 
 	public static boolean validatePresetModifiers(DelvesManager.DungeonDelveInfo delveMods, DelvePreset preset) {
-		for (DelvesModifier modifier : preset.mModifiers.keySet()) {
-			if (delveMods.get(modifier) < preset.mModifiers.get(modifier)) {
+		for (Map.Entry<DelvesModifier, Integer> entry : preset.mModifiers.entrySet()) {
+			if (delveMods.get(entry.getKey()) < entry.getValue()) {
 				return false;
 			}
 		}

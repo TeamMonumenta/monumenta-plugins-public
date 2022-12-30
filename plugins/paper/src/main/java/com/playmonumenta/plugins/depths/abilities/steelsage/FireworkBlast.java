@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Bukkit;
@@ -105,10 +106,10 @@ public class FireworkBlast extends DepthsAbility {
 						//Max damage cap from array
 						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), Math.min(damage, DAMAGE_CAP[mRarity - 1]), false, true, false);
 
-						world.spawnParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2);
-						world.spawnParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR);
-						world.spawnParticle(Particle.REDSTONE, e.getLocation(), 5, 0.25, 0.25, 0.25, RED_COLOR);
-						world.spawnParticle(Particle.REDSTONE, e.getLocation(), 5, 0.25, 0.25, 0.25, ORANGE_COLOR);
+						new PartialParticle(Particle.SMOKE_LARGE, e.getLocation(), 20, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, e.getLocation(), 5, 0.25, 0.25, 0.25, RED_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, e.getLocation(), 5, 0.25, 0.25, 0.25, ORANGE_COLOR).spawnAsPlayerActive(mPlayer);
 						world.playSound(e.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1, 2);
 					}
 

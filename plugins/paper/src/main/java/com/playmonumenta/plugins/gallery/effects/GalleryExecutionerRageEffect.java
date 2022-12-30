@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
-import org.bukkit.attribute.Attribute;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
 
 public class GalleryExecutionerRageEffect extends GalleryConsumableEffect {
@@ -21,8 +21,8 @@ public class GalleryExecutionerRageEffect extends GalleryConsumableEffect {
 
 	@Override public void onPlayerDamage(GalleryPlayer player, DamageEvent event, LivingEntity entity) {
 		if (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH || event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
-			double maxHealt = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-			if (entity.getHealth() < maxHealt) {
+			double maxHealth = EntityUtils.getMaxHealth(entity);
+			if (entity.getHealth() < maxHealth) {
 				event.setDamage(event.getDamage() * MELEE_DAMAGE_INCREASE);
 			}
 

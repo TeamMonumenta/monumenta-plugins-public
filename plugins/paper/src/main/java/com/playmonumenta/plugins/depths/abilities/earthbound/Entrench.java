@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -49,7 +50,7 @@ public class Entrench extends DepthsAbility {
 
 			world.playSound(centerLoc, Sound.BLOCK_NETHER_BRICKS_BREAK, 1.2f, 0.45f);
 			world.playSound(centerLoc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1, 0.6f);
-			world.spawnParticle(Particle.BLOCK_DUST, centerLoc, 35, 1.5, 1.5, 1.5, 1, Material.SOUL_SOIL.createBlockData());
+			new PartialParticle(Particle.BLOCK_DUST, centerLoc, 35, 1.5, 1.5, 1.5, 1, Material.SOUL_SOIL.createBlockData()).spawnAsPlayerActive(mPlayer);
 		}
 		return true;
 	}

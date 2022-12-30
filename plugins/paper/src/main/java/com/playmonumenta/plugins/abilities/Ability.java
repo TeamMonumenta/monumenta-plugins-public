@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -38,6 +37,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Ability {
 	protected final Plugin mPlugin;

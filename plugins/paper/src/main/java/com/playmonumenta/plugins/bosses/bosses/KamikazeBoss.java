@@ -42,8 +42,8 @@ public final class KamikazeBoss extends BossAbilityGroup {
 			if (damager instanceof Damageable) {
 				((Damageable) damager).setHealth(0);
 				World world = damager.getWorld();
-				world.playSound(event.getDamager().getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
-				new PartialParticle(Particle.EXPLOSION_LARGE, event.getDamager().getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
+				world.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
+				new PartialParticle(Particle.EXPLOSION_LARGE, damager.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 			}
 		}
 	}

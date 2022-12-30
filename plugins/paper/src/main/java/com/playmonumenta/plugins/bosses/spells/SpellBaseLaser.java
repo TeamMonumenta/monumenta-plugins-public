@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.LocationUtils.TravelAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -15,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellBaseLaser extends Spell {
 	private static final double BOX_SIZE = 0.5;
@@ -31,7 +31,7 @@ public class SpellBaseLaser extends Spell {
 	private final ParticleAction mParticleAction;
 	private final int mParticleFrequency;
 	private final int mParticleChance;
-	private final FinishAction mFinishAction;
+	private final @Nullable FinishAction mFinishAction;
 	private final @Nullable GetSpellTargets<LivingEntity> mGetTargets;
 
 	/**
@@ -59,7 +59,7 @@ public class SpellBaseLaser extends Spell {
 		int cooldown,
 		TickAction tickAction,
 		ParticleAction particleAction,
-		FinishAction finishAction
+		@Nullable FinishAction finishAction
 	) {
 		this(
 			plugin,
@@ -89,7 +89,7 @@ public class SpellBaseLaser extends Spell {
 		ParticleAction particleAction,
 		int particleFrequency,
 		int particleChance,
-		FinishAction finishAction
+		@Nullable FinishAction finishAction
 	) {
 		mPlugin = plugin;
 		mBoss = boss;

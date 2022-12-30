@@ -16,7 +16,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -26,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 
@@ -115,7 +115,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return mDepthsTrigger;
 	}
 
-	public DepthsTree getDepthsTree() {
+	public @Nullable DepthsTree getDepthsTree() {
 		return mDepthsTree;
 	}
 
@@ -168,6 +168,9 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			item.mAbility = getDisplayName();
 			item.mTrigger = mDepthsTrigger;
 			ItemStack stack = getDisplayItem();
+			if (stack == null) {
+				return null;
+			}
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			TextColor color = mDepthsTree == null ? NamedTextColor.WHITE : mDepthsTree.getColor();

@@ -48,6 +48,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This is the main class for each game of gallery, each map has a UNIQUE key as the UUID of the world is playing on.
  */
+@SuppressWarnings("NullAway") // nit class needs some refactoring to solve all issues
 public class GalleryGame {
 
 	//statics constant that we may need to move inside GalleryGame if each map has his own constant
@@ -75,16 +76,16 @@ public class GalleryGame {
 	private final Map<String, BaseInteractable> mInteractableMap = new HashMap<>();
 
 	//map of ALL the spawners object loaded in the game, each object has a unique name used has map key (updated on request by reloadAll)
-	private final Map<String, Spawner> mSpawnerMap = new HashMap<>();
+	private final Map<String, GallerySpawner> mSpawnerMap = new HashMap<>();
 
 	//contains a reference of all the spawners that have been activated (updated when ever a spawner is activated)
-	private final Set<Spawner> mActivatedSpawnerSet = new HashSet<>();
+	private final Set<GallerySpawner> mActivatedSpawnerSet = new HashSet<>();
 
 	//contains a reference of all the spawners that have been activated and are near the players (updated two time in a sec)
-	private final List<Spawner> mSpawningSpawnersList = new ArrayList<>();
+	private final List<GallerySpawner> mSpawningSpawnersList = new ArrayList<>();
 
 	//contains a reference of all the spawners that have been activated and are NOT near the players (updated two time in a sec)
-	private final List<Spawner> mSleepySpawnersList = new ArrayList<>();
+	private final List<GallerySpawner> mSleepySpawnersList = new ArrayList<>();
 
 	//map of ALL the players that are playing this map, as map keys their UUID
 	private final Map<UUID, GalleryPlayer> mPlayersMap = new HashMap<>();
@@ -128,11 +129,11 @@ public class GalleryGame {
 	private BukkitRunnable mRoundStartRunnable = null;
 
 	/**
-	 * @param gameUUID uuid of the world the game is playing in.
-	 * @param map which current map is playing
-	 * @param players list of the players
+	 * Main constructor of the game, used when run by command /gallery init @a[...] {GalleryMapName}
 	 *
-	 *                Main constructor of the game, used when run by command /gallery init @a[...] {GalleryMapName}
+	 * @param gameUUID uuid of the world the game is playing in.
+	 * @param map      which current map is playing
+	 * @param players  list of the players
 	 */
 	public GalleryGame(UUID gameUUID, GalleryMap map, List<Player> players) {
 		GAME_INSTANCE = this;
@@ -237,9 +238,9 @@ public class GalleryGame {
 				if (player == null) {
 					continue;
 				}
-				Iterator<Spawner> iterator = mSleepySpawnersList.iterator();
+				Iterator<GallerySpawner> iterator = mSleepySpawnersList.iterator();
 				while (iterator.hasNext()) {
-					Spawner spawner = iterator.next();
+					GallerySpawner spawner = iterator.next();
 					if (player.getLocation().distance(spawner.getLocation()) <= 30) {
 						mSpawningSpawnersList.add(spawner);
 						iterator.remove();
@@ -343,6 +344,9 @@ public class GalleryGame {
 		for (LivingEntity entity : interactable) {
 			try {
 				BaseInteractable interact = BaseInteractable.fromEntity(entity);
+				if (interact == null) {
+					continue;
+				}
 				BaseInteractable otherInteractable = mInteractableMap.get(interact.getName());
 				if (otherInteractable != null) {
 					//we have more than one interactable with the same name. this is a problem since only one will be saved
@@ -362,11 +366,11 @@ public class GalleryGame {
 			}
 		}
 
-		List<ArmorStand> spawnersEntities = armorStands.stream().filter(armorStand -> armorStand.getScoreboardTags().contains(Spawner.TAG_STRING)).toList();
+		List<ArmorStand> spawnersEntities = armorStands.stream().filter(armorStand -> armorStand.getScoreboardTags().contains(GallerySpawner.TAG_STRING)).toList();
 		for (LivingEntity entity : spawnersEntities) {
 			try {
-				Spawner spawner = Spawner.fromEntity(entity);
-				Spawner otherSpawner = mSpawnerMap.get(spawner.getName());
+				GallerySpawner spawner = GallerySpawner.fromEntity(entity);
+				GallerySpawner otherSpawner = mSpawnerMap.get(spawner.getName());
 				if (otherSpawner != null) {
 					//we have more than one interactable with the same name. this is a problem since only one will be saved
 					GalleryUtils.printDebugMessage("DUPLICATE SPAWNER NAME! " + spawner.getName() + " Pos1. " + spawner.getLocation().toVector() + " Pos2. " + otherSpawner.getLocation().toVector());
@@ -449,7 +453,7 @@ public class GalleryGame {
 		}
 	}
 
-	public void setInteractableText(String interactableName, String text) {
+	public void setInteractableText(String interactableName, @Nullable String text) {
 		BaseInteractable interactable = mInteractableMap.get(interactableName);
 		if (interactable != null) {
 			interactable.setShowingText(text);
@@ -460,7 +464,7 @@ public class GalleryGame {
 		if (!mSpawnerMap.containsKey(name)) {
 			return;
 		}
-		Spawner spawner = mSpawnerMap.get(name);
+		GallerySpawner spawner = mSpawnerMap.get(name);
 		spawner.setActive(active);
 		if (active) {
 			mActivatedSpawnerSet.add(spawner);
@@ -502,6 +506,9 @@ public class GalleryGame {
 			    entity.getScoreboardTags().contains(EffectInteractable.TAG_STRING)) {
 			try {
 				BaseInteractable interact = BaseInteractable.fromEntity(entity);
+				if (interact == null) {
+					return;
+				}
 				mInteractableMap.put(interact.getName(), interact);
 
 			} catch (Exception e) {
@@ -509,9 +516,9 @@ public class GalleryGame {
 				e.printStackTrace();
 			}
 		}
-		if (entity.getScoreboardTags().contains(Spawner.TAG_STRING)) {
+		if (entity.getScoreboardTags().contains(GallerySpawner.TAG_STRING)) {
 			try {
-				Spawner spawner = Spawner.fromEntity(entity);
+				GallerySpawner spawner = GallerySpawner.fromEntity(entity);
 				mSpawnerMap.put(spawner.getName(), spawner);
 				if (spawner.isActive()) {
 					mActivatedSpawnerSet.add(spawner);
@@ -665,7 +672,7 @@ public class GalleryGame {
 			interactable.save();
 		}
 
-		for (Spawner spawner : mSpawnerMap.values()) {
+		for (GallerySpawner spawner : mSpawnerMap.values()) {
 			spawner.save();
 		}
 	}
@@ -778,7 +785,7 @@ public class GalleryGame {
 		}
 	}
 
-	public void playerDeathEvent(PlayerDeathEvent event, LivingEntity player, int ticks) {
+	public void playerDeathEvent(PlayerDeathEvent event, Player player, int ticks) {
 		GalleryPlayer realPlayer = mPlayersMap.get(player.getUniqueId());
 		if (realPlayer == null) {
 			GalleryUtils.printDebugMessage("Player == null while playerDeathEvent for game " + mUUIDGame);
@@ -826,20 +833,18 @@ public class GalleryGame {
 					gPlayer.sendMessage("hold crouch to revive them");
 				}
 			}
-			GalleryGrave.createGrave(realPlayer, deadLoc, this);
+			GalleryGrave.createGrave(realPlayer, player, deadLoc, this);
 			return;
 		}
-		if (player instanceof Player player1) {
-			GalleryManager.refreshEffects(player1);
-		}
+		GalleryManager.refreshEffects(player);
 	}
 
-	public void onPlayerHurtEvent(DamageEvent event, Player player, Entity damager, LivingEntity source) {
+	public void onPlayerHurtEvent(DamageEvent event, Player player, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (mCurrentRound > GalleryUtils.STARTING_ROUND_FOR_SCALING && (source == null || !GalleryUtils.ignoreScaling(source))) {
 			double multiply;
 			if (mCurrentRound <= GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER) {
 				int dif = mCurrentRound - GalleryUtils.STARTING_ROUND_FOR_SCALING;
-				 multiply = 1 + dif * 0.1;
+				multiply = 1 + dif * 0.1;
 			} else {
 				int difH = mCurrentRound - GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER;
 				multiply = 1 + (GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER - GalleryUtils.STARTING_ROUND_FOR_SCALING) * 0.1 + difH * 0.2;

@@ -15,6 +15,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class DivineJusticeCS implements CosmeticSkill {
 
@@ -26,7 +27,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 	private final float HEAL_PITCH_OTHER = Constants.NotePitches.E22;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -41,7 +42,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

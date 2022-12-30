@@ -43,7 +43,7 @@ public class MarchingFate extends Spell {
 
 	private final ChargeUpManager mBossBar;
 	private boolean mSentMessage = false;
-	private HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
+	private final HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
 	private int mT = 0;
 	private boolean mHasRun = false;
 

@@ -33,6 +33,7 @@ public class TowerManager implements Listener {
 
 	protected static final Map<UUID, TowerGame> GAMES = new HashMap<>();
 
+	@SuppressWarnings("NullAway.Init") // set in constructor, which should be called before any other tower methods
 	public static Plugin mPlugin;
 
 

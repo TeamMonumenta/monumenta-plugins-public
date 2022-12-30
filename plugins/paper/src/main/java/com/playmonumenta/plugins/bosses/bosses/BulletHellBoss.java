@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class BulletHellBoss extends BossAbilityGroup {
 
@@ -92,7 +93,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 					world.playSound(mBoss.getLocation(), p.SHOOT_SOUND, p.SHOOT_VOLUME, 0);
 				},
 				p.MATERIAL,
-				(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
 						BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.PROJECTILE, p.DAMAGE, prevLoc);
 					}

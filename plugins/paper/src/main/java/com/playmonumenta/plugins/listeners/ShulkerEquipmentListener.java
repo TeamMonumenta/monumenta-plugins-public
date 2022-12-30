@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
@@ -54,6 +53,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ShulkerEquipmentListener implements Listener {
 	private static final String LOCK_STRING = "AdminEquipmentTool";
@@ -178,7 +178,7 @@ public class ShulkerEquipmentListener implements Listener {
 					event.setCancelled(true);
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
 					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
+						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				} else if (sbox.isLocked() && sbox.getLock().equals(CHARM_STRING)) {
@@ -204,9 +204,7 @@ public class ShulkerEquipmentListener implements Listener {
 					sMeta.setBlockState(sbox);
 					sboxItem.setItemMeta(sMeta);
 
-					if (CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()) != null) {
-						CharmManager.getInstance().updateCharms(player, CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()));
-					}
+					CharmManager.getInstance().updateCharms(player);
 					event.setCancelled(true);
 				} else if (sbox.isLocked() && sbox.getLock().equals(PORTAL_EPIC_STRING)) {
 					//if on cooldown don't swap
@@ -248,9 +246,7 @@ public class ShulkerEquipmentListener implements Listener {
 					swapParrots(player, sboxItem);
 
 					player.updateInventory();
-					if (CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()) != null) {
-						CharmManager.getInstance().updateCharms(player, CharmManager.getInstance().mPlayerCharms.get(player.getUniqueId()));
-					}
+					CharmManager.getInstance().updateCharms(player);
 					event.setCancelled(true);
 
 					//check if swapped in radius of boss
@@ -264,7 +260,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
 					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, player.getMaxHealth(), true);
+						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, true);
 					}
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				}
@@ -279,7 +275,7 @@ public class ShulkerEquipmentListener implements Listener {
 		}
 	}
 
-	private static String getShulkerLock(@Nullable ItemStack sboxItem) {
+	private static @Nullable String getShulkerLock(@Nullable ItemStack sboxItem) {
 		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
 				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {

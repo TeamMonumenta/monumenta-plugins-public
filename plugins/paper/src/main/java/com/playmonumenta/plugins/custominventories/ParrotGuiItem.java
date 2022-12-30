@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.custominventories;
 
 import java.util.Map;
 import java.util.function.BiPredicate;
-import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class ParrotGuiItem {
 	private final int mPage;

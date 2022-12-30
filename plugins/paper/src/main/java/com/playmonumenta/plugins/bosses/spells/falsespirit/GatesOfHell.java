@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -47,7 +48,7 @@ public class GatesOfHell extends Spell {
 		}
 
 		mOpenPortals.add(portal);
-		Entity portalEntity = LibraryOfSoulsIntegration.summon(portal.getLocation(), "PortalGate");
+		Entity portalEntity = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(portal.getLocation(), "PortalGate"));
 		portalEntity.addScoreboardTag("PortalNum" + mNum);
 
 		switch (mNum) {

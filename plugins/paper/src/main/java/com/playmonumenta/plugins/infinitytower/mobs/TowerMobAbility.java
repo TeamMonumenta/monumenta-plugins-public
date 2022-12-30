@@ -36,6 +36,7 @@ import com.playmonumenta.plugins.infinitytower.mobs.abilities.RandomTeleportTowe
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.SvalgotGhalkorTowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.TowerAbility;
 import com.playmonumenta.plugins.infinitytower.mobs.abilities.VolcanicDemiseTowerAbility;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerMobAbility {
 
@@ -121,7 +123,7 @@ public class TowerMobAbility {
 							final EntityTargets mTargets = new EntityTargets(EntityTargets.TARGETS.MOB, 5, false, EntityTargets.Limit.DEFAULT, List.of(), new EntityTargets.TagsListFiter(Set.of(mIsPlayerMob ? TowerConstants.MOB_TAG_FLOOR_TEAM : TowerConstants.MOB_TAG_PLAYER_TEAM)));
 
 							@Override
-							public void death(EntityDeathEvent event) {
+							public void death(@Nullable EntityDeathEvent event) {
 								new BukkitRunnable() {
 									int mTimer = 0;
 									final Location mLocation = mBoss.getLocation();
@@ -143,7 +145,7 @@ public class TowerMobAbility {
 										}
 
 										//Summon particles
-										mWorld.spawnParticle(Particle.REDSTONE, mLocation, 20, 2, 0, 2, 0.05, new DustOptions(Color.RED, 1f));
+										new PartialParticle(Particle.REDSTONE, mLocation, 20, 2, 0, 2, 0.05, new DustOptions(Color.RED, 1f)).spawnAsEntityActive(mBoss);
 
 										if (mTimer % 20 == 0) {
 											for (LivingEntity target : mTargets.getTargetsListByLocation(mBoss, mLocation)) {
@@ -492,7 +494,7 @@ public class TowerMobAbility {
 
 	public final String mName;
 	public final String mDescription;
-	private final BuildMobAbility mBuilder;
+	private final @Nullable BuildMobAbility mBuilder;
 
 	private TowerMobAbility(String name) {
 		mName = name;
@@ -533,9 +535,9 @@ public class TowerMobAbility {
 	public static class Tuple {
 		public final String mName;
 		public final String mDescription;
-		public final BuildMobAbility mBuilder;
+		public final @Nullable BuildMobAbility mBuilder;
 
-		public Tuple(String name, String description, BuildMobAbility buildAbility) {
+		public Tuple(String name, String description, @Nullable BuildMobAbility buildAbility) {
 			mName = name;
 			mDescription = description;
 			mBuilder = buildAbility;

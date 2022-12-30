@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.EnumSet;
@@ -46,8 +47,8 @@ public class Starvation implements Enchantment {
 			player.setSaturation(newSat);
 			player.setFoodLevel(newFood);
 			World world = player.getWorld();
-			world.spawnParticle(Particle.SNEEZE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1);
-			world.spawnParticle(Particle.SLIME, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1);
+			new PartialParticle(Particle.SNEEZE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerBuff(player);
+			new PartialParticle(Particle.SLIME, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerBuff(player);
 			world.playSound(player.getLocation(), Sound.ENTITY_HOGLIN_AMBIENT, 1, 1.25f);
 		}
 	}

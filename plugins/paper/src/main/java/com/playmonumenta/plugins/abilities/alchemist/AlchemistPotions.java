@@ -88,11 +88,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private double mRadius = 0;
 	private int mTimer = 0;
 	private int mSlot;
-	private int mMaxCharges;
+	private final int mMaxCharges;
 	private int mCharges;
 	private int mChargeTime;
-	private WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
-	private Map<UUID, Integer> mMobsIframeMap;
+	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final Map<UUID, Integer> mMobsIframeMap;
 
 	private boolean mGruesomeMode;
 
@@ -104,14 +104,12 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			.linkedSpell(ClassAbility.ALCHEMIST_POTION)
 			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
 
-	private GruesomeAlchemyCS mCosmetic;
+	private final GruesomeAlchemyCS mCosmetic;
+
+	private @Nullable ProjectileHitEvent mLastHitEvent;
 
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		if (player == null) {
-			/* This is a reference ability, not one actually tied to a player */
-			return;
-		}
 
 		/*
 		 * Run this stuff 5 ticks later. As of now, the AbilityManager takes a tick
@@ -253,8 +251,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		});
 		potion.setItem(item);
 	}
-
-	private ProjectileHitEvent mLastHitEvent;
 
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {

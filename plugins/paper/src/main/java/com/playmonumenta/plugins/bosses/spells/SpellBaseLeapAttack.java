@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -15,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellBaseLeapAttack extends Spell {
 
@@ -75,8 +75,8 @@ public class SpellBaseLeapAttack extends Spell {
 	private final AestheticAction mLeapAesthetic;
 	private final AestheticAction mLeapingAesthetic;
 	private final HitAction mHitAction;
-	private final JumpVelocityModifier mVelocityModifier;
-	private final MidLeapTickAction mMidLeapTick;
+	private final @Nullable JumpVelocityModifier mVelocityModifier;
+	private final @Nullable MidLeapTickAction mMidLeapTick;
 
 	/**
 	 * @param plugin             Plugin
@@ -95,8 +95,8 @@ public class SpellBaseLeapAttack extends Spell {
 	 */
 	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
 	                           double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
-	                           AestheticAction leapingAesthetic, HitAction hitAction, JumpVelocityModifier velocityModifier,
-	                           MidLeapTickAction midLeapTick) {
+	                           AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
+	                           @Nullable MidLeapTickAction midLeapTick) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();

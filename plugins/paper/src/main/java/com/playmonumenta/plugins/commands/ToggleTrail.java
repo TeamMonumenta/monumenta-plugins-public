@@ -19,11 +19,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ToggleTrail extends GenericCommand implements Listener {
 
-	private static Map<UUID, Material> mTrackedPlayers = new HashMap();
-	private static BukkitRunnable mRunnable = null;
+	private static final Map<UUID, Material> mTrackedPlayers = new HashMap<>();
+	private static @Nullable BukkitRunnable mRunnable = null;
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.toggletrail");
@@ -54,28 +55,26 @@ public class ToggleTrail extends GenericCommand implements Listener {
 			.register();
 	}
 
-	private static void run(Player player, String material) {
-		Material block = null;
+	private static void run(Player player, @Nullable String material) {
+		Material block = Material.SPONGE;
 		if (material != null) {
 			block = Material.getMaterial(material.toUpperCase());
 		}
 
 		if (!mTrackedPlayers.containsKey(player.getUniqueId())) {
 			player.sendMessage("Toggled trail ON.");
-			if (block == null) {
-				mTrackedPlayers.put(player.getUniqueId(), Material.SPONGE);
-			} else {
-				mTrackedPlayers.put(player.getUniqueId(), block);
-			}
+			mTrackedPlayers.put(player.getUniqueId(), block);
 			if (mTrackedPlayers.size() == 1) {
 				mRunnable = new BukkitRunnable() {
 
 					@Override
 					public void run() {
-						for (UUID uuid : mTrackedPlayers.keySet()) {
-							Player p = Bukkit.getPlayer(uuid);
-							p.getLocation().getBlock().setType(mTrackedPlayers.get(uuid));
-							CoreProtectIntegration.logPlacement(p, p.getLocation(), mTrackedPlayers.get(uuid), mTrackedPlayers.get(uuid).createBlockData());
+						for (Map.Entry<UUID, Material> entry : mTrackedPlayers.entrySet()) {
+							Player p = Bukkit.getPlayer(entry.getKey());
+							if (p != null) {
+								p.getLocation().getBlock().setType(entry.getValue());
+								CoreProtectIntegration.logPlacement(p, p.getLocation(), entry.getValue(), entry.getValue().createBlockData());
+							}
 						}
 					}
 				};
@@ -85,7 +84,7 @@ public class ToggleTrail extends GenericCommand implements Listener {
 		} else {
 			player.sendMessage("Toggled trail OFF.");
 			mTrackedPlayers.remove(player.getUniqueId());
-			if (mTrackedPlayers.isEmpty()) {
+			if (mTrackedPlayers.isEmpty() && mRunnable != null) {
 				mRunnable.cancel();
 				mRunnable = null;
 			}

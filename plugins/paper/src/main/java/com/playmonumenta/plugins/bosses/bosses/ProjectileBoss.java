@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class ProjectileBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_projectile";
@@ -200,7 +201,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 					}
 				},
 				// Hit Action
-				(World world, LivingEntity target, Location loc, Location prevLoc) -> {
+				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 					if (!p.DAMAGE_PLAYER_ONLY || target instanceof Player) {
 						p.SOUND_HIT.play(loc, 0.5f, 0.5f);
 						p.PARTICLE_HIT.spawn(boss, loc, 0d, 0d, 0d, 0.25d);

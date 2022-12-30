@@ -1,10 +1,11 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.adapters.VersionAdapter;
+import com.playmonumenta.plugins.adapters.VersionAdapter_unsupported;
 import java.util.logging.Logger;
 
 public class NmsUtils {
-	private static VersionAdapter mVersionAdapter = null;
+	private static VersionAdapter mVersionAdapter = new VersionAdapter_unsupported();
 
 	public static VersionAdapter getVersionAdapter() {
 		return mVersionAdapter;

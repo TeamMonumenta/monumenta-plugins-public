@@ -19,7 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_training_dummy";
@@ -104,27 +104,29 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 						mMaxDPS = mDPSCounter;
 					}
 
-					Component hologramDisplay;
+					if (mHologram != null) {
+						Component hologramDisplay;
 
-					if (mDPSDisp10s >= 0) {
-						hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-							                  .append(Component.text(" (", NamedTextColor.YELLOW))
-							                  .append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
-							                  .append(Component.text("/", NamedTextColor.YELLOW))
-							                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							                  .append(Component.text(")", NamedTextColor.YELLOW));
-					} else {
-						hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
-							                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
-							                  .append(Component.text(" (", NamedTextColor.YELLOW))
-							                  .append(Component.text("???", NamedTextColor.DARK_AQUA))
-							                  .append(Component.text("/", NamedTextColor.YELLOW))
-							                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
-							                  .append(Component.text(")", NamedTextColor.YELLOW));
+						if (mDPSDisp10s >= 0) {
+							hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
+								                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+								                  .append(Component.text(" (", NamedTextColor.YELLOW))
+								                  .append(Component.text(damageToString(mDPSDisp10s, true), NamedTextColor.GREEN))
+								                  .append(Component.text("/", NamedTextColor.YELLOW))
+								                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+								                  .append(Component.text(")", NamedTextColor.YELLOW));
+						} else {
+							hologramDisplay = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
+								                  .append(Component.text(damageToString(mDPSDisp, true), NamedTextColor.RED))
+								                  .append(Component.text(" (", NamedTextColor.YELLOW))
+								                  .append(Component.text("???", NamedTextColor.DARK_AQUA))
+								                  .append(Component.text("/", NamedTextColor.YELLOW))
+								                  .append(Component.text(damageToString(mMaxDPS, true), NamedTextColor.GOLD))
+								                  .append(Component.text(")", NamedTextColor.YELLOW));
+						}
+
+						mHologram.customName(hologramDisplay);
 					}
-
-					mHologram.customName(hologramDisplay);
 					mDPSCounter = -1;
 				}, 20);
 			}

@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 
 public class GruesomeAlchemyCS implements CosmeticSkill {
@@ -19,7 +20,7 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 		.build();
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -34,7 +35,7 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class DaggerOfNothingCS extends DaggerThrowCS {
 	//To test Ronde's effect, we need a skill with completely no effect.
@@ -15,7 +16,7 @@ public class DaggerOfNothingCS extends DaggerThrowCS {
 	public static final String NAME = "Dagger of Nothing";
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"New daggers of the EmpError"
 		);
@@ -32,7 +33,7 @@ public class DaggerOfNothingCS extends DaggerThrowCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

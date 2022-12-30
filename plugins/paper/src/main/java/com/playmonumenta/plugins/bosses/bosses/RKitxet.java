@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -50,6 +49,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class RKitxet extends BossAbilityGroup {
 	public static final String identityTag = "boss_rkitxet";
@@ -66,7 +66,6 @@ public class RKitxet extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	public SpellShardShield mShieldSpell;
-	public SpellEndlessAgony mEndlessAgony;
 	public List<Location> mAgonyLocations;
 
 	private @Nullable Player mAgonyTarget;
@@ -262,7 +261,7 @@ public class RKitxet extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {

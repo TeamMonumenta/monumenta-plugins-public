@@ -22,6 +22,7 @@ import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 
 public class DropShardBoss extends BossAbilityGroup {
@@ -50,7 +51,7 @@ public class DropShardBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		double rand = FastUtils.randomDoubleInRange(0, 1.0);
 		if (EntityUtils.isElite(mBoss) || rand > 0.5) {
 			LootContext cont = new LootContext.Builder(mBoss.getLocation()).build();
@@ -58,8 +59,10 @@ public class DropShardBoss extends BossAbilityGroup {
 			mBoss.getWorld().dropItem(mBoss.getLocation(), item).setGlowing(true);
 		}
 
-		event.setDroppedExp(0);
-		event.getDrops().clear();
+		if (event != null) {
+			event.setDroppedExp(0);
+			event.getDrops().clear();
+		}
 	}
 
 	@Override

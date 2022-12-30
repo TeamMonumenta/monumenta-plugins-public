@@ -22,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class GhalkorFlameBolt extends Spell {
 
@@ -71,7 +72,7 @@ public class GhalkorFlameBolt extends Spell {
 				new PartialParticle(Particle.FLAME, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(mBoss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
 				loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
 				new PartialParticle(Particle.FLAME, loc, 20, 0.5, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
 				if (player != null) {

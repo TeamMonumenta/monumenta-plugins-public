@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Blaze;
@@ -29,6 +28,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.Nullable;
 
 
 public class ElementalArrows extends Ability {
@@ -97,6 +97,9 @@ public class ElementalArrows extends Ability {
 			return false;
 		}
 		ItemStatManager.PlayerItemStats playerItemStats = DamageListener.getProjectileItemStats(proj);
+		if (playerItemStats == null) {
+			return false;
+		}
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ELEMENTAL_ARROWS_DURATION);
 

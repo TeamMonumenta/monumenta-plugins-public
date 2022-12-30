@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PercentExperience extends SingleArgumentEffect {
 	public static final String effectID = "PercentExperience";

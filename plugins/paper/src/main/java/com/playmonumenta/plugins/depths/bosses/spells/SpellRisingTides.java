@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -23,10 +24,10 @@ public class SpellRisingTides extends Spell {
 	private static final Particle.DustOptions UP_COLOR = new Particle.DustOptions(Color.fromRGB(66, 140, 237), 1.0f);
 	private static final Particle.DustOptions DOWN_COLOR = new Particle.DustOptions(Color.fromRGB(226, 88, 34), 1.0f);
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	public int mCooldownTicks;
-	private Location mStartLoc;
+	private final Location mStartLoc;
 	public Nucleus mBossInstance;
 
 	public SpellRisingTides(Plugin plugin, LivingEntity boss, Location startLoc, int cooldownTicks, Nucleus bossInstance) {
@@ -97,9 +98,9 @@ public class SpellRisingTides extends Spell {
 
 								if (dist < 10 || x % 4 == 0) {
 									if (tide) {
-										player.spawnParticle(Particle.REDSTONE, loc.add(0, -.5 + (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, UP_COLOR);
+										new PartialParticle(Particle.REDSTONE, loc.add(0, -.5 + (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, UP_COLOR).spawnAsEntityActive(mBoss);
 									} else {
-										player.spawnParticle(Particle.REDSTONE, loc.add(0, 2.5 - (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, DOWN_COLOR);
+										new PartialParticle(Particle.REDSTONE, loc.add(0, 2.5 - (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, DOWN_COLOR).spawnAsEntityActive(mBoss);
 									}
 								}
 							}
@@ -122,20 +123,20 @@ public class SpellRisingTides extends Spell {
 
 								if (dist < 10) {
 									if (tide) {
-										player.spawnParticle(Particle.SMOKE_NORMAL, loc.add(0, -.5, 0), 1, 0.15, 0.15, 0.15, 0);
+										new PartialParticle(Particle.SMOKE_NORMAL, loc.add(0, -.5, 0), 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 
 										if (deg % 16 == 0) {
-											player.spawnParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.15, 0.15, 0.15);
+											new PartialParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.15, 0.15, 0.15).spawnAsEntityActive(mBoss);
 											//Remove if explosions unwanted
-											player.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.15, 0.15, 0.15, 0);
+											new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 										}
 									} else {
-										player.spawnParticle(Particle.SMOKE_NORMAL, loc.add(0, 2.5, 0), 1, 0.15, 0.15, 0.15, 0);
+										new PartialParticle(Particle.SMOKE_NORMAL, loc.add(0, 2.5, 0), 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 
 										if (deg % 16 == 0) {
-											player.spawnParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.15, 0.15, 0.15);
+											new PartialParticle(Particle.DAMAGE_INDICATOR, loc, 1, 0.15, 0.15, 0.15).spawnAsEntityActive(mBoss);
 											//Remove if explosions unwanted
-											player.spawnParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.15, 0.15, 0.15, 0);
+											new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.15, 0.15, 0.15, 0).spawnAsEntityActive(mBoss);
 										}
 									}
 								}

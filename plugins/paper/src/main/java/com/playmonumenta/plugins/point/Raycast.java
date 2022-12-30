@@ -11,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Raycast {
 
@@ -27,14 +28,14 @@ public class Raycast {
 	public boolean mThroughNonOccluding = false;
 	public boolean mNoIterations = false;
 
-	public Particle mParticle = null;
+	public @Nullable Particle mParticle = null;
 
 	public boolean mPrecision = false;
 	public int mPrecisionTicks = 0;
 
 	//Locations
 	private final Location mStart;
-	private Location mEnd = null;
+	private @Nullable Location mEnd = null;
 
 	public Raycast(Location p1, Location p2) {
 		this.mDir = LocationUtils.getDirectionTo(p2, p1);

@@ -23,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	//Steely predator stirke. Depth set: steel
@@ -35,7 +36,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"These twin fireworks will make",
 			"a spectacle out of your target!");
@@ -52,7 +53,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -42,7 +43,7 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 
 	public SeasonalEventRepurchaseGUI(Player player) {
 		super(player, 6 * 9, Component.text("Season Passes", NamedTextColor.GOLD));
-		mMetamorphosisToken = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(SeasonalPass.ITEM_SKIN_KEY));
+		mMetamorphosisToken = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(SeasonalPass.ITEM_SKIN_KEY)));
 		setFiller(Material.GRAY_STAINED_GLASS_PANE);
 	}
 
@@ -55,7 +56,9 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 			setItem(0, 0, back)
 				.onLeftClick(() -> {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
-					new SeasonalEventGUI(SeasonalEventManager.mActivePass, mPlayer).open();
+					if (SeasonalEventManager.mActivePass != null) {
+						new SeasonalEventGUI(SeasonalEventManager.mActivePass, mPlayer).open();
+					}
 				});
 
 			int i = 0;
@@ -123,6 +126,9 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 					}
 					int soFar = rewardsSoFar.merge(cosmeticType, 1, Integer::sum);
 					int[] costs = COSMETIC_COSTS.get(cosmeticType);
+					if (costs == null) {
+						continue;
+					}
 					cost = costs[Math.min(soFar - 1, costs.length - 1)];
 					owned = CosmeticsManager.getInstance().playerHasCosmetic(mPlayer, cosmeticType, reward.mData);
 					icon = ItemUtils.modifyMeta(new ItemStack(reward.mDisplayItem),

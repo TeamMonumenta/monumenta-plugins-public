@@ -16,12 +16,12 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public class ChoirBells extends Ability {
@@ -97,7 +97,7 @@ public class ChoirBells extends Ability {
 			}
 
 			if (Crusade.applyCrusadeToSlayer(mob, mCrusade)) {
-				mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(mCrusade.getEnhancementDuration()));
+				mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
 			}
 		}
 		putOnCooldown();

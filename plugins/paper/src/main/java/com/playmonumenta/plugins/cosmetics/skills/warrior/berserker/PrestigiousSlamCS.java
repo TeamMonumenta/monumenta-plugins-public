@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousSlamCS extends MeteorSlamCS implements PrestigeCS {
 
@@ -28,7 +29,7 @@ public class PrestigiousSlamCS extends MeteorSlamCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.25f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"SLAM_DESC"
 		);
@@ -45,7 +46,7 @@ public class PrestigiousSlamCS extends MeteorSlamCS implements PrestigeCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

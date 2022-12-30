@@ -5,10 +5,11 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class ActivityManager {
 	private static @Nullable ActivityManager mManager = null;
@@ -26,7 +27,7 @@ public class ActivityManager {
 	}
 
 	public static ActivityManager getManager() {
-		return mManager;
+		return Objects.requireNonNull(mManager);
 	}
 
 	public void clearPlayerStats(Player player) {

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,6 +40,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public final class Azacor extends BossAbilityGroup {
 	public static final String identityTag = "boss_azacor";
@@ -161,19 +163,19 @@ public final class Azacor extends BossAbilityGroup {
 	static void randomMinion(String tellraw, Location loc, double eliteHealth) {
 		int rand = FastUtils.RANDOM.nextInt(4);
 		if (rand == 0) {
-			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "SarintultheUnseen");
+			LivingEntity elite = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "SarintultheUnseen"));
 			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, eliteHealth);
 			elite.setHealth(eliteHealth);
 		} else if (rand == 1) {
-			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ZirinkelthePrecise");
+			LivingEntity elite = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ZirinkelthePrecise"));
 			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, eliteHealth);
 			elite.setHealth(eliteHealth);
 		} else if (rand == 2) {
-			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "KazarthuntheMighty");
+			LivingEntity elite = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "KazarthuntheMighty"));
 			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, 1.5 * eliteHealth);
 			elite.setHealth(1.5 * eliteHealth);
 		} else {
-			LivingEntity elite = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "VerkantaltheCunning");
+			LivingEntity elite = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "VerkantaltheCunning"));
 			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, 0.75 * eliteHealth);
 			elite.setHealth(0.75 * eliteHealth);
 		}
@@ -199,7 +201,7 @@ public final class Azacor extends BossAbilityGroup {
 
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {

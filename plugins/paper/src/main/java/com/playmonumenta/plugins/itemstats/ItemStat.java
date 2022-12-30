@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.itemstats;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -22,6 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
+import org.jetbrains.annotations.Nullable;
 
 public interface ItemStat {
 

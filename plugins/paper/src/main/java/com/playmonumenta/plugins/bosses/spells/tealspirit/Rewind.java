@@ -17,6 +17,8 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -154,27 +156,27 @@ public class Rewind extends Spell {
 								mWindDown.reset();
 
 								HashMap<Player, HashMap<LivingEntity, Vector>> relatives = new HashMap<>();
-								players.forEach(player -> relatives.put(player, new HashMap<>()));
 								for (LivingEntity mob : EntityUtils.getNearbyMobs(mCenter, TealSpirit.detectionRange, mBoss)) {
 									Location mobLoc = mob.getLocation();
 									Player player = EntityUtils.getNearestPlayer(mobLoc, RADIUS);
 									if (player != null) {
-										HashMap<LivingEntity, Vector> relative = relatives.get(player);
-										if (relative != null) {
-											relative.put(mob, mobLoc.toVector().subtract(player.getLocation().toVector()));
-										}
+										relatives.computeIfAbsent(player, key -> new HashMap<>())
+											.put(mob, mobLoc.toVector().subtract(player.getLocation().toVector()));
 									}
 								}
 
 								for (Player player : players) {
-									Location origin = origins.get(player);
+									Location origin = Objects.requireNonNull(origins.get(player));
 									player.teleport(origin);
 									HashMap<LivingEntity, Vector> relative = relatives.get(player);
-									for (LivingEntity mob : relative.keySet()) {
-										if (mob.getType() != EntityType.SHULKER || !mob.getScoreboardTags().contains("NoMove")) {
-											Location destination = origin.clone().add(relative.get(mob));
-											mob.teleport(destination);
-											new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, destination.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
+									if (relative != null) {
+										for (Map.Entry<LivingEntity, Vector> entry : relative.entrySet()) {
+											LivingEntity mob = entry.getKey();
+											if (mob.getType() != EntityType.SHULKER || !mob.getScoreboardTags().contains("NoMove")) {
+												Location destination = origin.clone().add(entry.getValue());
+												mob.teleport(destination);
+												new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, destination.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
+											}
 										}
 									}
 
@@ -193,7 +195,7 @@ public class Rewind extends Spell {
 										origins.remove(player);
 										continue;
 									}
-									back.location(origins.get(player)).spawnAsBoss();
+									back.location(Objects.requireNonNull(origins.get(player))).spawnAsBoss();
 
 									Location loc = player.getLocation();
 									double ratio = ((double) REWIND_TIME - time) / REWIND_TIME;

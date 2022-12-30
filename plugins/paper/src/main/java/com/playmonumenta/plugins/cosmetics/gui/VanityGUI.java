@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -102,7 +103,7 @@ public class VanityGUI extends Gui {
 				meta.lore(lore);
 				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE);
 				titleItem.setItemMeta(meta);
-				setItem(VANITY_EQUIPMENT_TITLE_SLOTS.get(slot), titleItem);
+				setItem(Objects.requireNonNull(VANITY_EQUIPMENT_TITLE_SLOTS.get(slot)), titleItem);
 			}
 
 			// active vanity item or placeholder
@@ -123,7 +124,7 @@ public class VanityGUI extends Gui {
 				}
 				meta.lore(lore);
 				vanityItem.setItemMeta(meta);
-				setItem(VANITY_EQUIPMENT_ITEM_SLOTS.get(slot), vanityItem).onLeftClick(() -> {
+				setItem(Objects.requireNonNull(VANITY_EQUIPMENT_ITEM_SLOTS.get(slot)), vanityItem).onLeftClick(() -> {
 					if (VanityManager.hasFreeAccess(mPlayer)) {
 						mNewVanity.put(slot, VanityManager.getInvisibleVanityItem(slot));
 						update();
@@ -134,7 +135,7 @@ public class VanityGUI extends Gui {
 				ItemMeta meta = vanityItem.getItemMeta();
 				List<Component> lore = new ArrayList<>();
 				if (VanityManager.isInvisibleVanityItem(vanityItem)) {
-					lore.add(Component.text("Hides your equipped " + VANITY_EQUIPMENT_TITLE_NAMES.get(slot).toLowerCase(Locale.ROOT) + ".", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+					lore.add(Component.text("Hides your equipped " + Objects.requireNonNull(VANITY_EQUIPMENT_TITLE_NAMES.get(slot)).toLowerCase(Locale.ROOT) + ".", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 					if (slot == EquipmentSlot.OFF_HAND) {
 						lore.add(Component.text("Does not hide shields, food, bows, etc.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 					}
@@ -147,7 +148,7 @@ public class VanityGUI extends Gui {
 				meta.lore(lore);
 				meta.addItemFlags(ItemFlag.values());
 				vanityItem.setItemMeta(meta);
-				setItem(VANITY_EQUIPMENT_ITEM_SLOTS.get(slot), new GuiItem(vanityItem, false)).onLeftClick(() -> {
+				setItem(Objects.requireNonNull(VANITY_EQUIPMENT_ITEM_SLOTS.get(slot)), new GuiItem(vanityItem, false)).onLeftClick(() -> {
 					mNewVanity.remove(slot);
 					update();
 				});

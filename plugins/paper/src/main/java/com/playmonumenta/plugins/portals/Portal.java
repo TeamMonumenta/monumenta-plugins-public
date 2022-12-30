@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.portals;
 
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -11,6 +10,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class Portal {
 	private static final double VERTICAL_BOOST = 0.18;

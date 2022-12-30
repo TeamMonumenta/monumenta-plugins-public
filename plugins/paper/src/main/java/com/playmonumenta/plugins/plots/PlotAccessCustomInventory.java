@@ -9,7 +9,6 @@ import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -21,6 +20,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class PlotAccessCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
@@ -135,7 +135,7 @@ public class PlotAccessCustomInventory extends CustomInventory {
 		if (record.mSelf) {
 			return makeYourHead(player);
 		} else {
-			if (record.mEntry != null) {
+			if (record.mEntry != null && record.mEntry.mHead != null) {
 				return record.mEntry.mHead;
 			}
 			return new ItemStack(Material.PLAYER_HEAD);

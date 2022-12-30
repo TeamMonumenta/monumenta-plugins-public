@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class TowerGuiFloorDesign extends CustomInventory {
 
@@ -61,16 +62,17 @@ public class TowerGuiFloorDesign extends CustomInventory {
 	private int mDx = 0;
 	private int mDz = 0;
 
-	private TowerMob mMobSelected;
+	private @Nullable TowerMob mMobSelected;
 
 	public TowerGuiFloorDesign(Player owner, int floor) {
 		super(owner, 54, "Floor N " + (floor + 1));
 		mFloor = floor;
-		mTeam = TowerFileUtils.getDefaultFloorTeam(floor);
-		if (mTeam == null) {
+		TowerTeam team = TowerFileUtils.getDefaultFloorTeam(floor);
+		if (team == null) {
 			owner.sendMessage("No team found?");
-			mTeam = new TowerTeam("", new ArrayList<>());
+			team = new TowerTeam("", new ArrayList<>());
 		}
+		mTeam = team;
 
 		loadItems();
 		loadInv();
@@ -244,9 +246,10 @@ public class TowerGuiFloorDesign extends CustomInventory {
 					return;
 				}
 
-				if (mFloorMap.get(TowerConstants.FLOOR_SIZE_Z * (q + mDx) + mod + mDz) != null) {
-					mMobSelected = mFloorMap.get(TowerConstants.FLOOR_SIZE_Z * (q + mDx) + mod + mDz);
-					player.sendMessage(mMobSelected.toJson().toString());
+				TowerMob towerMob = mFloorMap.get(TowerConstants.FLOOR_SIZE_Z * (q + mDx) + mod + mDz);
+				if (towerMob != null) {
+					mMobSelected = towerMob;
+					player.sendMessage(towerMob.toJson().toString());
 				} else {
 					int x = TowerConstants.FLOOR_SIZE_X - (q + mDx);
 					int z = mod + mDz;

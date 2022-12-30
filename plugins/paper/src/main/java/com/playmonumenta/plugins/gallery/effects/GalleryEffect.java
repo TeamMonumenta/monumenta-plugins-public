@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class GalleryEffect implements DisplayableEffect {
 
@@ -38,11 +39,11 @@ public abstract class GalleryEffect implements DisplayableEffect {
 
 	}
 
-	public void onPlayerHurt(GalleryPlayer player, DamageEvent event, LivingEntity enemy) {
+	public void onPlayerHurt(GalleryPlayer player, DamageEvent event, @Nullable LivingEntity enemy) {
 
 	}
 
-	public void onPlayerFatalHurt(GalleryPlayer player, DamageEvent event, LivingEntity enemy) {
+	public void onPlayerFatalHurt(GalleryPlayer player, DamageEvent event, @Nullable LivingEntity enemy) {
 
 	}
 
@@ -93,10 +94,7 @@ public abstract class GalleryEffect implements DisplayableEffect {
 
 	public abstract boolean canBuy(GalleryPlayer player);
 
-
-
-
-	public static GalleryEffect fromJsonObject(JsonObject object) {
+	public static @Nullable GalleryEffect fromJsonObject(JsonObject object) {
 		GalleryEffectType type = GalleryEffectType.fromName(object.get("EffectTypeName").getAsString());
 		if (type != null) {
 			GalleryEffect effect = type.newEffect();

@@ -5,9 +5,10 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class DungeonUtils {
-	public static int[] getSpawnersBroken(Player p) {
+	public static int @Nullable [] getSpawnersBroken(Player p) {
 		Location armorStandLoc = p.getWorld().getSpawnLocation(); // get the spawn location
 		ArmorStand armorStand = null;
 		for (Entity entity : armorStandLoc.getNearbyEntities(2, 2, 2)) { // get the entities at the spawn location
@@ -16,7 +17,7 @@ public class DungeonUtils {
 			}
 		}
 		if (armorStand != null) {
-			return new int[]{ScoreboardUtils.getScoreboardValue(armorStand, "SpawnerBreaks").orElse(0), ScoreboardUtils.getScoreboardValue(armorStand, "SpawnersTotal").orElse(0)};
+			return new int[] {ScoreboardUtils.getScoreboardValue(armorStand, "SpawnerBreaks").orElse(0), ScoreboardUtils.getScoreboardValue(armorStand, "SpawnersTotal").orElse(0)};
 		} else {
 			return null;
 		}

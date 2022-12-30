@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
@@ -87,14 +88,14 @@ public class Skyhook extends DepthsAbility {
 			for (int i = 0; i <= mPlayer.getLocation().distance(loc); i++) {
 				pLoc.add(dir);
 
-				world.spawnParticle(Particle.SWEEP_ATTACK, pLoc, 5, 0.25, 0.25, 0.25, 0);
-				world.spawnParticle(Particle.CLOUD, pLoc, 10, 0.05, 0.05, 0.05, 0.05);
+				new PartialParticle(Particle.SWEEP_ATTACK, pLoc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, pLoc, 10, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
 			}
 
 			world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 1, 1.5f);
-			world.spawnParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 10, .5, .2, .5, 0.65);
-			world.spawnParticle(Particle.CLOUD, loc, 10, .5, .2, .5, 0.65);
-			world.spawnParticle(Particle.SWEEP_ATTACK, loc, 5, .5, .2, .5, 0.65);
+			new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CLOUD, loc, 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SWEEP_ATTACK, loc, 5, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			loc.setDirection(mPlayer.getEyeLocation().getDirection());
 			mPlayer.teleport(loc);
 

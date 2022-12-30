@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -106,8 +107,8 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 								while (l.getBlock().getType() != Material.AIR && l.getBlockY() <= loc.getBlockY() + 3) {
 									l.add(0, 1, 0);
 								}
-								world.spawnParticle(Particle.SPELL_WITCH, l, 1, 0.25, 0.25, 0.25, 0);
-								world.spawnParticle(Particle.END_ROD, l, 1, 0.25, 0.25, 0.25, 0);
+								new PartialParticle(Particle.SPELL_WITCH, l, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.END_ROD, l, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 							}
 						}
 
@@ -213,9 +214,9 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 												}
 											}.runTaskLater(mPlugin, 15);
 
-											world.spawnParticle(Particle.CLOUD, l, 2, 0.15, 0.15, 0.15, 0.125);
-											world.spawnParticle(Particle.CRIT, l, 8, 0.15, 0.15, 0.15, 0.7);
-											world.spawnParticle(Particle.REDSTONE, l, 8, 0.15, 0.15, 0.15, BLUE_COLOR);
+											new PartialParticle(Particle.CLOUD, l, 2, 0.15, 0.15, 0.15, 0.125).spawnAsEntityActive(mBoss);
+											new PartialParticle(Particle.CRIT, l, 8, 0.15, 0.15, 0.15, 0.7).spawnAsEntityActive(mBoss);
+											new PartialParticle(Particle.REDSTONE, l, 8, 0.15, 0.15, 0.15, BLUE_COLOR).spawnAsEntityActive(mBoss);
 											if (degree > 85 && degree < 95 && mRadius % 5 == 0) {
 												world.playSound(l, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
 											}

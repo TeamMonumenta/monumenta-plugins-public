@@ -47,6 +47,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_breath";
@@ -166,7 +167,7 @@ public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 
 		if (players.size() <= 0) {

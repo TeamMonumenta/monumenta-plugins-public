@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,9 +23,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerTracking implements EntityTracking {
-	private static @Nullable PlayerTracking INSTANCE = null;
+	private static @MonotonicNonNull PlayerTracking INSTANCE = null;
 
 	private final Plugin mPlugin;
 	private final HashMap<Player, PlayerInventoryManager> mPlayers = new HashMap<>();

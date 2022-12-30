@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -54,11 +53,9 @@ public class SpellDiesIrae extends Spell {
 	private final PartialParticle mSoul;
 	private final PartialParticle mBreath1;
 	private final PartialParticle mBreath2;
-	private @Nullable
-	PartialParticle mBreath3;
+	private final PartialParticle mBreath3;
 	private final PartialParticle mExpL1;
-	private @Nullable
-	PartialParticle mExpL2;
+	private final PartialParticle mExpL2;
 	private final PartialParticle mHeart;
 
 	public SpellDiesIrae(Plugin plugin, LivingEntity boss, LivingEntity key, Location loc, double range, int ceil, List<Location> crystalLoc, String crystalnbt) {
@@ -77,6 +74,8 @@ public class SpellDiesIrae extends Spell {
 		mExpL1 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 0, 0, 0, 0);
 		mBreath2 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 15, 0.4, 0.4, 0.4, 0.01);
 		mHeart = new PartialParticle(Particle.HEART, mBoss.getLocation(), 20, 0.5, 0.5, 0.5, 0.1);
+		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);
+		mExpL2 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0);
 	}
 
 	public static double getDmg() {
@@ -194,9 +193,6 @@ public class SpellDiesIrae extends Spell {
 		World world = mBoss.getWorld();
 		mCrystalDmg = Math.min(1.2, mCrystal.size() * 0.2);
 		int debuffTicks = mCrystal.size() * 5 * 20;
-
-		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);
-		mExpL2 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), mCrystal.size() * 125 + 1000, 42, 0.75, 42, 0);
 
 		//healing and final damage calc
 		double heal = mBoss.getHealth() + EntityUtils.getMaxHealth(mBoss) * mCrystal.size() * 0.025;

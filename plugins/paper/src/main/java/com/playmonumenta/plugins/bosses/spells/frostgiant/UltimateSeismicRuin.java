@@ -13,20 +13,21 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class UltimateSeismicRuin extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private World mWorld;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final World mWorld;
 
 	//Lists which directions have already been used
-	private List<Character> mDirections;
+	private final List<Character> mDirections;
 
-	private LivingEntity mNorthStand;
-	private LivingEntity mEastStand;
-	private LivingEntity mSouthStand;
-	private LivingEntity mWestStand;
+	private final @Nullable LivingEntity mNorthStand;
+	private final @Nullable LivingEntity mEastStand;
+	private final @Nullable LivingEntity mSouthStand;
+	private final @Nullable LivingEntity mWestStand;
 
 	public UltimateSeismicRuin(Plugin plugin, LivingEntity boss, List<Character> dirs, LivingEntity n, LivingEntity e, LivingEntity s, LivingEntity w) {
 		mPlugin = plugin;
@@ -76,6 +77,9 @@ public class UltimateSeismicRuin extends Spell {
 	}
 
 	private void ruinNorth() {
+		if (mNorthStand == null) {
+			return;
+		}
 		Location loc = mNorthStand.getLocation();
 
 		Location l = loc.clone();
@@ -214,6 +218,9 @@ public class UltimateSeismicRuin extends Spell {
 	}
 
 	private void ruinEast() {
+		if (mEastStand == null) {
+			return;
+		}
 		Location loc = mEastStand.getLocation().clone();
 
 		int randX = (int) FastUtils.randomDoubleInRange(-12, -9);
@@ -351,6 +358,9 @@ public class UltimateSeismicRuin extends Spell {
 	}
 
 	private void ruinSouth() {
+		if (mSouthStand == null) {
+			return;
+		}
 		Location loc = mSouthStand.getLocation().clone();
 
 		int randZ = (int) FastUtils.randomDoubleInRange(-12, -9);
@@ -488,6 +498,9 @@ public class UltimateSeismicRuin extends Spell {
 	}
 
 	private void ruinWest() {
+		if (mWestStand == null) {
+			return;
+		}
 		Location loc = mWestStand.getLocation().clone();
 
 		int randX = (int) FastUtils.randomDoubleInRange(9, 12);

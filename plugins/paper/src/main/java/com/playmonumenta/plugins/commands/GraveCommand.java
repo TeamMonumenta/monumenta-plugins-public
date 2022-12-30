@@ -24,6 +24,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class GraveCommand {
 	private static final String SUMMON_LIST_TAG = "SummonGraveSelect";
@@ -239,7 +240,7 @@ public class GraveCommand {
 			if (manager != null) {
 				Grave grave = manager.getGrave(uuid);
 				if (grave != null) {
-					Component graveInfo = manager.getGraveInfo(manager.getGrave(uuid));
+					Component graveInfo = manager.getGraveInfo(grave);
 					String coordinates = String.format("%s %s %s", location.getBlockX(), location.getBlockY(), location.getBlockZ());
 					player.sendMessage(Component.text("Are you sure you wanted to summon this grave?", NamedTextColor.AQUA)
 						.append(Component.newline())
@@ -334,7 +335,7 @@ public class GraveCommand {
 		return false;
 	}
 
-	private static void delete(Player player, UUID uuid) {
+	private static void delete(Player player, @Nullable UUID uuid) {
 		GraveManager manager = GraveManager.getInstance(player);
 		if (manager == null) {
 			player.sendMessage(Component.text("You do not have any graves.", NamedTextColor.RED));

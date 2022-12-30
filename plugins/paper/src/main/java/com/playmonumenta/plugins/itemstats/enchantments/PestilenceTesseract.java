@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -25,7 +26,7 @@ public class PestilenceTesseract implements Enchantment {
 	private static final int MAX_LIFETIME_SECONDS = 60;
 	private static final double EFFECT_RADIUS = 5;
 	private static final double PARTICLE_RING_HEIGHT = 1.0;
-	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES = Arrays.asList(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4, (Location loc) -> loc.getWorld().spawnParticle(Particle.CRIT, loc, 1, 0, 0, 0, 0)));
+	private static final Collection<Map.Entry<Double, ParticleUtils.SpawnParticleAction>> PARTICLES = Arrays.asList(new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.4, (Location loc) -> new PartialParticle(Particle.CRIT, loc, 1, 0, 0, 0, 0).spawnFull()));
 
 	@Override
 	public String getName() {

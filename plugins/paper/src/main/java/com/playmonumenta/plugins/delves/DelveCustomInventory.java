@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -30,6 +29,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class DelveCustomInventory extends CustomInventory {
 
@@ -185,11 +185,13 @@ public class DelveCustomInventory extends CustomInventory {
 
 				for (int j = 0; j < 5; j++) {
 					ItemStack stack = DelvesUtils.getRankItem(mod, j + 1, level);
-					int slot = (DELVE_MOD_ITEM_SLOTS[i] - (9 * (j + 1)));
-					if (j == 4 && DelvesModifier.rotatingDelveModifiers().contains(mod)) {
-						stack = ROTATING_DELVE_MODIFIER_INFO;
+					if (stack != null) {
+						int slot = (DELVE_MOD_ITEM_SLOTS[i] - (9 * (j + 1)));
+						if (j == 4 && DelvesModifier.rotatingDelveModifiers().contains(mod)) {
+							stack = ROTATING_DELVE_MODIFIER_INFO;
+						}
+						mInventory.setItem(slot, stack);
 					}
-					mInventory.setItem(slot, stack);
 				}
 			}
 		}
@@ -198,18 +200,20 @@ public class DelveCustomInventory extends CustomInventory {
 			mInventory.setItem(PAGE_LEFT_SLOT, getPreviousPage());
 		} else if (mEditableDelvePoint) {
 			mInventory.setItem(PAGE_LEFT_SLOT, REMOVE_ALL_MOD_ITEM);
-			if (mDungeonName.equals("ring") && ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0) > 0) {
+			if (mDungeonName.equals("ring")) {
 				DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
-				ItemStack presetItem = new ItemStack(delvePreset.mDisplayItem, 1);
-				ItemMeta meta = presetItem.getItemMeta();
-				meta.displayName(Component.text("Use Bounty Preset", NamedTextColor.WHITE)
-					                 .decoration(TextDecoration.ITALIC, false)
-					                 .decoration(TextDecoration.BOLD, true));
-				GUIUtils.splitLoreLine(meta, delvePreset.mName, 30, ChatColor.AQUA, true);
-				meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-				meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-				presetItem.setItemMeta(meta);
-				mInventory.setItem(PRESET_SLOT, presetItem);
+				if (delvePreset != null) {
+					ItemStack presetItem = new ItemStack(delvePreset.mDisplayItem, 1);
+					ItemMeta meta = presetItem.getItemMeta();
+					meta.displayName(Component.text("Use Bounty Preset", NamedTextColor.WHITE)
+						                 .decoration(TextDecoration.ITALIC, false)
+						                 .decoration(TextDecoration.BOLD, true));
+					GUIUtils.splitLoreLine(meta, delvePreset.mName, 30, ChatColor.AQUA, true);
+					meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+					meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+					presetItem.setItemMeta(meta);
+					mInventory.setItem(PRESET_SLOT, presetItem);
+				}
 			}
 		} else if (mPreset != null) {
 			mInventory.setItem(PAGE_LEFT_SLOT, BOUNTY_SELECTION_ITEM);
@@ -236,7 +240,7 @@ public class DelveCustomInventory extends CustomInventory {
 		} else if (mOwner.getGameMode() != GameMode.CREATIVE) {
 			List<DelvesModifier> weeklyMods = DelvesUtils.getWeeklyRotatingModifier();
 			for (DelvesModifier rotating : DelvesModifier.rotatingDelveModifiers()) {
-				if (mPointSelected.get(rotating) == 0 && !weeklyMods.contains(rotating)) {
+				if (mPointSelected.getOrDefault(rotating, 0) == 0 && !weeklyMods.contains(rotating)) {
 					mods.remove(rotating);
 				}
 			}
@@ -473,10 +477,10 @@ public class DelveCustomInventory extends CustomInventory {
 			}
 		}
 
-		if (slot == PRESET_SLOT && mPage == 0 && mDungeonName.equals("ring") && mEditableDelvePoint && ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0) > 0) {
+		if (slot == PRESET_SLOT && mPage == 0 && mDungeonName.equals("ring") && mEditableDelvePoint) {
 			DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
-			for (Map.Entry<DelvesModifier, Integer> entry : delvePreset.mModifiers.entrySet()) {
-				mPointSelected.put(entry.getKey(), entry.getValue());
+			if (delvePreset != null) {
+				mPointSelected.putAll(delvePreset.mModifiers);
 			}
 		}
 

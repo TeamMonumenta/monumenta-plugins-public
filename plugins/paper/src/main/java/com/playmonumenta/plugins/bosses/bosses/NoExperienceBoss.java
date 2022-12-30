@@ -5,6 +5,7 @@ import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class NoExperienceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_no_exp";
@@ -22,7 +23,7 @@ public class NoExperienceBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (event != null) {
 			event.setDroppedExp(0);
 		}

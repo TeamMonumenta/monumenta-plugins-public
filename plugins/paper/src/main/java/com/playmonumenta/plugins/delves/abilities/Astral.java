@@ -9,13 +9,13 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.Nullable;
 
 public class Astral {
 
@@ -57,13 +57,15 @@ public class Astral {
 		if (validSpawnLocs.size() > 0) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
 			LivingEntity boss = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, MOB_POOL.get(FastUtils.RANDOM.nextInt(MOB_POOL.size())));
-			boss.addScoreboardTag(ChestLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
-			boss.getWorld().playSound(loc, Sound.ENTITY_WITHER_DEATH, 10, 3f);
-			try {
-				BossManager.createBoss(null, boss, ChestLockBoss.identityTag);
-			} catch (Exception e) {
-				Plugin.getInstance().getLogger().warning("Failed to create boss ChestLockBoss: " + e.getMessage());
-				e.printStackTrace();
+			if (boss != null) {
+				boss.addScoreboardTag(ChestLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
+				boss.getWorld().playSound(loc, Sound.ENTITY_WITHER_DEATH, 10, 3f);
+				try {
+					BossManager.createBoss(null, boss, ChestLockBoss.identityTag);
+				} catch (Exception e) {
+					Plugin.getInstance().getLogger().warning("Failed to create boss ChestLockBoss: " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 	}

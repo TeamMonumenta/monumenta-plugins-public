@@ -5,11 +5,11 @@ import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT>> {
 
@@ -231,8 +231,16 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_ACTIVE, ParticleCategory.OTHER_ACTIVE);
 	}
 
+	public SelfT spawnAsOtherPlayerActive() {
+		return spawnForPlayers(ParticleCategory.OTHER_ACTIVE);
+	}
+
 	public SelfT spawnAsPlayerPassive(Player sourcePlayer) {
 		return spawnAsPlayer(sourcePlayer, ParticleCategory.OWN_PASSIVE, ParticleCategory.OTHER_PASSIVE);
+	}
+
+	public SelfT spawnAsOtherPlayerPassive() {
+		return spawnForPlayers(ParticleCategory.OTHER_PASSIVE);
 	}
 
 	public SelfT spawnAsPlayerBuff(Player sourcePlayer) {

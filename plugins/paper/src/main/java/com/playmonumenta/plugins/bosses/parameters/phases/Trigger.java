@@ -5,12 +5,13 @@ import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.events.DamageEvent;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Trigger {
 
 	private boolean mIsNegated;
 
-	private TriggerOperation mOperation = null;
+	private @Nullable TriggerOperation mOperation = null;
 
 	public abstract boolean test(LivingEntity boss);
 
@@ -34,7 +35,7 @@ public abstract class Trigger {
 		mOperation = operation;
 	}
 
-	public TriggerOperation getOperation() {
+	public @Nullable TriggerOperation getOperation() {
 		return mOperation;
 	}
 
@@ -50,7 +51,7 @@ public abstract class Trigger {
 		return false;
 	}
 
-	public boolean onHurt(LivingEntity boss, LivingEntity damager, DamageEvent event) {
+	public boolean onHurt(LivingEntity boss, @Nullable LivingEntity damager, DamageEvent event) {
 		return false;
 	}
 

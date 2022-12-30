@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
@@ -98,8 +99,8 @@ public class Avalanche extends DepthsAbility {
 				DepthsUtils.iceActive.remove(l);
 			}
 
-			world.spawnParticle(Particle.REDSTONE, aboveLoc, 15, 0.5, 0.5, 0.5, ICE_PARTICLE_COLOR);
-			world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 2, 0.5, 0.25, 0.5);
+			new PartialParticle(Particle.REDSTONE, aboveLoc, 15, 0.5, 0.5, 0.5, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, aboveLoc, 2, 0.5, 0.25, 0.5).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 
@@ -41,7 +42,7 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	private static int EYE_ANIM_FRAMES = 4;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"The dream never ends. When its quivering eye",
 			"gazes upon the land, the beast will dictate",
@@ -60,7 +61,7 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

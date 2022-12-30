@@ -22,6 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS {
 	// Gallery set: blood
@@ -33,7 +34,7 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	private static final Particle.DustOptions INJURY_COLOR = new Particle.DustOptions(Color.fromRGB(79, 24, 17), 1.2f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"The light cannot protect you forever.",
 			"It was never meant to be the color of blood.",
@@ -52,7 +53,7 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

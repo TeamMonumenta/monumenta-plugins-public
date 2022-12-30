@@ -23,14 +23,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellShuraAS extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
-	private Location mCenter;
-	private Player mTarget;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
+	private final Location mCenter;
+	private @Nullable Player mTarget;
 	private boolean mMarked = false;
 	private final Particle.DustOptions DARK_RED = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
@@ -52,6 +53,9 @@ public class SpellShuraAS extends Spell {
 		world.playSound(mTarget.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			if (mTarget == null) {
+				return;
+			}
 			mMarked = true;
 			Location loc = mBoss.getLocation();
 			new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsEntityActive(mBoss);
@@ -67,6 +71,10 @@ public class SpellShuraAS extends Spell {
 
 				@Override
 				public void run() {
+					if (mTarget == null) {
+						this.cancel();
+						return;
+					}
 					mT += 10;
 					new PartialParticle(Particle.REDSTONE, mTarget.getLocation().add(0, 1.5, 0), 6, 0.5, 0.5, 0.5, 0, DARK_RED).spawnAsEntityActive(mBoss);
 					if (mT >= 2 * 20 && mTrigger) {

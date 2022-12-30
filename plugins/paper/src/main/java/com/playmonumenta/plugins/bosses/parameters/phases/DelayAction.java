@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 
@@ -54,7 +55,7 @@ public class DelayAction implements Action {
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
-		ParseResult<Action> actionParseResult = Phase.ACTION_BUILDER_MAP.get(name).buildAction(reader);
+		ParseResult<Action> actionParseResult = Objects.requireNonNull(Phase.ACTION_BUILDER_MAP.get(name)).buildAction(reader);
 
 		if (actionParseResult.getResult() == null) {
 			return actionParseResult;

@@ -9,7 +9,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import javax.annotation.Nullable;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +20,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class Bulwark extends DepthsAbility {
 
@@ -46,8 +47,8 @@ public class Bulwark extends DepthsAbility {
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
 			Location particleLoc = loc.add(0, mPlayer.getHeight() / 2, 0);
-			world.spawnParticle(Particle.CLOUD, particleLoc, 10, 0.35, 0.35, 0.35, 0.125);
-			world.spawnParticle(Particle.BLOCK_DUST, particleLoc, 20, 0.5, 0.5, 0.5, 0.125, Material.STRIPPED_DARK_OAK_WOOD.createBlockData());
+			new PartialParticle(Particle.CLOUD, particleLoc, 10, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
+			new PartialParticle(Particle.BLOCK_DUST, particleLoc, 20, 0.5, 0.5, 0.5, 0.125, Material.STRIPPED_DARK_OAK_WOOD.createBlockData()).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1, 1.2f);
 			event.setCancelled(true);
 			putOnCooldown();

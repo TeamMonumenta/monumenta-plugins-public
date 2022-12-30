@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -85,7 +86,7 @@ public class BottledSunlight extends DepthsAbility {
 
 			@Override
 			public void run() {
-				world.spawnParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1);
+				new PartialParticle(Particle.SPELL, tincture.getLocation(), 3, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 
 				for (Player p : PlayerUtils.playersInRange(tincture.getLocation(), 1, true)) {
 					// Prevent players from picking up their own tincture instantly
@@ -94,8 +95,8 @@ public class BottledSunlight extends DepthsAbility {
 					}
 
 					world.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
-					world.spawnParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData());
-					world.spawnParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2);
+					new PartialParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 					tincture.remove();
 
 					execute(mPlayer);
@@ -103,7 +104,7 @@ public class BottledSunlight extends DepthsAbility {
 						execute(p);
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.getLinkedSpell());
+					mPlugin.mTimers.removeCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT);
 					putOnCooldown();
 
 					this.cancel();
@@ -116,7 +117,7 @@ public class BottledSunlight extends DepthsAbility {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
+					mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.BOTTLED_SUNLIGHT, 0);
 				}
 			}
 
@@ -140,11 +141,12 @@ public class BottledSunlight extends DepthsAbility {
 
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
-		world.spawnParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125);
+		new PartialParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {
 			double mRotation = 0;
 			double mY = 0.15;
 			final double mRadius = 1.15;
+
 			@Override
 			public void run() {
 				Location loc = player.getLocation();
@@ -153,8 +155,8 @@ public class BottledSunlight extends DepthsAbility {
 				for (int i = 0; i < 3; i++) {
 					double degree = Math.toRadians(mRotation + (i * 120));
 					loc.add(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
-					world.spawnParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05);
-					world.spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0);
+					new PartialParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0).spawnAsPlayerActive(mPlayer);
 					loc.subtract(FastUtils.cos(degree) * mRadius, mY, FastUtils.sin(degree) * mRadius);
 				}
 

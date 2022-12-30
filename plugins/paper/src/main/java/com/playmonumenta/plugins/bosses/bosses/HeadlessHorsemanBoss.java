@@ -49,6 +49,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * Barrier of Flames - (Hard mode only) When the boss enters phase 2 he gains a shield of
@@ -133,7 +134,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		mBoss.setRemoveWhenFarAway(false);
 
 		new BukkitRunnable() {
-			Creature mHorse = null;
+			@Nullable Creature mHorse = null;
 
 			@Override
 			public void run() {
@@ -292,7 +293,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			player.sendMessage(ChatColor.DARK_RED + "[The Horseman] No matter. I'll be seeing you all again soon.");
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1.0f, 0.1f);

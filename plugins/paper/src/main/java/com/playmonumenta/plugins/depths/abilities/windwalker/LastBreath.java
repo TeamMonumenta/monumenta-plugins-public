@@ -11,10 +11,10 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class LastBreath extends DepthsAbility {
 	public static final String ABILITY_NAME = "Last Breath";
@@ -69,7 +70,8 @@ public class LastBreath extends DepthsAbility {
 		putOnCooldown();
 
 		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
-			if (abil == this) {
+			ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
+			if (abil == this || linkedSpell == null) {
 				continue;
 			}
 			int totalCD = abil.getModifiedCooldown();
@@ -79,7 +81,7 @@ public class LastBreath extends DepthsAbility {
 			} else {
 				reducedCD = (int) (totalCD * COOLDOWN_REDUCTION[mRarity - 1]);
 			}
-			mPlugin.mTimers.updateCooldown(mPlayer, abil.getInfo().getLinkedSpell(), reducedCD);
+			mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
 		}
 
 		Location loc = mPlayer.getLocation();
@@ -92,13 +94,13 @@ public class LastBreath extends DepthsAbility {
 				Vector knockback = e.getVelocity().add(e.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(KNOCKBACK_SPEED));
 				knockback.setY(knockback.getY() * 2);
 				e.setVelocity(knockback.add(new Vector(0, 0.25, 0)));
-				world.spawnParticle(Particle.EXPLOSION_NORMAL, e.getLocation(), 5, 0, 0, 0, 0.35);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, e.getLocation(), 5, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
 			}
 		}
 
-		world.spawnParticle(Particle.END_ROD, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25);
-		world.spawnParticle(Particle.CLOUD, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25);
-		world.spawnParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25);
+		new PartialParticle(Particle.END_ROD, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.2f);
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 2.0f, 0.4f);

@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum SeasonalRewardType {
 	TITLE("title"),

@@ -126,7 +126,7 @@ public class CosmicMoonblade extends Ability {
 			}
 			int totalCD = abil.getModifiedCooldown();
 			int reducedCD = Math.min((int) (totalCD * percent), mLevelCap);
-			mPlugin.mTimers.updateCooldown(mPlayer, abil.getInfo().getLinkedSpell(), reducedCD);
+			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.COSMIC_MOONBLADE, reducedCD);
 		}
 	}
 }

@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class ForcefulGrip extends SpellBaseSeekingProjectile {
 	public static final int detectionRange = 24;
@@ -56,7 +57,7 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 				}
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
 				new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 				if (player != null) {

@@ -18,6 +18,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 
@@ -27,7 +28,7 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.25f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"SHIELD_DESC"
 		);
@@ -44,7 +45,7 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

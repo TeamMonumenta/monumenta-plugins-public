@@ -11,11 +11,11 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.List;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class ChaosDagger extends DepthsAbility {
 
@@ -100,7 +101,7 @@ public class ChaosDagger extends DepthsAbility {
 				if (mExpire >= 10 * 20) {
 					dagger.remove();
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
+					mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.CHAOS_DAGGER, 0);
 					this.cancel();
 				}
 				Location tLoc = dagger.getLocation();
@@ -123,7 +124,7 @@ public class ChaosDagger extends DepthsAbility {
 				}
 
 				if (mTarget.getBoundingBox().overlaps(dagger.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
 					world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
 					mHitMob = mTarget;
 					if (EntityUtils.isBoss(mTarget)) {
@@ -147,7 +148,7 @@ public class ChaosDagger extends DepthsAbility {
 					dagger.remove();
 					this.cancel();
 				} else {
-					loc.getWorld().spawnParticle(Particle.SPELL_WITCH, tLoc, 5, 0.2, 0.2, 0.2, 0.65);
+					new PartialParticle(Particle.SPELL_WITCH, tLoc, 5, 0.2, 0.2, 0.2, 0.65).spawnAsPlayerActive(mPlayer);
 
 					Vector dir = tLoc.subtract(mTarget.getLocation().toVector().clone().add(new Vector(0, 0.5, 0))).toVector();
 

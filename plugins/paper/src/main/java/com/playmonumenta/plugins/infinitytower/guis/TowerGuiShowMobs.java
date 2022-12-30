@@ -32,19 +32,19 @@ public class TowerGuiShowMobs extends CustomInventory {
 	private static final List<TowerMobInfo> MOBS_INFO = new ArrayList<>();
 
 	public static void loadGuiItems() {
-		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.COMMON)) {
+		for (TowerMobInfo info : TowerFileUtils.getMobsByRarity(TowerMobRarity.COMMON)) {
 			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
 			MOBS_INFO.add(info);
 		}
-		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.RARE)) {
+		for (TowerMobInfo info : TowerFileUtils.getMobsByRarity(TowerMobRarity.RARE)) {
 			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
 			MOBS_INFO.add(info);
 		}
-		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.EPIC)) {
+		for (TowerMobInfo info : TowerFileUtils.getMobsByRarity(TowerMobRarity.EPIC)) {
 			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
 			MOBS_INFO.add(info);
 		}
-		for (TowerMobInfo info : TowerFileUtils.TOWER_MOBS_RARITY_MAP.get(TowerMobRarity.LEGENDARY)) {
+		for (TowerMobInfo info : TowerFileUtils.getMobsByRarity(TowerMobRarity.LEGENDARY)) {
 			MOBS_ITEMS.add(new TowerGuiItem(info.getBuyableItem(), player -> true));
 			MOBS_INFO.add(info);
 		}

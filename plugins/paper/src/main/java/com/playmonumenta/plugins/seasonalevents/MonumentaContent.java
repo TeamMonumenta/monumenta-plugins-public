@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public enum MonumentaContent {
 	LABS("labs", ContentType.DUNGEON, 1),

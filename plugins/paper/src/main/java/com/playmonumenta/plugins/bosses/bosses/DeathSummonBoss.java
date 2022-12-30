@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class DeathSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_death_summon";
@@ -52,7 +53,7 @@ public class DeathSummonBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mParam.PARTICLES.spawn(mBoss, mBoss.getLocation().clone().add(0, 0.5, 0));
 		mParam.SOUNDS.play(mBoss.getLocation());
 		for (int i = 0; i < mParam.MOB_COUNT; i++) {

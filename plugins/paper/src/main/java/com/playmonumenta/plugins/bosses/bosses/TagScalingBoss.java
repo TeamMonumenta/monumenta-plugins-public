@@ -26,7 +26,7 @@ public class TagScalingBoss extends BossAbilityGroup {
 		return new TagScalingBoss(plugin, boss);
 	}
 
-	private TagScalingBoss.Parameters mParams;
+	private final TagScalingBoss.Parameters mParams;
 
 	public TagScalingBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);

@@ -18,7 +18,7 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class MessagingUtils {
 	public static final Gson GSON = new Gson();

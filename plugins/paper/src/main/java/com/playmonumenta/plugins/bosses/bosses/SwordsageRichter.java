@@ -42,6 +42,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public final class SwordsageRichter extends BossAbilityGroup {
@@ -95,7 +96,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					new PartialParticle(Particle.REDSTONE, loc, 40, 0.25, 0.25, 0.25, BOLT_COLOR).spawnAsEntityActive(boss);
 				},
 
-				(Player player, Location loc, boolean blocked, Location prevLoc) -> {
+				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (!blocked && player != null) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.PROJECTILE, 15, prevLoc);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 6, 1));

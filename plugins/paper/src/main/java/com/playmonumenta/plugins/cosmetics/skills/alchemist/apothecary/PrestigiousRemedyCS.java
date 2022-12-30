@@ -22,6 +22,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 
@@ -33,7 +34,7 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	private static final BlockData GOLD_DUST = Bukkit.createBlockData(Material.GOLD_BLOCK);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"REMEDY_DESC"
 		);
@@ -50,7 +51,7 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

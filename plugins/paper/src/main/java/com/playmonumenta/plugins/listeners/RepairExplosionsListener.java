@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -421,8 +422,9 @@ public class RepairExplosionsListener implements Listener {
 	}
 
 	private static boolean isEnabled(World world) {
+		Pattern repairExplosionsWorldPattern = ServerProperties.getRepairExplosionsWorldPattern();
 		return ServerProperties.getRepairExplosions()
-				&& (ServerProperties.getRepairExplosionsWorldPattern() == null || ServerProperties.getRepairExplosionsWorldPattern().matcher(world.getName()).matches());
+			       && (repairExplosionsWorldPattern == null || repairExplosionsWorldPattern.matcher(world.getName()).matches());
 	}
 
 }

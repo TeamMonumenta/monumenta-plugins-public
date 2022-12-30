@@ -37,6 +37,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class Varcosa extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa";
@@ -153,7 +154,7 @@ public final class Varcosa extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Ye thought I be the one in control here? Yarharhar! N'argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -55,7 +54,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("NullAway")
 public class ChessManager implements Listener {
 
 	public static final String FEN_DEFAULT_BOARD_STRING = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -86,23 +87,23 @@ public class ChessManager implements Listener {
 			arguments.add(new StringArgument("Board Name"));
 			arguments.add(new MultiLiteralArgument("create"));
 			arguments.add(new MultiLiteralArgument(
-						ChessBoardType.PVP.name(),
-						ChessBoardType.PVAI.name()));
+					ChessBoardType.PVP.name(),
+					ChessBoardType.PVAI.name()));
 
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					createBoard((String)args[0], ChessBoardType.valueOf((String) args[2]), FEN_DEFAULT_BOARD_STRING);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						createBoard((String)args[0], ChessBoardType.valueOf((String) args[2]), FEN_DEFAULT_BOARD_STRING);
+					}).register();
 
 			arguments.add(new GreedyStringArgument("fen String"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					createBoard((String)args[0], ChessBoardType.valueOf((String) args[2]), (String) args[3]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						createBoard((String)args[0], ChessBoardType.valueOf((String) args[2]), (String) args[3]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -111,11 +112,11 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("get"));
 			arguments.add(new MultiLiteralArgument("fen"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					printCurrentChessBoardFenString(sender, (String)args[0]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						printCurrentChessBoardFenString(sender, (String)args[0]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -123,11 +124,11 @@ public class ChessManager implements Listener {
 			}));
 			arguments.add(new MultiLiteralArgument("restart"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					restartBoard((String) args[0]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						restartBoard((String) args[0]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -137,19 +138,19 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("fen"));
 			arguments.add(new GreedyStringArgument("fen String"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					if (!mBoards.containsKey((String)args[0])) {
-						CommandAPI.fail("Invalid name, Board: " + (String)args[0] + " doesn't exists");
-					}
-					ChessBoard board = mBoards.get((String)args[0]);
-					board.buildBoardFromString((String)args[3]);
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						if (!mBoards.containsKey((String)args[0])) {
+							CommandAPI.fail("Invalid name, Board: " + (String)args[0] + " doesn't exists");
+						}
+						ChessBoard board = mBoards.get((String)args[0]);
+						board.buildBoardFromString((String)args[3]);
 
-					for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
-						chessInterface.refresh();
-					}
-				}).register();
+						for (ChessInterface chessInterface : mBoardsInterfaces.get(board)) {
+							chessInterface.refresh();
+						}
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -157,11 +158,11 @@ public class ChessManager implements Listener {
 			}));
 			arguments.add(new MultiLiteralArgument("delete"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					deleteBoard((String)args[0]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						deleteBoard((String)args[0]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -169,11 +170,11 @@ public class ChessManager implements Listener {
 			}));
 			arguments.add(new MultiLiteralArgument("refresh"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					refreshGuis((String)args[0]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						refreshGuis((String)args[0]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -182,22 +183,22 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("piece"));
 			arguments.add(new MultiLiteralArgument(ChessPieceType.BISHOPS.name(),
-												ChessPieceType.KING.name(),
-												ChessPieceType.KNIGHTS.name(),
-												ChessPieceType.PAWNS.name(),
-												ChessPieceType.QUEEN.name(),
-												ChessPieceType.ROOKS.name()));
+					ChessPieceType.KING.name(),
+					ChessPieceType.KNIGHTS.name(),
+					ChessPieceType.PAWNS.name(),
+					ChessPieceType.QUEEN.name(),
+					ChessPieceType.ROOKS.name()));
 
 			arguments.add(new MultiLiteralArgument(ChessTeam.BLACK.name(),
-													ChessTeam.WHITE.name()));
+					ChessTeam.WHITE.name()));
 			arguments.add(new IntegerArgument("Position", 0, 63));
 
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					setPiece((String)args[0], (String)args[3], (String)args[4], (int)args[5]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						setPiece((String)args[0], (String)args[3], (String)args[4], (int)args[5]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -208,11 +209,11 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("white"));
 			arguments.add(new PlayerArgument("player"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					setPlayer((String)args[0], (Player)args[4], "white");
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						setPlayer((String)args[0], (Player)args[4], "white");
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -223,11 +224,11 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("black"));
 			arguments.add(new PlayerArgument("player"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					setPlayer((String)args[0], (Player)args[4], "black");
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						setPlayer((String)args[0], (Player)args[4], "black");
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -236,17 +237,17 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("gui"));
 			arguments.add(new MultiLiteralArgument(ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(),
-												ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(),
-												ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase()));
+					ChessInterface.InterfaceType.BLACKPLAYER.name().toLowerCase(),
+					ChessInterface.InterfaceType.SPECTATOR.name().toLowerCase()));
 			arguments.add(new LocationArgument("starting positions", LocationType.BLOCK_POSITION));
 			arguments.add(new MultiLiteralArgument(ChessInterface.FacingPosition.NORTH.getLabel(),
-													ChessInterface.FacingPosition.SOUTH.getLabel()));
+					ChessInterface.FacingPosition.SOUTH.getLabel()));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					createGui((String)args[0], (String)args[3], (Location)args[4], (String) args[5]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						createGui((String)args[0], (String)args[3], (Location)args[4], (String) args[5]);
+					}).register();
 
 			arguments.clear();
 			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
@@ -255,11 +256,11 @@ public class ChessManager implements Listener {
 			arguments.add(new MultiLiteralArgument("surrend"));
 			arguments.add(new PlayerArgument("Surrender"));
 			new CommandAPICommand(command)
-				.withPermission(perms)
-				.withArguments(arguments)
-				.executes((sender, args) -> {
-					surrender((String)args[0], (Player)args[2]);
-				}).register();
+					.withPermission(perms)
+					.withArguments(arguments)
+					.executes((sender, args) -> {
+						surrender((String)args[0], (Player)args[2]);
+					}).register();
 		}
 	}
 
@@ -350,9 +351,9 @@ public class ChessManager implements Listener {
 		EndGameChessEvent event = new EndGameChessEvent(board, whitePlayer, blackPlayer);
 
 
-		if (whitePlayer.mPlayer.equals(loser)) {
+		if (whitePlayer != null && whitePlayer.mPlayer.equals(loser)) {
 			event.setEndGameScore(1);
-		} else if (blackPlayer.mPlayer.equals(loser)) {
+		} else if (blackPlayer != null && blackPlayer.mPlayer.equals(loser)) {
 			event.setEndGameScore(0);
 		}
 
@@ -411,6 +412,7 @@ public class ChessManager implements Listener {
 
 		new BukkitRunnable() {
 			int mTimer = 0;
+
 			@Override
 			public void run() {
 				if (mTimer >= 15) {

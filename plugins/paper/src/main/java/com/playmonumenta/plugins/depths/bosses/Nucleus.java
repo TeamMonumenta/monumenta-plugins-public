@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,6 +48,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class Nucleus extends BossAbilityGroup {
 	public static final String identityTag = "boss_nucleus";
@@ -173,7 +175,7 @@ public final class Nucleus extends BossAbilityGroup {
 		List<Spell> phase1Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this),
 			music
 		);
 
@@ -185,7 +187,7 @@ public final class Nucleus extends BossAbilityGroup {
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this),
 			music
 		);
 
@@ -198,7 +200,7 @@ public final class Nucleus extends BossAbilityGroup {
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, ((party.getFloor() - 1) / 3) + 1, this),
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this),
 			music
 		);
 
@@ -297,11 +299,11 @@ public final class Nucleus extends BossAbilityGroup {
 		for (Location loc : mEyeSpawns) {
 			List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(loc, 1.0);
 			if (mEyes.get(loc) == null && nearbyMobs.size() == 0) {
-				//Summon a new plant here
-				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, EYE_LOS);
-				mEyes.put(loc, newPlant);
-				newPlant.setAI(false);
-				newPlant.setGlowing(true);
+				//Summon a new eye here
+				LivingEntity newEye = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, EYE_LOS));
+				mEyes.put(loc, newEye);
+				newEye.setAI(false);
+				newEye.setGlowing(true);
 				loc.getBlock().getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.FIRE);
 
 				mBoss.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, 20.0f, 1.0f);
@@ -311,8 +313,8 @@ public final class Nucleus extends BossAbilityGroup {
 
 					@Override
 					public void run() {
-						mEyes.remove(loc, newPlant);
-						newPlant.remove();
+						mEyes.remove(loc, newEye);
+						newEye.remove();
 						loc.getBlock().getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.AIR);
 					}
 
@@ -363,7 +365,7 @@ public final class Nucleus extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" B\",\"color\":\"red\"},{\"text\":\"ngrbgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"A\",\"color\":\"red\"},{\"text\":\"gbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"C\",\"color\":\"red\"},{\"text\":\"bggbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"K!!! AWAY!!! This world... \",\"color\":\"red\"},{\"text\":\"hhgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"is poison...\",\"color\":\"red\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
@@ -384,7 +386,10 @@ public final class Nucleus extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				DepthsManager.getInstance().goToNextFloor(EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange));
+				Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
+				if (nearestPlayer != null) {
+					DepthsManager.getInstance().goToNextFloor(nearestPlayer);
+				}
 			}
 
 		}.runTaskLater(mPlugin, 20);

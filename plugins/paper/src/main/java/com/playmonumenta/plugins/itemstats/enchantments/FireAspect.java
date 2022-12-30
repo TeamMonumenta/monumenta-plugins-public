@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class FireAspect implements Enchantment {
 	public static final int FIRE_ASPECT_DURATION = 20 * 4;
@@ -61,11 +63,11 @@ public class FireAspect implements Enchantment {
 		apply(plugin, player, plugin.mItemStatManager.getPlayerItemStats(player), duration, enemy);
 	}
 
-	public static void apply(Plugin plugin, Player player, ItemStatManager.PlayerItemStats playerItemStats, int duration, LivingEntity enemy) {
+	public static void apply(Plugin plugin, Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats, int duration, LivingEntity enemy) {
 		EntityUtils.applyFire(plugin, duration, enemy, player, playerItemStats);
 		// So that fire resistant mobs don't get fire particles
 		if (enemy.getFireTicks() > 0) {
-			enemy.getWorld().spawnParticle(Particle.FLAME, enemy.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0.001);
+			new PartialParticle(Particle.FLAME, enemy.getLocation().add(0, 1, 0), 6, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 		}
 	}
 

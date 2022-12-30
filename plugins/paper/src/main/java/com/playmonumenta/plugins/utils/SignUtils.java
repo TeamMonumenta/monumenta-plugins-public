@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,6 +28,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public final class SignUtils {
 
@@ -48,15 +48,12 @@ public final class SignUtils {
 		listen();
 	}
 
-	public static @Nullable Menu newMenu(List<String> text) {
+	public static Menu newMenu(List<String> text) {
 		return newMenu(text, true);
 	}
 
-	public static @Nullable Menu newMenu(List<String> text, boolean allowColor) {
-		if (INSTANCE == null) {
-			return null;
-		}
-		return INSTANCE.newMenuInternal(text, allowColor);
+	public static Menu newMenu(List<String> text, boolean allowColor) {
+		return Objects.requireNonNull(INSTANCE).newMenuInternal(text, allowColor);
 	}
 
 	private Menu newMenuInternal(List<String> text, boolean allowColor) {

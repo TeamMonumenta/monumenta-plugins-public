@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 	// Meteor like magma shield. Depth set: flame
@@ -27,7 +28,7 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 	public static final String NAME = "Volcanic Burst";
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Unleash forth volcanic havoc,",
 			"an unstoppable blast from the heavens.");
@@ -44,7 +45,7 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

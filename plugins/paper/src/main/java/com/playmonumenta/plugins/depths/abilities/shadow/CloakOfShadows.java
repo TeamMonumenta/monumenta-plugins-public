@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -95,13 +96,12 @@ public class CloakOfShadows extends DepthsAbility {
 		new BukkitRunnable() {
 
 			int mExpire = 0;
-			World mWorld = mPlayer.getWorld();
 
 			@Override
 			public void run() {
 				if (tincture.isOnGround()) {
-					mWorld.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, tincture.getLocation(), 30, 3, 0, 3);
-					mWorld.spawnParticle(Particle.EXPLOSION_NORMAL, tincture.getLocation(), 30, 2, 0, 2);
+					new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, tincture.getLocation(), 30, 3, 0, 3).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, tincture.getLocation(), 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
 					world.playSound(tincture.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
 					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(tincture.getLocation(), RADIUS);
 					for (LivingEntity mob : mobs) {

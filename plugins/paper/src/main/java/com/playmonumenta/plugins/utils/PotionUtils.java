@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -25,6 +24,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.Nullable;
 
 
 public class PotionUtils {
@@ -373,9 +373,9 @@ public class PotionUtils {
 
 			//If instant healing, manually add health, otherwise if instant damage, manually remove health, else add effect
 			//Check then add health
-			if (info != null && info.mType.equals(PotionEffectType.HEAL)) {
+			if (info != null && info.mType != null && info.mType.equals(PotionEffectType.HEAL)) {
 				PlayerUtils.healPlayer(plugin, player, 2 * Math.pow(2, info.mAmplifier + 1));
-			} else if (info != null && info.mType.equals(PotionEffectType.HARM)) {
+			} else if (info != null && info.mType != null && info.mType.equals(PotionEffectType.HARM)) {
 				DamageUtils.damage(null, player, DamageType.MAGIC, 3 * Math.pow(2, info.mAmplifier + 1));
 			} else {
 				plugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, info);

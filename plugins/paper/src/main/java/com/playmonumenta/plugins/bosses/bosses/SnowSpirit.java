@@ -44,6 +44,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class SnowSpirit extends BossAbilityGroup {
 	public static final String identityTag = "boss_snowspirit";
@@ -220,7 +221,7 @@ public class SnowSpirit extends BossAbilityGroup {
 
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 		mBoss.setHealth(100);
 		mBoss.setInvulnerable(true);
@@ -233,8 +234,10 @@ public class SnowSpirit extends BossAbilityGroup {
 
 		new ShiningStar(mBoss, mPlugin).run();
 
-		event.setCancelled(true);
-		event.setReviveHealth(100);
+		if (event != null) {
+			event.setCancelled(true);
+			event.setReviveHealth(100);
+		}
 
 		new BukkitRunnable() {
 			int mTicks = 0;

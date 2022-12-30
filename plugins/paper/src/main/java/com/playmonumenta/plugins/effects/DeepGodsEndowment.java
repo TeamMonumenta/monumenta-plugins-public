@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -21,7 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class DeepGodsEndowment extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "DeepGodsEndowment";
@@ -65,14 +66,14 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		for (Player p : players) {
 			p.addPotionEffect(hasteEffect);
 			Plugin.getInstance().mEffectManager.addEffect(p, SoothingCombos.SPEED_EFFECT_NAME, new PercentSpeed(20 * 2, 0.1, SoothingCombos.SPEED_EFFECT_NAME));
-			entity.getWorld().spawnParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
-			entity.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001);
+			new PartialParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
+			new PartialParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
 			entity.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
 		}
 
 		Location loc = entity.getLocation().add(0, 1, 0);
 		entity.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
-		entity.getWorld().spawnParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001);
+		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
 	}
 
 	public void earthenCombo(LivingEntity entity, LivingEntity enemy) {
@@ -84,9 +85,9 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		Location entityLoc = enemy.getLocation();
 		world.playSound(loc, Sound.BLOCK_GRASS_BREAK, 0.8f, 0.65f);
 		world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, 0.8f, 0.45f);
-		world.spawnParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65);
-		world.spawnParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData());
-		world.spawnParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData());
+		new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65);
+		new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsEntityActive(entity);
+		new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsEntityActive(entity);
 	}
 
 	public void volcanicCombo(LivingEntity entity, LivingEntity enemy) {
@@ -100,7 +101,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 			double rad = Math.toRadians(i);
 			Location locationDelta = new Location(world, 4 / 2 * FastUtils.cos(rad), 0.5, 4 / 2 * FastUtils.sin(rad));
 			location.add(locationDelta);
-			world.spawnParticle(Particle.FLAME, location, 1);
+			new PartialParticle(Particle.FLAME, location, 1).spawnAsEntityActive(entity);
 			location.subtract(locationDelta);
 		}
 		world.playSound(location, Sound.ITEM_FIRECHARGE_USE, 0.5f, 1);
@@ -111,7 +112,7 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		World world = targetLoc.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, 4)) {
 			if (!(mob.getHealth() <= 0 || mob == null)) {
-				world.spawnParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65);
+				new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65).spawnAsEntityActive(entity);
 				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, 0.2, mob);
 				DamageUtils.damage(entity, mob, DamageType.MAGIC, 2, null, true);
 			}
@@ -120,15 +121,14 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		Location playerLoc = entity.getLocation().add(0, 1, 0);
 		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.65f);
 		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.45f);
-		world.spawnParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65);
+		new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsEntityActive(entity);
 	}
 
 	public void darkCombo(LivingEntity entity, LivingEntity enemy) {
 		EntityUtils.applyVulnerability(Plugin.getInstance(), 20 * 3, 0.15, enemy);
 
-		Location loc = entity.getLocation().add(0, 1, 0);
 		((Player) entity).playSound(entity.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
-		loc.getWorld().spawnParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65);
+		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsEntityActive(entity);
 		PotionUtils.applyPotion(entity, enemy,
 			new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, true, false));
 	}

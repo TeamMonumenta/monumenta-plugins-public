@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancementsCS implements CosmeticSkill {
 
@@ -18,7 +19,7 @@ public class EsotericEnhancementsCS implements CosmeticSkill {
 	private static final String ABERRATION_LOS = "Alchemicalaberration";
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return null;
 	}
 
@@ -33,7 +34,7 @@ public class EsotericEnhancementsCS implements CosmeticSkill {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return null;
 	}
 

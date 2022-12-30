@@ -49,8 +49,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("NullAway") // so many...
 public class ImperialConstruct extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_imperialconstruct";
@@ -147,63 +148,63 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
-				// Active Spell List
-				mRush,
-				new SpellStonemason(boss, plugin, mSpawnLoc, 30, 110),
-				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 300)
+					// Active Spell List
+					mRush,
+					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 110),
+					new SilverBolts(boss, plugin),
+					new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 300)
 			));
 
 			SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
-				// Active Spell List
-				mRush2,
-				new SpellStonemason(boss, plugin, mPhase2Loc, 30, 110),
-				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 300)
+					// Active Spell List
+					mRush2,
+					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 110),
+					new SilverBolts(boss, plugin),
+					new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 300)
 			));
 
 			SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
-				new SpellStonemason(boss, plugin, mPhase3Loc, 30, 110),
-				new SilverBolts(boss, plugin)
+					new SpellStonemason(boss, plugin, mPhase3Loc, 30, 110),
+					new SilverBolts(boss, plugin)
 			));
 
 			List<Spell> passiveSpells = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss)
 			);
 
 			List<Spell> passiveSpellsPhase3 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 16, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 16, mPhase3Loc)
 			);
 
 			List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 12, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 12, mPhase3Loc)
 			);
 
 			List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 8, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 8, mPhase3Loc)
 			);
 
 			Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -321,63 +322,63 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
-				// Active Spell List
-				mRush,
-				new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
-				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 110)
+					// Active Spell List
+					mRush,
+					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
+					new SilverBolts(boss, plugin),
+					new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 110)
 			));
 
 			SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
-				// Active Spell List
-				mRush2,
-				new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
-				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 110)
+					// Active Spell List
+					mRush2,
+					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
+					new SilverBolts(boss, plugin),
+					new SpellEchoCharge(plugin, boss, (int) (20 * 7), (int) (20 * 3), 110)
 			));
 
 			SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
-				new SpellStonemason(boss, plugin, mPhase3Loc, 30, 70),
-				new SilverBolts(boss, plugin)
+					new SpellStonemason(boss, plugin, mPhase3Loc, 30, 70),
+					new SilverBolts(boss, plugin)
 			));
 
 			List<Spell> passiveSpells = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss)
 			);
 
 			List<Spell> passiveSpellsPhase3 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 16, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 16, mPhase3Loc)
 			);
 
 			List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 12, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 12, mPhase3Loc)
 			);
 
 			List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 8, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 8, mPhase3Loc)
 			);
 
 			Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -490,63 +491,63 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 			SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
-				// Active Spell List
-				mRush,
-				new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
-				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5), 110)
+					// Active Spell List
+					mRush,
+					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
+					new SilverBolts(boss, plugin),
+					new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5), 110)
 			));
 
 			SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
-				// Active Spell List
-				mRush2,
-				new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
-				new SilverBolts(boss, plugin),
-				new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5), 110)
+					// Active Spell List
+					mRush2,
+					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
+					new SilverBolts(boss, plugin),
+					new SpellEchoCharge(plugin, boss, (int) (20 * 10), (int) (20 * 4.5), 110)
 			));
 
 			SpellManager finalStandActiveSpells = new SpellManager(Arrays.asList(
-				new SpellStonemason(boss, plugin, mPhase3Loc, 30, 70),
-				new SilverBolts(boss, plugin)
+					new SpellStonemason(boss, plugin, mPhase3Loc, 30, 70),
+					new SilverBolts(boss, plugin)
 			));
 
 			List<Spell> passiveSpells = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss)
 			);
 
 			List<Spell> passiveSpellsPhase3 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 16, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 16, mPhase3Loc)
 			);
 
 			List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 12, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 12, mPhase3Loc)
 			);
 
 			List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
-				// passiveSpells
-				new SpellBlockBreak(boss, 2, 2, 2),
-				mFloor,
-				mRecover,
-				mSpawner,
-				new SpellConstructAggro(boss),
-				new SpellFinalStandPassive(boss, 8, mPhase3Loc)
+					// passiveSpells
+					new SpellBlockBreak(boss, 2, 2, 2),
+					mFloor,
+					mRecover,
+					mSpawner,
+					new SpellConstructAggro(boss),
+					new SpellFinalStandPassive(boss, 8, mPhase3Loc)
 			);
 
 			Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -644,7 +645,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		for (Player p : PlayerUtils.playersInRange(event.getEntity().getLocation(), detectionRange, true)) {
 			Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
 		}

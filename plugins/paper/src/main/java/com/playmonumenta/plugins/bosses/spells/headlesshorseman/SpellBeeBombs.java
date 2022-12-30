@@ -55,6 +55,9 @@ public class SpellBeeBombs extends Spell {
 					new PartialParticle(Particle.SMOKE_NORMAL, loc, 25, 0.15, .15, .15, 0.125).spawnAsEntityActive(mBoss);
 
 					LivingEntity bee = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, "ExplosiveDrone");
+					if (bee == null) {
+						return;
+					}
 					new BukkitRunnable() {
 						int mTicks = 0;
 

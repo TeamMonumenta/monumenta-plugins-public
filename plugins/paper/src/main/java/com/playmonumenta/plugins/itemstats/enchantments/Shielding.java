@@ -6,11 +6,11 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class Shielding implements Enchantment {
 
@@ -56,6 +56,7 @@ public class Shielding implements Enchantment {
 		if (doesShieldingApply(player, source)
 			    && event.getType() == DamageEvent.DamageType.MELEE
 			    && event.getDamage() > 0
+			    && source != null
 			    && source.getEquipment() != null
 			    && ItemUtils.isAxe(source.getEquipment().getItemInMainHand())
 			    && !event.isBlockedByShield()) {

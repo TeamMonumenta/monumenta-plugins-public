@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -51,6 +52,6 @@ public class Bleeding implements Enchantment {
 
 	public static void apply(Plugin plugin, Player player, double level, int duration, LivingEntity enemy) {
 		EntityUtils.applyBleed(plugin, duration, level * AMOUNT_PER_LEVEL, enemy);
-		player.getWorld().spawnParticle(Particle.REDSTONE, enemy.getLocation().add(0, 1, 0), 8, 0.3, 0.6, 0.3, COLOR);
+		new PartialParticle(Particle.REDSTONE, enemy.getLocation().add(0, 1, 0), 8, 0.3, 0.6, 0.3, COLOR).spawnAsPlayerBuff(player);
 	}
 }

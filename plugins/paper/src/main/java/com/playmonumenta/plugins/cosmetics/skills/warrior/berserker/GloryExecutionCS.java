@@ -25,6 +25,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 	// Gallery theme1: blood
@@ -36,7 +37,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 	private static final int LAND_ANIM_FRAMES = 5;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"What makes glory? What makes a fool?",
 			"Loyalty is the trailhead, but for now",
@@ -55,7 +56,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

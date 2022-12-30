@@ -20,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -125,16 +124,16 @@ public class Explosive implements Enchantment {
 		}
 		if (wind > 0) {
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
-			player.getWorld().spawnParticle(Particle.CLOUD, location, 25, 1.5, 1.5, 1.5);
+			new PartialParticle(Particle.CLOUD, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 		}
 		if (earth > 0) {
 			player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1.0f, 1.0f);
-			player.getWorld().spawnParticle(Particle.FALLING_DUST, location, 12, 1.5, 1.5, 1.5, Material.COARSE_DIRT.createBlockData());
-			player.getWorld().spawnParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, new Particle.DustOptions(Color.fromRGB(120, 148, 82), 0.75f));
+			new PartialParticle(Particle.FALLING_DUST, location, 12, 1.5, 1.5, 1.5, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, location, 12, 1.5, 1.5, 1.5, new Particle.DustOptions(Color.fromRGB(120, 148, 82), 0.75f)).spawnAsPlayerActive(player);
 		}
 		if (fire > 0 || fire + ice + thunder + decay + bleed + wind + earth == 0) {
 			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
-			player.getWorld().spawnParticle(Particle.LAVA, location, 25, 1.5, 1.5, 1.5);
+			new PartialParticle(Particle.LAVA, location, 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 		}
 
 		// Remove projectile (mainly to avoid tridents doing a double explosion)
@@ -142,13 +141,12 @@ public class Explosive implements Enchantment {
 	}
 
 	public static void particles(Location loc, Player player, double radius) {
-		World world = loc.getWorld();
 		double ratio = radius / RADIUS;
 		int count = (int) (10 * ratio * ratio);
 		double offset = 0.5 * ratio;
-		world.spawnParticle(Particle.EXPLOSION_NORMAL, loc, count, offset, offset, offset, 0.25);
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, count, offset, offset, offset, 0.25);
-		world.spawnParticle(Particle.FLAME, loc, count, offset, offset, offset, 0.25);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, count, offset, offset, offset, 0.25).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, count, offset, offset, offset, 0.25).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FLAME, loc, count, offset, offset, offset, 0.25).spawnAsPlayerActive(player);
 		player.playSound(player.getLocation(), Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1.0f, 1.5f);
 	}
 }

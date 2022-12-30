@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -73,8 +74,8 @@ public class EarthsWrathTowerAbility extends TowerAbility {
 							mTicks++;
 							mBox.shift(mDir.clone().multiply(0.45));
 							Location bLoc = mBox.getCenter().toLocation(mWorld);
-							mWorld.spawnParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0);
-							mWorld.spawnParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0);
+							new PartialParticle(Particle.DAMAGE_INDICATOR, bLoc, 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 							for (LivingEntity target : (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs())) {
 								if (target.getBoundingBox().overlaps(mBox)) {
 									DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false);

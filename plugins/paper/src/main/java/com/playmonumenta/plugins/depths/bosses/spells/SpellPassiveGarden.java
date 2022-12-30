@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellPassiveGarden extends Spell {
 
@@ -110,7 +111,7 @@ public class SpellPassiveGarden extends Spell {
 					continue;
 				}
 
-				LivingEntity newPlant = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, plant);
+				LivingEntity newPlant = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, plant));
 				newPlant.setPersistent(true);
 				mPlants.put(loc, newPlant);
 				mPlantTypes.put(loc, plant);
@@ -126,10 +127,7 @@ public class SpellPassiveGarden extends Spell {
 
 	private @Nullable String getValidPlant() {
 		Collection<String> activeTypes = mPlantTypes.values();
-		List<String> currentTypes = new ArrayList<>();
-		for (String s : activeTypes) {
-			currentTypes.add(s);
-		}
+		List<String> currentTypes = new ArrayList<>(activeTypes);
 
 		if (currentTypes.contains("SporeDionaea")) {
 			currentTypes.add("ElderSporeDionaea");

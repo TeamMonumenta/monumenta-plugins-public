@@ -17,6 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class TemporalShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_temporalshield";
@@ -59,7 +60,7 @@ public class TemporalShieldBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange, detectionRange, detectionRange);
 		for (LivingEntity e : mobs) {
 			if (e.getScoreboardTags().contains("shieldReceiver")) {

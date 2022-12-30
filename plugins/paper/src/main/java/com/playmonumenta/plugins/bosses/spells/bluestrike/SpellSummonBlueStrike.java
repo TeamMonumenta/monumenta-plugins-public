@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -85,7 +86,7 @@ public class SpellSummonBlueStrike extends Spell {
 					}
 
 					Collections.shuffle(mLocationOffsets);
-					LivingEntity e = (LivingEntity) mWeights.get(keys.get(iteration)).spawn(mCenter.clone().add(mLocationOffsets.get(FastUtils.RANDOM.nextInt(mLocationOffsets.size()))));
+					LivingEntity e = (LivingEntity) Objects.requireNonNull(mWeights.get(keys.get(iteration))).spawn(mCenter.clone().add(mLocationOffsets.get(FastUtils.RANDOM.nextInt(mLocationOffsets.size()))));
 
 					if (e != null) {
 						bossManager.manuallyRegisterBoss(e, new DropShardBoss(mPlugin, e));

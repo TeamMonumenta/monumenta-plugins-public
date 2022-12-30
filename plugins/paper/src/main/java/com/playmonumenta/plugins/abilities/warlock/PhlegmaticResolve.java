@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,6 +22,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class PhlegmaticResolve extends Ability {
 
@@ -156,8 +156,9 @@ public class PhlegmaticResolve extends Ability {
 
 			// Need to apply Voodoo Bonds + Resistance effects here since the damage event will be cancelled before
 			// they can apply, this is easier than rewriting whole effect manager.
-			if (mPlugin.mEffectManager.hasEffect(mPlayer, "VoodooBondsEffect")) {
-				mPlugin.mEffectManager.getActiveEffect(mPlayer, "VoodooBondsEffect").onHurt(mPlayer, event);
+			Effect voodooBondsEffect = mPlugin.mEffectManager.getActiveEffect(mPlayer, "VoodooBondsEffect");
+			if (voodooBondsEffect != null) {
+				voodooBondsEffect.onHurt(mPlayer, event);
 			}
 
 			if (mPlugin.mEffectManager.hasEffect(mPlayer, PercentDamageReceived.class)) {

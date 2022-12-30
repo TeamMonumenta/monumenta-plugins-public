@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 
 public final class ItemOverrides {
@@ -399,11 +399,11 @@ public final class ItemOverrides {
 		BaseOverride blockOverride = mItems.get(blockType);
 		boolean notCancelled = true;
 
-		if (itemOverride != null) {
+		if (item != null && itemOverride != null) {
 			notCancelled = itemOverride.rightClickItemInteraction(plugin, player, action, item, block);
 		}
 
-		if (notCancelled && blockOverride != null) {
+		if (notCancelled && block != null && blockOverride != null) {
 			notCancelled = blockOverride.rightClickBlockInteraction(plugin, player, action, item, block, event);
 		}
 
@@ -418,11 +418,11 @@ public final class ItemOverrides {
 		BaseOverride blockOverride = mItems.get(blockType);
 		boolean notCancelled = true;
 
-		if (itemOverride != null) {
+		if (item != null && itemOverride != null) {
 			notCancelled = itemOverride.leftClickItemInteraction(plugin, player, action, item, block);
 		}
 
-		if (notCancelled && blockOverride != null) {
+		if (notCancelled && block != null && blockOverride != null) {
 			notCancelled = blockOverride.leftClickBlockInteraction(plugin, player, action, item, block);
 		}
 

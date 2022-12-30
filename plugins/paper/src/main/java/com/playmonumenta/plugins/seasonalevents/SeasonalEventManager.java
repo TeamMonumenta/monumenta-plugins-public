@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -25,6 +24,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class SeasonalEventManager {
 	private static class PassFiles {
@@ -116,7 +116,7 @@ public class SeasonalEventManager {
 		}
 	}
 
-	public static SeasonalPass getPass() {
+	public static @Nullable SeasonalPass getPass() {
 		return mActivePass;
 	}
 

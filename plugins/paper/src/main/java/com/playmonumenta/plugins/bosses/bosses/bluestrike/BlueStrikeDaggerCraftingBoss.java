@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 
@@ -55,44 +56,46 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			.register();
 	}
 
-	private Location mSpawnLoc;
-	private Location mDaggerLoc;
+	private final Location mSpawnLoc;
 	public static String identityTag = "boss_bluestrikedaggercraft";
-	public static BukkitTask mRunnable;
-	public List<Spell> mOnlinePassives;
+	public static @Nullable BukkitTask mRunnable;
+	public List<Spell> mOnlinePassives = List.of();
 	public List<Spell> mOfflinePassives = new ArrayList<>();
-	private LivingEntity mSamwell = null;
-	private Samwell mSamwellAbility = null;
-	private SpellManager mSpellManager = SpellManager.EMPTY;
+	private Samwell mSamwellAbility;
+	private final SpellManager mSpellManager = SpellManager.EMPTY;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlueStrikeDaggerCraftingBoss(plugin, boss);
+	public static @Nullable BlueStrikeDaggerCraftingBoss deserialize(Plugin plugin, LivingEntity boss) throws Exception {
+		return construct(plugin, boss);
 	}
 
-	public BlueStrikeDaggerCraftingBoss(Plugin plugin, LivingEntity boss) {
+	public static @Nullable BlueStrikeDaggerCraftingBoss construct(Plugin plugin, LivingEntity boss) {
+		// Get nearest entity called Samwell.
+		Samwell samwell = null;
+		List<LivingEntity> witherSkeletons = EntityUtils.getNearbyMobs(boss.getLocation(), 100, EnumSet.of(EntityType.WITHER_SKELETON));
+		for (LivingEntity mob : witherSkeletons) {
+			if (mob.getScoreboardTags().contains(Samwell.identityTag)) {
+				samwell = BossUtils.getBossOfClass(mob, Samwell.class);
+				break;
+			}
+		}
+		if (samwell == null) {
+			MMLog.warning("DaggerCraftingBoss: Samwell wasn't found! (This is a bug)");
+			return null;
+		}
+		return new BlueStrikeDaggerCraftingBoss(plugin, boss, samwell);
+	}
+
+	BlueStrikeDaggerCraftingBoss(Plugin plugin, LivingEntity boss, Samwell samwell) {
 		super(plugin, identityTag, boss);
 		mSpawnLoc = mBoss.getLocation();
 		boss.getScoreboardTags().add(NPC_TAG);
 
-		// Get nearest entity called Samwell.
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mSpawnLoc, 100, EnumSet.of(EntityType.WITHER_SKELETON));
-		for (LivingEntity mob : mobs) {
-			if (mob.getScoreboardTags().contains(Samwell.identityTag)) {
-				mSamwell = mob;
-				mSamwellAbility = BossUtils.getBossOfClass(mSamwell, Samwell.class);
-				break;
-			}
-		}
+		mSamwellAbility = samwell;
 
-		if (mSamwell == null) {
-			MMLog.warning("DaggerCraftingBoss: Samwell wasn't found! (This is a bug)");
-			return;
-		}
-
-		mDaggerLoc = mSamwellAbility.mDaggerLoc;
+		Location daggerLoc = mSamwellAbility.mDaggerLoc;
 
 		mOnlinePassives = List.of(
-			new SpellCraftDaggerAnimation(mBoss, mDaggerLoc)
+				new SpellCraftDaggerAnimation(mBoss, daggerLoc)
 		);
 
 		super.constructBoss(mSpellManager, mOfflinePassives, 100, null);

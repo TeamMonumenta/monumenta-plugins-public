@@ -34,13 +34,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public final class VarcosaSummonerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_summoner";
 	public static final int detectionRange = 50;
 	public static int mSummonPeriod = 20 * 5;
-	private Location mCenter = null;
+	private Location mCenter;
 	private boolean mActive;
 	private final Location mEndLoc;
 	private final Location mSpawnLoc;
@@ -103,7 +104,7 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		mActive = false;
 		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
 

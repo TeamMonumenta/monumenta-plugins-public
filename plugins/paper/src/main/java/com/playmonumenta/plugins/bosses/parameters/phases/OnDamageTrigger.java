@@ -6,12 +6,14 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class OnDamageTrigger extends Trigger {
 
-	private final String mCustomAbilityName;
-	private final DamageEvent.DamageType mDamageType;
+	private final @Nullable String mCustomAbilityName;
+	private final @Nullable DamageEvent.DamageType mDamageType;
 	private final Long mTotalDamage;
 	private double mCurrentDamage = 0;
 
@@ -85,7 +87,7 @@ public class OnDamageTrigger extends Trigger {
 			return ParseResult.of(new OnDamageTrigger(type, value));
 		}
 
-		return ParseResult.of(new OnDamageTrigger(customAbilityName, value));
+		return ParseResult.of(new OnDamageTrigger(Objects.requireNonNull(customAbilityName), value));
 
 	}
 }

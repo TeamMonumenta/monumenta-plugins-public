@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ArrowSaving extends SingleArgumentEffect {
 	public static final String GENERIC_NAME = "ArrowSaving";

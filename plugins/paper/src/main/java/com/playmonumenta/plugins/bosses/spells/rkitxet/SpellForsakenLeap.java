@@ -19,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SpellForsakenLeap extends SpellBaseSlam {
 
@@ -44,7 +45,7 @@ public class SpellForsakenLeap extends SpellBaseSlam {
 				new PartialParticle(Particle.FLAME, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(launcher);
 			}, (World world, Location loc) -> {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(0, 190, 0), 1.0f)).spawnAsEntityActive(launcher);
-			}, (World world, Player player, Location loc, Vector dir) -> {
+			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				rKitxet.useSpell("Forsaken Leap");
 
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,

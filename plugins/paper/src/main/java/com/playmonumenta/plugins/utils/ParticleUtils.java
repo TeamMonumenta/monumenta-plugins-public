@@ -1,7 +1,12 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -13,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 // TODO use PartialParticle
@@ -293,14 +299,14 @@ public class ParticleUtils {
 	}
 
 	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
-												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
-												    Particle... effects) {
+	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
+	                                               Particle... effects) {
 		drawParticleCircleExplosion(player, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, y, null, effects);
 	}
 
 	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
-												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
-												   Object data, Particle... effects) {
+	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
+	                                               @Nullable Object data, Particle... effects) {
 
 		Vector vec;
 		for (int i = 0; i < points; i++) {

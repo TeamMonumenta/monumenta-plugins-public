@@ -4,10 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,6 +18,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * Resurrection - Makes the armor piece act like a totem (saves your life and then breaks)
@@ -70,7 +71,7 @@ public class Resurrection implements Enchantment {
 		}.runTaskLater(plugin, 1);
 
 		player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1f, 1);
-		player.getWorld().spawnParticle(Particle.TOTEM, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 1);
+		new PartialParticle(Particle.TOTEM, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 1).spawnAsPlayerActive(player);
 
 		if (resurrectionEnchantment != null) {
 			PlayerInventory inventory = player.getInventory();
@@ -83,7 +84,7 @@ public class Resurrection implements Enchantment {
 
 			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
-				playerItemStats.updateStats(player, true, player.getMaxHealth(), true);
+				playerItemStats.updateStats(player, true, true);
 			}
 		}
 

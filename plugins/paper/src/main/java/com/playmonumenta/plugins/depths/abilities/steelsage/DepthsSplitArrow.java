@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -57,15 +58,15 @@ public class DepthsSplitArrow extends DepthsAbility {
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 50; i++) {
 					loc.add(dir.clone().multiply(0.1));
-					world.spawnParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0);
+					new PartialParticle(Particle.CRIT, loc, 2, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(mPlayer);
 					if (loc.distance(eye) < 0.4) {
 						break;
 					}
 				}
 
 				if (!EntityUtils.hasArrowIframes(mPlugin, nearestMob)) {
-					world.spawnParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6);
-					world.spawnParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6);
+					new PartialParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
 
 					if (proj instanceof SpectralArrow) {

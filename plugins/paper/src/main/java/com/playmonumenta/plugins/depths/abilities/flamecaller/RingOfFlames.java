@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -65,7 +66,7 @@ public class RingOfFlames extends DepthsAbility {
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 50, 0.25f, 0.1f, 0.25f, 0.15f);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 50, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0);
 		new BukkitRunnable() {
@@ -96,10 +97,10 @@ public class RingOfFlames extends DepthsAbility {
 
 				for (int y = -1; y < 4; y++) {
 					tempLoc.set(loc.getX() + 4 * FastUtils.cos(mDeg), loc.getY() + y, loc.getZ() + 4 * FastUtils.sin(mDeg));
-					world.spawnParticle(Particle.SOUL_FIRE_FLAME, tempLoc, 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 
 					tempLoc.set(loc.getX() + 4 * FastUtils.cos(mDeg + 180), loc.getY() + y, loc.getZ() + 4 * FastUtils.sin(mDeg + 180));
-					world.spawnParticle(Particle.FLAME, tempLoc, 1, 0, 0, 0, 0);
+					new PartialParticle(Particle.FLAME, tempLoc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 				}
 				mDeg++;
 				if (mDeg >= 360) {
@@ -118,7 +119,7 @@ public class RingOfFlames extends DepthsAbility {
 								if (mobsHitThisTick <= 10) {
 									world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 0.8f, 1f);
 								}
-								world.spawnParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+								new PartialParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer, playerItemStats);
 								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
 

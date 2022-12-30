@@ -26,12 +26,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class BlueStrikeTurretBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bluestriketurretboss";
 	public static final int CHARGE_DURATION = 7 * 20; // 7 seconds charging
-	public LivingEntity mTarget;
-	public LivingEntity mSamwell;
+	public @Nullable LivingEntity mTarget;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return new BlueStrikeTurretBoss(plugin, boss);
@@ -58,20 +58,6 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 			}
 		}
 
-		// Get nearest entity called Samwell.
-		List<LivingEntity> witherSkeletons = EntityUtils.getNearbyMobs(mBoss.getLocation(), 100, EnumSet.of(EntityType.WITHER_SKELETON));
-		for (LivingEntity mob : witherSkeletons) {
-			if (mob.getScoreboardTags().contains(Samwell.identityTag)) {
-				mSamwell = mob;
-				break;
-			}
-		}
-
-		if (mSamwell == null) {
-			MMLog.warning("TurretNPCBoss: Samwell wasn't found! (This is a bug)");
-			return;
-		}
-
 		if (mTarget == null) {
 			MMLog.warning("TurretNPCBoss: Didn't find NPC! (Likely bug)");
 			return;
@@ -92,6 +78,11 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
+				if (mTarget == null) {
+					this.cancel();
+					return;
+				}
+
 				// Shoot Laser!
 				Location startLocation = mBoss.getEyeLocation();
 				Location endLocation = mTarget.getLocation().add(0, mTarget.getEyeHeight() * 3 / 5, 0);

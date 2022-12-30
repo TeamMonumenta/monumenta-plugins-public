@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -18,7 +17,6 @@ import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -41,6 +39,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
+import org.jetbrains.annotations.Nullable;
 
 public class ChestUtils {
 	private static final int LOOTBOX_EPIC_MAX_SIZE = 100;

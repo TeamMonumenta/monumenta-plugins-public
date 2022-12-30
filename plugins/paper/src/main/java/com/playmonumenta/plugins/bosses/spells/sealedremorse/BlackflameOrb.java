@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Nullable;
 
 public class BlackflameOrb extends SpellBaseSeekingProjectile {
 
@@ -68,7 +69,7 @@ public class BlackflameOrb extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 6, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 			},
 			// Hit Action
-			(World world, LivingEntity player, Location loc, Location prevLoc) -> {
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 				new PartialParticle(Particle.FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 80, 2, 2, 2, 0.5).spawnAsEntityActive(boss);

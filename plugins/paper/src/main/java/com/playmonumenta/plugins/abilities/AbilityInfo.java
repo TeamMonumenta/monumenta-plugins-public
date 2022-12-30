@@ -16,13 +16,13 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The AbilityInfo class contains static information about an ability.
@@ -34,7 +34,7 @@ public class AbilityInfo<T extends Ability> {
 	private final Class<T> mAbilityClass;
 	private final BiFunction<Plugin, Player, T> mConstructor;
 	// Ability name as shown in-game
-	private final String mDisplayName;
+	private final @Nullable String mDisplayName;
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
 	private @Nullable String mShorthandName;
 	// List of descriptions to aid ability selection
@@ -61,7 +61,7 @@ public class AbilityInfo<T extends Ability> {
 	private Consumer<Player> mRemove = player -> {
 	};
 
-	public AbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor) {
+	public AbilityInfo(Class<T> abilityClass, @Nullable String displayName, BiFunction<Plugin, Player, T> constructor) {
 		mAbilityClass = abilityClass;
 		mDisplayName = displayName;
 		mConstructor = constructor;
@@ -209,11 +209,11 @@ public class AbilityInfo<T extends Ability> {
 		return mPriorityAmount;
 	}
 
-	public String getScoreboard() {
+	public @Nullable String getScoreboard() {
 		return mScoreboardId;
 	}
 
-	public String getDisplayName() {
+	public @Nullable String getDisplayName() {
 		return mDisplayName;
 	}
 
@@ -267,15 +267,19 @@ public class AbilityInfo<T extends Ability> {
 		if (strDescription == null) {
 			strDescription = "NULL! Set description properly!";
 		}
+		String displayName = mDisplayName;
+		if (displayName == null) {
+			displayName = "NULL! Set name properly!";
+		}
 
 		boolean coloured = enabled;
 
 		String skillHeader;
 		if (skillLevel <= 2) {
-			skillHeader = "[" + mDisplayName.toUpperCase() + " Level " + skillLevel + "] : ";
+			skillHeader = "[" + displayName.toUpperCase() + " Level " + skillLevel + "] : ";
 		} else {
 			coloured &= ServerProperties.getAbilityEnhancementsEnabled();
-			skillHeader = "[" + mDisplayName.toUpperCase() + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled() ? "(disabled in this region) " : "") + ": ";
+			skillHeader = "[" + displayName.toUpperCase() + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled() ? "(disabled in this region) " : "") + ": ";
 		}
 
 		return Component.text("")

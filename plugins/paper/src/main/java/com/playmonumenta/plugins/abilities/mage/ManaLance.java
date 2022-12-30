@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,7 +65,7 @@ public class ManaLance extends MultipleChargeAbility {
 
 	private final ManaLanceCS mCosmetic;
 
-	public ManaLance(Plugin plugin, @Nullable Player player) {
+	public ManaLance(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
 		mMaxCharges = (isEnhanced() ? 2 : 1) + (int) CharmManager.getLevel(player, CHARM_CHARGES);

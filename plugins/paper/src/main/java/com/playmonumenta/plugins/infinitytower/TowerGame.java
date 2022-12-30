@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiBuyMob;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class TowerGame {
@@ -40,16 +41,17 @@ public class TowerGame {
 	public int mCurrentFloor;
 
 	public TowerPlayer mPlayer;
+	@SuppressWarnings("NullAway.Init") // constructor stops game if null
 	protected TowerTeam mFloorTeam;
-
+	@SuppressWarnings("NullAway.Init") // constructor stops game if null
 	protected TowerFloor mFloor;
 	//keep track of the starting point of the floor.
 
 	public final List<LivingEntity> mPlayerMobs;
 	public final List<LivingEntity> mFloorMobs;
 
-	private BukkitRunnable mCountDown;
-	private BukkitRunnable mAesthetics;
+	private @Nullable BukkitRunnable mCountDown;
+	private @Nullable BukkitRunnable mAesthetics;
 
 	private boolean mIsGameEnded = false;
 	private boolean mIsTurnEnded = false;
@@ -66,9 +68,8 @@ public class TowerGame {
 		mFloorMobs = new ArrayList<>();
 		mCurrentFloor = 0;
 
-		mFloor = TowerFileUtils.getTowerFloor(this, mCurrentFloor);
-
-		if (mFloor == null) {
+		TowerFloor floor = TowerFileUtils.getTowerFloor(this, mCurrentFloor);
+		if (floor == null) {
 			//no file?
 			//make a log and stop the game.
 			TowerFileUtils.warning("mFloor == null, no file loaded? stopping the game.");
@@ -76,10 +77,10 @@ public class TowerGame {
 			forceStopGame();
 			return;
 		}
+		mFloor = floor;
 
-		mFloorTeam = TowerFileUtils.getFloorTeam(mCurrentFloor);
-
-		if (mFloorTeam == null) {
+		TowerTeam floorTeam = TowerFileUtils.getFloorTeam(mCurrentFloor);
+		if (floorTeam == null) {
 			//no file?
 			//make a log and stop the game.
 			TowerFileUtils.warning("mFloorTeam == null, no file loaded? stopping the game.");
@@ -87,10 +88,11 @@ public class TowerGame {
 			forceStopGame();
 			return;
 		}
+		mFloorTeam = floorTeam;
 
 		ItemStack stack = InventoryUtils.getItemFromLootTable(mPlayer.mPlayer, TowerConstants.BOOK_LOOT_TABLE_KEY);
 		if (stack == null) {
-			TowerFileUtils.warning("Falied to load loottable");
+			TowerFileUtils.warning("Failed to load loottable");
 			forceStopGame();
 			return;
 		}
@@ -167,21 +169,22 @@ public class TowerGame {
 		TowerGameUtils.addGold(mPlayer.mPlayer, TowerConstants.getGoldWin(mCurrentFloor));
 		if (mCurrentFloor > mFloor.mMax) {
 			//we need to change the floor
-			mFloor = TowerFileUtils.getTowerFloor(this, mCurrentFloor);
+			TowerFloor nextFloor = TowerFileUtils.getTowerFloor(this, mCurrentFloor);
+			if (nextFloor == null) {
+				//no floor usable ->stop the player
+				stop();
+				return;
+			}
+			mFloor = nextFloor;
 		}
 
-		if (mFloor == null) {
-			//no floor usable ->stop the player
-			stop();
-			return;
-		}
-
-		mFloorTeam = TowerFileUtils.getFloorTeam(mCurrentFloor);
-		if (mFloorTeam == null) {
+		TowerTeam nextFloorTeam = TowerFileUtils.getFloorTeam(mCurrentFloor);
+		if (nextFloorTeam == null) {
 			//we reach the end of the game GG
 			stop();
 			return;
 		}
+		mFloorTeam = nextFloorTeam;
 
 		//the player choose to continue the game
 		TowerGameUtils.sendMessage(mPlayer.mPlayer, "Going to start next round!");
@@ -201,7 +204,7 @@ public class TowerGame {
 		}
 		mAesthetics = new BukkitRunnable() {
 			int mTimer = 0;
-			List<LivingEntity> mMobAbilities = new ArrayList<>(mobs);
+			@Nullable List<LivingEntity> mMobAbilities = new ArrayList<>(mobs);
 
 			final List<LivingEntity> mMobs = new ArrayList<>(mobs);
 			final boolean mPlayerWin = playerWin;
@@ -267,7 +270,9 @@ public class TowerGame {
 	}
 
 	public void startTurn() {
-		mCountDown.cancel();
+		if (mCountDown != null) {
+			mCountDown.cancel();
+		}
 
 		if (mIsGameEnded) {
 			return;
@@ -344,7 +349,7 @@ public class TowerGame {
 			}
 			clearMobs();
 		}
-		if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS - 1 && mFloor != null) {
+		if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS - 1 && TowerFileUtils.getTowerFloor(this, mCurrentFloor) != null) {
 			Collection<ArmorStand> armorStand = mPlayer.mPlayer.getWorld().getNearbyEntitiesByType(ArmorStand.class, mPlayer.mPlayer.getLocation(), 150, 150, 150);
 			armorStand.removeIf(armor -> !armor.getScoreboardTags().contains(TowerConstants.TAG_FIREWORK_ARMORSTAND));
 			if (mPlayerLose) {
@@ -364,7 +369,7 @@ public class TowerGame {
 
 					if (mTimes >= 5) {
 						cancel();
-						if (mFloorTeam == null) {
+						if (TowerFileUtils.getFloorTeam(mCurrentFloor) == null) {
 							TowerFileUtils.convertPlayerTeamLocation(INSTANCE);
 							TowerFileUtils.savePlayerTeam(mPlayer.mTeam, mCurrentFloor);
 						} else if (mCurrentFloor > TowerConstants.DESIGNED_FLOORS + 1) {
@@ -489,9 +494,9 @@ public class TowerGame {
 				}
 
 				if (mPlayer != null) {
-					World world = mPlayer.mPlayer.getWorld();
 					for (TowerMob playerMob : mPlayer.mTeam.mMobs) {
-						world.spawnParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(playerMob.mInfo.mMobRarity.getColor(), 0.5f));
+						new PartialParticle(Particle.REDSTONE, playerMob.getSpawnLocation(INSTANCE), 80, 0, 0.5, 0, 1, new DustOptions(playerMob.mInfo.mMobRarity.getColor(), 0.5f))
+							.spawnAsPlayerActive(mPlayer.mPlayer);
 					}
 				}
 

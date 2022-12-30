@@ -133,9 +133,8 @@ public class DelvesManager implements Listener {
 
 		if (PLAYER_DELVE_DUNGEON_MOD_MAP.containsKey(player.getUniqueId())) {
 			Map<String, DungeonDelveInfo> playerDDinfo = PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
-			if (playerDDinfo.containsKey(ServerProperties.getShardName())) {
-				DungeonDelveInfo info = playerDDinfo.get(ServerProperties.getShardName());
-
+			DungeonDelveInfo info = playerDDinfo.get(ServerProperties.getShardName());
+			if (info != null) {
 				return info.get(modifier);
 			}
 		}
@@ -183,8 +182,6 @@ public class DelvesManager implements Listener {
 			return;
 		}
 
-		PLAYER_DELVE_DUNGEON_MOD_MAP.putIfAbsent(player.getUniqueId(), new HashMap<>());
-
 		for (int i = 0; i < dungeonArr.size(); i++) {
 			JsonObject dungeonObj = dungeonArr.get(i).getAsJsonObject();
 			try {
@@ -212,7 +209,7 @@ public class DelvesManager implements Listener {
 
 				}
 
-				PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId()).putIfAbsent(name, info);
+				PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>()).putIfAbsent(name, info);
 				DelvesUtils.updateDelveScoreBoard(player);
 			} catch (Exception e) {
 				MMLog.warning("[DelveManager] error while loading player info. Reason: " + e.getMessage());
@@ -223,45 +220,42 @@ public class DelvesManager implements Listener {
 	}
 
 	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods) {
-		PLAYER_DELVE_DUNGEON_MOD_MAP.putIfAbsent(player.getUniqueId(), new HashMap<>());
-
-		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId());
-
-		DungeonDelveInfo ddinfo = playerDungeonInfo.getOrDefault(dungeon, new DungeonDelveInfo());
+		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
+		DungeonDelveInfo ddinfo = playerDungeonInfo.computeIfAbsent(dungeon, key -> new DungeonDelveInfo());
 		ddinfo.mModifierPoint.clear();
 		for (DelvesModifier mod : mods.keySet()) {
 			ddinfo.mModifierPoint.put(mod, mods.get(mod));
 		}
 		ddinfo.recalculateTotalPoint();
-		playerDungeonInfo.put(dungeon, ddinfo);
-		PLAYER_DELVE_DUNGEON_MOD_MAP.put(player.getUniqueId(), playerDungeonInfo);
 	}
 
 	public static boolean validateDelvePreset(Player player, String dungeon) {
+		int preset = ScoreboardUtils.getScoreboardValue(player, DelvePreset.PRESET_SCOREBOARD).orElse(0);
+		DelvePreset delvePreset = DelvePreset.getDelvePreset(preset);
+		if (delvePreset == null) {
+			return true;
+		}
+
 		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId());
+		if (playerDungeonInfo == null) {
+			return false;
+		}
 
 		DungeonDelveInfo ddinfo = playerDungeonInfo.getOrDefault(dungeon, new DungeonDelveInfo());
-
-		int preset = ScoreboardUtils.getScoreboardValue(player, DelvePreset.PRESET_SCOREBOARD).orElse(0);
-		if (preset == 0) {
-			return true;
-		}
-		if (DelvePreset.validatePresetModifiers(ddinfo, DelvePreset.getDelvePreset(preset))) {
-			return true;
-		}
-		return false;
+		return DelvePreset.validatePresetModifiers(ddinfo, delvePreset);
 	}
 
 	protected static JsonObject convertPlayerData(Player player) {
-		if (PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId()) == null) {
-			return null;
+		Map<String, DungeonDelveInfo> delveInfoMap = PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId());
+		if (delveInfoMap == null) {
+			return new JsonObject();
 		}
 
 		JsonObject obj = new JsonObject();
 		JsonArray dungeons = new JsonArray();
 		obj.add("dungeons", dungeons);
 
-		for (Map.Entry<String, DungeonDelveInfo> playerDungeonInfo : PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId()).entrySet()) {
+		for (Map.Entry<String, DungeonDelveInfo> playerDungeonInfo : delveInfoMap.entrySet()) {
 			JsonObject dungeonObj = new JsonObject();
 			dungeonObj.addProperty("dungeonName", playerDungeonInfo.getKey());
 
@@ -462,15 +456,13 @@ public class DelvesManager implements Listener {
 			}
 
 			Location armorStandLoc = event.getPlayer().getWorld().getSpawnLocation(); // get the spawn location
-			boolean foundStand = false;
 			ArmorStand armorStand = null;
 			for (Entity entity : armorStandLoc.getNearbyEntities(2, 2, 2)) { // get the entities at the spawn location
 				if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName() != null && entity.getCustomName().equals("SpawnerBreaksArmorStand")) { //if it's our marker armorstand
-					foundStand = true;
 					armorStand = (ArmorStand) entity;
 				}
 			}
-			if (!foundStand) { // create new armor stand
+			if (armorStand == null) { // create new armor stand
 				armorStand = (ArmorStand) event.getPlayer().getWorld().spawnEntity(armorStandLoc, EntityType.ARMOR_STAND);
 				armorStand.setVisible(false);
 				armorStand.setGravity(false);

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.ChatColor;
@@ -54,7 +55,7 @@ public class Fireball extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
-		world.spawnParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f);
+		new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 		Vector dir = loc.getDirection().normalize();
 		for (int i = 0; i < DISTANCE; i++) {
 			loc.add(dir);
@@ -72,9 +73,9 @@ public class Fireball extends DepthsAbility {
 	private void explode(Location loc) {
 		World world = loc.getWorld();
 
-		world.spawnParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0);
-		world.spawnParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 1.5, 1.5, 1.5, 0);
-		world.spawnParticle(Particle.FLAME, loc, 25, 1.5, 1.5, 1.5, 0);
+		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 1.5, 1.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 25, 1.5, 1.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {

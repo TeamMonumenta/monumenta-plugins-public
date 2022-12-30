@@ -5,8 +5,14 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class HallowedLanceCS extends ManaLanceCS {
 	// Test only. What happens if two skins for one spell?
@@ -16,7 +22,7 @@ public class HallowedLanceCS extends ManaLanceCS {
 	private static final Particle.DustOptions HALLOWED_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 80), 1.0f);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName());
 	}
 
@@ -31,7 +37,7 @@ public class HallowedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

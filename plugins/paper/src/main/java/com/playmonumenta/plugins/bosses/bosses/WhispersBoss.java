@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -16,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class WhispersBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_whispers";
@@ -26,9 +26,8 @@ public class WhispersBoss extends BossAbilityGroup {
 	}
 
 	final Parameters mParam;
-	private List<Player> mStolenPlayers = new ArrayList<>();
-	@Nullable
-	private List<BukkitRunnable> mCleanse = new ArrayList<>();
+	private final List<Player> mStolenPlayers = new ArrayList<>();
+	private final List<BukkitRunnable> mCleanse = new ArrayList<>();
 
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -69,7 +68,7 @@ public class WhispersBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		for (int i = 0; i < mStolenPlayers.size(); i++) {
 			Player stolenPlayer = mStolenPlayers.get(i);
 			if (!stolenPlayer.isDead() && EntityUtils.hasAttributesContaining(stolenPlayer, Attribute.GENERIC_MAX_HEALTH, "Whispers")) {

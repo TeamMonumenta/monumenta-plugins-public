@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +29,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancements extends PotionAbility {
 	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.6;
@@ -94,7 +94,7 @@ public class EsotericEnhancements extends PotionAbility {
 		} else if (!isOnCooldown()) {
 			// Clear out list so it doesn't build up
 			int reactionTime = CharmManager.getDuration(mPlayer, CHARM_REACTION_TIME, ABERRATION_SUMMON_DURATION);
-			mAppliedMobs.keySet().removeIf((entity) -> (entity.getTicksLived() - mAppliedMobs.get(entity) > reactionTime));
+			mAppliedMobs.entrySet().removeIf((entry) -> (entry.getKey().getTicksLived() - entry.getValue() > reactionTime));
 
 			// If it's still in the list, it was applied recently enough
 			if (mAppliedMobs.containsKey(mob)) {
@@ -123,7 +123,7 @@ public class EsotericEnhancements extends PotionAbility {
 			}
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
-			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * mDamageMultiplier), radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
+			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions == null ? 0 : mAlchemistPotions.getDamage() * mDamageMultiplier), radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 
 			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
 			aberration.setExplosionRadius((int) radius);
@@ -134,7 +134,7 @@ public class EsotericEnhancements extends PotionAbility {
 
 			new BukkitRunnable() {
 				int mTicks = 0;
-				LivingEntity mTarget = null;
+				@Nullable LivingEntity mTarget = null;
 				@Override
 				public void run() {
 					if (mTicks >= ABERRATION_LIFETIME || !mPlayer.isOnline() || mPlayer.isDead() || aberration.isDead()) {

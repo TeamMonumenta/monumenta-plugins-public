@@ -33,7 +33,7 @@ public abstract class Gui {
 
 	private final List<GuiItem> mItems;
 
-	private ItemStack mFiller = null;
+	private @Nullable ItemStack mFiller = null;
 
 	public Gui(Player player, int size, Component title) {
 		mPlugin = Plugin.getInstance();

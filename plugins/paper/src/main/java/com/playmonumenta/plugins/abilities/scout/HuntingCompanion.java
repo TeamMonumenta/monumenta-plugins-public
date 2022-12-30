@@ -24,9 +24,10 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -52,6 +53,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class HuntingCompanion extends Ability {
 	private static final int COOLDOWN = 24 * 20;
@@ -175,11 +177,13 @@ public class HuntingCompanion extends Ability {
 			@Override
 			public void run() {
 				mT++;
-				for (Mob summon : new ArrayList<>(mSummons.keySet())) {
+				for (Iterator<Map.Entry<Mob, LivingEntity>> iterator = mSummons.entrySet().iterator(); iterator.hasNext(); ) {
+					Map.Entry<Mob, LivingEntity> e = iterator.next();
+					Mob summon = e.getKey();
 					if (summon.isDead() || !summon.isValid()) {
-						mSummons.remove(summon);
+						iterator.remove();
 					} else {
-						mCosmetic.tick(summon, mPlayer, mSummons.get(summon), mT);
+						mCosmetic.tick(summon, mPlayer, e.getValue(), mT);
 					}
 				}
 				if (mSummons.isEmpty()) {

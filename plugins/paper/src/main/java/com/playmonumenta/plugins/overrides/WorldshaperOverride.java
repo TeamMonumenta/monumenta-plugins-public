@@ -37,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class WorldshaperOverride {
 	private static final String CAN_PLACE_SHULKER_PERM = "monumenta.canplaceshulker";
@@ -286,7 +287,7 @@ public class WorldshaperOverride {
 	}
 
 	// Gets and remove first block it finds in the shulker
-	private static BlockData getBlockAndSubtract(ItemStack item) {
+	private static @Nullable BlockData getBlockAndSubtract(ItemStack item) {
 
 		BlockStateMeta shulkerMeta = (BlockStateMeta) item.getItemMeta();
 		ShulkerBox shulkerBox = (ShulkerBox) shulkerMeta.getBlockState();
@@ -295,8 +296,8 @@ public class WorldshaperOverride {
 		for (int i = 0; i < 27; i++) {
 			ItemStack currentItem = shulkerInventory.getItem(i);
 			if (currentItem == null
-				|| currentItem.getType().isAir()
-				|| ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
+				    || currentItem.getType().isAir()
+				    || ItemUtils.notAllowedTreeReplace.contains(currentItem.getType())
 				|| (!currentItem.getType().isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(currentItem.getType()))
 				|| currentItem.getItemMeta().hasLore()) {
 				// Air breaks it, skip over it. Also the banned items break it, skip over those.

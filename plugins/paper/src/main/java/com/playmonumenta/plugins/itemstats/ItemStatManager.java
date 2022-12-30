@@ -39,7 +39,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -80,6 +79,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemStatManager implements Listener {
 
@@ -111,16 +111,19 @@ public class ItemStatManager implements Listener {
 				}
 			}
 
-			public double get(ItemStat stat) {
+			public double get(@Nullable ItemStat stat) {
 				return get(stat, 0);
 			}
 
-			public double get(ItemStat stat, double defaultValue) {
+			public double get(@Nullable ItemStat stat, double defaultValue) {
 				Double value = mMap.get(stat);
 				return value == null ? defaultValue : value;
 			}
 
-			public double get(EnchantmentType type) {
+			public double get(@Nullable EnchantmentType type) {
+				if (type == null) {
+					return 0;
+				}
 				ItemStat stat = type.getItemStat();
 				if (stat == null) {
 					return 0;
@@ -155,9 +158,8 @@ public class ItemStatManager implements Listener {
 			mRegion = region;
 		}
 
-		public PlayerItemStats(Player player) {
+		public PlayerItemStats() {
 			mRegion = ServerProperties.getRegion();
-			updateStats(player, true, player.getMaxHealth(), false);
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
@@ -182,7 +184,8 @@ public class ItemStatManager implements Listener {
 			mRegion = region;
 		}
 
-		public void updateStats(Player player, boolean updateAll, double priorHealth, boolean checkHealth) {
+		public void updateStats(Player player, boolean updateAll, boolean checkHealth) {
+			double priorHealth = EntityUtils.getMaxHealth(player);
 			PlayerInventory inventory = player.getInventory();
 			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), player, updateAll);
 			// Tell the ItemStats that there has been an update
@@ -409,7 +412,7 @@ public class ItemStatManager implements Listener {
 				for (Player p : mUpdateStatsDelayed) {
 					PlayerItemStats playerItemStats = mPlayerItemStatsMappings.get(p.getUniqueId());
 					if (playerItemStats != null) {
-						playerItemStats.updateStats(p, true, p.getMaxHealth(), true);
+						playerItemStats.updateStats(p, true, true);
 					}
 				}
 				mUpdateStatsDelayed.clear();
@@ -421,11 +424,10 @@ public class ItemStatManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		PlayerItemStats playerItemStats = new PlayerItemStats(player);
+		PlayerItemStats playerItemStats = new PlayerItemStats();
 		mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			playerItemStats.updateStats(player, true, player.getMaxHealth(), false);
-		});
+		playerItemStats.updateStats(player, true, false);
+		updateStatsDelayed(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
@@ -508,8 +510,14 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public @Nullable PlayerItemStats getPlayerItemStats(Player player) {
-		return mPlayerItemStatsMappings.get(player.getUniqueId());
+	public PlayerItemStats getPlayerItemStats(Player player) {
+		PlayerItemStats playerItemStats = mPlayerItemStatsMappings.get(player.getUniqueId());
+		if (playerItemStats == null) {
+			playerItemStats = new PlayerItemStats();
+			mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
+			playerItemStats.updateStats(player, true, false);
+		}
+		return playerItemStats;
 	}
 
 	public double getEnchantmentLevel(Player player, EnchantmentType type) {
@@ -547,7 +555,7 @@ public class ItemStatManager implements Listener {
 
 	public void tick(Plugin plugin, Player player, PlayerItemStats stats, boolean twoHz, boolean oneHz) {
 		if (!Objects.equals(stats.mMainhand, player.getInventory().getItemInMainHand())) {
-			stats.updateStats(player, false, EntityUtils.getMaxHealth(player), true);
+			stats.updateStats(player, false, true);
 		}
 		for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
 			entry.getKey().tick(plugin, player, entry.getValue(), twoHz, oneHz);
@@ -736,7 +744,7 @@ public class ItemStatManager implements Listener {
 			for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
 				int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
 				if (level > 0) {
-					ench.getItemStat().onSpawn(mPlugin, item, level);
+					Objects.requireNonNull(ench.getItemStat()).onSpawn(mPlugin, item, level);
 				}
 			}
 
@@ -745,26 +753,20 @@ public class ItemStatManager implements Listener {
 			for (ItemStatUtils.InfusionType infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
 				int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
 				if (level > 0) {
-					infusion.getItemStat().onSpawn(mPlugin, item, level);
+					Objects.requireNonNull(infusion.getItemStat()).onSpawn(mPlugin, item, level);
 				}
 			}
 		}
 	}
 
 	public PlayerItemStats getPlayerItemStatsCopy(Player player) {
-		PlayerItemStats stats = getPlayerItemStats(player);
-		// They should always have stats, but if they don't, make new ones and store them
-		if (stats == null) {
-			stats = new PlayerItemStats(player);
-			mPlayerItemStatsMappings.put(player.getUniqueId(), stats);
-		}
-		return new PlayerItemStats(stats);
+		return new PlayerItemStats(getPlayerItemStats(player));
 	}
 
 	public void updateStats(Player player) {
 		PlayerItemStats stats = getPlayerItemStats(player);
 		if (stats != null) {
-			stats.updateStats(player, true, player.getMaxHealth(), true);
+			stats.updateStats(player, true, true);
 		}
 	}
 

@@ -7,10 +7,10 @@ import com.playmonumenta.plugins.itemstats.Attribute;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
-import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class ThornsDamage implements Attribute {
 

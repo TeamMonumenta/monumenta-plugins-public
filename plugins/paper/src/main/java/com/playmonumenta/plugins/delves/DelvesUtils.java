@@ -23,9 +23,9 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -41,6 +41,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DelvesUtils {
 
@@ -112,15 +113,14 @@ public class DelvesUtils {
 			}
 		}
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
-		// return nWeekRotation.get((int)(DateUtils.getWeeklyVersion() % nWeekRotation.size()));
+		// return nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
 		return DelvesModifier.rotatingDelveModifiers();
 	}
 
-	public static ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
-		if (rank > MODIFIER_RANK_CAPS.get(mod)) {
+	public static @Nullable ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
+		if (rank > MODIFIER_RANK_CAPS.getOrDefault(mod, 0)) {
 			return null;
 		}
-		rank = Math.min(rank, MODIFIER_RANK_CAPS.get(mod));
 		ItemStack stack = new ItemStack(level >= rank ? Material.ORANGE_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE);
 		ItemMeta meta = stack.getItemMeta();
 
@@ -167,13 +167,10 @@ public class DelvesUtils {
 	}
 
 	public static void copyDelvePoint(@Nullable CommandSender sender, @NotNull Player copyTarget, @NotNull Player target, @NotNull String dungeonName) {
-		DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.putIfAbsent(copyTarget.getUniqueId(), new HashMap<>());
-		DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.putIfAbsent(target.getUniqueId(), new HashMap<>());
-		Map<String, DelvesManager.DungeonDelveInfo> copyMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.get(copyTarget.getUniqueId());
-		Map<String, DelvesManager.DungeonDelveInfo> targetMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.get(target.getUniqueId());
+		Map<String, DelvesManager.DungeonDelveInfo> copyMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(copyTarget.getUniqueId(), key -> new HashMap<>());
+		Map<String, DelvesManager.DungeonDelveInfo> targetMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
 
-		copyMap.putIfAbsent(dungeonName, new DelvesManager.DungeonDelveInfo());
-		targetMap.put(dungeonName, copyMap.get(dungeonName).cloneDelveInfo());
+		targetMap.put(dungeonName, copyMap.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo()).cloneDelveInfo());
 
 		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
 			sender.sendMessage(Component.text("Copied delve info " + copyTarget.getName() + " -> " + target.getName() + " for shard " + dungeonName, NamedTextColor.GOLD));
@@ -187,14 +184,11 @@ public class DelvesUtils {
 			return 0;
 		}
 
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(target.getUniqueId(), new HashMap<>());
-
-		map.putIfAbsent(dungeonName, new DelvesManager.DungeonDelveInfo());
-
-		DelvesManager.DungeonDelveInfo info = map.get(dungeonName);
+		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
+		DelvesManager.DungeonDelveInfo info = map.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo());
 		int oldLevel = info.get(modifier);
 
-		 if (modifier == DelvesModifier.ENTROPY) {
+		if (modifier == DelvesModifier.ENTROPY) {
 			int pointsToAssign = Entropy.getDepthPointsAssigned(level) - Entropy.getDepthPointsAssigned(oldLevel);
 			info.mTotalPoint += pointsToAssign;
 			if (pointsToAssign > 0) {
@@ -231,8 +225,7 @@ public class DelvesUtils {
 	}
 
 	public static void clearDelvePlayerByShard(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName) {
-		DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.putIfAbsent(target.getUniqueId(), new HashMap<>());
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.get(target.getUniqueId());
+		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
 
 		map.remove(dungeonName);
 
@@ -291,10 +284,8 @@ public class DelvesUtils {
 	}
 
 	public static void assignRandomDelvePoints(Player target, String dungeonName, int pointsToAssign) {
-		DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.putIfAbsent(target.getUniqueId(), new HashMap<>());
-		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.get(target.getUniqueId());
-		map.putIfAbsent(dungeonName, new DelvesManager.DungeonDelveInfo());
-		DelvesManager.DungeonDelveInfo info = map.get(dungeonName);
+		Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
+		DelvesManager.DungeonDelveInfo info = map.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo());
 
 		if (pointsToAssign > 0) {
 			List<DelvesModifier> mods = DelvesModifier.valuesList();
@@ -464,8 +455,8 @@ public class DelvesUtils {
 		return players;
 	}
 
-	private static final HashMap<RespawningStructure, HashMap<DelvesModifier, Integer>> LAST_POI_DELVE_POINTS = new HashMap<>();
-	private static List<BountyGui.BountyData> BOUNTY_DATA = null;
+	private static final HashMap<RespawningStructure, Map<DelvesModifier, Integer>> LAST_POI_DELVE_POINTS = new HashMap<>();
+	private static @Nullable List<BountyGui.BountyData> BOUNTY_DATA = null;
 
 	public static int getPartyDelvePoints(Player player) {
 		return getPartyDelvePoints(player.getLocation());
@@ -510,7 +501,7 @@ public class DelvesUtils {
 
 			if (structures.isEmpty()) {
 				MMLog.fine("Delve party is not in any structures");
-				return new HashMap<>();
+				return Collections.emptyMap();
 			} else if (structures.size() > 1) {
 				MMLog.warning("Delve party is in multiple structures at once: " + structures.stream().map(DelvesUtils::getStructureName).collect(Collectors.joining(", ")));
 			}
@@ -546,36 +537,36 @@ public class DelvesUtils {
 				players = bountyPlayers;
 			}
 
-			HashMap<DelvesModifier, Integer> lastMap = LAST_POI_DELVE_POINTS.get(structure);
-			HashMap<DelvesModifier, Integer> highestMap = getHighestDelvePointsWithLast(players, lastMap);
-			LAST_POI_DELVE_POINTS.put(structure, highestMap);
+			Map<DelvesModifier, Integer> lastMap = LAST_POI_DELVE_POINTS.get(structure);
+			Map<DelvesModifier, Integer> highestMap = getHighestDelvePointsWithLast(players, lastMap);
+			LAST_POI_DELVE_POINTS.put(structure, new HashMap<>(highestMap));
 			return highestMap;
 		} else {
 			return Collections.emptyMap();
 		}
 	}
 
-	private static HashMap<DelvesModifier, Integer> getHighestDelvePointsWithLast(List<Player> players, @Nullable HashMap<DelvesModifier, Integer> last) {
-		List<HashMap<DelvesModifier, Integer>> list = new ArrayList<>();
+	private static Map<DelvesModifier, Integer> getHighestDelvePointsWithLast(List<Player> players, @Nullable Map<DelvesModifier, Integer> last) {
+		List<Map<DelvesModifier, Integer>> list = new ArrayList<>();
 		boolean foundLast = false;
 		for (Player player : players) {
-			HashMap<DelvesModifier, Integer> playerMap = getPlayerDelvePoints(player);
+			Map<DelvesModifier, Integer> playerMap = getPlayerDelvePoints(player);
 			if (playerMap.equals(last)) {
 				foundLast = true;
 			}
 			list.add(playerMap);
 		}
-		HashMap<DelvesModifier, Integer> highest = getHighestDelvePoints(list);
-		if (foundLast && getTotalPoints(highest) == getTotalPoints(last)) {
+		Map<DelvesModifier, Integer> highest = getHighestDelvePoints(list);
+		if (foundLast && last != null && getTotalPoints(highest) == getTotalPoints(last)) {
 			return last;
 		}
-		return highest;
+		return Collections.unmodifiableMap(highest);
 	}
 
-	private static HashMap<DelvesModifier, Integer> getHighestDelvePoints(List<HashMap<DelvesModifier, Integer>> list) {
-		HashMap<DelvesModifier, Integer> highestMap = new HashMap<>();
+	private static Map<DelvesModifier, Integer> getHighestDelvePoints(List<Map<DelvesModifier, Integer>> list) {
+		Map<DelvesModifier, Integer> highestMap = new HashMap<>();
 		int highestPoints = 0;
-		for (HashMap<DelvesModifier, Integer> playerMap : list) {
+		for (Map<DelvesModifier, Integer> playerMap : list) {
 			int playerPoints = getTotalPoints(playerMap);
 			if (playerPoints > highestPoints) {
 				highestMap = playerMap;
@@ -585,13 +576,13 @@ public class DelvesUtils {
 		return highestMap;
 	}
 
-	private static HashMap<DelvesModifier, Integer> getPlayerDelvePoints(Player player) {
+	private static Map<DelvesModifier, Integer> getPlayerDelvePoints(Player player) {
 		Map<String, DelvesManager.DungeonDelveInfo> playerDDInfo = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
 		DelvesManager.DungeonDelveInfo info = playerDDInfo.get(ServerProperties.getShardName());
 		if (info != null) {
-			return info.getMap();
+			return Collections.unmodifiableMap(info.getMap());
 		}
-		return new HashMap<>();
+		return Collections.emptyMap();
 	}
 
 	public static int getTotalPoints(@Nullable Map<DelvesModifier, Integer> map) {
@@ -600,7 +591,7 @@ public class DelvesUtils {
 		}
 		int points = 0;
 		for (DelvesModifier mod : map.keySet()) {
-			points += map.get(mod) * mod.getPointsPerLevel();
+			points += map.getOrDefault(mod, 0) * mod.getPointsPerLevel();
 		}
 		return points;
 	}
@@ -614,6 +605,6 @@ public class DelvesUtils {
 	}
 
 	private static String getStructureName(RespawningStructure structure) {
-		return (String) structure.getConfig().get("name");
+		return Objects.requireNonNull((String) structure.getConfig().get("name"));
 	}
 }

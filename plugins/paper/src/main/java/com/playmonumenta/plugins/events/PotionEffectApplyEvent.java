@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.events;
 
-import javax.annotation.Nullable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Nullable;
 
 public class PotionEffectApplyEvent extends Event implements Cancellable {
 

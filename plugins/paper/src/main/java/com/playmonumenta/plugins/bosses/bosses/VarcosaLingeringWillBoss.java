@@ -46,6 +46,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_will";
@@ -139,7 +140,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		String dio = "I feel it... partin'... the beyond calls... and I answer...";
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, 50, "tellraw @s [\"\",{\"text\":\"" + dio + "\",\"color\":\"red\"}]");
 		new BukkitRunnable() {

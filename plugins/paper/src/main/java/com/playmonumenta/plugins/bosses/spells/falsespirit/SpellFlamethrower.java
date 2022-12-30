@@ -25,15 +25,14 @@ import org.bukkit.util.Vector;
 
 public class SpellFlamethrower extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private final int mRange = FalseSpirit.detectionRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private static final int mRange = FalseSpirit.detectionRange;
 	private final int mNumTicks = 20 * 3;
 	private final int mDuration = 20 * 5;
-	private final int mCooldown = 20 * 15;
-	private Location mLoc = null;
+	private static final int mCooldown = 20 * 15;
 
-	private boolean mDelve = false;
+	private final boolean mDelve;
 
 	public SpellFlamethrower(Plugin plugin, LivingEntity boss, boolean delve) {
 		mPlugin = plugin;
@@ -56,12 +55,12 @@ public class SpellFlamethrower extends Spell {
 	private void launch(Player target) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
 
-		mLoc = target.getEyeLocation();
 		World world = mBoss.getWorld();
 
 		//Start up warning for flamethrower
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
+			final Location mLoc = target.getEyeLocation();
 
 			@Override
 			public void run() {
@@ -130,7 +129,7 @@ public class SpellFlamethrower extends Spell {
 						//Where the fire particle should go in the laser
 						int mFireLoc = 0;
 						//Don't hit a player twice in the same tick
-						List<Player> mHitPlayers = new ArrayList<>();
+						final List<Player> mHitPlayers = new ArrayList<>();
 
 						@Override
 						public void run() {

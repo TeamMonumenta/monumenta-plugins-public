@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 public class LimitedLifespanBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_limited_lifespan";
@@ -33,7 +34,7 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 		return new LimitedLifespanBoss(plugin, boss);
 	}
 
-	private BukkitTask mTask = null;
+	private @Nullable BukkitTask mTask;
 
 	public LimitedLifespanBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);

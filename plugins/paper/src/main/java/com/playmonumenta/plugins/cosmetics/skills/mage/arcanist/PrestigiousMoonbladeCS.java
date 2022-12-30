@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements PrestigeCS {
 
@@ -36,7 +37,7 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 	private double mDLongAngle;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"MOONBLADE_DESC"
 		);
@@ -53,7 +54,7 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

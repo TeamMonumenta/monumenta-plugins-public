@@ -49,8 +49,8 @@ public class DelveScalingBoss extends BossAbilityGroup {
 
 		if (player != null) {
 			Map<String, DelvesManager.DungeonDelveInfo> map = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.getOrDefault(player.getUniqueId(), new HashMap<>());
-			if (map.containsKey(ServerProperties.getShardName())) {
-				DelvesManager.DungeonDelveInfo info = map.get(ServerProperties.getShardName());
+			DelvesManager.DungeonDelveInfo info = map.get(ServerProperties.getShardName());
+			if (info != null) {
 				mPoints = info.mTotalPoint;
 			}
 		}

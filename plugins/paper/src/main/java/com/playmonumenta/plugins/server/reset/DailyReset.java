@@ -11,13 +11,14 @@ import java.util.Arrays;
 import java.util.TreeSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DailyReset {
 	private static final TreeSet<Integer> COUNTDOWN_SECONDS = new TreeSet<>(Arrays.asList(
@@ -28,8 +29,8 @@ public class DailyReset {
 		0));
 	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
 	static ScheduledThreadPoolExecutor mRealTimePool = new ScheduledThreadPoolExecutor(1);
-	private static @Nullable Runnable mRealTimeRunnable = null;
-	private static @Nullable BukkitRunnable mCountdownRunnable = null;
+	private static @MonotonicNonNull Runnable mRealTimeRunnable = null;
+	private static @MonotonicNonNull BukkitRunnable mCountdownRunnable = null;
 	private static int mLastDailyVersion;
 	private static int mLastCountdownTarget;
 
@@ -42,7 +43,7 @@ public class DailyReset {
 	}
 
 	private static void scheduleCountdownTick(Plugin plugin) {
-		long remainingMillis = Math.max(DateUtils.untilNewDay(ChronoUnit.MILLIS) - 1000 * mLastCountdownTarget, 0) + 1;
+		long remainingMillis = Math.max(DateUtils.untilNewDay(ChronoUnit.MILLIS) - 1000L * mLastCountdownTarget, 0) + 1;
 		if (mCountdownRunnable != null) {
 			mCountdownRunnable.cancel();
 		}
@@ -63,10 +64,12 @@ public class DailyReset {
 					}
 				} else if (targetIsNew) {
 					message = getCountdownMessage(mLastCountdownTarget);
-					Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
-					plugin.getLogger().info("[DailyReset] " + message);
-					for (Player player : plugin.getServer().getOnlinePlayers()) {
-						player.sendMessage(component);
+					if (message != null) {
+						Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
+						plugin.getLogger().info("[DailyReset] " + message);
+						for (Player player : plugin.getServer().getOnlinePlayers()) {
+							player.sendMessage(component);
+						}
 					}
 				}
 				mLastCountdownTarget = nextTarget;

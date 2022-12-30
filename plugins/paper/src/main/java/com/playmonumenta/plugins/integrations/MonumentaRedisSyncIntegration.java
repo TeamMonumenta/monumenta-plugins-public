@@ -10,7 +10,6 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 import java.util.UUID;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -19,6 +18,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.Nullable;
 
 public class MonumentaRedisSyncIntegration implements Listener {
 	private static final String IDENTIFIER = "Monumenta";
@@ -107,12 +107,20 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		}, 5);
 	}
 
-	public static String cachedUuidToName(UUID uuid) {
+	public static @Nullable String cachedUuidToName(UUID uuid) {
 		if (mEnabled) {
 			return MonumentaRedisSyncAPI.cachedUuidToName(uuid);
 		} else {
 			return Bukkit.getOfflinePlayer(uuid).getName();
 		}
+	}
+
+	public static String cachedUuidToNameOrUuid(UUID uuid) {
+		String name = cachedUuidToName(uuid);
+		if (name != null) {
+			return name;
+		}
+		return uuid.toString();
 	}
 
 	public static @Nullable UUID cachedNameToUuid(String name) {

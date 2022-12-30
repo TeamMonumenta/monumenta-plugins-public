@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
@@ -59,7 +60,7 @@ public class Sidearm extends DepthsAbility {
 		Vector dir = loc.getDirection();
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer);
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
 
@@ -67,12 +68,12 @@ public class Sidearm extends DepthsAbility {
 			box.shift(dir);
 			Location bLoc = box.getCenter().toLocation(world);
 
-			world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 6, 0.05, 0.05, 0.05, 0.05);
-			world.spawnParticle(Particle.REDSTONE, bLoc, 18, 0.1, 0.1, 0.1, SIDEARM_COLOR);
+			new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, bLoc, 18, 0.1, 0.1, 0.1, SIDEARM_COLOR).spawnAsPlayerActive(mPlayer);
 
 			if (bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
-				world.spawnParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125);
+				new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
 				break;
 			}
@@ -80,12 +81,12 @@ public class Sidearm extends DepthsAbility {
 				if (box.overlaps(mob.getBoundingBox())) {
 					DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 					if (mob.isDead() || mob.getHealth() <= 0) {
-						mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
+						mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.SIDEARM, getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
 					}
 
 					mob.setVelocity(new Vector(0, 0, 0));
 
-					world.spawnParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125);
+					new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 					world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
 
 					return;
@@ -93,7 +94,7 @@ public class Sidearm extends DepthsAbility {
 			}
 
 			if (i == 5) {
-				world.spawnParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125);
+				new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
 			}
 		}

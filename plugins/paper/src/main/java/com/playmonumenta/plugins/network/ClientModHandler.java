@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -30,7 +31,7 @@ public class ClientModHandler {
 
 	public static final String CHANNEL_ID = "monumenta:client_channel_v1";
 
-	private static ClientModHandler INSTANCE = null;
+	private static @MonotonicNonNull ClientModHandler INSTANCE = null;
 
 	private final MonumentaClasses mClasses;
 
@@ -88,26 +89,27 @@ public class ClientModHandler {
 			return;
 		}
 
-		ClassUpdatePacket.ClientModAbilityInfo[] abilities = INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
-			                                                     .filter(ClientModHandler::shouldHandleAbility)
-			                                                     .map(ability -> {
-				                                                     ClassAbility classAbility = ability.getInfo().getLinkedSpell();
-				                                                     int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
-				                                                     int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
-				                                                     int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
+		ClassUpdatePacket.ClientModAbilityInfo[] abilities =
+			INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
+				.filter(ClientModHandler::shouldHandleAbility)
+				.map(ability -> {
+					ClassAbility classAbility = ability.getInfo().getLinkedSpell();
+					int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
+					int charges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getCharges() : 0;
+					int maxCharges = ability instanceof AbilityWithChargesOrStacks ? ((AbilityWithChargesOrStacks) ability).getMaxCharges() : 0;
 
-				                                                     ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
-				                                                     info.name = getAbilityName(ability);
-				                                                     info.className = getAbilityClassName(ability);
-				                                                     info.remainingCooldown = remainingCooldown;
-				                                                     info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
-				                                                     info.remainingCharges = charges;
-				                                                     info.maxCharges = maxCharges;
-				                                                     info.mode = ability.getMode();
-				                                                     return info;
-			                                                     })
-			                                                     .sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
-			                                                     .toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
+					ClassUpdatePacket.ClientModAbilityInfo info = new ClassUpdatePacket.ClientModAbilityInfo();
+					info.name = getAbilityName(ability);
+					info.className = getAbilityClassName(ability);
+					info.remainingCooldown = remainingCooldown;
+					info.initialCooldown = ability.getInfo().getModifiedCooldown(player, ability.getAbilityScore());
+					info.remainingCharges = charges;
+					info.maxCharges = maxCharges;
+					info.mode = ability.getMode();
+					return info;
+				})
+				.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
+				.toArray(ClassUpdatePacket.ClientModAbilityInfo[]::new);
 
 		ClassUpdatePacket packet = new ClassUpdatePacket();
 		packet.abilities = abilities;
@@ -194,7 +196,7 @@ public class ClientModHandler {
 
 		final String _type = "ClassUpdatePacket";
 
-		ClientModAbilityInfo[] abilities;
+		ClientModAbilityInfo @Nullable [] abilities;
 
 		public static class ClientModAbilityInfo {
 

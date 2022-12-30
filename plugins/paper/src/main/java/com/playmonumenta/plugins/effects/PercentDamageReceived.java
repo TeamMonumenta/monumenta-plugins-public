@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PercentDamageReceived extends Effect {
 	public static final String effectID = "PercentDamageReceived";
@@ -46,7 +46,7 @@ public class PercentDamageReceived extends Effect {
 		return mAmount < 0;
 	}
 
-	public EnumSet<DamageType> getAffectedDamageTypes() {
+	public @Nullable EnumSet<DamageType> getAffectedDamageTypes() {
 		return mAffectedDamageTypes;
 	}
 

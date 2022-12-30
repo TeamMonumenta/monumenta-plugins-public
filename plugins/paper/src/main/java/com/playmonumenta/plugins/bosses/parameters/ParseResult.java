@@ -1,14 +1,15 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import dev.jorel.commandapi.Tooltip;
+import org.jetbrains.annotations.Nullable;
 
 public class ParseResult<T> {
-	private final Tooltip<String>[] mTooltip;
-	private final T mResults;
+	private final @Nullable Tooltip<String>[] mTooltip;
+	private final @Nullable T mResults;
 
 	public Boolean mContainsDeprecated = false;
 
-	private ParseResult(Tooltip<String>[] tooltip, T results) {
+	private ParseResult(@Nullable Tooltip<String>[] tooltip, @Nullable T results) {
 		mTooltip = tooltip;
 		mResults = results;
 	}
@@ -21,13 +22,11 @@ public class ParseResult<T> {
 		return new ParseResult<T>(tooltip, null);
 	}
 
-	/* TODO nullable */
-	public Tooltip<String>[] getTooltip() {
+	public @Nullable Tooltip<String>[] getTooltip() {
 		return mTooltip;
 	}
 
-	/* TODO nullable */
-	public T getResult() {
+	public @Nullable T getResult() {
 		return mResults;
 	}
 }

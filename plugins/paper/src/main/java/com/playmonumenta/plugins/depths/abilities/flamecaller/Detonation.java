@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -48,11 +49,11 @@ public class Detonation extends DepthsAbility {
 		Location location = entity.getLocation();
 		World world = mPlayer.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, DAMAGE_RADIUS)) {
-			world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2);
+			new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2).spawnAsPlayerActive(mPlayer);
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true, false);
 		}
-		world.spawnParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1);
-		world.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, location.add(0, 1, 0), 3);
+		new PartialParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, location.add(0, 1, 0), 3).spawnAsPlayerActive(mPlayer);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 1);
 	}
 

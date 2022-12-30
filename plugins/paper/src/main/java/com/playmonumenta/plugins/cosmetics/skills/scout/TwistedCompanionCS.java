@@ -21,6 +21,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class TwistedCompanionCS extends HuntingCompanionCS {
 	//Twisted theme
@@ -34,7 +35,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	private static final Color TWIST_COLOR_TIP = Color.fromRGB(127, 0, 0);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Bound to you by a twisted energy,",
 			"this companion will execute your orders",
@@ -52,7 +53,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

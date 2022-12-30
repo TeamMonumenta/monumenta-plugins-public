@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.headlesshorseman;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,7 +15,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
@@ -100,7 +100,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 							Location sLoc = pLoc.clone().add(0, 7.5, 0);
 							world.playSound(sLoc, Sound.ENTITY_WITHER_HURT, 3, 0.75f);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1).spawnAsEntityActive(mBoss);
-							LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
+							Phantom nightTerror = (Phantom) LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
 
 							List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 							if (players.size() == 0) {
@@ -113,18 +113,11 @@ public class SpellPhantomOfTheOpera extends Spell {
 							}
 							mPlayerScalingHP = mN;
 
-							LivingEntity mEntity = null;
-							for (Entity e : mCenter.getWorld().getNearbyEntities(sLoc, 0.4, 0.4, 0.4)) {
-								if (e instanceof LivingEntity && !(e instanceof Player) && e instanceof Phantom && !mSummoned.contains(e.getUniqueId())) {
-									mEntity = (LivingEntity) e;
-									break;
-								}
+							if (nightTerror != null) {
+								mSummoned.add(nightTerror.getUniqueId());
+								EntityUtils.setAttributeBase(nightTerror, Attribute.GENERIC_MAX_HEALTH, mPlayerScalingHP);
+								nightTerror.setHealth(mPlayerScalingHP);
 							}
-							if (!mSummoned.contains(mEntity.getUniqueId())) {
-								mSummoned.add(mEntity.getUniqueId());
-							}
-							mEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mPlayerScalingHP);
-							mEntity.setHealth(mPlayerScalingHP);
 						}
 					}
 

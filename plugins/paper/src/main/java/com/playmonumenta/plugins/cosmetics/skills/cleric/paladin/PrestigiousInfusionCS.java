@@ -24,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousInfusionCS extends LuminousInfusionCS implements PrestigeCS {
 
@@ -41,7 +42,7 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	};
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"INFUSION_DESC"
 		);
@@ -58,7 +59,7 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

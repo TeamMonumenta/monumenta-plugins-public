@@ -6,16 +6,17 @@ import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEventBungee;
 import java.util.UUID;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Nullable;
 
 public class NetworkRelayIntegration implements Listener {
 	public static final String VOTE_NOTIFY_CHANNEL = "Monumenta.Bungee.VoteNotify";
 
 	private final Logger mLogger;
-	private static NetworkRelayIntegration INSTANCE = null;
+	private static @MonotonicNonNull NetworkRelayIntegration INSTANCE = null;
 
 	public NetworkRelayIntegration(Logger logger) {
 		logger.info("Enabling MonumentaNetworkRelay integration");

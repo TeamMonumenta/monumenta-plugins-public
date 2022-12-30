@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import javax.annotation.Nullable;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -17,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class InfusionUtils {
 
@@ -30,21 +30,21 @@ public class InfusionUtils {
 	public static final String PULSATING_DIAMOND = "epic:r3/items/currency/pulsating_diamond";
 
 	public enum InfusionSelection {
-		ACUMEN("acumen", "Acumen"),
-		FOCUS("focus", "Focus"),
-		PERSPICACITY("perspicacity", "Perspicacity"),
-		TENACITY("tenacity", "Tenacity"),
-		VIGOR("vigor", "Vigor"),
-		VITALITY("vitality", "Vitality"),
-		REFUND("refund", "refund"),
-		SPEC_REFUND("special", "special");
+		ACUMEN("acumen", InfusionType.ACUMEN),
+		FOCUS("focus", InfusionType.FOCUS),
+		PERSPICACITY("perspicacity", InfusionType.PERSPICACITY),
+		TENACITY("tenacity", InfusionType.TENACITY),
+		VIGOR("vigor", InfusionType.VIGOR),
+		VITALITY("vitality", InfusionType.VITALITY),
+		REFUND("refund", null),
+		SPEC_REFUND("special", null);
 
 		private final String mLabel;
-		private final String mEnchantName;
+		private final @Nullable InfusionType mInfusionType;
 
-		InfusionSelection(String label, String enchantName) {
+		InfusionSelection(String label, @Nullable InfusionType infusionType) {
 			mLabel = label;
-			mEnchantName = enchantName;
+			mInfusionType = infusionType;
 		}
 
 		public static @Nullable InfusionSelection getInfusionSelection(@Nullable String label) {
@@ -63,8 +63,8 @@ public class InfusionUtils {
 			return mLabel;
 		}
 
-		public String getEnchantName() {
-			return mEnchantName;
+		public @Nullable InfusionType getInfusionType() {
+			return mInfusionType;
 		}
 	}
 
@@ -87,7 +87,10 @@ public class InfusionUtils {
 
 		//Remove the infusion enchants from the item
 		for (InfusionSelection sel : InfusionSelection.values()) {
-			ItemStatUtils.removeInfusion(item, InfusionType.getInfusionType(sel.getEnchantName()), false);
+			InfusionType infusionType = sel.getInfusionType();
+			if (infusionType != null) {
+				ItemStatUtils.removeInfusion(item, infusionType, false);
+			}
 		}
 		ItemStatUtils.generateItemStats(item);
 		if (refundMaterials > 0 && region != null) {
@@ -388,9 +391,13 @@ public class InfusionUtils {
 			return false;
 		}
 
-		int prevLvl = ItemStatUtils.getInfusionLevel(item, InfusionType.getInfusionType(selection.getEnchantName()));
+		InfusionType infusionType = selection.getInfusionType();
+		if (infusionType == null) {
+			return false;
+		}
 
-		ItemStatUtils.addInfusion(item, InfusionType.getInfusionType(selection.getEnchantName()), prevLvl + 1, player.getUniqueId());
+		int prevLvl = ItemStatUtils.getInfusionLevel(item, infusionType);
+		ItemStatUtils.addInfusion(item, infusionType, prevLvl + 1, player.getUniqueId());
 
 		return true;
 	}

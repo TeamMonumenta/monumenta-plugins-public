@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -85,7 +86,7 @@ public class SpellThrowSummon extends Spell {
 				List<String> souls = LibraryOfSoulsIntegration.getPool(mSummonName).keySet().stream().map((x) -> x.getLabel()).toList();
 				soul = souls.get(FastUtils.RANDOM.nextInt(souls.size()));
 			}
-			Entity e = LibraryOfSoulsIntegration.summon(sLoc, soul);
+			Entity e = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(sLoc, soul));
 			Location pLoc = target.getLocation();
 			Location tLoc = e.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());

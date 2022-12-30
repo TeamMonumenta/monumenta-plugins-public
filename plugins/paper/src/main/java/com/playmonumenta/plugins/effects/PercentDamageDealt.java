@@ -12,7 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.BiPredicate;
 import org.bukkit.entity.LivingEntity;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PercentDamageDealt extends Effect {
 	public static final String GENERIC_NAME = "PercentDamageDealt";
@@ -75,7 +75,7 @@ public class PercentDamageDealt extends Effect {
 		return mAmount > 0;
 	}
 
-	public EnumSet<DamageType> getAffectedDamageTypes() {
+	public @Nullable EnumSet<DamageType> getAffectedDamageTypes() {
 		return mAffectedDamageTypes;
 	}
 
@@ -118,7 +118,7 @@ public class PercentDamageDealt extends Effect {
 		return object;
 	}
 
-	public static PercentDamageDealt deserialize(JsonObject object, Plugin plugin) {
+	public static @Nullable PercentDamageDealt deserialize(JsonObject object, Plugin plugin) {
 		if (object.has("hasPredicate") && object.get("hasPredicate").getAsBoolean()) {
 			// Noper nope nope not dealing with this
 			return null;

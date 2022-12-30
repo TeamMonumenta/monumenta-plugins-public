@@ -7,7 +7,7 @@ import java.util.HashSet;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BoonOfThePit extends ZeroArgumentEffect {
 	public static final String GENERIC_NAME = "BoonOfThePit";

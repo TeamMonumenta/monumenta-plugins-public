@@ -71,6 +71,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Nullable;
 
 public class Samwell extends BossAbilityGroup {
 	public static final String identityTag = "boss_samwell";
@@ -87,8 +88,8 @@ public class Samwell extends BossAbilityGroup {
 	public int mPhase = 1;
 	public boolean mCraftPhase = false;
 	public boolean mDaggerPhase = false;
-	public BossBar mGatheringBar;
-	public BossBar mCraftingBar;
+	public @Nullable BossBar mGatheringBar;
+	public @Nullable BossBar mCraftingBar;
 	private final List<Spell> mBasePassives;
 	List<Spell> mPhase1Passives;
 	List<Spell> mPhase2Passives;
@@ -283,9 +284,9 @@ public class Samwell extends BossAbilityGroup {
 			mLevyn = mSpawnLoc.getWorld().spawn(mLevynLoc, Villager.class);
 			mLevyn.customName(Component.text("Levyn"));
 
-			mBhairaviAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mBhairavi);
-			mIzzyAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mIzzy);
-			mLevynAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mLevyn);
+			mBhairaviAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mBhairavi, this);
+			mIzzyAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mIzzy, this);
+			mLevynAbility = new BlueStrikeDaggerCraftingBoss(mPlugin, mLevyn, this);
 
 			BossManager.getInstance().manuallyRegisterBoss(mBhairavi, mBhairaviAbility);
 			BossManager.getInstance().manuallyRegisterBoss(mIzzy, mIzzyAbility);
@@ -510,7 +511,7 @@ public class Samwell extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		if (mDefeated) {
 			return;
 		}
@@ -554,12 +555,14 @@ public class Samwell extends BossAbilityGroup {
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 1000, 10));
 		mBoss.removePotionEffect(PotionEffectType.GLOWING);
 		mBoss.teleport(mSpawnLoc.clone().add(0, 3, 0));
-		event.setCancelled(true);
-		event.setReviveHealth(100);
+		if (event != null) {
+			event.setCancelled(true);
+			event.setReviveHealth(100);
+		}
 
 		new BukkitRunnable() {
 			double mRadius = 0;
-			Location mLoc = mSpawnLoc.clone();
+			final Location mLoc = mSpawnLoc.clone();
 
 			@Override
 			public void run() {

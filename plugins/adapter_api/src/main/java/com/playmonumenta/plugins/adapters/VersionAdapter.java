@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.adapters;
 
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -18,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public interface VersionAdapter {
 
@@ -159,7 +159,7 @@ public interface VersionAdapter {
 	/**
 	 * @return Whether the given item stacks refer to the same vanilla stack. Can e.g. be used to test if an item is still in an inventory, and not just an exact copy.
 	 */
-	boolean isSameItem(ItemStack item1, ItemStack item2);
+	boolean isSameItem(@Nullable ItemStack item1, @Nullable ItemStack item2);
 
 	void forceDismountVehicle(Entity entity);
 

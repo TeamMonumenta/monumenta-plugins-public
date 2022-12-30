@@ -20,6 +20,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 //general version of bossMeteorSlam
 public final class PounceBoss extends BossAbilityGroup {
@@ -94,7 +95,7 @@ public final class PounceBoss extends BossAbilityGroup {
 			p.PARTICLE_LEAP.spawn(boss, loc, 1d, 0f, 1d, 0d);
 		}, (World world, Location loc) -> {
 			p.PARTICLE_LEAPING.spawn(boss, loc, 0.5, 0.5, 0.5, 1d);
-		}, (World world, Player player, Location loc, Vector dir) -> {
+		}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
 				Arrays.asList(
 					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {

@@ -24,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	//Gallery theme1 blood
@@ -35,7 +36,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	private static final int HEAL_UNIT = 9;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Blood and water are much the same in the",
 			"dream. With what is left of your strength,",
@@ -54,7 +55,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

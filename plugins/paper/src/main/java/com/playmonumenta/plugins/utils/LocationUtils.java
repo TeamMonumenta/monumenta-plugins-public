@@ -8,7 +8,6 @@ import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +21,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class LocationUtils {
 	public static Vector getVectorTo(Location to, Location from) {
@@ -606,7 +606,7 @@ public class LocationUtils {
 		}
 	}
 
-	public static String getPoiNameFromLocation(Location location) {
+	public static @Nullable String getPoiNameFromLocation(Location location) {
 		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(location.toVector(), false);
 
 		for (RespawningStructure structure : structures) {

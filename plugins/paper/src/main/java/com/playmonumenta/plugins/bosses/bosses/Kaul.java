@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -68,6 +67,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 /* Woah it's Kaul! */
@@ -140,7 +140,7 @@ public class Kaul extends BossAbilityGroup {
 
 	// At the centre of the Kaul shrine,
 	// upon the height of most of the arena's surface
-	private @Nullable LivingEntity mShrineMarker;
+	private LivingEntity mShrineMarker;
 
 	public static final String identityTag = "boss_kaul";
 	public static final int detectionRange = 50;
@@ -178,6 +178,7 @@ public class Kaul extends BossAbilityGroup {
 		mSpawnLoc = spawnLoc;
 		mEndLoc = endLoc;
 
+		mShrineMarker = boss;
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
 				mShrineMarker = (LivingEntity) e;
@@ -919,7 +920,7 @@ public class Kaul extends BossAbilityGroup {
 	}
 
 	@Override
-	public void death(EntityDeathEvent event) {
+	public void death(@Nullable EntityDeathEvent event) {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		if (players.size() <= 0) {
 			return;

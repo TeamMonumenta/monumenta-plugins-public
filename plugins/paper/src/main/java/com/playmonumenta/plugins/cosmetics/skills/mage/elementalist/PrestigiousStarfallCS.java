@@ -18,6 +18,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 
@@ -29,7 +30,7 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	private static double CAST_EFFECT_RADIUS = 3.5;
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"\"Nobody survived under catastrophe\"",
 			"Now, we are the catastrophe."
@@ -47,7 +48,7 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 

@@ -118,8 +118,9 @@ public class GalleryGrave {
 	public void respawnPlayer() {
 		//TODO - sound and particle
 		mPlayer.setAlive(true);
-		if (mPlayer.isOnline()) {
-			mPlayer.getPlayer().teleport(mGrave);
+		Player player = mPlayer.getPlayer();
+		if (player != null) {
+			player.teleport(mGrave);
 		} else {
 			mPlayer.setShouldTeleportWhenJoining(true);
 		}
@@ -133,7 +134,7 @@ public class GalleryGrave {
 		mGame.mGraves.remove(this);
 	}
 
-	public static GalleryGrave createGrave(GalleryPlayer player, Location location, GalleryGame game) {
+	public static GalleryGrave createGrave(GalleryPlayer player, Player bukkitPlayer, Location location, GalleryGame game) {
 		ArmorStand grave = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
 		grave.setGravity(false);
 		grave.setInvulnerable(true);
@@ -145,11 +146,11 @@ public class GalleryGrave {
 		indicator.setInvisible(true);
 		indicator.addDisabledSlots(EquipmentSlot.values());
 
-		PlayerInventory playerInventory = player.getPlayer().getInventory();
+		PlayerInventory playerInventory = bukkitPlayer.getInventory();
 
 		ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
 		SkullMeta meta = (SkullMeta) skull.getItemMeta();
-		meta.setPlayerProfile(player.getPlayer().getPlayerProfile());
+		meta.setPlayerProfile(bukkitPlayer.getPlayerProfile());
 		skull.setItemMeta(meta);
 
 		grave.setArms(true);
@@ -169,7 +170,7 @@ public class GalleryGrave {
 		grave.addEquipmentLock(EquipmentSlot.OFF_HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
 		//TODO - set grave position like it is all on the floor
 		grave.setCustomNameVisible(true);
-		grave.setCustomName(player.getPlayer().getName() + "'s grave");
+		grave.setCustomName(bukkitPlayer.getName() + "'s grave");
 
 		return new GalleryGrave(grave, indicator, player, game);
 

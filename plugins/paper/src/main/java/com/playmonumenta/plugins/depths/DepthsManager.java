@@ -108,7 +108,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -120,6 +119,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This is the main brain of the depths plugin, responsible for handling all interactions from
@@ -351,7 +351,7 @@ public class DepthsManager {
 	 * @param dp depths player instance to check
 	 * @return party object of associated player
 	 */
-	public @Nullable DepthsParty getPartyFromId(DepthsPlayer dp) {
+	public @Nullable DepthsParty getPartyFromId(@Nullable DepthsPlayer dp) {
 		if (dp == null) {
 			return null;
 		}
@@ -389,12 +389,14 @@ public class DepthsManager {
 		}
 		// If the players need a new party, create one
 		// The constructor will also assign the players to this party
-		if (depthsPlayers.size() > 0 && partyToAdd == null) {
-			mParties.add(new DepthsParty(depthsPlayers, player.getLocation()));
-		} else if (depthsPlayers.size() > 0) {
-			//Join the new players to the party that already exists
-			for (DepthsPlayer dp : depthsPlayers) {
-				partyToAdd.addPlayerToParty(dp);
+		if (depthsPlayers.size() > 0) {
+			if (partyToAdd == null) {
+				mParties.add(new DepthsParty(depthsPlayers, player.getLocation()));
+			} else {
+				//Join the new players to the party that already exists
+				for (DepthsPlayer dp : depthsPlayers) {
+					partyToAdd.addPlayerToParty(dp);
+				}
 			}
 		}
 	}
@@ -410,12 +412,13 @@ public class DepthsManager {
 		if (dp != null) {
 			dp.mAbilities.put(name, level);
 		}
+		DepthsParty party = getPartyFromId(dp);
+		if (party == null) {
+			return;
+		}
 		//Tell their party that someone has selected an ability and is eligible for upgrade rooms
 		if (!DepthsUtils.isWeaponAspectAbility(name)) {
-			DepthsParty party = getPartyFromId(dp);
-			if (party != null) {
-				party.mHasAtLeastOneAbility = true;
-			}
+			party.mHasAtLeastOneAbility = true;
 			try {
 				for (DepthsPlayer otherPlayer : party.mPlayersInParty) {
 					Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
@@ -434,7 +437,7 @@ public class DepthsManager {
 				e.printStackTrace();
 			}
 		} else {
-			for (DepthsPlayer otherPlayer : getPartyFromId(dp).mPlayersInParty) {
+			for (DepthsPlayer otherPlayer : party.mPlayersInParty) {
 				Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
 				if (newPlayer != null && !newPlayer.equals(p)) {
 					if (level == 1) {
@@ -706,7 +709,7 @@ public class DepthsManager {
 			return;
 		}
 		DepthsAbilityItem choice = itemChoices.get(slot);
-		if (choice == null) {
+		if (choice == null || choice.mAbility == null) {
 			return;
 		}
 		setPlayerLevelInAbility(choice.mAbility, p, choice.mRarity);
@@ -762,11 +765,13 @@ public class DepthsManager {
 
 		if (dp != null) {
 			DepthsParty party = getPartyFromId(dp);
-			party.mPlayersInParty.remove(dp);
+			if (party != null) {
+				party.mPlayersInParty.remove(dp);
 
-			//Delete the party if no players are left
-			if (party.mPlayersInParty.isEmpty()) {
-				mParties.remove(party);
+				//Delete the party if no players are left
+				if (party.mPlayersInParty.isEmpty()) {
+					mParties.remove(party);
+				}
 			}
 		}
 
@@ -962,7 +967,7 @@ public class DepthsManager {
 	 */
 	public void playerSelectedRoom(DepthsRoomType roomType, Player player) {
 		DepthsParty party = getDepthsParty(player);
-		if (party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty()) {
+		if (party == null || party.mNextRoomChoices == null || party.mNextRoomChoices.isEmpty() || party.mRoomSpawnerLocation == null) {
 			return;
 		}
 		party.mNextRoomChoices.clear();
@@ -974,10 +979,11 @@ public class DepthsManager {
 		}
 
 		World world = player.getWorld();
-		removeNearbyButton(party.mRoomSpawnerLocation, world);
+		Vector roomSpawnerLocation = party.mRoomSpawnerLocation;
+		removeNearbyButton(roomSpawnerLocation, world);
 		//Remove the button later in case of structure bug
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			removeNearbyButton(party.mRoomSpawnerLocation, world);
+			removeNearbyButton(roomSpawnerLocation, world);
 		}, 10);
 
 		// Generate the room
@@ -986,7 +992,7 @@ public class DepthsManager {
 		}
 
 		// Summon the new room and give it to the party
-		Location l = new Location(world, party.mRoomSpawnerLocation.getX(), party.mRoomSpawnerLocation.getY(), party.mRoomSpawnerLocation.getZ());
+		Location l = new Location(world, roomSpawnerLocation.getX(), roomSpawnerLocation.getY(), roomSpawnerLocation.getZ());
 		party.setNewRoom(mRoomRepository.summonRoom(l, roomType, party));
 	}
 
@@ -1068,10 +1074,11 @@ public class DepthsManager {
 	 * This method is called when a player opens a chest
 	 * If the room is clear and they haven't picked a reward yet,
 	 * they will get the gui to select their reward
+	 *
 	 * @param p player who opened the chest
 	 * @return the appropriate GUI to open for their current room reward
 	 */
-	public Boolean getRoomReward(Player p, Location l) {
+	public Boolean getRoomReward(Player p, @Nullable Location l) {
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null) {
 			return false;

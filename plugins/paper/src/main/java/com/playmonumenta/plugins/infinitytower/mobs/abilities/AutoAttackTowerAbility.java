@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.infinitytower.mobs.abilities;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
@@ -158,11 +159,12 @@ public class AutoAttackTowerAbility extends TowerAbility {
 							for (LivingEntity target2 : targets) {
 								if (target2.getBoundingBox().overlaps(mBox)) {
 									DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, RANGED_DAMAGE);
-									if (!plugin.mEffectManager.hasEffect(target, "ITPercentDamageReceived")) {
+									Effect percentDamageReceived = plugin.mEffectManager.getActiveEffect(target, "ITPercentDamageReceived");
+									if (percentDamageReceived == null) {
 										plugin.mEffectManager.addEffect(target, "ITPercentDamageReceived",
 											new PercentDamageReceived(20 * 10, 0.1));
 									} else {
-										double oldAmount = plugin.mEffectManager.getEffects(target, "ITPercentDamageReceived").last().getMagnitude();
+										double oldAmount = percentDamageReceived.getMagnitude();
 										double newAmount = oldAmount + 0.1;
 										plugin.mEffectManager.addEffect(target, "ITPercentDamageReceived",
 											new PercentDamageReceived(20 * 10, newAmount));

@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -63,7 +64,7 @@ public class Scrapshot extends DepthsAbility {
 		box.shift(dir);
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 10, mPlayer);
 		World world = mPlayer.getWorld();
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
 
@@ -83,18 +84,18 @@ public class Scrapshot extends DepthsAbility {
 
 				box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
 
-				world.spawnParticle(Particle.CLOUD, loc, 0, newDir.getX(), newDir.getY(), newDir.getZ(), 1);
+				new PartialParticle(Particle.CLOUD, loc, 0, newDir.getX(), newDir.getY(), newDir.getZ(), 1).spawnAsPlayerActive(mPlayer);
 
 				for (int i = 0; i < RANGE; i++) {
 					box.shift(newDir);
 					Location bLoc = box.getCenter().toLocation(world);
 
-					world.spawnParticle(Particle.SMOKE_NORMAL, bLoc, 3, 0.025, 0.025, 0.025, 0.05);
-					world.spawnParticle(Particle.REDSTONE, bLoc, 3, 0.05, 0.05, 0.05, SCRAPSHOT_COLOR);
+					new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 3, 0.025, 0.025, 0.025, 0.05).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, bLoc, 3, 0.05, 0.05, 0.05, SCRAPSHOT_COLOR).spawnAsPlayerActive(mPlayer);
 
 					if (bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(newDir.multiply(0.5));
-						world.spawnParticle(Particle.SQUID_INK, bLoc, (8 - i) * 2, 0, 0, 0, 0.125);
+						new PartialParticle(Particle.SQUID_INK, bLoc, (8 - i) * 2, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 						world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
 						break;
 					}
@@ -108,7 +109,7 @@ public class Scrapshot extends DepthsAbility {
 							iter.remove();
 							mobs.remove(mob);
 
-							world.spawnParticle(Particle.SQUID_INK, bLoc, (8 - i) * 2, 0, 0, 0, 0.125);
+							new PartialParticle(Particle.SQUID_INK, bLoc, (8 - i) * 2, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 							world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
 
 							return;

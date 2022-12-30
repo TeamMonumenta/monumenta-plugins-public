@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -33,6 +32,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class IronTincture extends Ability {
 
@@ -139,7 +139,7 @@ public class IronTincture extends Ability {
 						}
 					}
 
-					mPlugin.mTimers.removeCooldown(mPlayer, mInfo.getLinkedSpell());
+					mPlugin.mTimers.removeCooldown(mPlayer, ClassAbility.IRON_TINCTURE);
 					putOnCooldown();
 
 					this.cancel();
@@ -152,7 +152,7 @@ public class IronTincture extends Ability {
 					this.cancel();
 
 					// Take the skill off cooldown (by setting to 0)
-					mPlugin.mTimers.addCooldown(mPlayer, mInfo.getLinkedSpell(), 0);
+					mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.IRON_TINCTURE, 0);
 				}
 			}
 

@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Configuration for Experiencinators, stored in a JSON file for quick & easy changes.
@@ -330,7 +330,7 @@ public final class ExperiencinatorConfig {
 			return mName;
 		}
 
-		public String getCombinedName() {
+		public @Nullable String getCombinedName() {
 			return mCombinedName;
 		}
 

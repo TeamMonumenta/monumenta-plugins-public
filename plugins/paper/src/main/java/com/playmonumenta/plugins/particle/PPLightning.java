@@ -6,10 +6,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public class PPLightning extends AbstractPartialParticle<PPLightning> {
 	public static final int ANIMATION_TICKS = Constants.TICKS_PER_SECOND;

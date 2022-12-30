@@ -16,6 +16,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class TwistedLanceCS extends ManaLanceCS {
 	//Delve theme
@@ -26,7 +27,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 	private static final Color DARK_COLOR = Color.fromRGB(54, 114, 156);
 
 	@Override
-	public Cosmetic getCosmetic() {
+	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
 			"Something about this lance is",
 			"wrong... Twisted...");
@@ -43,7 +44,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public String getName() {
+	public @Nullable String getName() {
 		return NAME;
 	}
 
