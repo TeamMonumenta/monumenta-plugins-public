@@ -1013,6 +1013,13 @@ public class BossManager implements Listener {
 		}
 	}
 
+	public void entityKnockedAway(Entity entity, float speed) {
+		Boss boss = mBosses.get(entity.getUniqueId());
+		if (boss != null) {
+			boss.bossKnockedAway(speed);
+		}
+	}
+
 	/* Kind of a weird one - not hooked to bosses but used for snowman killer */
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerDeathEvent(PlayerDeathEvent event) {

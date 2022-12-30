@@ -11,10 +11,11 @@ public class Unyielding {
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 		{
-			"Elite enemies gain invulnerability for 2 seconds",
-			"upon falling to 50% health. When this occurs, they shed",
-			"negative effects and gain 30% damage and 10% speed",
-			"for the rest of combat."
+			"Elite enemies heal 120% maximum health over 3 seconds",
+			"upon falling to 50% health and shed negative effects.",
+			"The attack that triggers this cannot bring the elite",
+			"to under 50% health. The healing can be cancelled through",
+			"hard crowd control (knock away, pull, stun, silence, freeze)."
 		}
 	};
 
@@ -24,7 +25,7 @@ public class Unyielding {
 		}
 		if (!DelvesUtils.isDelveMob(mob) && EntityUtils.isElite(mob)) {
 			mob.addScoreboardTag(UnyieldingBoss.identityTag);
-			mob.addScoreboardTag(UnyieldingBoss.identityTag + "[damageincrease=0.3,speedincrease=0.1]");
+			mob.addScoreboardTag(UnyieldingBoss.identityTag + "[healing=0.04,durationticks=60,tickstoheal=2]");
 		}
 	}
 }

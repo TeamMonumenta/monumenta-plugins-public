@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.bosses.BossManager;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -41,7 +42,7 @@ public class MovementUtils {
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}
-
+		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector();
 
 		if (dir.length() < 0.001) {
@@ -66,6 +67,7 @@ public class MovementUtils {
 		if (EntityUtils.isBoss(target)) {
 			speed /= 2;
 		}
+		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(loc.toVector()).toVector();
 		dir = dir.multiply(speed / Math.pow(Math.max(1, dir.length()), 2));
 		dir.setY(Math.max(0.5, Math.min(2.5, dir.getY())));
@@ -84,6 +86,7 @@ public class MovementUtils {
 		if (EntityUtils.isBoss(target)) {
 			return;
 		}
+		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(towardsEntity.getLocation().toVector()).toVector().multiply(-speed);
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
@@ -100,6 +103,7 @@ public class MovementUtils {
 		if (EntityUtils.isBoss(target)) {
 			return;
 		}
+		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(location.toVector()).toVector().multiply(-speed);
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
@@ -117,6 +121,7 @@ public class MovementUtils {
 			// Don't pull if target is a boss, in a different world, or if they're already on top of each other
 			return;
 		}
+		BossManager.getInstance().entityKnockedAway(target, speed);
 		Vector dir = target.getLocation().subtract(towardsEntity.getLocation()).toVector().normalize().multiply(-speed);
 		if (dir.getY() < 0) {
 			dir.setY(0.5f);
@@ -132,6 +137,7 @@ public class MovementUtils {
 		if (EntityUtils.isBoss(target)) {
 			return;
 		}
+		BossManager.getInstance().entityKnockedAway(target, 0);
 		target.setVelocity(new Vector(0, 0, 0));
 		Location newLoc = towardsEntity.getLocation().add(-1, 0, -1).subtract(target.getLocation().toVector().normalize().multiply(2));
 		Vector dir = target.getLocation().subtract(newLoc.toVector()).toVector().multiply(-0.125f);

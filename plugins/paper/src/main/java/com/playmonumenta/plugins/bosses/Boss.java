@@ -262,6 +262,12 @@ public class Boss {
 		}
 	}
 
+	public void bossKnockedAway(float speed) {
+		for (BossAbilityGroup ability : mAbilities) {
+			ability.bossKnockedAway(speed);
+		}
+	}
+
 	public List<BossAbilityGroup> getAbilities() {
 		return new ArrayList<BossAbilityGroup>(mAbilities);
 	}

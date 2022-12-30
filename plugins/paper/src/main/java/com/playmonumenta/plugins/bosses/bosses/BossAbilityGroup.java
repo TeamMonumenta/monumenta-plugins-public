@@ -350,6 +350,10 @@ public abstract class BossAbilityGroup {
 		mActiveSpells.cancelAll();
 	}
 
+	public void bossKnockedAway(float speed) {
+
+	}
+
 	/*
 	 * Called only the first time the boss is summoned into the world
 	 *
