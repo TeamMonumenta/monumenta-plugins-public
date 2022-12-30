@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
@@ -42,6 +43,8 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		event.getPlayer().clearTitle();
 
 		player.closeInventory();
+
+		NmsUtils.getVersionAdapter().forceDismountVehicle(player);
 
 		if (ServerProperties.getPreventDungeonItemTransfer()) {
 			int dropped = InventoryUtils.removeSpecialItems(player, false, true);

@@ -161,4 +161,6 @@ public interface VersionAdapter {
 	 */
 	boolean isSameItem(ItemStack item1, ItemStack item2);
 
+	void forceDismountVehicle(Entity entity);
+
 }

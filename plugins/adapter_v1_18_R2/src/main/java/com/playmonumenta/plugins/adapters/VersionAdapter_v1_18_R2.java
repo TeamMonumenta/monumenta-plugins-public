@@ -533,4 +533,10 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 			       || item1 instanceof CraftItemStack craftItem1 && item2 instanceof CraftItemStack craftItem2
 				          && craftItem1.handle == craftItem2.handle;
 	}
+
+	@Override
+	public void forceDismountVehicle(Entity entity) {
+		((CraftEntity) entity).getHandle().stopRiding(true);
+	}
+
 }

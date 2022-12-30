@@ -151,4 +151,10 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	public boolean isSameItem(ItemStack item1, ItemStack item2) {
 		return item1 == item2;
 	}
+
+	@Override
+	public void forceDismountVehicle(Entity entity) {
+		entity.leaveVehicle();
+	}
+
 }
