@@ -27,6 +27,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -86,8 +87,14 @@ public class ChestOverride extends BaseOverride {
 			return true;
 		}
 
-		if (block.getState() instanceof Chest chest && !chest.getLock().isEmpty()) {
-			return false;
+		if (block.getState() instanceof Chest chest
+			    && !chest.getLock().isEmpty()) {
+			ItemMeta itemMeta = player.getInventory().getItemInMainHand().getItemMeta();
+			if (itemMeta == null
+				    || itemMeta.displayName() == null
+				    || !chest.getLock().equals(MessagingUtils.plainText(itemMeta.displayName()))) {
+				return false;
+			}
 		}
 
 		// Iterate over adjacent blocks to trigger physics
