@@ -596,6 +596,16 @@ public class PlayerListener implements Listener {
 			    && ItemUtils.isNullOrAir(event.getCursor())) {
 			new CharmsGUI(player).openInventory(player, mPlugin);
 		}
+
+
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void inventoryClickEventHighest(InventoryClickEvent event) {
+		if (event.getClick() == ClickType.SWAP_OFFHAND
+			    && event.getWhoClicked().getScoreboardTags().contains(ToggleSwap.SWAP_INVENTORY_TAG)) {
+			event.setCancelled(true);
+		}
 	}
 
 	// If an item is being dragged in an inventory

@@ -210,9 +210,12 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(32, "Auto-abandon completed dungeons",
 				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", ChatColor.LIGHT_PURPLE,
 				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),
-			new PebItem(33, "Block Interactions",
-				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", ChatColor.LIGHT_PURPLE,
-				Material.LOOM, false).playerCommand("blockinteractions"),
+			new PebItem(33, "Spawner Equipment",
+				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", ChatColor.LIGHT_PURPLE,
+				Material.SPAWNER, false).playerCommand("clickable peb_spawnerequipment"),
+			new PebItem(34, "Virtual Firmament",
+				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", ChatColor.LIGHT_PURPLE,
+				Material.PRISMARINE, false).playerCommand("virtualfirmament"),
 			new PebItem(37, "Spoof World Names",
 				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", ChatColor.LIGHT_PURPLE,
 				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
@@ -222,15 +225,15 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(39, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", ChatColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
-			new PebItem(41, "Offhand Swapping",
+			new PebItem(41, "Block Interactions",
+				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", ChatColor.LIGHT_PURPLE,
+				Material.LOOM, false).playerCommand("blockinteractions"),
+			new PebItem(42, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
 				Material.SHIELD, false).playerCommand("toggleswap"),
-			new PebItem(42, "Spawner Equipment",
-				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", ChatColor.LIGHT_PURPLE,
-				Material.IRON_CHESTPLATE, false).playerCommand("clickable peb_spawnerequipment"),
-			new PebItem(43, "Virtual Firmament",
-				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", ChatColor.LIGHT_PURPLE,
-				Material.PRISMARINE, false).playerCommand("virtualfirmament")
+			new PebItem(43, "Offhand Swapping in Inventory",
+				"Click to toggle whether pressing your swap key in an inventory will perform its vanilla action", ChatColor.LIGHT_PURPLE,
+				Material.SHIELD, false).playerCommand("toggleinventoryswap")
 		);
 
 		// Server Info

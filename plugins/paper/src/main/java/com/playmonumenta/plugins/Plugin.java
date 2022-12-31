@@ -194,7 +194,7 @@ public class Plugin extends JavaPlugin {
 		GetScoreCommand.register();
 		GraveCommand.register();
 		StatTrackItem.register();
-		ToggleSwap.register(this);
+		ToggleSwap.register();
 		CustomInventoryCommands.register(this);
 		DelvesCommands.register(this);
 		AdminNotify.register();

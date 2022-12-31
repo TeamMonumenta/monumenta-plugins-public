@@ -1,41 +1,44 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Plugin;
-import dev.jorel.commandapi.CommandAPI;
+import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ToggleSwap {
 
 	public static final String SWAP_TAG = "DisableSwapHands";
+	public static final String SWAP_INVENTORY_TAG = "DisableSwapHandsInventory";
 
-	public static void register(Plugin plugin) {
+	public static void register() {
 		new CommandAPICommand("toggleswap")
 			.executes((sender, args) -> {
-				run(plugin, sender);
+				run(sender, SWAP_TAG, "Swapping hands");
+			})
+			.register();
+
+		new CommandAPICommand("toggleinventoryswap")
+			.executes((sender, args) -> {
+				run(sender, SWAP_INVENTORY_TAG, "Swapping in inventory");
 			})
 			.register();
 	}
 
-	public static void run(Plugin plugin, CommandSender sender) throws WrapperCommandSyntaxException {
-		if (!(sender instanceof Player)) {
-			CommandAPI.fail("This command can only be run by players");
-		}
-
-		Player player = (Player)sender;
+	public static void run(CommandSender sender, String tag, String text) throws WrapperCommandSyntaxException {
+		Player player = CommandUtils.getPlayerFromSender(sender);
 
 		String message;
-		if (player.getScoreboardTags().contains(SWAP_TAG)) {
-			player.removeScoreboardTag(SWAP_TAG);
-			message = "Swapping hands has been enabled";
+		if (ScoreboardUtils.toggleTag(player, tag)) {
+			message = text + " has been disabled";
 		} else {
-			player.addScoreboardTag(SWAP_TAG);
-			message = "Swapping hands has been disabled";
+			message = text + " has been enabled";
 		}
 
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + message);
+		player.sendMessage(Component.text(message, NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
 	}
 }
