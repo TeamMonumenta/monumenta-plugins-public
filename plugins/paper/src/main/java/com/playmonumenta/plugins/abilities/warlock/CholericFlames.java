@@ -38,7 +38,7 @@ public class CholericFlames extends Ability {
 	private static final int DAMAGE_2 = 5;
 	private static final int DURATION = 7 * 20;
 	private static final int COOLDOWN = 10 * 20;
-	private static final int MAX_DEBUFFS = 3;
+	private static final int MAX_DEBUFFS = 2;
 	private static final String SPREAD_EFFECT_ON_DEATH_EFFECT = "CholericFlamesSpreadEffectOnDeath";
 	private static final int SPREAD_EFFECT_DURATION = 30 * 20;
 	private static final int SPREAD_EFFECT_DURATION_APPLIED = 5 * 20;
@@ -64,7 +64,7 @@ public class CholericFlames extends Ability {
 					.formatted(RANGE, StringUtils.ticksToSeconds(DURATION), DAMAGE_1, StringUtils.ticksToSeconds(COOLDOWN)),
 				"The damage is increased to %s, and also afflict mobs with Hunger I."
 					.formatted(DAMAGE_2),
-				("Mobs ignited by this ability are inflicted with an additional level of Inferno for each debuff they have prior to this ability, up to %s. " +
+				("Mobs ignited by this ability are inflicted with an additional level of Inferno for every two debuffs they have (rounded down) prior to this ability, up to %s. " +
 					 "Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within a %s block radius for %ss.")
 					.formatted(MAX_DEBUFFS, SPREAD_EFFECT_RADIUS, StringUtils.ticksToSeconds(SPREAD_EFFECT_DURATION_APPLIED)))
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -100,7 +100,7 @@ public class CholericFlames extends Ability {
 			// Gets a copy so modifying the inferno level does not have effect elsewhere
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 			if (isEnhanced()) {
-				int debuffs = Math.min(AbilityUtils.getDebuffCount(mPlugin, mob), maxDebuffs);
+				int debuffs = Math.min(AbilityUtils.getDebuffCount(mPlugin, mob) / 2, maxDebuffs);
 				if (debuffs > 0) {
 					playerItemStats.getItemStats().add(Objects.requireNonNull(ItemStatUtils.EnchantmentType.INFERNO.getItemStat()), debuffs);
 				}
