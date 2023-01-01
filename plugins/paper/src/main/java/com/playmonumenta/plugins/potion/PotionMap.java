@@ -184,7 +184,7 @@ public class PotionMap {
 		return bestEffect;
 	}
 
-	private void applyBestPotionEffect(Player player) {
+	void applyBestPotionEffect(Player player) {
 		PotionInfo bestEffect = getBestEffect();
 
 		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);

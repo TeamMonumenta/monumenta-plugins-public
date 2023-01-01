@@ -160,6 +160,13 @@ public class PotionManager {
 		}
 	}
 
+	public void refreshEffects(Player player) {
+		PlayerPotionInfo potionInfo = mPlayerPotions.get(player.getUniqueId());
+		if (potionInfo != null) {
+			potionInfo.refreshEffects(player);
+		}
+	}
+
 	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
 		PlayerPotionInfo info = mPlayerPotions.get(player.getUniqueId());
 		if (info != null) {

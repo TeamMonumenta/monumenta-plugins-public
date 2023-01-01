@@ -57,6 +57,12 @@ public class PlayerPotionInfo {
 		}
 	}
 
+	public void refreshEffects(Player player) {
+		for (PotionMap potionMap : mPotionInfo.values()) {
+			potionMap.applyBestPotionEffect(player);
+		}
+	}
+
 	public void modifyPotionDuration(Player player, ToIntFunction<PotionInfo> function) {
 		for (PotionMap potionMap : mPotionInfo.values()) {
 			potionMap.modifyPotionDuration(player, function);

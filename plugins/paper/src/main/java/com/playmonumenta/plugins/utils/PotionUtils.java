@@ -285,10 +285,13 @@ public class PotionUtils {
 				}
 				PotionEffect effect = player.getPotionEffect(type);
 				if (effect != null && effect.getDuration() < Constants.THIRTY_MINUTES) {
+					player.removePotionEffect(effect.getType());
 					plugin.mPotionManager.removePotion(player, PotionID.APPLIED_POTION, type);
 				}
 			}
 		}
+		// This method removes vanilla effects regardless of source - may need to re-apply effects from non-potion sources afterwards
+		plugin.mPotionManager.refreshEffects(player);
 	}
 
 	public static void clearNegatives(LivingEntity entity) {
