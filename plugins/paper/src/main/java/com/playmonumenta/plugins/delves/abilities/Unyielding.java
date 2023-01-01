@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class Unyielding {
 
-	public static final String DESCRIPTION = "Elites become invincible at 50% health.";
+	public static final String DESCRIPTION = "Elites find renewed strength at half health.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 		{
