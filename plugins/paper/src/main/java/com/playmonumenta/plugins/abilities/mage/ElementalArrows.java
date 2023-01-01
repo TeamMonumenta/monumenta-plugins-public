@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.function.Consumer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Blaze;
@@ -147,7 +148,7 @@ public class ElementalArrows extends Ability {
 
 		mLastDamage = targetDamage;
 
-		effectAction.accept(enemy);
+		Bukkit.getScheduler().runTask(mPlugin, () -> effectAction.accept(enemy));
 		event.setDamage(0);
 		DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats, NAME), targetDamage, false, true, false);
 
