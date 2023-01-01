@@ -141,7 +141,7 @@ public class HuntingCompanion extends Ability {
 
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
-		double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (multiply != 0 ? multiply : 1);
+		double damage = mDamageFraction * ItemStatUtils.getAttributeAmount(inMainHand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * multiply;
 		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);

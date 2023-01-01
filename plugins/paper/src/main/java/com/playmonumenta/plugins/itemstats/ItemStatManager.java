@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.CritScaling;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
@@ -112,12 +113,11 @@ public class ItemStatManager implements Listener {
 			}
 
 			public double get(@Nullable ItemStat stat) {
-				return get(stat, 0);
-			}
-
-			public double get(@Nullable ItemStat stat, double defaultValue) {
+				if (stat == null) {
+					return 0;
+				}
 				Double value = mMap.get(stat);
-				return value == null ? defaultValue : value;
+				return value == null ? stat.getDefaultValue() : value;
 			}
 
 			public double get(@Nullable EnchantmentType type) {
@@ -259,7 +259,7 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment, 0), getRegionScaling(player, region, mRegion, 0, 1, 2)));
+								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getRegionScaling(player, region, mRegion, 0, 1, 2)));
 							}
 						} else if (stat instanceof Infusion infusion) {
 							double multiplier = infusion.getInfusionType().isRegionScaled() ? (shattered ? 0 : regionScaling) : 1.0;
@@ -305,20 +305,26 @@ public class ItemStatManager implements Listener {
 			}
 
 			for (ItemStat stat : ITEM_STATS) {
-				if (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat) == 0 && newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat) != 0 && stat instanceof Attribute) {
-					newStats.add(stat, 1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat));
+				double newAdd = newArmorAddStats.mMap.getOrDefault(stat, 0.0) + newMainhandAddStats.mMap.getOrDefault(stat, 0.0);
+				double newMultiply = newArmorMultiplyStats.mMap.getOrDefault(stat, 0.0) + newMainhandMultiplyStats.mMap.getOrDefault(stat, 0.0);
+				if (newAdd == 0 && newMultiply != 0 && stat instanceof Attribute) {
+					if (stat instanceof ProjectileSpeed) {
+						newStats.set(stat, newMultiply);
+					} else {
+						newStats.set(stat, 1 + newMultiply);
+					}
 				} else if (stat instanceof Phylactery) {
-					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat))) + Phylactery.BASE_POTION_KEEP_LEVEL);
+					newStats.set(stat, newAdd * (1 + newMultiply) + Phylactery.BASE_POTION_KEEP_LEVEL);
 				} else {
-					newStats.add(stat, (newArmorAddStats.get(stat) + newMainhandAddStats.get(stat)) * (1 + newArmorMultiplyStats.get(stat) + newMainhandMultiplyStats.get(stat)));
+					newStats.set(stat, newAdd * (1 + newMultiply));
 				}
 				if (stat instanceof CritScaling || stat instanceof AntiCritScaling ||
 					    stat instanceof StrengthApply || stat instanceof StrengthCancel) {
-					newStats.add(stat, 1);
+					newStats.set(stat, 1);
 				}
 				if ((stat instanceof SKTQuestDamageDealt || stat instanceof SKTQuestDamageTaken)
 					    && ServerProperties.getShardName().startsWith("skt")) {
-					newStats.add(stat, 1);
+					newStats.set(stat, 1);
 				}
 			}
 

@@ -3,11 +3,11 @@ package com.playmonumenta.plugins.itemstats.gui;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.attributes.Armor;
 import com.playmonumenta.plugins.itemstats.enchantments.Protection;
-import com.playmonumenta.plugins.itemstats.enchantments.WorldlyProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
+import com.playmonumenta.plugins.itemstats.enchantments.WorldlyProtection;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
 import com.playmonumenta.plugins.itemstats.infusions.Choler;
 import com.playmonumenta.plugins.itemstats.infusions.Decapitation;
@@ -47,10 +47,6 @@ class PSGUIStats {
 
 	double get(ItemStatUtils.AttributeType attr) {
 		return mPlayerItemStats.getItemStats().get(attr.getItemStat());
-	}
-
-	double get(ItemStatUtils.AttributeType attr, double defaultValue) {
-		return mPlayerItemStats.getItemStats().get(attr.getItemStat(), defaultValue);
 	}
 
 	double get(ItemStatUtils.EnchantmentType ench) {

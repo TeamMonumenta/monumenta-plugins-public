@@ -33,6 +33,13 @@ public interface ItemStat {
 	String getName();
 
 	/**
+	 * Returns the default value of this item stat if it isn't present. Most stats will default to 0, but multiply stats will have this at 1 usually.
+	 */
+	default double getDefaultValue() {
+		return 0;
+	}
+
+	/**
 	 * Priority order in event handling, with lower values being handled earlier than higher ones.
 	 * <p>
 	 * Some references:

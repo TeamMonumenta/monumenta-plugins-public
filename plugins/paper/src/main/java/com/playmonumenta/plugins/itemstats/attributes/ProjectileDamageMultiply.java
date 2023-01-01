@@ -26,6 +26,11 @@ public class ProjectileDamageMultiply implements Attribute {
 	}
 
 	@Override
+	public double getDefaultValue() {
+		return 1;
+	}
+
+	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
 		if (type.equals(DamageType.PROJECTILE) || type.equals(DamageType.PROJECTILE_SKILL)) {

@@ -26,6 +26,11 @@ public class AttackDamageMultiply implements Attribute {
 	}
 
 	@Override
+	public double getDefaultValue() {
+		return 1;
+	}
+
+	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL) {
 			event.setDamage(event.getDamage() * value);

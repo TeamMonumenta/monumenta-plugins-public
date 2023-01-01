@@ -97,7 +97,7 @@ enum PSGUIStat {
 
 	// melee
 	ATTACK_DAMAGE_ADD("+flat Attack Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD, ItemStatUtils.Operation.ADD)),
-	ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY, 1)
+	ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY)
 		                                                                                 * stats.getDamageDealtMultiplier()
 		                                                                                 * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.VIGOR))),
 	TOTAL_ATTACK_DAMAGE("Total Attack Damage", Formatting.NUMBER, stats -> (1 + stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
@@ -106,21 +106,13 @@ enum PSGUIStat {
 
 	// projectile
 	PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD)),
-	PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY, 1)
+	PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY)
 		                                                                                         * stats.getDamageDealtMultiplier()
 		                                                                                         * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.FOCUS))),
 	TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
-	PROJECTILE_SPEED("Projectile Speed", Formatting.NUMBER, stats -> {
-		ItemStack mainhand = stats.getItem(PSGUIEquipment.MAINHAND);
-		if (ItemUtils.isBowOrTrident(mainhand)) {
-			// bows, crossbows, and tridents have the final projectile speed lowered by one in ProjectileSpeed.onLaunchProjectile
-			return stats.get(ItemStatUtils.AttributeType.PROJECTILE_SPEED, 1) - 1;
-		} else {
-			return stats.get(ItemStatUtils.AttributeType.PROJECTILE_SPEED, 0);
-		}
-	}),
+	PROJECTILE_SPEED("Projectile Speed", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_SPEED)),
 	PROJECTILE_RATE("Shoot/Throw Rate", Formatting.NUMBER, stats -> {
-		double throwRate = stats.get(ItemStatUtils.AttributeType.THROW_RATE, 0);
+		double throwRate = stats.get(ItemStatUtils.AttributeType.THROW_RATE);
 		if (throwRate != 0) {
 			return throwRate;
 		}
@@ -139,7 +131,7 @@ enum PSGUIStat {
 	// magic
 	SPELL_POWER("Spell Power", Formatting.PERCENT, stats -> stats.get(ItemStatUtils.AttributeType.SPELL_DAMAGE)),
 	MAGIC_DAMAGE_ADD("+flat Magic Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.MAGIC_DAMAGE_ADD)),
-	MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.MAGIC_DAMAGE_MULTIPLY, 1)
+	MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.MAGIC_DAMAGE_MULTIPLY)
 		                                                                               * stats.getDamageDealtMultiplier()
 		                                                                               * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.PERSPICACITY))),
 	TOTAL_SPELL_DAMAGE("Total Spell Damage %", Formatting.PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),

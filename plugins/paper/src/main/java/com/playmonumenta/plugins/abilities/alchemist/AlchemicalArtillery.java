@@ -123,9 +123,7 @@ public class AlchemicalArtillery extends PotionAbility {
 			PlayerInventory inv = mPlayer.getInventory();
 			bownus = (BOW_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_MULTIPLIER)) * ItemStatUtils.getAttributeAmount(inv.getItemInMainHand(), AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
 			double multiply = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
-			if (multiply != 0) {
-				bownus *= multiply;
-			}
+			bownus *= multiply;
 		}
 
 		pot.setMetadata(ARTILLERY_POTION_TAG, new FixedMetadataValue(mPlugin, bownus));

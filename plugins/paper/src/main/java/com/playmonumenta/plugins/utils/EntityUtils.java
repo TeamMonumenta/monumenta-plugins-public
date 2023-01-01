@@ -1409,7 +1409,7 @@ public class EntityUtils {
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null
-				       && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat(), 0) > 0;
+				       && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
 		}
 		return false;
 	}

@@ -33,19 +33,17 @@ public class Versatile extends Ability {
 		}
 
 		if (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_SKILL || event.getType() == DamageEvent.DamageType.MELEE_ENCH) {
-			double currentdamage = event.getDamage();
 			double percentproj = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
-			if (percentproj > 0) {
-				event.setDamage(currentdamage * (1 + (percentproj - 1) * DAMAGE_MULTIPLY_MELEE));
+			if (percentproj > 1) {
+				event.setDamage(event.getDamage() * (1 + (percentproj - 1) * DAMAGE_MULTIPLY_MELEE));
 			}
 		} else if (event.getType() == DamageEvent.DamageType.PROJECTILE || event.getType() == DamageEvent.DamageType.PROJECTILE_SKILL) {
-			double currentdamage = event.getDamage();
 			double percentatk = mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY);
-			if (percentatk > 0) {
-				event.setDamage(currentdamage * (1 + (percentatk - 1) * DAMAGE_MULTIPLY_PROJ));
+			if (percentatk > 1) {
+				event.setDamage(event.getDamage() * (1 + (percentatk - 1) * DAMAGE_MULTIPLY_PROJ));
 			}
 		}
 		return false; // no recursion possible as we only change the damage amount
-
 	}
+
 }

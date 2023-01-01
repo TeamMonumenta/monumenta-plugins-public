@@ -23,6 +23,11 @@ public class SpellPower implements Attribute {
 		return 19;
 	}
 
+	@Override
+	public double getDefaultValue() {
+		return 1;
+	}
+
 	public static float getSpellDamage(Plugin plugin, @Nullable Player player, int damage) {
 		return getSpellDamage(plugin, player, (float) damage);
 	}

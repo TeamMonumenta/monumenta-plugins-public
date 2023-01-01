@@ -184,8 +184,10 @@ public class ElementalArrows extends Ability {
 				// Apply additional fire or ice effect without adding particle trail
 				if (mPlayer.isSneaking()) {
 					projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
+					projectile.setFireTicks(0);
 				} else {
 					projectile.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
+					projectile.setFireTicks(ELEMENTAL_ARROWS_DURATION);
 				}
 			} else if (mPlayer.isSneaking()) {
 				projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
