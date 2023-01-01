@@ -106,9 +106,10 @@ public class WindWalk extends MultipleChargeAbility {
 		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
 		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
 			boolean mTickOne = true;
+
 			@Override
 			public void run() {
 				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
@@ -152,7 +153,7 @@ public class WindWalk extends MultipleChargeAbility {
 				mTickOne = false;
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 }

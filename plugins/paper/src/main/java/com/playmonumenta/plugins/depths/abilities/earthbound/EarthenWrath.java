@@ -75,7 +75,7 @@ public class EarthenWrath extends DepthsAbility {
 			return;
 		}
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			private int mTicks = 0;
 			private float mPitch = 0.5f;
 
@@ -130,7 +130,7 @@ public class EarthenWrath extends DepthsAbility {
 
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	//Returns true if the damage was absorbed

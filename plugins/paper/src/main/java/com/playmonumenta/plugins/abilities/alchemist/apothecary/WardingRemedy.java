@@ -83,7 +83,7 @@ public class WardingRemedy extends Ability {
 
 		mCosmetic.remedyStartEffect(world, loc, mPlayer, radius);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mPulses = 0;
 			int mTick = 10;
 			final ImmutableList<PPPeriodic> mParticles = mCosmetic.remedyPeriodicEffect(mPlayer.getLocation());
@@ -112,7 +112,7 @@ public class WardingRemedy extends Ability {
 
 				mTick++;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	@Override

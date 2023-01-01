@@ -93,17 +93,15 @@ public class AmplifyingHex extends Ability {
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS(), AmplifyingHexCS.SKIN_LIST);
 
-		if (player != null) {
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
-				charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
-				int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player) +
-					                 AbilityUtils.getEffectiveTotalSpecPoints(player) +
-					                 ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
-					                 charmPower;
-				mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
-			});
-		}
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
+			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
+			int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player) +
+				                 AbilityUtils.getEffectiveTotalSpecPoints(player) +
+				                 ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
+				                 charmPower;
+			mDamage = DAMAGE_PER_SKILL_POINT * totalLevel;
+		});
 	}
 
 	public void cast() {

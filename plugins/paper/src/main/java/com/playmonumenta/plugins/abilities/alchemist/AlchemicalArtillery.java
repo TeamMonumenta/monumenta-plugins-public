@@ -166,7 +166,7 @@ public class AlchemicalArtillery extends PotionAbility {
 	public void createAura(Location loc, ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (isEnhanced() && potion.hasMetadata(ARTILLERY_POTION_TAG) && mAlchemistPotions != null) {
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ENHANCEMENT_EXPLOSION_RADIUS);
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			cancelOnDeath(Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				new PartialParticle(Particle.EXPLOSION_LARGE, loc, (int) (4 * radius * radius / 9), radius, radius / 2.0, radius, 0.1).spawnAsPlayerActive(mPlayer);
 				World world = loc.getWorld();
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.2f);
@@ -180,7 +180,7 @@ public class AlchemicalArtillery extends PotionAbility {
 					MovementUtils.knockAway(loc, mob, knockback);
 				}
 
-			}, CharmManager.getDuration(mPlayer, CHARM_DELAY, ENHANCEMENT_EXPLOSION_DELAY));
+			}, CharmManager.getDuration(mPlayer, CHARM_DELAY, ENHANCEMENT_EXPLOSION_DELAY)));
 		}
 	}
 

@@ -114,7 +114,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 		World world = mPlayer.getWorld();
 		mCosmetic.blitzStartSound(world, loc);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			final BoundingBox mPlayerBox = mPlayer.getBoundingBox();
 			final Vector mDirection = mPlayer.getLocation().getDirection().normalize();
 			final double mDistance = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, isLevelOne() ? DISTANCE_1 : DISTANCE_2);
@@ -178,13 +178,13 @@ public class BodkinBlitz extends MultipleChargeAbility {
 								mTicks--;
 							}
 						};
-						mRunnable.runTaskTimer(mPlugin, 0, 1);
+						cancelOnDeath(mRunnable.runTaskTimer(mPlugin, 0, 1));
 					}
 
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	@Override

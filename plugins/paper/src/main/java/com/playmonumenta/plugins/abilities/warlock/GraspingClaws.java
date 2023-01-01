@@ -155,8 +155,8 @@ public class GraspingClaws extends Ability {
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
 			boolean mHitboxes = false;
-			World mWorld = loc.getWorld();
-			double mRadius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
+			final World mWorld = loc.getWorld();
+			final double mRadius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 
 			List<Integer> mDegrees1 = new ArrayList<>();
 			List<Integer> mDegrees2 = new ArrayList<>();

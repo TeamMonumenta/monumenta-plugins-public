@@ -79,7 +79,6 @@ public class RestlessSouls extends Ability {
 	private final double mDamage;
 	private final int mSilenceTime;
 	private final int mVexCap;
-	private @Nullable Vex mVex;
 	private final List<Vex> mVexList = new ArrayList<Vex>();
 
 	public RestlessSouls(Plugin plugin, Player player) {
@@ -107,9 +106,7 @@ public class RestlessSouls extends Ability {
 			return;
 		}
 
-		if (mVexList != null) {
-			mVexList.removeIf(e -> !e.isValid() || e.isDead());
-		}
+		mVexList.removeIf(e -> !e.isValid() || e.isDead());
 
 		Set<String> tags = event.getEntity().getScoreboardTags();
 		if (tags.contains("TeneGhost") || tags.contains(AbilityUtils.IGNORE_TAG)) {
@@ -117,14 +114,14 @@ public class RestlessSouls extends Ability {
 		}
 
 		if (mVexList.size() < mVexCap) {
-			mVex = (Vex) LibraryOfSoulsIntegration.summon(summonLoc.clone(), VEX_NAME);
-			if (mVex == null) {
+			Vex vex = (Vex) LibraryOfSoulsIntegration.summon(summonLoc.clone(), VEX_NAME);
+			if (vex == null) {
 				MMLog.warning("Failed to summon RestlessSoul");
 				return;
 			}
-			mVexList.add(mVex);
+			mVexList.add(vex);
 
-			RestlessSoulsBoss restlessSoulsBoss = BossUtils.getBossOfClass(mVex, RestlessSoulsBoss.class);
+			RestlessSoulsBoss restlessSoulsBoss = BossUtils.getBossOfClass(vex, RestlessSoulsBoss.class);
 			if (restlessSoulsBoss == null) {
 				MMLog.warning("Failed to get RestlessSoulsBoss");
 				return;
@@ -132,15 +129,15 @@ public class RestlessSouls extends Ability {
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 			restlessSoulsBoss.spawn(mPlayer, mDamage, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
 
-			PartialParticle particle1 = new PartialParticle(Particle.SOUL, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
-			PartialParticle particle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, mVex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+			PartialParticle particle1 = new PartialParticle(Particle.SOUL, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
+			PartialParticle particle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, VEX_DURATION);
 
 			new BukkitRunnable() {
 				int mTicksElapsed = 0;
 				@Nullable LivingEntity mTarget;
-				final Vex mBoss = Objects.requireNonNull(mVex);
+				final Vex mBoss = Objects.requireNonNull(vex);
 				double mRadian = 0;
 
 				@Override
@@ -157,9 +154,7 @@ public class RestlessSouls extends Ability {
 							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, 1.5f, 1.0f);
 							new PartialParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 						}
-						if (mBoss != null) {
-							mBoss.remove();
-						}
+						mBoss.remove();
 						this.cancel();
 						return;
 					}

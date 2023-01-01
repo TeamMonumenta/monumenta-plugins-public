@@ -138,7 +138,7 @@ public class Skyhook extends DepthsAbility {
 
 		mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FIREWORKS_SPARK);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
 
 			@Override
@@ -157,7 +157,7 @@ public class Skyhook extends DepthsAbility {
 				mT++;
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 
 		return true;
 	}

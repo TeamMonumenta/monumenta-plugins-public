@@ -14,10 +14,12 @@ import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -37,6 +39,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Ability {
@@ -46,6 +49,8 @@ public abstract class Ability {
 	private @Nullable Integer mScore = null;
 
 	protected List<? extends AbilityTriggerInfo<?>> mCustomTriggers;
+
+	private final List<BukkitTask> mCancelOnDeath = new ArrayList<>(0);
 
 	public Ability(Plugin plugin, Player player, AbilityInfo<?> info) {
 		mPlugin = plugin;
@@ -67,6 +72,22 @@ public abstract class Ability {
 
 	public List<? extends AbilityTriggerInfo<?>> getCustomTriggers() {
 		return mCustomTriggers;
+	}
+
+	// TODO useless?
+
+	/**
+	 * Checks if the player still has this ability.
+	 */
+	public boolean playerHasAbility() {
+		return mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, getClass()) != null;
+	}
+
+	/**
+	 * Mark a task to be cancelled on death. Note that the task is not cancelled when the player removes the ability or gets silenced.
+	 */
+	protected void cancelOnDeath(BukkitTask task) {
+		mCancelOnDeath.add(task);
 	}
 
 	public boolean isOnCooldown() {
@@ -225,6 +246,13 @@ public abstract class Ability {
 
 	}
 
+	final void playerDeathEventFinal(PlayerDeathEvent event) {
+		for (BukkitTask activeTask : mCancelOnDeath) {
+			activeTask.cancel();
+		}
+		playerDeathEvent(event);
+	}
+
 	public void playerDeathEvent(PlayerDeathEvent event) {
 
 	}
@@ -264,6 +292,13 @@ public abstract class Ability {
 
 	public void setupClassPotionEffects() {
 
+	}
+
+	void periodicTriggerFinal(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (oneSecond) {
+			mCancelOnDeath.removeIf(task -> !Bukkit.getScheduler().isQueued(task.getTaskId()));
+		}
+		periodicTrigger(twoHertz, oneSecond, ticks);
 	}
 
 	// Every 5 ticks - 4 times a second.

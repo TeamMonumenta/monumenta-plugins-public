@@ -57,7 +57,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,63 +136,60 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			}
 		}
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Ability[] classAbilities = new Ability[8];
-				Ability[] specAbilities = new Ability[6];
-				classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
-				classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
-				classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EmpoweringOdor.class);
-				classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, IronTincture.class);
-				classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
-				classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class);
-				classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EnergizingElixir.class);
-				classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Bezoar.class);
-				specAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class);
-				specAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class);
-				specAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ScorchedEarth.class);
-				specAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class);
-				specAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, TransmutationRing.class);
-				specAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class);
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			Ability[] classAbilities = new Ability[8];
+			Ability[] specAbilities = new Ability[6];
+			classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
+			classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
+			classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EmpoweringOdor.class);
+			classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, IronTincture.class);
+			classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
+			classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class);
+			classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EnergizingElixir.class);
+			classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Bezoar.class);
+			specAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class);
+			specAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class);
+			specAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ScorchedEarth.class);
+			specAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class);
+			specAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, TransmutationRing.class);
+			specAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class);
 
-				for (Ability classAbility : classAbilities) {
-					if (classAbility != null) {
-						int abilityScore = classAbility.isLevelTwo() ? 2 : 1;
-						mDamage += DAMAGE_PER_SKILL_POINT * abilityScore;
+			for (Ability classAbility : classAbilities) {
+				if (classAbility != null) {
+					int abilityScore = classAbility.isLevelTwo() ? 2 : 1;
+					mDamage += DAMAGE_PER_SKILL_POINT * abilityScore;
 
-						if (ServerProperties.getAbilityEnhancementsEnabled() && classAbility.isEnhanced()) {
-							mDamage += DAMAGE_PER_ENHANCEMENT;
-						}
+					if (ServerProperties.getAbilityEnhancementsEnabled() && classAbility.isEnhanced()) {
+						mDamage += DAMAGE_PER_ENHANCEMENT;
+					}
 
-						if (classAbility instanceof PotionAbility potionAbility) {
+					if (classAbility instanceof PotionAbility potionAbility) {
+						mPotionAbilities.add(potionAbility);
+						mDamage += potionAbility.getDamage();
+					}
+
+					if (classAbility instanceof EmpoweringOdor odor && odor.isLevelTwo()) {
+						mChargeTime -= EmpoweringOdor.POTION_RECHARGE_TIME_REDUCTION_2;
+					}
+				}
+			}
+
+			if (ServerProperties.getClassSpecializationsEnabled()) {
+				for (Ability specAbility : specAbilities) {
+					if (specAbility != null) {
+						int abilityScore = specAbility.isLevelTwo() ? 2 : 1;
+						mDamage += DAMAGE_PER_SPEC_POINT * abilityScore;
+
+						if (specAbility instanceof PotionAbility potionAbility) {
 							mPotionAbilities.add(potionAbility);
 							mDamage += potionAbility.getDamage();
 						}
-
-						if (classAbility instanceof EmpoweringOdor odor && odor.isLevelTwo()) {
-							mChargeTime -= EmpoweringOdor.POTION_RECHARGE_TIME_REDUCTION_2;
-						}
 					}
 				}
-
-				if (ServerProperties.getClassSpecializationsEnabled()) {
-					for (Ability specAbility : specAbilities) {
-						if (specAbility != null) {
-							int abilityScore = specAbility.isLevelTwo() ? 2 : 1;
-							mDamage += DAMAGE_PER_SPEC_POINT * abilityScore;
-
-							if (specAbility instanceof PotionAbility potionAbility) {
-								mPotionAbilities.add(potionAbility);
-								mDamage += potionAbility.getDamage();
-							}
-						}
-					}
-				}
-
-				mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage);
 			}
-		}.runTaskLater(mPlugin, 5);
+
+			mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage);
+		});
 
 		// Always switch back to the default mode when refreshing class
 		mGruesomeMode = false;

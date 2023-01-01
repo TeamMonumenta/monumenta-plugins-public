@@ -65,11 +65,12 @@ public class BladeFlurry extends DepthsAbility {
 		}
 		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			final Vector mEyeDir = loc.getDirection();
 
-			double mStartAngle = Math.atan(mEyeDir.getZ()/mEyeDir.getX());
+			double mStartAngle = Math.atan(mEyeDir.getZ() / mEyeDir.getX());
 			int mIncrementDegrees = 0;
+
 			@Override
 			public void run() {
 				if (mIncrementDegrees == 0) {
@@ -91,7 +92,7 @@ public class BladeFlurry extends DepthsAbility {
 
 				mIncrementDegrees += 30;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	private static String getDescription(int rarity) {

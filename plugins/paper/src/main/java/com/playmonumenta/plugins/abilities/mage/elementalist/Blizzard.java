@@ -99,7 +99,7 @@ public class Blizzard extends Ability {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
 
 		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
@@ -135,7 +135,7 @@ public class Blizzard extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 }

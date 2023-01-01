@@ -206,7 +206,7 @@ public class JudgementChain extends Ability {
 			mPlugin.mEffectManager.addEffect(mTarget, EFFECT_NAME, new JudgementChainMobEffect(DURATION, mPlayer, EFFECT_NAME));
 			EntityUtils.applyTaunt(mPlugin, mTarget, mPlayer);
 
-			new BukkitRunnable() {
+			cancelOnDeath(new BukkitRunnable() {
 				final int mRunnableDuration = DURATION;
 				final double mWidth = e.getWidth() / 2;
 				int mT = 0;
@@ -257,7 +257,7 @@ public class JudgementChain extends Ability {
 					}
 				}
 
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1));
 
 			// This loop only runs at most once!
 			putOnCooldown();

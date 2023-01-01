@@ -92,7 +92,7 @@ public class CosmicMoonblade extends Ability {
 		int swings = (int) CharmManager.getLevel(mPlayer, CHARM_SLASH) + SWINGS;
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mSwings = 0;
 
 			@Override
@@ -116,7 +116,7 @@ public class CosmicMoonblade extends Ability {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 7);
+		}.runTaskTimer(mPlugin, 0, 7));
 	}
 
 	public void updateCooldowns(double percent) {

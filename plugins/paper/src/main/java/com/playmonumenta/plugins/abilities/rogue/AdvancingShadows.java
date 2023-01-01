@@ -224,10 +224,11 @@ public class AdvancingShadows extends Ability {
 					mColorTeam.addEntry(entity.getUniqueId().toString());
 				}
 				entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, ENHANCEMENT_KILL_REQUIREMENT_TIME, 0));
-				new BukkitRunnable() {
+				cancelOnDeath(new BukkitRunnable() {
 					int mT = 0;
 
-					@Override public void run() {
+					@Override
+					public void run() {
 						if (mT > ENHANCEMENT_KILL_REQUIREMENT_TIME) {
 							mEnhancementChain = 0;
 							// Revert glowing color to normal white
@@ -258,7 +259,7 @@ public class AdvancingShadows extends Ability {
 
 						mT++;
 					}
-				}.runTaskTimer(mPlugin, 0, 1);
+				}.runTaskTimer(mPlugin, 0, 1));
 			}
 
 			mCosmetic.tpParticle(mPlayer);

@@ -84,7 +84,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 		double throwRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
 		double bladeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			final World mWorld = mPlayer.getWorld();
 			final Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
 			final Vector mEyeDir = mLoc.getDirection();
@@ -130,6 +130,6 @@ public class WhirlingBlade extends MultipleChargeAbility {
 				}
 				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 }

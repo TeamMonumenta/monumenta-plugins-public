@@ -50,7 +50,7 @@ public final class RestoringDraft extends DepthsAbility {
 				checkSlamAttack();
 			}
 		};
-		mSlamAttackRunner.runTaskTimer(mPlugin, 0, 1);
+		cancelOnDeath(mSlamAttackRunner.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	@Override

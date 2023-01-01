@@ -745,7 +745,7 @@ public class AbilityManager {
 	}
 
 	public void periodicTrigger(Player player, boolean twoHertz, boolean oneSecond, int ticks) {
-		conditionalCast(player, (ability) -> ability.periodicTrigger(twoHertz, oneSecond, ticks));
+		conditionalCast(player, (ability) -> ability.periodicTriggerFinal(twoHertz, oneSecond, ticks));
 	}
 
 	public void entityTargetLivingEntityEvent(Player player, EntityTargetLivingEntityEvent event) {
@@ -757,7 +757,7 @@ public class AbilityManager {
 	}
 
 	public void playerDeathEvent(Player player, PlayerDeathEvent event) {
-		conditionalCast(player, (ability) -> ability.playerDeathEvent(event));
+		conditionalCast(player, (ability) -> ability.playerDeathEventFinal(event));
 	}
 
 	public void playerAnimationEvent(Player player, PlayerAnimationEvent event) {

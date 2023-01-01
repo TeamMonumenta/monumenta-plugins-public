@@ -156,7 +156,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				}
 			}
 		};
-		mRunnable.runTaskTimer(mPlugin, mSpellDelay, 1);
+		cancelOnDeath(mRunnable.runTaskTimer(mPlugin, mSpellDelay, 1));
 	}
 
 	@Override

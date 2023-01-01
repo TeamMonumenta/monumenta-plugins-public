@@ -93,7 +93,7 @@ public class LuminousInfusion extends Ability {
 		World world = mPlayer.getWorld();
 		mCosmetic.infusionStartEffect(world, mPlayer);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
 
 			@Override
@@ -109,7 +109,7 @@ public class LuminousInfusion extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(Plugin.getInstance(), 1, 1);
+		}.runTaskTimer(Plugin.getInstance(), 1, 1));
 	}
 
 	@Override

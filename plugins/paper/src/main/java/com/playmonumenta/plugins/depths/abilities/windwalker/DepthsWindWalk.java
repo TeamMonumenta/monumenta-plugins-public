@@ -85,9 +85,10 @@ public class DepthsWindWalk extends DepthsAbility {
 
 		}.runTaskLater(mPlugin, 10);
 
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
 			boolean mTickOne = true;
+
 			@Override
 			public void run() {
 				if (mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
@@ -133,7 +134,7 @@ public class DepthsWindWalk extends DepthsAbility {
 				mTickOne = false;
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	//Cancel melee damage within 10 ticks of casting

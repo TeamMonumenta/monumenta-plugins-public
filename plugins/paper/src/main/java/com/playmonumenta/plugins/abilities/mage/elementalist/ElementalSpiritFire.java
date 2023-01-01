@@ -213,7 +213,7 @@ public class ElementalSpiritFire extends Ability {
 		// Periodic trigger starts running again when the skill is off cooldown,
 		// which restarts these passive particles
 		if (mPlayerParticlesGenerator == null) {
-			mPlayerParticlesGenerator = new BukkitRunnable() {
+			cancelOnDeath(mPlayerParticlesGenerator = new BukkitRunnable() {
 				double mVerticalAngle = 0;
 				double mRotationAngle = 0;
 				final PPPeriodic mParticle = new PPPeriodic(Particle.FLAME, mPlayer.getLocation()).extra(0.01);
@@ -242,7 +242,7 @@ public class ElementalSpiritFire extends Ability {
 								))
 						.spawnAsPlayerPassive(mPlayer);
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1));
 		}
 	}
 

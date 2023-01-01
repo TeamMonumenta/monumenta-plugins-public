@@ -86,7 +86,7 @@ public class Smokescreen extends Ability {
 
 		if (isEnhanced()) {
 			new BukkitRunnable() {
-				Location mCloudLocation = loc.clone();
+				final Location mCloudLocation = loc.clone();
 				int mT = 0;
 
 				@Override

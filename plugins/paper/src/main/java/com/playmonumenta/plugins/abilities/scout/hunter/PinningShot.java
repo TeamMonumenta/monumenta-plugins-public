@@ -83,12 +83,12 @@ public class PinningShot extends Ability {
 				EntityUtils.applyWeaken(mPlugin, PINNING_SHOT_DURATION, mWeaken, enemy);
 			}
 			mPinnedMobs.put(enemy, true);
-			new BukkitRunnable() {
+			cancelOnDeath(new BukkitRunnable() {
 				@Override
 				public void run() {
 					mPinnedMobs.put(enemy, false);
 				}
-			}.runTaskLater(mPlugin, PINNING_SHOT_DURATION);
+			}.runTaskLater(mPlugin, PINNING_SHOT_DURATION));
 		}
 		return false; // prevents multiple applications itself
 	}

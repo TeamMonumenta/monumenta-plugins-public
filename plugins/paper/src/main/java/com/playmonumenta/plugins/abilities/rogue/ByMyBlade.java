@@ -102,7 +102,7 @@ public class ByMyBlade extends Ability {
 				// This might be a bit scuffed... but hopefully it feels better this way.
 				// As BMB applies first before melee hit, if the enemy survives BMB but dies to melee
 				// It doesn't heal the player. So we delay this check by 1 tick.
-				new BukkitRunnable() {
+				cancelOnDeath(new BukkitRunnable() {
 					@Override
 					public void run() {
 						if (enemy.isDead() || !enemy.isValid()) {
@@ -115,7 +115,7 @@ public class ByMyBlade extends Ability {
 							mCosmetic.bmbHeal(mPlayer, loc);
 						}
 					}
-				}.runTaskLater(mPlugin, 1);
+				}.runTaskLater(mPlugin, 1));
 			}
 			mCosmetic.bmbDamage(world, mPlayer, enemy, level);
 			putOnCooldown();

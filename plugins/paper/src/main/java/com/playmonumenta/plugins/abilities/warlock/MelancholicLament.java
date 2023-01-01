@@ -104,7 +104,7 @@ public class MelancholicLament extends Ability {
 		}
 
 		if (isEnhanced()) {
-			new BukkitRunnable() {
+			cancelOnDeath(new BukkitRunnable() {
 				int mTicks = 0;
 
 				@Override
@@ -137,7 +137,7 @@ public class MelancholicLament extends Ability {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1));
 
 		}
 

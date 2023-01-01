@@ -80,7 +80,7 @@ public class EnchantedPrayer extends Ability {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.5f, 1);
 		putOnCooldown();
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			final Location mLoc = mPlayer.getLocation().add(0, 0.15, 0);
 			double mRadius = 0;
 
@@ -92,7 +92,7 @@ public class EnchantedPrayer extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RANGE, ENCHANTED_PRAYER_RANGE), true)) {
 			p.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 50, 0.25, 0, 0.25, 0.01).spawnAsPlayerActive(mPlayer);

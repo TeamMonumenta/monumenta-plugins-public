@@ -75,7 +75,7 @@ public class CleansingRain extends Ability {
 		putOnCooldown();
 
 		// Run cleansing rain here until it finishes
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 			final List<Player> mCleansedPlayers = new ArrayList<>();
 
@@ -139,7 +139,7 @@ public class CleansingRain extends Ability {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD);
+		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD));
 	}
 
 }

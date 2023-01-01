@@ -96,7 +96,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			mCosmetic.maneuverStartEffect(world, mPlayer, dir);
 			mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
 
-			new BukkitRunnable() {
+			cancelOnDeath(new BukkitRunnable() {
 				@Override
 				public void run() {
 					if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
@@ -131,7 +131,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(mPlugin, 5, 1);
+			}.runTaskTimer(mPlugin, 5, 1));
 			// Needs the 5 tick delay since being close to the ground will cancel the runnable
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius, mPlayer)) {

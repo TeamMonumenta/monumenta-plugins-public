@@ -162,7 +162,7 @@ public final class MeteorSlam extends Ability {
 				}
 			}
 		};
-		mSlamAttackRunner.runTaskTimer(plugin, 0, 1);
+		cancelOnDeath(mSlamAttackRunner.runTaskTimer(plugin, 0, 1));
 	}
 
 	@Override

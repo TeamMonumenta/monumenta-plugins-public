@@ -115,6 +115,7 @@ public class EsotericEnhancements extends PotionAbility {
 				MMLog.warning("Failed to spawn Alchemical Aberration from Library of Souls");
 				return;
 			}
+			EntityUtils.setRemoveEntityOnUnload(aberration);
 
 			AlchemicalAberrationBoss alchemicalAberrationBoss = BossUtils.getBossOfClass(aberration, AlchemicalAberrationBoss.class);
 			if (alchemicalAberrationBoss == null) {

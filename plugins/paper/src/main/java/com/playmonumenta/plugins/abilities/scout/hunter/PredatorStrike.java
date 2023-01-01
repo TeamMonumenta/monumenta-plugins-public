@@ -90,7 +90,7 @@ public class PredatorStrike extends Ability {
 		mActive = true;
 		ClientModHandler.updateAbility(mPlayer, this);
 		mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
@@ -104,7 +104,7 @@ public class PredatorStrike extends Ability {
 					ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	@Override

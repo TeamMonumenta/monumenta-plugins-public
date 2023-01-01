@@ -82,7 +82,7 @@ public class CoupDeGrace extends Ability {
 
 	private void execute(LivingEntity le) {
 		DamageUtils.damage(mPlayer, le, DamageType.OTHER, 9001, ClassAbility.COUP_DE_GRACE, true, false);
-		World world = mPlayer.getWorld();
+		World world = le.getWorld();
 		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.75f, 0.75f);
 		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.5f, 1.5f);
 		new PartialParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData()).spawnAsPlayerActive(mPlayer);

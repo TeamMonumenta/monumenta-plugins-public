@@ -116,7 +116,7 @@ public class Panacea extends Ability {
 		if (mAlchemistPotions != null) {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION);
 
-			new BukkitRunnable() {
+			cancelOnDeath(new BukkitRunnable() {
 				final Location mLoc = mPlayer.getEyeLocation();
 				final BoundingBox mBox = BoundingBox.of(mLoc, radius, radius, radius);
 				Vector mIncrement = mLoc.getDirection().multiply(moveSpeed);
@@ -212,7 +212,7 @@ public class Panacea extends Ability {
 					}
 				}
 
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1));
 		}
 	}
 

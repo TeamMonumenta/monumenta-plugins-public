@@ -87,7 +87,7 @@ public final class ShadowSlam extends DepthsAbility {
 				}
 			}
 		};
-		mSlamAttackRunner.runTaskTimer(plugin, 0, 1);
+		cancelOnDeath(mSlamAttackRunner.runTaskTimer(plugin, 0, 1));
 	}
 
 	@Override

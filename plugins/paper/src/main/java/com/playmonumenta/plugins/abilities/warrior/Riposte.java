@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,14 +55,17 @@ public class Riposte extends Ability {
 			.scoreboardId("Obliteration")
 			.shorthandName("Rip")
 			.descriptions(
-				"While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: 15s.",
-				"Cooldown lowered to 12s and if you block an attack with Riposte's effect while holding a sword, your next sword attack within 2s deals double damage. " +
-					"If you block with Riposte's effect while holding an axe, the attacking mob is stunned for 3s.",
-				"When Riposte activates, deal 15 melee damage to all mobs in a 4 block radius and root them for 1.5s.")
+				"While wielding a sword or axe, you block a melee attack that would have hit you. Cooldown: %ss."
+					.formatted(StringUtils.ticksToSeconds(RIPOSTE_1_COOLDOWN)),
+				("Cooldown lowered to %ss and if you block an attack with Riposte's effect while holding a sword, your next sword attack within %ss deals double damage. " +
+					 "If you block with Riposte's effect while holding an axe, the attacking mob is stunned for %ss.")
+					.formatted(StringUtils.ticksToSeconds(RIPOSTE_2_COOLDOWN), StringUtils.ticksToSeconds(RIPOSTE_SWORD_DURATION), StringUtils.ticksToSeconds(RIPOSTE_AXE_DURATION)),
+				"When Riposte activates, deal %s melee damage to all mobs in a %s block radius and root them for %ss."
+					.formatted(ENHANCEMENT_DAMAGE, ENHANCEMENT_RADIUS, StringUtils.ticksToSeconds(ENHANCEMENT_ROOT_DURATION)))
 			.cooldown(RIPOSTE_1_COOLDOWN, RIPOSTE_2_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
 
-	private @Nullable BukkitRunnable mSwordTimer = null;
+	private int mSwordTimer = Integer.MIN_VALUE;
 
 	public Riposte(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -78,24 +82,8 @@ public class Riposte extends Ability {
 				MovementUtils.knockAway(mPlayer, source, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RIPOSTE_KNOCKBACK_SPEED), true);
 				if (isLevelTwo()) {
 					if (ItemUtils.isSword(mainHand)) {
-						if (mSwordTimer == null) {
-							int duration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, RIPOSTE_SWORD_DURATION);
-							mSwordTimer = new BukkitRunnable() {
-								int mTimer = 0;
-
-								@Override
-								public void run() {
-									if (mTimer >= duration) {
-										this.cancel();
-										mSwordTimer = null;
-										return;
-									}
-									mTimer += 5;
-								}
-							};
-						}
-						mSwordTimer.runTaskTimer(mPlugin, 0, 5);
-
+						int duration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, RIPOSTE_SWORD_DURATION);
+						mSwordTimer = Bukkit.getServer().getCurrentTick() + duration;
 					} else if (ItemUtils.isAxe(mainHand)) {
 						EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, RIPOSTE_AXE_DURATION), source);
 					}
@@ -130,11 +118,9 @@ public class Riposte extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE
 			    && ItemUtils.isSword(mPlayer.getInventory().getItemInMainHand())
-			    && mSwordTimer != null
-			    && !mSwordTimer.isCancelled()) {
+			    && Bukkit.getServer().getCurrentTick() <= mSwordTimer) {
 			event.setDamage(event.getDamage() * (1 + RIPOSTE_SWORD_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE)));
-			mSwordTimer.cancel();
-			mSwordTimer = null;
+			mSwordTimer = Integer.MIN_VALUE;
 		}
 		return false; // prevents multiple applications itself by clearing mSwordTimer
 	}

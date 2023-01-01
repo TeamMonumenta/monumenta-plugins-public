@@ -112,7 +112,7 @@ public class BruteForce extends Ability {
 						mComboRunnable = null;
 					}
 				};
-				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * 20) + 15);
+				cancelOnDeath(mComboRunnable.runTaskLater(mPlugin, (long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * 20) + 15));
 			}
 			mComboNumber++;
 

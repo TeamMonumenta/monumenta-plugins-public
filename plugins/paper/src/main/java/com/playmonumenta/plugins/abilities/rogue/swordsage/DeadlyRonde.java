@@ -86,7 +86,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		if (mActiveRunnable != null) {
 			mActiveRunnable.cancel();
 		} else {
-			new BukkitRunnable() {
+			cancelOnDeath(new BukkitRunnable() {
 				int mTicks = 0;
 
 				@Override
@@ -98,7 +98,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(mPlugin, 0, 1));
 		}
 		mActiveRunnable = new BukkitRunnable() {
 
@@ -110,7 +110,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			}
 
 		};
-		mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER);
+		cancelOnDeath(mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER));
 
 		if (mRondeStacks < mMaxStacks) {
 			mCosmetic.rondeGainStackEffect(mPlayer);
@@ -157,7 +157,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 					}
 
 				};
-				mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER);
+				cancelOnDeath(mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER));
 			}
 			return true; // only trigger once per attack
 		}

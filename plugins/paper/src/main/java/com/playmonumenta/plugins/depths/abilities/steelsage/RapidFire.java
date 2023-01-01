@@ -64,7 +64,7 @@ public class RapidFire extends DepthsAbility {
 		}
 
 		World world = mPlayer.getWorld();
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mCount = 0;
 
 			@Override
@@ -102,7 +102,7 @@ public class RapidFire extends DepthsAbility {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 3);
+		}.runTaskTimer(mPlugin, 0, 3));
 		putOnCooldown();
 	}
 

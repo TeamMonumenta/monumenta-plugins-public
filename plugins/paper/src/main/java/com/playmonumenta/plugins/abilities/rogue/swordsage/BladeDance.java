@@ -94,7 +94,7 @@ public class BladeDance extends Ability {
 		new PartialParticle(Particle.CLOUD, mPlayer.getLocation().clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
 		mPlayer.setInvulnerable(true);
-		new BukkitRunnable() {
+		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 			float mPitch = 0.5f;
 
@@ -134,7 +134,7 @@ public class BladeDance extends Ability {
 						new PartialParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
 					}
 
-					new BukkitRunnable() {
+					cancelOnDeath(new BukkitRunnable() {
 						int mTicks = 0;
 						double mRadians = 0;
 
@@ -155,12 +155,12 @@ public class BladeDance extends Ability {
 							mTicks++;
 							mRadians += Math.toRadians(72);
 						}
-					}.runTaskTimer(mPlugin, 0, 1);
+					}.runTaskTimer(mPlugin, 0, 1));
 
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		}.runTaskTimer(mPlugin, 0, 1));
 
 		putOnCooldown();
 	}
