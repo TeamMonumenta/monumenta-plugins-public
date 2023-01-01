@@ -108,6 +108,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Hekawt's Arena", "Located in the Hekawt arena.", Material.RED_SANDSTONE, "LichWins", 1, "hekawt_arena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 29, "Verdant Remnants", "A plot located right in the middle of Verdant Remnants.", Material.JUNGLE_SAPLING, "Verdant Remnants", "dungeons/verdant_remnants"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 30, "Corsair's Claw", "Located under a looming claw on the beach.", Material.SAND, "Corsair's Claw", "pois/corsairs_claw"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 31, "SKT Teal Arena", "The silver knights keep watch over this plot.", Material.IRON_SWORD, "SKT Teal Arena", "pass/skttealarena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 32, "Monumenta Spawn Box", "Pulled directly from the new spawn location, with its scenic views and stylized signage.", Material.OAK_SIGN, "Monumenta Spawn Box", "pass/spawnbox"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 33, "Sierhaven", "Located right in the town square of Sierhaven.", Material.BLUE_CONCRETE, "Sierhaven", "pass/sierhaven"));
 
