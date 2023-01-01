@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 public class Choler implements Infusion {
 
@@ -34,7 +35,8 @@ public class Choler implements Infusion {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(enemy, InfernoDamage.class)) {
+		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.hasPotionEffect(PotionEffectType.SLOW)
+			    || enemy.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(enemy, InfernoDamage.class)) {
 			event.setDamage(event.getDamage() * getDamageDealtMultiplier(DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value)));
 		}
 	}

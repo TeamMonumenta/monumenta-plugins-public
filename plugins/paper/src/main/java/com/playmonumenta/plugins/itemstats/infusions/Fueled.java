@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public class Fueled implements Infusion {
@@ -38,7 +39,8 @@ public class Fueled implements Infusion {
 
 			int count = 0;
 			for (LivingEntity mob : mobs) {
-				if (EntityUtils.isStunned(mob) || EntityUtils.isSlowed(plugin, mob) || mob.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(mob, InfernoDamage.class)) {
+				if (EntityUtils.isStunned(mob) || EntityUtils.isSlowed(plugin, mob) || mob.hasPotionEffect(PotionEffectType.SLOW)
+					    || mob.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(mob, InfernoDamage.class)) {
 					count++;
 				}
 				if (count >= MOB_CAP) {
