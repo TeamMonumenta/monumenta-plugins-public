@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
+import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -18,6 +20,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
 import java.util.Set;
 import org.bukkit.Color;
@@ -40,6 +43,7 @@ public class PredatorStrike extends Ability {
 
 	private static final int COOLDOWN_1 = 20 * 18;
 	private static final int COOLDOWN_2 = 20 * 14;
+	private static final double DAMAGE_MULTIPLIER = 2.0;
 	private static final double DISTANCE_SCALE_1 = 0.1;
 	private static final double DISTANCE_SCALE_2 = 0.15;
 	private static final int MAX_RANGE = 30;
@@ -60,10 +64,12 @@ public class PredatorStrike extends Ability {
 				String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
 					              "When you fire a critical projectile, it will instantaneously travel in a straight line " +
 					              "for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
-					              "This ability deals 100%% of your projectile base damage increased by %d%% for every block of distance from you and the target " +
-					              "(up to %d blocks, or %d%% total). Cooldown: %ds.",
-					MAX_RANGE, EXPLODE_RADIUS, (int) (DISTANCE_SCALE_1 * 100), MAX_DAMAGE_RANGE, MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_1 * 100) + 100, COOLDOWN_1 / 20),
-				String.format("Damage now increases %d%% for each block of distance (up to %d%%). Cooldown: %ds.", (int) (DISTANCE_SCALE_2 * 100), MAX_DAMAGE_RANGE * (int) (DISTANCE_SCALE_2 * 100) + 100, COOLDOWN_2 / 20))
+					              "This ability deals %s%% of your projectile damage increased by %s%% for every block of distance from you and the target " +
+					              "(up to %d blocks, or %s%% total). Cooldown: %ds.",
+					MAX_RANGE, EXPLODE_RADIUS, StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER), StringUtils.multiplierToPercentage(DISTANCE_SCALE_1), MAX_DAMAGE_RANGE,
+					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), COOLDOWN_1 / 20),
+				String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). Cooldown: %ds.", StringUtils.multiplierToPercentage(DISTANCE_SCALE_2),
+					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER), COOLDOWN_2 / 20))
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", PredatorStrike::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
@@ -168,18 +174,17 @@ public class PredatorStrike extends Ability {
 	}
 
 	private void explode(Location loc) {
-		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ItemStatUtils.getAttributeAmount(mPlayer.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) * (2 + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE)));
+		ItemStack item = mPlayer.getInventory().getItemInMainHand();
+		double damage = ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+		damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.POINT_BLANK));
+		damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.SNIPER));
+		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+		damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
 			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
-		}
-
-		//Visual feedback
-		ItemStack item = mPlayer.getItemInHand();
-		if (item == null) {
-			return;
 		}
 
 		//Get enchant levels on weapon

@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SpellShockExplosion;
 import com.playmonumenta.plugins.effects.SpellShockStatic;
@@ -14,16 +13,10 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.NavigableSet;
-import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -99,105 +92,71 @@ public class Spellshock extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		ClassAbility eventAbility = event.getAbility();
 		if (event.getType() == DamageType.MELEE
-			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
-			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
-			if (effectGroupOriginal != null) {
+				&& mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
+			SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
+			if (existingStatic != null) {
 				event.setDamage(event.getDamage() * (1 + mMeleeBonus));
 				mPlugin.mEffectManager.addEffect(enemy, PERCENT_SLOW_EFFECT_NAME, new PercentSpeed(SLOW_DURATION, SLOW_MULTIPLIER - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), PERCENT_SLOW_EFFECT_NAME));
-				for (Effect e : effectGroupOriginal) {
-					e.clearEffect();
-				}
+				existingStatic.trigger();
 			}
-		} else if (event.getAbility() != null
-			           && !event.getAbility().isFake()
-			           && event.getAbility() != ClassAbility.BLIZZARD
-			           && event.getAbility() != ClassAbility.ARCANE_STRIKE
-			           && event.getAbility() != ClassAbility.ARCANE_STRIKE_ENHANCED
-			           && event.getAbility() != ClassAbility.ASTRAL_OMEN) {
+		} else if (eventAbility != null
+				&& !eventAbility.isFake()
+				&& eventAbility != ClassAbility.BLIZZARD
+				&& eventAbility != ClassAbility.ASTRAL_OMEN) {
 			// Check if the mob has static, and trigger it if possible; otherwise, apply/refresh it
-			NavigableSet<Effect> effectGroupOriginal = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
-			if (effectGroupOriginal != null) {
-				SpellShockStatic effectOriginal = (SpellShockStatic) effectGroupOriginal.last();
-				// We don't directly remove the effect, because we don't want mobs with static to immediately be re-applied with it, so set flags instead
-				if (!effectOriginal.isTriggered()) {
-					effectOriginal.trigger();
+			// We don't directly remove the effect, because we don't want mobs with static to immediately be re-applied with it, so set flags instead
+			SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
+			if (existingStatic != null && !existingStatic.isTriggered()) {
+				// static on the mob, trigger it
 
-					if (isLevelTwo()) {
-						mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
-					}
+				// Arcane Strike cannot trigger static (but can apply it)
+				if (eventAbility == ClassAbility.ARCANE_STRIKE
+						|| eventAbility == ClassAbility.ARCANE_STRIKE_ENHANCED) {
+					return false;
+				}
 
-					Location loc = enemy.getLocation().add(0, 1, 0);
-					World world = mPlayer.getWorld();
-					new PartialParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
-					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
-					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
-					world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
+				existingStatic.trigger();
 
-					// Grab all realistically possible nearby mobs for simplicity, use Set for fast removal
-					Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(enemy.getLocation(), 32));
-					List<LivingEntity> triggeredMobs = new ArrayList<>();
-					triggeredMobs.add(enemy);
+				if (isLevelTwo()) {
+					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION_TICKS, SPEED_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
+				}
 
-					// spellshock triggering other spellshocks propagates the damage at 100%
-					double spellShockDamage = event.getAbility() == mInfo.getLinkedSpell() ? event.getDamage() : event.getDamage() * mLevelDamage;
+				Location loc = LocationUtils.getHalfHeightLocation(enemy);
+				World world = mPlayer.getWorld();
+				new PartialParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
 
-					/*
-					 * Loop through triggeredMobs, and check distances to each in nearbyMobs. If in range,
-					 * deal damage. If the mob can be triggered, trigger it, adding it before the iteration
-					 * cursor for triggeredMobs. Remove the mob from nearbyMobs. When we finish iterating
-					 * through nearbyMobs, remove the triggered mob from triggeredMobs.
-					 *
-					 * Once we reach the end of the iteration for triggeredMobs, create another iterator
-					 * to catch any newly triggered mobs, and repeat until there are no more newly triggered
-					 * mobs.
-					 */
-					while (!triggeredMobs.isEmpty()) {
-						ListIterator<LivingEntity> triggeredMobsIter = triggeredMobs.listIterator();
-						while (triggeredMobsIter.hasNext()) {
-							LivingEntity triggeredMob = triggeredMobsIter.next();
+				// spellshock triggering other spellshocks propagates the damage at 100%
+				double spellShockDamage = eventAbility == ClassAbility.SPELLSHOCK ? event.getDamage() : event.getDamage() * mLevelDamage;
 
-							Iterator<LivingEntity> nearbyMobsIter = nearbyMobs.iterator();
-							while (nearbyMobsIter.hasNext()) {
-								LivingEntity nearbyMob = nearbyMobsIter.next();
-								if (nearbyMob.getLocation().distanceSquared(triggeredMob.getLocation()) < (SIZE * SIZE)) {
-									// Only damage a mob once per tick
-									if (MetadataUtils.checkOnceThisTick(mPlugin, nearbyMob, DAMAGED_THIS_TICK_METAKEY)) {
-										DamageUtils.damage(mPlayer, nearbyMob, DamageType.OTHER, spellShockDamage, mInfo.getLinkedSpell(), true);
-									}
-
-									NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
-									if (effectGroup != null) {
-										SpellShockStatic effect = (SpellShockStatic) effectGroup.last();
-										if (!effect.isTriggered()) {
-											effect.trigger();
-											triggeredMobsIter.add(nearbyMob);
-										}
-									}
-
-									nearbyMobsIter.remove();
-								}
-							}
-
-							triggeredMobsIter.remove();
-						}
+				Hitbox hitbox = new Hitbox.SphereHitbox(loc, SIZE);
+				for (LivingEntity hitMob : hitbox.getHitMobs()) {
+					// Only damage a mob once per tick
+					if (MetadataUtils.checkOnceThisTick(mPlugin, hitMob, DAMAGED_THIS_TICK_METAKEY)) {
+						DamageUtils.damage(mPlayer, hitMob, DamageType.OTHER, spellShockDamage, ClassAbility.SPELLSHOCK, true);
 					}
 				}
-			}
-			if (event.getAbility() != null && event.getAbility() != mInfo.getLinkedSpell()) {
-				NavigableSet<Effect> effectGroup = mPlugin.mEffectManager.getEffects(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME);
-				if (effectGroup != null) {
-					SpellShockStatic effect = (SpellShockStatic) effectGroup.last();
-					if (!effect.isTriggered()) {
-						effect.setDuration(DURATION_TICKS);
-					}
-				} else {
-					mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
-					if (isEnhanced() && !mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
-						mPlugin.mEffectManager.addEffect(enemy, ENHANCEMENT_EFFECT_NAME,
+
+			} else {
+				// no static on the mob, apply new static
+
+				// Spellshock and Elemental Arrows cannot apply static (but can trigger it)
+				if (eventAbility == ClassAbility.SPELLSHOCK
+						|| eventAbility == ClassAbility.ELEMENTAL_ARROWS_FIRE
+						|| eventAbility == ClassAbility.ELEMENTAL_ARROWS_ICE
+						|| eventAbility == ClassAbility.ELEMENTAL_ARROWS) {
+					return false;
+				}
+
+				mPlugin.mEffectManager.addEffect(enemy, SPELL_SHOCK_STATIC_EFFECT_NAME, new SpellShockStatic(DURATION_TICKS));
+				if (isEnhanced() && !mPlugin.mEffectManager.hasEffect(enemy, ENHANCEMENT_EFFECT_NAME)) {
+					mPlugin.mEffectManager.addEffect(enemy, ENHANCEMENT_EFFECT_NAME,
 							new SpellShockExplosion(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer), SpellPower.getSpellDamage(mPlugin, mPlayer, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATION_DAMAGE, ENHANCEMENT_DAMAGE)), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DETONATION_RADIUS, ENHANCEMENT_RADIUS), mPlayer.getUniqueId()));
-					}
 				}
 			}
 		}

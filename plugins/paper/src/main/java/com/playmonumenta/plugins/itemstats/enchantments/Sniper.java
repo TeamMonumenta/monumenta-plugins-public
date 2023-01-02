@@ -54,8 +54,12 @@ public class Sniper implements Enchantment {
 	}
 
 	public static double apply(Player player, LivingEntity target, double level) {
-		if (level > 0 && player.getLocation().distance(target.getLocation()) > DISTANCE) {
-			particles(target.getEyeLocation(), player);
+		return apply(player, target.getEyeLocation(), level);
+	}
+
+	public static double apply(Player player, Location target, double level) {
+		if (level > 0 && player.getEyeLocation().distance(target) > DISTANCE) {
+			particles(target, player);
 			return CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, level * DAMAGE_PER_LEVEL);
 		}
 		return 0;
