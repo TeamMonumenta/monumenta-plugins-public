@@ -18,6 +18,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -378,8 +379,7 @@ public class PotionBarrelListener implements Listener {
 	// Replace drop on breaking the barrel with the item from the loot table (with description text)
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void blockDropItemEvent(BlockDropItemEvent event) {
-		if (event.getBlockState() instanceof Barrel barrel
-				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()))) {
+		if (isPotionBarrel(event.getBlockState())) {
 			ItemStack potionBarrel = InventoryUtils.getItemFromLootTable(event.getBlock().getLocation(), POTION_BARREL_LOOT_TABLE);
 			if (potionBarrel != null) {
 				event.getItems().removeIf(item -> item.getItemStack().getType() == Material.BARREL);
@@ -391,20 +391,24 @@ public class PotionBarrelListener implements Listener {
 	private static boolean isPotionBarrel(ItemStack item) {
 		return item.getType() == Material.BARREL
 				&& item.getItemMeta() instanceof BlockStateMeta blockStateMeta
-				&& blockStateMeta.getBlockState() instanceof Barrel barrel
-				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
+				&& isPotionBarrel(blockStateMeta.getBlockState());
 	}
 
 	private static boolean isPotionBarrel(Block block) {
 		return block.getType() == Material.BARREL
-				&& block.getState() instanceof Barrel barrel
+				&& isPotionBarrel(block.getState());
+	}
+
+	private static boolean isPotionBarrel(BlockState blockState) {
+		return blockState instanceof Barrel barrel
+				&& barrel.customName() != null
 				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
 	}
 
 	private static boolean isValidLocation(Location location) {
 		return ServerProperties.getShardName().equals("playerplots")
-			       || ServerProperties.getShardName().startsWith("dev")
-			       || (ServerProperties.getShardName().equals("plots") && !ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
+				|| ServerProperties.getShardName().startsWith("dev")
+				|| (ServerProperties.getShardName().equals("plots") && !ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
 	}
 
 }
