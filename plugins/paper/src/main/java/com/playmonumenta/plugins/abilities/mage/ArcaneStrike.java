@@ -57,7 +57,7 @@ public class ArcaneStrike extends Ability {
 			.shorthandName("AS")
 			.descriptions(
 				String.format("When you attack an enemy with a wand, you unleash an arcane explosion dealing %s arcane magic damage to all mobs in a %s block radius around the target. " +
-					              "Enemies that are on fire or slowed take %s extra damage. Arcane strike can not trigger Spellshock's static. Cooldown: %ss.",
+					              "Enemies that are on fire or slowed take %s extra damage. Arcane Strike can not trigger Spellshock's static. Cooldown: %ss.",
 					DAMAGE_1,
 					(int) RADIUS,
 					BONUS_DAMAGE_1,

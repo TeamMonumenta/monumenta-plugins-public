@@ -32,6 +32,7 @@ public class PrismaticShield extends Ability {
 
 	private static final float RADIUS = 4.0f;
 	private static final int TRIGGER_HEALTH = 6;
+	private static final int OVERKILL_PROTECTION_MULTIPLIER = 4;
 	private static final int ABSORPTION_HEALTH_1 = 4;
 	private static final int ABSORPTION_HEALTH_2 = 8;
 	private static final int DURATION = 12 * 20;
@@ -57,12 +58,13 @@ public class PrismaticShield extends Ability {
 			.scoreboardId("Prismatic")
 			.shorthandName("PS")
 			.descriptions(
-				String.format("When your health drops below %s hearts (including if the attack would've killed you)," +
-					              " you receive %s Absorption hearts which lasts up to %ss." +
+				String.format("When your health drops below %s hearts you receive %s Absorption hearts which lasts up to %ss." +
+					              " If damage taken would kill you but could have been prevented by up to %s times this skill's absorption, it will save you from death." +
 					              " In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
 					TRIGGER_HEALTH / 2,
 					ABSORPTION_HEALTH_1 / 2,
 					DURATION / 20,
+					OVERKILL_PROTECTION_MULTIPLIER,
 					(int) RADIUS,
 					COOLDOWN / 20
 				),
@@ -101,7 +103,7 @@ public class PrismaticShield extends Ability {
 			double healthRemaining = mPlayer.getHealth() - event.getFinalDamage(true);
 
 			// Health is less than 0 but does not penetrate the absorption shield
-			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -4 * (mAbsorptionHealth + 1);
+			boolean dealDamageLater = healthRemaining < 0 && healthRemaining > -OVERKILL_PROTECTION_MULTIPLIER * (mAbsorptionHealth + 1);
 
 			if (healthRemaining <= CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TRIGGER, TRIGGER_HEALTH)) {
 				mPlugin.mEffectManager.damageEvent(event);
