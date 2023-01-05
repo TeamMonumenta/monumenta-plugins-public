@@ -140,7 +140,6 @@ public class BruteForce extends Ability {
 		for (LivingEntity mob : mobs) {
 			if (damageTarget || mob != target) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damageBonus, mob == target ? ClassAbility.BRUTE_FORCE : ClassAbility.BRUTE_FORCE_AOE, true);
-				mCosmetic.bruteOnSpread(mPlayer, mob);
 			}
 
 			if (!EntityUtils.isBoss(mob)) {

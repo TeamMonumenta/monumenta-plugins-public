@@ -87,7 +87,7 @@ public class ColossalBruteCS extends BruteForceCS {
 
 			double mRadius = 0;
 			final Location mL = loc.clone().subtract(0, 0.6, 0);
-			final double RADIUS = radius * 1.25;
+			final double RADIUS = Math.max(radius * 1.25, 0.5);
 			@Override
 			public void run() {
 
