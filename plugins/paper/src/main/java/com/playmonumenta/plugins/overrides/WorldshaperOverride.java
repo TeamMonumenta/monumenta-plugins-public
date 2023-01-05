@@ -4,11 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -38,7 +38,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 public class WorldshaperOverride {
@@ -256,14 +255,7 @@ public class WorldshaperOverride {
 			}
 		}
 
-		// Create hitbox for the blocks placed, test for collision with players excluding the user
-		Hitbox hitbox = new Hitbox.AABBHitbox(player.getWorld(), BoundingBox.of(blockPlacePattern.get(0).getBlock()));
-
-		for (int i = 1; i < blockPlacePattern.size() - 1; i++) {
-			hitbox = hitbox.union(new Hitbox.AABBHitbox(player.getWorld(), BoundingBox.of(blockPlacePattern.get(i).getBlock())));
-		}
-
-		if (!hitbox.getHitPlayers(player, true).isEmpty()) {
+		if (LocationUtils.blocksIntersectPlayer(player, player.getWorld(), blockPlacePattern)) {
 			player.sendMessage(Component.text("A player is in the way!", TextColor.fromHexString("#D02E28")));
 			return false;
 		}

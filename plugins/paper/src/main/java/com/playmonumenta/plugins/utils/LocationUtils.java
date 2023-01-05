@@ -18,6 +18,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -616,4 +617,12 @@ public class LocationUtils {
 		return null;
 	}
 
+	public static boolean blocksIntersectPlayer(@Nullable Player excludedPlayer, World world, List<Location> locs) {
+		Hitbox hitbox = null;
+		for (Location loc : locs) {
+			Hitbox hb = new Hitbox.AABBHitbox(world, BoundingBox.of(loc.getBlock()));
+			hitbox = hitbox == null ? hb : hitbox.union(hb);
+		}
+		return hitbox != null && !hitbox.getHitPlayers(excludedPlayer, true).isEmpty();
+	}
 }

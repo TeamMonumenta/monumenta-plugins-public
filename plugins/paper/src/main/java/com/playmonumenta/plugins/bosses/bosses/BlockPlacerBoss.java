@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
@@ -24,8 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.loot.Lootable;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 /**
@@ -257,27 +256,14 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 							continue;
 						}
 
-						Location blockLoc = loc.getBlock().getLocation();
-						BoundingBox box = BoundingBox.of(blockLoc, blockLoc.add(1, 1, 1));
-						boolean overlaps = false;
-						for (Player player : PlayerUtils.playersInRange(loc.toCenterLocation(), 3, true)) {
-							if (box.overlaps(player.getBoundingBox())) {
-								overlaps = true;
-								break;
-							}
-						}
-						if (overlaps) {
+						if (LocationUtils.blocksIntersectPlayer(null, loc.getWorld(), List.of(loc))) {
 							continue;
 						}
+
 						block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
 						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.7f);
 						pathfinder.moveTo(loc.clone().add(0, 1, 0));
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								pathfinder.moveTo(loc.clone().add(0, 1, 0));
-							}
-						}.runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), 5);
+						Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> pathfinder.moveTo(loc.clone().add(0, 1, 0)), 5);
 					}
 
 				}
