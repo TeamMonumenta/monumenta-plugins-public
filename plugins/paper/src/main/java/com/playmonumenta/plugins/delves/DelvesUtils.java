@@ -61,7 +61,6 @@ public class DelvesUtils {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.PERNICIOUS, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.LEGIONARY, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.CARAPACE, 5);
-		MODIFIER_RANK_CAPS.put(DelvesModifier.ECHOES, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.VENGEANCE, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ENTROPY, 5);
 		MODIFIER_RANK_CAPS.put(DelvesModifier.TWISTED, 5);
@@ -90,7 +89,6 @@ public class DelvesUtils {
 			MODIFIER_RANK_CAPS.put(DelvesModifier.LEGIONARY, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.CARAPACE, 7);
 			MODIFIER_RANK_CAPS.put(DelvesModifier.VENGEANCE, 5);
-			MODIFIER_RANK_CAPS.put(DelvesModifier.ECHOES, 0);
 		}
 
 		int maxDepthPoints = 0;
@@ -113,8 +111,7 @@ public class DelvesUtils {
 			}
 		}
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
-		// return nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
-		return DelvesModifier.rotatingDelveModifiers();
+		return nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
 	}
 
 	public static @Nullable ItemStack getRankItem(DelvesModifier mod, int rank, int level) {

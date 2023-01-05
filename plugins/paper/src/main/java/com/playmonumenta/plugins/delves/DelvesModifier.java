@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
 import com.playmonumenta.plugins.delves.abilities.Colossal;
 import com.playmonumenta.plugins.delves.abilities.Dreadful;
-import com.playmonumenta.plugins.delves.abilities.Echoes;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.Fragile;
 import com.playmonumenta.plugins.delves.abilities.Haunted;
@@ -36,7 +35,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public enum DelvesModifier {
-	ECHOES(1, Echoes::applyModifiers, createIcon(Material.GHAST_TEAR, Component.text("Echoes", NamedTextColor.GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Echoes.DESCRIPTION), Echoes.RANK_DESCRIPTIONS, 1, 1),
+	VENGEANCE(1, Vengeance::applyModifiers, createIcon(Material.RED_BANNER, Component.text("Vengeance", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Vengeance.DESCRIPTION), Vengeance.RANK_DESCRIPTIONS, 15, 1),
 	ARCANIC(2, Arcanic::applyModifiers, createIcon(Material.NETHER_STAR, Component.text("Arcanic", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Arcanic.DESCRIPTION), Arcanic.RANK_DESCRIPTIONS, 2, 1),
 	INFERNAL(3, Infernal::applyModifiers, createIcon(Material.LAVA_BUCKET, Component.text("Infernal", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Infernal.DESCRIPTION), Infernal.RANK_DESCRIPTIONS, 3, 1),
 	TRANSCENDENT(4, Transcendent::applyModifiers, createIcon(Material.ENDER_EYE, Component.text("Transcendent", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Transcendent.DESCRIPTION), Transcendent.RANK_DESCRIPTIONS, 4, 1),
@@ -48,22 +47,21 @@ public enum DelvesModifier {
 	PERNICIOUS(10, Pernicious::applyModifiers, createIcon(Material.MUSIC_DISC_11, Component.text("Pernicious", NamedTextColor.DARK_AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Pernicious.DESCRIPTION), Pernicious.RANK_DESCRIPTIONS, 12, 1),
 	LEGIONARY(11, Legionary::applyModifiers, createIcon(Material.IRON_SWORD, Component.text("Legionary", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Legionary.DESCRIPTION), Legionary.RANK_DESCRIPTIONS, 13, 1),
 	CARAPACE(12, Carapace::applyModifiers, createIcon(Material.NETHERITE_HELMET, Component.text("Carapace", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Carapace.DESCRIPTION), Carapace.RANK_DESCRIPTIONS, 14, 1),
-	VENGEANCE(13, Vengeance::applyModifiers, createIcon(Material.RED_BANNER, Component.text("Vengeance", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Vengeance.DESCRIPTION), Vengeance.RANK_DESCRIPTIONS, 15, 1),
-	ENTROPY(14, null, createIcon(Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION), Entropy.RANK_DESCRIPTIONS, 16, 1),
-	TWISTED(15, Twisted::applyModifiers, createIcon(Material.WITHER_ROSE, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION), Twisted.RANK_DESCRIPTIONS, 19, 1),
-	FRAGILE(16, null, createIcon(Material.GLASS, Component.text("Fragile", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Fragile.DESCRIPTION), Fragile.RANK_DESCRIPTIONS, 20, 5),
+	ENTROPY(13, null, createIcon(Material.STRUCTURE_VOID, Component.text("Entropy", NamedTextColor.BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Entropy.DESCRIPTION), Entropy.RANK_DESCRIPTIONS, 16, 1),
+	TWISTED(14, Twisted::applyModifiers, createIcon(Material.WITHER_ROSE, Component.text("Twisted", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Twisted.DESCRIPTION), Twisted.RANK_DESCRIPTIONS, 19, 1),
+	FRAGILE(15, null, createIcon(Material.GLASS, Component.text("Fragile", NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Fragile.DESCRIPTION), Fragile.RANK_DESCRIPTIONS, 20, 5),
 	// Keep rotating modifiers after here -----------------------------------------------
-	ASSASSINS(17, Assassins::applyModifiers, createIcon(Material.NETHERITE_SWORD, Component.text("Assassins", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Assassins.DESCRIPTION), Assassins.RANK_DESCRIPTIONS, 21, 5),
-	ASTRAL(18, null, createIcon(Material.SPYGLASS, Component.text("Astral", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Astral.DESCRIPTION), Astral.RANK_DESCRIPTIONS, 22, 5),
-	UNYIELDING(19, Unyielding::applyModifiers, createIcon(Material.NETHERITE_CHESTPLATE, Component.text("Unyielding", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Unyielding.DESCRIPTION), Unyielding.RANK_DESCRIPTIONS, 23, 5),
-	CHRONOLOGY(20, null, createIcon(Material.CLOCK, Component.text("Chronology", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chronology.DESCRIPTION), Chronology.RANK_DESCRIPTIONS, 24, 5),
-	RIFTBORN(21, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn.RANK_DESCRIPTIONS, 25, 5),
-	HAUNTED(22, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted.RANK_DESCRIPTIONS, 26, 5)
+	ASSASSINS(16, Assassins::applyModifiers, createIcon(Material.NETHERITE_SWORD, Component.text("Assassins", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Assassins.DESCRIPTION), Assassins.RANK_DESCRIPTIONS, 21, 5),
+	ASTRAL(17, null, createIcon(Material.SPYGLASS, Component.text("Astral", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Astral.DESCRIPTION), Astral.RANK_DESCRIPTIONS, 22, 5),
+	UNYIELDING(18, Unyielding::applyModifiers, createIcon(Material.NETHERITE_CHESTPLATE, Component.text("Unyielding", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Unyielding.DESCRIPTION), Unyielding.RANK_DESCRIPTIONS, 23, 5),
+	CHRONOLOGY(19, null, createIcon(Material.CLOCK, Component.text("Chronology", NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Chronology.DESCRIPTION), Chronology.RANK_DESCRIPTIONS, 24, 5),
+	RIFTBORN(20, null, createIcon(Material.END_PORTAL_FRAME, Component.text("Riftborn", NamedTextColor.DARK_BLUE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Riftborn.DESCRIPTION), Riftborn.RANK_DESCRIPTIONS, 25, 5),
+	HAUNTED(21, null, createIcon(Material.CARVED_PUMPKIN, Component.text("Haunted", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Haunted.DESCRIPTION), Haunted.RANK_DESCRIPTIONS, 26, 5)
 	;
 
 	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL);
 	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED);
-	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ECHOES, ASSASSINS, VENGEANCE, UNYIELDING);
+	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ASSASSINS, VENGEANCE, UNYIELDING);
 
 	private final int mIndex;
 	private final @Nullable BiConsumer<LivingEntity, Integer> mApplyFunc;
