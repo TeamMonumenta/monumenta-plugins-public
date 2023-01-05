@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -105,7 +107,8 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 				ItemStack icon;
 				Runnable buy;
 				if (reward.mType == SeasonalRewardType.LOOT_TABLE
-					    && reward.mLootTable.getItemMeta() instanceof SpawnEggMeta) {
+					&& reward.mLootTable != null
+					&& reward.mLootTable.getItemMeta() instanceof SpawnEggMeta) {
 					owned = false; // can buy as many as you want
 					cost = DUMMY_COSTS[Math.min(dummiesSoFar, DUMMY_COSTS.length - 1)];
 					dummiesSoFar++;
@@ -131,33 +134,72 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 					}
 					cost = costs[Math.min(soFar - 1, costs.length - 1)];
 					owned = CosmeticsManager.getInstance().playerHasCosmetic(mPlayer, cosmeticType, reward.mData);
-					icon = ItemUtils.modifyMeta(new ItemStack(reward.mDisplayItem),
-						meta -> meta.displayName(Component.text(reward.mName, reward.mNameColor).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)));
+					Material displayItem = reward.mDisplayItem;
+					if (displayItem == null) {
+						displayItem = Material.STONE;
+					}
+					String rewardName = reward.mName;
+					if (rewardName == null) {
+						rewardName = "Name not set";
+					}
+					final String finalRewardName = rewardName;
+					icon = ItemUtils.modifyMeta(new ItemStack(displayItem),
+						meta -> meta.displayName(Component.text(finalRewardName, reward.mNameColor).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false)));
 					buy = () -> {
 						CosmeticsManager.getInstance().addCosmetic(mPlayer, cosmeticType, reward.mData);
 						mPlayer.sendMessage(Component.text("Unlocked " + cosmeticType.getDisplayName() + " '" + reward.mData + "'.", NamedTextColor.GOLD));
 					};
 				}
-				if (reward.mDescription != null) {
-					ItemUtils.modifyMeta(icon, meta -> GUIUtils.splitLoreLine(meta, reward.mDescription, 30, GUIUtils.namedTextColorToChatColor(reward.mDescriptionColor), false));
+				String description = reward.mDescription;
+				if (description != null) {
+					NamedTextColor namedTextColor = reward.mDescriptionColor;
+					if (namedTextColor == null) {
+						namedTextColor = NamedTextColor.WHITE;
+					}
+					ChatColor chatColor = GUIUtils.namedTextColorToChatColor(namedTextColor);
+					ItemUtils.modifyMeta(icon, meta -> GUIUtils.splitLoreLine(meta, description, 30, chatColor, false));
 				}
 				if (owned) {
-					ItemUtils.modifyMeta(icon, meta -> meta.displayName(meta.displayName().append(Component.text(" (owned)", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, false))));
-					ItemUtils.modifyMeta(icon, meta -> meta.lore(Stream.concat(meta.lore().stream(), Stream.of(
-						Component.text("You already own this.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					)).toList()));
+					ItemUtils.modifyMeta(icon, meta -> {
+						Component displayName = meta.displayName();
+						if (displayName == null) {
+							displayName = Component.empty();
+						}
+						meta.displayName(displayName.append(Component.text(" (owned)", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, false)));
+					});
+					ItemUtils.modifyMeta(icon, meta -> {
+						List<Component> lore = meta.lore();
+						if (lore == null) {
+							lore = new ArrayList<>();
+						}
+						meta.lore(Stream.concat(lore.stream(), Stream.of(
+							Component.text("You already own this.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+						)).toList());
+					});
 				} else if (!canBuy) {
-					ItemUtils.modifyMeta(icon, meta -> meta.lore(Stream.concat(meta.lore().stream(), Stream.of(
-						Component.text("Cannot buy items from this pass", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false),
-						Component.text("until the current pass ends.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
-					)).toList()));
+					ItemUtils.modifyMeta(icon, meta -> {
+						List<Component> lore = meta.lore();
+						if (lore == null) {
+							lore = new ArrayList<>();
+						}
+						meta.lore(Stream.concat(lore.stream(), Stream.of(
+							Component.text("Cannot buy items from this pass", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false),
+							Component.text("until the current pass ends.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
+						)).toList());
+					});
 				} else {
-					ItemUtils.modifyMeta(icon, meta -> meta.lore(Stream.concat(meta.lore().stream(), Stream.of(
-						Component.text("Click to buy.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
-						Component.text("Cost: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-							.append(Component.text(cost, NamedTextColor.GOLD).decorate(TextDecoration.BOLD))
-							.append(Component.text(" " + ItemUtils.getPlainName(mMetamorphosisToken) + (cost == 1 ? "" : "s"), NamedTextColor.GOLD)))
-					).toList()));
+					ItemUtils.modifyMeta(icon, meta -> {
+						List<Component> lore = meta.lore();
+						if (lore == null) {
+							lore = new ArrayList<>();
+						}
+						meta.lore(Stream.concat(lore.stream(), Stream.of(
+							Component.text("Click to buy.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false),
+							Component.text("Cost: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+								.append(Component.text(cost, NamedTextColor.GOLD).decorate(TextDecoration.BOLD))
+								.append(Component.text(" " + ItemUtils.getPlainName(mMetamorphosisToken) + (cost == 1 ? "" : "s"), NamedTextColor.GOLD)))
+						).toList());
+					});
 				}
 				setItem(2 + (i / 7), 1 + (i % 7), icon)
 					.onLeftClick(() -> {

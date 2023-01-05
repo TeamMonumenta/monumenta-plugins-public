@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.time.LocalDateTime;
@@ -28,6 +27,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -59,26 +59,30 @@ public class SeasonalPass {
 	 *
 	 * @param missionsJson The contents of a missions json file for this pass
 	 * @param rewardsJson  The contents of a rewards json file for this pass
-	 * @throws Exception if the season pass has an invalid file
 	 */
-	public SeasonalPass(String startDateString, JsonObject missionsJson, JsonObject rewardsJson) throws Exception {
-		mPassStart = LocalDateTime.parse(startDateString + "T00:00:00");
-		loadRewards(rewardsJson);
-		loadMissions(missionsJson);
+	public SeasonalPass(final CommandSender sender, LocalDateTime passStart, JsonObject missionsJson, JsonObject rewardsJson, boolean showWarnings) {
+		mPassStart = passStart;
+		loadRewards(sender, rewardsJson, showWarnings);
+		loadMissions(sender, missionsJson, showWarnings);
 	}
 
 	/**
 	 * Load reward objects from json parsing
 	 */
-	private void loadRewards(JsonObject data) throws Exception {
+	private void loadRewards(final CommandSender sender, JsonObject data, boolean showWarnings) {
+		String startDateStr = data.get("start_date").getAsString();
 		JsonArray rewardParse = data.get("rewards").getAsJsonArray();
 		for (JsonElement missionElement : rewardParse) {
 			try {
 
 				JsonObject toParse = missionElement.getAsJsonObject();
 
-				SeasonalRewardType type = SeasonalRewardType.getRewardTypeSelection(toParse.get("type").getAsString());
+				String rewardTypeStr = toParse.get("type").getAsString();
+				SeasonalRewardType type = SeasonalRewardType.getRewardTypeSelection(rewardTypeStr);
 				if (type == null) {
+					if (showWarnings) {
+						sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr + " " + mName + ": No such mission type " + rewardTypeStr, NamedTextColor.RED));
+					}
 					continue;
 				}
 				SeasonalReward reward = new SeasonalReward(type);
@@ -95,7 +99,7 @@ public class SeasonalPass {
 						LootTable rewardTable = Bukkit.getLootTable(NamespacedKeyUtils.fromString(lootTable));
 						if (rewardTable != null) {
 							Collection<ItemStack> loot = rewardTable.populateLoot(FastUtils.RANDOM, context);
-							if (loot != null && loot.size() > 0) {
+							if (loot.size() > 0) {
 								for (ItemStack item : loot) {
 									reward.mLootTable = item;
 									mRewards.add(reward);
@@ -143,7 +147,7 @@ public class SeasonalPass {
 	/**
 	 * Load mission objects from json parsing
 	 */
-	private void loadMissions(JsonObject data) throws Exception {
+	private void loadMissions(final CommandSender sender, JsonObject data, boolean showWarnings) {
 		int numberOfWeeks = 0;
 		String startDateStr = data.get("start_date").getAsString();
 		mName = data.get("pass_name").getAsString();
@@ -157,7 +161,11 @@ public class SeasonalPass {
 
 				WeeklyMission mission = new WeeklyMission();
 				// Required fields
-				mission.mType = WeeklyMissionType.getMissionTypeSelection(toParse.get("type").getAsString());
+				String missionTypeStr = toParse.get("type").getAsString();
+				mission.mType = WeeklyMissionType.getMissionTypeSelection(missionTypeStr);
+				if (mission.mType == null && showWarnings) {
+					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such mission type " + missionTypeStr, NamedTextColor.RED));
+				}
 				mission.mWeek = toParse.get("week").getAsInt();
 				mission.mMP = toParse.get("mp").getAsInt();
 				mission.mAmount = toParse.get("amount").getAsInt();
@@ -169,7 +177,15 @@ public class SeasonalPass {
 					JsonArray content = toParse.get("content").getAsJsonArray();
 					List<MonumentaContent> contentList = new ArrayList<>();
 					for (JsonElement con : content) {
-						contentList.add(MonumentaContent.getContentSelection(con.getAsString()));
+						String contentStr = con.getAsString();
+						MonumentaContent monumentaContent = MonumentaContent.getContentSelection(contentStr);
+						if (monumentaContent == null) {
+							if (showWarnings) {
+								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such content " + contentStr, NamedTextColor.RED));
+							}
+							continue;
+						}
+						contentList.add(monumentaContent);
 					}
 					mission.mContent = contentList;
 				}
@@ -196,11 +212,11 @@ public class SeasonalPass {
 								DelvesModifier modifier = DelvesModifier.fromName(modName);
 								if (modifier != null) {
 									modList.add(modifier);
-								} else {
-									MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName);
+								} else if (showWarnings) {
+									sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName, NamedTextColor.RED));
 								}
-							} else {
-								MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + mod);
+							} else if (showWarnings) {
+								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + mod, NamedTextColor.RED));
 							}
 						}
 						mission.mDelveModifiers = modList;
@@ -213,11 +229,11 @@ public class SeasonalPass {
 								List<DelvesModifier> modList = new ArrayList<>();
 								modList.add(modifier);
 								mission.mDelveModifiers = modList;
-							} else {
-								MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName);
+							} else if (showWarnings) {
+								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName, NamedTextColor.RED));
 							}
-						} else {
-							MMLog.warning("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + modPrimitive);
+						} else if (showWarnings) {
+							sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + modPrimitive, NamedTextColor.RED));
 						}
 					}
 				}
@@ -279,9 +295,7 @@ public class SeasonalPass {
 			String scoreboard = SeasonalEventManager.MISSION_SCOREBOARD + missionCounter;
 			missionCounter++;
 			int playerScore = ScoreboardUtils.getScoreboardValue(p.getName(), scoreboard);
-			if (playerScore < mission.mAmount) {
-				continue;
-			} else {
+			if (playerScore >= mission.mAmount) {
 				// Add mp and mark mission as claimed by setting score to -1
 				mpToAdd += mission.mMP;
 				ScoreboardUtils.setScoreboardValue(p.getName(), scoreboard, -1);
@@ -376,41 +390,42 @@ public class SeasonalPass {
 			amount = reward.mAmount;
 		}
 		switch (reward.mType) {
-			case ELITE_FINISHER:
+			case ELITE_FINISHER ->
 				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.ELITE_FINISHER, Objects.requireNonNull(reward.mData));
-				break;
-			case TITLE:
+			case TITLE ->
 				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, Objects.requireNonNull(reward.mData));
-				break;
-			case PLOT_BORDER:
+			case PLOT_BORDER ->
 				CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.PLOT_BORDER, Objects.requireNonNull(reward.mData));
-				break;
-			case ITEM_SKIN:
+			case ITEM_SKIN -> {
 				for (int i = 0; i < amount; i++) {
 					givePlayerLootTable(p, ITEM_SKIN_KEY);
 				}
-				break;
-			case LOOT_SPIN:
+			}
+			case LOOT_SPIN -> {
 				for (int i = 0; i < amount; i++) {
 					givePlayerLootTable(p, TREASURE_WHEEL_KEY);
 				}
-				break;
-			case UNIQUE_SPIN:
+			}
+			case UNIQUE_SPIN -> {
 				for (int i = 0; i < amount; i++) {
 					givePlayerLootTable(p, RELIC_WHEEL_KEY);
 				}
-				break;
-			case LOOT_TABLE:
+			}
+			case LOOT_TABLE -> {
 				for (int i = 0; i < amount; i++) {
 					givePlayerLootTable(p, Objects.requireNonNull(reward.mData));
 				}
-				break;
-			case SHULKER_BOX:
-				ItemStack shulker = new ItemStack(reward.mDisplayItem, 1);
+			}
+			case SHULKER_BOX -> {
+				Material shulkerMaterial = reward.mDisplayItem;
+				if (shulkerMaterial == null) {
+					shulkerMaterial = Material.PURPLE_SHULKER_BOX;
+				}
+				ItemStack shulker = new ItemStack(shulkerMaterial, 1);
 				InventoryUtils.giveItem(p, shulker);
-				break;
-			default:
-				break;
+			}
+			default -> {
+			}
 		}
 	}
 
@@ -428,10 +443,8 @@ public class SeasonalPass {
 		LootTable rewardTable = Bukkit.getLootTable(NamespacedKeyUtils.fromString(lootTablePath));
 		if (rewardTable != null) {
 			Collection<ItemStack> loot = rewardTable.populateLoot(FastUtils.RANDOM, context);
-			if (loot != null) {
-				for (ItemStack item : loot) {
-					InventoryUtils.giveItem(p, item);
-				}
+			for (ItemStack item : loot) {
+				InventoryUtils.giveItem(p, item);
 			}
 		}
 	}

@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,7 +28,7 @@ public class SeasonalEventListener implements Listener {
 		Material blockType = event.getBlock().getType();
 		Player p = event.getPlayer();
 
-		if (p != null && blockType == Material.SPAWNER) {
+		if (blockType == Material.SPAWNER) {
 			// Loop through weekly missions and update them if they apply
 			int missionNumber = 1;
 			for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
@@ -59,7 +61,7 @@ public class SeasonalEventListener implements Listener {
 			} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && 2 == mission.mRegion) {
 				// Region matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
-			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent.contains(MonumentaContent.DEPTHS) && roomNumber >= 30) {
+			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.DEPTHS) && roomNumber >= 30) {
 				// Content matches up - award points
 				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 			}
@@ -80,7 +82,7 @@ public class SeasonalEventListener implements Listener {
 			// Loop through weekly missions and update them if they apply
 			int missionNumber = 1;
 			for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
-				if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent.contains(content)) {
+				if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(content)) {
 					// Content matches up - award points
 					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.DUNGEONS && content.getContentType() == ContentType.DUNGEON) {
@@ -100,7 +102,11 @@ public class SeasonalEventListener implements Listener {
 						}
 					} else if (mission.mType == WeeklyMissionType.DELVE_MODIFIER) {
 						boolean modsActive = true;
-						for (DelvesModifier modifier : mission.mDelveModifiers) {
+						List<DelvesModifier> modifiers = mission.mDelveModifiers;
+						if (modifiers == null) {
+							modifiers = new ArrayList<>();
+						}
+						for (DelvesModifier modifier : modifiers) {
 							if (DelvesUtils.getDelveModLevel(p, content.getLabel(), modifier) < mission.mModifierRank) {
 								modsActive = false;
 							}
@@ -120,7 +126,7 @@ public class SeasonalEventListener implements Listener {
 					// Region matches up - award points
 					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.ROD_WAVES && content == MonumentaContent.RUSH) {
-					// Cleared rod- add number of waves cleared
+					// Cleared rod - add number of waves cleared
 					int waves = ScoreboardUtils.getScoreboardValue(p.getName(), ROD_WAVE_SCOREBOARD);
 					// Subtract the 20 wave checkpoint if player has certain tags
 					Set<String> tags = p.getScoreboardTags();

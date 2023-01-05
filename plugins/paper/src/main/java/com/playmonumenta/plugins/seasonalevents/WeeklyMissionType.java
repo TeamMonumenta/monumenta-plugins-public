@@ -4,15 +4,15 @@ import org.jetbrains.annotations.Nullable;
 
 public enum WeeklyMissionType {
 
-	//Content- Clear a specific piece of content x times (examples- blue, eldrask, rush)
-	//Dungeons- Clear x amount of dungeons (all)
-	//Strikes- Clear x amount of strikes (all)
-	//Bosses- Clear x amount of bosses (all)
-	//Spawners- Break x amount of spawners
-	//Delves- Clear any content with x modifier
-	//Rod Waves- Clear x waves in rod (cumulative)
-	//Depths Rooms- Clear x rooms in depths (cumulative)
-	//Regional- comes from a specific region
+	//Content - Clear a specific piece of content x times (examples- blue, eldrask, rush)
+	//Dungeons - Clear x amount of dungeons (all)
+	//Strikes - Clear x amount of strikes (all)
+	//Bosses - Clear x amount of bosses (all)
+	//Spawners - Break x amount of spawners
+	//Delves - Clear any content with x modifier
+	//Rod Waves - Clear x waves in rod (cumulative)
+	//Depths Rooms - Clear x rooms in depths (cumulative)
+	//Regional - comes from a specific region
 
 	CONTENT("content"),
 	DUNGEONS("dungeons"),

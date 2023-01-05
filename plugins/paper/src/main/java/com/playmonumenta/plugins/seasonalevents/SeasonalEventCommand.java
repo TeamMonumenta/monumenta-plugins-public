@@ -14,12 +14,11 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 public class SeasonalEventCommand extends GenericCommand {
 
-	public static void register(Plugin plugin) {
+	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.battlepass");
 

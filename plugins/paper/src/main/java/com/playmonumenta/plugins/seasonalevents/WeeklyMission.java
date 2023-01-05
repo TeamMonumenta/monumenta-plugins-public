@@ -9,9 +9,9 @@ public class WeeklyMission {
 	public int mWeek;
 	//XP granted for completing the mission
 	public int mMP;
-	//Type of mission- content, kills, etc
+	//Type of mission - content, kills, etc
 	public @Nullable WeeklyMissionType mType;
-	//Times needed to do the thing (content clears, kills, room number, etc)
+	//Times needed to do the thing (content clears, kills, room number, etc.)
 	//This is what is tracked on the scoreboard
 	public int mAmount;
 
@@ -30,14 +30,6 @@ public class WeeklyMission {
 	public int mDelvePoints;
 	//Region of content to clear (includes dungeon, strike, boss)
 	public int mRegion;
-
-	public WeeklyMission(WeeklyMissionType type, int week, int mp, int amount, String description) {
-		mType = type;
-		mWeek = week;
-		mMP = mp;
-		mAmount = amount;
-		mDescription = description;
-	}
 
 	public WeeklyMission() {
 

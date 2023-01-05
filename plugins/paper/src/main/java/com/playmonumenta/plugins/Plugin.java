@@ -222,7 +222,7 @@ public class Plugin extends JavaPlugin {
 		ExperiencinatorCommand.register();
 		EventCommand.register();
 		Eggify.register();
-		SeasonalEventCommand.register(this);
+		SeasonalEventCommand.register();
 		CosmeticsCommand.register(this);
 		POICommands.register();
 		NameMCVerify.register(this);

@@ -28,8 +28,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class SeasonalEventManager {
 	private static class PassFiles {
+		public final LocalDateTime mPassStart;
 		public @Nullable JsonObject mMissionsJson = null;
 		public @Nullable JsonObject mRewardsJson = null;
+
+		public PassFiles(LocalDateTime passStart) {
+			mPassStart = passStart;
+		}
 	}
 
 	public static final int LEVEL_COUNT = 25;
@@ -47,6 +52,8 @@ public class SeasonalEventManager {
 	public static void reloadPasses(final CommandSender sender) {
 		Plugin plugin = Plugin.getInstance();
 		final TreeMap<String, PassFiles> allPassFiles = new TreeMap<>();
+		LocalDateTime now = DateUtils.localDateTime();
+		LocalDateTime mostRecentPassStart = LocalDateTime.MIN;
 
 		sender.sendMessage(Component.text("Loading all seasonalevent files (files without start_date incorrectly counted):", NamedTextColor.GOLD));
 		QuestUtils.loadScriptedQuests(plugin,
@@ -60,7 +67,10 @@ public class SeasonalEventManager {
 					return null;
 				}
 				String startDateString = startDateJson.getAsString();
-				PassFiles passFiles = allPassFiles.computeIfAbsent(startDateString, (key) -> new PassFiles());
+				PassFiles passFiles = allPassFiles.computeIfAbsent(startDateString, (key) -> {
+					LocalDateTime passStart = LocalDateTime.parse(startDateString + "T00:00:00");
+					return new PassFiles(passStart);
+				});
 
 				if (object.has("missions")) {
 					passFiles.mMissionsJson = object;
@@ -70,6 +80,14 @@ public class SeasonalEventManager {
 				}
 				return null;
 			});
+
+		for (Map.Entry<String, PassFiles> passFilesEntry : allPassFiles.entrySet()) {
+			LocalDateTime passStart = passFilesEntry.getValue().mPassStart;
+			if (passStart.isBefore(now) && passStart.isAfter(mostRecentPassStart)) {
+				mostRecentPassStart = passStart;
+			}
+		}
+
 		sender.sendMessage(Component.text("Parsing passes:", NamedTextColor.GOLD));
 		final TreeMap<LocalDateTime, SeasonalPass> allPasses = new TreeMap<>();
 		for (Map.Entry<String, PassFiles> passFilesEntry : allPassFiles.entrySet()) {
@@ -84,7 +102,7 @@ public class SeasonalEventManager {
 				continue;
 			}
 			try {
-				SeasonalPass seasonalPass = new SeasonalPass(startDateString, passFiles.mMissionsJson, passFiles.mRewardsJson);
+				SeasonalPass seasonalPass = new SeasonalPass(sender, passFiles.mPassStart, passFiles.mMissionsJson, passFiles.mRewardsJson, !passFiles.mPassStart.isBefore(mostRecentPassStart));
 				allPasses.put(seasonalPass.mPassStart, seasonalPass);
 				sender.sendMessage(Component.text("Loaded " + seasonalPass, NamedTextColor.GOLD));
 			} catch (Exception exception) {
@@ -111,7 +129,7 @@ public class SeasonalEventManager {
 			}
 			if (lastPlayedWeek < 1) {
 				// Player has not played during this pass yet, reset their MP
-				ScoreboardUtils.setScoreboardValue(p, mActivePass.PASS_MP_SCOREBOARD, 0);
+				ScoreboardUtils.setScoreboardValue(p, SeasonalPass.PASS_MP_SCOREBOARD, 0);
 			}
 		}
 	}

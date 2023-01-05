@@ -101,7 +101,7 @@ public class SeasonalEventGUI extends Gui {
 			LocalDateTime now = DateUtils.localDateTime();
 			LocalDateTime passStart = mSeasonalPass.mPassStart;
 			LocalDateTime passEnd = passStart.plusWeeks(mSeasonalPass.mNumberOfWeeks).minusDays(1);
-			if (now.compareTo(passStart) < 0) {
+			if (now.isBefore(passStart)) {
 				lore.add(Component.text(String.format("Week %d", mWeek), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 				lore.add(Component.text(String.format("Pass starts %s %d, %d",
 					passStart.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()),
@@ -149,8 +149,15 @@ public class SeasonalEventGUI extends Gui {
 
 				meta = missionItem.getItemMeta();
 				meta.displayName(Component.text("Mission " + (i + 1), NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				GUIUtils.splitLoreLine(meta, mission.mDescription, 30, ChatColor.RED, false);
+				String missionDescription = mission.mDescription;
+				if (missionDescription == null) {
+					missionDescription = "Mission description not set";
+				}
+				GUIUtils.splitLoreLine(meta, missionDescription, 30, ChatColor.RED, false);
 				lore = meta.lore();
+				if (lore == null) {
+					lore = new ArrayList<>();
+				}
 
 				if (progress == -1) {
 					lore.add(Component.text("Progress: " + mission.mAmount + "/" + mission.mAmount, NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false));
@@ -210,10 +217,26 @@ public class SeasonalEventGUI extends Gui {
 					setItem(rewardLocation, reward.mLootTable);
 					continue;
 				}
-				ItemStack rewardItem = new ItemStack(reward.mDisplayItem, 1);
+				Material displayItem = reward.mDisplayItem;
+				if (displayItem == null) {
+					displayItem = Material.STONE;
+				}
+				ItemStack rewardItem = new ItemStack(displayItem, 1);
 				meta = rewardItem.getItemMeta();
-				meta.displayName(Component.text(reward.mName, reward.mNameColor).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-				GUIUtils.splitLoreLine(meta, reward.mDescription, 30, GUIUtils.namedTextColorToChatColor(reward.mDescriptionColor), false);
+				String rewardName = reward.mName;
+				if (rewardName == null) {
+					rewardName = "Reward name not set";
+				}
+				meta.displayName(Component.text(rewardName, reward.mNameColor).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+				String description = reward.mDescription;
+				if (description == null) {
+					description = "Description not set";
+				}
+				NamedTextColor namedTextColor = reward.mDescriptionColor;
+				if (namedTextColor == null) {
+					namedTextColor = NamedTextColor.WHITE;
+				}
+				GUIUtils.splitLoreLine(meta, description, 30, GUIUtils.namedTextColorToChatColor(namedTextColor), false);
 				rewardItem.setItemMeta(meta);
 
 				setItem(rewardLocation, rewardItem);
