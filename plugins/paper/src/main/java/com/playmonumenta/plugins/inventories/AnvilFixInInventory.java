@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -110,6 +111,8 @@ public class AnvilFixInInventory implements Listener {
 			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
 				"execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
+
+			StatTrackManager.getInstance().incrementStatImmediately(event.getCurrentItem(), player, ItemStatUtils.InfusionType.STAT_TRACK_REPAIR, 1);
 
 			player.updateInventory();
 			event.setCancelled(true);

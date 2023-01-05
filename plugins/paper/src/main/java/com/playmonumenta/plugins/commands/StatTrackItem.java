@@ -51,6 +51,13 @@ public class StatTrackItem extends GenericCommand {
 		options.put("spawners", InfusionType.STAT_TRACK_SPAWNER);
 		options.put("consumed", InfusionType.STAT_TRACK_CONSUMED);
 		options.put("blocks", InfusionType.STAT_TRACK_BLOCKS);
+		options.put("blocksbroken", InfusionType.STAT_TRACK_BLOCKS_BROKEN);
+		options.put("deaths", InfusionType.STAT_TRACK_DEATH);
+		options.put("riptide", InfusionType.STAT_TRACK_RIPTIDE);
+		options.put("shield", InfusionType.STAT_TRACK_SHIELD_BLOCKED);
+		options.put("repair", InfusionType.STAT_TRACK_REPAIR);
+		options.put("convert", InfusionType.STAT_TRACK_CONVERT);
+		options.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN);
 
 		Argument selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
 

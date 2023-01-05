@@ -678,7 +678,14 @@ public class ItemStatUtils {
 		STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, true, false),
 		STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, true, false),
 		STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, true, false),
-		STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, true, false);
+		STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, true, false),
+		STAT_TRACK_RIPTIDE(new StatTrackRiptide(), "", true, false, true, false),
+		STAT_TRACK_BLOCKS_BROKEN(new StatTrackBlocksBroken(), "", true, false, true, false),
+		STAT_TRACK_SHIELD_BLOCKED(new StatTrackShielded(), "", true, false, true, false),
+		STAT_TRACK_DEATH(new StatTrackDeath(), "", true, false, true, false),
+		STAT_TRACK_REPAIR(new StatTrackRepair(), "", true, false, true, false),
+		STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, true, false),
+		STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, true, false);
 
 		public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
 			                                                                 .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));

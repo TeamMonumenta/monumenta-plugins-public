@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Experiencinator;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
@@ -140,6 +141,9 @@ public abstract class ExperiencinatorUtils {
 
 				// calculate sell value for the entire item stack and clear the item
 				int value = sellValue * item.getAmount();
+
+				StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, ItemStatUtils.InfusionType.STAT_TRACK_CONVERT, item.getAmount());
+
 				totalSellValue.merge(region, value, Integer::sum);
 				inventory[i] = null;
 			}
