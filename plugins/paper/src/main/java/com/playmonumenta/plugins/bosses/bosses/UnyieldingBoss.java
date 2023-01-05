@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -54,6 +55,7 @@ public class UnyieldingBoss extends BossAbilityGroup {
 			if (mBoss.getFireTicks() > 1) {
 				mBoss.setFireTicks(1);
 			}
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mBoss, "UnyieldingResistanceEffect", new PercentDamageReceived(2, -1));
 
 			mHealingRunnable = new BukkitRunnable() {
 				int mTicks = 0;
