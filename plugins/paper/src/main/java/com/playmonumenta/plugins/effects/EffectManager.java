@@ -283,7 +283,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(BoonOfKnightlyPrayer.effectID, BoonOfKnightlyPrayer::deserialize);
 		mEffectDeserializer.put(BoonOfThePit.effectID, BoonOfThePit::deserialize);
 		mEffectDeserializer.put(CourageEffect.effectID, CourageEffect::deserialize);
-		mEffectDeserializer.put(CrusadeEnhancementTag.effectID, CrusadeEnhancementTag::deserialize);
+		mEffectDeserializer.put(CrusadeTag.effectID, CrusadeTag::deserialize);
 		mEffectDeserializer.put(CrystalineBlessing.effectID, CrystalineBlessing::deserialize);
 		mEffectDeserializer.put(CustomDamageOverTime.effectID, CustomDamageOverTime::deserialize);
 		mEffectDeserializer.put(CustomRegeneration.effectID, CustomRegeneration::deserialize);

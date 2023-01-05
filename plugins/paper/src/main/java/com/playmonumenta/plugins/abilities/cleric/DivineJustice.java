@@ -105,8 +105,6 @@ public class DivineJustice extends Ability {
 	// Passive damage to share with Holy Javelin
 	public double mLastPassiveDamage = 0;
 
-	private @Nullable Crusade mCrusade;
-
 	private final DivineJusticeCS mCosmetic;
 
 	private int mComboNumber = 0;
@@ -119,15 +117,11 @@ public class DivineJustice extends Ability {
 		mDoHealingAndMultiplier = isLevelTwo();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS(), DivineJusticeCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
-		});
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
+		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy)) {
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
@@ -171,7 +165,7 @@ public class DivineJustice extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
-		if (mDoHealingAndMultiplier && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)) {
+		if (mDoHealingAndMultiplier && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity())) {
 			PlayerUtils.healPlayer(
 				mPlugin,
 				mPlayer,
@@ -190,16 +184,11 @@ public class DivineJustice extends Ability {
 			players.add(mPlayer);
 			mCosmetic.justiceKill(mPlayer, entityDeathEvent.getEntity().getLocation());
 			mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchSelf());
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchOther());
-				}
-			}.runTaskLater(Plugin.getInstance(), 2);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCosmetic.justiceHealSound(players, mCosmetic.getHealPitchOther()), 2);
 		}
 
 		if (isEnhanced()
-			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
+			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity())
 			    && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
 		}
@@ -214,7 +203,7 @@ public class DivineJustice extends Ability {
 			mPriorAmount = existingEffect.getMagnitude();
 		} else if (existingEffect == null && mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE > 0) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
-				new PercentDamageDealt(ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION, mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+				new PercentDamageDealt(ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION, mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy)));
 			mPriorAmount -= ENHANCEMENT_ASH_BONUS_DAMAGE;
 		}
 	}
@@ -294,7 +283,7 @@ public class DivineJustice extends Ability {
 		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + ENHANCEMENT_ASH_BONUS_DAMAGE, ENHANCEMENT_BONUS_DAMAGE_MAX);
 
 		mPlugin.mEffectManager.addEffect(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
-			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
+			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy)));
 	}
 
 	@Override

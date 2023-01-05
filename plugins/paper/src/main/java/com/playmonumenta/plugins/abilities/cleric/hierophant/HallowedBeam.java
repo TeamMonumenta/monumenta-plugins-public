@@ -9,11 +9,12 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.HallowedBeamCS;
-import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
+import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -91,7 +92,15 @@ public class HallowedBeam extends MultipleChargeAbility {
 	private @Nullable Crusade mCrusade;
 
 	private enum Mode {
-		DEFAULT, HEALING, ATTACK
+		DEFAULT("Default"),
+		HEALING("Healing"),
+		ATTACK("Attack");
+
+		private String mLabel;
+
+		Mode(String label) {
+			mLabel = label;
+		}
 	}
 
 	private Mode mMode = Mode.DEFAULT;
@@ -170,29 +179,34 @@ public class HallowedBeam extends MultipleChargeAbility {
 				for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, HALLOWED_RADIUS)) {
 					MovementUtils.knockAway(healedPlayer, le, 0.65f, true);
 				}
-			} else if (Crusade.enemyTriggersAbilities(targetedEntity, mCrusade)) {
-				mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
-
-				double damage = ItemStatUtils.getAttributeAmount(player.getInventory().getItemInMainHand(), ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
-				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-				DamageUtils.damage(mPlayer, targetedEntity, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true, true);
-
-				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);
-				mCosmetic.beamHarmCrusade(mPlayer, eLoc);
 			} else {
+
 				mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
-
-				EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN, Crusade.enemyTriggersAbilities(targetedEntity, mCrusade) ? HALLOWED_UNDEAD_STUN : HALLOWED_LIVING_STUN), targetedEntity);
-
-				if (Crusade.applyCrusadeToSlayer(targetedEntity, mCrusade)) {
-					mPlugin.mEffectManager.addEffect(targetedEntity, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
-				}
-
-				if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT) > 0) {
-					EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, player);
-				}
 				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);
-				mCosmetic.beamHarmOther(mPlayer, eLoc);
+				int stunDuration;
+				if (Crusade.enemyTriggersAbilities(targetedEntity)) {
+					double damage = ItemStatUtils.getAttributeAmount(inMainHand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+					damage += Sniper.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.SNIPER));
+					damage += PointBlank.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.POINT_BLANK));
+					damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+					DamageUtils.damage(mPlayer, targetedEntity, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true, true);
+
+					if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT) > 0) {
+						EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, player);
+					}
+
+					stunDuration = HALLOWED_UNDEAD_STUN;
+
+					mCosmetic.beamHarmCrusade(mPlayer, eLoc);
+				} else {
+					stunDuration = HALLOWED_LIVING_STUN;
+
+					mCosmetic.beamHarmOther(mPlayer, eLoc);
+				}
+
+				EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN, stunDuration), targetedEntity);
+
+				Crusade.addCrusadeTag(targetedEntity, mCrusade);
 			}
 			applyRecoil();
 		});
@@ -213,14 +227,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 	public void swapMode() {
 		if (mMode == Mode.DEFAULT) {
 			mMode = Mode.HEALING;
-			MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + "Healing");
 		} else if (mMode == Mode.HEALING) {
 			mMode = Mode.ATTACK;
-			MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + "Attack");
 		} else {
 			mMode = Mode.DEFAULT;
-			MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + "Default");
 		}
+		MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + mMode.mLabel);
 		ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.ordinal());
 		ClientModHandler.updateAbility(mPlayer, this);
 	}

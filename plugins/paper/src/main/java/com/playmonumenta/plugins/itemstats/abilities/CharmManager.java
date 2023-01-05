@@ -750,21 +750,24 @@ public class CharmManager {
 			WhirlingBlade.CHARM_COOLDOWN,
 			WhirlingBlade.CHARM_DAMAGE,
 			WhirlingBlade.CHARM_RADIUS,
-			WhirlingBlade.CHARM_KNOCKBACK
+			WhirlingBlade.CHARM_KNOCKBACK,
+			WhirlingBlade.CHARM_WEAKEN,
+			WhirlingBlade.CHARM_WEAKEN_DURATION,
+			WhirlingBlade.CHARM_SILENCE_DURATION
 		);
 	}
 
 	private void loadFlippedColorEffects() {
 		mFlippedColorEffectSubstrings = Arrays.asList(
-				JunglesNourishment.CHARM_COOLDOWN,
-				RageOfTheKeter.CHARM_COOLDOWN,
-				IntoxicatingWarmth.CHARM_COOLDOWN,
-				TemporalBender.CHARM_COOLDOWN,
-				LiquidCourage.CHARM_COOLDOWN,
-				ElementalArrows.CHARM_THUNDER_COOLDOWN,
-				ManaLance.CHARM_COOLDOWN,
-				ThunderStep.CHARM_COOLDOWN,
-				PrismaticShield.CHARM_COOLDOWN,
+			JunglesNourishment.CHARM_COOLDOWN,
+			RageOfTheKeter.CHARM_COOLDOWN,
+			IntoxicatingWarmth.CHARM_COOLDOWN,
+			TemporalBender.CHARM_COOLDOWN,
+			LiquidCourage.CHARM_COOLDOWN,
+			ElementalArrows.CHARM_THUNDER_COOLDOWN,
+			ManaLance.CHARM_COOLDOWN,
+			ThunderStep.CHARM_COOLDOWN,
+			PrismaticShield.CHARM_COOLDOWN,
 			FrostNova.CHARM_COOLDOWN,
 			MagmaShield.CHARM_COOLDOWN,
 			ArcaneStrike.CHARM_COOLDOWN,

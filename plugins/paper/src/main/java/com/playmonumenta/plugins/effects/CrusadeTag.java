@@ -8,18 +8,13 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-public class CrusadeEnhancementTag extends SingleArgumentEffect {
+public class CrusadeTag extends ZeroArgumentEffect {
 	public static final String effectID = "CrusadeSlayerTag";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(252, 211, 3), 1.0f);
 
-	public CrusadeEnhancementTag(int duration) {
-		super(duration, 1, effectID);
-	}
-
-	@Override
-	public double getMagnitude() {
-		return mAmount;
+	public CrusadeTag(int duration) {
+		super(duration, effectID);
 	}
 
 	@Override
@@ -31,10 +26,10 @@ public class CrusadeEnhancementTag extends SingleArgumentEffect {
 		}
 	}
 
-	public static CrusadeEnhancementTag deserialize(JsonObject object) {
+	public static CrusadeTag deserialize(JsonObject object) {
 		int duration = object.get("duration").getAsInt();
 
-		return new CrusadeEnhancementTag(duration);
+		return new CrusadeTag(duration);
 	}
 
 
@@ -45,6 +40,6 @@ public class CrusadeEnhancementTag extends SingleArgumentEffect {
 
 	@Override
 	public String toString() {
-		return String.format("CrusadeSlayerTag duration:%d modifier:%s", this.getDuration(), "CrusadeSlayerTag");
+		return String.format("CrusadeSlayerTag duration:%d", this.getDuration());
 	}
 }

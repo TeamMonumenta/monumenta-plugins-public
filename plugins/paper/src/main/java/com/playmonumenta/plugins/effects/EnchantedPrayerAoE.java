@@ -67,9 +67,7 @@ public class EnchantedPrayerAoE extends Effect {
 			new PartialParticle(Particle.FIREWORKS_SPARK, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 75, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
 			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), mEffectSize).getHitMobs()) {
 				DamageUtils.damage(mPlayer, le, DamageType.MAGIC, mDamageAmount, ClassAbility.ENCHANTED_PRAYER, true, true);
-				if (Crusade.applyCrusadeToSlayer(le, mCrusade)) {
-					mPlugin.mEffectManager.addEffect(le, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
-				}
+				Crusade.addCrusadeTag(le, mCrusade);
 			}
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
 			PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * mHealAmount, mPlayer);

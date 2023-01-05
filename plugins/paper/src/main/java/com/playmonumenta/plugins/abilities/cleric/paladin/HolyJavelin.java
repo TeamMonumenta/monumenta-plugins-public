@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -69,7 +68,6 @@ public class HolyJavelin extends Ability {
 			.displayItem(new ItemStack(Material.TRIDENT, 1))
 			.priorityAmount(1001); // shortly after divine justice and luminous infusion
 
-	private @Nullable Crusade mCrusade;
 	private @Nullable DivineJustice mDivineJustice;
 	private @Nullable LuminousInfusion mLuminousInfusion;
 
@@ -79,7 +77,6 @@ public class HolyJavelin extends Ability {
 		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			mDivineJustice = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DivineJustice.class);
 			mLuminousInfusion = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class);
 		});
@@ -109,8 +106,7 @@ public class HolyJavelin extends Ability {
 		return false;
 	}
 
-	public void execute(double bonusDamage,
-	                    @Nullable LivingEntity triggeringEnemy) {
+	public void execute(double bonusDamage, @Nullable LivingEntity triggeringEnemy) {
 		if (isOnCooldown()) {
 			return;
 		}
@@ -138,11 +134,7 @@ public class HolyJavelin extends Ability {
 			while (iterator.hasNext()) {
 				LivingEntity enemy = iterator.next();
 				if (enemy.getBoundingBox().overlaps(box)) {
-					double damage = (
-						Crusade.enemyTriggersAbilities(enemy, mCrusade)
-							? mUndeadDamage
-							: mDamage
-					);
+					double damage = Crusade.enemyTriggersAbilities(enemy) ? mUndeadDamage : mDamage;
 					if (enemy != triggeringEnemy) {
 						// Triggering enemy would've already received the melee damage from Luminous
 						// Infusion
@@ -150,9 +142,6 @@ public class HolyJavelin extends Ability {
 					}
 					EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
 					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
-					if (Crusade.applyCrusadeToSlayer(enemy, mCrusade)) {
-						mPlugin.mEffectManager.addEffect(enemy, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
-					}
 					iterator.remove();
 				}
 			}

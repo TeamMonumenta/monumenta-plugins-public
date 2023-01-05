@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
-import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.potion.PotionManager;
@@ -19,7 +18,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.Nullable;
 
 
 public class HandOfLight extends Ability {
@@ -85,8 +82,6 @@ public class HandOfLight extends Ability {
 	private final double mDamagePer;
 	private final double mDamageMax;
 
-	private @Nullable Crusade mCrusade;
-
 	private final HandOfLightCS mCosmetic;
 
 	public HandOfLight(Plugin plugin, Player player) {
@@ -98,10 +93,6 @@ public class HandOfLight extends Ability {
 		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
-		});
 	}
 
 	public void cast() {
@@ -123,7 +114,7 @@ public class HandOfLight extends Ability {
 
 		boolean doCooldown = false;
 		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
-		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
+		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob));
 		if (isEnhanced()) {
 			undeadMobs.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 			if (!undeadMobs.isEmpty()) {
@@ -138,9 +129,6 @@ public class HandOfLight extends Ability {
 			doCooldown = true;
 			for (LivingEntity mob : nearbyMobs) {
 				DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
-				if (Crusade.applyCrusadeToSlayer(mob, mCrusade)) {
-					mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
-				}
 
 				Location loc = mob.getLocation();
 				mCosmetic.lightDamageEffect(mPlayer, loc, mob);

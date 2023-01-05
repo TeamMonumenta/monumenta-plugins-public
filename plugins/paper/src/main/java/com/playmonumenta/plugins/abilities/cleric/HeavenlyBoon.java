@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -29,7 +28,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
@@ -89,8 +87,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private final int mDurationChange;
 	private final double mRadius;
 
-	private @Nullable Crusade mCrusade;
-
 	public HeavenlyBoon(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
@@ -98,10 +94,6 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
 		mDurationChange = CharmManager.getExtraDuration(player, CHARM_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
-		});
 	}
 
 	/*
@@ -166,7 +158,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
-		if (Crusade.enemyTriggersAbilities(mob, mCrusade)
+		if (Crusade.enemyTriggersAbilities(mob)
 			    && FastUtils.RANDOM.nextDouble() < mChance) {
 			ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));

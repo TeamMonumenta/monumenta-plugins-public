@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.ChoirBellsCS;
-import com.playmonumenta.plugins.effects.CrusadeEnhancementTag;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -88,17 +87,14 @@ public class ChoirBells extends Ability {
 			mCosmetic.bellsApplyEffect(mPlayer, mob);
 			EntityUtils.applySlow(mPlugin, DURATION, mSlownessAmount, mob);
 
-			if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
+			if (Crusade.enemyTriggersAbilities(mob)) {
 				// Infusion
 				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE), mInfo.getLinkedSpell(), true, true);
 				EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);
 				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
 			}
-
-			if (Crusade.applyCrusadeToSlayer(mob, mCrusade)) {
-				mPlugin.mEffectManager.addEffect(mob, "CrusadeSlayerTag", new CrusadeEnhancementTag(Crusade.getEnhancementDuration()));
-			}
+			Crusade.addCrusadeTag(mob, mCrusade);
 		}
 		putOnCooldown();
 	}
