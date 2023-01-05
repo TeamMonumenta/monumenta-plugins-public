@@ -406,7 +406,7 @@ public class SeasonalPass {
 				}
 				break;
 			case SHULKER_BOX:
-				ItemStack shulker = new ItemStack(Material.PURPLE_SHULKER_BOX, 1);
+				ItemStack shulker = new ItemStack(reward.mDisplayItem, 1);
 				InventoryUtils.giveItem(p, shulker);
 				break;
 			default:
