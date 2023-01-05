@@ -62,7 +62,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			.scoreboardId("Thurible")
 			.shorthandName("TP")
 			.descriptions(
-				"The Hierophant passively builds up buffs when other players are within 30 blocks, which are applied to all players in the radius. " +
+				"The Hierophant passively builds up buffs, which are applied to all players in a 30 block radius. " +
 					"Buffs end and the buildup resets upon taking damage that causes you to drop below 60% of your max health, unless the full set of buffs have been obtained. " +
 					"Then all players (including the Hierophant) get 8 seconds of all built-up buffs. After these 8 seconds the timer resets and the Procession begins anew. " +
 					"Progression - +10% Attack Speed (after 4s of no health threshold reached), " +
@@ -112,12 +112,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			new PartialParticle(Particle.REDSTONE, mPlayer.getLocation(), 10, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerPassive(mPlayer);
 		}
 		if (oneSecond) {
-			List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
-			if (players.size() > 1) {
-				mSeconds++;
-				updateBuffs();
-				applyBuffs(PASSIVE_DURATION);
-			}
+			mSeconds++;
+			updateBuffs();
+			applyBuffs(PASSIVE_DURATION);
 		}
 	}
 
@@ -142,13 +139,11 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private void applyBuffs(int duration) {
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
-		if (players.size() > 1) {
-			duration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, duration);
-			for (Player pl : players) {
-				Effect[] effects = getEffectArray(duration);
-				for (int i = 0; i < mBuffs; i++) {
-					mPlugin.mEffectManager.addEffect(pl, EFFECTS_NAMES[i], effects[i]);
-				}
+		duration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, duration);
+		Effect[] effects = getEffectArray(duration);
+		for (Player pl : players) {
+			for (int i = 0; i < mBuffs; i++) {
+				mPlugin.mEffectManager.addEffect(pl, EFFECTS_NAMES[i], effects[i]);
 			}
 		}
 	}
