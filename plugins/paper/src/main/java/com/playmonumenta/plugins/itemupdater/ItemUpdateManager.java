@@ -6,15 +6,12 @@ import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -220,61 +217,6 @@ public class ItemUpdateManager implements Listener {
 		}
 
 		try {
-			// TODO temporary fix for broken shulkers, to be removed just before the next weekly update (which will fix all of these)
-			if (ItemUtils.isShulkerBox(item.getType())
-				    && ItemUtils.getPlainNameIfExists(item).isEmpty()) {
-
-				ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
-				if (tier == ItemStatUtils.Tier.EPIC || tier == ItemStatUtils.Tier.UNIQUE) {
-					ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
-					ItemStatUtils.Location location = ItemStatUtils.getLocation(item);
-					if (tier == ItemStatUtils.Tier.EPIC
-						    && region == ItemStatUtils.Region.ISLES
-						    && location == ItemStatUtils.Location.SHIFTING
-						    && ItemUtils.getPlainLoreIfExists(item).contains("50% of the time, the Firmament will place Prismarine")) {
-						// '{\"bold\":true,\"italic\":false,\"underlined\":true,\"color\":\"#7fffd4\",\"text\":\"Firmament\"}'}
-						ItemUtils.modifyMeta(item, meta -> meta.displayName(Component.text("Firmament", TextColor.fromHexString("#7fffd4"))
-							                                                    .decorate(TextDecoration.BOLD, TextDecoration.UNDERLINED)
-							                                                    .decoration(TextDecoration.ITALIC, false)));
-						ItemUtils.setPlainName(item);
-						NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item, true));
-						if (playerModified != null) {
-							playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-						}
-						ItemStatUtils.generateItemStats(item);
-					} else if (tier == ItemStatUtils.Tier.UNIQUE
-						           && region == ItemStatUtils.Region.VALLEY
-						           && location == ItemStatUtils.Location.OVERWORLD1
-						           && ItemUtils.getPlainLoreIfExists(item).contains("of any nearby opened loot chest.")) {
-						// Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"#dcae32\",\"text\":\"LOOTBOX\"}'},
-						ItemUtils.modifyMeta(item, meta -> meta.displayName(Component.text("LOOTBOX", TextColor.fromHexString("#dcae32"))
-							                                                    .decorate(TextDecoration.BOLD)
-							                                                    .decoration(TextDecoration.ITALIC, false)
-							                                                    .decoration(TextDecoration.UNDERLINED, false)));
-						ItemUtils.setPlainName(item);
-						NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item, true));
-						if (playerModified != null) {
-							playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-						}
-						ItemStatUtils.generateItemStats(item);
-					} else if (tier == ItemStatUtils.Tier.EPIC
-						           && region == ItemStatUtils.Region.RING
-						           && location == ItemStatUtils.Location.SCIENCE
-						           && ItemUtils.getPlainLoreIfExists(item).contains("the Omnilockbox swaps all of the user's")) {
-						// '{\"bold\":true,\"italic\":false,\"underlined\":true,\"color\":\"#dce8e3\",\"text\":\"Omnilockbox\"}'}
-						ItemUtils.modifyMeta(item, meta -> meta.displayName(Component.text("Omnilockbox", TextColor.fromHexString("#dce8e3"))
-							                                                    .decorate(TextDecoration.BOLD, TextDecoration.UNDERLINED)
-							                                                    .decoration(TextDecoration.ITALIC, false)));
-						ItemUtils.setPlainName(item);
-						NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item, true));
-						if (playerModified != null) {
-							playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-						}
-						ItemStatUtils.generateItemStats(item);
-					}
-				}
-			}
-
 			if (ItemStatUtils.isClean(item)) {
 				return;
 			}
