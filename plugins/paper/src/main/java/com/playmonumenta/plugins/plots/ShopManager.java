@@ -369,7 +369,7 @@ public class ShopManager implements Listener {
 			.withArguments(new MultiLiteralArgument("lock"))
 			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
 			.executes((sender, args) -> {
-				shopLock((Entity)args[1], null);
+				shopLock((Entity) args[1], null, true);
 			})
 			.register();
 		new CommandAPICommand("monumentashop")
@@ -378,7 +378,26 @@ public class ShopManager implements Listener {
 			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
 			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
 			.executes((sender, args) -> {
-				shopLock((Entity)args[1], (Player)args[2]);
+				shopLock((Entity) args[1], (Player) args[2], true);
+			})
+			.register();
+
+		/********************* SEMI-LOCK (adventure mode, but unlocked containers) *********************/
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new MultiLiteralArgument("semilock"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.executes((sender, args) -> {
+				shopLock((Entity) args[1], null, false);
+			})
+			.register();
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new MultiLiteralArgument("semilock"))
+			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.executes((sender, args) -> {
+				shopLock((Entity) args[1], (Player) args[2], false);
 			})
 			.register();
 
@@ -388,7 +407,7 @@ public class ShopManager implements Listener {
 			.withArguments(new MultiLiteralArgument("unlock"))
 			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
 			.executes((sender, args) -> {
-				shopUnlock((Entity)args[1], null);
+				shopUnlock((Entity) args[1], null);
 			})
 			.register();
 		new CommandAPICommand("monumentashop")
@@ -619,7 +638,7 @@ public class ShopManager implements Listener {
 		shop.particles();
 	}
 
-	private static void shopLock(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
+	private static void shopLock(Entity shopEntity, @Nullable Player player, boolean fullLock) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
 			CommandAPI.fail("This command can only be used within a Shops Possible zone");
 		}
@@ -637,25 +656,31 @@ public class ShopManager implements Listener {
 		}
 
 		if (player != null) {
-			player.sendMessage(ChatColor.WHITE + "Your shop has been locked.");
+			if (fullLock) {
+				player.sendMessage(ChatColor.WHITE + "Your shop has been locked.");
+			} else {
+				player.sendMessage(ChatColor.WHITE + "Your shop has been locked, except for barrels.");
+			}
 		}
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.9f);
 		shop.particles();
 		shop.disableSurvival();
 
-		shop.iterExpandedArea((Location plat) -> {
-			/* Lock tile entities */
-			plat.subtract(0, SHOP_DEPTH, 0);
-			for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
-				BlockState state = plat.getBlock().getState();
-				if (state instanceof Lockable && (((Lockable)state).getLock() == null || ((Lockable)state).getLock().isEmpty())) {
-					((Lockable)state).setLock("* Soulbound to " + shop.mOwnerName + " *");
-					state.update();
+		if (fullLock) {
+			shop.iterExpandedArea((Location plat) -> {
+				/* Lock tile entities */
+				plat.subtract(0, SHOP_DEPTH, 0);
+				for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
+					BlockState state = plat.getBlock().getState();
+					if (state instanceof Lockable && (((Lockable) state).getLock() == null || ((Lockable) state).getLock().isEmpty())) {
+						((Lockable) state).setLock("* Soulbound to " + shop.mOwnerName + " *");
+						state.update();
+					}
+					plat.add(0, 1, 0);
 				}
-				plat.add(0, 1, 0);
-			}
-		});
+			});
+		}
 
 		/* Lock regular entities */
 		for (Entity entity : shop.getEntities()) {
@@ -663,7 +688,7 @@ public class ShopManager implements Listener {
 				entity.setInvulnerable(true);
 			} else if (entity instanceof ArmorStand) {
 				entity.setInvulnerable(true);
-				((ArmorStand)entity).setDisabledSlots(EquipmentSlot.values());
+				((ArmorStand) entity).setDisabledSlots(EquipmentSlot.values());
 			}
 		}
 	}

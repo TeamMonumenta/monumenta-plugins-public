@@ -90,7 +90,7 @@ public class ZoneUtils {
 
 	private static boolean isSurvivalModeInPlots(Location loc) {
 		Material mat = loc.getWorld().getBlockAt(loc.getBlockX(), 10, loc.getBlockZ()).getType();
-		return mat == Material.SPONGE;
+		return mat == Material.SPONGE || (mat.equals(Material.WET_SPONGE) && loc.getY() < 53);
 	}
 
 	public static boolean playerCanMineBlock(Player player, Block block) {
