@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.overrides;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -260,7 +261,7 @@ public class WorldshaperOverride {
 			return false;
 		}
 
-		boolean blockPlaced = false;
+		int blocksPlaced = 0;
 		for (Location location : blockPlacePattern) {
 			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanMineBlock(player, location) || ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
 				continue;
@@ -273,21 +274,27 @@ public class WorldshaperOverride {
 				BlockData blockData = getBlockAndSubtract(item);
 				if (blockData != null) {
 					location.getBlock().setBlockData(blockData);
-					blockPlaced = true;
+					blocksPlaced++;
 					new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
 					player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 0.75f);
 					CoreProtectIntegration.logPlacement(player, location, blockData.getMaterial(), blockData);
-
 				} else {
-					player.sendMessage(ChatColor.RED + "There were not enough valid blocks to place in the shulker!");
+					if (blocksPlaced == 0) {
+						player.sendMessage(ChatColor.RED + "There are no valid blocks to place in the shulker!");
+					} else {
+						player.sendMessage(ChatColor.RED + "There were not enough valid blocks to place in the shulker!");
+					}
 					break;
 				}
 			}
 		}
 
-		if (blockPlaced) {
+		if (blocksPlaced > 0) {
 			// Ensure only put on cooldown if blocks are placed.
 			plugin.mEffectManager.addEffect(player, COOLDOWN_SOURCE, new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
+
+			// update stat track
+			StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_BLOCKS, blocksPlaced);
 		}
 		return false;
 	}

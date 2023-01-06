@@ -87,8 +87,6 @@ public class FirmamentOverride {
 			ItemMeta meta = currentItem.getItemMeta();
 			// No known way to preserve BlockStateMeta - so check that it's either null or simple BlockDataMeta
 			if (currentItem.getType().isBlock() && (meta == null || meta instanceof BlockDataMeta)) {
-				//Stat tracking for firmament
-				StatTrackManager.incrementStat(item, player, ItemStatUtils.InfusionType.STAT_TRACK_BLOCKS, 1);
 
 				BlockData blockData;
 				boolean removeItem = true;
@@ -132,6 +130,9 @@ public class FirmamentOverride {
 						shulkerMeta.setBlockState(shulkerBox);
 						item.setItemMeta(shulkerMeta);
 					}
+
+					//Stat tracking for firmament
+					StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_BLOCKS, 1);
 
 					// Prevent sending block update packets for neighbors of the placed block
 					FirmamentLagFix.firmamentUsed(event.getBlock());
