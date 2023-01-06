@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
 public class SoulRend extends Ability {
 
 	private static final double PERCENT_HEAL = 0.2;
-	private static final int HEAL_1 = 2;
-	private static final int HEAL_2 = 4;
+	public static final int HEAL_1 = 2;
+	public static final int HEAL_2 = 4;
 	private static final int RADIUS = 7;
 	private static final int COOLDOWN = 20 * 8;
 	private static final int HEAL_CAP = 10;

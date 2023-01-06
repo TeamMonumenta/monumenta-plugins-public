@@ -15,9 +15,11 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,17 +73,20 @@ public class GraspingClaws extends Ability {
 			.scoreboardId("GraspingClaws")
 			.shorthandName("GC")
 			.descriptions(
-				"Left-clicking while shifted while holding a projectile weapon fires an arrow " +
-					"that pulls nearby enemies towards your arrow once it makes contact with a mob or block. " +
-					"Mobs caught in the arrow's 8 block radius are given 20% Slowness for 8 seconds and take 3 magic damage. Cooldown: 16s.",
-				"The pulled enemies now take 8 damage, and their Slowness is increased to 30%.",
-				"At the location that the arrow lands, summon an impenetrable cage. " +
-					"Non-boss mobs within a 6 block radius of the location cannot enter or exit the cage, " +
-					"and players within the cage are granted 5% max health healing every 2 seconds. " +
-					"The cage disappears after 6 seconds. Mobs that are immune to crowd control cannot be trapped.")
+				("Pressing the drop key while sneaking and holding a scythe or projectile weapon fires a projectile " +
+					 "that pulls nearby enemies towards it once it makes contact with a mob or block. " +
+					 "Mobs caught in the projectile's %s block radius are given %s%% Slowness for %s seconds and take %s magic damage. Cooldown: %ss.")
+					.formatted(RADIUS, StringUtils.multiplierToPercentage(AMPLIFIER_1), StringUtils.ticksToSeconds(DURATION), DAMAGE_1, StringUtils.ticksToSeconds(COOLDOWN)),
+				"The pulled enemies now take %s damage, and their Slowness is increased to %s%%."
+					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(AMPLIFIER_2)),
+				("At the location that the arrow lands, summon an impenetrable cage. " +
+					 "Non-boss mobs within a %s block radius of the location cannot enter or exit the cage, " +
+					 "and players within the cage are granted %s%% max health healing every second. " +
+					 "The cage disappears after %s seconds. Mobs that are immune to crowd control cannot be trapped.")
+					.formatted(CAGE_RADIUS, StringUtils.multiplierToPercentage(HEAL_AMOUNT), StringUtils.ticksToSeconds(CAGE_DURATION)))
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
+				new AbilityTriggerInfo.TriggerRestriction("holding a scythe or projectile weapon", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()) || ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()))))
 			.displayItem(new ItemStack(Material.BOW, 1));
 
 	private final double mAmplifier;

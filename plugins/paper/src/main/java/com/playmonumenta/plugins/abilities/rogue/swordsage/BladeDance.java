@@ -54,7 +54,7 @@ public class BladeDance extends Ability {
 			.scoreboardId("BladeDance")
 			.shorthandName("BD")
 			.descriptions(
-				String.format("When holding two swords, right-click while looking down to enter a defensive stance, " +
+				String.format("When holding two swords, press the drop key to enter a defensive stance, " +
 					              "parrying all attacks and becoming invulnerable for 0.75 seconds. " +
 					              "Afterwards, unleash a powerful attack that deals %s melee damage to enemies in a %s block radius. " +
 					              "Damaged enemies are rooted for %s seconds. Cooldown: %ss.",
@@ -68,7 +68,7 @@ public class BladeDance extends Ability {
 					SLOW_DURATION_2 / 20.0,
 					COOLDOWN_2 / 20))
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeDance::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN).sneaking(false),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeDance::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(new ItemStack(Material.STRING, 1));
 

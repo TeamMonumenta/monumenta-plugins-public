@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 
 
 public class WitheringGaze extends Ability {
@@ -52,12 +52,15 @@ public class WitheringGaze extends Ability {
 			.scoreboardId("WitheringGaze")
 			.shorthandName("WG")
 			.descriptions(
-				"Sprint left-clicking unleashes a 9 block long cone in the direction the player is facing. " +
-					"Enemies in its path are stunned for 3 seconds (elites and bosses are given 100% Slowness instead) " +
-					"and dealt 1 damage every half second for 6 seconds. Cooldown: 30s.",
-				"Your damage over time lasts for 8 seconds. Cooldown: 20s.")
+				("Pressing the drop key while not sneaking and holding a scythe unleashes a %s block long cone in the direction the player is facing. " +
+					 "Enemies in its path are stunned for %s seconds (elites and bosses are given 100%% Slowness instead) " +
+					 "and dealt %s damage every half second for %s seconds. Cooldown: %ss.")
+					.formatted(WITHERING_GAZE_RANGE, StringUtils.ticksToSeconds(WITHERING_GAZE_STUN_DURATION), WITHERING_GAZE_DOT_DAMAGE,
+						StringUtils.ticksToSeconds(WITHERING_GAZE_DOT_DURATION_1), StringUtils.ticksToSeconds(WITHERING_GAZE_1_COOLDOWN)),
+				"Your damage over time lasts for %s seconds. Cooldown: %ss."
+					.formatted(StringUtils.ticksToSeconds(WITHERING_GAZE_DOT_DURATION_2), StringUtils.ticksToSeconds(WITHERING_GAZE_2_COOLDOWN)))
 			.cooldown(WITHERING_GAZE_1_COOLDOWN, WITHERING_GAZE_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WitheringGaze::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).sprinting(true),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WitheringGaze::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
 			.displayItem(new ItemStack(Material.WITHER_ROSE, 1));
 

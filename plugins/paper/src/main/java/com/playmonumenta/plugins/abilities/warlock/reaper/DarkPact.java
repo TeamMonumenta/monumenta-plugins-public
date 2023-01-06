@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.warlock.SoulRend;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.Material;
@@ -58,14 +60,17 @@ public class DarkPact extends Ability {
 			.scoreboardId("DarkPact")
 			.shorthandName("DaP")
 			.descriptions(
-				"Swapping while airborne and not sneaking and holding a scythe causes a dark aura to form around you. " +
-					"For the next 7 seconds, your scythe attacks deal +35% melee damage. " +
-					"Each kill during this time increases the duration of your aura by 1 second and gives 1 absorption health (capped at 6) for the duration of the aura. " +
-					"However, the player cannot heal for 7 seconds. Cooldown: 14s.",
-				"Attacks with a scythe deal +55% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +2/+4 HP, depending on the level of Soul Rend. " +
-					"Nearby players are still healed as normal.")
+				("Pressing the drop key while not sneaking and holding a scythe causes a dark aura to form around you. " +
+					 "For the next %s seconds, your scythe attacks deal +%s%% melee damage. " +
+					 "Each kill during this time increases the duration of your aura by %s second and gives %s absorption health (capped at %s) for the duration of the aura. " +
+					 "However, the player cannot heal for %s seconds. Cooldown: %ss.")
+					.formatted(StringUtils.ticksToSeconds(DURATION), StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_1), StringUtils.ticksToSeconds(DURATION_INCREASE_ON_KILL),
+						ABSORPTION_ON_KILL, MAX_ABSORPTION, StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
+				("Attacks with a scythe deal +%s%% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +%s/+%s HP, depending on the level of Soul Rend. " +
+					 "Nearby players are still healed as normal.")
+					.formatted(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_2), SoulRend.HEAL_1, SoulRend.HEAL_2))
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DarkPact::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).onGround(false).sneaking(false),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DarkPact::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
 			.displayItem(new ItemStack(Material.SOUL_SAND, 1))
 			.priorityAmount(950); // multiplicative damage before additive

@@ -52,7 +52,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			.shorthandName("CnD")
 			.descriptions(
 				String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them in R2; every %s damage to them in R3). Stacks are capped at %s. " +
-					              "When you sneak left click while looking up with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth " +
+					              "When you press the drop key with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth " +
 					              "and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
 					CLOAK_STACKS_ON_ELITE_KILL,
 					BOSS_DAMAGE_THRESHOLD_R2,
@@ -64,7 +64,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 				String.format("Cloak stacks are now capped at %s and bonus damage is increased to (%s * X) where X is the number of stacks you have upon activating this skill.",
 					CLOAK_2_MAX_STACKS,
 					(int) CLOAK_2_DAMAGE_MULTIPLIER))
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakAndDagger::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakAndDagger::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
 

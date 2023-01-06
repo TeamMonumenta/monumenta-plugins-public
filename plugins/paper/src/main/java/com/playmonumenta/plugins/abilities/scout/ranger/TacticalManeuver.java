@@ -51,16 +51,14 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			.scoreboardId("TacticalManeuver")
 			.shorthandName("TM")
 			.descriptions(
-				String.format("Sprint right click to dash forward, dealing the first enemy hit %d damage, and stunning it and all enemies in a %d block radius for %d second. " +
-					              "Shift right click to leap backwards, dealing enemies in a %d block radius %d damage and knocking them away. " +
-					              "Only triggers with non-trident melee weapons. Cooldown: %ds. Charges: %d.",
+				String.format("Press the drop key while not sneaking to dash forward, dealing %d damage to the first enemy hit, and stunning it and all enemies in a %d block radius for %d second. " +
+					              "Press the drop key while sneaking to leap backwards, dealing %d damage to enemies in a %d block radius and knocking them away. " +
+					              "Cooldown: %ds. Charges: %d.",
 					TACTICAL_DASH_DAMAGE, TACTICAL_MANEUVER_RADIUS, TACTICAL_DASH_STUN_DURATION / 20, TACTICAL_MANEUVER_RADIUS, TACTICAL_LEAP_DAMAGE, TACTICAL_MANEUVER_1_COOLDOWN / 20, TACTICAL_MANEUVER_1_MAX_CHARGES),
 				String.format("Cooldown: %ds. Charges: %d.", TACTICAL_MANEUVER_2_COOLDOWN / 20, TACTICAL_MANEUVER_2_MAX_CHARGES))
 			.cooldown(TACTICAL_MANEUVER_1_COOLDOWN, TACTICAL_MANEUVER_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("castForward", "dash forwards", tm -> tm.cast(true), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sprinting(true)
-				                                                                                          .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
-			.addTrigger(new AbilityTriggerInfo<>("castBackwards", "leap backwards", tm -> tm.cast(false), new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-				                                                                                              .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.addTrigger(new AbilityTriggerInfo<>("castForward", "dash forwards", tm -> tm.cast(true), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false)))
+			.addTrigger(new AbilityTriggerInfo<>("castBackwards", "leap backwards", tm -> tm.cast(false), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)))
 			.displayItem(new ItemStack(Material.STRING, 1));
 
 	private int mLastCastTicks = 0;

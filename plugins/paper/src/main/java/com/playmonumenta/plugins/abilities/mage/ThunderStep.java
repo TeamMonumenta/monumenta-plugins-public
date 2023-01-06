@@ -78,7 +78,7 @@ public class ThunderStep extends Ability {
 			.shorthandName("TS")
 			.descriptions(
 				String.format(
-					"While holding a wand while sneaking, pressing the swap key materializes a flash of thunder," +
+					"Pressing the drop key while holding a wand materializes a flash of thunder," +
 						" dealing %s thunder magic damage to all enemies in a %s block radius around you and knocking them away." +
 						" The next moment, you teleport towards where you're looking, travelling up to %s blocks or until you hit a solid block," +
 						" and repeat the thunder attack at your destination, ignoring iframes. Cooldown: %ss.",
@@ -104,7 +104,7 @@ public class ThunderStep extends Ability {
 				)
 			)
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ThunderStep::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ThunderStep::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
 			.displayItem(new ItemStack(Material.HORN_CORAL, 1));
 
