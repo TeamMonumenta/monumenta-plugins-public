@@ -140,8 +140,8 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 		//Give everyone buffs from the array
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getLocation(), THURIBLE_RADIUS, true);
 		duration = CharmManager.getDuration(mPlayer, CHARM_EFFECT_DURATION, duration);
-		Effect[] effects = getEffectArray(duration);
 		for (Player pl : players) {
+			Effect[] effects = getEffectArray(duration);
 			for (int i = 0; i < mBuffs; i++) {
 				mPlugin.mEffectManager.addEffect(pl, EFFECTS_NAMES[i], effects[i]);
 			}

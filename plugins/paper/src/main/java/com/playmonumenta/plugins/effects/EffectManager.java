@@ -76,6 +76,14 @@ public final class EffectManager implements Listener {
 		}
 
 		public void addEffect(String source, Effect effect) {
+			if (effect.mUsed) {
+				// Each entity must have their own instance of an effect, they cannot be shared
+				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
+					             + source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
+				return;
+			}
+			effect.mUsed = true;
+
 			Map<String, NavigableSet<Effect>> priorityEffects = Objects.requireNonNull(mPriorityMap.get(effect.getPriority()));
 			NavigableSet<Effect> effectGroup = priorityEffects.computeIfAbsent(source, k -> new ConcurrentSkipListSet<>());
 
@@ -480,12 +488,7 @@ public final class EffectManager implements Listener {
 			source = event.getSource();
 			effect = event.getEffect();
 
-			Effects effects = mEntities.get(entity);
-			if (effects == null) {
-				effects = new Effects(entity);
-				mEntities.put(entity, effects);
-			}
-
+			Effects effects = mEntities.computeIfAbsent(entity, Effects::new);
 			effects.addEffect(source, effect);
 		}
 	}
