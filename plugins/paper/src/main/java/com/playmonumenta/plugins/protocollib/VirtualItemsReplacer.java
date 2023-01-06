@@ -34,6 +34,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 
 public class VirtualItemsReplacer extends PacketAdapter {
 
@@ -51,7 +52,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 	private final Plugin mPlugin;
 
 	public VirtualItemsReplacer(Plugin plugin) {
-		super(plugin, PacketType.Play.Server.WINDOW_ITEMS, PacketType.Play.Server.SET_SLOT);
+		super(plugin, PacketType.Play.Server.WINDOW_ITEMS, PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.OPEN_WINDOW_MERCHANT);
 		mPlugin = plugin;
 	}
 
@@ -72,6 +73,22 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				ItemStack item = items.get(i);
 				processItem(item, i, player, isPlayerInventory);
 			}
+		} else if (packet.getType().equals(PacketType.Play.Server.OPEN_WINDOW_MERCHANT)) {
+			List<MerchantRecipe> recipeList = packet.getMerchantRecipeLists().read(0);
+			for (int i = 0; i < recipeList.size(); i++) {
+				MerchantRecipe recipe = recipeList.get(i);
+				List<ItemStack> ingredients = recipe.getIngredients();
+				for (ItemStack ingredient : ingredients) {
+					processItem(ingredient, -1, player, false);
+				}
+				ItemStack result = recipe.getResult();
+				processItem(result, -1, player, false);
+				MerchantRecipe recipeCopy = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(),
+					recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice(), recipe.shouldIgnoreDiscounts());
+				recipeCopy.setIngredients(ingredients);
+				recipeList.set(i, recipeCopy);
+			}
+			packet.getMerchantRecipeLists().write(0, recipeList);
 		} else { // PacketType.Play.Server.SET_SLOT
 			PacketPlayOutSetSlotHandle handle = PacketPlayOutSetSlotHandle.createHandle(packet.getHandle());
 			boolean isPlayerInventory = handle.getWindowId() == 0;
