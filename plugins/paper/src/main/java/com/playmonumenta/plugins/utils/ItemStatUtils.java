@@ -1675,12 +1675,12 @@ public class ItemStatUtils {
 	}
 
 	public static void removeInfusion(final ItemStack item, final InfusionType type, boolean updateItem) {
-		if (item.getType() == Material.AIR) {
+		if (item.getType() == Material.AIR || type == null) {
 			return;
 		}
 		NBTItem nbt = new NBTItem(item);
 		NBTCompound infusions = getInfusions(nbt);
-		if (infusions == null || type == null) {
+		if (infusions == null) {
 			return;
 		}
 

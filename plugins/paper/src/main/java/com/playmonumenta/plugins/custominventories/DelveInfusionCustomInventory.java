@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
@@ -8,8 +9,6 @@ import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,13 +21,14 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 public final class DelveInfusionCustomInventory extends CustomInventory {
 
@@ -44,13 +44,15 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	private static final Map<DelveInfusionSelection, String> mDelveMatsMap = new HashMap<>();
 	private static final HashMap<DelveInfusionSelection, ItemStack> mDelvePanelList = new HashMap<>();
 
+	private static final ImmutableList<EquipmentSlot> SLOT_ORDER = ImmutableList.of(
+		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final List<ItemStack> mInvalidItems = new ArrayList<>();
 	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
 	private static final ItemStack mMaxLevelReachedItem = new ItemStack(Material.CAKE);
 
 	private final Map<Integer, ItemClicked> mMapFunction;
 
-	private int mRowSelected = 99;
+	private @Nullable EquipmentSlot mSlotSelected;
 
 	static {
 		//----------------------------------------------------------------------
@@ -748,31 +750,26 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	public DelveInfusionCustomInventory(Player owner) {
 		super(owner, 54, "Delve Infusions");
 		mMapFunction = new HashMap<>();
-		mRowSelected = 99;
+		mSlotSelected = null;
 		loadInv(owner);
 	}
 
 	private void loadInv(Player player) {
 		mInventory.clear();
 		mMapFunction.clear();
-		PlayerInventory pi = player.getInventory();
-		List<ItemStack> items = new ArrayList<>();
-		items.addAll(Arrays.asList(pi.getArmorContents()));
-		Collections.reverse(items);
-		items.add(pi.getItemInMainHand());
-		items.add(pi.getItemInOffHand());
 
-		if (mRowSelected == 99) {
-			loadDelveInfusionPage(items);
+		if (mSlotSelected == null) {
+			loadDelveInfusionPage(player);
 		} else {
-			loadDelveInfusionSelection(items.get(mRowSelected), player);
+			loadDelveInfusionSelection(mSlotSelected, player);
 		}
 
 		fillWithJunk();
 	}
 
 
-	private void loadDelveInfusionSelection(ItemStack infusedItem, Player player) {
+	private void loadDelveInfusionSelection(EquipmentSlot equipmentSlot, Player player) {
+		ItemStack infusedItem = player.getEquipment().getItem(equipmentSlot);
 		//we need to delay this loading to make the item skin applied
 		new BukkitRunnable() {
 			@Override
@@ -826,7 +823,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (infusion.isUnlocked(player)) {
 				mInventory.setItem(place, mDelvePanelList.get(infusion));
 				mMapFunction.put(place, (p, inventory, slot) -> {
-					attemptInfusion(p, infusedItem, infusion);
+					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
+					mSlotSelected = null;
 				});
 			}
 		});
@@ -841,8 +839,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mInventory.setItem(53, swapPage);
 
 		mMapFunction.put(53, (p, clickedInventory, slot) -> {
-			mRowSelected = 99;
-
+			mSlotSelected = null;
 		});
 
 	}
@@ -850,6 +847,10 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 	private void attemptInfusion(Player p, ItemStack item, DelveInfusionSelection infusion) {
 		if (item.getAmount() > 1) {
 			p.sendMessage(ChatColor.RED + "You cannot infuse stacked items.");
+			return;
+		}
+		if (!InfusionUtils.isInfusionable(item)) {
+			p.sendMessage(ChatColor.RED + "This item cannot be infused.");
 			return;
 		}
 
@@ -863,131 +864,111 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			} else {
 				p.sendMessage(ChatColor.RED + "You don't have enough experience and/or currency for this infusion.");
 			}
-			mRowSelected = 99;
 		} catch (Exception e) {
 			p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in infusing)");
 			e.printStackTrace();
 		}
 	}
 
-	private void loadDelveInfusionPage(List<ItemStack> items) {
+	private void loadDelveInfusionPage(Player player) {
 		//load panels for each item with the corresponding infusions.
 		int row = 0;
-		for (ItemStack item : items) {
-			if (item != null) {
-				//check valid item
-				if (InfusionUtils.isInfusionable(item)) {
-					//same tier needed.
-					DelveInfusionSelection infusion = DelveInfusionUtils.getCurrentInfusion(item);
-					final int rowF = row;
+		for (EquipmentSlot equipmentSlot : SLOT_ORDER) {
+			ItemStack item = player.getEquipment().getItem(equipmentSlot);
+			//check valid item
+			if (InfusionUtils.isInfusionable(item)) {
+				//same tier needed.
+				DelveInfusionSelection infusion = DelveInfusionUtils.getCurrentInfusion(item);
+				final int rowF = row;
 
-					//we need to delay this loading to make the item skin applied
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							ItemStack itemStack = new ItemStack(item.getType());
-							ItemMeta meta = itemStack.getItemMeta();
-							meta.displayName(item.getItemMeta().displayName()
-								.decoration(TextDecoration.BOLD, true)
-								.decoration(TextDecoration.ITALIC, false));
-							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-							itemStack.setItemMeta(meta);
-							ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(item));
-							mInventory.setItem((rowF * 9) + 1, itemStack);
-						}
-					}.runTaskLater(Plugin.getInstance(), 2);
+				//we need to delay this loading to make the item skin applied
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						ItemStack itemStack = new ItemStack(item.getType());
+						ItemMeta meta = itemStack.getItemMeta();
+						meta.displayName(item.getItemMeta().displayName()
+							                 .decoration(TextDecoration.BOLD, true)
+							                 .decoration(TextDecoration.ITALIC, false));
+						meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+						itemStack.setItemMeta(meta);
+						ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(item));
+						mInventory.setItem((rowF * 9) + 1, itemStack);
+					}
+				}.runTaskLater(Plugin.getInstance(), 2);
 
-					if (infusion != null) {
-						mInventory.setItem((row * 9), mRefundItem);
-						mMapFunction.put((row * 9), (p, inventory, slot) -> {
-							DelveInfusionUtils.refundInfusion(item, p);
-						});
+				if (infusion != null) {
+					mInventory.setItem((row * 9), mRefundItem);
+					mMapFunction.put((row * 9), (p, inventory, slot) -> {
+						DelveInfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
+					});
 
-						//load the infusion.
-						int level = DelveInfusionUtils.getInfusionLevel(item, infusion);
-						List<ItemStack> panelsList = mDelveInfusionPanelsMap.get(infusion);
-						if (panelsList != null) {
-							for (int i = 0; i < level; i++) {
-								if (panelsList.get(i) != null) {
-									mInventory.setItem((row * 9) + 2 + i, panelsList.get(i));
-								}
+					//load the infusion.
+					int level = DelveInfusionUtils.getInfusionLevel(item, infusion);
+					List<ItemStack> panelsList = mDelveInfusionPanelsMap.get(infusion);
+					if (panelsList != null) {
+						for (int i = 0; i < level; i++) {
+							if (panelsList.get(i) != null) {
+								mInventory.setItem((row * 9) + 2 + i, panelsList.get(i));
 							}
 						}
+					}
 
-						if (level < DelveInfusionUtils.MAX_LEVEL) {
-							//if we didn't reach max level then load item to infuse
-							int slot = (row * 9) + 2 + level;
+					int slot = (row * 9) + 2 + level;
+					if (level < DelveInfusionUtils.MAX_LEVEL) {
+						//if we didn't reach max level then load item to infuse
 
-							ItemStack infuseItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
-							ItemMeta infuseMeta = infuseItem.getItemMeta();
-							infuseMeta.displayName(Component.text("Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA)
-											.decoration(TextDecoration.ITALIC, false)
-											.decoration(TextDecoration.BOLD, true));
-							List<Component> itemLore = new ArrayList<>();
-
-							itemLore.add(Component.text("You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " Voidstained Geodes,", NamedTextColor.GRAY)
-											.decoration(TextDecoration.ITALIC, false));
-
-							itemLore.add(Component.text(DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + mDelveMatsMap.get(infusion) + ",", NamedTextColor.GRAY)
-											.decoration(TextDecoration.ITALIC, false));
-
-							itemLore.add(Component.text("and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY)
-											.decoration(TextDecoration.ITALIC, false));
-
-							infuseMeta.lore(itemLore);
-							infuseItem.setItemMeta(infuseMeta);
-							mInventory.setItem(slot, infuseItem);
-
-							mMapFunction.put(slot, (p, inventory, slotClicked) -> {
-								try {
-									if (DelveInfusionUtils.canPayInfusion(item, infusion, p)) {
-										if (DelveInfusionUtils.payInfusion(item, infusion, p)) {
-											DelveInfusionUtils.infuseItem(p, item, infusion);
-										} else {
-											p.sendMessage(ChatColor.RED + "If you see this message please contact a mod. Error paying.");
-										}
-									} else {
-										p.sendMessage(ChatColor.RED + "You don't have enough experience and/or currency for this infusion.");
-									}
-								} catch (Exception e) {
-									p.sendMessage(ChatColor.RED + "Error while infusing, please contact a mod: " + e);
-								}
-
-							});
-						} else {
-							//Max level reached
-							int slot = (row * 9) + 2 + level;
-							mInventory.setItem(slot, mMaxLevelReachedItem);
-						}
-					} else {
-						//Item with no infusion -> load item to swap page
 						ItemStack infuseItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
 						ItemMeta infuseMeta = infuseItem.getItemMeta();
-						infuseMeta.displayName(Component.text("Click to select a Delve Infusion.", NamedTextColor.DARK_AQUA)
-											.decoration(TextDecoration.ITALIC, false)
-											.decoration(TextDecoration.BOLD, true));
+						infuseMeta.displayName(Component.text("Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA)
+							                       .decoration(TextDecoration.ITALIC, false)
+							                       .decoration(TextDecoration.BOLD, true));
 						List<Component> itemLore = new ArrayList<>();
-						itemLore.add(Component.text("The first Delve Infusion level costs", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
-						itemLore.add(Component.text("" + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " Voidstained Geodes,", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
-						itemLore.add(Component.text("" + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
+
+						itemLore.add(Component.text("You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " Voidstained Geodes,", NamedTextColor.GRAY)
+							             .decoration(TextDecoration.ITALIC, false));
+
+						itemLore.add(Component.text(DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + mDelveMatsMap.get(infusion) + ",", NamedTextColor.GRAY)
+							             .decoration(TextDecoration.ITALIC, false));
+
 						itemLore.add(Component.text("and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY)
-								.decoration(TextDecoration.ITALIC, false));
+							             .decoration(TextDecoration.ITALIC, false));
 
 						infuseMeta.lore(itemLore);
 						infuseItem.setItemMeta(infuseMeta);
+						mInventory.setItem(slot, infuseItem);
 
-						mInventory.setItem((rowF * 9) + 2 + 4, infuseItem);
-						mMapFunction.put((rowF * 9) + 2 + 4, (p, inventory, slot) -> {
-							mRowSelected = rowF;
-
+						mMapFunction.put(slot, (p, inventory, slotClicked) -> {
+							attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
 						});
+					} else {
+						//Max level reached
+						mInventory.setItem(slot, mMaxLevelReachedItem);
 					}
 				} else {
-					ItemStack invalidItem = mInvalidItems.get(row);
-					mInventory.setItem((row * 9) + 1, invalidItem);
+					//Item with no infusion -> load item to swap page
+					ItemStack infuseItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
+					ItemMeta infuseMeta = infuseItem.getItemMeta();
+					infuseMeta.displayName(Component.text("Click to select a Delve Infusion.", NamedTextColor.DARK_AQUA)
+						                       .decoration(TextDecoration.ITALIC, false)
+						                       .decoration(TextDecoration.BOLD, true));
+					List<Component> itemLore = new ArrayList<>();
+					itemLore.add(Component.text("The first Delve Infusion level costs", NamedTextColor.GRAY)
+						             .decoration(TextDecoration.ITALIC, false));
+					itemLore.add(Component.text("" + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[0] + " Voidstained Geodes,", NamedTextColor.GRAY)
+						             .decoration(TextDecoration.ITALIC, false));
+					itemLore.add(Component.text("" + DelveInfusionUtils.MAT_COST_PER_INFUSION[0] + " corresponding Delve Materials", NamedTextColor.GRAY)
+						             .decoration(TextDecoration.ITALIC, false));
+					itemLore.add(Component.text("and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY)
+						             .decoration(TextDecoration.ITALIC, false));
+
+					infuseMeta.lore(itemLore);
+					infuseItem.setItemMeta(infuseMeta);
+
+					mInventory.setItem((rowF * 9) + 2 + 4, infuseItem);
+					mMapFunction.put((rowF * 9) + 2 + 4, (p, inventory, slot) -> {
+						mSlotSelected = equipmentSlot;
+					});
 				}
 			} else {
 				ItemStack invalidItem = mInvalidItems.get(row);

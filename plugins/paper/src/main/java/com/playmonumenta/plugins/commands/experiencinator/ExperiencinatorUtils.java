@@ -104,6 +104,7 @@ public abstract class ExperiencinatorUtils {
 		Map<Region, String> conversionRateNames = experiencinator.getConversionRates();
 
 		boolean soldSomething = false;
+		int soldItems = 0;
 		for (ExperiencinatorConfig.Conversion conversion : mConfig.getConversions()) {
 
 			Map<Region, Integer> totalSellValue = new HashMap<>();
@@ -141,8 +142,7 @@ public abstract class ExperiencinatorUtils {
 
 				// calculate sell value for the entire item stack and clear the item
 				int value = sellValue * item.getAmount();
-
-				StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, ItemStatUtils.InfusionType.STAT_TRACK_CONVERT, item.getAmount());
+				soldItems += item.getAmount();
 
 				totalSellValue.merge(region, value, Integer::sum);
 				inventory[i] = null;
@@ -167,6 +167,8 @@ public abstract class ExperiencinatorUtils {
 
 		if (!soldSomething) {
 			player.sendRawMessage(ChatColor.AQUA + "No items were converted.");
+		} else {
+			StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, ItemStatUtils.InfusionType.STAT_TRACK_CONVERT, soldItems);
 		}
 
 	}

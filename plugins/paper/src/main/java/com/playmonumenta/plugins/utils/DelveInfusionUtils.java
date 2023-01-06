@@ -142,16 +142,13 @@ public class DelveInfusionUtils {
 		int levelXp = level;
 
 		ItemStatUtils.removeInfusion(item, infusionType);
-		ItemStatUtils.generateItemStats(item);
-
-		List<ItemStack> mats;
 
 		/* Audit */
 		String matStr = "";
 		int auditLevel = level + 1;
 
 		while (level >= 0) {
-			mats = getCurrenciesCost(item, infusion, level, player);
+			List<ItemStack> mats = getCurrenciesCost(item, infusion, level, player);
 			level--;
 
 			/* Audit */
@@ -165,7 +162,6 @@ public class DelveInfusionUtils {
 			}
 
 			giveMaterials(player, mats);
-			mats.clear();
 		}
 
 		AuditListener.log("Delve infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + auditLevel + "' stack size=" + item.getAmount() + " mats=" + matStr);

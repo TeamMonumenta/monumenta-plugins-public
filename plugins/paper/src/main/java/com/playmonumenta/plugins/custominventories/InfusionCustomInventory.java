@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.InfusionUtils;
@@ -10,8 +11,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -45,6 +45,8 @@ public class InfusionCustomInventory extends CustomInventory {
 	private static final int MAX_LORE_LENGHT = 30;
 	private static final Material JUNK_ITEM = Material.GRAY_STAINED_GLASS_PANE;
 
+	private static final ImmutableList<EquipmentSlot> SLOT_ORDER = ImmutableList.of(
+		EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
 	private static final Map<InfusionSelection, List<ItemStack>> mInfusionPanelsMap = new HashMap<>();
 	private static final List<ItemStack> mPanelList = new ArrayList<>();
 
@@ -272,46 +274,37 @@ public class InfusionCustomInventory extends CustomInventory {
 		mInventory.clear();
 		mMapFunction.clear();
 		PlayerInventory pi = player.getInventory();
-		List<ItemStack> items = new ArrayList<>();
-		items.addAll(Arrays.asList(pi.getArmorContents()));
-		Collections.reverse(items);
-		items.add(pi.getItemInMainHand());
-		items.add(pi.getItemInOffHand());
-		loadInfusionPage(player, items);
+		loadInfusionPage(player);
 		fillWithJunk();
 	}
 
-	private void loadInfusionPage(Player player, List<ItemStack> items) {
+	private void loadInfusionPage(Player player) {
 		int row = 0;
-		for (ItemStack is : items) {
-			if (is != null) {
-				if (InfusionUtils.isInfusionable(is)) {
-					loadRowNormalInfusionItem(player, is, row);
-					final int mRow = row;
-					//we need to delay the item change so the skins are loaded
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							ItemStack itemStack = new ItemStack(is.getType());
-							ItemMeta originalMeta = is.getItemMeta();
-							ItemMeta meta = itemStack.getItemMeta();
-							if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
-								newLeather.setColor(oldLeather.getColor());
-							}
-							meta.displayName(originalMeta.displayName()
-											.decoration(TextDecoration.BOLD, true)
-											.decoration(TextDecoration.ITALIC, false));
-							meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-							itemStack.setItemMeta(meta);
-							ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(is));
-							mInventory.setItem((mRow * 9) + 1, itemStack);
+		for (EquipmentSlot equipmentSlot : SLOT_ORDER) {
+			ItemStack is = player.getEquipment().getItem(equipmentSlot);
+			if (InfusionUtils.isInfusionable(is)) {
+				loadRowNormalInfusionItem(player, equipmentSlot, row);
+				final int mRow = row;
+				//we need to delay the item change so the skins are loaded
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						ItemStack itemStack = new ItemStack(is.getType());
+						ItemMeta originalMeta = is.getItemMeta();
+						ItemMeta meta = itemStack.getItemMeta();
+						if (originalMeta instanceof LeatherArmorMeta oldLeather && meta instanceof LeatherArmorMeta newLeather) {
+							newLeather.setColor(oldLeather.getColor());
 						}
-					}.runTaskLater(Plugin.getInstance(), 2);
+						meta.displayName(originalMeta.displayName()
+							                 .decoration(TextDecoration.BOLD, true)
+							                 .decoration(TextDecoration.ITALIC, false));
+						meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+						itemStack.setItemMeta(meta);
+						ItemUtils.setPlainName(itemStack, ItemUtils.getPlainName(is));
+						mInventory.setItem((mRow * 9) + 1, itemStack);
+					}
+				}.runTaskLater(Plugin.getInstance(), 2);
 
-				} else {
-					ItemStack invalidItem = mInvalidItems.get(row);
-					mInventory.setItem((row * 9) + 1, invalidItem);
-				}
 			} else {
 				ItemStack invalidItem = mInvalidItems.get(row);
 				mInventory.setItem((row * 9) + 1, invalidItem);
@@ -335,9 +328,10 @@ public class InfusionCustomInventory extends CustomInventory {
 		}
 	}
 
-	private void loadRowNormalInfusionItem(Player player, ItemStack item, int row) {
+	private void loadRowNormalInfusionItem(Player player, EquipmentSlot equipmentSlot, int row) {
 		Plugin plugin = Plugin.getInstance();
-		InfusionSelection infusion = InfusionUtils.getCurrentInfusion(plugin, player, item);
+		ItemStack item = player.getEquipment().getItem(equipmentSlot);
+		InfusionSelection infusion = InfusionUtils.getCurrentInfusion(item);
 		int infusionLvl = InfusionUtils.getInfuseLevel(item);
 
 		List<ItemStack> panelsInfusions = mInfusionPanelsMap.get(infusion);
@@ -349,7 +343,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			mInventory.setItem((row * 9), mRefundItem);
 			mMapFunction.put((row * 9), (p, inventory, slot) -> {
 				try {
-					InfusionUtils.refundInfusion(item, p, plugin);
+					InfusionUtils.refundInfusion(player.getEquipment().getItem(equipmentSlot), p);
 				} catch (WrapperCommandSyntaxException e) {
 					p.sendMessage(Component.text("Error refunding infusion. Please contact a mod: " + e.getMessage()));
 				}
@@ -376,7 +370,7 @@ public class InfusionCustomInventory extends CustomInventory {
 				int currency = -1;
 
 				try {
-					currency = InfusionUtils.calcInfuseCost(plugin, player, item);
+					currency = InfusionUtils.calcInfuseCost(item);
 				} catch (WrapperCommandSyntaxException e) {
 					currency = -1;
 				}
@@ -403,16 +397,7 @@ public class InfusionCustomInventory extends CustomInventory {
 				mInventory.setItem(slot, infuseItem);
 
 				mMapFunction.put(slot, (p, inventory, itemSlot) -> {
-					if (InfusionUtils.canPayInfusion(plugin, p, item)) {
-						if (InfusionUtils.payInfusion(plugin, p, item)) {
-							InfusionUtils.animate(p);
-							InfusionUtils.infuseItem(plugin, p, item, infusion);
-						} else {
-							p.sendMessage("If you see this message please contact a mod! (Error payInfusion)");
-						}
-					} else {
-						p.sendMessage("You don't have enough currency and/or experience for this infusion.");
-					}
+					attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), infusion);
 				});
 			} else {
 				int slot = (row * 9) + 2 + infusionLvl;
@@ -434,46 +419,50 @@ public class InfusionCustomInventory extends CustomInventory {
 
 			mInventory.setItem((row * 9) + 2, mPanelList.get(0));
 			mMapFunction.put((row * 9) + 2, (p, inventory, slot) -> {
-				attemptInfusion(plugin, p, item, InfusionSelection.VITALITY);
+				attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), InfusionSelection.VITALITY);
 			});
 
 			mInventory.setItem((row * 9) + 3, mPanelList.get(1));
 			mMapFunction.put((row * 9) + 3, (p, inventory, slot) -> {
-				attemptInfusion(plugin, p, item, InfusionSelection.VIGOR);
+				attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), InfusionSelection.VIGOR);
 			});
 
 			mInventory.setItem((row * 9) + 4, mPanelList.get(2));
 			mMapFunction.put((row * 9) + 4, (p, inventory, slot) -> {
-				attemptInfusion(plugin, p, item, InfusionSelection.TENACITY);
+				attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), InfusionSelection.TENACITY);
 			});
 
 			mInventory.setItem((row * 9) + 5, mPanelList.get(3));
 			mMapFunction.put((row * 9) + 5, (p, inventory, slot) -> {
-				attemptInfusion(plugin, p, item, InfusionSelection.PERSPICACITY);
+				attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), InfusionSelection.PERSPICACITY);
 			});
 
 			mInventory.setItem((row * 9) + 6, mPanelList.get(4));
 			mMapFunction.put((row * 9) + 6, (p, inventory, slot) -> {
-				attemptInfusion(plugin, p, item, InfusionSelection.FOCUS);
+				attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), InfusionSelection.FOCUS);
 			});
 
 			mInventory.setItem((row * 9) + 7, mPanelList.get(5));
 			mMapFunction.put((row * 9) + 7, (p, inventory, slot) -> {
-				attemptInfusion(plugin, p, item, InfusionSelection.ACUMEN);
+				attemptInfusion(p, player.getEquipment().getItem(equipmentSlot), InfusionSelection.ACUMEN);
 			});
 		}
 	}
 
-	private void attemptInfusion(Plugin plugin, Player p, ItemStack item, InfusionSelection infusion) {
+	private void attemptInfusion(Player p, ItemStack item, InfusionSelection infusion) {
 		if (item.getAmount() > 1) {
 			p.sendMessage(ChatColor.RED + "You cannot infuse stacked items.");
 			return;
 		}
+		if (!InfusionUtils.isInfusionable(item)) {
+			p.sendMessage(ChatColor.RED + "This item cannot be infused.");
+			return;
+		}
 
-		if (InfusionUtils.canPayExp(plugin, p, item)) {
-			if (InfusionUtils.payInfusion(plugin, p, item)) {
+		if (InfusionUtils.canPayExp(p, item)) {
+			if (InfusionUtils.payInfusion(p, item)) {
 				InfusionUtils.animate(p);
-				InfusionUtils.infuseItem(plugin, p, item, infusion);
+				InfusionUtils.infuseItem(p, item, infusion);
 			} else {
 				p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in paying infusion cost)");
 			}

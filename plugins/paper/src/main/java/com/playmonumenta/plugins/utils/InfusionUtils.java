@@ -68,7 +68,7 @@ public class InfusionUtils {
 		}
 	}
 
-	public static void refundInfusion(ItemStack item, Player player, Plugin plugin) throws WrapperCommandSyntaxException {
+	public static void refundInfusion(ItemStack item, Player player) throws WrapperCommandSyntaxException {
 		Region region = ItemStatUtils.getRegion(item);
 		int refundMaterials = 0;
 
@@ -230,7 +230,7 @@ public class InfusionUtils {
 		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
-	public static int calcInfuseCost(Plugin plugin, Player player, ItemStack item) throws WrapperCommandSyntaxException {
+	public static int calcInfuseCost(ItemStack item) throws WrapperCommandSyntaxException {
 		// First level is free
 		int infuseLvl = getInfuseLevel(item);
 		int cost = getCostMultiplierWithCheck(item);
@@ -238,7 +238,7 @@ public class InfusionUtils {
 		if (infuseLvl == 0) {
 			cost = 0;
 		} else if (infuseLvl <= 3) {
-			cost *= (int)Math.pow(2, infuseLvl - 1);
+			cost *= (int) Math.pow(2, infuseLvl - 1);
 		} else {
 			cost = 99999999;
 			CommandAPI.fail("Items may only be infused 4 times!");
@@ -357,7 +357,7 @@ public class InfusionUtils {
 		}
 	}
 
-	public static InfusionSelection getCurrentInfusion(Plugin plugin, Player player, ItemStack item) {
+	public static InfusionSelection getCurrentInfusion(ItemStack item) {
 
 		if (ItemStatUtils.getInfusionLevel(item, InfusionType.ACUMEN) > 0) {
 			return InfusionSelection.ACUMEN;
@@ -386,8 +386,8 @@ public class InfusionUtils {
 		return InfusionSelection.REFUND;
 	}
 
-	public static boolean infuseItem(Plugin plugin, Player player, ItemStack item, InfusionSelection selection) {
-		if (!getCurrentInfusion(plugin, player, item).equals(selection) && getInfuseLevel(item) > 0) {
+	public static boolean infuseItem(Player player, ItemStack item, InfusionSelection selection) {
+		if (!getCurrentInfusion(item).equals(selection) && getInfuseLevel(item) > 0) {
 			return false;
 		}
 
@@ -460,7 +460,7 @@ public class InfusionUtils {
 		}
 	}
 
-	public static boolean canPayExp(Plugin plugin, Player player, ItemStack item) {
+	public static boolean canPayExp(Player player, ItemStack item) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
@@ -483,7 +483,7 @@ public class InfusionUtils {
 		return true;
 	}
 
-	public static boolean canPayPulsating(Plugin plugin, Player player, ItemStack item) {
+	public static boolean canPayPulsating(Player player, ItemStack item) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
@@ -510,7 +510,7 @@ public class InfusionUtils {
 		int amount;
 
 		try {
-			amount = calcInfuseCost(plugin, player, item);
+			amount = calcInfuseCost(item);
 		} catch (WrapperCommandSyntaxException e) {
 			return false;
 		}
@@ -524,11 +524,11 @@ public class InfusionUtils {
 		return true;
 	}
 
-	public static boolean canPayInfusion(Plugin plugin, Player player, ItemStack item) {
-		return canPayExp(plugin, player, item) && canPayPulsating(plugin, player, item);
+	public static boolean canPayInfusion(Player player, ItemStack item) {
+		return canPayExp(player, item) && canPayPulsating(player, item);
 	}
 
-	public static boolean payInfusion(Plugin plugin, Player player, ItemStack item) {
+	public static boolean payInfusion(Player player, ItemStack item) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			Plugin.getInstance().getLogger().warning("[Infusion] Player: " + player.getName() + " infused an item while be on creative mode!");
 			return true;
@@ -551,7 +551,7 @@ public class InfusionUtils {
 
 		int amount;
 		try {
-			amount = calcInfuseCost(plugin, player, item);
+			amount = calcInfuseCost(item);
 		} catch (WrapperCommandSyntaxException e) {
 			return false;
 		}
