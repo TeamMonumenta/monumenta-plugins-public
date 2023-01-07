@@ -332,6 +332,7 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("yellow", "D5Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("willows", "DWDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("reverie", "DMRDelve");
+
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("lime", "D6Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("pink", "D7Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("gray", "D8Delve");
@@ -341,10 +342,17 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("teal", "DTLDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("forum", "DFFDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("shiftingcity", "DSCDelve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("depths", "DDDelve");
+
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("blue", "D12Delve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("brown", "D13Delve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("green", "D14Delve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("red", "D15Delve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("black", "D16Delve");
+
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev1", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev2", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("mobs", "DTestDelve");
-		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("depths", "DDDelve");
 	}
 
 	public static void duplicateLibraryOfSoulsMob(LivingEntity mob) {
