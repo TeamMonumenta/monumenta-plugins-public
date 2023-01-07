@@ -145,9 +145,8 @@ public abstract class ExperiencinatorUtils {
 				soldItems += item.getAmount();
 
 				totalSellValue.merge(region, value, Integer::sum);
-				inventory[i] = null;
+				item.setAmount(0);
 			}
-			player.getInventory().setStorageContents(inventory);
 
 			// Give currency to player and send a chat message
 			// Iterate over regions to get a consistent order
@@ -211,12 +210,11 @@ public abstract class ExperiencinatorUtils {
 						ItemStack invItem = inv[j];
 						if (invItem != null && resultItem.isSimilar(invItem)) {
 							totalValue += invItem.getAmount() * conversionResult.getValue();
-							inv[j] = null;
+							invItem.setAmount(0);
 							existingSlots.set(i, j);
 						}
 					}
 				}
-				player.getInventory().setContents(inv);
 			}
 
 			// Give result items to the player
