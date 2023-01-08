@@ -32,7 +32,8 @@ public class StatTrackDamageTaken implements Infusion {
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		PlayerInventory inv = player.getInventory();
 
-		int dmgTaken = (int) Math.round(event.getFinalDamage(false));
+		// Ensures no overkill damage is added on to the stat track, important in cases where 1,000,000+ damage is dealt by some attacks.
+		int dmgTaken = (int) Math.round(Math.min(event.getFinalDamage(false), player.getHealth() + player.getAbsorptionAmount()));
 
 		for (ItemStack is : inv.getArmorContents()) {
 			StatTrackManager.getInstance().incrementStatImmediately(is, player, ItemStatUtils.InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
