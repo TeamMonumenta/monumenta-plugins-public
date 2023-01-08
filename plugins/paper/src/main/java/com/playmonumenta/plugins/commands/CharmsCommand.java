@@ -6,7 +6,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
@@ -27,10 +26,10 @@ public class CharmsCommand extends GenericCommand {
 
 		//ADD COMMAND
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("add"));
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
 		.withPermission(perms)
@@ -50,7 +49,7 @@ public class CharmsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("remove"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
 		.withPermission(perms)
@@ -67,7 +66,7 @@ public class CharmsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("remove"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("slot"));
 
 		new CommandAPICommand("charm")
@@ -87,7 +86,7 @@ public class CharmsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("effectsummary"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
 		.withPermission(perms)
@@ -104,7 +103,7 @@ public class CharmsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("charmsummary"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
 		.withPermission(perms)
@@ -118,7 +117,7 @@ public class CharmsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("clear"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
 		.withPermission(perms)
@@ -141,7 +140,7 @@ public class CharmsCommand extends GenericCommand {
 				new CharmsGUI(player).openInventory(player, plugin);
 			}).register();
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
 		.withPermission(guiPerms)
@@ -167,7 +166,7 @@ public class CharmsCommand extends GenericCommand {
 				new CharmsGUI(player).openInventory(player, plugin);
 			}).register();
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("viewcharms")
 			.withAliases("vc")

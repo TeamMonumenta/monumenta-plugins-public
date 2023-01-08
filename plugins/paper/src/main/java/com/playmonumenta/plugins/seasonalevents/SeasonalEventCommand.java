@@ -5,7 +5,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.time.LocalDateTime;
@@ -23,7 +22,7 @@ public class SeasonalEventCommand extends GenericCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.battlepass");
 
 		// Add battlepass reload command
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new MultiLiteralArgument("reload"));
 
 		new CommandAPICommand("battlepass")
@@ -37,7 +36,7 @@ public class SeasonalEventCommand extends GenericCommand {
 		// Add battlepass xp command
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("addxp"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("amount"));
 
 		new CommandAPICommand("battlepass")
@@ -54,7 +53,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("setxp"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("amount"));
 
 		new CommandAPICommand("battlepass")
@@ -71,7 +70,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("getxp"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
@@ -92,7 +91,7 @@ public class SeasonalEventCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("gui"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("battlepass")
 			.withPermission(perms)
@@ -110,7 +109,7 @@ public class SeasonalEventCommand extends GenericCommand {
 		//GUI command with specific week
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("gui"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new MultiLiteralArgument("week"));
 		arguments.add(new IntegerArgument("week"));
 
@@ -130,7 +129,7 @@ public class SeasonalEventCommand extends GenericCommand {
 		//GUI command with specific date
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("gui"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new MultiLiteralArgument("date"));
 		arguments.add(new IntegerArgument("year", 2022));
 		arguments.add(new IntegerArgument("month", 1, 12));

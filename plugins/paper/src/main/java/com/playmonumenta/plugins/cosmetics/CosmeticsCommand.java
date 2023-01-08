@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -35,9 +35,9 @@ public class CosmeticsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("add"),
-				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(types),
-				new GreedyStringArgument("name").replaceSuggestions(info -> {
+				new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(info -> {
 					CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
 					if (type == CosmeticType.ELITE_FINISHER) {
 						return EliteFinishers.getNames();
@@ -50,7 +50,7 @@ public class CosmeticsCommand extends GenericCommand {
 					} else {
 						return new String[0];
 					}
-				}))
+				})))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
@@ -69,13 +69,13 @@ public class CosmeticsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("remove"),
-				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(types),
-				new GreedyStringArgument("name").replaceSuggestions(
+				new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
 					info -> CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical((Player) info.previousArgs()[0], CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
 						.map(Cosmetic::getName)
 						.filter(n -> n.startsWith(info.currentArg()))
-						.toArray(String[]::new)))
+						.toArray(String[]::new))))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
@@ -94,7 +94,7 @@ public class CosmeticsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("clear"),
-				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(types))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
@@ -109,7 +109,7 @@ public class CosmeticsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("get"),
-				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+				new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				for (CosmeticType type : CosmeticType.values()) {
@@ -120,7 +120,7 @@ public class CosmeticsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("get"),
-				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(types))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
@@ -133,7 +133,7 @@ public class CosmeticsCommand extends GenericCommand {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("gui"),
-				new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+				new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new CosmeticsGUI(plugin, player).openInventory(player, plugin);

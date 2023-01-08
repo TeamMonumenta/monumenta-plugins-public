@@ -5,7 +5,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FloatArgument;
 import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -29,8 +28,8 @@ public class TeleportByScore extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportbyscore");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OneEntity("entity"));
 		arguments.add(new ObjectiveArgument("x objective"));
 		arguments.add(new ObjectiveArgument("y objective"));
 		arguments.add(new ObjectiveArgument("z objective"));

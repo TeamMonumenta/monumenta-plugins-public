@@ -29,7 +29,7 @@ public class ToggleTrail extends GenericCommand implements Listener {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.toggletrail");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 		new CommandAPICommand("toggletrail")
 			.withPermission(perms)

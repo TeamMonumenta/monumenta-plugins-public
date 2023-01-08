@@ -37,8 +37,8 @@ import de.tr7zw.nbtapi.NBTListCompound;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -61,7 +61,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -2458,11 +2457,11 @@ public class ItemStatUtils {
 			locations[i] = locationsRaw[i].getName();
 		}
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("region").overrideSuggestions(regions));
-		arguments.add(new StringArgument("tier").overrideSuggestions(tiers));
-		arguments.add(new StringArgument("location").overrideSuggestions(locations));
-		arguments.add(new StringArgument("masterwork").overrideSuggestions(ms));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new StringArgument("region").replaceSuggestions(ArgumentSuggestions.strings(regions)));
+		arguments.add(new StringArgument("tier").replaceSuggestions(ArgumentSuggestions.strings(tiers)));
+		arguments.add(new StringArgument("location").replaceSuggestions(ArgumentSuggestions.strings(locations)));
+		arguments.add(new StringArgument("masterwork").replaceSuggestions(ArgumentSuggestions.strings(ms)));
 
 		new CommandAPICommand("editinfo").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			if (player.getGameMode() != GameMode.CREATIVE) {
@@ -2520,7 +2519,7 @@ public class ItemStatUtils {
 	public static void registerLoreCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editlore");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new MultiLiteralArgument("add"));
 		arguments.add(new IntegerArgument("index", 0));
 
@@ -2660,7 +2659,7 @@ public class ItemStatUtils {
 	public static void registerCharmCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editcharm");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new MultiLiteralArgument("add"));
 		arguments.add(new IntegerArgument("index", 0));
 		new CommandAPICommand("editcharm").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
@@ -2702,7 +2701,7 @@ public class ItemStatUtils {
 			generateItemStats(item);
 		}).register();
 
-		Function<SuggestionInfo, String[]> suggestions = suggestionInfo -> Plugin.getInstance().mCharmManager.mCharmEffectList.toArray(String[]::new);
+		ArgumentSuggestions suggestions = ArgumentSuggestions.strings(suggestionInfo -> Plugin.getInstance().mCharmManager.mCharmEffectList.toArray(String[]::new));
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("add"));
@@ -2856,8 +2855,8 @@ public class ItemStatUtils {
 			locations[i] = locationsRaw[i].getName();
 		}
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("location").replaceSuggestions(info -> locations));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new StringArgument("location").replaceSuggestions(ArgumentSuggestions.strings(info -> locations)));
 		arguments.add(new BooleanArgument("bold"));
 		arguments.add(new BooleanArgument("underline"));
 		arguments.add(new GreedyStringArgument("name"));
@@ -2894,8 +2893,8 @@ public class ItemStatUtils {
 			effects[i++] = type.getType();
 		}
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("enchantment").includeSuggestions(info -> effects));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new StringArgument("enchantment").includeSuggestions(ArgumentSuggestions.strings(info -> effects)));
 		arguments.add(new IntegerArgument("duration", 0));
 		arguments.add(new DoubleArgument("strength", 0));
 
@@ -2906,8 +2905,7 @@ public class ItemStatUtils {
 			}
 			EffectType type = EffectType.fromType((String) args[0]);
 			if (type == null) {
-				CommandAPI.fail("Invalid effect type " + args[0]);
-				throw new RuntimeException();
+				throw CommandAPI.failWithString("Invalid effect type " + args[0]);
 			}
 			int duration = (int) args[1];
 			double strength = (double) args[2];
@@ -2962,8 +2960,8 @@ public class ItemStatUtils {
 			}
 		}
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("enchantment").replaceSuggestions(info -> enchantments));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new StringArgument("enchantment").replaceSuggestions(ArgumentSuggestions.strings(info -> enchantments)));
 		arguments.add(new IntegerArgument("level", 0));
 
 		new CommandAPICommand("editench").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
@@ -2982,9 +2980,9 @@ public class ItemStatUtils {
 			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
 
-		List<Argument> argumentsOther = new ArrayList<>();
-		argumentsOther.add(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER));
-		argumentsOther.add(new StringArgument("enchantment").replaceSuggestions(info -> enchantments));
+		List<Argument<?>> argumentsOther = new ArrayList<>();
+		argumentsOther.add(new EntitySelectorArgument.OnePlayer("player"));
+		argumentsOther.add(new StringArgument("enchantment").replaceSuggestions(ArgumentSuggestions.strings(info -> enchantments)));
 		argumentsOther.add(new IntegerArgument("level", 0));
 
 		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
@@ -3038,8 +3036,8 @@ public class ItemStatUtils {
 			i++;
 		}
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("attribute").replaceSuggestions(info -> attributes));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new StringArgument("attribute").replaceSuggestions(ArgumentSuggestions.strings(info -> attributes)));
 		arguments.add(new DoubleArgument("amount"));
 		arguments.add(new MultiLiteralArgument(Operation.ADD.getName(), Operation.MULTIPLY.getName()));
 		arguments.add(new MultiLiteralArgument(Slot.MAINHAND.getName(), Slot.OFFHAND.getName(), Slot.HEAD.getName(), Slot.CHEST.getName(), Slot.LEGS.getName(), Slot.FEET.getName()));
@@ -3053,13 +3051,11 @@ public class ItemStatUtils {
 			Double amount = (Double) args[1];
 			Operation operation = Operation.getOperation((String) args[2]);
 			if (operation == null) {
-				CommandAPI.fail("Invalid operation " + args[2]);
-				throw new RuntimeException();
+				throw CommandAPI.failWithString("Invalid operation " + args[2]);
 			}
 			Slot slot = Slot.getSlot((String) args[3]);
 			if (slot == null) {
-				CommandAPI.fail("Invalid slot " + args[3]);
-				throw new RuntimeException();
+				throw CommandAPI.failWithString("Invalid slot " + args[3]);
 			}
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {

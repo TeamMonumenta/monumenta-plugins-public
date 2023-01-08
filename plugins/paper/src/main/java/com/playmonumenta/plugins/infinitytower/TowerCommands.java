@@ -19,6 +19,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -46,7 +47,8 @@ public class TowerCommands {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.infinitytower");
 
-		Argument mobLosNameArgument = new StringArgument("los name").includeSuggestions(info -> TowerFileUtils.TOWER_MOBS_INFO.stream().map(item -> item.mLosName).toArray(String[]::new));
+		Argument<?> mobLosNameArgument = new StringArgument("los name").includeSuggestions(ArgumentSuggestions.strings(
+			info -> TowerFileUtils.TOWER_MOBS_INFO.stream().map(item -> item.mLosName).toArray(String[]::new)));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
@@ -69,7 +71,7 @@ public class TowerCommands {
 			.withPermission(perms)
 			.withArguments(
 				new MultiLiteralArgument("create"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
 				Player player = (Player) args[1];
 				UUID playerUUID = player.getUniqueId();
@@ -104,13 +106,12 @@ public class TowerCommands {
 			.withArguments(
 				new MultiLiteralArgument("buy"),
 				new MultiLiteralArgument("mobs"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
 				Player player = (Player) args[2];
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
-					CommandAPI.fail("No game in progress!");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("No game in progress!");
 				}
 				game.buyMobs();
 				return 1;
@@ -121,13 +122,12 @@ public class TowerCommands {
 			.withArguments(
 				new MultiLiteralArgument("open"),
 				new MultiLiteralArgument("team"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
 				Player player = (Player) args[2];
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
-					CommandAPI.fail("No game in progress!");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("No game in progress!");
 				}
 				new TowerGuiTeam(player, game).openInventory(player, plugin);
 
@@ -139,13 +139,12 @@ public class TowerCommands {
 			.withArguments(
 				new MultiLiteralArgument("start"),
 				new MultiLiteralArgument("turn"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
 				Player player = (Player) args[2];
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
-					CommandAPI.fail("No game in progress!");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("No game in progress!");
 				}
 				game.startTurn();
 				return 1;
@@ -156,7 +155,7 @@ public class TowerCommands {
 			.withArguments(
 				new MultiLiteralArgument("game"),
 				new MultiLiteralArgument("stop"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument.OnePlayer("player")
 			).executes((sender, args) -> {
 				Player player = (Player) args[2];
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
@@ -169,7 +168,7 @@ public class TowerCommands {
 				return 1;
 			}).register();
 
-		//command for debuging, not used by players!
+		//command for debugging, not used by players!
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
@@ -179,13 +178,11 @@ public class TowerCommands {
 			).executesPlayer((player, args) -> {
 				TowerMobInfo info = TowerFileUtils.getMobInfo((String) args[2]);
 				if (info == null) {
-					CommandAPI.fail("Can't find a match for this bos: " + args[2]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Can't find a match for this bos: " + (String)args[2]);
 				}
 				TowerGame game = TowerManager.GAMES.get(player.getUniqueId());
 				if (game == null) {
-					CommandAPI.fail("No game in progress!");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("No game in progress!");
 				}
 				game.addNewMob(info);
 				return 1;
@@ -200,8 +197,7 @@ public class TowerCommands {
 			).executesPlayer((player, args) -> {
 				JsonObject data = TowerFileUtils.readFile("InfinityTowerPlayer.json");
 				if (data == null) {
-					CommandAPI.fail("Failed to load InfinityTowerPlayer.json file from plugin folder");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Failed to load InfinityTowerPlayer.json file from plugin folder");
 				}
 				TowerFileUtils.saveFileRedis(data, "InfinityTowerPlayer.json");
 				player.sendMessage("Imported InfinityTowerPlayer.json from plugin folder -> redis");
@@ -215,8 +211,7 @@ public class TowerCommands {
 			).executesPlayer((player, args) -> {
 				JsonObject data = TowerFileUtils.readFileRedis("InfinityTowerPlayer.json");
 				if (data == null) {
-					CommandAPI.fail("Failed to load InfinityTowerPlayer.json file from redis");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Failed to load InfinityTowerPlayer.json file from redis");
 				}
 				TowerFileUtils.saveFile(data, "InfinityTowerPlayer.json");
 				player.sendMessage("Exported InfinityTowerPlayer.json from redis -> plugin folder");
@@ -226,7 +221,8 @@ public class TowerCommands {
 	public static void registerDesign(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.infinitytower");
 
-		Argument mobLosNameArgument = new StringArgument("los name").includeSuggestions(info -> TowerFileUtils.TOWER_MOBS_INFO.stream().map(item -> item.mLosName).toArray(String[]::new));
+		Argument<?> mobLosNameArgument = new StringArgument("los name").includeSuggestions(ArgumentSuggestions.strings(
+			info -> TowerFileUtils.TOWER_MOBS_INFO.stream().map(item -> item.mLosName).toArray(String[]::new)));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
@@ -331,9 +327,8 @@ public class TowerCommands {
 				new MultiLiteralArgument("modify"),
 				new MultiLiteralArgument("new"),
 				new MultiLiteralArgument("mob"),
-				new StringArgument("los name").includeSuggestions((sug) -> {
-					return LibraryOfSoulsIntegration.getSoulNames().toArray(new String[0]);
-				})
+				new StringArgument("los name").includeSuggestions(ArgumentSuggestions.strings(
+					(sug) -> LibraryOfSoulsIntegration.getSoulNames().toArray(new String[0])))
 			).executesPlayer((player, args) -> {
 				createNewTowerMob(player, (String)args[3]);
 			}).register();
@@ -349,8 +344,7 @@ public class TowerCommands {
 
 				TowerMobInfo info = TowerFileUtils.getMobInfo((String) args[3]);
 				if (info == null) {
-					CommandAPI.fail("No mob with: " + ((String) args[3]));
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("No mob with: " + ((String) args[3]));
 				}
 				TowerGameUtils.setMainHandItem(player, info);
 
@@ -377,8 +371,7 @@ public class TowerCommands {
 			).executesPlayer((player, args) -> {
 				TowerMobInfo info = TowerFileUtils.getMobInfo((String) args[3]);
 				if (info == null) {
-					CommandAPI.fail("No mob with: " + ((String) args[3]));
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("No mob with: " + ((String) args[3]));
 				}
 				TowerGameUtils.setMainHandItem(player, info);
 
@@ -410,8 +403,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 
 				item.mMobStats.mHP = hp;
@@ -440,8 +432,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 
 				item.mMobStats.mAtk = atk;
@@ -463,22 +454,21 @@ public class TowerCommands {
 				mobLosNameArgument,
 				new MultiLiteralArgument("ability"),
 				new MultiLiteralArgument("add"),
-				new GreedyStringArgument("Mob Ability").replaceSuggestions((info) -> {
+				new GreedyStringArgument("Mob Ability").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
 					String[] abilities = new String[TowerMobAbility.ABILITIES.size()];
 					int i = 0;
 					for (TowerMobAbility.Tuple tuple : TowerMobAbility.ABILITIES) {
 						abilities[i++] = tuple.mName;
 					}
 					return abilities;
-				})
+				}))
 			).executesPlayer((player, args) -> {
 				String mob = (String)args[2];
 				String ability = (String)args[5];
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 
 				item.mAbilities.add(ability);
@@ -499,22 +489,21 @@ public class TowerCommands {
 				mobLosNameArgument,
 				new MultiLiteralArgument("ability"),
 				new MultiLiteralArgument("remove"),
-				new GreedyStringArgument("Mob Ability").replaceSuggestions((info) -> {
+				new GreedyStringArgument("Mob Ability").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
 					String[] abilities = new String[TowerMobAbility.ABILITIES.size()];
 					int i = 0;
 					for (TowerMobAbility.Tuple tuple : TowerMobAbility.ABILITIES) {
 						abilities[i++] = tuple.mName;
 					}
 					return abilities;
-				})
+				}))
 			).executesPlayer((player, args) -> {
 				String mob = (String)args[2];
 				String ability = (String)args[5];
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 
 				item.mAbilities.remove(ability);
@@ -542,8 +531,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 				item.mMobStats.mCost = cost;
 
@@ -570,8 +558,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 				item.mMobStats.mWeight = weight;
 
@@ -598,8 +585,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 				item.mMobStats.mLimit = limit;
 
@@ -627,8 +613,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob don't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob don't exist");
 				}
 				item.mLore = lore;
 
@@ -655,8 +640,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob doesn't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob doesn't exist");
 				}
 				item.mDisplayName = name;
 
@@ -682,12 +666,11 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob doesn't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob doesn't exist");
 				}
 
 				if (stack.getType() == Material.AIR) {
-					CommandAPI.fail("You must hold an item!");
+					throw CommandAPI.failWithString("You must hold an item!");
 				}
 				item.mBaseItem = stack.clone();
 
@@ -719,8 +702,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob doesn't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob doesn't exist");
 				}
 				TowerFileUtils.getMobsByRarity(item.mMobRarity).remove(item);
 				item.mMobRarity = rarity;
@@ -755,8 +737,7 @@ public class TowerCommands {
 				TowerMobInfo item = TowerFileUtils.getMobInfo(mob);
 
 				if (item == null) {
-					CommandAPI.fail("This mob doesn't exist");
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("This mob doesn't exist");
 				}
 				item.mMobClass = mobClass;
 
@@ -787,14 +768,14 @@ public class TowerCommands {
 		ItemStack item = sender.getInventory().getItemInMainHand();
 
 		if (item.getType() == Material.AIR) {
-			CommandAPI.fail("You MUST hold an item");
+			throw CommandAPI.failWithString("You MUST hold an item");
 		}
 
 		if (!TowerFileUtils.TOWER_MOBS_INFO.isEmpty()) {
 			for (TowerMobInfo oldItem : TowerFileUtils.TOWER_MOBS_INFO) {
 				if (oldItem.mLosName.equals(mob)) {
 					sender.getInventory().addItem(oldItem.getBuyableItem());
-					CommandAPI.fail("LoS already used: " + mob);
+					throw CommandAPI.failWithString("LoS already used: " + mob);
 				}
 			}
 		}

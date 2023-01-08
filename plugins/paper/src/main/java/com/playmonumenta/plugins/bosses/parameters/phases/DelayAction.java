@@ -33,16 +33,16 @@ public class DelayAction implements Action {
 
 	public static ParseResult<Action> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(..)")));
 		}
 
 		Long delay = reader.readLong();
 		if (delay == null || delay < 0) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "20", "ticks of delay")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "20", "ticks of delay")));
 		}
 
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", ".-.")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", ".-.")));
 		}
 
 		String name = reader.readOneOf(Phase.ACTION_BUILDER_MAP.keySet().stream().filter(str -> !str.equals("DELAY_ACTION")).toList());
@@ -50,7 +50,7 @@ public class DelayAction implements Action {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(Phase.ACTION_BUILDER_MAP.keySet().size());
 			String soFar = reader.readSoFar();
 			for (String valid : Phase.ACTION_BUILDER_MAP.keySet()) {
-				suggArgs.add(Tooltip.of(soFar + valid, "action builder"));
+				suggArgs.add(Tooltip.ofString(soFar + valid, "action builder"));
 			}
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
@@ -65,7 +65,7 @@ public class DelayAction implements Action {
 
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(..)")));
 		}
 
 		return ParseResult.of(new DelayAction(delay.intValue(), action));

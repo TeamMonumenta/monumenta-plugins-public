@@ -14,8 +14,8 @@ import com.playmonumenta.worlds.paper.MonumentaWorldManagementAPI;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -49,14 +49,14 @@ public class PlotManager {
 	private static void registerCommands() {
 		new CommandAPICommand("plot")
 			.withPermission(CommandPermission.NONE)
-			/********************* ACCESS *********************/
+			/* ACCESS */
 			.withSubcommand(new CommandAPICommand("access")
-				/***** HELP *****/
+				/* HELP */
 				.withSubcommand(new CommandAPICommand("help")
 					.executesPlayer((player, args) -> {
 						plotAccessHelp(player);
 					}))
-				/***** INFO *****/
+				/* INFO */
 				.withSubcommand(new CommandAPICommand("info")
 					.executesPlayer((player, args) -> {
 						getPlotInfo(player.getUniqueId()).whenComplete((info, ex) -> {
@@ -87,18 +87,20 @@ public class PlotManager {
 							}
 						});
 					}))
-				/***** ADD *****/
+				/* ADD */
 				.withSubcommand(new CommandAPICommand("add")
-						.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
-								.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-								.map((player) -> player.getName()).toArray(String[]::new)))
+					.withArguments(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
+						(info) -> Bukkit.getOnlinePlayers().stream()
+							.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
+							.map((player) -> player.getName()).toArray(String[]::new))))
 					.executesPlayer((player, args) -> {
 						plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), null);
 					}))
 				.withSubcommand(new CommandAPICommand("add")
-						.withArguments(new StringArgument("name").replaceSuggestions((info) -> Bukkit.getOnlinePlayers().stream()
+						.withArguments(new StringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
+							(info) -> Bukkit.getOnlinePlayers().stream()
 								.filter((player) -> !Objects.equals(player, info.sender()) && !PremiumVanishIntegration.isInvisibleOrSpectator(player))
-								.map((player) -> player.getName()).toArray(String[]::new)))
+								.map((player) -> player.getName()).toArray(String[]::new))))
 						.withArguments(new StringArgument("duration"))
 						.executesPlayer((player, args) -> {
 							plotAccessAdd(player, player.getUniqueId(), resolveUUID((String) args[0]), (String) args[1]);
@@ -143,10 +145,10 @@ public class PlotManager {
 								plotAccessRemove(sender, ownerUUID, otherPlayerUUID);
 							}))
 			)
-			/********************* SEND *********************/
+			/* SEND */
 			.withSubcommand(new CommandAPICommand("send")
 				.withPermission(CommandPermission.fromString("monumenta.plot.send"))
-				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
 						try {
@@ -160,7 +162,7 @@ public class PlotManager {
 				}))
 			.withSubcommand(new CommandAPICommand("send")
 				.withPermission(CommandPermission.fromString("monumenta.plot.send"))
-				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.withArguments(new IntegerArgument("instance", 1))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
@@ -174,10 +176,10 @@ public class PlotManager {
 						}
 					}
 				}))
-			/********************* GUI *********************/
+			/* GUI */
 			.withSubcommand(new CommandAPICommand("gui")
 				.withPermission(CommandPermission.fromString("monumenta.plot.gui"))
-				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
 						getPlotInfo(player.getUniqueId()).thenCompose((info) -> info.populateNamesAndHeads()).whenComplete((info, ex) -> {
@@ -193,12 +195,11 @@ public class PlotManager {
 				}))
 			.withSubcommand(new CommandAPICommand("bordergui")
 				.withPermission(CommandPermission.fromString("monumenta.plot.bordergui"))
-				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					if (!ServerProperties.getShardName().equals("playerplots") &&
 						!ServerProperties.getShardName().startsWith("dev")) {
-						CommandAPI.fail("This command is only available on the playerplots world. Current shard: " + ServerProperties.getShardName());
-						return;
+						throw CommandAPI.failWithString("This command is only available on the playerplots world. Current shard: " + ServerProperties.getShardName());
 					}
 					for (Player player : (List<Player>)args[0]) {
 						int plot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
@@ -215,10 +216,10 @@ public class PlotManager {
 						}
 					}
 				}))
-			/********************* NEW *********************/
+			/* NEW */
 			.withSubcommand(new CommandAPICommand("new")
 				.withPermission(CommandPermission.fromString("monumenta.plot.new"))
-				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
 						try {
@@ -248,10 +249,10 @@ public class PlotManager {
 						}
 					}
 				}))
-			/********************* RESET *********************/
+			/* RESET */
 			.withSubcommand(new CommandAPICommand("reset")
 				.withPermission(CommandPermission.fromString("monumenta.plot.reset"))
-				.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+				.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 				.executes((sender, args) -> {
 					for (Player player : (List<Player>)args[0]) {
 						int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
@@ -343,23 +344,23 @@ public class PlotManager {
 			try {
 				expiration = Duration.parse(duration).getSeconds();
 				if (expiration > 365 * 24 * 60 * 60) {
-					CommandAPI.fail("Duration must be at most 1 year");
+					throw CommandAPI.failWithString("Duration must be at most 1 year");
 				} else if (expiration < 60) {
-					CommandAPI.fail("Duration must be at least 1 minute");
+					throw CommandAPI.failWithString("Duration must be at least 1 minute");
 				}
 
 				// Add the current time, so we store the time when it expires, not the delta
 				expiration += java.time.Instant.now().getEpochSecond();
 			} catch (Exception ex) {
-				CommandAPI.fail("Caught exception: " + ex.getMessage());
+				throw CommandAPI.failWithString("Caught exception: " + ex.getMessage());
 			}
 		}
 
 		if (ownerUUID.equals(otherUUID)) {
 			if (sender instanceof Player player && player.getUniqueId().equals(ownerUUID)) {
-				CommandAPI.fail("You can not add yourself to your own plot");
+				throw CommandAPI.failWithString("You can not add yourself to your own plot");
 			} else {
-				CommandAPI.fail("You can not grant a player access to their own plot");
+				throw CommandAPI.failWithString("You can not grant a player access to their own plot");
 			}
 		}
 
@@ -636,8 +637,7 @@ public class PlotManager {
 		} catch (IllegalArgumentException e) {
 			UUID uuid = MonumentaRedisSyncIntegration.cachedNameToUuid(name);
 			if (uuid == null) {
-				CommandAPI.fail("Can't find player '" + name + "' - perhaps incorrect capitalization or spelled wrong?");
-				throw new RuntimeException();
+				throw CommandAPI.failWithString("Can't find player '" + name + "' - perhaps incorrect capitalization or spelled wrong?");
 			}
 			return uuid;
 		}

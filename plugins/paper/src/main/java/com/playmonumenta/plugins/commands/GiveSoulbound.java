@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.ItemStackArgument;
 import dev.jorel.commandapi.arguments.LootTableArgument;
 import java.util.Collection;
@@ -29,7 +28,7 @@ public class GiveSoulbound extends GenericCommand {
 
 		new CommandAPICommand("givesoulbound")
 			.withPermission(perms)
-			.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+			.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 			.withArguments(new ItemStackArgument("item"))
 			.executes((sender, args) -> {
 				for (Player player : (Collection<Player>)args[0]) {
@@ -40,7 +39,7 @@ public class GiveSoulbound extends GenericCommand {
 
 		new CommandAPICommand("givesoulbound")
 			.withPermission(perms)
-			.withArguments(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS))
+			.withArguments(new EntitySelectorArgument.ManyPlayers("players"))
 			.withArguments(new LootTableArgument("item_loot_table"))
 			.executes((sender, args) -> {
 				for (Player player : (Collection<Player>)args[0]) {

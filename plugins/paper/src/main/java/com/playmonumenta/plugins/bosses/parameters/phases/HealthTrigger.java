@@ -37,15 +37,15 @@ public class HealthTrigger extends Trigger {
 
 	public static ParseResult<Trigger> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(..)")));
 		}
 		Double health = reader.readDouble();
 		if (health == null || health < 0) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "0.9", "range must be positive")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "0.9", "range must be positive")));
 		}
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(..)")));
 		}
 
 		return ParseResult.of(new HealthTrigger(health));

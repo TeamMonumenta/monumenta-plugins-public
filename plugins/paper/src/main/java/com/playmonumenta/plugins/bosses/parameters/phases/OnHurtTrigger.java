@@ -61,7 +61,7 @@ public class OnHurtTrigger extends Trigger {
 
 	public static ParseResult<Trigger> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "this object requires brackets")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "this object requires brackets")));
 		}
 
 		ClassAbility classAbility = reader.readEnum(ClassAbility.values());
@@ -71,27 +71,27 @@ public class OnHurtTrigger extends Trigger {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(ClassAbility.values().length + DamageEvent.DamageType.values().length + 1);
 			String soFar = reader.readSoFar();
 			for (ClassAbility valid : ClassAbility.values()) {
-				suggArgs.add(Tooltip.of(soFar + valid.name(), "Class type"));
+				suggArgs.add(Tooltip.ofString(soFar + valid.name(), "Class type"));
 			}
 			for (DamageEvent.DamageType valid : DamageEvent.DamageType.values()) {
-				suggArgs.add(Tooltip.of(soFar + valid.name(), "Damage type"));
+				suggArgs.add(Tooltip.ofString(soFar + valid.name(), "Damage type"));
 			}
-			suggArgs.add(Tooltip.of(soFar + "ALL", "ALL damage type"));
+			suggArgs.add(Tooltip.ofString(soFar + "ALL", "ALL damage type"));
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "kkk")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "kkk")));
 		}
 
 		Double value = reader.readDouble();
 		if (value == null || value < 0) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "10", "damage > 0")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "10", "damage > 0")));
 		}
 
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "this object requires brackets")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "this object requires brackets")));
 		}
 
 		if (type != null) {

@@ -21,7 +21,7 @@ public class SetGuildTeleport {
 		// setguildteleport <guildname>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.setguildteleport");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new TextArgument("guild name"));
 
 		new CommandAPICommand("setguildteleport")
@@ -38,11 +38,9 @@ public class SetGuildTeleport {
 	private static void run(Plugin plugin, CommandSender sender,
 	                        String guildName) throws WrapperCommandSyntaxException {
 
-		if (!(sender instanceof Player)) {
-			CommandAPI.fail("This command can only be run by players");
+		if (!(sender instanceof Player player)) {
+			throw CommandAPI.failWithString("This command can only be run by players");
 		}
-
-		Player player = (Player)sender;
 
 		// Guild name sanitization for command usage
 		String cleanGuildName = LuckPermsIntegration.getCleanGuildName(guildName);
@@ -50,8 +48,7 @@ public class SetGuildTeleport {
 		//TODO: Better lookup of guild name?
 		Group group = LuckPermsIntegration.GM.getGroup(cleanGuildName);
 		if (group == null) {
-			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
-			throw new RuntimeException();
+			throw CommandAPI.failWithString("The luckperms group '" + cleanGuildName + "' does not exist");
 		}
 
 		Location loc = player.getLocation();

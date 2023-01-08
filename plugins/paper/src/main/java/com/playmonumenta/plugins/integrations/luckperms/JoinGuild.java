@@ -10,7 +10,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,8 @@ public class JoinGuild {
 		// joinguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.joinguild");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.MANY_PLAYERS));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.ManyPlayers("player"));
 
 		new CommandAPICommand("joinguild")
 			.withPermission(perms)
@@ -60,8 +59,7 @@ public class JoinGuild {
 		if (currentGuildName != null &&
 			ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
 			String err = ChatColor.RED + "You are not a founder of '" + currentGuildName + "' !";
-			CommandAPI.fail(err);
-			return;
+			throw CommandAPI.failWithString(err);
 		}
 		if (currentGuildName == null) {
 			founder.sendMessage(ChatColor.RED + "You are not currently in a guild.");

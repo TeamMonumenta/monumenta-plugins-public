@@ -28,8 +28,7 @@ public class PartialParticleCommand {
 			.executesPlayer((player, args) -> {
 				ParticleCategory category = ParticleCategory.valueOf(((String) args[0]).toUpperCase(Locale.ROOT));
 				if (category.mObjectiveName == null) {
-					CommandAPI.fail("Invalid particle category " + args[0]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid particle category " + args[0]);
 				}
 				int multiplier = (int) args[1];
 

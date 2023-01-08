@@ -31,7 +31,7 @@ public class ClaimRaffle {
 				if (sender instanceof Player) {
 					run(plugin, (Player)sender);
 				} else {
-					CommandAPI.fail(ChatColor.RED + "This command must be run by a player!");
+					throw CommandAPI.failWithString("This command must be run by a player!");
 				}
 			})
 			.register();

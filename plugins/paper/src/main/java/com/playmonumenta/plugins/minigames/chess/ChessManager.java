@@ -14,6 +14,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
@@ -65,7 +66,7 @@ public class ChessManager implements Listener {
 
 	public enum ChessBoardType {
 		PVP,
-		PVAI;
+		PVAI
 	}
 
 	private static @Nullable Plugin mPlugin;
@@ -79,7 +80,7 @@ public class ChessManager implements Listener {
 
 		//Register commands.
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.chess");
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 		for (String command : CHESSBOARD_COMMANDS) {
 
@@ -106,9 +107,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("get"));
 			arguments.add(new MultiLiteralArgument("fen"));
 			new CommandAPICommand(command)
@@ -119,9 +119,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("restart"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
@@ -131,9 +130,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("fen"));
 			arguments.add(new GreedyStringArgument("fen String"));
@@ -142,7 +140,7 @@ public class ChessManager implements Listener {
 					.withArguments(arguments)
 					.executes((sender, args) -> {
 						if (!mBoards.containsKey((String)args[0])) {
-							CommandAPI.fail("Invalid name, Board: " + (String)args[0] + " doesn't exists");
+							throw CommandAPI.failWithString("Invalid name, Board: " + (String)args[0] + " doesn't exists");
 						}
 						ChessBoard board = mBoards.get((String)args[0]);
 						board.buildBoardFromString((String)args[3]);
@@ -153,9 +151,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("delete"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
@@ -165,9 +162,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("refresh"));
 			new CommandAPICommand(command)
 					.withPermission(perms)
@@ -177,9 +173,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("piece"));
 			arguments.add(new MultiLiteralArgument(ChessPieceType.BISHOPS.name(),
@@ -201,9 +196,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("player"));
 			arguments.add(new MultiLiteralArgument("white"));
@@ -216,9 +210,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("player"));
 			arguments.add(new MultiLiteralArgument("black"));
@@ -231,9 +224,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("set"));
 			arguments.add(new MultiLiteralArgument("gui"));
 			arguments.add(new MultiLiteralArgument(ChessInterface.InterfaceType.WHITEPLAYER.name().toLowerCase(),
@@ -250,9 +242,8 @@ public class ChessManager implements Listener {
 					}).register();
 
 			arguments.clear();
-			arguments.add(new StringArgument("Board Name").replaceSuggestions((info) -> {
-				return mBoards.keySet().toArray(new String[0]);
-			}));
+			arguments.add(new StringArgument("Board Name").replaceSuggestions(ArgumentSuggestions.strings(
+				(info) -> mBoards.keySet().toArray(new String[0]))));
 			arguments.add(new MultiLiteralArgument("surrend"));
 			arguments.add(new PlayerArgument("Surrender"));
 			new CommandAPICommand(command)
@@ -266,7 +257,7 @@ public class ChessManager implements Listener {
 
 	public static void printCurrentChessBoardFenString(CommandSender sender, String boardname) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(boardname)) {
-			CommandAPI.fail("Invalid name, Board: " + boardname + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + boardname + " doesn't exists");
 		}
 		ChessBoard board = mBoards.get(boardname);
 		String fenString = board.convertBoardToFenString();
@@ -277,7 +268,7 @@ public class ChessManager implements Listener {
 
 	public static void createGui(String name, String type, Location startingLoc, String facing) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 		ChessBoard board = mBoards.get(name);
 		final ChessInterface newChessInterface = new ChessInterface(board, InterfaceType.valueOf(type.toUpperCase()));
@@ -299,7 +290,7 @@ public class ChessManager implements Listener {
 
 	public static void createBoard(String name, ChessBoardType type, String fenString) throws WrapperCommandSyntaxException {
 		if (mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, name " + name + " already used for a different board");
+			throw CommandAPI.failWithString("Invalid name, name " + name + " already used for a different board");
 		}
 
 		ChessBoard board = new ChessBoard(name, type);
@@ -310,7 +301,7 @@ public class ChessManager implements Listener {
 
 	public static void deleteBoard(String name) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
 		ChessBoard board = mBoards.get(name);
@@ -326,7 +317,7 @@ public class ChessManager implements Listener {
 
 	public static void restartBoard(String name) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
 		ChessBoard board = mBoards.get(name);
@@ -340,7 +331,7 @@ public class ChessManager implements Listener {
 
 	public static void surrender(String name, Player loser) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
 		ChessBoard board = mBoards.get(name);
@@ -362,7 +353,7 @@ public class ChessManager implements Listener {
 
 	public static void refreshGuis(String name) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
 		ChessBoard board = mBoards.get(name);
@@ -373,7 +364,7 @@ public class ChessManager implements Listener {
 
 	public static void setPlayer(String name, Player player, String role) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
 		ChessBoard board = mBoards.get(name);
@@ -382,13 +373,13 @@ public class ChessManager implements Listener {
 
 	public static void setPiece(String name, String piece, String teamString, int pos) throws WrapperCommandSyntaxException {
 		if (!mBoards.containsKey(name)) {
-			CommandAPI.fail("Invalid name, Board: " + name + " doesn't exists");
+			throw CommandAPI.failWithString("Invalid name, Board: " + name + " doesn't exists");
 		}
 
 		ChessPieceType type = ChessPieceType.valueOf(piece.toUpperCase());
 		ChessTeam team = ChessTeam.valueOf(teamString.toUpperCase());
 		if (type == null || team == null || pos < 0 || pos > 63) {
-			CommandAPI.fail("Error. type: " + type + " team: " + team + " pos: " + pos);
+			throw CommandAPI.failWithString("Error. type: " + type + " team: " + team + " pos: " + pos);
 		}
 
 		ChessPiece newPiece = new ChessPiece(type, team, pos);

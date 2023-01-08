@@ -6,7 +6,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -38,9 +37,9 @@ public class TeleportAsync extends GenericCommand {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportasync");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new FunctionArgument("function"));
-		arguments.add(new EntitySelectorArgument("destination", EntitySelector.ONE_ENTITY));
+		arguments.add(new EntitySelectorArgument.OneEntity("destination"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -62,8 +61,8 @@ public class TeleportAsync extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new FunctionArgument("function"));
-		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
-		arguments.add(new EntitySelectorArgument("destination", EntitySelector.ONE_ENTITY));
+		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
+		arguments.add(new EntitySelectorArgument.OneEntity("destination"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -75,7 +74,7 @@ public class TeleportAsync extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new FunctionArgument("function"));
-		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
 		arguments.add(new LocationArgument("location"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
@@ -87,11 +86,11 @@ public class TeleportAsync extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new FunctionArgument("function"));
-		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
 		arguments.add(new LocationArgument("location"));
 		arguments.add(new MultiLiteralArgument("facing"));
 		arguments.add(new MultiLiteralArgument("entity"));
-		arguments.add(new EntitySelectorArgument("facingEntity", EntitySelector.ONE_ENTITY));
+		arguments.add(new EntitySelectorArgument.OneEntity("facingEntity"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -103,7 +102,7 @@ public class TeleportAsync extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new FunctionArgument("function"));
-		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
 		arguments.add(new LocationArgument("location"));
 		arguments.add(new MultiLiteralArgument("facing"));
 		arguments.add(new LocationArgument("facingLocation"));
@@ -117,7 +116,7 @@ public class TeleportAsync extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new FunctionArgument("function"));
-		arguments.add(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("targets"));
 		arguments.add(new LocationArgument("location"));
 		arguments.add(new RotationArgument("Rotation"));
 		new CommandAPICommand(COMMAND)
@@ -134,8 +133,7 @@ public class TeleportAsync extends GenericCommand {
 		CommandSender srcSender = CommandUtils.getCallee(sender);
 
 		if (!(srcSender instanceof Entity)) {
-			CommandAPI.fail("An entity is required to run this command here");
-			return 0;
+			throw CommandAPI.failWithString("An entity is required to run this command here");
 		}
 
 		Entity src = (Entity) srcSender;
@@ -147,36 +145,35 @@ public class TeleportAsync extends GenericCommand {
 		CommandSender srcSender = CommandUtils.getCallee(sender);
 
 		if (!(srcSender instanceof Entity)) {
-			CommandAPI.fail("An entity is required to run this command here");
-			return 0;
+			throw CommandAPI.failWithString("An entity is required to run this command here");
 		}
 
 		Entity src = (Entity) srcSender;
 		return teleport(sender, functions, src, dst, null);
 	}
 
-	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> srcs, Location dst, @Nullable Rotation rot) {
+	private static int teleport(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> entities, Location dst, @Nullable Rotation rot) {
 		int teleported = 0;
-		for (Entity src : srcs) {
+		for (Entity src : entities) {
 			teleported += teleport(sender, functions, src, dst, rot);
 		}
 		return teleported;
 	}
 
-	public static int teleport(CommandSender sender, FunctionWrapper[] functions, Entity src, Location dst, @Nullable Rotation rot) {
-		if (entitiesTeleportingAsync.contains(src.getUniqueId())) {
-			sender.sendMessage(src.getName() + " is already scheduled to teleport, honoring previous request instead.");
+	public static int teleport(CommandSender sender, FunctionWrapper[] functions, Entity entity, Location dst, @Nullable Rotation rot) {
+		if (entitiesTeleportingAsync.contains(entity.getUniqueId())) {
+			sender.sendMessage(entity.getName() + " is already scheduled to teleport, honoring previous request instead.");
 			return 0;
 		}
 
-		if (src instanceof Player) {
-			((Player) src).setSwimming(false);
+		if (entity instanceof Player) {
+			((Player) entity).setSwimming(false);
 		}
-		if (src instanceof Mob) {
-			((Mob) src).setVelocity(new Vector(0, 0.1, 0));
+		if (entity instanceof Mob) {
+			((Mob) entity).setVelocity(new Vector(0, 0.1, 0));
 		}
 
-		Location srcLocation = src.getLocation();
+		Location srcLocation = entity.getLocation();
 		Location adjustedDst = dst.clone();
 		if (rot == null) {
 			adjustedDst.setPitch(srcLocation.getPitch());
@@ -186,16 +183,16 @@ public class TeleportAsync extends GenericCommand {
 			adjustedDst.setYaw(rot.getYaw());
 		}
 
-		entitiesTeleportingAsync.add(src.getUniqueId());
-		CompletableFuture<Boolean> completableFuture = src.teleportAsync(adjustedDst, TeleportCause.COMMAND);
+		entitiesTeleportingAsync.add(entity.getUniqueId());
+		CompletableFuture<Boolean> completableFuture = entity.teleportAsync(adjustedDst, TeleportCause.COMMAND);
 
 		completableFuture.thenApply(resultBool -> {
-			entitiesTeleportingAsync.remove(src.getUniqueId());
+			entitiesTeleportingAsync.remove(entity.getUniqueId());
 
 			if (resultBool) {
-				sender.sendMessage("Teleported " + src.getName());
+				sender.sendMessage("Teleported " + entity.getName());
 			} else {
-				sender.sendMessage("Didn't teleport " + src.getName() + "? Got False from CompletableFuture<Boolean>.");
+				sender.sendMessage("Didn't teleport " + entity.getName() + "? Got False from CompletableFuture<Boolean>.");
 			}
 
 			for (FunctionWrapper func : functions) {
@@ -205,35 +202,35 @@ public class TeleportAsync extends GenericCommand {
 			return resultBool;
 		});
 		completableFuture.exceptionally(ex -> {
-			entitiesTeleportingAsync.remove(src.getUniqueId());
-			sender.sendMessage("An exception occured teleporting " + src.getName() + ": " + ex.getMessage());
+			entitiesTeleportingAsync.remove(entity.getUniqueId());
+			sender.sendMessage("An exception occurred teleporting " + entity.getName() + ": " + ex.getMessage());
 			return false;
 		});
 
-		sender.sendMessage("Teleporting " + src.getName() + " to " + Double.toString(adjustedDst.getX()) + " " + Double.toString(adjustedDst.getY()) + " " + Double.toString(adjustedDst.getZ()) + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
+		sender.sendMessage("Teleporting " + entity.getName() + " to " + Double.toString(adjustedDst.getX()) + " " + Double.toString(adjustedDst.getY()) + " " + Double.toString(adjustedDst.getZ()) + ", yaw/pitch " + Float.toString(adjustedDst.getYaw()) + " " + Float.toString(adjustedDst.getPitch()));
 		return 1;
 	}
 
-	private static int teleportFacing(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> srcs, Location dst, Entity facingEntity) {
+	private static int teleportFacing(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> entities, Location dst, Entity facingEntity) {
 		Rotation rot;
-		if (srcs.contains(facingEntity)) {
+		if (entities.contains(facingEntity)) {
 			rot = new Rotation(0.0f, -90.0f);
 		} else {
 			rot = getFacingRotation(dst, facingEntity.getLocation());
 		}
 
 		int teleported = 0;
-		for (Entity src : srcs) {
+		for (Entity src : entities) {
 			teleported += teleport(sender, functions, src, dst, rot);
 		}
 		return teleported;
 	}
 
-	private static int teleportFacing(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> srcs, Location dst, Location facing) {
+	private static int teleportFacing(CommandSender sender, FunctionWrapper[] functions, Collection<Entity> entities, Location dst, Location facing) {
 		Rotation rot = getFacingRotation(dst, facing);
 
 		int teleported = 0;
-		for (Entity src : srcs) {
+		for (Entity src : entities) {
 			teleported += teleport(sender, functions, src, dst, rot);
 		}
 		return teleported;

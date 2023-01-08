@@ -9,7 +9,6 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.PotionEffectArgument;
@@ -37,10 +36,10 @@ public class Effect {
 		CommandAPI.unregister("effect");
 
 		/* Add effects (/effect give) */
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 		arguments.add(new MultiLiteralArgument("give"));
-		arguments.add(new EntitySelectorArgument("entity", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("entity"));
 		arguments.add(new PotionEffectArgument("effect"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
@@ -87,7 +86,7 @@ public class Effect {
 		/* Clear effects (/effect clear) */
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("clear"));
-		arguments.add(new EntitySelectorArgument("entity", EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("entity"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

@@ -24,17 +24,17 @@ public class CustomTriggerAction implements Action {
 
 	public static ParseResult<Action> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(...)")));
 		}
 
 		String key = reader.readString();
 		if (key == null || key.isEmpty()) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "KeyTriggerName", "name of this custom trigger"),
-				Tooltip.of(reader.readSoFar() + "\"KeyTriggerNameWithInvertedCommas\"", "name of this custom trigger")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "KeyTriggerName", "name of this custom trigger"),
+				Tooltip.ofString(reader.readSoFar() + "\"KeyTriggerNameWithInvertedCommas\"", "name of this custom trigger")));
 		}
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(...)")));
 		}
 
 		return ParseResult.of(new CustomTriggerAction(key));

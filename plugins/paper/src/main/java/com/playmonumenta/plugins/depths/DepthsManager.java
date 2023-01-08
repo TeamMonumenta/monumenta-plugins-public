@@ -1053,7 +1053,7 @@ public class DepthsManager {
 			// Store the location to spawn the next room from
 			party.mRoomSpawnerLocation = l.toVector();
 			//Let the player select the room
-			DepthsGUICommands.roomchoice(Plugin.getInstance(), p);
+			DepthsGUICommands.roomChoice(Plugin.getInstance(), p);
 		}
 	}
 

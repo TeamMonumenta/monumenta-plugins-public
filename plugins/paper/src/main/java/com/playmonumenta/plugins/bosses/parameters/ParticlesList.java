@@ -163,7 +163,7 @@ public class ParticlesList {
 	 */
 	public static ParseResult<ParticlesList> fromReader(StringReader reader, String hoverDescription) {
 		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 		}
 
 		List<CParticle> particlesList = new ArrayList<>(2);
@@ -180,18 +180,18 @@ public class ParticlesList {
 			if (atLeastOneParticleIter) {
 				if (!reader.advance(",")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
 					));
 				}
 				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", hoverDescription)));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
 				}
 			} else {
 				if (!reader.advance("(")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + "(", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+						Tooltip.ofString(reader.readSoFar() + "(", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
 					));
 				}
 			}
@@ -203,7 +203,7 @@ public class ParticlesList {
 				List<Tooltip<String>> suggArgs = new ArrayList<>(Particle.values().length);
 				String soFar = reader.readSoFar();
 				for (Particle valid : Particle.values()) {
-					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 				}
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 			}
@@ -216,12 +216,12 @@ public class ParticlesList {
 			 */
 			if (!reader.advance(",")) {
 				if (PARTICLES_WITH_PARAMETERS.contains(particle)) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify count, variance, velocity, and particle-specific parameters")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "Specify count, variance, velocity, and particle-specific parameters")));
 				}
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", "Specify count, variance, velocity, and particle-specific parameters"),
-						Tooltip.of(reader.readSoFar() + ")", "Use default 1 particle, zero variance, 1 velocity")
+						Tooltip.ofString(reader.readSoFar() + ",", "Specify count, variance, velocity, and particle-specific parameters"),
+						Tooltip.ofString(reader.readSoFar() + ")", "Use default 1 particle, zero variance, 1 velocity")
 					));
 				}
 				// End of this particle, loop to next
@@ -231,17 +231,17 @@ public class ParticlesList {
 
 			Long count = reader.readLong();
 			if (count == null || count < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1", "Particle count >= 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1", "Particle count >= 0")));
 			}
 
 			if (!reader.advance(",")) {
 				if (PARTICLES_WITH_PARAMETERS.contains(particle)) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify variance, velocity and particle-specific parameters")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "Specify variance, velocity and particle-specific parameters")));
 				}
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", "Specify variance, velocity and particle-specific parameters"),
-						Tooltip.of(reader.readSoFar() + ")", "Use default zero variance, 1 velocity")
+						Tooltip.ofString(reader.readSoFar() + ",", "Specify variance, velocity and particle-specific parameters"),
+						Tooltip.ofString(reader.readSoFar() + ")", "Use default zero variance, 1 velocity")
 					));
 				}
 				// End of this particle, loop to next
@@ -251,31 +251,31 @@ public class ParticlesList {
 
 			Double dx = reader.readDouble();
 			if (dx == null || dx < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "0.0", "X Variance >= 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "0.0", "X Variance >= 0")));
 			}
 			if (!reader.advance(",")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
 			}
 			Double dy = reader.readDouble();
 			if (dy == null || dy < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "0.0", "Y Variance >= 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "0.0", "Y Variance >= 0")));
 			}
 			if (!reader.advance(",")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
 			}
 			Double dz = reader.readDouble();
 			if (dz == null || dz < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "0.0", "Z Variance >= 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "0.0", "Z Variance >= 0")));
 			}
 
 			if (!reader.advance(",")) {
 				if (PARTICLES_WITH_PARAMETERS.contains(particle)) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify velocity and particle-specific parameters")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "Specify velocity and particle-specific parameters")));
 				}
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", "Specify velocity and particle-specific parameters"),
-						Tooltip.of(reader.readSoFar() + ")", "Use default 1 velocity")
+						Tooltip.ofString(reader.readSoFar() + ",", "Specify velocity and particle-specific parameters"),
+						Tooltip.ofString(reader.readSoFar() + ")", "Use default 1 velocity")
 					));
 				}
 				// End of this particle, loop to next
@@ -285,12 +285,12 @@ public class ParticlesList {
 
 			Double velocity = reader.readDouble();
 			if (velocity == null || velocity < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Velocity >= 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Velocity >= 0")));
 			}
 
 			if (!PARTICLES_WITH_PARAMETERS.contains(particle)) {
 				if (!reader.advance(")")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 				}
 
 				// End of this particle, loop to next
@@ -298,7 +298,7 @@ public class ParticlesList {
 				continue;
 			} else {
 				if (!reader.advance(",")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "Specify particle-specific parameters")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "Specify particle-specific parameters")));
 				}
 
 				if (particle.equals(Particle.REDSTONE)) {
@@ -309,17 +309,17 @@ public class ParticlesList {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(1 + StringReader.COLOR_MAP.size());
 						String soFar = reader.readSoFar();
 						for (String valid : StringReader.COLOR_MAP.keySet()) {
-							suggArgs.add(Tooltip.of(soFar + valid, "Particle color"));
+							suggArgs.add(Tooltip.ofString(soFar + valid, "Particle color"));
 						}
-						suggArgs.add(Tooltip.of("#FFFFFF", "Particle color"));
+						suggArgs.add(Tooltip.ofString("#FFFFFF", "Particle color"));
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
 
 					if (!reader.advance(",")) {
 						if (!reader.advance(")")) {
 							return ParseResult.of(Tooltip.arrayOf(
-								Tooltip.of(reader.readSoFar() + ",", "Specify redstone particle size"),
-								Tooltip.of(reader.readSoFar() + ")", "Use default 1 redstone size")
+								Tooltip.ofString(reader.readSoFar() + ",", "Specify redstone particle size"),
+								Tooltip.ofString(reader.readSoFar() + ")", "Use default 1 redstone size")
 							));
 						}
 						// End of this particle, loop to next
@@ -329,11 +329,11 @@ public class ParticlesList {
 
 					Double size = reader.readDouble();
 					if (size == null || size <= 0) {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Size > 0")));
+						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Size > 0")));
 					}
 
 					if (!reader.advance(")")) {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 					}
 
 					// End of this particle, loop to next
@@ -347,13 +347,13 @@ public class ParticlesList {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(Material.values().length);
 						String soFar = reader.readSoFar();
 						for (Material valid : Material.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
 
 					if (!reader.advance(")")) {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 					}
 
 					// End of this particle, loop to next

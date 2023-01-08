@@ -41,8 +41,8 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			// @N is the UUID of the npc entity
 			.withPermission(CommandPermission.fromString(PERMISSION))
 			.withArguments(
-				new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-				new EntitySelectorArgument("npc", EntitySelectorArgument.EntitySelector.ONE_ENTITY)
+				new EntitySelectorArgument.OnePlayer("players"),
+				new EntitySelectorArgument.OneEntity("npc")
 			)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];

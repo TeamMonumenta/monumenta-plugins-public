@@ -59,14 +59,14 @@ public class NearbyPlayersTrigger extends Trigger {
 
 	public static ParseResult<Trigger> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(..)")));
 		}
 		Long playerCount = reader.readLong();
 		if (playerCount == null || playerCount < 0) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "5", "player count must be positive")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "5", "player count must be positive")));
 		}
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "(..)")));
 		}
 
 		CompareOperation opp = reader.readEnum(CompareOperation.values());
@@ -74,23 +74,23 @@ public class NearbyPlayersTrigger extends Trigger {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(CompareOperation.values().length);
 			String soFar = reader.readSoFar();
 			for (CompareOperation valid : CompareOperation.values()) {
-				suggArgs.add(Tooltip.of(soFar + valid.name(), "CompareOperation"));
+				suggArgs.add(Tooltip.ofString(soFar + valid.name(), "CompareOperation"));
 			}
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "(..)")));
 		}
 
 		Double range = reader.readDouble();
 		if (range == null || range < 0) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "30", "range must be positive")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "30", "range must be positive")));
 		}
 
 		//TODO -> read optional filters
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(..)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(..)")));
 		}
 
 		return ParseResult.of(new NearbyPlayersTrigger(range, opp, playerCount.intValue()));

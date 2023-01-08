@@ -274,7 +274,7 @@ public class EntityTargets implements Cloneable {
 
 		public static ParseResult<TagsListFiter> parseResult(StringReader reader, String hoverDescription) {
 			if (!reader.advance("[")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 			}
 
 			Set<String> tags = new LinkedHashSet<>();
@@ -288,8 +288,8 @@ public class EntityTargets implements Cloneable {
 				if (atLeastOneTagsIter) {
 					if (!reader.advance(",")) {
 						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-							Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+							Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+							Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 					}
 				}
 
@@ -299,7 +299,7 @@ public class EntityTargets implements Cloneable {
 				String tag = reader.readString();
 
 				if (tag == null) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "\"tagggg\"", "write tag")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "\"tagggg\"", "write tag")));
 				}
 
 				tags.add(tag);
@@ -466,7 +466,7 @@ public class EntityTargets implements Cloneable {
 		//format (num,sortingEnum) || (limitEnum,sortingEnum)
 		public static ParseResult<Limit> fromReader(StringReader reader, String hoverDescription) {
 			if (!reader.advance("(")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
 			}
 
 			LIMITSENUM limit = reader.readEnum(LIMITSENUM.values());
@@ -478,16 +478,16 @@ public class EntityTargets implements Cloneable {
 					List<Tooltip<String>> suggArgs = new ArrayList<>(LIMITSENUM.values().length + 1);
 					String soFar = reader.readSoFar();
 					for (LIMITSENUM valid : LIMITSENUM.values()) {
-						suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+						suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 					}
-					suggArgs.add(Tooltip.of(soFar + "1", "Specify the numbers"));
+					suggArgs.add(Tooltip.ofString(soFar + "1", "Specify the numbers"));
 
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 				}
 			}
 
 			if (!reader.advance(",")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
 			}
 
 			SORTING sort = reader.readEnum(SORTING.values());
@@ -497,13 +497,13 @@ public class EntityTargets implements Cloneable {
 				List<Tooltip<String>> suggArgs = new ArrayList<>(SORTING.values().length);
 				String soFar = reader.readSoFar();
 				for (SORTING valid : SORTING.values()) {
-					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 				}
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 			}
 
 			if (!reader.advance(")")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 			}
 
 			if (limit == null) {
@@ -658,7 +658,7 @@ public class EntityTargets implements Cloneable {
 
 	public static ParseResult<EntityTargets> fromReader(StringReader reader, String hoverDescription) {
 		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 		}
 
 		TARGETS target = reader.readEnum(TARGETS.values());
@@ -667,25 +667,25 @@ public class EntityTargets implements Cloneable {
 				List<Tooltip<String>> suggArgs = new ArrayList<>(TARGETS.values().length);
 				String soFar = reader.readSoFar();
 				for (TARGETS valid : TARGETS.values()) {
-					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 				}
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
 		}
 
 		Double range = reader.readDouble();
 		if (range == null) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "10.0", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "10.0", hoverDescription)));
 		}
 
 		if (!reader.advance(",")) {
 			if (!reader.advance("]")) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-					Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+					Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 			}
 			return ParseResult.of(new EntityTargets(target, range));
 		}
@@ -695,18 +695,18 @@ public class EntityTargets implements Cloneable {
 			switch (target) {
 				case PLAYER -> {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + "true", "true -> target player in stealth"),
-						Tooltip.of(reader.readSoFar() + "false", "false -> DON'T target player in stealth")));
+						Tooltip.ofString(reader.readSoFar() + "true", "true -> target player in stealth"),
+						Tooltip.ofString(reader.readSoFar() + "false", "false -> DON'T target player in stealth")));
 				}
 				case MOB, ENTITY -> {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + "true", "true -> DON'T include the launcher"),
-						Tooltip.of(reader.readSoFar() + "false", "false -> include the launcher")));
+						Tooltip.ofString(reader.readSoFar() + "true", "true -> DON'T include the launcher"),
+						Tooltip.ofString(reader.readSoFar() + "false", "false -> include the launcher")));
 				}
 				default -> {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + "true", "not used >.<"),
-						Tooltip.of(reader.readSoFar() + "false", "not used >.>")));
+						Tooltip.ofString(reader.readSoFar() + "true", "not used >.<"),
+						Tooltip.ofString(reader.readSoFar() + "false", "not used >.>")));
 				}
 			}
 		}
@@ -715,8 +715,8 @@ public class EntityTargets implements Cloneable {
 		if (!reader.advance(",")) {
 			if (!reader.advance("]")) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-					Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+					Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 			}
 			return ParseResult.of(new EntityTargets(target, range, optional));
 		}
@@ -730,8 +730,8 @@ public class EntityTargets implements Cloneable {
 		if (!foundLimits && !foundFilters) {
 			//no match but we want to write them
 			return ParseResult.of(Tooltip.arrayOf(
-				Tooltip.of(reader.readSoFar() + LIMIT_STRING, hoverDescription),
-				Tooltip.of(reader.readSoFar() + FILTERS_STRING, hoverDescription)));
+				Tooltip.ofString(reader.readSoFar() + LIMIT_STRING, hoverDescription),
+				Tooltip.ofString(reader.readSoFar() + FILTERS_STRING, hoverDescription)));
 		}
 
 		Limit limit;
@@ -746,8 +746,8 @@ public class EntityTargets implements Cloneable {
 			if (!reader.advance(",")) {
 				if (!reader.advance("]")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 				}
 				return ParseResult.of(new EntityTargets(target, range, optional, parseLimit.getResult()));
 			}
@@ -757,12 +757,12 @@ public class EntityTargets implements Cloneable {
 			foundFilters = reader.advance(FILTERS_STRING);
 			if (!foundFilters) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + FILTERS_STRING, hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + FILTERS_STRING, hoverDescription)));
 			}
 
 			if (!reader.advance("[")) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 			}
 
 			boolean atLeastOneFilterIter = false;
@@ -777,8 +777,8 @@ public class EntityTargets implements Cloneable {
 					if (!reader.advance(",")) {
 						if (!reader.advance("]")) {
 							return ParseResult.of(Tooltip.arrayOf(
-								Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-								Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+								Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+								Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 						}
 						break;
 					}
@@ -794,7 +794,7 @@ public class EntityTargets implements Cloneable {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(PLAYERFILTER.values().length);
 						String soFar = reader.readSoFar();
 						for (PLAYERFILTER valid : PLAYERFILTER.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
@@ -810,7 +810,7 @@ public class EntityTargets implements Cloneable {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(MOBFILTER.values().length);
 						String soFar = reader.readSoFar();
 						for (MOBFILTER valid : MOBFILTER.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
@@ -825,7 +825,7 @@ public class EntityTargets implements Cloneable {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(ENTITYFILTERENUM.values().length);
 						String soFar = reader.readSoFar();
 						for (ENTITYFILTERENUM valid : ENTITYFILTERENUM.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
@@ -844,7 +844,7 @@ public class EntityTargets implements Cloneable {
 
 			if (!reader.advance("[")) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 			}
 			boolean atLeastOneFilterIter = false;
 
@@ -857,8 +857,8 @@ public class EntityTargets implements Cloneable {
 					if (!reader.advance(",")) {
 						if (!reader.advance("]")) {
 							return ParseResult.of(Tooltip.arrayOf(
-								Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-								Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+								Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+								Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 						}
 						break;
 					}
@@ -874,7 +874,7 @@ public class EntityTargets implements Cloneable {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(PLAYERFILTER.values().length);
 						String soFar = reader.readSoFar();
 						for (PLAYERFILTER valid : PLAYERFILTER.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
@@ -890,7 +890,7 @@ public class EntityTargets implements Cloneable {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(MOBFILTER.values().length);
 						String soFar = reader.readSoFar();
 						for (MOBFILTER valid : MOBFILTER.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
@@ -905,7 +905,7 @@ public class EntityTargets implements Cloneable {
 						List<Tooltip<String>> suggArgs = new ArrayList<>(ENTITYFILTERENUM.values().length);
 						String soFar = reader.readSoFar();
 						for (ENTITYFILTERENUM valid : ENTITYFILTERENUM.values()) {
-							suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+							suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 						}
 						return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 					}
@@ -921,8 +921,8 @@ public class EntityTargets implements Cloneable {
 			if (!reader.advance(",")) {
 				if (!reader.advance("]")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 				}
 				return ParseResult.of(new EntityTargets(target, range, optional, Limit.DEFAULT, filters));
 			}
@@ -930,7 +930,7 @@ public class EntityTargets implements Cloneable {
 			//we want read the limit
 			if (!reader.advance(LIMIT_STRING)) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + LIMIT_STRING, hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + LIMIT_STRING, hoverDescription)));
 			}
 
 			ParseResult<Limit> parseLimit = Limit.fromReader(reader, hoverDescription);
@@ -943,8 +943,8 @@ public class EntityTargets implements Cloneable {
 		if (!reader.advance(",")) {
 			if (!reader.advance("]")) {
 				return ParseResult.of(Tooltip.arrayOf(
-					Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-					Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+					Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+					Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 			}
 			return ParseResult.of(new EntityTargets(target, range, optional, limit, filters));
 		}
@@ -954,7 +954,7 @@ public class EntityTargets implements Cloneable {
 
 		if (!reader.advance(TAGS_FILTER_STRING)) {
 			return ParseResult.of(Tooltip.arrayOf(
-				Tooltip.of(reader.readSoFar() + TAGS_FILTER_STRING, hoverDescription)));
+				Tooltip.ofString(reader.readSoFar() + TAGS_FILTER_STRING, hoverDescription)));
 		}
 
 		ParseResult<TagsListFiter> parseTags = TagsListFiter.parseResult(reader, hoverDescription);
@@ -964,8 +964,7 @@ public class EntityTargets implements Cloneable {
 		}
 
 		if (!reader.advance("]")) {
-			return ParseResult.of(Tooltip.arrayOf(
-				Tooltip.of(reader.readSoFar() + "]", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)));
 		}
 
 		return ParseResult.of(new EntityTargets(target, range, optional, limit, filters, tags));

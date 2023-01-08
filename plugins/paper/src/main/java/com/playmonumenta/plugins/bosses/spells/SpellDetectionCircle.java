@@ -19,14 +19,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellDetectionCircle extends Spell {
-	private Plugin mPlugin;
-	private double mRadius;
-	private int mDuration;
-	private Location mCenter;
-	private Location mTarget;
+	private final Plugin mPlugin;
+	private final double mRadius;
+	private final int mDuration;
+	private final Location mCenter;
+	private final Location mTarget;
 
 	public static void registerCommand(Plugin plugin) {
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 		arguments.add(new MultiLiteralArgument("detection_circle"));
 		arguments.add(new LocationArgument("center_pos"));

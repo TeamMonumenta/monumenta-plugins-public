@@ -69,7 +69,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 				if (sender instanceof Player && ((Player) sender).getGameMode().equals(GameMode.SPECTATOR)) {
 					run(plugin, (Player) sender);
 				} else {
-					CommandAPI.fail(ChatColor.RED + "This command must be run by a player in spectator mode!");
+					throw CommandAPI.failWithString("This command must be run by a player in spectator mode!");
 				}
 			})
 			.register();
@@ -78,7 +78,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 	private static @Nullable Player getPlayerToSpectate(Player spectator) {
 		List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
 		players.removeIf((p) -> p.equals(spectator) || p.getGameMode().equals(GameMode.SPECTATOR));
-		if (players.size() <= 0) {
+		if (players.isEmpty()) {
 			return null;
 		}
 		Collections.shuffle(players);

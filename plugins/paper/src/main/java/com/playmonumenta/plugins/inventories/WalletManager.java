@@ -775,7 +775,7 @@ public class WalletManager implements Listener {
 	public static void registerCommand() {
 		new CommandAPICommand("openwallet")
 			.withPermission("monumenta.command.openwallet")
-			.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player viewer = CommandUtils.getPlayerFromSender(sender);
 				Player viewee = (Player) args[0];

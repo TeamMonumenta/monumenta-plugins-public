@@ -7,7 +7,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
@@ -20,9 +19,9 @@ public class RedeemVoteRewards extends GenericCommand {
 	private static final String VOTES_UNCLAIMED = "votesUnclaimed";
 
 	public static void register(Plugin plugin) {
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new StringArgument("scoreboard"));
 		arguments.add(new FunctionArgument("function"));
 

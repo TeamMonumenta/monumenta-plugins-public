@@ -20,10 +20,12 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.Tooltip;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.SafeSuggestions;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.lang.reflect.Field;
@@ -57,7 +59,7 @@ public class BossTagCommand {
 
 	private static final Pattern COMMAS_REMOVER = Pattern.compile(",+");
 
-	private static final int MAXIMUS_TAG_LENGHT = 150;
+	private static final int MAXIMUS_TAG_LENGTH = 150;
 
 	private static final String COMMAND = "bosstag";
 
@@ -65,11 +67,11 @@ public class BossTagCommand {
 
 	public static void register() {
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 
 		arguments.add(new MultiLiteralArgument("add"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionsBossTag));
+		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionsBossTag)));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.add")
@@ -81,7 +83,7 @@ public class BossTagCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("info"));
-		arguments.add(new StringArgument("boss_tag").includeSuggestions(t -> getPossibleBosses(t.currentArg())));
+		arguments.add(new StringArgument("boss_tag").includeSuggestions(ArgumentSuggestions.strings(t -> getPossibleBosses(t.currentArg()))));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.help")
@@ -90,7 +92,7 @@ public class BossTagCommand {
 				try {
 					infoBossTag(player, (String) args[1]);
 				} catch (Exception e) {
-					CommandAPI.fail(e.getMessage());
+					throw CommandAPI.failWithString(e.getMessage());
 				}
 			})
 			.register();
@@ -106,7 +108,7 @@ public class BossTagCommand {
 			})
 			.register();
 
-		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionBossTagBasedonBoS));
+		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionBossTagBasedonBoS)));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.show")
@@ -118,7 +120,7 @@ public class BossTagCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("search"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionsBossTag));
+		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionsBossTag)));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.search")
@@ -130,7 +132,7 @@ public class BossTagCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("get"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestions(t -> SEARCH_OUTCOME_MAP.keySet().toArray(new String[0])));
+		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.suggest(SEARCH_OUTCOME_MAP.keySet())));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.search")
@@ -142,7 +144,7 @@ public class BossTagCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("remove"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceWithSafeSuggestionsT(BossTagCommand::suggestionBossTagBasedonBoSAndParams));
+		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionBossTagBasedonBoSAndParams)));
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.remove")
 			.withArguments(arguments)
@@ -186,7 +188,7 @@ public class BossTagCommand {
 		arguments.add(new MultiLiteralArgument("add"));
 		arguments.add(new StringArgument("PhaseName"));
 		arguments.add(new BooleanArgument("reusable"));
-		arguments.add(new GreedyStringArgument("PhaseExpression").replaceWithSafeSuggestionsT(BossPhasesList::suggestionPhases));
+		arguments.add(new GreedyStringArgument("PhaseExpression").replaceSafeSuggestions(SafeSuggestions.tooltips(BossPhasesList::suggestionPhases)));
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.Phase")
 			.withArguments(arguments)
@@ -228,7 +230,7 @@ public class BossTagCommand {
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("phase"));
 		arguments.add(new MultiLiteralArgument("trigger"));
-		arguments.add(new EntitySelectorArgument("bosses", EntitySelectorArgument.EntitySelector.MANY_ENTITIES));
+		arguments.add(new EntitySelectorArgument.ManyEntities("bosses"));
 		arguments.add(new GreedyStringArgument("triggerKey"));
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.Phase")
@@ -264,12 +266,12 @@ public class BossTagCommand {
 			}
 			if (BossManager.mBossParameters.containsKey(bossTags[0])) {
 				return Tooltip.arrayOf(
-					Tooltip.of(bossTags[0], description),
-					Tooltip.of(bossTags[0] + "[", description)
+					Tooltip.ofString(bossTags[0], description),
+					Tooltip.ofString(bossTags[0] + "[", description)
 				);
 			} else {
 				// Tag is a real tag but doesn't have paremeters - don't bother offering opening [
-				return Tooltip.arrayOf(Tooltip.of(bossTags[0], description));
+				return Tooltip.arrayOf(Tooltip.ofString(bossTags[0], description));
 			}
 		} else if (bossTags.length > 1) {
 			List<Tooltip<String>> entries = new ArrayList<Tooltip<String>>(bossTags.length);
@@ -282,7 +284,7 @@ public class BossTagCommand {
 						description = annotations.help();
 					}
 				}
-				entries.add(Tooltip.of(bossTag, description));
+				entries.add(Tooltip.ofString(bossTag, description));
 			}
 			return entries.toArray(Tooltip.arrayOf());
 		} else {
@@ -418,7 +420,7 @@ public class BossTagCommand {
 
 				for (String paramName : newParams.keySet()) {
 					if (oldParams.get(paramName) != null) {
-						CommandAPI.fail("Parameter: " + paramName + " already implemented from another tag with value " + oldParams.get(paramName));
+						throw CommandAPI.failWithString("Parameter: " + paramName + " already implemented from another tag with value " + oldParams.get(paramName));
 					}
 				}
 			}
@@ -438,10 +440,9 @@ public class BossTagCommand {
 			if (bos != null) {
 				return bos;
 			}
-			CommandAPI.fail("That Book of Souls is corrupted!");
+			throw CommandAPI.failWithString("That Book of Souls is corrupted!");
 		}
-		CommandAPI.fail("You must be holding a Book of Souls!");
-		throw new RuntimeException();
+		throw CommandAPI.failWithString("You must be holding a Book of Souls!");
 	}
 
 	private static void infoBossTag(Player player, String bossTag) throws IllegalArgumentException, IllegalAccessException {
@@ -675,13 +676,12 @@ public class BossTagCommand {
 		List<Soul> souls = SEARCH_OUTCOME_MAP.get(bossTag);
 
 		if (souls == null) {
-			CommandAPI.fail("You must use /bosstag seach " + bossTag + " before using this command");
-			throw new RuntimeException();
+			throw CommandAPI.failWithString("You must use /bosstag seach " + bossTag + " before using this command");
 		}
 
 		if (souls.size() == 0) {
 			SEARCH_OUTCOME_MAP.remove(bossTag);
-			CommandAPI.fail("No BookOfSouls remaining for tag: " + bossTag);
+			throw CommandAPI.failWithString("No BookOfSouls remaining for tag: " + bossTag);
 		}
 
 		Soul bos = souls.get(0);
@@ -803,7 +803,7 @@ public class BossTagCommand {
 				String tagString = (String) tag;
 
 				if (BossManager.mBossParameters.get(tagString) != null) {
-					bossTags.add(Tooltip.of(tagString, null));
+					bossTags.add(Tooltip.ofString(tagString, null));
 					//TODO- write a better Tooltip
 				}
 			}
@@ -834,7 +834,7 @@ public class BossTagCommand {
 					if (BossManager.mBossParameters.get(tagString) != null) {
 						bossTagList.add(tagString);
 						paramsMap.put(tagString, new LinkedHashMap<>());
-						bossTags.add(Tooltip.of(tagString, null));
+						bossTags.add(Tooltip.ofString(tagString, null));
 						//TODO- write a better Tooltip
 					}
 				}
@@ -918,7 +918,7 @@ public class BossTagCommand {
 					if (parametersMap.containsKey(translated)) {
 						tag += translated + "=" + parametersMap.get(translated) + ",";
 
-						if (tag.length() >= MAXIMUS_TAG_LENGHT) {
+						if (tag.length() >= MAXIMUS_TAG_LENGTH) {
 							tag = tag.substring(0, tag.length() - 1) + "]";
 							nextTags.add(tag);
 							tag = bossTag + "[";
@@ -1086,7 +1086,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag remove <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
-			                   .append(Component.text(" Remove the boss_tag and all the dependecies to the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text(" Remove the boss_tag and all the dependencies to the holding BoS", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()

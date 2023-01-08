@@ -30,7 +30,7 @@ public class RunWithPlaceholdersCommand {
 		new CommandAPICommand("papiexecute")
 			.withPermission("monumenta.command.papiexecute")
 			.withArguments(
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new GreedyStringArgument("command"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];

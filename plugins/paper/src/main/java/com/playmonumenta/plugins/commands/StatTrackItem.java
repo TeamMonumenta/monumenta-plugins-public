@@ -10,7 +10,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -59,10 +58,10 @@ public class StatTrackItem extends GenericCommand {
 		options.put("convert", InfusionType.STAT_TRACK_CONVERT);
 		options.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN);
 
-		Argument selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
+		Argument<?> selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(selectionArg);
 		new CommandAPICommand("stattrackhelditem")
 			.withPermission(perms)
@@ -70,8 +69,7 @@ public class StatTrackItem extends GenericCommand {
 			.executes((sender, args) -> {
 				InfusionType selection = options.get((String) args[1]);
 				if (selection == null) {
-					CommandAPI.fail("Invalid stat selection; how did we get here?");
-					return;
+					throw CommandAPI.failWithString("Invalid stat selection; how did we get here?");
 				}
 				run((Player) args[0], selection);
 			})
@@ -80,7 +78,7 @@ public class StatTrackItem extends GenericCommand {
 		perms = CommandPermission.fromString("monumenta.command.modstattrackhelditem");
 
 		arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("number"));
 		new CommandAPICommand("modstattrackhelditem")
 			.withPermission(perms)
@@ -93,7 +91,7 @@ public class StatTrackItem extends GenericCommand {
 		perms = CommandPermission.fromString("monumenta.command.removestattrackhelditem");
 
 		arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("removestattrackhelditem")
 			.withPermission(perms)
@@ -135,7 +133,7 @@ public class StatTrackItem extends GenericCommand {
 	 * @param player the mod who ran the command (get their item in hand)
 	 * @param stat the numerical value the stat should have
 	 */
-	private static void runMod(Player player, int stat) throws WrapperCommandSyntaxException {
+	private static void runMod(Player player, int stat) {
 		//Check to see if the item in hand is already infused
 		ItemStack is = player.getInventory().getItemInMainHand();
 

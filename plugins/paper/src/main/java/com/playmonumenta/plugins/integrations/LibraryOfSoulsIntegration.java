@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.integrations;
 import com.playmonumenta.libraryofsouls.LibraryOfSoulsAPI;
 import com.playmonumenta.libraryofsouls.Soul;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -27,44 +26,44 @@ public class LibraryOfSoulsIntegration {
 	}
 
 	public static Set<String> getSoulNames() {
-		if (ENABLED) {
-			return LibraryOfSoulsAPI.getSoulNames();
+		if (!ENABLED) {
+			return Set.of();
 		}
-		return Collections.emptySet();
+		return LibraryOfSoulsAPI.getSoulNames();
 	}
 
 	public static Set<String> getSoulLocations() {
-		if (ENABLED) {
-			return LibraryOfSoulsAPI.getSoulLocations();
+		if (!ENABLED) {
+			return Set.of();
 		}
-		return Collections.emptySet();
+		return LibraryOfSoulsAPI.getSoulLocations();
 	}
 
 	public static Set<String> getPoolNames() {
-		if (ENABLED) {
-			return LibraryOfSoulsAPI.getSoulPoolNames();
+		if (!ENABLED) {
+			return Set.of();
 		}
-		return Collections.emptySet();
+		return LibraryOfSoulsAPI.getSoulPoolNames();
 	}
 
 	public static Set<String> getGroupNames() {
-		if (ENABLED) {
-			return LibraryOfSoulsAPI.getSoulGroupNames();
+		if (!ENABLED) {
+			return Set.of();
 		}
-		return Collections.emptySet();
+		return LibraryOfSoulsAPI.getSoulGroupNames();
 	}
 
 	public static Set<String> getPartyNames() {
-		if (ENABLED) {
-			return LibraryOfSoulsAPI.getSoulPartyNames();
+		if (!ENABLED) {
+			return Set.of();
 		}
-		return Collections.emptySet();
+		return LibraryOfSoulsAPI.getSoulPartyNames();
 	}
 
 	public static Map<Soul, Integer> getPool(String pool) {
-		if (ENABLED) {
-			return LibraryOfSoulsAPI.getRandomSouls(pool, FastUtils.RANDOM);
+		if (!ENABLED) {
+			return Map.of();
 		}
-		return Collections.emptyMap();
+		return LibraryOfSoulsAPI.getRandomSouls(pool, FastUtils.RANDOM);
 	}
 }

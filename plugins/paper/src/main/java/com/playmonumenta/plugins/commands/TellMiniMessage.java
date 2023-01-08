@@ -14,7 +14,7 @@ public class TellMiniMessage {
 		new CommandAPICommand("tellmini")
 			.withPermission("monumenta.command.tellmini")
 			.withArguments(
-				new EntitySelectorArgument("recipients", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
+				new EntitySelectorArgument.ManyPlayers("recipients"),
 				new GreedyStringArgument("message")
 			).executes((sender, args) -> {
 				@SuppressWarnings("unchecked")

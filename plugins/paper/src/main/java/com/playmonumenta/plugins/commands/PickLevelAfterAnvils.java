@@ -10,7 +10,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +31,9 @@ public class PickLevelAfterAnvils extends GenericCommand {
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.picklevelafteranvils");
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)

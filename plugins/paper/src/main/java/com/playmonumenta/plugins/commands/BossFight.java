@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
@@ -24,14 +24,12 @@ public class BossFight {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.bossfight");
 		/* First one has just the boss name (stateless) */
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
-		arguments.add(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY));
-		arguments.add(new StringArgument("boss_tag").replaceSuggestions(
-			(info) -> {
-				return BossManager.getInstance().listBosses();
-			}
-		));
+		arguments.add(new EntitySelectorArgument.OneEntity("entity"));
+		arguments.add(new StringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.strings(
+			(info) -> BossManager.getInstance().listBosses()
+		)));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)

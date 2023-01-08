@@ -287,7 +287,7 @@ public class EffectsList {
 	 */
 	public static ParseResult<EffectsList> fromReader(StringReader reader, String hoverDescription) {
 		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 		}
 
 		List<Effect> effectsList = new ArrayList<>(4);
@@ -304,18 +304,18 @@ public class EffectsList {
 			if (atLeastOneEffectIter) {
 				if (!reader.advance(",")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
 					));
 				}
 				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", hoverDescription)));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
 				}
 			} else {
 				if (!reader.advance("(")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + "(", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+						Tooltip.ofString(reader.readSoFar() + "(", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
 					));
 				}
 			}
@@ -336,13 +336,13 @@ public class EffectsList {
 					List<Tooltip<String>> suggArgs = new ArrayList<>(PotionEffectType.values().length + Effect.EFFECT_RUNNER.size() + Effect.CUSTOM_EFFECT_RUNNER.size());
 					String soFar = reader.readSoFar();
 					for (String valid : Effect.EFFECT_RUNNER.keySet()) {
-						suggArgs.add(Tooltip.of(soFar + valid, hoverDescription));
+						suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
 					}
 					for (String valid : Effect.CUSTOM_EFFECT_RUNNER.keySet()) {
-						suggArgs.add(Tooltip.of(soFar + valid, hoverDescription));
+						suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
 					}
 					for (PotionEffectType valid : PotionEffectType.values()) {
-						suggArgs.add(Tooltip.of(soFar + valid.getName(), hoverDescription));
+						suggArgs.add(Tooltip.ofString(soFar + valid.getName(), hoverDescription));
 					}
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 				}
@@ -352,7 +352,7 @@ public class EffectsList {
 			}
 
 			if (!reader.advance(",")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", hoverDescription)));
 			}
 
 			Long durationInTicks = 0L;
@@ -360,12 +360,12 @@ public class EffectsList {
 			if (effect != null || foundCustomPotionEffect) {
 				durationInTicks = reader.readLong();
 				if (durationInTicks == null || durationInTicks <= 0) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "20", "Duration in ticks > 0")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "20", "Duration in ticks > 0")));
 				}
 			} else {
 				effectStrength = reader.readDouble();
 				if (effectStrength == null) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Custom effect strength")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Custom effect strength")));
 				}
 			}
 
@@ -373,11 +373,11 @@ public class EffectsList {
 				if (!reader.advance(")")) {
 					if (foundCustomPotionEffect) {
 						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.of(reader.readSoFar() + ",", "Specify strength")));
+							Tooltip.ofString(reader.readSoFar() + ",", "Specify strength")));
 					} else {
 						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.of(reader.readSoFar() + ",", "Specify amplifier"),
-							Tooltip.of(reader.readSoFar() + ")", "Use 0 as amplifier")
+							Tooltip.ofString(reader.readSoFar() + ",", "Specify amplifier"),
+							Tooltip.ofString(reader.readSoFar() + ")", "Use 0 as amplifier")
 						));
 					}
 				}
@@ -397,9 +397,9 @@ public class EffectsList {
 			Double amplifier = reader.readDouble();
 			if (amplifier == null) {
 				if (foundCustomPotionEffect) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Effect strength percentage")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Effect strength percentage")));
 				} else {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "0", "Effect amplifier, starting at 0 for first level")));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "0", "Effect amplifier, starting at 0 for first level")));
 				}
 			}
 
@@ -407,11 +407,11 @@ public class EffectsList {
 				if (!reader.advance(")")) {
 					if (foundCustomPotionEffect) {
 						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.of(reader.readSoFar() + ",", "Specify source"),
-							Tooltip.of(reader.readSoFar() + ")", "Use default source")
+							Tooltip.ofString(reader.readSoFar() + ",", "Specify source"),
+							Tooltip.ofString(reader.readSoFar() + ")", "Use default source")
 						));
 					} else {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 					}
 				}
 
@@ -425,11 +425,11 @@ public class EffectsList {
 
 			String source = reader.readString();
 			if (source == null) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "\"EffectsList" + customEffect + "\"", "Effect source")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "\"EffectsList" + customEffect + "\"", "Effect source")));
 			}
 
 			if (!reader.advance(")")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 			}
 
 

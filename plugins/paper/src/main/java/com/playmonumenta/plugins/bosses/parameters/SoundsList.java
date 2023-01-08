@@ -137,7 +137,7 @@ public class SoundsList {
 	 */
 	public static ParseResult<SoundsList> fromReader(StringReader reader, String hoverDescription) {
 		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", hoverDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", hoverDescription)));
 		}
 
 		List<CSound> soundsList = new ArrayList<>(2);
@@ -154,18 +154,18 @@ public class SoundsList {
 			if (atLeastOneSoundIter) {
 				if (!reader.advance(",")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+						Tooltip.ofString(reader.readSoFar() + ",", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
 					));
 				}
 				if (!reader.advance("(")) {
-					return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", hoverDescription)));
+					return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", hoverDescription)));
 				}
 			} else {
 				if (!reader.advance("(")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + "(", hoverDescription),
-						Tooltip.of(reader.readSoFar() + "]", hoverDescription)
+						Tooltip.ofString(reader.readSoFar() + "(", hoverDescription),
+						Tooltip.ofString(reader.readSoFar() + "]", hoverDescription)
 					));
 				}
 			}
@@ -178,7 +178,7 @@ public class SoundsList {
 				List<Tooltip<String>> suggArgs = new ArrayList<>(Sound.values().length);
 				String soFar = reader.readSoFar();
 				for (Sound valid : Sound.values()) {
-					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 				}
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 			}
@@ -186,8 +186,8 @@ public class SoundsList {
 			if (!reader.advance(",")) {
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", "Specify volume and optionally pitch"),
-						Tooltip.of(reader.readSoFar() + ")", "Use 1.0 as default volume and pitch")
+						Tooltip.ofString(reader.readSoFar() + ",", "Specify volume and optionally pitch"),
+						Tooltip.ofString(reader.readSoFar() + ")", "Use 1.0 as default volume and pitch")
 					));
 				}
 				// End of this sound, loop to next
@@ -197,14 +197,14 @@ public class SoundsList {
 
 			Double volume = reader.readDouble();
 			if (volume == null || volume <= 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Sound volume > 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Sound volume > 0")));
 			}
 
 			if (!reader.advance(",")) {
 				if (!reader.advance(")")) {
 					return ParseResult.of(Tooltip.arrayOf(
-						Tooltip.of(reader.readSoFar() + ",", "Specify pitch"),
-						Tooltip.of(reader.readSoFar() + ")", "Use 1.0 as default pitch")
+						Tooltip.ofString(reader.readSoFar() + ",", "Specify pitch"),
+						Tooltip.ofString(reader.readSoFar() + ")", "Use 1.0 as default pitch")
 					));
 				}
 				// End of this sound, loop to next
@@ -214,11 +214,11 @@ public class SoundsList {
 
 			Double pitch = reader.readDouble();
 			if (pitch == null || pitch < 0) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "1.0", "Sound pitch >= 0")));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "1.0", "Sound pitch >= 0")));
 			}
 
 			if (!reader.advance(")")) {
-				return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", hoverDescription)));
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", hoverDescription)));
 			}
 
 			// End of this sound, loop to next

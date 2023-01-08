@@ -9,7 +9,6 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -61,7 +60,7 @@ public class Spectate implements Listener {
 				if (sender instanceof Player) {
 					run(plugin, (Player)sender);
 				} else {
-					CommandAPI.fail(ChatColor.RED + "This command must be run by a player!");
+					throw CommandAPI.failWithString("This command must be run by a player!");
 				}
 			})
 			.register();
@@ -73,7 +72,7 @@ public class Spectate implements Listener {
 				// Put player back where they were before when they log out
 				((SpectateContext)player.getMetadata(SPECTATE_METAKEY).get(0).value()).restore(player);
 			} else {
-				CommandAPI.fail(ChatColor.RED + "You can not use this command in spectator mode");
+				throw CommandAPI.failWithString("You can not use this command in spectator mode");
 			}
 			//Success condition- either in a safezone OR on a dungeon shard with no nearby mobs
 		} else if (ZoneUtils.hasZoneProperty(player, ZoneProperty.SPECTATE_AVAILABLE) || (ServerProperties.getPreventDungeonItemTransfer() && EntityUtils.getNearbyMobs(player.getLocation(), MOB_CANCEL_RADIUS).size() == 0)) {
@@ -82,7 +81,7 @@ public class Spectate implements Listener {
 			// Succeeded in making this player a spectator
 			return true;
 		} else {
-			CommandAPI.fail(ChatColor.RED + "You can only use this command from within a safezone or dungeon with no nearby mobs");
+			throw CommandAPI.failWithString("You can only use this command from within a safezone or dungeon with no nearby mobs");
 		}
 		return false;
 	}

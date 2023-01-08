@@ -11,8 +11,8 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
@@ -38,11 +38,11 @@ public class CreateGuild {
 		// createguild <guildname> <guild tag>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.createguild");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new TextArgument("guild name"));
 		arguments.add(new TextArgument("guild tag"));
-		arguments.add(new EntitySelectorArgument("founders", EntitySelector.MANY_PLAYERS)
-				.replaceSuggestions(info -> SUGGESTIONS));
+		arguments.add(new EntitySelectorArgument.ManyPlayers("founders")
+				.replaceSuggestions(ArgumentSuggestions.strings(info -> SUGGESTIONS)));
 
 		new CommandAPICommand("createguild")
 			.withPermission(perms)
@@ -63,7 +63,7 @@ public class CreateGuild {
 
 		//TODO: Better lookup of guild name?
 		if (LuckPermsIntegration.GM.getGroup(cleanGuildName) != null) {
-			CommandAPI.fail("The luckperms group '" + cleanGuildName + "' already exists!");
+			throw CommandAPI.failWithString("The luckperms group '" + cleanGuildName + "' already exists!");
 		}
 
 		boolean hasEnoughLevels = true;
@@ -86,10 +86,10 @@ public class CreateGuild {
 
 		// Displays ALL founders in a guild / without enough levels
 		if (inGuildAlready) {
-			CommandAPI.fail("At least one founder is already in a guild");
+			throw CommandAPI.failWithString("At least one founder is already in a guild");
 		}
 		if (!hasEnoughLevels) {
-			CommandAPI.fail("Individual founder level requirements not met");
+			throw CommandAPI.failWithString("Individual founder level requirements not met");
 		}
 
 		// Sort out permissions

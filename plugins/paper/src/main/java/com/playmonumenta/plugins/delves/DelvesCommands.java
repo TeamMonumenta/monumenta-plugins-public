@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -29,14 +30,15 @@ public class DelvesCommands {
 			delveModNames[i++] = mod.name();
 		}
 
-		Argument dungeonArg = new StringArgument("dungeon").includeSuggestions(info -> DelvesManager.DUNGEONS.toArray(new String[0]));
-		Argument delveModArg = new MultiLiteralArgument(delveModNames);
+		Argument<?> dungeonArg = new StringArgument("dungeon").includeSuggestions(
+			ArgumentSuggestions.strings(info -> DelvesManager.DUNGEONS.toArray(new String[0])));
+		Argument<?> delveModArg = new MultiLiteralArgument(delveModNames);
 
 		//this command is the old used to open Delve GUI
 		new CommandAPICommand("opendmsgui")
 			.withPermission(perms)
 			.withArguments(
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg)
 			.executes((sender, args) -> {
 				new DelveCustomInventory((Player) args[0], (String) args[1], true).openInventory((Player) args[0], plugin);
@@ -45,8 +47,8 @@ public class DelvesCommands {
 		new CommandAPICommand("openmoderatordmsgui")
 			.withPermission(perms)
 			.withArguments(
-				new EntitySelectorArgument("moderator", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-				new EntitySelectorArgument("playerToDebug", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("moderator"),
+				new EntitySelectorArgument.OnePlayer("playerToDebug"),
 				dungeonArg)
 			.executes((sender, args) -> {
 				new DelveCustomInventory((Player) args[1], (String) args[2], true).openInventory((Player) args[0], plugin);
@@ -57,7 +59,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("show"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg)
 			.executes((sender, args) -> {
 				new DelveCustomInventory((Player) args[2], (String) args[3], false).openInventory((Player) args[2], plugin);
@@ -68,7 +70,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("utils"),
 				new MultiLiteralArgument("hasallpoints"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER)
+				new EntitySelectorArgument.OnePlayer("player")
 			).executes((commandSender, args) -> {
 				int currentPoint = DelvesUtils.getPlayerTotalDelvePoint(null, (Player) args[2], ServerProperties.getShardName());
 				return currentPoint >= DelvesUtils.MAX_DEPTH_POINTS ? 1 : -1;
@@ -79,7 +81,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("get"),
 				new MultiLiteralArgument("mod"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg,
 				delveModArg
 			).executes((commandSender, args) -> {
@@ -92,7 +94,7 @@ public class DelvesCommands {
 				new MultiLiteralArgument("get"),
 				new MultiLiteralArgument("total"),
 				new MultiLiteralArgument("points"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg
 			).executes((commandSender, args) -> {
 				return DelvesUtils.getPlayerTotalDelvePoint(commandSender, (Player) args[3], (String) args[4]);
@@ -114,7 +116,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("set"),
 				new MultiLiteralArgument("mod"),
-				new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
+				new EntitySelectorArgument.ManyPlayers("entity"),
 				dungeonArg,
 				delveModArg,
 				new IntegerArgument("rank", 0, 10)
@@ -131,11 +133,11 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("set"),
 				new MultiLiteralArgument("mod"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
+				new EntitySelectorArgument.ManyPlayers("player"),
 				dungeonArg,
 				delveModArg,
 				new MultiLiteralArgument("score"),
-				new ScoreHolderArgument("score holder"),
+				new ScoreHolderArgument.Multiple("score holder"),
 				new ObjectiveArgument("objective")
 			).executes((commandSender, args) -> {
 				DelvesModifier mod = DelvesModifier.fromName((String) args[4]);
@@ -154,7 +156,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("random"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
+				new EntitySelectorArgument.ManyPlayers("player"),
 				dungeonArg,
 				new IntegerArgument("pointsToAssign", 0)
 			).executes((commandSender, args) -> {
@@ -172,7 +174,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("clear"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_PLAYERS)
+				new EntitySelectorArgument.ManyPlayers("entity")
 			).executes((commandSender, args) -> {
 				int count = 0;
 				for (Player target : ((Collection<Player>) args[2])) {
@@ -187,7 +189,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("clear"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_PLAYERS),
+				new EntitySelectorArgument.ManyPlayers("player"),
 				dungeonArg
 			).executes((commandSender, args) -> {
 				int count = 0;
@@ -203,7 +205,7 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("update"),
 				new MultiLiteralArgument("scoreboard"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.MANY_ENTITIES)
+				new EntitySelectorArgument.ManyEntities("player")
 			).executes((commandSender, args) -> {
 				for (Player target : ((Collection<Player>) args[2])) {
 					DelvesUtils.updateDelveScoreBoard(target);
@@ -215,9 +217,9 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("copy"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("copy player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("copy player"),
 				dungeonArg,
-				new EntitySelectorArgument("players to copy", EntitySelectorArgument.EntitySelector.MANY_PLAYERS)
+				new EntitySelectorArgument.ManyPlayers("players to copy")
 			).executes((commandSender, args) -> {
 				for (Player target : ((Collection<Player>) args[4])) {
 					DelvesUtils.copyDelvePoint(commandSender, (Player) args[2], target, (String) args[3]);
@@ -229,8 +231,8 @@ public class DelvesCommands {
 			.withArguments(
 				new MultiLiteralArgument("copy"),
 				new MultiLiteralArgument("mods"),
-				new EntitySelectorArgument("copy player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-				new EntitySelectorArgument("players to copy", EntitySelectorArgument.EntitySelector.MANY_PLAYERS)
+				new EntitySelectorArgument.OnePlayer("copy player"),
+				new EntitySelectorArgument.ManyPlayers("players to copy")
 			).executes((commandSender, args) -> {
 				for (Player target : ((Collection<Player>) args[3])) {
 					DelvesUtils.copyDelvePoint(commandSender, (Player) args[2], target, ServerProperties.getShardName());
@@ -241,7 +243,7 @@ public class DelvesCommands {
 			.withPermission(perms)
 			.withArguments(
 				new MultiLiteralArgument("validate"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER), dungeonArg
+				new EntitySelectorArgument.OnePlayer("player"), dungeonArg
 			).executes((commandSender, args) -> {
 				Player player = (Player) args[1];
 				String dungeon = (String) args[2];

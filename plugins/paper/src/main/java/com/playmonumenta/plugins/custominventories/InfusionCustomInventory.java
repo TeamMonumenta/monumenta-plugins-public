@@ -273,7 +273,6 @@ public class InfusionCustomInventory extends CustomInventory {
 	public void loadInv(Player player) {
 		mInventory.clear();
 		mMapFunction.clear();
-		PlayerInventory pi = player.getInventory();
 		loadInfusionPage(player);
 		fillWithJunk();
 	}

@@ -155,7 +155,6 @@ public class CommandUtils {
 				return ((Player) callee);
 			}
 		}
-		CommandAPI.fail("This command must be run by/as a player");
-		throw new RuntimeException(); // This can never happen but is required by the compiler
+		throw CommandAPI.failWithString("This command must be run by/as a player");
 	}
 }

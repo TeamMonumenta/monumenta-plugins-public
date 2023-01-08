@@ -5,7 +5,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
@@ -26,10 +25,10 @@ public class DepthsCommand extends GenericCommand {
 
 		//INIT COMMAND - loads nearby players into one party, or joins new player to an existing one
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new LiteralArgument("init"));
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)
@@ -45,7 +44,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("ability"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new TextArgument("Ability Name"));
 		arguments.add(new IntegerArgument("Rarity"));
 
@@ -62,7 +61,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("delete"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)
@@ -77,7 +76,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("party"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)
@@ -92,7 +91,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("spawn"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new LocationArgument("loc", LocationType.BLOCK_POSITION));
 
 		new CommandAPICommand("depths")
@@ -107,7 +106,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("weapon"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)
@@ -121,7 +120,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("treasure"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("amount"));
 
 		new CommandAPICommand("depths")
@@ -138,7 +137,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("chaos"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)
@@ -154,7 +153,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("floor"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)
@@ -170,7 +169,7 @@ public class DepthsCommand extends GenericCommand {
 
 		arguments.clear();
 		arguments.add(new LiteralArgument("bossfight"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new LocationArgument("loc", LocationType.BLOCK_POSITION));
 
 		new CommandAPICommand("depths")
@@ -184,7 +183,7 @@ public class DepthsCommand extends GenericCommand {
 		//ROOM COMMAND - debug command to manually set the party's room number to specified value
 		arguments.clear();
 		arguments.add(new LiteralArgument("room"));
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("amount"));
 
 		new CommandAPICommand("depths")
@@ -200,8 +199,8 @@ public class DepthsCommand extends GenericCommand {
 		//ROOM COMMAND - debug command to manually set the party's room number to specified value
 		arguments.clear();
 		arguments.add(new LiteralArgument("debug"));
-		arguments.add(new EntitySelectorArgument("moderator", EntitySelector.ONE_PLAYER));
-		arguments.add(new EntitySelectorArgument("target player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("moderator"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("target player"));
 
 		new CommandAPICommand("depths")
 		.withPermission(perms)

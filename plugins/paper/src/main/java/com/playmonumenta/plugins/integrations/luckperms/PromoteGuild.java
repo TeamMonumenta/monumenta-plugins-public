@@ -7,7 +7,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,8 @@ public class PromoteGuild {
 		// promoteguild <player collection>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.promoteguild");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.ManyPlayers("players"));
 
 		new CommandAPICommand("promoteguild")
 			.withPermission(perms)
@@ -54,13 +53,12 @@ public class PromoteGuild {
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuild == null || currentGuildName == null) {
 			String err = ChatColor.RED + "Founder is not in a guild";
-			CommandAPI.fail(err);
+			throw CommandAPI.failWithString(err);
 		}
 
 		if (ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
 			String err = ChatColor.RED + "You are not a founder of guild '" + currentGuildName + "'";
-			CommandAPI.fail(err);
-			return;
+			throw CommandAPI.failWithString(err);
 		}
 		players.removeIf(player -> founder.getName().equalsIgnoreCase(player.getName()));
 		if (players.size() == 0) {

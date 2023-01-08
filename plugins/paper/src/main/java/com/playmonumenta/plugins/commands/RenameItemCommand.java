@@ -101,13 +101,13 @@ public class RenameItemCommand {
 		if (itemStack.getType().isAir()
 			    || !ItemUtils.isShulkerBox(itemStack.getType())) {
 			player.sendMessage(Component.text("You must be holding a shulker box!", NamedTextColor.RED));
-			CommandAPI.fail("You must be holding a Shulker box!");
+			throw CommandAPI.failWithString("You must be holding a Shulker box!");
 		}
 		if (ItemStatUtils.getRegion(itemStack) != ItemStatUtils.Region.SHULKER_BOX
 			    && !ShulkerEquipmentListener.isEquipmentBox(itemStack)
 			    && !ShulkerEquipmentListener.isCharmBox(itemStack)) {
 			player.sendMessage(Component.text("This item cannot be renamed!", NamedTextColor.RED));
-			CommandAPI.fail("This item cannot be renamed!");
+			throw CommandAPI.failWithString("This item cannot be renamed!");
 		}
 	}
 

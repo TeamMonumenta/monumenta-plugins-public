@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
@@ -109,14 +110,13 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(zeroArgumentEffects.keySet().toArray(String[]::new)),
 				new DoubleArgument("seconds")
 			).executes((sender, args) -> {
 				ZeroArgument effect = zeroArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					effect.run(entity, (int) (((double) args[2]) * 20));
@@ -125,15 +125,14 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new DoubleArgument("seconds"),
 				new DoubleArgument("amount")
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					effect.run(entity, (int) (((double) args[2]) * 20), (double) args[3], null);
@@ -142,7 +141,7 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new DoubleArgument("seconds"),
 				new DoubleArgument("amount"),
@@ -150,8 +149,7 @@ public class CustomEffect {
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					effect.run(entity, (int) (((double) args[2]) * 20), (double) args[3], (String) args[4]);
@@ -160,15 +158,14 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(zeroArgumentEffects.keySet().toArray(String[]::new)),
 				new DoubleArgument("time"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks")
 			).executes((sender, args) -> {
 				ZeroArgument effect = zeroArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				int duration = getDuration((String) args[3], (double) args[2]);
 				for (Entity entity : (Collection<Entity>) args[0]) {
@@ -178,7 +175,7 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new DoubleArgument("time"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
@@ -186,8 +183,7 @@ public class CustomEffect {
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				int duration = getDuration((String) args[3], (double) args[2]);
 				for (Entity entity : (Collection<Entity>) args[0]) {
@@ -197,7 +193,7 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new DoubleArgument("time"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
@@ -206,8 +202,7 @@ public class CustomEffect {
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				int duration = getDuration((String) args[3], (double) args[2]);
 				for (Entity entity : (Collection<Entity>) args[0]) {
@@ -217,15 +212,14 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(zeroArgumentEffects.keySet().toArray(String[]::new)),
 				new ObjectiveArgument("objective"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks")
 			).executes((sender, args) -> {
 				ZeroArgument effect = zeroArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue(entity, (String) args[2]).orElse(0));
@@ -237,7 +231,7 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new ObjectiveArgument("objective"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
@@ -245,8 +239,7 @@ public class CustomEffect {
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				for (Entity entity : (Collection<Entity>) args[0]) {
 					int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue(entity, (String) args[2]).orElse(0));
@@ -258,16 +251,15 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(zeroArgumentEffects.keySet().toArray(String[]::new)),
 				new ObjectiveArgument("objective"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
-				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE)
+				new ScoreHolderArgument.Single("scoreholder")
 			).executes((sender, args) -> {
 				ZeroArgument effect = zeroArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
 				if (duration > 0) {
@@ -279,18 +271,17 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new ObjectiveArgument("objective"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
-				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE),
+				new ScoreHolderArgument.Single("scoreholder"),
 				new DoubleArgument("amount"),
 				new GreedyStringArgument("source")
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
 				if (duration > 0) {
@@ -302,17 +293,16 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument(singleArgumentEffects.keySet().toArray(String[]::new)),
 				new ObjectiveArgument("objective"),
 				new MultiLiteralArgument("minutes", "seconds", "ticks"),
-				new ScoreHolderArgument("scoreholder", ScoreHolderArgument.ScoreHolderType.SINGLE),
+				new ScoreHolderArgument.Single("scoreholder"),
 				new DoubleArgument("amount")
 			).executes((sender, args) -> {
 				SingleArgument effect = singleArgumentEffects.get((String) args[1]);
 				if (effect == null) {
-					CommandAPI.fail("Invalid effect " + args[1]);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid effect " + args[1]);
 				}
 				int duration = getDuration((String) args[3], ScoreboardUtils.getScoreboardValue((String) args[4], (String) args[2]).orElse(0));
 				if (duration > 0) {
@@ -324,12 +314,12 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument("clear"),
 				new StringArgument("effect")
-					.replaceSuggestions((info) ->
+					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
 						translations.keySet().stream().toList().toArray(String[]::new)
-					)
+					))
 			).executes((sender, args) -> {
 				String source = (String) args[2];
 				String translation = translations.get(source);
@@ -343,12 +333,12 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument("clear"),
 				new StringArgument("effect")
-					.replaceSuggestions((info) ->
+					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
 						translations.keySet().stream().toList().toArray(String[]::new)
-					),
+					)),
 				new StringArgument("source")
 			).executes((sender, args) -> {
 				String source = (String) args[3];
@@ -363,12 +353,12 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument("haseffect"),
 				new StringArgument("effect")
-					.replaceSuggestions((info) ->
+					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
 						translations.keySet().stream().toList().toArray(String[]::new)
-					)
+					))
 			).executes((sender, args) -> {
 				String source = (String) args[2];
 				String translation = translations.get(source);
@@ -384,12 +374,12 @@ public class CustomEffect {
 
 		new CommandAPICommand(COMMAND).withPermission(PERMISSION)
 			.withArguments(
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new MultiLiteralArgument("haseffect"),
 				new StringArgument("effect")
-					.replaceSuggestions((info) ->
+					.replaceSuggestions(ArgumentSuggestions.strings((info) ->
 						translations.keySet().stream().toList().toArray(String[]::new)
-					),
+					)),
 				new StringArgument("source")
 			).executes((sender, args) -> {
 				String source = (String) args[3];

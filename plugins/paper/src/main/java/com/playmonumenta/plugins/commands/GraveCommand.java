@@ -44,18 +44,18 @@ public class GraveCommand {
 			)
 			.withSubcommand(new CommandAPICommand("list")
 				.withPermission("monumenta.command.grave.list")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.list.other"))
+				.withArguments(new EntitySelectorArgument.OnePlayer("player").withPermission("monumenta.command.grave.list.other"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesOther(player, (Player) args[0], 1))
 			)
 			.withSubcommand(new CommandAPICommand("list")
 				.withPermission("monumenta.command.grave.list")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.list.other"))
+				.withArguments(new EntitySelectorArgument.OnePlayer("player").withPermission("monumenta.command.grave.list.other"))
 				.withArguments(new IntegerArgument("page"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> listGravesOther(player, (Player) args[0], (int) args[1]))
 			)
 			.withSubcommand(new CommandAPICommand("summon")
 				.withSubcommand(new CommandAPICommand("list")
-					.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.list"))
+					.withArguments(new EntitySelectorArgument.OnePlayer("player").withPermission("monumenta.command.grave.summon.list"))
 					.withArguments(new LocationArgument("location"))
 					.executes((CommandExecutor) (sender, args) -> summonGraveList((Player) args[0], (Location) args[1]))
 				)
@@ -81,13 +81,13 @@ public class GraveCommand {
 				)
 			)
 			.withSubcommand(new CommandAPICommand("summon")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.other"))
+				.withArguments(new EntitySelectorArgument.OnePlayer("player").withPermission("monumenta.command.grave.summon.other"))
 				.withArguments(new LocationArgument("location"))
 				.withArguments(new UUIDArgument("grave"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], (Location) args[1], (UUID) args[2]))
 			)
 			.withSubcommand(new CommandAPICommand("summon")
-				.withArguments(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER).withPermission("monumenta.command.grave.summon.other"))
+				.withArguments(new EntitySelectorArgument.OnePlayer("player").withPermission("monumenta.command.grave.summon.other"))
 				.withArguments(new UUIDArgument("grave"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> summonGraveOther(player, (Player) args[0], player.getLocation(), (UUID) args[1]))
 			)
@@ -137,7 +137,7 @@ public class GraveCommand {
 			);
 			player.sendMessage(message);
 		} else {
-			CommandAPI.fail("You don't have any graves");
+			throw CommandAPI.failWithString("You don't have any graves");
 		}
 	}
 
@@ -177,7 +177,7 @@ public class GraveCommand {
 			);
 			sender.sendMessage(message);
 		} else {
-			CommandAPI.fail(player.getName() + " doesn't have any graves");
+			throw CommandAPI.failWithString(player.getName() + " doesn't have any graves");
 		}
 	}
 
@@ -227,10 +227,10 @@ public class GraveCommand {
 				player.sendMessage(message);
 				addSummonListTag(player);
 			} else {
-				CommandAPI.fail("You don't have any graves");
+				throw CommandAPI.failWithString("You don't have any graves");
 			}
 		} else {
-			CommandAPI.fail("Timed out; please talk to the NPC again.");
+			throw CommandAPI.failWithString("Timed out; please talk to the NPC again.");
 		}
 	}
 
@@ -254,13 +254,13 @@ public class GraveCommand {
 					);
 					addSummonListTag(player);
 				} else {
-					CommandAPI.fail("This grave does not exist.");
+					throw CommandAPI.failWithString("This grave does not exist.");
 				}
 			} else {
-				CommandAPI.fail("You do not have any graves.");
+				throw CommandAPI.failWithString("You do not have any graves.");
 			}
 		} else {
-			CommandAPI.fail("Timed out; please talk to the NPC again.");
+			throw CommandAPI.failWithString("Timed out; please talk to the NPC again.");
 		}
 	}
 

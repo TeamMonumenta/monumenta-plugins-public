@@ -69,7 +69,7 @@ public class DeathMsg {
 	public static void register() {
 		final CommandPermission perms = CommandPermission.fromString("monumenta.command.deathmsg");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.executes((sender, args) -> {

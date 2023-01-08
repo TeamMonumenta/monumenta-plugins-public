@@ -58,7 +58,7 @@ public abstract class BossParameters {
 
 		// Advance beyond [ character
 		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", bossDescription)));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", bossDescription)));
 		}
 
 		// Parse all the valid fields into a map of name : Entry(class, description)
@@ -88,8 +88,8 @@ public abstract class BossParameters {
 						return res;
 					} else {
 						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.of(reader.readSoFar() + ",", ""),
-							Tooltip.of(reader.readSoFar() + "]", "")
+							Tooltip.ofString(reader.readSoFar() + ",", ""),
+							Tooltip.ofString(reader.readSoFar() + "]", "")
 						));
 					}
 				}
@@ -138,7 +138,7 @@ public abstract class BossParameters {
 							} else {
 								defStr = def.toString();
 							}
-							suggArgs.add(Tooltip.of(soFar + valid.getKey() + "=" + defStr, valid.getValue().getDesc()));
+							suggArgs.add(Tooltip.ofString(soFar + valid.getKey() + "=" + defStr, valid.getValue().getDesc()));
 						}
 					}
 					return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
@@ -146,7 +146,7 @@ public abstract class BossParameters {
 					// This hashmap get must succeed or there is a bug in the Reader
 					TypeAndDesc validType = Objects.requireNonNull(validParams.get(validKey));
 					if (!reader.advance("=")) {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "=", validType.getDesc())));
+						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "=", validType.getDesc())));
 					}
 
 					if (validType.getDeprecated()) {
@@ -164,7 +164,7 @@ public abstract class BossParameters {
 							} else {
 								def = validType.getField().getLong(parameters);
 							}
-							return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + def, validType.getDesc())));
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + def, validType.getDesc())));
 						}
 						if (validTypeClass == int.class) {
 							validType.getField().setInt(parameters, val.intValue());
@@ -181,7 +181,7 @@ public abstract class BossParameters {
 							} else {
 								def = validType.getField().getDouble(parameters);
 							}
-							return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + def, validType.getDesc())));
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + def, validType.getDesc())));
 						}
 						if (validTypeClass == float.class) {
 							validType.getField().setFloat(parameters, val.floatValue());
@@ -193,8 +193,8 @@ public abstract class BossParameters {
 						if (val == null) {
 							// No valid value here - offer true and false as options
 							return ParseResult.of(Tooltip.arrayOf(
-								Tooltip.of(reader.readSoFar() + "true", validType.getDesc()),
-								Tooltip.of(reader.readSoFar() + "false", validType.getDesc())
+								Tooltip.ofString(reader.readSoFar() + "true", validType.getDesc()),
+								Tooltip.ofString(reader.readSoFar() + "false", validType.getDesc())
 							));
 						}
 						validType.getField().setBoolean(parameters, val);
@@ -203,8 +203,8 @@ public abstract class BossParameters {
 						if (val == null) {
 							// No valid string here
 							return ParseResult.of(Tooltip.arrayOf(
-								Tooltip.of(reader.readSoFar() + "\"quoted,)string\"", "String with quotes can store any data"),
-								Tooltip.of(reader.readSoFar() + "simple string", "String without quotes can't contain , or )")
+								Tooltip.ofString(reader.readSoFar() + "\"quoted,)string\"", "String with quotes can store any data"),
+								Tooltip.ofString(reader.readSoFar() + "simple string", "String without quotes can't contain , or )")
 							));
 						}
 						validType.getField().set(parameters, val);
@@ -215,7 +215,7 @@ public abstract class BossParameters {
 							List<Tooltip<String>> suggArgs = new ArrayList<>(PotionEffectType.values().length);
 							String soFar = reader.readSoFar();
 							for (PotionEffectType valid : PotionEffectType.values()) {
-								suggArgs.add(Tooltip.of(soFar + valid.getName(), validType.getDesc()));
+								suggArgs.add(Tooltip.ofString(soFar + valid.getName(), validType.getDesc()));
 							}
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
@@ -227,7 +227,7 @@ public abstract class BossParameters {
 							List<Tooltip<String>> suggArgs = new ArrayList<>(Sound.values().length);
 							String soFar = reader.readSoFar();
 							for (Sound valid : Sound.values()) {
-								suggArgs.add(Tooltip.of(soFar + valid.name(), validType.getDesc()));
+								suggArgs.add(Tooltip.ofString(soFar + valid.name(), validType.getDesc()));
 							}
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
@@ -239,9 +239,9 @@ public abstract class BossParameters {
 							List<Tooltip<String>> suggArgs = new ArrayList<>(1 + StringReader.COLOR_MAP.size());
 							String soFar = reader.readSoFar();
 							for (String valid : StringReader.COLOR_MAP.keySet()) {
-								suggArgs.add(Tooltip.of(soFar + valid, validType.getDesc()));
+								suggArgs.add(Tooltip.ofString(soFar + valid, validType.getDesc()));
 							}
-							suggArgs.add(Tooltip.of("#FFFFFF", validType.getDesc()));
+							suggArgs.add(Tooltip.ofString("#FFFFFF", validType.getDesc()));
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
 						validType.getField().set(parameters, val);
@@ -252,7 +252,7 @@ public abstract class BossParameters {
 							List<Tooltip<String>> suggArgs = new ArrayList<>(Material.values().length);
 							String soFar = reader.readSoFar();
 							for (Material valid : Material.values()) {
-								suggArgs.add(Tooltip.of(soFar + valid.name(), validType.getDesc()));
+								suggArgs.add(Tooltip.ofString(soFar + valid.name(), validType.getDesc()));
 							}
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
@@ -290,7 +290,7 @@ public abstract class BossParameters {
 					} else if (validTypeClass == BossPhasesList.class) {
 						ParseResult<BossPhasesList> result = BossPhasesList.fromReader(reader);
 						if (result.getTooltip() != null) {
-							return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "USE: /bosstag phase add ---", "DUMP")));
+							return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "USE: /bosstag phase add ---", "DUMP")));
 						}
 						((BossPhasesList) validType.getField().get(parameters)).addBossPhases(Objects.requireNonNull(result.getResult()));
 					} else if (Enum.class.isAssignableFrom(validTypeClass)) {
@@ -300,13 +300,13 @@ public abstract class BossParameters {
 							List<Tooltip<String>> suggArgs = new ArrayList<>();
 							String soFar = reader.readSoFar();
 							for (Enum<?> valid : ((Class<? extends Enum>) validTypeClass).getEnumConstants()) {
-								suggArgs.add(Tooltip.of(soFar + valid.name(), validType.getDesc()));
+								suggArgs.add(Tooltip.ofString(soFar + valid.name(), validType.getDesc()));
 							}
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 						}
 						validType.getField().set(parameters, val);
 					} else {
-						return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "Not supported yet: " + validTypeClass.toString(), "")));
+						return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "Not supported yet: " + validTypeClass.toString(), "")));
 					}
 
 					// Still more in the string, so this isn't the end

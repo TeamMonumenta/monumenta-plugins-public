@@ -9,7 +9,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +26,8 @@ public class LeaveGuild {
 		// leaveguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.leaveguild");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("leaveguild")
 			.withPermission(perms)
@@ -49,8 +48,7 @@ public class LeaveGuild {
 		if (group == null) {
 			String err = ChatColor.RED + "You are not in a guild";
 			player.sendMessage(err);
-			CommandAPI.fail(err);
-			throw new RuntimeException();
+			throw CommandAPI.failWithString(err);
 		}
 
 		String guildName = LuckPermsIntegration.getGuildName(group);

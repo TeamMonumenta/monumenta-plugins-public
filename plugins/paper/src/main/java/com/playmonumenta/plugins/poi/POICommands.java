@@ -23,15 +23,14 @@ public class POICommands {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("conquer"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(poiNames))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				String poiName = (String) args[1];
 				POI poi = POI.getPOI(poiName);
 				if (poi == null || poi == POI.NONE) {
-					CommandAPI.fail("Invalid POI name " + poiName);
-					throw new RuntimeException();
+					throw CommandAPI.failWithString("Invalid POI name " + poiName);
 				}
 				boolean added = POIManager.getInstance().completePOI(player, poi);
 				if (added) {
@@ -45,7 +44,7 @@ public class POICommands {
 			.withPermission(perms)
 			.withArguments(
 				new LiteralArgument("list"),
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER))
+				new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				Set<POI> pois = POIManager.getInstance().mPlayerPOI.get(player.getUniqueId());

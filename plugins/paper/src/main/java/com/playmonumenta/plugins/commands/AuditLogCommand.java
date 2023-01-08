@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.listeners.AuditListener;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import org.bukkit.entity.Player;
 
@@ -19,7 +18,7 @@ public class AuditLogCommand {
 			.register();
 		new CommandAPICommand("auditlogplayer")
 			.withPermission(CommandPermission.fromString("monumenta.command.auditlog"))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
 				AuditListener.log(((String)args[1]).replaceAll("@S", ((Player)args[0]).getName()));
@@ -34,7 +33,7 @@ public class AuditLogCommand {
 			.register();
 		new CommandAPICommand("auditlogsevereplayer")
 			.withPermission(CommandPermission.fromString("monumenta.command.auditlog"))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.withArguments(new TextArgument("message"))
 			.executes((sender, args) -> {
 				AuditListener.logSevere(((String)args[1]).replaceAll("@S", ((Player)args[0]).getName()));

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
@@ -43,7 +44,7 @@ public class ExperiencinatorCommand {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION_OTHERS)
-			.withArguments(new LiteralArgument("menu"), new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
+			.withArguments(new LiteralArgument("menu"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
 				for (Player player : (Collection<Player>) args[0]) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorMainGui.show(player, Plugin.getInstance(), experiencinator, item));
@@ -62,7 +63,7 @@ public class ExperiencinatorCommand {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION_OTHERS)
-			.withArguments(new LiteralArgument("convert"), new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
+			.withArguments(new LiteralArgument("convert"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
 				for (Player player : (Collection<Player>) args[0]) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorUtils.useExperiencinator(experiencinator, item, player));
@@ -81,7 +82,7 @@ public class ExperiencinatorCommand {
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION_OTHERS)
-			.withArguments(new LiteralArgument("configure"), new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
+			.withArguments(new LiteralArgument("configure"), new EntitySelectorArgument.ManyPlayers("players"))
 			.executes((sender, args) -> {
 				for (Player player : (Collection<Player>) args[0]) {
 					useExperiencinator(player, (experiencinator, item) -> ExperiencinatorSettingsGui.showConfig(player, Plugin.getInstance(), experiencinator, item));
@@ -92,16 +93,16 @@ public class ExperiencinatorCommand {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION_ITEMS)
 			.withArguments(new LiteralArgument("convert_items"),
-			               new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-			               new EntitySelectorArgument("items", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+			               new EntitySelectorArgument.OnePlayer("player"),
+			               new EntitySelectorArgument.ManyEntities("items"),
 			               new StringArgument("conversionName")
-				               .replaceSuggestions(info -> {
+				               .replaceSuggestions(ArgumentSuggestions.strings(info -> {
 					               Location lootTableLocation = info.sender() instanceof Player ? ((Player) info.sender()).getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
 					               ExperiencinatorConfig config = ExperiencinatorUtils.getConfig(lootTableLocation);
 					               return config != null ? config.getConversionNames().toArray(new String[0]) : new String[0];
-				               }),
+				               })),
 			               new StringArgument("conversionResultName")
-				               .replaceSuggestions(info -> {
+				               .replaceSuggestions(ArgumentSuggestions.strings(info -> {
 					               String conversionName = info.previousArgs() != null ? (String) info.previousArgs()[2] : null;
 					               if (conversionName == null) {
 						               return new String[0];
@@ -113,7 +114,7 @@ public class ExperiencinatorCommand {
 					               }
 					               ExperiencinatorConfig.Conversion conversion = config.getConversion(conversionName);
 					               return conversion != null ? conversion.getConversionRateNames().toArray(new String[0]) : new String[0];
-				               }),
+				               })),
 			               new BooleanArgument("giveToPlayerOnFail"))
 			.executes((sender, args) -> {
 				for (Entity entity : (Collection<Entity>) args[1]) {
@@ -166,7 +167,7 @@ public class ExperiencinatorCommand {
 		if (experiencinator != null) {
 			func.accept(experiencinator, item);
 		} else {
-			CommandAPI.fail("You don't have an Experiencinator or one of its upgrades in your inventory!");
+			throw CommandAPI.failWithString("You don't have an Experiencinator or one of its upgrades in your inventory!");
 		}
 	}
 

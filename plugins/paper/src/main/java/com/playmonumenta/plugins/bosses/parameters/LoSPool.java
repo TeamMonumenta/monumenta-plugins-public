@@ -67,7 +67,7 @@ public class LoSPool {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(mobsPool.size());
 			String soFar = reader.readSoFar();
 			for (String valid : mobsPool) {
-				suggArgs.add(Tooltip.of(soFar + valid, hoverDescription));
+				suggArgs.add(Tooltip.ofString(soFar + valid, hoverDescription));
 			}
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}

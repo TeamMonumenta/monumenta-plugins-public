@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
@@ -120,14 +121,14 @@ public class GlowingCommand {
 
 		// enable/disable option can take a variable amount of options as arguments
 		String[] optionLiterals = Arrays.stream(Option.values()).map(o -> o.name().toLowerCase(Locale.ROOT)).toArray(String[]::new);
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new MultiLiteralArgument("enable", "disable", "toggle"));
 		arguments.add(new MultiLiteralArgument(optionLiterals));
 		for (int i = 0; i < optionLiterals.length - 2; i++) { // -1 for "all", and another -1 because listing every single option makes no sense
 			if (i != 0) {
-				arguments.add(new StringArgument("option" + (i + 1)).replaceSuggestions(info -> Arrays.stream(optionLiterals)
+				arguments.add(new StringArgument("option" + (i + 1)).replaceSuggestions(ArgumentSuggestions.strings(info -> Arrays.stream(optionLiterals)
 						.filter(o -> !o.equals(Option.ALL.name().toLowerCase(Locale.ROOT)) && !info.currentInput().contains(o))
-						.toArray(String[]::new)));
+						.toArray(String[]::new))));
 			}
 
 			new CommandAPICommand(COMMAND)
@@ -165,7 +166,7 @@ public class GlowingCommand {
 			try {
 				options.add(Option.valueOf(((String) optionString).toUpperCase(Locale.ROOT)));
 			} catch (IllegalArgumentException e) {
-				CommandAPI.fail("Invalid option '" + optionString + "'");
+				throw CommandAPI.failWithString("Invalid option '" + optionString + "'");
 			}
 		}
 

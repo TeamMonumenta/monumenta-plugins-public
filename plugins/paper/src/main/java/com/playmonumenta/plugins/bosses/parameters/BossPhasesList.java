@@ -100,32 +100,32 @@ public class BossPhasesList {
 
 	public static ParseResult<BossPhasesList> fromReader(StringReader reader) {
 		if (!reader.advance("[")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "[", "[...]")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "[", "[...]")));
 		}
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "[...]")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "[...]")));
 		}
 
 		String phaseName = reader.readUntil(",");
 		if (phaseName == null) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "specificPhaseName", "name")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "specificPhaseName", "name")));
 		}
 
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "[...]")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "[...]")));
 		}
 
 		Boolean reusable = reader.readBoolean();
 		if (reusable == null) {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(2);
 			String soFar = reader.readSoFar();
-			suggArgs.add(Tooltip.of(soFar + "false", "not reusable"));
-			suggArgs.add(Tooltip.of(soFar + "true", "reusable"));
+			suggArgs.add(Tooltip.ofString(soFar + "false", "not reusable"));
+			suggArgs.add(Tooltip.ofString(soFar + "true", "reusable"));
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", "[...]")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "[...]")));
 		}
 
 		ParseResult<Phase> phaseResult = Phase.fromReader(reader);
@@ -137,10 +137,10 @@ public class BossPhasesList {
 		phase.setReusable(reusable);
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "[...]")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "[...]")));
 		}
 		if (!reader.advance("]")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "]", "[...]")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "]", "[...]")));
 		}
 
 		List<Phase> phases = new ArrayList<>();

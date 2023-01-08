@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.seasonalevents.MonumentaContent;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.executors.CommandExecutor;
@@ -25,15 +26,15 @@ public class EventCommand extends GenericCommand {
 			labels.add(content.getLabel());
 		}
 		String[] arr = labels.toArray(new String[labels.size()]);
-		Argument contentArgs = new TextArgument("event").replaceSuggestions((info) -> arr);
+		Argument<?> contentArgs = new TextArgument("event").replaceSuggestions(ArgumentSuggestions.strings((info) -> arr));
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(contentArgs);
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
-			.executes((CommandExecutor) (sender, args) -> {
+			.executes((sender, args) -> {
 				Bukkit.getPluginManager().callEvent(new MonumentaEvent((Player) args[0], (String) args[1]));
 			})
 			.register();

@@ -30,7 +30,7 @@ public class SkillSummary extends GenericCommand {
 			})
 			.register();
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new BooleanArgument("shorthand"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)

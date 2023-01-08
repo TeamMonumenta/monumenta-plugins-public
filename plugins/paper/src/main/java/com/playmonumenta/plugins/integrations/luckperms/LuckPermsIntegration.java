@@ -35,7 +35,7 @@ public class LuckPermsIntegration {
 		JoinGuild.register(plugin);
 		PromoteGuild.register();
 		LeaveGuild.register(plugin);
-		TestGuild.register(plugin);
+		TestGuild.register();
 		TeleportGuild.register();
 		SetGuildTeleport.register(plugin);
 	}

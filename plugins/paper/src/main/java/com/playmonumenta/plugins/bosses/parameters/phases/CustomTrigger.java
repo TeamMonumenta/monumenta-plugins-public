@@ -36,28 +36,28 @@ public class CustomTrigger extends Trigger {
 
 	public static ParseResult<Trigger> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(...)")));
 		}
 
 		String key = reader.readString();
 		if (key == null || key.isEmpty()) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "KeyTriggerName", "name of this custom trigger"),
-												Tooltip.of(reader.readSoFar() + "\"KeyTriggerNameWithInvertedCommas\"", "name of this custom trigger")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "KeyTriggerName", "name of this custom trigger"),
+												Tooltip.ofString(reader.readSoFar() + "\"KeyTriggerNameWithInvertedCommas\"", "name of this custom trigger")));
 		}
 
 		if (!reader.advance(",")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ",", ",")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", ",")));
 		}
 
 		Boolean onlyOnce = reader.readBoolean();
 		if (onlyOnce == null) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "true", "if this trigger should return true when running test() after custom() return true"),
-				Tooltip.of(reader.readSoFar() + "false", "if this trigger should return false when running test() after custom() return true")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "true", "if this trigger should return true when running test() after custom() return true"),
+				Tooltip.ofString(reader.readSoFar() + "false", "if this trigger should return false when running test() after custom() return true")));
 		}
 
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(...)")));
 		}
 
 		return ParseResult.of(new CustomTrigger(key, onlyOnce));

@@ -23,7 +23,7 @@ public class RemoveAbilityAction implements Action {
 
 	public static ParseResult<Action> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(...)")));
 		}
 
 		String ability = reader.readOneOf(List.of(BossManager.getInstance().listStatelessBosses()));
@@ -32,13 +32,13 @@ public class RemoveAbilityAction implements Action {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(BossManager.getInstance().listStatelessBosses().length);
 			String soFar = reader.readSoFar();
 			for (String valid : BossManager.getInstance().listStatelessBosses()) {
-				suggArgs.add(Tooltip.of(soFar + valid, "boss ability"));
+				suggArgs.add(Tooltip.ofString(soFar + valid, "boss ability"));
 			}
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(...)")));
 		}
 
 		return ParseResult.of(new RemoveAbilityAction(ability));

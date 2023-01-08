@@ -164,7 +164,7 @@ public class InfusionUtils {
 					}
 					break;
 				default:
-					CommandAPI.fail("Invalid item. Item must be infused!");
+					throw CommandAPI.failWithString("Invalid item. Item must be infused!");
 			}
 		} else if (region == Region.RING) {
 			// All Ring items has same infusion price, Artifact level.
@@ -200,15 +200,14 @@ public class InfusionUtils {
 		} else if (region.equals(Region.RING)) {
 			stack = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(PULSATING_DIAMOND));
 		} else {
-			CommandAPI.fail("Item must have a Region tag!");
-			return;
+			throw CommandAPI.failWithString("Item must have a Region tag!");
 		}
 		if (stack != null) {
 			stack.setAmount(refundMaterials);
 			InventoryUtils.giveItem(player, stack);
 			return;
 		}
-		CommandAPI.fail("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
+		throw CommandAPI.failWithString("ERROR while refunding infusion (failed to get loot table). Please contact a moderator if you see this message!");
 	}
 
 	public static void animate(Player player) {
@@ -240,8 +239,7 @@ public class InfusionUtils {
 		} else if (infuseLvl <= 3) {
 			cost *= (int) Math.pow(2, infuseLvl - 1);
 		} else {
-			cost = 99999999;
-			CommandAPI.fail("Items may only be infused 4 times!");
+			throw CommandAPI.failWithString("Items may only be infused 4 times!");
 		}
 		return cost;
 	}
@@ -255,8 +253,7 @@ public class InfusionUtils {
 	private static int getCostMultiplierWithCheck(ItemStack item) throws WrapperCommandSyntaxException {
 		int mult = getCostMultiplier(item);
 		if (mult < 0) {
-			CommandAPI.fail("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
-			return 99999999;
+			throw CommandAPI.failWithString("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
 		}
 		return mult;
 	}
@@ -305,9 +302,7 @@ public class InfusionUtils {
 						return ExperienceUtils.LEVEL_60;
 					default:
 					// Infuse Level 4 Rare
-						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-						return 99999999;
-						// Exp Level 9000 (but not really)
+						throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				}
 			case 3:
 				switch (level) {
@@ -325,9 +320,7 @@ public class InfusionUtils {
 						return ExperienceUtils.LEVEL_70;
 					default:
 					// Infuse Level 4 Artifact
-						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-						return 99999999;
-						// Exp Level 9000 (but not really)
+						throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				}
 			case 6:
 				switch (level) {
@@ -345,15 +338,11 @@ public class InfusionUtils {
 						return ExperienceUtils.LEVEL_80;
 					default:
 					// Infuse Level 4 Epic
-						CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-						return 99999999;
-						// Exp Level 9000 (but not really)
+						throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 				}
 			default:
-			// Infuse level What even happened?
-				CommandAPI.fail("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
-				return 99999999;
-				// Exp Level How did you hit this code?
+				// Infuse level What even happened?
+				throw CommandAPI.failWithString("ERROR while calculating experience cost (invalid score multiplier). Please contact a moderator if you see this message!");
 		}
 	}
 

@@ -126,7 +126,7 @@ public class DamageEvent extends Event implements Cancellable {
 				List<Tooltip<String>> suggArgs = new ArrayList<>(DamageType.values().length);
 				String soFar = reader.readSoFar();
 				for (DamageType valid : DamageType.values()) {
-					suggArgs.add(Tooltip.of(soFar + valid.name(), hoverDescription));
+					suggArgs.add(Tooltip.ofString(soFar + valid.name(), hoverDescription));
 				}
 				return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 			}

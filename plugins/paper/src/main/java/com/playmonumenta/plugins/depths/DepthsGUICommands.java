@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.Player;
@@ -19,7 +18,7 @@ public class DepthsGUICommands {
 		new CommandAPICommand(command)
 			.withPermission(CommandPermission.fromString("monumenta.command.opendepthsgui"))
 			.withSubcommand(new CommandAPICommand("summary")
-				.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
 					Player player = (Player) args[0];
 					List<DepthsAbilityItem> items = DepthsManager.getInstance().getPlayerAbilitySummary(player);
@@ -32,25 +31,25 @@ public class DepthsGUICommands {
 					new DepthsSummaryGUI(player).openInventory(player, plugin);
 				}))
 			.withSubcommand(new CommandAPICommand("roomchoice")
-					.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
-						roomchoice(plugin, player);
+						roomChoice(plugin, player);
 					}))
 			.withSubcommand(new CommandAPICommand("upgrade")
-					.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
 						upgrade(plugin, player);
 					}))
 			.withSubcommand(new CommandAPICommand("ability")
-					.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
 						ability(plugin, player);
 					}))
 			.withSubcommand(new CommandAPICommand("weaponaspect")
-					.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
 						//If the player is not in the system or they already have selected a weapon aspect, return
@@ -68,7 +67,7 @@ public class DepthsGUICommands {
 						new DepthsWeaponAspectGUI(player).openInventory(player, plugin);
 					}))
 			.withSubcommand(new CommandAPICommand("removeability")
-					.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+					.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 					.executes((sender, args) -> {
 						Player player = (Player) args[0];
 
@@ -81,7 +80,7 @@ public class DepthsGUICommands {
 						new DepthsRemoveAbilityGUI(player).openInventory(player, plugin);
 					}))
 			.withSubcommand(new CommandAPICommand("mutateability")
-				.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 				.executes((sender, args) -> {
 					Player player = (Player) args[0];
 
@@ -96,7 +95,7 @@ public class DepthsGUICommands {
 			.register();
 	}
 
-	public static void roomchoice(Plugin plugin, Player player) {
+	public static void roomChoice(Plugin plugin, Player player) {
 		EnumSet<DepthsRoomType> roomChoices = DepthsManager.getInstance().generateRoomOptions(player);
 
 		if (roomChoices == null) {

@@ -17,8 +17,8 @@ public class Spawn {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.spawn");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("Targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.ManyEntities("Targets"));
 
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)

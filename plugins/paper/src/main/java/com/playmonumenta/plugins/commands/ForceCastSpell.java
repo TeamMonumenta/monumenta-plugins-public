@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.Collections;
@@ -17,9 +18,9 @@ public class ForceCastSpell {
 		new CommandAPICommand("forcecastspell")
 			.withPermission("monumenta.command.forcecastspell")
 			.withArguments(
-				new EntitySelectorArgument("boss", EntitySelectorArgument.EntitySelector.ONE_ENTITY),
+				new EntitySelectorArgument.OneEntity("boss"),
 				new StringArgument("spell class")
-					.replaceSuggestions(info -> getSpellClasses((Entity) info.previousArgs()[0]))
+					.replaceSuggestions(ArgumentSuggestions.strings(info -> getSpellClasses((Entity) info.previousArgs()[0])))
 			)
 			.executes((sender, args) -> {
 				execute((Entity) args[0], (String) args[1]);

@@ -15,7 +15,7 @@ public class MonumentaDebug {
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.monumentadebug");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new MultiLiteralArgument("INFO"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)

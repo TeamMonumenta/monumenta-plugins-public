@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
-import com.playmonumenta.plugins.Plugin;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
@@ -15,13 +13,13 @@ import net.luckperms.api.model.group.Group;
 import org.bukkit.entity.Player;
 
 public class TestGuild {
-	public static void register(Plugin plugin) {
+	public static void register() {
 
 		// testguild <playername>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.testguild");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new TextArgument("guild name"));
 
 		new CommandAPICommand("testguild")
@@ -38,9 +36,9 @@ public class TestGuild {
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 
 		if (currentGuildName == null) {
-			CommandAPI.fail("Player '" + player.getName() + "' is not in a guild!");
+			throw CommandAPI.failWithString("Player '" + player.getName() + "' is not in a guild!");
 		} else if (!currentGuildName.equalsIgnoreCase(guildName)) {
-			CommandAPI.fail("Player '" + player.getName() + "' is in other guild '" + currentGuildName + "'");
+			throw CommandAPI.failWithString("Player '" + player.getName() + "' is in other guild '" + currentGuildName + "'");
 		}
 	}
 }

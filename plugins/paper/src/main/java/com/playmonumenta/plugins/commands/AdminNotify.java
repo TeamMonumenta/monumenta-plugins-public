@@ -16,7 +16,7 @@ public class AdminNotify {
 
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.checkinstances");
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 		arguments.add(new TextArgument("message"));
 

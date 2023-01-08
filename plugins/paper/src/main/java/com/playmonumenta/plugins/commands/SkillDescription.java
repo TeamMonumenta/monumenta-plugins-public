@@ -18,7 +18,7 @@ public class SkillDescription extends GenericCommand {
 	public static void register(Plugin plugin) {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.skilldescription");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new ObjectiveArgument("objective"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)

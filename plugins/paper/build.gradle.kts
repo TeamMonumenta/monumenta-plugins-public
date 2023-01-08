@@ -35,7 +35,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
     compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
-    compileOnly("dev.jorel.CommandAPI:commandapi-core:6.0.0")
+    implementation("dev.jorel.CommandAPI:commandapi-shade:8.7.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
     compileOnly("net.luckperms:api:5.3")
@@ -48,7 +48,7 @@ dependencies {
     compileOnly("com.playmonumenta:libraryofsouls:4.2")
     compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.18.2-v2")
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
-    compileOnly("de.tr7zw:item-nbt-api-plugin:2.3.1")
+    compileOnly("de.tr7zw:item-nbt-api-plugin:2.10.0")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
     compileOnly("io.prometheus:simpleclient:0.11.0")
     errorprone("com.google.errorprone:error_prone_core:2.10.0")
@@ -72,7 +72,7 @@ bukkit {
     apiVersion = "1.18"
     name = "Monumenta"
     authors = listOf("The Monumenta Team")
-    depend = listOf("CommandAPI", "ScriptedQuests", "NBTAPI")
+    depend = listOf("ScriptedQuests", "NBTAPI")
     softDepend = listOf(
         "MonumentaRedisSync",
         "PlaceholderAPI",
@@ -103,8 +103,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-Xmaxwarns")
     options.compilerArgs.add("10000")
 
-    // TODO: Also need to re-enable these deprecation warnings
-    //options.compilerArgs.add("-Xlint:deprecation")
+    options.compilerArgs.add("-Xlint:deprecation")
 
     options.errorprone {
         option("NullAway:AnnotatedPackages", "com.playmonumenta")

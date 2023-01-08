@@ -24,8 +24,8 @@ public class Eggify {
 		new CommandAPICommand("eggify")
 			.withPermission("monumenta.command.eggify")
 			.withArguments(
-				new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
+				new EntitySelectorArgument.OnePlayer("player"),
+				new EntitySelectorArgument.ManyEntities("entities"))
 			.executes((sender, args) -> {
 				for (Entity entity : (Collection<Entity>) args[1]) {
 					eggify((Player) args[0], entity);

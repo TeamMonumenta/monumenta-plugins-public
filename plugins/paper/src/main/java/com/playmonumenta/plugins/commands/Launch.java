@@ -5,7 +5,6 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.Player;
@@ -16,8 +15,8 @@ public class Launch extends GenericCommand {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.launch");
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new DoubleArgument("horizontal"));
 		arguments.add(new DoubleArgument("vertical"));
 
@@ -34,7 +33,7 @@ public class Launch extends GenericCommand {
 			.register();
 
 		arguments.clear();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new DoubleArgument("x"));
 		arguments.add(new DoubleArgument("y"));
 		arguments.add(new DoubleArgument("z"));

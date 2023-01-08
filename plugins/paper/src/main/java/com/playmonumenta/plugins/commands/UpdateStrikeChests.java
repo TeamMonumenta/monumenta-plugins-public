@@ -25,45 +25,45 @@ public class UpdateStrikeChests {
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.updatestrikechests");
 
-		List<Argument> startingArguments = new ArrayList<>();
+		List<Argument<?>> startingArguments = new ArrayList<>();
 		startingArguments.add(new MultiLiteralArgument("UpdateStrikeChests"));
-		startingArguments.add(new EntitySelectorArgument("Targets", EntitySelectorArgument.EntitySelector.MANY_PLAYERS));
+		startingArguments.add(new EntitySelectorArgument.ManyPlayers("Targets"));
 
-		Map<String, List<Argument>> limitMap = new HashMap<>();
+		Map<String, List<Argument<?>>> limitMap = new HashMap<>();
 
-		List<Argument> limitConstArguments = new ArrayList<>();
+		List<Argument<?>> limitConstArguments = new ArrayList<>();
 		limitConstArguments.add(new MultiLiteralArgument("ConstLimit"));
 		limitConstArguments.add(new IntegerArgument("Limit", 0));
 		limitMap.put("const", limitConstArguments);
 
-		List<Argument> limitScoreArguments = new ArrayList<>();
+		List<Argument<?>> limitScoreArguments = new ArrayList<>();
 		limitScoreArguments.add(new MultiLiteralArgument("ScoreLimit"));
-		limitScoreArguments.add(new ScoreHolderArgument("LimitHolder", ScoreHolderArgument.ScoreHolderType.SINGLE));
+		limitScoreArguments.add(new ScoreHolderArgument.Single("LimitHolder"));
 		limitScoreArguments.add(new ObjectiveArgument("LimitObjective"));
 		limitMap.put("score", limitScoreArguments);
 
-		Map<String, List<Argument>> countMap = new HashMap<>();
+		Map<String, List<Argument<?>>> countMap = new HashMap<>();
 		countMap.put("noChange", new ArrayList<>());
 
-		List<Argument> countResetArguments = new ArrayList<>();
+		List<Argument<?>> countResetArguments = new ArrayList<>();
 		countResetArguments.add(new MultiLiteralArgument("ResetCount"));
 		countMap.put("reset", countResetArguments);
 
-		List<Argument> countConstArguments = new ArrayList<>();
+		List<Argument<?>> countConstArguments = new ArrayList<>();
 		countConstArguments.add(new MultiLiteralArgument("ConstCount"));
 		countConstArguments.add(new IntegerArgument("Count", 0));
 		countMap.put("const", countConstArguments);
 
-		List<Argument> countScoreArguments = new ArrayList<>();
+		List<Argument<?>> countScoreArguments = new ArrayList<>();
 		countScoreArguments.add(new MultiLiteralArgument("ScoreCount"));
-		countScoreArguments.add(new ScoreHolderArgument("CountHolder", ScoreHolderArgument.ScoreHolderType.SINGLE));
+		countScoreArguments.add(new ScoreHolderArgument.Single("CountHolder"));
 		countScoreArguments.add(new ObjectiveArgument("CountObjective"));
 		countMap.put("score", countScoreArguments);
 
-		List<Argument> arguments = new ArrayList<>();
-		for (Map.Entry<String, List<Argument>> limitArgsEntry : limitMap.entrySet()) {
+		List<Argument<?>> arguments = new ArrayList<>();
+		for (Map.Entry<String, List<Argument<?>>> limitArgsEntry : limitMap.entrySet()) {
 			String limitArgType = limitArgsEntry.getKey();
-			for (Map.Entry<String, List<Argument>> countArgsEntry : countMap.entrySet()) {
+			for (Map.Entry<String, List<Argument<?>>> countArgsEntry : countMap.entrySet()) {
 				String countArgType = countArgsEntry.getKey();
 
 				arguments.clear();

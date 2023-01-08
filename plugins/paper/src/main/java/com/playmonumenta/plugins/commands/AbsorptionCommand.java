@@ -17,7 +17,7 @@ public class AbsorptionCommand {
 			.withPermission("monumenta.command.absorption")
 			.withArguments(
 				new LiteralArgument("flat"),
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new DoubleArgument("absorption"),
 				new DoubleArgument("max"),
 				new IntegerArgument("ticks"))
@@ -33,7 +33,7 @@ public class AbsorptionCommand {
 			.withPermission("monumenta.command.absorption")
 			.withArguments(
 				new LiteralArgument("percent"),
-				new EntitySelectorArgument("entities", EntitySelectorArgument.EntitySelector.MANY_ENTITIES),
+				new EntitySelectorArgument.ManyEntities("entities"),
 				new DoubleArgument("absorptionpercent"),
 				new DoubleArgument("maxpercent"),
 				new IntegerArgument("ticks"))

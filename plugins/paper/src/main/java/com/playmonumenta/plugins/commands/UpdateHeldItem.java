@@ -14,8 +14,8 @@ public class UpdateHeldItem extends GenericCommand {
 
 	public static void run(CommandSender sender, Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
-		if (item == null || item.getAmount() <= 0) {
-			CommandAPI.fail("Player must have a valid item in their main hand!");
+		if (item.getAmount() <= 0) {
+			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		}
 		ItemStatUtils.generateItemStats(item);
 		player.getEquipment().setItemInMainHand(item, true);

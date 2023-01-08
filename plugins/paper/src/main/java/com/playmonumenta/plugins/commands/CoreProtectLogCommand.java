@@ -16,7 +16,7 @@ public class CoreProtectLogCommand {
 			.withSubcommand(
 				new CommandAPICommand("placement")
 					.withArguments(
-						new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+						new EntitySelectorArgument.OnePlayer("player"),
 						new LocationArgument("block", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
@@ -26,7 +26,7 @@ public class CoreProtectLogCommand {
 			.withSubcommand(
 				new CommandAPICommand("removal")
 					.withArguments(
-						new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+						new EntitySelectorArgument.OnePlayer("player"),
 						new LocationArgument("block", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {
@@ -36,7 +36,7 @@ public class CoreProtectLogCommand {
 			.withSubcommand(
 				new CommandAPICommand("transaction")
 					.withArguments(
-						new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+						new EntitySelectorArgument.OnePlayer("player"),
 						new LocationArgument("block", LocationType.BLOCK_POSITION)
 					)
 					.executes((sender, args) -> {

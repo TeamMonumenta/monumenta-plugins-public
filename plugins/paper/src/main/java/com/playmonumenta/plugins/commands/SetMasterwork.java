@@ -9,6 +9,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
@@ -25,7 +26,7 @@ public class SetMasterwork extends GenericCommand {
 		String[] options = new String[2];
 		options[0] = "upgrade";
 		options[1] = "set";
-		Argument selectionArg = new MultiLiteralArgument(options);
+		Argument<?> selectionArg = new MultiLiteralArgument(options);
 
 		Masterwork[] masterworkRaw = Masterwork.values();
 		String[] ms = new String[masterworkRaw.length];
@@ -33,10 +34,10 @@ public class SetMasterwork extends GenericCommand {
 			ms[i] = masterworkRaw[i].getName();
 		}
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelectorArgument.EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(selectionArg);
-		arguments.add(new StringArgument("level").overrideSuggestions(ms));
+		arguments.add(new StringArgument("level").replaceSuggestions(ArgumentSuggestions.strings(ms)));
 
 		new CommandAPICommand("setmasterwork")
 			.withPermission(perms)
@@ -47,12 +48,11 @@ public class SetMasterwork extends GenericCommand {
 				} else if (args[1].equals("set")) {
 					Masterwork newLevel = Masterwork.getMasterwork((String) args[2]);
 					if (newLevel == null) {
-						CommandAPI.fail("Invalid level selection; how did we get here?");
-						return;
+						throw CommandAPI.failWithString("Invalid level selection; how did we get here?");
 					}
 					run((Player) args[0], newLevel);
 				} else {
-					CommandAPI.fail("Invalid arg selection; how did we get here?");
+					throw CommandAPI.failWithString("Invalid arg selection; how did we get here?");
 				}
 			})
 			.register();
@@ -61,19 +61,18 @@ public class SetMasterwork extends GenericCommand {
 	public static void run(Player player, Masterwork level) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null || item.getAmount() <= 0) {
-			CommandAPI.fail("Player must have a valid item in their main hand!");
+			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		}
 
 		Masterwork masterworkLevel = ItemStatUtils.getMasterwork(item);
 		if (masterworkLevel == Masterwork.NONE || masterworkLevel == null || masterworkLevel == Masterwork.ERROR) {
-			CommandAPI.fail("Player must have a valid item in their main hand!");
+			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		}
 
 		MasterworkUtils.getItemPath(item, level);
 		ItemStack newItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(MasterworkUtils.getItemPath(item, level)));
 		if (newItem == null) {
-			CommandAPI.fail("Invalid loot table found! Please submit a bug report.");
-			throw new RuntimeException();
+			throw CommandAPI.failWithString("Invalid loot table found! Please submit a bug report.");
 		}
 
 		newItem = MasterworkUtils.preserveModified(item, newItem);
@@ -85,14 +84,14 @@ public class SetMasterwork extends GenericCommand {
 	public static void upgrade(Player player) throws WrapperCommandSyntaxException {
 		ItemStack item = player.getEquipment().getItemInMainHand();
 		if (item == null || item.getAmount() <= 0) {
-			CommandAPI.fail("Player must have a valid item in their main hand!");
+			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		}
 
 		Masterwork masterworkLevel = ItemStatUtils.getMasterwork(item);
 		if (masterworkLevel == Masterwork.NONE || masterworkLevel == null || masterworkLevel == Masterwork.ERROR) {
-			CommandAPI.fail("Player must have a valid item in their main hand!");
+			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		} else if (masterworkLevel == Masterwork.II) {
-			CommandAPI.fail("The selected item is already at the highest level possible!");
+			throw CommandAPI.failWithString("The selected item is already at the highest level possible!");
 		}
 
 		run(player, Masterwork.getMasterwork(Integer.toString(Integer.parseInt(masterworkLevel.getName()) + 1)));

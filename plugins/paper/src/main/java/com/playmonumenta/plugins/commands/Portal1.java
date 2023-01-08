@@ -15,8 +15,8 @@ public class Portal1 extends GenericCommand {
 	@SuppressWarnings("unchecked")
 	public static void register() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.portal1");
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.ManyPlayers("players"));
 		new CommandAPICommand("portal1")
 			.withPermission(perms)
 			.withArguments(arguments)

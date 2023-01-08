@@ -3,9 +3,9 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument;
-import dev.jorel.commandapi.arguments.ScoreHolderArgument.ScoreHolderType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,13 +20,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class GetScoreCommand {
-	private static final List<String> SELECTORS = Arrays.asList(new String[] {"@a", "@e", "@p", "@r", "@s"});
+	private static final List<String> SELECTORS = Arrays.asList("@a", "@e", "@p", "@r", "@s");
 
 	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand("getscore")
 		.withPermission(CommandPermission.fromString("monumenta.command.getscore"))
-		.withArguments(new ScoreHolderArgument("targets", ScoreHolderType.MULTIPLE).replaceSuggestions((info) -> {
+		.withArguments(new ScoreHolderArgument.Multiple("targets").replaceSuggestions(ArgumentSuggestions.strings((info) -> {
 			// If ScoreHolderArgument's default suggestions get fixed, remove this override.
 			List<String> suggestions = new ArrayList<>(SELECTORS);
 			for (Player player : Bukkit.getOnlinePlayers()) {
@@ -40,7 +40,7 @@ public class GetScoreCommand {
 				}
 			}
 			return suggestions.toArray(new String[0]);
-		}))
+		})))
 		.withArguments(new ObjectiveArgument("objective"))
 		.executes((sender, args) -> {
 			String objective = (String)args[1];

@@ -5,7 +5,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +41,7 @@ public class GenericCommand {
 	protected static void registerPlayerCommand(String command, String permission, PlayerCommandExecutor exec) {
 		CommandPermission perms = CommandPermission.fromString(permission);
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
 		/* No-argument variant which just is the sender (if they are a player) */
 		new CommandAPICommand(command)
@@ -53,7 +52,7 @@ public class GenericCommand {
 			.register();
 
 		/* Variant with player selector as arguments */
-		arguments.add(new EntitySelectorArgument("players", EntitySelector.MANY_PLAYERS));
+		arguments.add(new EntitySelectorArgument.ManyPlayers("players"));
 		new CommandAPICommand(command)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -69,8 +68,8 @@ public class GenericCommand {
 	protected static void registerEntityCommand(String command, String permission, EntityCommandExecutor exec) {
 		CommandPermission perms = CommandPermission.fromString(permission);
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("entities", EntitySelector.MANY_ENTITIES));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.ManyEntities("entities"));
 		new CommandAPICommand(command)
 			.withPermission(perms)
 			.withArguments(arguments)

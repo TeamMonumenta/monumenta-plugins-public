@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +26,7 @@ public class CustomInventoryCommands {
 		//reject the player.
 		new CommandAPICommand("openexamplecustominvgui")
 			.withPermission("monumenta.command.openexamplecustominvgui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player)args[0];
 				new ExampleCustomInventory(player).openInventory(player, plugin);
@@ -42,15 +41,15 @@ public class CustomInventoryCommands {
 			.register();
 		new CommandAPICommand("openteleportergui")
 			.withPermission("monumenta.command.openteleportergui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new OrinCustomInventory(player, -1).openInventory(player, plugin);
 			})
 			.register();
 
-		List<Argument> arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		List<Argument<?>> arguments = new ArrayList<>();
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("region #"));
 		new CommandAPICommand("openinstancebot")
 			.withPermission("monumenta.command.openinstancebot")
@@ -71,7 +70,7 @@ public class CustomInventoryCommands {
 			.register();
 		new CommandAPICommand("openpeb")
 			.withPermission("monumenta.command.openpeb")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new PEBCustomInventory(player).openInventory(player, plugin);
@@ -85,23 +84,21 @@ public class CustomInventoryCommands {
 					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 					return;
 				}
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					new InfusionCustomInventory(player).openInventory(player, plugin);
-				}, 1);
+				Bukkit.getScheduler().runTaskLater(plugin, () ->
+					new InfusionCustomInventory(player).openInventory(player, plugin), 1);
 			})
 			.register();
 		new CommandAPICommand("openinfusiongui")
 			.withPermission("monumenta.command.openinfusiongui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				if (!player.hasPermission("monumenta.infusions")) {
 					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 					return;
 				}
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					new InfusionCustomInventory(player).openInventory(player, plugin);
-				}, 1);
+				Bukkit.getScheduler().runTaskLater(plugin, () ->
+					new InfusionCustomInventory(player).openInventory(player, plugin), 1);
 			})
 			.register();
 
@@ -112,24 +109,22 @@ public class CustomInventoryCommands {
 					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 					return;
 				}
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					new DelveInfusionCustomInventory(player).openInventory(player, plugin);
-				}, 1);
+				Bukkit.getScheduler().runTaskLater(plugin, () ->
+					new DelveInfusionCustomInventory(player).openInventory(player, plugin), 1);
 
 			})
 			.register();
 		new CommandAPICommand("opendelveinfusiongui")
 			.withPermission("monumenta.command.opendelveinfusiongui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				if (!player.hasPermission("monumenta.infusions")) {
 					player.sendMessage(Component.text("Infusions are disabled, try again later.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 					return;
 				}
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					new DelveInfusionCustomInventory(player).openInventory(player, plugin);
-				}, 1);
+				Bukkit.getScheduler().runTaskLater(plugin, () ->
+					new DelveInfusionCustomInventory(player).openInventory(player, plugin), 1);
 			})
 			.register();
 
@@ -147,7 +142,7 @@ public class CustomInventoryCommands {
 			.register();
 		new CommandAPICommand("openparrotgui")
 			.withPermission("monumenta.command.openparrotgui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				try {
@@ -170,7 +165,7 @@ public class CustomInventoryCommands {
 
 		new CommandAPICommand("openblitzmobgui")
 			.withPermission("monumenta.command.openblitzmobgui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new TowerGuiShowMobs(player).openInventory(player, plugin);
@@ -185,7 +180,7 @@ public class CustomInventoryCommands {
 			.register();
 		new CommandAPICommand("openclassgui")
 			.withPermission("monumenta.command.openclassgui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new ClassSelectionCustomInventory(player).openInventory(player, plugin);
@@ -194,25 +189,23 @@ public class CustomInventoryCommands {
 		new CommandAPICommand("openmasterworkgui")
 			.withPermission("monumenta.command.openmasterworkgui")
 			.executesPlayer((player, args) -> {
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					new MasterworkCustomInventory(player).openInventory(player, plugin);
-				}, 1);
+				Bukkit.getScheduler().runTaskLater(plugin, () ->
+					new MasterworkCustomInventory(player).openInventory(player, plugin), 1);
 
 			})
 			.register();
 		new CommandAPICommand("openmasterworkgui")
 			.withPermission("monumenta.command.openmasterworkgui")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					new MasterworkCustomInventory(player).openInventory(player, plugin);
-				}, 1);
+				Bukkit.getScheduler().runTaskLater(plugin, () ->
+					new MasterworkCustomInventory(player).openInventory(player, plugin), 1);
 			})
 			.register();
 
 		arguments = new ArrayList<>();
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 		arguments.add(new IntegerArgument("region #"));
 		arguments.add(new IntegerArgument("level"));
 
@@ -245,7 +238,7 @@ public class CustomInventoryCommands {
 			.register();
 		new CommandAPICommand("emoji")
 			.withPermission("monumenta.command.emoji.others")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				new EmojiCustomInventory(player).openInventory(player, plugin);
@@ -259,7 +252,7 @@ public class CustomInventoryCommands {
 			.register();
 		new CommandAPICommand("emote")
 			.withPermission("monumenta.command.emote.others")
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				emote(player);
@@ -269,8 +262,7 @@ public class CustomInventoryCommands {
 
 	private static void emote(Player player) {
 		int defaultEmote = ScoreboardUtils.getScoreboardValue(player, EmojiCustomInventory.EMOJI_CHOICE_BOARD).orElse(0);
-		ArrayList<EmojiCustomInventory.Emoji> list = new ArrayList<>();
-		list.addAll(EmojiCustomInventory.EMOJI_LIST);
+		ArrayList<EmojiCustomInventory.Emoji> list = new ArrayList<>(EmojiCustomInventory.EMOJI_LIST);
 		list.removeIf(item -> item.mDefaultID != defaultEmote);
 		if (list.isEmpty()) {
 			player.sendMessage("Select an emote in the emoji selection GUI as a default first!");

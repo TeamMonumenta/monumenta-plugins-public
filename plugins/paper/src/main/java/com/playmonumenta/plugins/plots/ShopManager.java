@@ -12,7 +12,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
@@ -217,11 +216,11 @@ public class ShopManager implements Listener {
 
 		protected static Shop fromShopEntity(Entity shopEntity) throws WrapperCommandSyntaxException {
 			if (!(shopEntity instanceof Shulker)) {
-				CommandAPI.fail("Invalid shop entity - should be shulker");
+				throw CommandAPI.failWithString("Invalid shop entity - should be shulker");
 			}
 
 			if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
-				CommandAPI.fail("This command can only be used within a Shops Possible zone");
+				throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 			}
 
 			Integer x1 = null;
@@ -259,12 +258,11 @@ public class ShopManager implements Listener {
 					}
 				}
 			} catch (Exception ex) {
-				CommandAPI.fail(ex.getMessage());
+				throw CommandAPI.failWithString(ex.getMessage());
 			}
 
 			if (x1 == null || y1 == null || z1 == null || x2 == null || y2 == null || z2 == null || ownerName == null || ownerUUID == null || originalEntityMat == null) {
-				CommandAPI.fail("Shop entity is missing a required tag");
-				throw new RuntimeException();
+				throw CommandAPI.failWithString("Shop entity is missing a required tag");
 			}
 
 			return new Shop(new Location(shopEntity.getWorld(), x1, y1, z1), new Location(shopEntity.getWorld(), x2, y2, z2),
@@ -357,7 +355,7 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("new"))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				shopNew((Player)args[1]);
 			})
@@ -367,7 +365,7 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("lock"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
 			.executes((sender, args) -> {
 				shopLock((Entity) args[1], null, true);
 			})
@@ -375,8 +373,8 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("lock"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				shopLock((Entity) args[1], (Player) args[2], true);
 			})
@@ -386,7 +384,7 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("semilock"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
 			.executes((sender, args) -> {
 				shopLock((Entity) args[1], null, false);
 			})
@@ -394,8 +392,8 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("semilock"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				shopLock((Entity) args[1], (Player) args[2], false);
 			})
@@ -405,7 +403,7 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("unlock"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
 			.executes((sender, args) -> {
 				shopUnlock((Entity) args[1], null);
 			})
@@ -413,8 +411,8 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("unlock"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				shopUnlock((Entity)args[1], (Player)args[2]);
 			})
@@ -424,7 +422,7 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("setlockable"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
 			.withArguments(new BooleanArgument("lockable"))
 			.executes((sender, args) -> {
 				setLockable((Entity)args[1], null, (boolean)args[2]);
@@ -433,9 +431,9 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("setlockable"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
 			.withArguments(new BooleanArgument("lockable"))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				setLockable((Entity)args[1], (Player)args[3], (boolean)args[2]);
 			})
@@ -445,7 +443,7 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("reset"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
 			.executes((sender, args) -> {
 				shopReset((Entity)args[1], null);
 			})
@@ -453,8 +451,8 @@ public class ShopManager implements Listener {
 		new CommandAPICommand("monumentashop")
 			.withPermission(CommandPermission.fromString("monumenta.shop"))
 			.withArguments(new MultiLiteralArgument("reset"))
-			.withArguments(new EntitySelectorArgument("entity", EntitySelector.ONE_ENTITY))
-			.withArguments(new EntitySelectorArgument("player", EntitySelector.ONE_PLAYER))
+			.withArguments(new EntitySelectorArgument.OneEntity("entity"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
 				shopReset((Entity)args[1], (Player)args[2]);
 			})
@@ -473,12 +471,11 @@ public class ShopManager implements Listener {
 			pLoc.subtract(0, 1, 0);
 		}
 		if (startLoc == null) {
-			CommandAPI.fail("Could not find material " + SHOP_EMPTY_MAT + " under the player");
-			throw new RuntimeException();
+			throw CommandAPI.failWithString("Could not find material " + SHOP_EMPTY_MAT + " under the player");
 		}
 
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.SHOPS_POSSIBLE)) {
-			CommandAPI.fail("This command can only be used within a Shops Possible zone");
+			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
 
 		/* Find the dimensions of the platform */
@@ -533,7 +530,7 @@ public class ShopManager implements Listener {
 		if (isGuildShop) {
 			guildName = LuckPermsIntegration.getGuildName(LuckPermsIntegration.getGuild(player));
 			if (guildName == null) {
-				CommandAPI.fail("You must be in a guild to purchase a guild shop");
+				throw CommandAPI.failWithString("You must be in a guild to purchase a guild shop");
 			}
 		} else {
 			guildName = null;
@@ -620,7 +617,7 @@ public class ShopManager implements Listener {
 
 	private static void setLockable(Entity shopEntity, @Nullable Player player, boolean lockable) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
-			CommandAPI.fail("This command can only be used within a Shops Possible zone");
+			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
 
 		Shop shop = Shop.fromShopEntity(shopEntity);
@@ -640,7 +637,7 @@ public class ShopManager implements Listener {
 
 	private static void shopLock(Entity shopEntity, @Nullable Player player, boolean fullLock) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
-			CommandAPI.fail("This command can only be used within a Shops Possible zone");
+			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
 
 		Shop shop = Shop.fromShopEntity(shopEntity);
@@ -695,7 +692,7 @@ public class ShopManager implements Listener {
 
 	private static void shopUnlock(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
-			CommandAPI.fail("This command can only be used within a Shops Possible zone");
+			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
 
 		Shop shop = Shop.fromShopEntity(shopEntity);
@@ -746,7 +743,7 @@ public class ShopManager implements Listener {
 
 	private static void shopReset(Entity shopEntity, @Nullable Player player) throws WrapperCommandSyntaxException {
 		if (!ZoneUtils.hasZoneProperty(shopEntity, ZoneProperty.SHOPS_POSSIBLE)) {
-			CommandAPI.fail("This command can only be used within a Shops Possible zone");
+			throw CommandAPI.failWithString("This command can only be used within a Shops Possible zone");
 		}
 
 		Shop shop = Shop.fromShopEntity(shopEntity);
@@ -809,13 +806,13 @@ public class ShopManager implements Listener {
 			if (guildName == null || !guildName.equalsIgnoreCase(shop.mOwnerGuildName) || ScoreboardUtils.getScoreboardValue(player, "Founder").orElse(0) != 1) {
 				String msg = "You must be a *founder* of the guild '" + shop.mOwnerGuildName + "' to change settings for this shop";
 				player.sendMessage(ChatColor.RED + msg);
-				CommandAPI.fail(msg);
+				throw CommandAPI.failWithString(msg);
 			}
 		} else if (!player.getUniqueId().equals(shop.mOwnerUUID)) {
 			/* Not a guild shop, and also not the owning player */
 			String msg = "You must be the owner of this shop to change its settings";
 			player.sendMessage(ChatColor.RED + msg);
-			CommandAPI.fail(msg);
+			throw CommandAPI.failWithString(msg);
 		}
 	}
 

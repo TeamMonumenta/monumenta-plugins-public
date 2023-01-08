@@ -40,7 +40,7 @@ public class EffectFromPotionCommand {
 			// Consume potion in slot based on scoreboard value.
 			.withPermission(CommandPermission.fromString(PERMISSION))
 			.withArguments(
-				new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("players"),
 				new ObjectiveArgument("slotScoreboard")
 			)
 			.executes((sender, args) -> {
@@ -61,9 +61,9 @@ public class EffectFromPotionCommand {
 			// Consume potion in slot based on scoreboard value.
 			.withPermission(CommandPermission.fromString(PERMISSION))
 			.withArguments(
-				new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.ONE_PLAYER),
+				new EntitySelectorArgument.OnePlayer("players"),
 				new ObjectiveArgument("slotScoreboard"),
-				new ObjectiveArgument("subslotScoreboard")
+				new ObjectiveArgument("subSlotScoreboard")
 			)
 			.executes((sender, args) -> {
 				// Obtain Player, SlotScore, and SubSlot Score

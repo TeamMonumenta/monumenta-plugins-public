@@ -33,7 +33,7 @@ public class BossCastTrigger extends Trigger {
 
 	public static ParseResult<Trigger> fromReader(StringReader reader) {
 		if (!reader.advance("(")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + "(", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "(", "(...)")));
 		}
 
 		String bossTag = reader.readOneOf(List.of(BossManager.getInstance().listStatelessBosses()));
@@ -42,13 +42,13 @@ public class BossCastTrigger extends Trigger {
 			List<Tooltip<String>> suggArgs = new ArrayList<>(BossManager.getInstance().listStatelessBosses().length);
 			String soFar = reader.readSoFar();
 			for (String name : BossManager.getInstance().listStatelessBosses()) {
-				suggArgs.add(Tooltip.of(soFar + name, "boss tag"));
+				suggArgs.add(Tooltip.ofString(soFar + name, "boss tag"));
 			}
 			return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));
 		}
 
 		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.of(reader.readSoFar() + ")", "(...)")));
+			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(...)")));
 		}
 
 		return ParseResult.of(new BossCastTrigger(bossTag));

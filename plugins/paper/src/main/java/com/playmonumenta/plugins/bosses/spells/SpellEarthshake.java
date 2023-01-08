@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.bosses.bosses.EarthshakeBoss;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BlockUtils;
-import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;

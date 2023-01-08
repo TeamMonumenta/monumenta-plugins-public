@@ -5,7 +5,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument.EntitySelector;
 import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
@@ -25,9 +24,9 @@ public class TeleportGuild {
 		// teleportguild <guildname> <player>
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.teleportguild");
 
-		List<Argument> arguments = new ArrayList<>();
+		List<Argument<?>> arguments = new ArrayList<>();
 
-		arguments.add(new EntitySelectorArgument("player", EntitySelector.MANY_PLAYERS));
+		arguments.add(new EntitySelectorArgument.ManyPlayers("player"));
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(arguments)
@@ -52,7 +51,7 @@ public class TeleportGuild {
 
 	private static void run(Player player, @Nullable String guildName) throws WrapperCommandSyntaxException {
 
-		Group group = null;
+		Group group;
 
 		if (guildName == null) {
 			// Look up the player's guild
@@ -60,8 +59,7 @@ public class TeleportGuild {
 			if (group == null) {
 				String err = ChatColor.RED + "You are not in a guild!";
 				player.sendMessage(err);
-				CommandAPI.fail(err);
-				throw new RuntimeException();
+				throw CommandAPI.failWithString(err);
 			}
 		} else {
 			// need to look up from name
@@ -72,8 +70,7 @@ public class TeleportGuild {
 
 			group = LuckPermsIntegration.GM.getGroup(cleanGuildName);
 			if (group == null) {
-				CommandAPI.fail("The luckperms group '" + cleanGuildName + "' does not exist");
-				throw new RuntimeException();
+				throw CommandAPI.failWithString("The luckperms group '" + cleanGuildName + "' does not exist");
 			}
 		}
 
