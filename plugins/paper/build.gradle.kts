@@ -131,6 +131,7 @@ tasks {
         relocate("org.json", "com.playmonumenta.plugins.internal.org.json") // NameMC API dependency
         relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
         relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
+        relocate("dev.jorel.commandapi", "com.playmonumenta.plugins.internal.dev.jorel.commandapi")
         relocate(
             "org.apache.commons.lang3",
             "com.playmonumenta.plugins.internal.org.apache.commons.lang3"
