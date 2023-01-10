@@ -205,6 +205,12 @@ public class SpellBaseLaser extends Spell {
 			public void run() {
 				Location startLocation = mBoss.getEyeLocation();
 				Location targetedLocation = target.getLocation().add(0, target.getEyeHeight() * 3 / 5, 0);
+				if (startLocation.getWorld() != targetedLocation.getWorld()) {
+					mBoss.setAI(true);
+					this.cancel();
+					mActiveRunnables.remove(this);
+					return;
+				}
 
 				World world = mBoss.getWorld();
 				BoundingBox movingLaserBox = BoundingBox.of(startLocation, BOX_SIZE, BOX_SIZE, BOX_SIZE);

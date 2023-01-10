@@ -114,7 +114,7 @@ public class GalleryUtils {
 			game.despawnMob(mob);
 		} else {
 			mob.remove();
-			printDebugMessage("Despawn a mob that is not in a game? probably a bug!! world: " + mob.getWorld().getName());
+			printDebugMessage("Despawn a mob that is not in a game? probably a bug!! world: " + mob.getWorld().getName() + ", mob type: " + mob.getType() + ", mob name:" + mob.getName());
 		}
 	}
 

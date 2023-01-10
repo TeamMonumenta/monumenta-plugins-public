@@ -328,9 +328,9 @@ public class MasterworkUtils {
 		return realItems;
 	}
 
-	public static ItemStack getBaseMasterwork(ItemStack item, Player p) {
+	public static @Nullable ItemStack getBaseMasterwork(ItemStack item, Player p) {
 		List<ItemStack> allMasterworks = getAllMasterworks(item, p);
-		return allMasterworks.get(0);
+		return allMasterworks.isEmpty() ? null : allMasterworks.get(0);
 	}
 
 	public static String getNextItemPath(ItemStack item) {

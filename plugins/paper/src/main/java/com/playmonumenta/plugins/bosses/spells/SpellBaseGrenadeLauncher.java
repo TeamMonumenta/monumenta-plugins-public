@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.Location;
@@ -164,6 +165,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			Location tLoc = fallingBlock.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
 			vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
+			if (!Double.isFinite(vect.getX())) {
+				vect = new Vector(0, 1, 0);
+			}
 			fallingBlock.setVelocity(vect);
 
 			BukkitRunnable runn = new BukkitRunnable() {
@@ -252,12 +256,12 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				void launchLingering(Location startingLoc) {
 					if (mLingeringDuration > 0) {
 						new BukkitRunnable() {
-							double mRadius = mLingeringRadius;
-							Location mCenter = startingLoc;
+							final double mRadius = mLingeringRadius;
+							final Location mCenter = startingLoc;
 							int mTimer = 0;
-							int mRevolutionDegrees = 360;
+							final int mRevolutionDegrees = 360;
 							double mCurrentDegrees = FastUtils.randomDoubleInRange(0, mRevolutionDegrees);
-							double mDegreeSpeed = mRevolutionDegrees / (mLingeringDuration / (mRadius / 2));
+							final double mDegreeSpeed = mRevolutionDegrees / (mLingeringDuration / (mRadius / 2));
 
 							@Override
 							public void run() {
@@ -304,7 +308,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			mActiveRunnables.add(runn);
 
 		} catch (Exception e) {
-			mPlugin.getLogger().warning("Failed to summon grenade for SpellBaseGrenadeLauncher, mob:'" + mBoss.getName() + "' Reason: " + e.getMessage());
+			MMLog.warning("Failed to summon grenade for SpellBaseGrenadeLauncher, mob:'" + mBoss.getName() + "'", e);
 		}
 
 	}

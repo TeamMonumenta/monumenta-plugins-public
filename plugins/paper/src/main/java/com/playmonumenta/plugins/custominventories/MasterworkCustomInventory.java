@@ -547,8 +547,8 @@ public final class MasterworkCustomInventory extends CustomInventory {
 							}
 							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
 								ItemStack newItem = MasterworkUtils.preserveModified(item,
-										InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
-												NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
+									InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
+										NamespacedKeyUtils.fromString(MasterworkUtils.getSixItemPath(item))));
 								attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(costStringC));
 							});
 							for (int i = (row * 9) + 2; i < (row * 9) + 8; i++) {
@@ -557,16 +557,19 @@ public final class MasterworkCustomInventory extends CustomInventory {
 						}
 					}
 
-					if (ServerProperties.getMasterworkRefundEnabled() && ItemStatUtils.getMasterwork(item) != ItemStatUtils.getMasterwork(MasterworkUtils.getBaseMasterwork(item, ply))) {
-						mInventory.setItem((row * 9) + 1, mBalanceRefundItem);
-						mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
-							String refundString = ItemStatUtils.getLocation(item).getName() + "_"
-									+ MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
-							ItemStack newItem = MasterworkUtils.preserveModified(item,
+					if (ServerProperties.getMasterworkRefundEnabled()) {
+						ItemStack baseMasterwork = MasterworkUtils.getBaseMasterwork(item, ply);
+						if (baseMasterwork != null && ItemStatUtils.getMasterwork(item) != ItemStatUtils.getMasterwork(baseMasterwork)) {
+							mInventory.setItem((row * 9) + 1, mBalanceRefundItem);
+							mMapFunction.put((row * 9) + 1, (player, inventory, slot) -> {
+								String refundString = ItemStatUtils.getLocation(item).getName() + "_"
+									                      + MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item));
+								ItemStack newItem = MasterworkUtils.preserveModified(item,
 									InventoryUtils.getItemFromLootTableOrThrow(player.getLocation(),
 										NamespacedKeyUtils.fromString(MasterworkUtils.getPrevItemPath(item))));
-							attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(refundString));
-						});
+								attemptUpgrade(player, item, newItem, MasterworkCost.getMasterworkCost(refundString));
+							});
+						}
 					}
 
 				} else {

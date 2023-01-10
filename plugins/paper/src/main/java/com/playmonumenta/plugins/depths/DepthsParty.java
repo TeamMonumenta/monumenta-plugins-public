@@ -406,6 +406,10 @@ public class DepthsParty {
 
 		@Override
 		public void run() {
+			if (!mLocation.isWorldLoaded()) {
+				this.cancel();
+				return;
+			}
 			World world = mLocation.getWorld();
 
 			if (mSeconds == 2 || mSeconds == 4 || mSeconds == 6) {

@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -970,7 +971,12 @@ public class EntityListener implements Listener {
 			    && !MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)) {
 			Material material = fallingBlock.getBlockData().getMaterial();
 			if (!material.isAir()) { // this can apparently happen
-				fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(material));
+				try {
+					fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(material));
+				} catch (IllegalArgumentException e) {
+					// The error with dropping air still exists - log it to see what the issue is
+					MMLog.warning("IllegalArgumentException on dropping an item of type " + material, e);
+				}
 			}
 			fallingBlock.remove();
 			event.setCancelled(true);
