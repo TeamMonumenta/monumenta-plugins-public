@@ -111,6 +111,15 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 		return this;
 	}
 
+	@Override
+	public int getBaseCooldown(int score) {
+		if (mCooldowns == null) {
+			return 0;
+		}
+
+		return mCooldowns.get(Math.min(score - 1, mCooldowns.size() - 1));
+	}
+
 	public DepthsTrigger getDepthsTrigger() {
 		return mDepthsTrigger;
 	}

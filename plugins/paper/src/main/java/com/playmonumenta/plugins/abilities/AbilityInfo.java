@@ -53,8 +53,8 @@ public class AbilityInfo<T extends Ability> {
 	private boolean mIgnoresSilence = false;
 
 	//This is in ticks; order: [level 1, level 2, level 1 enhanced, level 2 enhanced]; for depths this is one entry per rarity (so 6 in total)
-	private @Nullable List<Integer> mCooldowns;
-	private @Nullable String mCharmCooldown;
+	public @Nullable List<Integer> mCooldowns;
+	public @Nullable String mCharmCooldown;
 
 	private Predicate<Player> mCanUse = player -> mScoreboardId != null && ScoreboardUtils.getScoreboardValue(player, mScoreboardId).orElse(0) > 0;
 
