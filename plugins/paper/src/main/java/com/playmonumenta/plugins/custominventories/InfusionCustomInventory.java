@@ -54,7 +54,7 @@ public class InfusionCustomInventory extends CustomInventory {
 	private static final ItemStack mRefundItem = new ItemStack(Material.GRINDSTONE);
 	private static final ItemStack mMaxLevelReachedItem = new ItemStack(Material.CAKE);
 
-	private Map<Integer, ItemClicked> mMapFunction;
+	private final Map<Integer, ItemClicked> mMapFunction;
 
 
 	static {
@@ -458,7 +458,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			return;
 		}
 
-		if (InfusionUtils.canPayExp(p, item)) {
+		if (InfusionUtils.canPayInfusion(p, item)) {
 			if (InfusionUtils.payInfusion(p, item)) {
 				InfusionUtils.animate(p);
 				InfusionUtils.infuseItem(p, item, infusion);
