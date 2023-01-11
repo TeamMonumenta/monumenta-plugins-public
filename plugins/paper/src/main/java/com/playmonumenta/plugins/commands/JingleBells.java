@@ -7,6 +7,7 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -43,7 +44,7 @@ public class JingleBells extends GenericCommand {
 		}
 		player.setMetadata(METADATA_TAG, new FixedMetadataValue(Plugin.getInstance(), player.getTicksLived()));
 
-		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, NOTES.get(note));
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1, NOTES.get(note));
 		ScoreboardUtils.setScoreboardValue(player, OBJECTIVE, (note + 1) % NOTES.size());
 	}
 }

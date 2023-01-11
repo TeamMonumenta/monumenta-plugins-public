@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -73,8 +74,8 @@ public class SpellRaiseDead extends Spell {
 					amount = 10 + players.size() * 1;
 				}
 				double a = amount;
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, 10, 0.75f);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 10, 1f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_WOLOLO, SoundCategory.HOSTILE, 10, 0.75f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.HOSTILE, 10, 1f);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
 				BukkitRunnable runB = new BukkitRunnable() {
 					int mT = 0;
@@ -134,7 +135,7 @@ public class SpellRaiseDead extends Spell {
 				mINC += 2;
 				dust1.spawnAsBoss();
 				if (mINC >= 20) {
-					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 1f);
 					dust2.spawnAsBoss();
 					LibraryOfSoulsIntegration.summon(loc, s);
 					this.cancel();

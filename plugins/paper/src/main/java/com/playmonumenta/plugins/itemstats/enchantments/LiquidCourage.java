@@ -20,6 +20,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -85,7 +86,7 @@ public class LiquidCourage implements Enchantment {
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 8, 20)));
 
 			// Particles + Sound
-			player.playSound(player.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, 1, 1);
+			player.playSound(player.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, SoundCategory.PLAYERS, 1, 1);
 			new PartialParticle(Particle.REDSTONE, player.getLocation(), 10, 0.25, 0.25, 0.25, 0.1, ORANGE1_COLOR).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.REDSTONE, player.getLocation(), 10, 0.5, 0.5, 0.5, 0.1, ORANGE2_COLOR).spawnAsPlayerBuff(player);
 

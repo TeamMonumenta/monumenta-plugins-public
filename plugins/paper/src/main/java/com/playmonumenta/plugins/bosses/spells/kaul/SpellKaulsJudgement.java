@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -147,7 +148,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		for (Player player : players) {
 			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");
 		}
-		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 2);
+		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
 		new PartialParticle(Particle.SMOKE_LARGE, mBossLoc, 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
 		double amount = Math.ceil(players.size() / 2);
 		if (amount < 2) {
@@ -194,7 +195,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 					/* Start judgement */
 					for (Player player : mJudgedPlayers) {
 						player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
-						mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+						mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 						Location tpLoc = mTp.getLocation();
@@ -202,7 +203,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						tpLoc.setYaw(tpLoc.getYaw() + FastUtils.randomFloatInRange(-30, 30));
 						tpLoc.setPitch(tpLoc.getPitch() + FastUtils.randomFloatInRange(-10, 10));
 						player.teleport(tpLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-						player.playSound(tpLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+						player.playSound(tpLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 						player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
@@ -238,8 +239,8 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private void fail(Player player) {
 		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.HEALTH_BOOST, 60 * 20, -2));
 		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SLOW, 60 * 20, 1));
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0);
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 0.2f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 0.2f);
 		new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData()).spawnAsBoss();
 		player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.ITALIC + "SUCH FAILURE.");
 
@@ -249,7 +250,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private void succeed(Player player) {
 		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
 		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 		player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
 
 		endCommon(player);

@@ -276,7 +276,7 @@ public class WorldshaperOverride {
 					location.getBlock().setBlockData(blockData);
 					blocksPlaced++;
 					new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
-					player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 0.75f);
+					player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1f, 0.75f);
 					CoreProtectIntegration.logPlacement(player, location, blockData.getMaterial(), blockData);
 				} else {
 					if (blocksPlaced == 0) {

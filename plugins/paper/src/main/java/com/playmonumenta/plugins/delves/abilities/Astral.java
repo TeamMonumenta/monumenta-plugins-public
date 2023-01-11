@@ -12,6 +12,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -22,7 +23,7 @@ public class Astral {
 	public static final String DESCRIPTION = "Sometimes, the stars gaze back.";
 	private static final List<String> MOB_POOL;
 
-	private static List<String> POSSIBLE_DESCRIPTIONS = Arrays.asList(
+	private static final List<String> POSSIBLE_DESCRIPTIONS = Arrays.asList(
 		"Po" + ChatColor.MAGIC + "tesn" + ChatColor.RESET + "e co" + ChatColor.MAGIC + "nsp" + ChatColor.RESET + "icere ira" + ChatColor.MAGIC + "m c" + ChatColor.RESET + "aeli?",
 		"Perc" + ChatColor.MAGIC + "ipi" + ChatColor.RESET + "sne co" + ChatColor.MAGIC + "nple" + ChatColor.RESET + "xu" + ChatColor.MAGIC + "m as" + ChatColor.RESET + "trorum?",
 		"Astra " + ChatColor.MAGIC + "consumu" + ChatColor.RESET + "nt omni" + ChatColor.MAGIC + "a",
@@ -59,7 +60,7 @@ public class Astral {
 			LivingEntity boss = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, MOB_POOL.get(FastUtils.RANDOM.nextInt(MOB_POOL.size())));
 			if (boss != null) {
 				boss.addScoreboardTag(ChestLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
-				boss.getWorld().playSound(loc, Sound.ENTITY_WITHER_DEATH, 10, 3f);
+				boss.getWorld().playSound(loc, Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 10, 3f);
 				try {
 					BossManager.createBoss(null, boss, ChestLockBoss.identityTag);
 				} catch (Exception e) {

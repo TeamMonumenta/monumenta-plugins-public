@@ -46,7 +46,7 @@ public class SpellUltimateShulkerMania extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 6.0f, 1.0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 6.0f, 1.0f);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 50, true);
 		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), PortalBoss.detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\", \"color\":\"gold\"},{\"text\":\" TARGETS LOCKED. BEGINNING BARRAGE.\",\"color\":\"red\"}]");
@@ -90,7 +90,7 @@ public class SpellUltimateShulkerMania extends Spell {
 						e.printStackTrace();
 					}
 				}
-				world.playSound(mBoss.getLocation(), Sound.BLOCK_LAVA_POP, 6.0f, 1.0f);
+				world.playSound(mBoss.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.HOSTILE, 6.0f, 1.0f);
 
 				//set target of bullet
 				Collections.shuffle(players);
@@ -129,7 +129,7 @@ public class SpellUltimateShulkerMania extends Spell {
 				}
 			}
 			//Let the players know something happened
-			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 0.3f, 0.9f);
+			p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 0.3f, 0.9f);
 			new PartialParticle(Particle.VILLAGER_ANGRY, p.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsEntityActive(mBoss);
 		}
 	}

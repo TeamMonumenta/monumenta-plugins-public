@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,7 +24,6 @@ import org.bukkit.inventory.ItemStack;
 public class EarthenCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Earthen Combos";
-	public static final int TIME = 20;
 	public static final String PERCENT_DAMAGE_RECEIVED_EFFECT_NAME = "EarthenCombosPercentDamageReceivedEffect";
 	private static final double[] PERCENT_DAMAGE_RECEIVED = {-.08, -.10, -.12, -.14, -.16, -.20};
 	private static final int DURATION = 20 * 4;
@@ -53,8 +53,8 @@ public class EarthenCombos extends DepthsAbility {
 				Location loc = mPlayer.getLocation().add(0, 1, 0);
 				World world = mPlayer.getWorld();
 				Location entityLoc = enemy.getLocation();
-				world.playSound(loc, Sound.BLOCK_GRASS_BREAK, 0.8f, 0.65f);
-				world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, 0.8f, 0.45f);
+				world.playSound(loc, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
+				world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
 				new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(mPlayer);

@@ -6,6 +6,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -38,8 +39,8 @@ public class AstralOmenBonusDamage extends Effect {
 		if (source == mPlayer) {
 			World world = entity.getWorld();
 			Location loc = entity.getLocation().add(0, 1, 0);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 1.25f);
-			world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 1.75f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1f, 1.25f);
+			world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1f, 1.75f);
 			new PartialParticle(Particle.CRIT, loc, 8, 0.25, 0.5, 0.25, 0.4).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.REDSTONE, loc, 8, 0.2, 0.2, 0.2, 0.1, COLOR_PURPLE).spawnAsPlayerActive(mPlayer);
 			event.setDamage(event.getDamage() * (1 + mAmount));

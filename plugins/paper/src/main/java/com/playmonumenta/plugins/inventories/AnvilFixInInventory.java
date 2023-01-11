@@ -101,10 +101,10 @@ public class AnvilFixInInventory implements Listener {
 			}
 
 			World world = player.getWorld();
-			world.playSound(player.getLocation(), Sound.BLOCK_ANVIL_DESTROY, 0.5f, 1.0f);
+			world.playSound(player.getLocation(), Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.5f, 1.0f);
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				world.playSound(player.getLocation(), Sound.BLOCK_STONE_BREAK, 0.75f, 0.75f);
-				world.playSound(player.getLocation(), Sound.BLOCK_STONE_BREAK, 0.75f, 0.75f);
+				world.playSound(player.getLocation(), Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 0.75f, 0.75f);
+				world.playSound(player.getLocation(), Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 0.75f, 0.75f);
 			}, 21);
 
 			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;

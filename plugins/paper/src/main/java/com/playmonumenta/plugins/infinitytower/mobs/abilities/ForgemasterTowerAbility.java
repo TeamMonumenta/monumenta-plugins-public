@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -52,9 +53,9 @@ public class ForgemasterTowerAbility extends TowerAbility {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(mBoss);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.75f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.15f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 1f, 0.85f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.75f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1.15f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 1f, 0.85f);
 			},
 			// Warning particles
 			(Location loc) -> {
@@ -64,9 +65,9 @@ public class ForgemasterTowerAbility extends TowerAbility {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.CLOUD, boss.getLocation(), 45, 0.15, 0.4, 0.15, 0.15).spawnAsEntityActive(mBoss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 0.9f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.4f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 0.75f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 1f, 0.9f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.4f);
 			},
 			// Attack hit a player
 			(LivingEntity player) -> {
@@ -97,7 +98,7 @@ public class ForgemasterTowerAbility extends TowerAbility {
 						}
 
 						if (mT % 20 == 0) {
-							world.playSound(mParticleLoc, Sound.BLOCK_LAVA_EXTINGUISH, 0.025f, 0f);
+							world.playSound(mParticleLoc, Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.HOSTILE, 0.025f, 0f);
 							new PartialParticle(Particle.LAVA, mParticleLoc, 1, 0.3, 0.1, 0.3, 0.02).spawnAsEntityActive(mBoss);
 						}
 						new PartialParticle(Particle.SMOKE_LARGE, mParticleLoc, 1, 0.3, 0.1, 0.3, 0).spawnAsEntityActive(mBoss);
@@ -105,7 +106,7 @@ public class ForgemasterTowerAbility extends TowerAbility {
 
 						for (LivingEntity target : mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()) {
 							if (mHitbox.overlaps(target.getBoundingBox())) {
-								world.playSound(mParticleLoc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
+								world.playSound(mParticleLoc, Sound.ENTITY_GENERIC_BURN, SoundCategory.HOSTILE, 0.5f, 1f);
 								target.setFireTicks(FIRE_DURATION);
 								DamageUtils.damage(mBoss, target, DamageEvent.DamageType.MAGIC, GROUND_DAMAGE, null, true);
 							}
@@ -119,10 +120,10 @@ public class ForgemasterTowerAbility extends TowerAbility {
 			() -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.CLOUD, boss.getLocation(), 45, 0.15, 0.4, 0.15, 0.15).spawnAsEntityActive(mBoss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.1f, 1.5f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 0.9f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.4f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 0.75f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 1f, 0.9f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.4f);
 			});
 
 		SpellManager active = new SpellManager(List.of(spell));

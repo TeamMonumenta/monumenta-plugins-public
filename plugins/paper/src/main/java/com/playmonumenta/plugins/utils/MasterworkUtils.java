@@ -16,6 +16,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -467,7 +468,7 @@ public class MasterworkUtils {
 			@Override
 			public void run() {
 				fw.detonate();
-				player.playSound(loc, Sound.BLOCK_ANVIL_USE, 1.f, 1.f);
+				player.playSound(loc, Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 5);
 	}

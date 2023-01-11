@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -41,8 +42,8 @@ public class Reflection implements Infusion {
 			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 			double reflectedDamage = modifiedLevel * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();
 			World world = player.getWorld();
-			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.8f, 0.6f);
-			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.8f, 0.4f);
+			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.6f);
+			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.4f);
 			new BukkitRunnable() {
 				int mTicks = 0;
 
@@ -54,7 +55,7 @@ public class Reflection implements Infusion {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), RADIUS, player)) {
 							DamageUtils.damage(player, mob, DamageType.OTHER, reflectedDamage, null, true);
 						}
-						world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
+						world.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 						new BukkitRunnable() {
 							double mRadius = 0;
 							final Location mLoc = player.getLocation().add(0, 0.15, 0);

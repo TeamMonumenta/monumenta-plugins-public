@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -76,7 +77,7 @@ public class SpellBeeBombs extends Spell {
 								new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
-								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.65f, 1);
+								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.65f, 1);
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {
 									if (mCenter.distance(player.getLocation()) < mRange) {
@@ -109,8 +110,8 @@ public class SpellBeeBombs extends Spell {
 			spawnBee(loc);
 		}
 
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 3, 1.1f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 3, 0.75f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.HOSTILE, 3, 1.1f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.HOSTILE, 3, 0.75f);
 		new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.1).spawnAsEntityActive(mBoss);
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -131,10 +132,10 @@ public class SpellBeeBombs extends Spell {
 					new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 5, 0.4, .4, .4, 0.125).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 20, 0.4, .4, .4, 0.09).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 40, 0.4, .4, .4, 0.1).spawnAsEntityActive(mBoss);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 0.65f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 3, 0.75f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 3, 1f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 3, 1.25f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 0.65f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, SoundCategory.HOSTILE, 3, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, SoundCategory.HOSTILE, 3, 1f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BAT_TAKEOFF, SoundCategory.HOSTILE, 3, 1.25f);
 				}
 			}
 

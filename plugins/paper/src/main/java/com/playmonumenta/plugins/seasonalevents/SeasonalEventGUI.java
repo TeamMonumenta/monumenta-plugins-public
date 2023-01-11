@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -130,7 +131,7 @@ public class SeasonalEventGUI extends Gui {
 				Component.text("and purchase rewards from them.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 		}))
 			.onLeftClick(() -> {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 				new SeasonalEventRepurchaseGUI(mPlayer).open();
 			});
 
@@ -254,7 +255,7 @@ public class SeasonalEventGUI extends Gui {
 			pageItem.setItemMeta(meta);
 			setItem(PREV_PAGE_LOC, pageItem)
 				.onLeftClick(() -> {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					mCurrentPage--;
 					update();
 				});
@@ -268,7 +269,7 @@ public class SeasonalEventGUI extends Gui {
 			pageItem.setItemMeta(meta);
 			setItem(NEXT_PAGE_LOC, pageItem)
 				.onLeftClick(() -> {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					mCurrentPage++;
 					update();
 				});

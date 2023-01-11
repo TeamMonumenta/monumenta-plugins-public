@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -75,7 +76,7 @@ public class SpellArachnopocolypse extends Spell {
 					spiderLocations.put("FireVassal", new Vector(15, -8, -15));
 					spiderLocations.put("WaterVassal", new Vector(15, -8, 15));
 
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 10, 1);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 50, 0.5, 0.25, 0.5, 0).spawnAsEntityActive(mBoss);
 
 					double health = 80 * BossUtils.healthScalingCoef(players.size(), 0.5, 0.5);
@@ -94,7 +95,7 @@ public class SpellArachnopocolypse extends Spell {
 
 	private void riseSpider(Location loc, String los, int health) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+		world.playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 1f);
 		new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 		Spider spider = (Spider) LibraryOfSoulsIntegration.summon(loc.clone().add(0, 1, 0), los);
 		if (spider != null) {

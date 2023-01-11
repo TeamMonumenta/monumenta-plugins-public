@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -25,8 +26,8 @@ public class SpellWindWalk extends Spell {
 		mCaster.removePotionEffect(PotionEffectType.SLOW);
 		mCaster.removePotionEffect(PotionEffectType.WEAKNESS);
 		mCaster.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 8, 0));
-		world.playSound(mCaster.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 2, 1.75f);
-		world.playSound(mCaster.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 2, 1f);
+		world.playSound(mCaster.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 2, 1.75f);
+		world.playSound(mCaster.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 2, 1f);
 		new PartialParticle(Particle.SMOKE_NORMAL, mCaster.getLocation(), 90, 0.25, 0.45, 0.25, 0.1).spawnAsEntityActive(mCaster);
 		new PartialParticle(Particle.CLOUD, mCaster.getLocation(), 20, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mCaster);
 		new BukkitRunnable() {

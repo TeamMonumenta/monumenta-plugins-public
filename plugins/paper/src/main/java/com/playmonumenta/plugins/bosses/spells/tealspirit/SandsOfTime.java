@@ -23,6 +23,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -107,8 +108,8 @@ public class SandsOfTime extends Spell {
 					for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
 						Location playerLoc = player.getLocation();
 						Location soundLoc = playerLoc.clone().add(LocationUtils.getDirectionTo(loc, playerLoc).normalize().multiply(3));
-						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, 1, sandsColor.mPitch);
-						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, 0.75f, sandsColor.mPitch * 0.334f);
+						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, SoundCategory.HOSTILE, 1, sandsColor.mPitch);
+						player.playSound(soundLoc, Sound.BLOCK_BELL_USE, SoundCategory.HOSTILE, 0.75f, sandsColor.mPitch * 0.334f);
 					}
 				}
 
@@ -207,7 +208,7 @@ public class SandsOfTime extends Spell {
 			public void run() {
 				List<Location> soundLocs = getRandomLocationsNear(tallCenter, 2);
 				for (Location soundLoc : soundLocs) {
-					world.playSound(soundLoc, Sound.ITEM_CROSSBOW_LOADING_START, 2.0f, 0.75f);
+					world.playSound(soundLoc, Sound.ITEM_CROSSBOW_LOADING_START, SoundCategory.HOSTILE, 2.0f, 0.75f);
 				}
 			}
 		};
@@ -219,7 +220,7 @@ public class SandsOfTime extends Spell {
 			public void run() {
 				List<Location> soundLocs = getRandomLocationsNear(tallCenter, 3);
 				for (Location soundLoc : soundLocs) {
-					world.playSound(soundLoc, Sound.ITEM_TRIDENT_THROW, 1.5f, 1.25f);
+					world.playSound(soundLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 1.5f, 1.25f);
 				}
 			}
 		};
@@ -241,11 +242,11 @@ public class SandsOfTime extends Spell {
 
 				List<Location> soundLocs = getRandomLocationsNear(loc, 3);
 				for (Location soundLoc : soundLocs) {
-					world.playSound(soundLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 1.25f);
+					world.playSound(soundLoc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.HOSTILE, 1.2f, 1.25f);
 				}
 				soundLocs = getRandomLocationsNear(loc, 3);
 				for (Location soundLoc : soundLocs) {
-					world.playSound(soundLoc, Sound.ENTITY_ARROW_HIT, 1.2f, 0.8f);
+					world.playSound(soundLoc, Sound.ENTITY_ARROW_HIT, SoundCategory.HOSTILE, 1.2f, 0.8f);
 				}
 			}
 		};

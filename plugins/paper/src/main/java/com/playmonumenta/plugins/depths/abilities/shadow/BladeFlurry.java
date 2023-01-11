@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -63,7 +64,7 @@ public class BladeFlurry extends DepthsAbility {
 			DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
 			MovementUtils.knockAway(mPlayer, mob, 0.8f, true);
 		}
-		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
+		mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.75f);
 
 		cancelOnDeath(new BukkitRunnable() {
 			final Vector mEyeDir = loc.getDirection();
@@ -84,7 +85,7 @@ public class BladeFlurry extends DepthsAbility {
 				Location bladeLoc = mLoc.clone().add(direction.clone().multiply(3.0));
 
 				new PartialParticle(Particle.SPELL_WITCH, bladeLoc, 10, 0.35, 0, 0.35, 1).spawnAsPlayerActive(mPlayer);
-				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+				mWorld.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
 
 				if (mIncrementDegrees >= 360) {
 					this.cancel();

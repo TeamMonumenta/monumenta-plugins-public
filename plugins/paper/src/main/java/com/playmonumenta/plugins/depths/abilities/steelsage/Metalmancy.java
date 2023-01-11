@@ -26,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -96,9 +97,9 @@ public class Metalmancy extends DepthsAbility {
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		metalmancyBoss.spawn(mPlayer, DAMAGE[mRarity - 1], playerItemStats);
 
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, 1.0f, 1.0f);
-		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 1.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 
 		new BukkitRunnable() {
 			int mTicksElapsed = 0;
@@ -109,7 +110,7 @@ public class Metalmancy extends DepthsAbility {
 				if (isOutOfTime || mGolem == null) {
 					if (isOutOfTime && mGolem != null) {
 						Location golemLoc = mGolem.getLocation();
-						world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, 0.8f, 1.0f);
+						world.playSound(golemLoc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.NEUTRAL, 0.8f, 1.0f);
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SMOKE_NORMAL, golemLoc, 20).spawnAsPlayerActive(mPlayer);
 					}
@@ -155,7 +156,7 @@ public class Metalmancy extends DepthsAbility {
 		}
 
 		mTarget = enemy;
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.NEUTRAL, 1.0f, 0.5f);
 		PotionUtils.applyPotion(mPlayer, mTarget, new PotionEffect(PotionEffectType.GLOWING, DURATION[mRarity - 1], 0, true, false));
 		new PartialParticle(Particle.VILLAGER_ANGRY, mGolem.getEyeLocation(), 15).spawnAsPlayerActive(mPlayer);
 		return true; // only one retarget per tick

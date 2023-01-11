@@ -91,14 +91,14 @@ his hunt (They are warned he is doing so). After 1.5s, For the next 5 seconds th
 aggro permanently set to that enemy, gaining a burst of speed to run down his mark. If the player is
  dealt damage by The Horseman they are skewered through the chest, taking 28/42 damage and being given
  antiheal 5 for the next 7 seconds and wither 2 for 5 seconds. (Normal mode) In hard mode the speed is
- higher and the charge-up is reduced to 1 seconds.
+ higher and the charge-up is reduced to 1 second.
 
 (Ultimate) Hallow’s End - A pillar of smoke and flames appears on the horseman, after 1 second the area
 nearby explodes, dealing 20/35 damage to players in a 4 block radius, igniting them for 8 seconds and
 launching them upwards greatly. Afterwards pillars appear underneath ⅓ of the players within 32 blocks of
 the horseman, after 1 second they also explode dealing the same thing. This continues to repeat as long as a
 player is dealt damage by the pillars explosion to a max of 8 casts of the skill. (In hard mode players
-it are also blinded for 5 seconds.)
+are also blinded for 5 seconds.)
 
  */
 
@@ -242,7 +242,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				World world = mBoss.getWorld();
 				new PartialParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0);
 			}
 		}
 
@@ -288,7 +288,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Headless Horseman", ChatColor.RED + "Scourge of the Isles");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 	}
 
@@ -296,7 +296,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	public void death(@Nullable EntityDeathEvent event) {
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			player.sendMessage(ChatColor.DARK_RED + "[The Horseman] No matter. I'll be seeing you all again soon.");
-			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1.0f, 0.1f);
+			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.HOSTILE, 1.0f, 0.1f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
 		}

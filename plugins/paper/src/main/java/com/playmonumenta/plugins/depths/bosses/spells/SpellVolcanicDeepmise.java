@@ -12,6 +12,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -97,12 +98,12 @@ public class SpellVolcanicDeepmise extends Spell {
 				if (FastUtils.RANDOM.nextBoolean()) {
 					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true).minimumMultiplier(false).spawnAsEntityActive(mBoss);
 				}
-				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
 					new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
-					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 4, 4, 4);
 					for (Player player : PlayerUtils.playersInRange(mLoc, 4, true)) {
 						BoundingBox pBox = player.getBoundingBox();

@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -92,7 +93,7 @@ public class CounterStrike extends Ability {
 				if (stacks != null) {
 					if (lastDamageTime != null) {
 						event.setDamage(event.getDamage() * (1 - stacks * (DAMAGE_REDUCTION_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION))));
-						mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHAIN_PLACE, 0.5f + 0.1f * stacks, 2.5f - 0.5f * stacks);
+						mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.5f + 0.1f * stacks, 2.5f - 0.5f * stacks);
 						if (stacks < MAX_STACKS + CharmManager.getLevel(mPlayer, CHARM_STACKS)) {
 							mStacks.put(source, stacks + 1);
 						}

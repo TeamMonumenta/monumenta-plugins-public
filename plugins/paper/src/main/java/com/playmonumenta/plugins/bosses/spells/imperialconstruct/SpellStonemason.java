@@ -123,7 +123,7 @@ public class SpellStonemason extends Spell {
 						new PartialParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 
 						if (mChargeUp.getTime() % 6 == 0) {
-							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1, 0f);
+							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0f);
 						}
 					}
 				}

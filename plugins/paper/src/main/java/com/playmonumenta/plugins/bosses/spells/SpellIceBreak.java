@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -61,7 +62,7 @@ public class SpellIceBreak extends Spell {
 					}
 				}
 				if (shouldBreak) {
-					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.3f, 0.9f);
+					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.3f, 0.9f);
 					new PartialParticle(Particle.WATER_SPLASH, block.getLocation(), 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 					block.setType(Material.AIR);
 					mBrokenBlocks.add(block);
@@ -76,7 +77,7 @@ public class SpellIceBreak extends Spell {
 			for (Block block : mIceBlocks) {
 				// Randomise a bit to make it look better.
 				if (FastUtils.RANDOM.nextDouble() < 0.6 || block == locationBelow.getBlock()) {
-					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.1f, 0.9f);
+					loc.getWorld().playSound(block.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.1f, 0.9f);
 					new PartialParticle(Particle.CLOUD, block.getLocation(), 10, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 					block.setType(Material.FROSTED_ICE);
 					mFrostedBlocks.add(block);

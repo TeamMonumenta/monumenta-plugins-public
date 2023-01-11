@@ -26,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -99,7 +100,7 @@ public class Masked extends BossAbilityGroup {
 				if (mT == TIME_SPAWN) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, SPAWN_DIALOG_COMMAND);
 					new PartialParticle(Particle.DRAGON_BREATH, mSpawnLoc, 50, 0.5, 0.5, 0.5, 0.02).spawnAsEntityActive(boss);
-					mWorld.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 2f, 1f);
+					mWorld.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2f, 1f);
 				} else if (mT == TIME_TITLE) {
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, DETECTION_RANGE, true)) {
 						player.sendTitle(ChatColor.BOLD + "" + ChatColor.LIGHT_PURPLE + "The Masked Man", ChatColor.LIGHT_PURPLE + "Harbinger of Shadow", 15, 100, 15);
@@ -142,8 +143,8 @@ public class Masked extends BossAbilityGroup {
 			new SpellBaseLaser(mPlugin, mBoss, 40, 120, true, false, 160,
 				// Tick action per player
 				(LivingEntity target, int ticks, boolean blocked) -> {
-					target.getWorld().playSound(target.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
-					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+					target.getWorld().playSound(target.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
+					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
 					if (!blocked && ticks > 0 && ticks % 20 == 0) {
 						BossUtils.blockableDamage(mBoss, target, DamageType.MAGIC, 5);
 					}

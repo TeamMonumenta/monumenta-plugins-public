@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -56,13 +57,13 @@ public class DivineAura implements Enchantment {
 				if (!DISABLE_TAG.contains(player.getUniqueId())) {
 					new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerActive(player);
-					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 0.25f);
+					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1, 0.25f);
 					player.sendMessage(ChatColor.AQUA + "You feel the Divine Aura around you fall dormant...");
 					player.addScoreboardTag(TAG_TO_DISABLE);
 				} else {
 					new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerActive(player);
-					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1.25f);
+					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1, 1.25f);
 					player.sendMessage(ChatColor.AQUA + "You feel a Divine Aura envelop you.");
 					player.removeScoreboardTag(TAG_TO_DISABLE);
 				}

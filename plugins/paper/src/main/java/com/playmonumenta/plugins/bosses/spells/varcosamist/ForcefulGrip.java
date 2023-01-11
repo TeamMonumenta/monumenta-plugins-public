@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -38,12 +39,12 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 			// Initiate Aesthetic
 			(World world, Location loc, int ticks) -> {
 				PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-				world.playSound(loc, Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 2f, 0.5f);
+				world.playSound(loc, Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.HOSTILE, 2f, 0.5f);
 			},
 			// Launch Aesthetic
 			(World world, Location loc, int ticks) -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 2f, 0.5f);
+				world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.HOSTILE, 2f, 0.5f);
 			},
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {
@@ -53,12 +54,12 @@ public class ForcefulGrip extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.CRIT, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 4, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 				if (ticks % 40 == 0) {
-					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 2f, 0.2f);
+					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, SoundCategory.HOSTILE, 2f, 0.2f);
 				}
 			},
 			// Hit Action
 			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-				world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, SoundCategory.HOSTILE, 1f, 0.5f);
 				new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 				if (player != null) {
 					BossUtils.blockableDamage(boss, player, DamageType.PROJECTILE, DAMAGE, "Forceful Grip", prevLoc);

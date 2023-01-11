@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -64,7 +65,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				(LivingEntity target) -> {
 					new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
 					boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
-					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
+					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 1f, 1.5f);
 				},
 				// Warning particles
 				(Location loc) -> {
@@ -73,13 +74,13 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				// Charge attack sound/particles at boss location
 				(LivingEntity player) -> {
 					new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0).spawnAsEntityActive(boss);
-					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 0.5f);
+					world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Attack hit a player
 				(LivingEntity target) -> {
 					new PartialParticle(Particle.SMOKE_NORMAL, target.getLocation(), 80, 1, 1, 1, 0).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.BLOCK_DUST, target.getLocation(), 20, 1, 1, 1, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(boss);
-					world.playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
+					world.playSound(target.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1f, 0.85f);
 					BossUtils.blockableDamage(mBoss, target, DamageType.MELEE, 25);
 					MovementUtils.knockAway(mBoss.getLocation(), target, 0.4f, 0.4f);
 				},

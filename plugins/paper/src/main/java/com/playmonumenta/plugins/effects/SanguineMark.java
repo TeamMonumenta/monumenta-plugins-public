@@ -8,6 +8,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -43,7 +44,7 @@ public class SanguineMark extends Effect {
 			Player player = event.getEntity().getKiller();
 			double maxHealth = EntityUtils.getMaxHealth(player);
 			PlayerUtils.healPlayer(mPlugin, player, mHealPercent * maxHealth, mPlayer);
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, 1.0f, 0.8f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH_SMALL, SoundCategory.PLAYERS, 1.0f, 0.8f);
 		}
 	}
 

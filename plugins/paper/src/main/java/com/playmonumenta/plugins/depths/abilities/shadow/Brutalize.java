@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -44,8 +45,8 @@ public class Brutalize extends DepthsAbility {
 			double brutalizeDamage = DAMAGE[mRarity - 1] * originalDamage;
 			event.setDamage(originalDamage + brutalizeDamage);
 			Location loc = enemy.getLocation();
-			mPlayer.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
-			mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+			mPlayer.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, 1.65f);
+			mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
 			new PartialParticle(Particle.SPELL_WITCH, loc, 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, enemy)) {
 				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, brutalizeDamage, null, false, true);

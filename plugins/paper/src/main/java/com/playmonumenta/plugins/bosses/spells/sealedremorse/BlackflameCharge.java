@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,9 +38,9 @@ public class BlackflameCharge extends SpellBaseCharge {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.75f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.15f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 1f, 0.85f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.75f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1.15f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 1f, 0.85f);
 			},
 			// Warning particles
 			(Location loc) -> {
@@ -49,9 +50,9 @@ public class BlackflameCharge extends SpellBaseCharge {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.CLOUD, boss.getLocation(), 45, 0.15, 0.4, 0.15, 0.15).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 0.9f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.4f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 0.75f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 1f, 0.9f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.4f);
 			},
 			// Attack hit a player
 			(LivingEntity player) -> {
@@ -83,7 +84,7 @@ public class BlackflameCharge extends SpellBaseCharge {
 						}
 
 						if (mT % 20 == 0) {
-							world.playSound(mParticleLoc, Sound.BLOCK_BEACON_DEACTIVATE, 0.025f, 0f);
+							world.playSound(mParticleLoc, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 0.025f, 0f);
 							new PartialParticle(Particle.SQUID_INK, mParticleLoc, 1, 0.6, 0.2, 0.6, 0.02).spawnAsEntityActive(boss);
 						}
 						new PartialParticle(Particle.SMOKE_LARGE, mParticleLoc, 1, 0.6, 0.2, 0.6, 0).spawnAsEntityActive(boss);
@@ -91,7 +92,7 @@ public class BlackflameCharge extends SpellBaseCharge {
 
 						for (Player player : players) {
 							if (mHitbox.overlaps(player.getBoundingBox())) {
-								world.playSound(mParticleLoc, Sound.ENTITY_BLAZE_HURT, 0.5f, 0f);
+								world.playSound(mParticleLoc, Sound.ENTITY_BLAZE_HURT, SoundCategory.HOSTILE, 0.5f, 0f);
 								EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), FIRE_DURATION, player, boss);
 								DamageUtils.damage(boss, player, DamageType.MAGIC, GROUND_DAMAGE, null, false, true, "Blackflame Charge");
 							}
@@ -105,10 +106,10 @@ public class BlackflameCharge extends SpellBaseCharge {
 			() -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, boss.getLocation(), 125, 0.4, 0.4, 0.4, 0.25).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.CLOUD, boss.getLocation(), 45, 0.15, 0.4, 0.15, 0.15).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.1f, 1.5f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.75f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1f, 0.9f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.4f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 0.75f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 1f, 0.9f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.4f);
 			});
 		mBossClass = bossClass;
 	}

@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -88,8 +89,8 @@ public class SpellChangeFloor extends Spell {
 				}
 
 				if (mTicks == 0) {
-					target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 4f);
-					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 5f);
+					target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 4f);
+					mBoss.getLocation().getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 5f);
 					new PartialParticle(Particle.LAVA, mBoss.getLocation(), 1, 0.8, 0.8, 0.8, 0).spawnAsEntityActive(mBoss);
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 3));
 

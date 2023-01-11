@@ -15,7 +15,7 @@ import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import org.jetbrains.annotations.Nullable;
 
 /*
- * Order does not matter here, it is simply alphebetical.
+ * Order does not matter here, it is simply alphabetical.
  * Where order matters for what runs first is in AbilityManager.
  * This is just to link existing spells to custom damage events.
  */

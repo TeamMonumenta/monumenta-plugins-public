@@ -9,6 +9,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class CakeifyFinisher implements EliteFinisher {
 			@Override
 			public void run() {
 				if (mTicks <= 30) {
-					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EAT, 1.0f, 0.6f + (.03f * mTicks));
+					loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1.0f, 0.6f + (.03f * mTicks));
 				}
 				if (mTicks == 10) {
 					throwCakes(30, loc);

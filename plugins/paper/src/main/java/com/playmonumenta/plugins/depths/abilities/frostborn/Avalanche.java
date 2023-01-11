@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -67,13 +68,13 @@ public class Avalanche extends DepthsAbility {
 
 		putOnCooldown();
 
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.95f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.95f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 0.95f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 1, 0.95f);
 
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.75f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.BLOCKS, 1, 1.25f);
 
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 0.5f, 1f);
 
 		List<LivingEntity> hitMobs = new ArrayList<>();
 

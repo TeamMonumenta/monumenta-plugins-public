@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -36,7 +37,7 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBombToss(plugin, boss, detectionRange, LOBS, FUSE,
 				(World world, TNTPrimed tnt, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 
 					for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {

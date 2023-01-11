@@ -91,7 +91,7 @@ public class TriplicateSlash extends Spell {
 						mDirection = 0;
 					}
 				} else {
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 
 					for (int dir = mDirection; dir <= 270 + mDirection; dir += 120) {
 						Vector vec;

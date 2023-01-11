@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -30,7 +31,7 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 		//Get players in depths system
 		Set<UUID> playersOnShard = DepthsManager.getInstance().mPlayers.keySet();
 
-		if (playersOnShard == null || playersOnShard.size() == 0) {
+		if (playersOnShard.size() == 0) {
 			return;
 		}
 
@@ -48,7 +49,7 @@ public class DepthsDamageRunnable extends BukkitRunnable {
 				DamageUtils.damage(null, p, DamageType.AILMENT, 0.1, null, true, false);
 				BossUtils.bossDamagePercent(null, p, PCT_DAMAGE);
 				p.setVelocity(vel);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.HOSTILE, 0.3f, 1.5f);
 			}
 		}
 	}

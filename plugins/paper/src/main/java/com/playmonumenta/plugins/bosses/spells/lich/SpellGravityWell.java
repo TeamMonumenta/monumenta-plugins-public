@@ -16,6 +16,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -89,8 +90,8 @@ public class SpellGravityWell extends Spell {
 		}
 		Collections.shuffle(players);
 		Player p = players.get(0);
-		world.playSound(p.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 2.0f, 0.5f);
-		world.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 2.0f, 1.0f);
+		world.playSound(p.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 2.0f, 0.5f);
+		world.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 2.0f, 1.0f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			Location mLoc = p.getLocation().add(0, 0.2, 0);
@@ -117,7 +118,7 @@ public class SpellGravityWell extends Spell {
 					this.cancel();
 					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Gravity Well...");
 					mChargeUp.setColor(BarColor.RED);
-					world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, 2.0f, 2.0f);
+					world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 2.0f, 2.0f);
 					mSmokeL.location(mBoss.getLocation()).spawnAsBoss();
 					mBreath.location(mBoss.getLocation()).spawnAsBoss();
 					BukkitRunnable runB = new BukkitRunnable() {
@@ -129,7 +130,7 @@ public class SpellGravityWell extends Spell {
 							mChargeUp.setProgress(1.0d - (mT / (20 * 9.0d)));
 							List<Player> players = Lich.playersInRange(mLoc, mRadius, true);
 							if (mT % 15 == 0) {
-								world.playSound(mLoc, Sound.BLOCK_PORTAL_AMBIENT, 2.0f, 0.5f);
+								world.playSound(mLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 2.0f, 0.5f);
 							}
 							indicator2.radius(mRadius).location(mLoc).spawnAsBoss();
 

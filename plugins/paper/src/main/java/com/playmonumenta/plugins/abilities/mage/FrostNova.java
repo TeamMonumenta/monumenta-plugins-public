@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -165,12 +166,12 @@ public class FrostNova extends Ability {
 
 		}.runTaskTimer(mPlugin, 0, 1);
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.65f);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.65f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.45f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.25f);
 		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.5f, 1f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1f);
 	}
 
 }

@@ -57,9 +57,8 @@ public final class Svalgot extends BossAbilityGroup {
 	public double mCastSpeed = 1;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Svalgot(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new Svalgot(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -84,7 +83,7 @@ public final class Svalgot extends BossAbilityGroup {
 			new SpellShieldStun(6 * 20)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(50, mBoss -> {
 			//Cast faster
@@ -92,8 +91,8 @@ public final class Svalgot extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = mBoss.getLocation();
-			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
-			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, 0.6f);
+			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 1.5f);
 			new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
@@ -130,12 +129,12 @@ public final class Svalgot extends BossAbilityGroup {
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 0) * 1.25);
 
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" Broer, for you and for the Blackflame, I will bathe in their blood!\",\"color\":\"dark_gray\"}]");
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, 3, 0);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, SoundCategory.HOSTILE, 3, 0);
 
 					World world = mBoss.getWorld();
 					Location loc = mBoss.getLocation();
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
-					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, 0.6f);
+					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 1.5f);
 					new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
@@ -164,7 +163,7 @@ public final class Svalgot extends BossAbilityGroup {
 			@Override
 			public void run() {
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 200, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(boss);
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 5, 2);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 2);
 			}
 		}.runTaskLater(mPlugin, 20 * 6);
 
@@ -193,7 +192,7 @@ public final class Svalgot extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!\",\"color\":\"dark_gray\"}]");
 
 			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.add(2, -3, 0), BeastOfTheBlackFlame.losName);
-			if (beast != null && beast instanceof LivingEntity leBeast) {
+			if (beast instanceof LivingEntity leBeast) {
 				try {
 					BossManager.createBoss(null, leBeast, BeastOfTheBlackFlame.identityTag, mEndLoc);
 				} catch (Exception e) {

@@ -432,7 +432,7 @@ public class DelveCustomInventory extends CustomInventory {
 					} else {
 						int finaPoint = DelvesUtils.getMaxPointAssignable(mod, 5 - row);
 						mPointSelected.put(mod, finaPoint);
-						playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.BLOCK_STONE_PLACE, 1f, 1.5f);
+						playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.BLOCK_STONE_PLACE, SoundCategory.PLAYERS, 1f, 1.5f);
 					}
 					if (mod == DelvesModifier.ENTROPY) {
 						int newPoint = mPointSelected.getOrDefault(mod, 0);

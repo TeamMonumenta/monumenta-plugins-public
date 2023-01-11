@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -64,7 +65,7 @@ public class SpellSummonLavaTitan extends Spell {
 			@Override
 			public void run() {
 				if (mT % (cooldownTicks() / 10) == 0) {
-					mCenter.getWorld().playSound(mCenter, Sound.BLOCK_BEEHIVE_DRIP, 20, 0.5f);
+					mCenter.getWorld().playSound(mCenter, Sound.BLOCK_BEEHIVE_DRIP, SoundCategory.HOSTILE, 20, 0.5f);
 				}
 
 				if (mT >= cooldownTicks() / 2) {
@@ -124,14 +125,14 @@ public class SpellSummonLavaTitan extends Spell {
 
 		int rand = (int) Math.floor(FastUtils.randomDoubleInRange(0, 7.99));
 
-		mCenter.getWorld().playSound(mCenter, Sound.ENTITY_ELDER_GUARDIAN_CURSE, 5, 0.5f);
+		mCenter.getWorld().playSound(mCenter, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 5, 0.5f);
 		Location loc = mCenter.clone().add(mSummonSpots.get(rand));
 		LibraryOfSoulsIntegration.summon(loc, "LavaTitan");
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				mCenter.getWorld().playSound(mCenter, Sound.ENTITY_ELDER_GUARDIAN_CURSE, 5, 0.5f);
+				mCenter.getWorld().playSound(mCenter, Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 5, 0.5f);
 				int rand2 = (int) Math.floor(FastUtils.randomDoubleInRange(0, 6.99));
 				if (rand2 == rand) {
 					rand2 = 7;

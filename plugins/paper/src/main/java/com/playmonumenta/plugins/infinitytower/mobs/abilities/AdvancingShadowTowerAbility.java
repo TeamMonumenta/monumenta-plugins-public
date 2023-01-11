@@ -14,6 +14,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -35,9 +36,7 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 			private @Nullable LivingEntity getTarget() {
 				List<LivingEntity> list = (mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs());
 				list.removeIf(le -> le.getScoreboardTags().contains(TowerConstants.MOB_TAG_UNTARGETABLE));
-				list.sort((a, b) -> {
-					return (int) (a.getHealth() - b.getHealth());
-				});
+				list.sort((a, b) -> (int) (a.getHealth() - b.getHealth()));
 				return list.size() > 0 ? list.get(0) : null;
 			}
 
@@ -95,7 +94,7 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 										locTest.add(0, mBoss.getHeight() / 2, 0);
 										new PartialParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
 										new PartialParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mBoss);
-										world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
+										world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 
 
 										// Janky way to break out of nested loop

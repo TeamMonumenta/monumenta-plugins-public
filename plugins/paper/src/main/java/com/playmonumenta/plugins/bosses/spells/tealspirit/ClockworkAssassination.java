@@ -13,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -58,7 +59,7 @@ public class ClockworkAssassination extends Spell {
 				if (mChargeUp.nextTick()) {
 					mChargeUp.setTitle(ChatColor.GOLD + "Executing " + ChatColor.RED + ABILITY_NAME);
 					mChargeUp.setColor(BarColor.RED);
-					players.forEach(p -> world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 0.6f, 2.0f));
+					players.forEach(p -> world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 0.6f, 2.0f));
 
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mT = 0;
@@ -113,8 +114,8 @@ public class ClockworkAssassination extends Spell {
 		Location location = player.getLocation();
 		World world = location.getWorld();
 		location.setY(location.getBlockY());
-		world.playSound(location, Sound.BLOCK_CAMPFIRE_CRACKLE, 2.0f, 0.3f);
-		world.playSound(location, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.7f);
+		world.playSound(location, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 2.0f, 0.3f);
+		world.playSound(location, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 0.7f);
 		PPCircle indicator = new PPCircle(Particle.REDSTONE, location, 0).ringMode(true).count(25).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(214, 58, 166), 1.65f));
 		PPCircle indicator2 = new PPCircle(Particle.DRAGON_BREATH, location, 0).ringMode(true).count(15).delta(0.25, 0.1, 0.25).extra(0.03);
 
@@ -137,7 +138,7 @@ public class ClockworkAssassination extends Spell {
 					for (Player p : PlayerUtils.playersInRange(location, MAX_RADIUS, true)) {
 						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, DAMAGE, null, false, false, "Clockwork Assassination");
 					}
-					world.playSound(location, Sound.BLOCK_SHROOMLIGHT_BREAK, 2.0f, 0.7f);
+					world.playSound(location, Sound.BLOCK_SHROOMLIGHT_BREAK, SoundCategory.HOSTILE, 2.0f, 0.7f);
 					radius = MAX_RADIUS;
 					this.cancel();
 				}

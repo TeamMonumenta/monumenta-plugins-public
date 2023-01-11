@@ -28,7 +28,7 @@ public class LightningFinisher implements EliteFinisher {
 	private static final int SHOCK_VERTICAL_RANGE = 10;
 	private static final int SHOCK_DELAY_TICKS = Constants.TICKS_PER_SECOND;
 
-	// Yeah this is straight ripped and tweaked from Kaul's LightningStrike
+	// Yeah, this is straight ripped and tweaked from Kaul's LightningStrike
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
 		World world = p.getWorld();
@@ -42,7 +42,6 @@ public class LightningFinisher implements EliteFinisher {
 
 
 		// S: Thunder & distant sparks
-		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 1 1.25
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
@@ -50,7 +49,6 @@ public class LightningFinisher implements EliteFinisher {
 			1,
 			1.25f
 		);
-		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 0.75 1.5
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
@@ -58,7 +56,6 @@ public class LightningFinisher implements EliteFinisher {
 			0.75f,
 			1.5f
 		);
-		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 1 1.75
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
@@ -66,7 +63,6 @@ public class LightningFinisher implements EliteFinisher {
 			1,
 			1.75f
 		);
-		// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.75 1.75
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
@@ -105,7 +101,6 @@ public class LightningFinisher implements EliteFinisher {
 					mInternalParticleRunnable = lightning.runnable();
 
 					// S: Electricity courses
-					// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 1 1.25
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
@@ -113,7 +108,6 @@ public class LightningFinisher implements EliteFinisher {
 						1,
 						1.25f
 					);
-					// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 1 1.5
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
@@ -158,7 +152,6 @@ public class LightningFinisher implements EliteFinisher {
 					).spawnAsBoss();
 
 					// S: Booms & fire ignites
-					// /playsound entity.lightning_bolt.impact master @p ~ ~ ~ 0.75 0.5
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_LIGHTNING_BOLT_IMPACT,
@@ -166,7 +159,6 @@ public class LightningFinisher implements EliteFinisher {
 						0.75f,
 						0.5f
 					);
-					// /playsound entity.lightning_bolt.impact master @p ~ ~ ~ 0.75 0.75
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_LIGHTNING_BOLT_IMPACT,
@@ -174,7 +166,6 @@ public class LightningFinisher implements EliteFinisher {
 						0.75f,
 						0.75f
 					);
-					// /playsound entity.blaze.shoot master @p ~ ~ ~ 1 0.75
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_BLAZE_SHOOT,
@@ -182,7 +173,6 @@ public class LightningFinisher implements EliteFinisher {
 						1,
 						0.75f
 					);
-					// /playsound entity.blaze.shoot master @p ~ ~ ~ 1 1
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_BLAZE_SHOOT,

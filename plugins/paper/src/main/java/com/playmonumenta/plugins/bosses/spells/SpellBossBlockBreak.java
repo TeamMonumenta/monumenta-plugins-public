@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Entity;
@@ -144,7 +145,7 @@ public class SpellBossBlockBreak extends Spell {
 					block.setType(Material.AIR);
 				}
 			}
-			l.getWorld().playSound(l, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
+			l.getWorld().playSound(l, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
 			new PartialParticle(Particle.EXPLOSION_NORMAL, l, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mBoss);
 		}
 	}

@@ -12,6 +12,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -83,9 +84,9 @@ public class SpellRisingTides extends Spell {
 					int t = mT / 5;
 					float dPitch = t * 0.2f;
 					if (tide) {
-						world.playSound(mStartLoc, Sound.ENTITY_DOLPHIN_SPLASH, 10, 0f + dPitch);
+						world.playSound(mStartLoc, Sound.ENTITY_DOLPHIN_SPLASH, SoundCategory.HOSTILE, 10, 0f + dPitch);
 					} else {
-						world.playSound(mStartLoc, Sound.ITEM_FIRECHARGE_USE, 10, 2.0f - dPitch);
+						world.playSound(mStartLoc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.HOSTILE, 10, 2.0f - dPitch);
 					}
 					for (double deg = 0; deg < 360; deg += 6) {
 						double cos = FastUtils.cosDeg(deg);
@@ -110,7 +111,7 @@ public class SpellRisingTides extends Spell {
 				}
 
 				if (mT == 55) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 20.0f, 1);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 20.0f, 1);
 
 					for (double deg = 0; deg < 360; deg += 4) {
 						double cos = FastUtils.cosDeg(deg);

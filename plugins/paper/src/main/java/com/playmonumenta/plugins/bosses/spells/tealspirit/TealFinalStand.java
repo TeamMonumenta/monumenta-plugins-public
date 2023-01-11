@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.boss.BarColor;
@@ -66,7 +67,7 @@ public class TealFinalStand extends Spell {
 								.count(120)
 								.extraRange(0.15, 1)
 								.spawnAsBoss();
-							p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.5f, 0.0f);
+							p.playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 0.5f, 0.0f);
 						});
 						mStack += 1;
 						this.cancel();

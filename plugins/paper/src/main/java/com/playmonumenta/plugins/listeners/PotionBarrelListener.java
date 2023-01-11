@@ -344,7 +344,7 @@ public class PotionBarrelListener implements Listener {
 	}
 
 	private static void errorSound(Player player) {
-		player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.MASTER, 1, 1);
+		player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.BLOCKS, 1, 1);
 	}
 
 	// block handling

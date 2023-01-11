@@ -14,6 +14,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -46,7 +47,7 @@ public class DarkCombos extends DepthsAbility {
 				EntityUtils.applyVulnerability(mPlugin, DURATION, VULN_AMPLIFIER[mRarity - 1], enemy);
 				mComboCount = 0;
 
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.6f, 0.5f);
 				new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 				PotionUtils.applyPotion(mPlayer, enemy,
 					new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));

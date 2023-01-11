@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -48,8 +49,8 @@ public final class CommanderBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = mBoss.getLocation();
-			world.playSound(loc, Sound.ENTITY_HORSE_ANGRY, 1f, 2f);
-			world.playSound(loc, Sound.ENTITY_HORSE_DEATH, 1f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_HORSE_ANGRY, SoundCategory.HOSTILE, 1f, 2f);
+			world.playSound(loc, Sound.ENTITY_HORSE_DEATH, SoundCategory.HOSTILE, 1f, 0.5f);
 
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), mParams.RANGE, mBoss)) {
 				if (!EntityUtils.isBoss(mob)) {

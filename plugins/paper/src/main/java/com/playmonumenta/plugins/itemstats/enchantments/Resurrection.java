@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.inventory.ItemStack;
@@ -70,7 +71,7 @@ public class Resurrection implements Enchantment {
 			}
 		}.runTaskLater(plugin, 1);
 
-		player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1f, 1);
+		player.getWorld().playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1f, 1);
 		new PartialParticle(Particle.TOTEM, player.getLocation().add(0, 1, 0), 100, 0, 0, 0, 1).spawnAsPlayerActive(player);
 
 		if (resurrectionEnchantment != null) {

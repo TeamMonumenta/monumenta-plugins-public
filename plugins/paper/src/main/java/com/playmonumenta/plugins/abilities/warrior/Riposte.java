@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -91,8 +92,8 @@ public class Riposte extends Ability {
 
 				World world = mPlayer.getWorld();
 				Location playerLoc = mPlayer.getLocation();
-				world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.2f);
-				world.playSound(playerLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 0.75f, 1.8f);
+				world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 1.2f);
+				world.playSound(playerLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 1.8f);
 				Vector dir = LocationUtils.getDirectionTo(playerLoc.clone().add(0, 1, 0), source.getLocation().add(0, source.getHeight() / 2, 0));
 				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
 				new PartialParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
@@ -108,7 +109,7 @@ public class Riposte extends Ability {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, ClassAbility.RIPOSTE, true, true);
 						EntityUtils.applySlow(mPlugin, duration, 1.0f, mob);
 					}
-					world.playSound(playerLoc, Sound.BLOCK_ANVIL_FALL, 0.5f, 0.5f);
+					world.playSound(playerLoc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 0.5f, 0.5f);
 				}
 			}
 		}

@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -58,9 +59,7 @@ public class SnowSpirit extends BossAbilityGroup {
 	private List<Entity> mActiveMinibosses;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new SnowSpirit(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new SnowSpirit(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -95,7 +94,7 @@ public class SnowSpirit extends BossAbilityGroup {
 			new JollyBall(plugin, boss, 12 * 20, 0.25)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(75, mBoss -> {
 			mActiveMinibosses.add(LibraryOfSoulsIntegration.summon(getMinibossSummonLocation(), "GhostOfHolidaysPast"));
@@ -125,9 +124,7 @@ public class SnowSpirit extends BossAbilityGroup {
 			mFinalPhase = true;
 		});
 
-		events.put(0, mBoss -> {
-			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-		});
+		events.put(0, mBoss -> changePhase(SpellManager.EMPTY, Collections.emptyList(), null));
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.WHITE, BarStyle.SEGMENTED_10, events);
 		constructBoss(activeSpells1, passiveSpells, detectionRange, bossBar, 20 * 10);
@@ -200,9 +197,9 @@ public class SnowSpirit extends BossAbilityGroup {
 			}
 		}.runTaskTimer(mPlugin, 0, 20);
 
-
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.spawn master @s ~ ~ ~ 10 0.75");
-
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10.0f, 0.75f);
+		}
 	}
 
 	//Teleport with special effects
@@ -255,7 +252,7 @@ public class SnowSpirit extends BossAbilityGroup {
 						public void run() {
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 								MessagingUtils.sendBoldTitle(player, ChatColor.RED + "VICTORY", ChatColor.DARK_RED + "Snow Spirit, Remnant of Snow");
-								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							}
 
 							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
@@ -293,8 +290,8 @@ public class SnowSpirit extends BossAbilityGroup {
 		if (mMinibossesPresent) {
 			LivingEntity source = event.getSource();
 			event.setCancelled(true);
-			if (source != null && source instanceof Player player) {
-				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
+			if (source instanceof Player player) {
+				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 				List<Entity> living = new ArrayList<>(mActiveMinibosses);
 				living.removeIf(miniboss -> miniboss.isDead() || !miniboss.isValid());
 				if (living.size() <= 1) {
@@ -310,11 +307,11 @@ public class SnowSpirit extends BossAbilityGroup {
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 		if (source instanceof Player player) {
 			ItemStack helmet = player.getInventory().getHelmet();
-			if (helmet != null && helmet.getItemMeta().getDisplayName().contains("The Grinch")) {
+			if (ItemUtils.getPlainName(helmet).contains("The Grinch")) {
 				Location loc = mBoss.getLocation();
 				event.setDamage(event.getDamage() * 1.2);
-				player.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
-				player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+				player.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.75f, 1.65f);
+				player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.75f, 0.5f);
 			}
 		}
 	}

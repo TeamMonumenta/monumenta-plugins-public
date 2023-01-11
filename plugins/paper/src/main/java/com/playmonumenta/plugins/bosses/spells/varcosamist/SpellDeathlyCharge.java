@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
@@ -54,8 +55,8 @@ public class SpellDeathlyCharge extends Spell {
 			player.sendMessage(ChatColor.RED + mDio);
 		}
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 30, 1));
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 1.25f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 3, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 1.25f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 3, 0.5f);
 		new BukkitRunnable() {
 			int mT = 0;
 
@@ -70,9 +71,9 @@ public class SpellDeathlyCharge extends Spell {
 				}
 				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 7, 0.4, 0.4, 0.4, 0.025).spawnAsEntityActive(mBoss);
 				if (mT >= 20) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 3, 0.75f);
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 3, 1.25f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 3, 1.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 3, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 3, 1.25f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 3, 1.75f);
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.08).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 80, 0.4, 0.4, 0.4, 0.145).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, 0.145).spawnAsEntityActive(mBoss);
@@ -97,8 +98,8 @@ public class SpellDeathlyCharge extends Spell {
 								new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 65, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
-								world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 3, 0.8f);
-								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 3, 0.75f);
+								world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 3, 0.8f);
+								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 3, 0.75f);
 								return;
 							}
 
@@ -110,8 +111,8 @@ public class SpellDeathlyCharge extends Spell {
 								new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 65, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(mBoss);
-								world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 3, 0.8f);
-								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 3, 0.75f);
+								world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 3, 0.8f);
+								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 3, 0.75f);
 								mBoss.removePotionEffect(PotionEffectType.SPEED);
 							}
 						}
@@ -131,9 +132,9 @@ public class SpellDeathlyCharge extends Spell {
 			World world = mBoss.getWorld();
 			Location loc = mBoss.getLocation();
 
-			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, 1.5f, 0.85f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.85f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_HURT, 1.5f, 0.65f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.HOSTILE, 1.5f, 0.85f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.HOSTILE, 1.5f, 0.85f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT, SoundCategory.HOSTILE, 1.5f, 0.65f);
 			new PartialParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 45, 0.4, 0.4, 0.4, Material.REDSTONE_WIRE.createBlockData()).spawnAsEntityActive(mBoss);
 			player.setNoDamageTicks(0);
 			BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, DAMAGE, "Deathly Charge", mBoss.getLocation());

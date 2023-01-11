@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
@@ -75,7 +76,7 @@ public class SpellReaperOfLife extends Spell {
 			vect.normalize().multiply(pLoc.distance(tLoc) / 25).setY(0.7f);
 			fallingBlock.setVelocity(vect);
 
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, 3, 1.5f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 3, 1.5f);
 			new PartialParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 2, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
 			PlayerUtils.executeCommandOnNearbyPlayers(mCenter, range, "tellraw @s [{\"text\":\"[The Horseman] \",\"color\":\"dark_red\",\"bold\":\"false\",\"italic\":\"false\"},{\"text\":\"May your life force fuel \",\"color\":\"gold\"},{\"text\":\"our \",\"color\":\"dark_red\"},{\"text\":\"existence.\",\"color\":\"gold\"}]");
@@ -156,7 +157,7 @@ public class SpellReaperOfLife extends Spell {
 					return;
 				}
 				if (mInc % 10 == 0) {
-					world.playSound(mCenter, Sound.ENTITY_CREEPER_HURT, 3, 1f);
+					world.playSound(mCenter, Sound.ENTITY_CREEPER_HURT, SoundCategory.HOSTILE, 3, 1f);
 					new PartialParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
 				}
 				if (mInc % 20 == 0) {
@@ -168,8 +169,8 @@ public class SpellReaperOfLife extends Spell {
 				if (mInc >= 20 * 10) {
 					mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 					z.setHealth(0);
-					world.playSound(mCenter, Sound.ENTITY_WITHER_SPAWN, 3, 1f);
-					world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 3, 1f);
+					world.playSound(mCenter, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 1f);
+					world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1f);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
 						if (mCenter.distance(player.getLocation()) < mRange) {

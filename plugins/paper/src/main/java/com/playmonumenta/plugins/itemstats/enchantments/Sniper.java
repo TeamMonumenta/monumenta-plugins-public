@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,7 +69,7 @@ public class Sniper implements Enchantment {
 	public static void particles(Location loc, Player player) {
 		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.65).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 30, 0, 0, 0, 0.65).spawnAsPlayerActive(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
+		player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.6f, 0.5f);
 	}
 
 }

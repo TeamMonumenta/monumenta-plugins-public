@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.LivingEntity;
@@ -29,7 +30,7 @@ import org.bukkit.util.Vector;
 
 /**
  * Copy-pasted from SpellSapper.java made for imperial construct
- * https://github.com/TeamMonumenta/monumenta-plugins/blob/qoo-skt-construct/plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/imperialconstruct/SpellSapper.java
+ * <a href="https://github.com/TeamMonumenta/monumenta-plugins/blob/qoo-skt-construct/plugins/paper/src/main/java/com/playmonumenta/plugins/bosses/spells/imperialconstruct/SpellSapper.java">...</a>
  */
 public class BlockPlacerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blockplacer";
@@ -181,7 +182,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 									if (!event.isCancelled()) {
 										/* Only allow bosses to break blocks in areas where explosions are allowed */
 										testloc.getBlock().setType(Material.AIR);
-										loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.2f, 0.6f);
+										loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.2f, 0.6f);
 										new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 										destroyedBlock = true;
 									}
@@ -206,7 +207,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 							block.setType(Material.AIR);
 						}
 						if (badBlockList.size() > 0) {
-							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.3f, 0.9f);
+							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 							destroyedBlock = true;
 						}
@@ -261,7 +262,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						}
 
 						block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
-						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, 1f, 0.7f);
+						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, SoundCategory.HOSTILE, 1f, 0.7f);
 						pathfinder.moveTo(loc.clone().add(0, 1, 0));
 						Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> pathfinder.moveTo(loc.clone().add(0, 1, 0)), 5);
 					}

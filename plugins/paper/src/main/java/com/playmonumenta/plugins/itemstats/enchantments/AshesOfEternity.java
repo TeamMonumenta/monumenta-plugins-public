@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.EnumSet;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +38,7 @@ public class AshesOfEternity implements Enchantment {
 
 		if (Resurrection.execute(plugin, player, event, null)) {
 
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 2, 2);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 2, 2);
 
 			// Remove Enchant
 			ItemStack item = player.getInventory().getItemInMainHand();

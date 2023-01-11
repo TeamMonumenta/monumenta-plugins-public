@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -51,7 +52,7 @@ public class Riftborn {
 				@Override
 				public void run() {
 					if (mTicks < 5) {
-						boss.getWorld().playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, 10, 3f);
+						boss.getWorld().playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.HOSTILE, 10, 3f);
 					} else {
 						this.cancel();
 					}

@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -79,8 +80,8 @@ public class WitheringGaze extends Ability {
 		Location loc = mPlayer.getLocation().add(0, 0.65, 0); // the Y height is higher so that the skill doesn't get stomped by half slabs
 		Vector direction = loc.getDirection().setY(0).normalize();
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1f, 0.4f);
-		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 1f, 0.4f);
+		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1f, 1f);
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RANGE, WITHERING_GAZE_RANGE);
 		new BukkitRunnable() {
 			double mT = 0;

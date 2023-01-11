@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,66 +30,66 @@ public class DefaultDanceFinisher implements EliteFinisher {
 			public void run() {
 				switch (mTicks) {
 					case 0:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, Constants.NotePitches.F11);
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1f, Constants.NotePitches.FS12);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.PLAYERS, 1f, Constants.NotePitches.FS12);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 10:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, Constants.NotePitches.F11);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 12:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.F11);
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, Constants.NotePitches.FS12);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.PLAYERS, 1f, Constants.NotePitches.FS12);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 16:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.GS14);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 18:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.AS16);
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, Constants.NotePitches.F11);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 22:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.AS16);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 24:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1f, Constants.NotePitches.FS12);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.PLAYERS, 1f, Constants.NotePitches.FS12);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 30:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.GS14);
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, Constants.NotePitches.F11);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 36:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, Constants.NotePitches.FS12);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.PLAYERS, 1f, Constants.NotePitches.FS12);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						break;
 					case 48:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, 1f, Constants.NotePitches.F11);
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1f, Constants.NotePitches.FS12);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
+						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.PLAYERS, 1f, Constants.NotePitches.FS12);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);

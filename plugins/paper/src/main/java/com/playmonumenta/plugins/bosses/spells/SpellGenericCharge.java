@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -21,7 +22,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 			// Warning sound/particles at boss location and slow boss
 			(LivingEntity player) -> {
 				new PartialParticle(start, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1f, 1.5f);
 				boss.setAI(false);
 			},
 			// Warning particles
@@ -31,7 +32,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
 				new PartialParticle(charge, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 1.5f);
 			},
 			// Attack hit a player
 			(LivingEntity player) -> {
@@ -47,7 +48,7 @@ public class SpellGenericCharge extends SpellBaseCharge {
 			// Ending particles on boss
 			() -> {
 				new PartialParticle(end, boss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 1.5f);
 				boss.setAI(true);
 			});
 	}

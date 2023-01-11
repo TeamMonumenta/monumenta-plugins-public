@@ -33,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -134,7 +135,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 				}
 			}
 			//Let the players know something happened
-			player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, 0.3f, 0.9f);
+			player.playSound(player.getLocation(), Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.3f, 0.9f);
 			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsEntityActive(mBoss);
 		}
 	}
@@ -167,7 +168,7 @@ public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Lingering Will", null);
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
 		}
 

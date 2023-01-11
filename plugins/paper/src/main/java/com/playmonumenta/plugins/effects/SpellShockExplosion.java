@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -48,9 +49,9 @@ public class SpellShockExplosion extends Effect {
 		}
 		new PartialParticle(Particle.SPELL_WITCH, loc, 60, 1, 1, 1, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 45, 1, 1, 1, 0.25).spawnAsPlayerActive(player);
-		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.5f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 2.0f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.75f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.HOSTILE, 0.75f, 2.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.HOSTILE, 0.75f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.HOSTILE, 0.75f, 1.5f);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(entity.getLocation(), mRadius, entity)) {
 			DamageUtils.damage(player, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, ClassAbility.SPELLSHOCK, mPlayerItemStats), mDamage, true, false, false);
 		}

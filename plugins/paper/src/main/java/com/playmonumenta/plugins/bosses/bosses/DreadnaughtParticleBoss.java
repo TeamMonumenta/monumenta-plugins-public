@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -64,7 +65,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 			loc.add(0, 1, 0);
 
 			World world = mBoss.getWorld();
-			world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, 1, 0.5f);
+			world.playSound(loc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 0.5f);
 			new PartialParticle(Particle.FLAME, loc, 50, 3, 1, 3, 0).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SMOKE_LARGE, loc, 200, 3, 1, 3, 0).spawnAsEntityActive(mBoss);
 		}

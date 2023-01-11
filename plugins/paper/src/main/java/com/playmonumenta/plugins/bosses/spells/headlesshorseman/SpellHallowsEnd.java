@@ -13,6 +13,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -48,7 +49,7 @@ public class SpellHallowsEnd extends Spell {
 
 	private void pillar(Location loc, boolean bounce) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 2, 0.85f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 0.85f);
 		BukkitRunnable run = new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -68,7 +69,7 @@ public class SpellHallowsEnd extends Spell {
 						new PartialParticle(Particle.FLAME, loc.clone().add(0, i, 0), 8, 0.2, 0.2, 0.2, 0.125).spawnAsEntityActive(mBoss);
 					}
 
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.75f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.75f);
 					new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);

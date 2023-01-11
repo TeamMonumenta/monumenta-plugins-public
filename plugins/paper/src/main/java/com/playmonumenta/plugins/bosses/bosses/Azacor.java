@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -128,25 +130,25 @@ public final class Azacor extends BossAbilityGroup {
 		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		events.put(100, (mBoss) -> {
-			randomMinion("tellraw @s [\"\",{\"text\":\"I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?\",\"color\":\"dark_red\"}]");
+			randomMinion("I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?");
 			if (playerCount >= 3) {
 				randomMinion("");
 			}
 		});
 		events.put(75, (mBoss) -> {
-			randomMinion("tellraw @s [\"\",{\"text\":\"I will bask in their screams!\",\"color\":\"dark_red\"}]");
+			randomMinion("I will bask in their screams!");
 			if (playerCount >= 3) {
 				randomMinion("");
 			}
 		});
 		events.put(50, (mBoss) -> {
-			randomMinion("tellraw @s [\"\",{\"text\":\"Foolish mortals! Your efforts mean nothing. You cannot stop me. You will fall, just like the rest.\",\"color\":\"dark_red\"}]");
+			randomMinion("Foolish mortals! Your efforts mean nothing. You cannot stop me. You will fall, just like the rest.");
 			if (playerCount >= 3) {
 				randomMinion("");
 			}
 		});
 		events.put(25, (mBoss) -> {
-			randomMinion("tellraw @s [\"\",{\"text\":\"I wield powers beyond your comprehension. I will not be defeated by insects like you!\",\"color\":\"dark_red\"}]");
+			randomMinion("I wield powers beyond your comprehension. I will not be defeated by insects like you!");
 			if (playerCount >= 3) {
 				randomMinion("");
 			}
@@ -156,11 +158,11 @@ public final class Azacor extends BossAbilityGroup {
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
 
-	private void randomMinion(String tellraw) {
-		randomMinion(tellraw, mSpawnLoc, (100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 75.0) * 1.1);
+	private void randomMinion(String message) {
+		randomMinion(message, mSpawnLoc, (100.0 + BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange) * 75.0) * 1.1);
 	}
 
-	static void randomMinion(String tellraw, Location loc, double eliteHealth) {
+	static void randomMinion(String message, Location loc, double eliteHealth) {
 		int rand = FastUtils.RANDOM.nextInt(4);
 		if (rand == 0) {
 			LivingEntity elite = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, "SarintultheUnseen"));
@@ -179,8 +181,8 @@ public final class Azacor extends BossAbilityGroup {
 			EntityUtils.setAttributeBase(elite, Attribute.GENERIC_MAX_HEALTH, 0.75 * eliteHealth);
 			elite.setHealth(0.75 * eliteHealth);
 		}
-		if (tellraw != null && !tellraw.isEmpty()) {
-			PlayerUtils.executeCommandOnNearbyPlayers(loc, detectionRange, tellraw);
+		if (!message.isEmpty()) {
+			PlayerUtils.nearbyPlayersAudience(loc, detectionRange).sendMessage(Component.text(message, NamedTextColor.DARK_RED));
 		}
 	}
 
@@ -195,16 +197,16 @@ public final class Azacor extends BossAbilityGroup {
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Azacor", ChatColor.GRAY + "The Dark Summoner");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 	}
 
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"No... it's not possible... I was promised...\",\"color\":\"dark_red\"}]");
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+			player.sendMessage(Component.text("No... it's not possible... I was promised...", NamedTextColor.DARK_RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}

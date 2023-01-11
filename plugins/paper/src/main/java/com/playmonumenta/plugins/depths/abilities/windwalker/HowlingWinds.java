@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -57,8 +58,8 @@ public class HowlingWinds extends DepthsAbility {
 
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 0.8f, 0.25f);
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1.0f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 0.8f, 0.25f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1.0f, 1.2f);
 		new PartialParticle(Particle.CLOUD, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
 		Vector dir = loc.getDirection().normalize();
 		for (int i = 0; i < DISTANCE; i++) {
@@ -78,7 +79,7 @@ public class HowlingWinds extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1f);
+		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1f);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -95,7 +96,7 @@ public class HowlingWinds extends DepthsAbility {
 						}
 					}
 					if (mTicks <= DURATION_TICKS - 5 * 20) {
-						world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, 0.8f, 1);
+						world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
 					}
 				}
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1).spawnAsPlayerActive(mPlayer);

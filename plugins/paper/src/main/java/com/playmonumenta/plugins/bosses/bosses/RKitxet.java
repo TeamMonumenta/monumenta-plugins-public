@@ -34,6 +34,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -245,7 +246,7 @@ public class RKitxet extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GREEN + "R'Kitxet", ChatColor.GREEN + "Forsaken Elder");
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 					}
 
 					changePhase(phase1Actives, phase1Passives, null);
@@ -307,7 +308,7 @@ public class RKitxet extends BossAbilityGroup {
 			}
 			if (event.getSource() instanceof Player player) {
 				player.sendMessage(ChatColor.AQUA + "The Elder's shield absorbs your attack.");
-				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
+				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 			}
 		}
 	}

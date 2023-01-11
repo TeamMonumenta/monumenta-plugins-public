@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -69,7 +70,7 @@ public class BottledSunlight extends DepthsAbility {
 			                         .decoration(TextDecoration.ITALIC, false));
 		itemTincture.setItemMeta(tinctureMeta);
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
+		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
 		Item tincture = world.dropItem(loc, itemTincture);
 		tincture.setPickupDelay(Integer.MAX_VALUE);
 
@@ -94,7 +95,7 @@ public class BottledSunlight extends DepthsAbility {
 						continue;
 					}
 
-					world.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 0.85f);
+					world.playSound(tincture.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.85f);
 					new PartialParticle(Particle.BLOCK_DUST, tincture.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.GLASS.createBlockData()).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.FIREWORKS_SPARK, tincture.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 					tincture.remove();
@@ -140,7 +141,7 @@ public class BottledSunlight extends DepthsAbility {
 		}
 
 		World world = player.getWorld();
-		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1.2f, 1.0f);
+		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.2f, 1.0f);
 		new PartialParticle(Particle.FLAME, player.getLocation(), 30, 0.25, 0.1, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {
 			double mRotation = 0;

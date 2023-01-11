@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -50,7 +51,7 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 	@Override
 	protected void outburstAction(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 2.0f, 0.65F);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 0.65F);
 	}
 
 	@Override

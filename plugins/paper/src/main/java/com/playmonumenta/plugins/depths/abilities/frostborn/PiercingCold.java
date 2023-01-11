@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -70,12 +71,12 @@ public class PiercingCold extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation();
 		Vector dir = loc.getDirection().normalize();
 
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 1.4f);
-		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_DEATH, 0.7f, 0.8f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, 1f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.75f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1f, 1f);
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1f, 0.75f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 1.4f);
+		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_DEATH, SoundCategory.PLAYERS, 0.7f, 0.8f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 0.75f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.PLAYERS, 1f, 1f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1f, 0.75f);
 
 		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CRIT_MAGIC, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
@@ -140,7 +141,7 @@ public class PiercingCold extends DepthsAbility {
 				new PartialParticle(Particle.SMOKE_LARGE, bLoc, 80, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CLOUD, bLoc, 80, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.FIREWORKS_SPARK, bLoc, 50, 0.1, 0.1, 0.1, 0.3).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.85f);
+				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
 				break;
 			}
 

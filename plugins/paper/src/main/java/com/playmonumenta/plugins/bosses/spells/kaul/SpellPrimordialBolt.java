@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -35,14 +36,14 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				new PartialParticle(Particle.LAVA, boss.getLocation(), 1, 0.35, 0, 0.35, 0.005).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, boss.getLocation(), 3, 0, 0, 0, 0.5,
 					Material.STONE.createBlockData()).spawnAsEntityActive(boss);
-				world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, 10, t);
+				world.playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 10, t);
 				boss.removePotionEffect(PotionEffectType.SLOW);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
 			},
 
 			(Entity entity) -> {
 				World world = boss.getWorld();
-				world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.5f);
+				world.playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 0.5f);
 				new PartialParticle(Particle.FLAME, boss.getLocation().add(0, 1, 0), 80, 0.2, 0.45,
 					0.2, 0.2).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation().add(0, 1, 0), 30, 0.2,
@@ -90,7 +91,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				World world = boss.getWorld();
 				new PartialParticle(Particle.FLAME, loc, 125, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.9f);
 			},
 
 			// Only allow targetting players below y=60

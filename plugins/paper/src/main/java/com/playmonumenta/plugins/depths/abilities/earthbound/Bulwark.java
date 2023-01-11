@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -49,7 +50,7 @@ public class Bulwark extends DepthsAbility {
 			Location particleLoc = loc.add(0, mPlayer.getHeight() / 2, 0);
 			new PartialParticle(Particle.CLOUD, particleLoc, 10, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
 			new PartialParticle(Particle.BLOCK_DUST, particleLoc, 20, 0.5, 0.5, 0.5, 0.125, Material.STRIPPED_DARK_OAK_WOOD.createBlockData()).spawnAsPlayerPassive(mPlayer);
-			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1, 1.2f);
+			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 1.2f);
 			event.setCancelled(true);
 			putOnCooldown();
 		}

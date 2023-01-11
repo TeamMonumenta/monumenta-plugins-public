@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -86,7 +87,7 @@ public class ChaosDagger extends DepthsAbility {
 
 		dagger.setVelocity(vel);
 		dagger.setGlowing(true);
-		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 2.5f);
+		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.4f, 2.5f);
 
 		new BukkitRunnable() {
 
@@ -125,7 +126,7 @@ public class ChaosDagger extends DepthsAbility {
 
 				if (mTarget.getBoundingBox().overlaps(dagger.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
-					world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
+					world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0.15f);
 					mHitMob = mTarget;
 					if (EntityUtils.isBoss(mTarget)) {
 						EntityUtils.applySlow(mPlugin, STUN_DURATION, 0.99f, mTarget);

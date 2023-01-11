@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -53,12 +54,12 @@ public class VolcanicCombos extends DepthsAbility {
 				World world = mPlayer.getWorld();
 				for (int i = 0; i < 360; i += 45) {
 					double rad = Math.toRadians(i);
-					Location locationDelta = new Location(world, RADIUS / 2 * FastUtils.cos(rad), 0.5, RADIUS / 2 * FastUtils.sin(rad));
+					Location locationDelta = new Location(world, RADIUS / 2.0 * FastUtils.cos(rad), 0.5, RADIUS / 2.0 * FastUtils.sin(rad));
 					location.add(locationDelta);
 					new PartialParticle(Particle.FLAME, location, 1).spawnAsPlayerActive(mPlayer);
 					location.subtract(locationDelta);
 				}
-				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, 0.5f, 1);
+				world.playSound(location, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1);
 				mComboCount = 0;
 			}
 			return true;

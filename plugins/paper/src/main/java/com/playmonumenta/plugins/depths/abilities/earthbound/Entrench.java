@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -48,8 +49,8 @@ public class Entrench extends DepthsAbility {
 				EntityUtils.applySlow(mPlugin, DURATION[mRarity - 1], SLOW_MODIFIER, mob);
 			}
 
-			world.playSound(centerLoc, Sound.BLOCK_NETHER_BRICKS_BREAK, 1.2f, 0.45f);
-			world.playSound(centerLoc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1, 0.6f);
+			world.playSound(centerLoc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 1.2f, 0.45f);
+			world.playSound(centerLoc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1, 0.6f);
 			new PartialParticle(Particle.BLOCK_DUST, centerLoc, 35, 1.5, 1.5, 1.5, 1, Material.SOUL_SOIL.createBlockData()).spawnAsPlayerActive(mPlayer);
 		}
 		return true;

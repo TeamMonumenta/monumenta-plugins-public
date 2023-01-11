@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -105,11 +106,11 @@ public class CarapaceBoss extends BossAbilityGroup {
 
 			double newDamage = damage - remainingCarapaceHealth;
 			if (newDamage > 0) {
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 0.3f, 0.2f);
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 0.3f, 0.2f);
 				event.setDamage(newDamage);
 			} else {
-				world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.05f, 2f);
-				world.playSound(loc, Sound.BLOCK_GRASS_PLACE, 0.05f, 0.5f);
+				world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.05f, 2f);
+				world.playSound(loc, Sound.BLOCK_GRASS_PLACE, SoundCategory.HOSTILE, 0.05f, 0.5f);
 				event.setDamage(0);
 			}
 		}

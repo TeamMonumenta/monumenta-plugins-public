@@ -18,6 +18,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -79,8 +80,8 @@ public class TemporalRift extends Spell {
 		}
 
 		for (Location loc : locs) {
-			world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, 0.6f, 0.5f);
-			world.playSound(loc, Sound.BLOCK_PORTAL_TRAVEL, 0.6f, 1.0f);
+			world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 0.6f, 0.5f);
+			world.playSound(loc, Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 0.6f, 1.0f);
 			loc.add(0, 0.2, 0);
 		}
 
@@ -109,7 +110,7 @@ public class TemporalRift extends Spell {
 					this.cancel();
 					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Temporal Rift...");
 					mChargeUp.setColor(BarColor.RED);
-					locs.forEach(loc -> world.playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, 0.6f, 2.0f));
+					locs.forEach(loc -> world.playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 0.6f, 2.0f));
 					mSmokeL.location(mBoss.getLocation()).spawnAsBoss();
 					mBreath.location(mBoss.getLocation()).spawnAsBoss();
 					BukkitRunnable runB = new BukkitRunnable() {
@@ -123,7 +124,7 @@ public class TemporalRift extends Spell {
 							for (Location loc : locs) {
 								List<Player> players = PlayerUtils.playersInRange(loc, RADIUS, true);
 								if (mT % 15 == 0 && mT < DURATION - 40) {
-									world.playSound(loc, Sound.BLOCK_PORTAL_AMBIENT, 0.75f, 0.5f);
+									world.playSound(loc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 0.75f, 0.5f);
 								}
 								indicator2.radius(RADIUS).location(loc).spawnAsBoss();
 

@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,7 +41,7 @@ public class SpellEndlessHederaSummons extends Spell {
 	@Override
 	public void run() {
 		Location loc = mBoss.getLocation();
-		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, 20, 1);
+		loc.getWorld().playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 20, 1);
 		int summonCount = SPAWN_COUNT + PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true).size();
 
 		//PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), Davey.detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Now ye've done it. She be watchin'. Help me, heathens of \",\"color\":\"blue\"},{\"text\":\"ngbgbggb\",\"obfuscated\":\"true\",\"color\":\"blue\"},{\"text\":\"!\",\"color\":\"blue\"}]");
@@ -76,7 +77,7 @@ public class SpellEndlessHederaSummons extends Spell {
 					}
 					//Summon the mob using our location
 					Location sLoc = loc.clone().add(x, 0.25, z);
-					loc.getWorld().playSound(sLoc, Sound.BLOCK_GRAVEL_BREAK, 1, 0.75f);
+					loc.getWorld().playSound(sLoc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
 					new PartialParticle(Particle.BLOCK_DUST, sLoc, 16, 0.25, 0.1, 0.25, 0.25, Material.GRAVEL.createBlockData()).spawnAsEntityActive(mBoss);
 					Random r = new Random();
 					int roll = r.nextInt(2);

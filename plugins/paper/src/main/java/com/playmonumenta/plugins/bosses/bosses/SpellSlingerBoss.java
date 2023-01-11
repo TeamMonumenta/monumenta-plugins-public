@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -50,7 +51,7 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Projectile Aesthetic
 				(World world, Location loc, int ticks) -> {
@@ -60,7 +61,7 @@ public class SpellSlingerBoss extends BossAbilityGroup {
 				},
 				// Hit Action
 				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
 					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (player != null) {
 						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, prevLoc);

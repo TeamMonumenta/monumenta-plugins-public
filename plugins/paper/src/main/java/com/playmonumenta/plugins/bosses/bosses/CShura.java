@@ -20,10 +20,15 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -211,7 +216,7 @@ public class CShura extends BossAbilityGroup {
 			for (int i = 0; i < 3; i++) {
 				if (loc.getBlock().isPassable()) {
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 
 					mBoss.teleport(loc);
 					break;
@@ -255,9 +260,10 @@ public class CShura extends BossAbilityGroup {
 					this.cancel();
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 					for (Player p : players) {
-						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
-						p.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "VICTORY",
-							ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "C'Shura, The Soulbinder", 10, 80, 10);
+						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100f, 0.8f);
+						p.showTitle(Title.title(Component.text("VICTORY", NamedTextColor.GREEN, TextDecoration.BOLD),
+							Component.text("C'Shura, The Soulbinder", NamedTextColor.DARK_GREEN, TextDecoration.BOLD),
+							Title.Times.times(Duration.ofMillis(500L), Duration.ofMillis(4000L), Duration.ofMillis(500L))));
 					}
 				}
 			}

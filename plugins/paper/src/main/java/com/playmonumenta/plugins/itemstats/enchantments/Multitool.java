@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -72,7 +73,7 @@ public class Multitool implements Enchantment {
 						Material mat = Material.valueOf(str[0] + "_" + "AXE");
 						item.setType(mat);
 					}
-					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, 1, 2F);
+					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2F);
 					player.updateInventory();
 				}
 

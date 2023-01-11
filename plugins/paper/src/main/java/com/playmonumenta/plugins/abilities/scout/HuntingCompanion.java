@@ -31,6 +31,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -248,7 +249,7 @@ public class HuntingCompanion extends Ability {
 				mSummons.replace(nearestSummon, enemy);
 
 				World world = nearestSummon.getWorld();
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 1.0f, 0.5f);
 				mCosmetic.onAggro(world, nearestSummon.getLocation(), mPlayer, nearestSummon);
 				PotionUtils.applyPotion(mPlayer, enemy, new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
 			}

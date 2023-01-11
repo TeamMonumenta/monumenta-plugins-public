@@ -846,7 +846,7 @@ public class PlayerListener implements Listener {
 		mPlugin.mEffectManager.applyEffectsOnRespawn(mPlugin, player);
 
 		mPlugin.mEffectManager.addEffect(player, RespawnStasis.NAME, new RespawnStasis());
-		player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, 0.75f);
+		player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1, 0.75f);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -965,8 +965,8 @@ public class PlayerListener implements Listener {
 			if (itemDamage < mat.getMaxDurability() * 0.9 && itemDamage + newDamage >= mat.getMaxDurability() * 0.9) {
 				World world = player.getWorld();
 				Location loc = player.getLocation();
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.45f);
-				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.25f);
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.45f);
+				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.25f);
 				BlockData fallingDustData = Material.ANVIL.createBlockData();
 				world.spawnParticle(Particle.FALLING_DUST, loc.add(0, 1, 0), 20,
 					1.1, 0.6, 1.1, fallingDustData);
@@ -1112,7 +1112,7 @@ public class PlayerListener implements Listener {
 
 				@Override
 				public void run() {
-					player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.MASTER, 1, mFreq);
+					player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.PLAYERS, 1, mFreq);
 					mFreq += 0.05f;
 					if (!player.isOnline() || mFreq > 1.5) {
 						this.cancel();
@@ -1192,7 +1192,7 @@ public class PlayerListener implements Listener {
 							} else if (mTicks >= BED_TELE_TIME + 1) {
 								player.teleport(teleLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
-								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1.0f, 1.3f);
+								world.playSound(teleLoc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1.0f, 1.3f);
 
 								this.cancel();
 							} else if (!player.isSleeping() || !player.isOnline() || !player.isValid()) {

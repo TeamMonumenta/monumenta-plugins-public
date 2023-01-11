@@ -11,6 +11,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -59,7 +60,7 @@ public class PvP extends Ability {
 			event.setCancelled(true);
 			player.setGameMode(GameMode.SPECTATOR);
 			World world = mPlayer.getWorld();
-			world.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, 1, 1);
+			world.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_DEATH, SoundCategory.PLAYERS, 1, 1);
 			new PartialParticle(Particle.BLOCK_CRACK, player.getLocation().add(0, 1, 0), 30, 0.15, 0.15, 0.15, 0.75F, Material.REDSTONE_BLOCK.createBlockData()).spawnAsPlayerActive(player);
 			player.sendTitle(ChatColor.RED + "Respawning...", ChatColor.GREEN + "In 3 seconds...", 10, 20 * 2, 10);
 			PotionUtils.clearNegatives(mPlugin, player);

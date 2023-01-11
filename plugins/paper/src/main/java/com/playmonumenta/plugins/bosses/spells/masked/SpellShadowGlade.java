@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -59,12 +60,12 @@ public class SpellShadowGlade extends Spell {
 
 			@Override
 			public void run() {
-				zoneStart.getWorld().playSound(zoneStart, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 2f, 0.5f);
+				zoneStart.getWorld().playSound(zoneStart, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.HOSTILE, 2f, 0.5f);
 				new PartialParticle(Particle.FLAME, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01).spawnAsEnemy();
 				if (mJ / mCount >= 24) {
 					for (Player player : pList) {
 						Location pPos = player.getLocation();
-						pPos.getWorld().playSound(pPos, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 0.8f);
+						pPos.getWorld().playSound(pPos, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 0.8f);
 					}
 					new PartialParticle(Particle.LAVA, zoneStart, (mJ / mCount) * 10, 4, 0, 4, 0.01).spawnAsEnemy();
 				}
@@ -76,12 +77,12 @@ public class SpellShadowGlade extends Spell {
 					for (Player player : pList) {
 						Location pPos = player.getLocation();
 						if (pPos.getX() > zoneStart.getX() - 8.25 && pPos.getX() < zoneStart.getX() + 8.25 && pPos.getZ() > zoneStart.getZ() - 8.25 && pPos.getZ() < zoneStart.getZ() + 8.25) {
-							pPos.getWorld().playSound(pPos, Sound.ENTITY_GHAST_HURT, 1f, 0.7f);
+							pPos.getWorld().playSound(pPos, Sound.ENTITY_GHAST_HURT, SoundCategory.HOSTILE, 1f, 0.7f);
 							player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 7 * 20, 3));
 							player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 7 * 20, 1));
 							EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), 20 * 7, player, null);
 						} else {
-							pPos.getWorld().playSound(pPos, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.85f);
+							pPos.getWorld().playSound(pPos, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1f, 0.85f);
 						}
 					}
 				}

@@ -18,6 +18,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -69,8 +70,8 @@ public class Eruption implements Enchantment {
 
 			//Sapper Interaction
 			if (sapper > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.6f);
-				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
+				player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
+				player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.05f, 1.0f);
 				new PartialParticle(Particle.HEART, event.getBlock().getLocation().add(0, 1, 0), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 				for (Player p : PlayerUtils.playersInRange(event.getBlock().getLocation(), SAPPER_RADIUS, true)) {
 					new PartialParticle(Particle.HEART, p.getEyeLocation(), 5, 1, 1, 1).spawnAsPlayerActive(player);
@@ -97,28 +98,28 @@ public class Eruption implements Enchantment {
 
 			//Visual feedback
 			if (ice > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
+				player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.6f, 1.3f);
 				new PartialParticle(Particle.SNOW_SHOVEL, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (thunder > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
+				player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.PLAYERS, 0.6f, 0.8f);
 				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR).spawnAsPlayerActive(player);
 			}
 			if (decay > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
+				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.4f, 0.7f);
 				new PartialParticle(Particle.SQUID_INK, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (bleed > 0 || adrenaline > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
+				player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.PLAYERS, 0.7f, 0.7f);
 				new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
 			if (wind > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.30f);
 				new PartialParticle(Particle.CLOUD, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (fire > 0 || fire + ice + thunder + decay + bleed + adrenaline + wind == 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
+				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.PLAYERS, 0.6f, 0.9f);
 				new PartialParticle(Particle.LAVA, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 		}

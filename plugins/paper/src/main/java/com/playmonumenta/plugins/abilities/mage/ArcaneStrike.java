@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -118,11 +119,11 @@ public class ArcaneStrike extends Ability {
 			new PartialParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001).spawnAsPlayerActive(mPlayer);
-			world.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.75f, 1.5f);
+			world.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1.5f);
 
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
-			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.65f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, 1.65f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
 
 			if (isEnhanced()) {
 				//Visual feedback
@@ -143,28 +144,28 @@ public class ArcaneStrike extends Ability {
 				double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS);
 
 				if (ice > 0) {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.6f, 1.3f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.6f, 1.3f);
 					new PartialParticle(Particle.SNOW_SHOVEL, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
 				}
 				if (thunder > 0) {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.6f, 0.8f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.PLAYERS, 0.6f, 0.8f);
 					new PartialParticle(Particle.REDSTONE, loc, 10, radius, radius, radius, new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f)).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.REDSTONE, loc, 10, radius, radius, radius, new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f)).spawnAsPlayerActive(mPlayer);
 				}
 				if (decay > 0) {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.4f, 0.7f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.4f, 0.7f);
 					new PartialParticle(Particle.SQUID_INK, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
 				}
 				if (bleed > 0) {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SLIME_SQUISH, 0.7f, 0.7f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.PLAYERS, 0.7f, 0.7f);
 					new PartialParticle(Particle.REDSTONE, loc, 20, radius, radius, radius, new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f)).spawnAsPlayerActive(mPlayer);
 				}
 				if (wind > 0) {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.30f);
 					mPlayer.getWorld().spawnParticle(Particle.CLOUD, loc, 20, radius, radius, radius);
 				}
 				if (fire > 0) {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_POP, 0.6f, 0.9f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.PLAYERS, 0.6f, 0.9f);
 					mPlayer.getWorld().spawnParticle(Particle.LAVA, loc, 20, radius, radius, radius);
 				}
 			}

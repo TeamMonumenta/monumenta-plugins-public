@@ -304,7 +304,7 @@ public class Samwell extends BossAbilityGroup {
 						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, ChatColor.DARK_RED + "Samwell", ChatColor.RED + "Usurper Of Life");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
 					});
-					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, 5, 0.7f);
+					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 0.7f);
 				}, 10);
 			}, 70);
 		}, 10);
@@ -356,7 +356,7 @@ public class Samwell extends BossAbilityGroup {
 						changePhaseNormal();
 					}
 				}
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ITEM_BREAK, 5f, 0.5f);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ITEM_BREAK, SoundCategory.HOSTILE, 5f, 0.5f);
 				MovementUtils.knockAway(player, mBoss, 3.0f, 0.5f);
 				clearDaggerAndShards();
 				return;
@@ -372,7 +372,7 @@ public class Samwell extends BossAbilityGroup {
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", "&c&oPlease&c! &4&lHarrakfar&c! Heal me!"));
-					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1.2f);
+					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1.2f);
 				}, 70);
 			}, 20);
 			mPhase4Damaged = true;
@@ -612,7 +612,7 @@ public class Samwell extends BossAbilityGroup {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_RED + "Samwell, Usurper Of Life");
-							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 							player.removePotionEffect(PotionEffectType.REGENERATION);
 						}

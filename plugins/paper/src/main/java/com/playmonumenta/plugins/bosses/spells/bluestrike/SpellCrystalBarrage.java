@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
@@ -78,8 +79,8 @@ public class SpellCrystalBarrage extends Spell {
 
 		}.runTaskLater(mPlugin, cooldownTicks() + 20);
 
-		mCenter.getWorld().playSound(mCenter, Sound.BLOCK_BEACON_POWER_SELECT, 5, 1);
-		mCenter.getWorld().playSound(mCenter, Sound.ENTITY_WITHER_AMBIENT, 5, 1.4f);
+		mCenter.getWorld().playSound(mCenter, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 1);
+		mCenter.getWorld().playSound(mCenter, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
 		mHitPlayers.clear();
 
 		new BukkitRunnable() {
@@ -132,8 +133,8 @@ public class SpellCrystalBarrage extends Spell {
 					mBullets++;
 
 					if (mT % 2 == 0) {
-						loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, 5, 1);
-						loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 5, 0.5f + 1.5f * mT / castTime());
+						loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
+						loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / castTime());
 					}
 
 				} else {
@@ -154,8 +155,8 @@ public class SpellCrystalBarrage extends Spell {
 					launchAcceleratingBullet(loc, dir, timeStart);
 					mBullets++;
 
-					loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, 5, 1);
-					loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 5, 0.5f + 1.5f * mT / castTime());
+					loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.HOSTILE, 5, 1);
+					loc.getWorld().playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 5, 0.5f + 1.5f * mT / castTime());
 				}
 
 				if (mBullets >= 60) {
@@ -237,7 +238,7 @@ public class SpellCrystalBarrage extends Spell {
 
 	private void directHit(Player player) {
 		mPHit.location(player.getLocation().add(0, 1, 0)).spawnAsBoss();
-		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 2);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 2);
 
 		if (!mHitPlayers.contains(player)) {
 			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DIRECT_HIT_DAMAGE, null, false, false, SPELL_NAME);

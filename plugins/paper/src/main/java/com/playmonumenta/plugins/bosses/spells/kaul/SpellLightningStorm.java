@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -87,8 +88,8 @@ public class SpellLightningStorm extends Spell {
 		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 15, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.9f);
-		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.9f);
+		world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1, 1);
 
 		/* Too-high lightning hits you directly and can not be blocked */
 		BossUtils.bossDamagePercent(mBoss, player, 0.5, "Lightning Storm");

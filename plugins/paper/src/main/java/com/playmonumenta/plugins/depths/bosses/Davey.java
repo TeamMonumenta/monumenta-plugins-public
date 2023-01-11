@@ -33,10 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -71,9 +74,8 @@ public class Davey extends BossAbilityGroup {
 	public int mCooldownTicks;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Davey(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new Davey(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -211,7 +213,7 @@ public class Davey extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(spells);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}
@@ -220,23 +222,27 @@ public class Davey extends BossAbilityGroup {
 	public void init() {
 		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, party == null ? 0 : party.getFloor() / 3));
+		int modifiedHealth = (int) (DAVEY_HEALTH * Math.pow(1.15, party == null ? 0.0 : party.getFloor() / 3.0));
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Lieutenant Davey", ChatColor.GRAY + "Void Herald");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
+			player.sendMessage(Component.text("", NamedTextColor.BLUE)
+				.append(Component.text("[Davey]", NamedTextColor.GOLD))
+				.append(Component.text(" Ahoy! Ye have the stink of the Veil upon ye. She won't be likin' this... Sink!")));
 		}
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\", \"color\":\"gold\"},{\"text\":\" Ahoy! Ye have the stink of the Veil upon ye. She won't be likin' this... Sink!\",\"color\":\"blue\"}]");
 	}
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Davey]\",\"color\":\"gold\"},{\"text\":\" Nay... I'll sink to ye, God of the Deep. I become a great part of ye ferever...\",\"color\":\"blue\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+			player.sendMessage(Component.text("", NamedTextColor.BLUE)
+				.append(Component.text("[Davey]", NamedTextColor.GOLD))
+				.append(Component.text(" Nay... I'll sink to ye, God of the Deep. I become a great part of ye ferever...")));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}

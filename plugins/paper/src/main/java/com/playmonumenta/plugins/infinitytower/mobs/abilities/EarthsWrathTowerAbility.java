@@ -18,6 +18,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -41,7 +42,7 @@ public class EarthsWrathTowerAbility extends TowerAbility {
 					return;
 				}
 
-				boss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 2, 1);
+				boss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 2, 1);
 				Location loc = mBoss.getLocation().clone().add(0, 0.25, 0);
 
 				for (int i = 0; i < 48; i++) {

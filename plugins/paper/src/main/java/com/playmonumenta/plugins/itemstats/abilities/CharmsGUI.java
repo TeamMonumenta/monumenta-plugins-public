@@ -5,10 +5,12 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -17,6 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -37,7 +40,7 @@ public class CharmsGUI extends CustomInventory {
 	}
 
 	public CharmsGUI(Player requestingPlayer, Player targetPlayer) {
-		super(requestingPlayer, 54, "" + targetPlayer.getDisplayName() + "\'s " + "Charms");
+		super(requestingPlayer, 54, "" + MessagingUtils.plainText(targetPlayer.displayName()) + "'s " + "Charms");
 		mTargetPlayer = targetPlayer;
 		setCharms();
 	}
@@ -60,12 +63,12 @@ public class CharmsGUI extends CustomInventory {
 				if (CharmManager.getInstance().validateCharm(mTargetPlayer, item)) {
 					if (CharmManager.getInstance().addCharm(mTargetPlayer, item)) {
 						setCharms();
-						mTargetPlayer.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f, 1f);
+						mTargetPlayer.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
 						//Remove one charm from the player inventory, not all ones with this name!
 						ItemStack[] items = mTargetPlayer.getInventory().getContents();
 						for (ItemStack itemStack : items) {
 							if (itemStack != null) {
-								if (itemStack.hasItemMeta() && itemStack.getItemMeta().getDisplayName().equals(item.getItemMeta().getDisplayName())) {
+								if (itemStack.hasItemMeta() && Objects.equals(itemStack.getItemMeta().displayName(), item.getItemMeta().displayName())) {
 									if (itemStack.getAmount() > 1) {
 										itemStack.setAmount(itemStack.getAmount() - 1);
 									} else {
@@ -76,10 +79,10 @@ public class CharmsGUI extends CustomInventory {
 							}
 						}
 					} else {
-						mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+						mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
 					}
 				} else {
-					mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+					mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
 				}
 			}
 		} else {
@@ -95,11 +98,11 @@ public class CharmsGUI extends CustomInventory {
 					return;
 				}
 				if (CharmManager.getInstance().removeCharm(mTargetPlayer, item)) {
-					mTargetPlayer.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f, 1f);
+					mTargetPlayer.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
 					setCharms();
 					InventoryUtils.giveItem(mTargetPlayer, item);
 				} else {
-					mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, 0.5f, 1f);
+					mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
 				}
 			}
 		}
@@ -107,7 +110,11 @@ public class CharmsGUI extends CustomInventory {
 	}
 
 	public void setCharms() {
-		List<ItemStack> items = CharmManager.getInstance().mPlayerCharms.getOrDefault(mTargetPlayer.getUniqueId(), new ArrayList<>());
+		// getOrDefault could hypothetically return a null, but present value. It won't, but it makes IntelliJ feel better I guess.
+		List<ItemStack> items = CharmManager.getInstance().mPlayerCharms.get(mTargetPlayer.getUniqueId());
+		if (items == null) {
+			items = new ArrayList<>();
+		}
 		int totalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, AbilityUtils.CHARM_POWER).orElse(0);
 		if (totalBudget <= 0) {
 			mTargetPlayer.sendMessage(ChatColor.RED + "You have no Charm Power!");
@@ -124,7 +131,7 @@ public class CharmsGUI extends CustomInventory {
 		}
 
 		for (int i = 0; i < totalBudget; i++) {
-			int slot = 0;
+			int slot;
 			if (i > 9) {
 				slot = 29 + (i - 10);
 			} else if (i > 4) {
@@ -138,35 +145,33 @@ public class CharmsGUI extends CustomInventory {
 
 		//Display active charms
 		List<ItemStack> indexedCharms = new ArrayList<>();
-		if (items != null) {
-			for (int i = 0; i < items.size(); i++) {
-				if (items.get(i) == null || items.get(i).getType() == Material.AIR) {
-					continue;
-				}
-				mInventory.setItem(i + START_OF_CHARMS, items.get(i));
+		for (int i = 0; i < items.size(); i++) {
+			if (items.get(i) == null || items.get(i).getType() == Material.AIR) {
+				continue;
 			}
+			mInventory.setItem(i + START_OF_CHARMS, items.get(i));
+		}
 
-			//Fill out yellow stained glass for visual display of charm budget
-			for (ItemStack item : items) {
-				if (item == null || item.getType() == Material.AIR) {
-					continue;
-				}
-				for (int j = 0; j < ItemStatUtils.getCharmPower(item); j++) {
-					indexedCharms.add(item);
-				}
+		//Fill out yellow stained glass for visual display of charm budget
+		for (ItemStack item : items) {
+			if (item == null || item.getType() == Material.AIR) {
+				continue;
 			}
+			for (int j = 0; j < ItemStatUtils.getCharmPower(item); j++) {
+				indexedCharms.add(item);
+			}
+		}
 
-			for (int i = 0; i < indexedCharms.size(); i++) {
-				int slot = 0;
-				if (i > 9) {
-					slot = 29 + (i - 10);
-				} else if (i > 4) {
-					slot = 20 + (i - 5);
-				} else {
-					slot = 11 + i;
-				}
-				mInventory.setItem(slot, indexedCharms.get(i));
+		for (int i = 0; i < indexedCharms.size(); i++) {
+			int slot;
+			if (i > 9) {
+				slot = 29 + (i - 10);
+			} else if (i > 4) {
+				slot = 20 + (i - 5);
+			} else {
+				slot = 11 + i;
 			}
+			mInventory.setItem(slot, indexedCharms.get(i));
 		}
 		//Charm power indicator
 		int charmPower = CharmManager.getInstance().getCharmPower(mTargetPlayer);
@@ -220,7 +225,7 @@ public class CharmsGUI extends CustomInventory {
 				}
 			}
 			mTargetPlayer.sendMessage(ChatColor.RED + "Your equipped charms cost more than your budget (likely because their cost was adjusted). Your charms have all be unequipped");
-			mTargetPlayer.playSound(mTargetPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+			mTargetPlayer.playSound(mTargetPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1f, 1f);
 			setCharms();
 		}
 	}

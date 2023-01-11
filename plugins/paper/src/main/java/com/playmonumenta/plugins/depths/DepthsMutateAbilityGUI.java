@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -86,7 +87,7 @@ public class DepthsMutateAbilityGUI extends CustomInventory {
 						instance.setPlayerLevelInAbility(ability.getDisplayName(), player, 0);
 						event.getWhoClicked().closeInventory();
 						DepthsManager.getInstance().getMutatedAbility(player, depthsplayer, ability.getDepthsTrigger(), ability.getDisplayName());
-						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 1.0f, 1.0f);
+						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						MessagingUtils.sendActionBarMessage(player, "Ability mutated!");
 						return;
 					}

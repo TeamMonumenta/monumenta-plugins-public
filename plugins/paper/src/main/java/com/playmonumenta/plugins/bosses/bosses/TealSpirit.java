@@ -41,6 +41,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -145,8 +146,8 @@ public class TealSpirit extends BossAbilityGroup {
 				locs.add(mSpawnLoc.clone().add(0, height, 0));
 				for (Location loc : locs) {
 					LibraryOfSoulsIntegration.summon(loc, "EchoOfOblivion");
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
-					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.4f, 1.2f);
+					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.8f, 2.0f);
 					new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 				}
@@ -248,8 +249,8 @@ public class TealSpirit extends BossAbilityGroup {
 				locs.add(mSpawnLoc.clone().add(0, height, 0));
 				for (Location loc : locs) {
 					LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
-					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.4f, 1.2f);
+					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.8f, 2.0f);
 					new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 				}
@@ -370,8 +371,8 @@ public class TealSpirit extends BossAbilityGroup {
 				locs.add(mSpawnLoc.clone().add(0, height, 0));
 				for (Location loc : locs) {
 					LibraryOfSoulsIntegration.summon(loc, "EchoesOfOblivion");
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.4f, 1.2f);
-					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.4f, 1.2f);
+					world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.8f, 2.0f);
 					new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(boss);
 				}
@@ -436,7 +437,7 @@ public class TealSpirit extends BossAbilityGroup {
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Orasomn", ChatColor.RED + "The Hand of Fate");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 
 		mBoss.setAI(true);
@@ -508,7 +509,7 @@ public class TealSpirit extends BossAbilityGroup {
 		locs.add(mSpawnLoc.clone().add(0, height, radius));
 		for (Location loc : locs) {
 			mExchangers.add(LibraryOfSoulsIntegration.summon(loc, "TemporalExchanger"));
-			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.8f, 2.0f);
 			new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 		}
@@ -529,7 +530,7 @@ public class TealSpirit extends BossAbilityGroup {
 		locs.add(mSpawnLoc.clone().add(-radius, height, 0));
 		for (Location loc : locs) {
 			mShielders.add(LibraryOfSoulsIntegration.summon(loc, "TemporalAnchor"));
-			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, 0.8f, 2.0f);
+			world.playSound(loc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 0.8f, 2.0f);
 			new PartialParticle(Particle.END_ROD, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0, 0.3, 0.1).spawnAsEntityActive(mBoss);
 		}

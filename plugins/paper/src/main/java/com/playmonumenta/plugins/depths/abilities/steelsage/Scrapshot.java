@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -66,7 +67,7 @@ public class Scrapshot extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 2);
 
 		Vector velocity = mPlayer.getLocation().getDirection().multiply(-VELOCITY);
 		mPlayer.setVelocity(velocity.setY(Math.max(0.1, velocity.getY())));
@@ -96,7 +97,7 @@ public class Scrapshot extends DepthsAbility {
 					if (bLoc.getBlock().getType().isSolid()) {
 						bLoc.subtract(newDir.multiply(0.5));
 						new PartialParticle(Particle.SQUID_INK, bLoc, (8 - i) * 2, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-						world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
+						world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 						break;
 					}
 					Iterator<LivingEntity> iter = mobs.iterator();
@@ -110,7 +111,7 @@ public class Scrapshot extends DepthsAbility {
 							mobs.remove(mob);
 
 							new PartialParticle(Particle.SQUID_INK, bLoc, (8 - i) * 2, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-							world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
+							world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 
 							return;
 						}

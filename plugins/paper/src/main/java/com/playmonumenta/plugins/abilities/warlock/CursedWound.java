@@ -29,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
@@ -115,7 +116,7 @@ public class CursedWound extends Ability {
 					mStoredPotionEffects = null;
 					mStoredCustomEffects = null;
 
-					world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.75f);
+					world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0f, 0.75f);
 					new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 25,
 						radius / 2, radius / 3, radius / 2, fallingDustData)
 						.spawnAsPlayerActive(mPlayer);
@@ -139,7 +140,7 @@ public class CursedWound extends Ability {
 			}
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
-				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 1.0f, 0.75f);
+				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1.0f, 0.75f);
 				for (LivingEntity mob : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CURSED_WOUND_RADIUS).getHitMobs()) {
 					new PartialParticle(Particle.FALLING_DUST, mob.getLocation().add(0, mob.getHeight() / 2, 0), 3,
 						(mob.getWidth() / 2) + 0.1, mob.getHeight() / 3, (mob.getWidth() / 2) + 0.1, fallingDustData)
@@ -178,7 +179,7 @@ public class CursedWound extends Ability {
 			}
 
 			if (!mStoredPotionEffects.isEmpty() || !mStoredCustomEffects.isEmpty()) {
-				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 1.65f);
+				world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.6f, 1.65f);
 				createOrb(new Vector(FastUtils.randomDoubleInRange(-0.75, 0.75),
 					FastUtils.randomDoubleInRange(1, 1.5),
 					FastUtils.randomDoubleInRange(-0.75, 0.75)), mPlayer.getLocation().add(0, 1, 0), mPlayer, entity, null);
@@ -232,7 +233,7 @@ public class CursedWound extends Ability {
 						.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 					if (mT > 5 && mL.distance(to) < 0.35) {
-						world.playSound(mPlayer.getLocation(), Sound.ITEM_ARMOR_EQUIP_CHAIN, 1, 0.8f);
+						world.playSound(mPlayer.getLocation(), Sound.ITEM_ARMOR_EQUIP_CHAIN, SoundCategory.PLAYERS, 1, 0.8f);
 						new PartialParticle(Particle.SPELL, loc.add(0, 1, 0), 20, 0.4f, 0.4f, 0.4f, 0.6F)
 							.spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.FALLING_DUST, mL, 45, 0, 0, 0, 0.75F, Material.ANVIL.createBlockData())

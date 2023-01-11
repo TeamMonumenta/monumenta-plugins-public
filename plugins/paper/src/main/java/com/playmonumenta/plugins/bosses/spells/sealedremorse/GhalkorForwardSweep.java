@@ -89,7 +89,7 @@ public class GhalkorForwardSweep extends Spell {
 
 					this.cancel();
 				} else {
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 
 					Vector vec;
 					//Rather inefficient, but was not able to optimize without breaking it

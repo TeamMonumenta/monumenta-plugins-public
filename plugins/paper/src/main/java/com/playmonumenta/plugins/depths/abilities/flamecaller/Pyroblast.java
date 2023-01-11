@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
@@ -85,7 +86,7 @@ public class Pyroblast extends DepthsAbility {
 			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1);
 			proj.remove();
 		}
 	}
@@ -99,7 +100,7 @@ public class Pyroblast extends DepthsAbility {
 		}
 		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.4f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.4f);
 
 		if (projectile instanceof AbstractArrow arrow) {
 			arrow.setPierceLevel(0);

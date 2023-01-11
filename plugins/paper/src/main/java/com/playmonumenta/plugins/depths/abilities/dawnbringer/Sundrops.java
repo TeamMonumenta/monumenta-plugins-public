@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -79,9 +80,9 @@ public class Sundrops extends DepthsAbility {
 
 					item.remove();
 
-					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					world.playSound(loc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
+					world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+					world.playSound(loc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+					world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1, 1f);
 					new PartialParticle(Particle.BLOCK_CRACK, item.getLocation(), 30, 0.15, 0.15, 0.15, 0.75F, Material.HONEYCOMB_BLOCK.createBlockData()).spawnAsOtherPlayerActive();
 					new PartialParticle(Particle.TOTEM, item.getLocation(), 20, 0, 0, 0, 0.35F).spawnAsOtherPlayerActive();
 

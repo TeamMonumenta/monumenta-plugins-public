@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -406,7 +407,7 @@ public class SwordRainFinisher implements EliteFinisher {
 				@Override
 				public void run() {
 					if (mTicks == 0) {
-						loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.25f, Constants.NotePitches.F11);
+						loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.25f, Constants.NotePitches.F11);
 					}
 					if (mSwordStand.getLocation().clone().add(0, 0.4, 0).getBlock().isEmpty()) {
 						if (mSwordStand.getLocation().clone().add(0, -mFallSpeed + 0.3, 0).getBlock().isEmpty()) {

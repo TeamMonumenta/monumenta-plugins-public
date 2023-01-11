@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -54,10 +55,10 @@ public class SpellAxtalTntThrow extends Spell {
 			@Override
 			public void run() {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 4, 0, 0, 0, 0.07).spawnAsEntityActive(mLauncher);
-				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.77F);
+				loc.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 1, 0.77F);
 			}
 		};
-		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, 1, 0.77F);
+		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, SoundCategory.HOSTILE, 1, 0.77F);
 		for (int i = 0; i < (40 + mCount * mCooldown); i++) {
 			scheduler.scheduleSyncDelayedTask(mPlugin, particles1, i);
 		}

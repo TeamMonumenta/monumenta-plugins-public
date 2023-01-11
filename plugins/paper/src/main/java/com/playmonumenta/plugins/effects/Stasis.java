@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -39,7 +40,7 @@ public class Stasis extends ZeroArgumentEffect {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getDuration(), 9));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, getDuration(), 4));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, getDuration(), 1));
-			player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, 1, 1.2f);
+			player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1, 1.2f);
 			AbilityManager.getManager().updateSilence(player, true);
 		}
 	}

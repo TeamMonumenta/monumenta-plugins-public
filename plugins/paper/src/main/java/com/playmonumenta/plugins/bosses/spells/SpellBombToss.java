@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -131,7 +132,7 @@ public class SpellBombToss extends Spell {
 
 	public void launch(Player target) {
 		Location sLoc = mBoss.getEyeLocation();
-		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 		try {
 			TNTPrimed tnt = (TNTPrimed) EntityUtils.getSummonEntityAt(sLoc, EntityType.PRIMED_TNT, "{Fuse:" + mFuse + "}");
 			mTNTList.add(tnt);
@@ -155,7 +156,7 @@ public class SpellBombToss extends Spell {
 						return;
 					}
 
-					mTnt.getWorld().playSound(mTnt.getLocation(), Sound.ENTITY_TNT_PRIMED, 1.5f, 1);
+					mTnt.getWorld().playSound(mTnt.getLocation(), Sound.ENTITY_TNT_PRIMED, SoundCategory.HOSTILE, 1.5f, 1);
 
 					mCount++;
 				}

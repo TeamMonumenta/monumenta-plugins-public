@@ -145,13 +145,13 @@ public class SpellFinalLaser extends Spell {
 				);
 
 				if (mTicks % 8 == 0) {
-					target.playSound(target.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					target.playSound(target.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				} else if (mTicks % 8 == 2) {
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				} else if (mTicks % 8 == 4) {
-					target.playSound(target.getLocation(), Sound.ENTITY_WITHER_SPAWN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					target.playSound(target.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				} else if (mTicks % 8 == 6) {
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				}
 
 				if (mTicks >= 100) {

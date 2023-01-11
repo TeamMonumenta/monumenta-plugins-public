@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -127,8 +128,8 @@ public class EscapeDeath extends Ability {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
 
-				world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.75f, 1.5f);
-				world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1f, 0f);
+				world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.75f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1f, 0f);
 
 				MessagingUtils.sendActionBarMessage(mPlayer, "Escape Death has been activated");
 

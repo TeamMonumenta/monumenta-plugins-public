@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -71,8 +72,8 @@ public class PassiveVoidRift extends Spell {
 
 						for (Location loc : locs) {
 							new PartialParticle(Particle.LAVA, loc, 20, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
-							world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 2);
-							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
+							world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 2);
+							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1.5f, 1);
 
 							for (Player p : PlayerUtils.playersInRange(loc, mRadius, true)) {
 								DamageUtils.damage(mBoss, p, DamageType.MAGIC, 30, null, false, true, "Void Rift");
@@ -106,7 +107,7 @@ public class PassiveVoidRift extends Spell {
 						new PartialParticle(Particle.LAVA, loc, 5, 2, 0.1, 2, 0.25).spawnAsEntityActive(mBoss);
 
 						if (mTicks % 10 == 0) {
-							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1, 0f);
+							world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0f);
 						}
 					}
 

@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -57,17 +58,17 @@ public class SpellSamwellSmokeBomb extends SpellBaseGrenadeLauncher {
 			},
 			(LivingEntity bosss, Location loc) -> {
 				// Boss Aesthetics
-				bosss.getWorld().playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 5, 1);
+				bosss.getWorld().playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 5, 1);
 			},
 			(LivingEntity bosss, Location loc) -> {
 				// Grenade Aesthetics
 				mPGrenade.spawn(bosss, loc);
-				bosss.getWorld().playSound(loc, Sound.BLOCK_ANVIL_FALL, 5, 1);
+				bosss.getWorld().playSound(loc, Sound.BLOCK_ANVIL_FALL, SoundCategory.HOSTILE, 5, 1);
 			},
 			(LivingEntity bosss, Location loc) -> {
 				// Explosion Aesthetics
 				mPExplode.spawn(bosss, loc);
-				bosss.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1);
+				bosss.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 			},
 			(LivingEntity bosss, LivingEntity target, Location loc) -> {
 				// Hit Action on Explosion Targets

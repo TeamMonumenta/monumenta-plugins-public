@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -79,7 +80,7 @@ public class SpellThrowSummon extends Spell {
 
 	public void launch(Player target) {
 		Location sLoc = mBoss.getEyeLocation();
-		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_SHULKER_SHOOT, 1, 1);
+		sLoc.getWorld().playSound(sLoc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.HOSTILE, 1, 1);
 		try {
 			String soul = mSummonName;
 			if (mFromPool) {

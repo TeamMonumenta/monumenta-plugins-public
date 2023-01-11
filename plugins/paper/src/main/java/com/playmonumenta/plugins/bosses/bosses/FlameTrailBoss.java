@@ -13,6 +13,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,7 +75,7 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 				},
 				// Hit Action
 				(World world, Player player, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_BURN, 0.5f, 1f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_BURN, SoundCategory.HOSTILE, 0.5f, 1f);
 					EntityUtils.applyFire(com.playmonumenta.plugins.Plugin.getInstance(), p.FIRE_DURATION, player, boss);
 					DamageUtils.damage(boss, player, DamageType.MAGIC, p.DAMAGE, null, false, false, p.SPELL_NAME);
 				},

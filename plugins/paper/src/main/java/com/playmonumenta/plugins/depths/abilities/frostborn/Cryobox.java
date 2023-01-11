@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -94,7 +95,7 @@ public class Cryobox extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.FIREWORKS_SPARK, center.clone().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPELL_INSTANT, center.clone().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1).spawnAsPlayerActive(mPlayer);
-		world.playSound(center, Sound.ITEM_TOTEM_USE, 1, 1.35f);
+		world.playSound(center, Sound.ITEM_TOTEM_USE, SoundCategory.BLOCKS, 1, 1.35f);
 		MessagingUtils.sendActionBarMessage(mPlayer, "Cryobox has been activated!");
 
 		if (dealDamageLater) {

@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
@@ -64,7 +65,7 @@ public class DummyDecoy extends DepthsAbility {
 	public void execute(Projectile proj) {
 
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1, 1.4f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.NEUTRAL, 1, 1.4f);
 
 		if (proj instanceof AbstractArrow arrow) {
 			arrow.setPierceLevel(0);

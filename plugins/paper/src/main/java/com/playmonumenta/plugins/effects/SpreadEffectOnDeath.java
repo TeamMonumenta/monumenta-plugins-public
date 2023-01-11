@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 
@@ -61,7 +62,7 @@ public class SpreadEffectOnDeath extends Effect {
 					}
 				}
 
-				entity.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.1f);
+				entity.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.6f, 1.1f);
 			} catch (Exception e) {
 				MMLog.warning("Caught exception when spreading effect: " + effect);
 				e.printStackTrace();

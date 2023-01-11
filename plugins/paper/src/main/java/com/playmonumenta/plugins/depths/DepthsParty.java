@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -240,8 +241,8 @@ public class DepthsParty {
 			mSpawnedReward = true;
 			//For ability and upgrade rewards, spawn a chest to interface with them
 
-			l.getWorld().playSound(l, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.8f, 1.0f);
-			l.getWorld().playSound(l, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+			l.getWorld().playSound(l, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.8f, 1.0f);
+			l.getWorld().playSound(l, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			DepthsUtils.animate(l);
 			spawnRoomReward(l, spawnSlime);
 		}
@@ -256,7 +257,7 @@ public class DepthsParty {
 
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
-				p.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.0f, 1.0f);
+				p.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				p.sendActionBar(Component.text("" + score + " treasure score added to loot room!", NamedTextColor.GOLD));
 			}
 		}
@@ -413,7 +414,7 @@ public class DepthsParty {
 			World world = mLocation.getWorld();
 
 			if (mSeconds == 2 || mSeconds == 4 || mSeconds == 6) {
-				world.playSound(mLocation, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.8f, 1.0f);
+				world.playSound(mLocation, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.8f, 1.0f);
 			}
 
 			if (mSeconds >= 60 && mSlime != null) {

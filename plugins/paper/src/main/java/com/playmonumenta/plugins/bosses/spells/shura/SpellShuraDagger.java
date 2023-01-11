@@ -61,7 +61,7 @@ public class SpellShuraDagger extends Spell {
 			},
 			// Launch Aesthetic
 			(World world, Location loc, int ticks) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 3, 1.2f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1.2f);
 			},
 			// Projectile Aesthetic
 			(World world, Location loc, int ticks) -> {

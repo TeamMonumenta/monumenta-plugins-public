@@ -26,12 +26,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -68,9 +72,8 @@ public final class PortalBoss extends BossAbilityGroup {
 	public List<Location> mReplaceBlocks;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new PortalBoss(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new PortalBoss(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -131,12 +134,22 @@ public final class PortalBoss extends BossAbilityGroup {
 		events.put(66, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase2Spells, phase2Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\", \"color\":\"gold\"},{\"text\":\" DAMAGE SUSTAINED. OVERCLOCKING… POWER LEVEL RAISED. INTRUDER - DESTRUCTION IS ASSURED. \",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" DAMAGE SUSTAINED. OVERCLOCKING… POWER LEVEL RAISED. INTRUDER - DESTRUCTION IS ASSURED.")));
 			mPhase = 2;
 			hide();
 		});
 		events.put(50, (mBoss) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM…INF\",\"color\":\"red\"},{\"text\":\"69\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"IN\",\"color\":\"red\"},{\"text\":\"  8\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"ITE.\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" THIS MACHINE FAILS. NO MATTER. THIS LAB IS VAST. I AM…INF"))
+					.append(Component.text("69").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("IN"))
+					.append(Component.text("  8").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("ITE.")));
 			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(10, 1, 10), ELITE_LOS);
 			LibraryOfSoulsIntegration.summon(spawnLoc.clone().add(-10, 1, -10), ELITE_LOS);
 
@@ -144,15 +157,25 @@ public final class PortalBoss extends BossAbilityGroup {
 		events.put(25, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase3Spells, phase3Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" DAMA\",\"color\":\"red\"},{\"text\":\"94\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" SUSTA\",\"color\":\"red\"},{\"text\":\"  32\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"ED...\",\"color\":\"red\"},{\"text\":\" Bermuda? Wher9… am I? The rift…\",\"obfuscated\":\"false\",\"color\":\"blue\"},{\"text\":\" 43267\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"THOUGHT PROTOCOL OVERRIDDEN. RIFT PROTECTION RESUMED. INTRUDERS WILL BE EXPUNGED.\",\"obfuscated\":\"false\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" DAMA"))
+					.append(Component.text("94").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" SUSTA"))
+					.append(Component.text("  32").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("ED..."))
+					.append(Component.text(" Bermuda? Wher9… am I? The rift…", NamedTextColor.BLUE))
+					.append(Component.text(" 43267").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("THOUGHT PROTOCOL OVERRIDDEN. RIFT PROTECTION RESUMED. INTRUDERS WILL BE EXPUNGED.")));
 			mPhase = 3;
 			//Clear portals
 			for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 				PortalManager.clearAllPortals(p);
 			}
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 1.0f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0f);
 			hide();
 			honeyify();
 		});
@@ -204,10 +227,26 @@ public final class PortalBoss extends BossAbilityGroup {
 		//Expose the boss if cubes dropped is above threshold
 		if ((mCubesDropped >= 1 && mPhase == 1) || (mCubesDropped >= 2 && mPhase >= 2)) {
 			//Expose the boss
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" I AM INDESTRUCT\",\"color\":\"red\"},{\"text\":\"698765\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"  The core… destroy it… \",\"color\":\"blue\"},{\"text\":\"  44546\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"MY DEMISE IS IMPOSSIBLE\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" I AM INDESTRUCT"))
+					.append(Component.text("698765").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("  The core… destroy it… ", NamedTextColor.BLUE))
+					.append(Component.text("  44546").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("MY DEMISE IS IMPOSSIBLE")));
 			expose();
 		} else {
-			PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" NO...\",\"color\":\"red\"},{\"text\":\"945\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"  YOU CANN\",\"color\":\"red\"},{\"text\":\"  32...\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" It's working.. keep going... \",\"color\":\"blue\"},{\"text\":\"945\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" I AM IMMORTAL\",\"bold\":\"true\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Iota]", NamedTextColor.GOLD))
+					.append(Component.text(" NO..."))
+					.append(Component.text("945").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("  YOU CANN"))
+					.append(Component.text("  32...").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" It's working.. keep going... ", NamedTextColor.BLUE))
+					.append(Component.text("945").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" I AM IMMORTAL").decoration(TextDecoration.BOLD, true)));
 		}
 	}
 
@@ -253,7 +292,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			@Override
 			public void run() {
 				mTicks += 5;
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 20.0f, 0.5f + (mTicks / 25));
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 20.0f, 0.5f + (mTicks / 25.0f));
 
 				//launch event related spawn commands
 				if (mTicks >= 6 * 20) {
@@ -265,7 +304,7 @@ public final class PortalBoss extends BossAbilityGroup {
 						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + ChatColor.BOLD + " BRING IT ON.");
 
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 					}
 				}
 
@@ -277,9 +316,17 @@ public final class PortalBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Iota]\",\"color\":\"gold\"},{\"text\":\" DESTR\",\"color\":\"red\"},{\"text\":\"6\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Y... INTRU\",\"color\":\"red\"},{\"text\":\"4\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"DER...\",\"color\":\"red\"},{\"text\":\"65789\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" Thank… you… tell Bermuda… that thing… it broke me… I didn’t mean to…\",\"color\":\"blue\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+			player.sendMessage(Component.text("", NamedTextColor.RED)
+				.append(Component.text("[Iota]", NamedTextColor.GOLD))
+				.append(Component.text(" DESTR"))
+				.append(Component.text("6")).decoration(TextDecoration.OBFUSCATED, true)
+				.append(Component.text("Y... INTRU"))
+				.append(Component.text("4").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("DER..."))
+				.append(Component.text("65789").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text(" Thank… you… tell Bermuda… that thing… it broke me… I didn't mean to…", NamedTextColor.BLUE)));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}

@@ -53,7 +53,7 @@ public class TowerGuiTeam extends CustomInventory {
 		super(owner, 54, "Player Team");
 
 		mGame = game;
-		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1, 2);
+		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1, 2);
 
 		loadInv();
 	}

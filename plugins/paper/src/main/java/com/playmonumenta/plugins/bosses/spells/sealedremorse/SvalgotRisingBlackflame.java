@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -46,7 +47,7 @@ public class SvalgotRisingBlackflame extends Spell {
 
 				Location loc = mBoss.getLocation();
 				if (mTicks % 10 == 0) {
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1, 0f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1, 0f);
 				}
 
 				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
@@ -60,8 +61,8 @@ public class SvalgotRisingBlackflame extends Spell {
 				if (mTicks >= 30) {
 					this.cancel();
 
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 2);
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.5f, 1);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 2);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 1.5f, 1);
 					new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.BONE_BLOCK.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.EnumSet;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -49,7 +50,7 @@ public class Starvation implements Enchantment {
 			World world = player.getWorld();
 			new PartialParticle(Particle.SNEEZE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.SLIME, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerBuff(player);
-			world.playSound(player.getLocation(), Sound.ENTITY_HOGLIN_AMBIENT, 1, 1.25f);
+			world.playSound(player.getLocation(), Sound.ENTITY_HOGLIN_AMBIENT, SoundCategory.PLAYERS, 1, 1.25f);
 		}
 	}
 

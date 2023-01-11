@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -178,7 +179,7 @@ public class PhlegmaticResolve extends Ability {
 				// Only play sound to player once per second.
 				if ((mLastPlayedSoundTick - Bukkit.getServer().getCurrentTick()) > 20) {
 					mLastPlayedSoundTick = Bukkit.getServer().getCurrentTick();
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, 1, 1);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 1, 1);
 				}
 
 				if (damageSplit > 0) {

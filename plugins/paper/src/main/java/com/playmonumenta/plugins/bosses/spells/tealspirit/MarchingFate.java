@@ -21,6 +21,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -94,9 +95,9 @@ public class MarchingFate extends Spell {
 				new PartialParticle(Particle.EXPLOSION_HUGE, mCenter.clone().add(0, 3, 0), 25, 11, 3, 11).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mCenter, 40, 17, 1, 17).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, mCenter.clone().add(0, 3, 0), 40, 17, 3, 17).spawnAsEntityActive(mBoss);
-				world.playSound(mCenter, Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0.8f);
-				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 0.5f);
-				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
+				world.playSound(mCenter, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0.8f);
+				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 0.5f);
+				world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 1.0f);
 
 				Plugin plugin = Plugin.getInstance();
 				for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {

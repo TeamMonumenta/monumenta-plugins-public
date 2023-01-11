@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -66,7 +67,7 @@ public class SpellSummonBlueStrike extends Spell {
 		mTimer--;
 		if (mTimer < 0 && countDropShardMobs() < 25) {
 			mTimer = mTimeBetween;
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1.0f, 1.0f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1.0f, 1.0f);
 			PartialParticle particles = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 50, 1, 1, 1);
 			particles.spawnAsEnemy();
 			BossManager bossManager = com.playmonumenta.plugins.Plugin.getInstance().mBossManager;

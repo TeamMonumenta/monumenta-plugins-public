@@ -99,8 +99,8 @@ public final class Ghalkor extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = mBoss.getLocation();
-			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
-			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, 0.6f);
+			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 1.5f);
 			new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
@@ -138,12 +138,12 @@ public final class Ghalkor extends BossAbilityGroup {
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, EntityUtils.getAttributeBaseOrDefault(mBoss, Attribute.GENERIC_ATTACK_DAMAGE, 0) * 1.25);
 
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Broer, for you and for the Blackflame, I will devour them!\",\"color\":\"dark_gray\"}]");
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, 3, 0);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_DEATH, SoundCategory.HOSTILE, 3, 0);
 
 					World world = mBoss.getWorld();
 					Location loc = mBoss.getLocation();
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
-					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, 0.6f);
+					world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 1.5f);
 					new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 15, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 5, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 
@@ -186,7 +186,7 @@ public final class Ghalkor extends BossAbilityGroup {
 		mBoss.setInvulnerable(true);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Hael Broer, the invaders approach.\",\"color\":\"dark_gray\"}]");
-		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 5, 0.8f);
+		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 5, 0.8f);
 
 		new BukkitRunnable() {
 			private int mTicks = 0;
@@ -196,14 +196,14 @@ public final class Ghalkor extends BossAbilityGroup {
 				if (mTicks == 20 * 2) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Svalgot]\",\"color\":\"gold\"},{\"text\":\" Yes Ghalkor! Fear not. The power of the Blackflame is absolute.\",\"color\":\"dark_gray\"}]");
 					if (mSvalgot != null) {
-						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 5, 1f);
+						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 5, 1f);
 					}
 				} else if (mTicks == 20 * 4) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" Yah Broer, the nonbelievers draw close.\",\"color\":\"dark_gray\"}]");
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, 5, 0.8f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_AMBIENT, SoundCategory.HOSTILE, 5, 0.8f);
 				} else if (mTicks == 20 * 6) {
 					new PartialParticle(Particle.FLAME, mBoss.getLocation(), 200, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(boss);
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 5, 2);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 2);
 				} else if (mTicks == 20 * 6 + 10) {
 					this.cancel();
 
@@ -216,14 +216,14 @@ public final class Ghalkor extends BossAbilityGroup {
 
 					PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor and Svalgot]\",\"color\":\"gold\"},{\"text\":\" BY THE BLACKFLAME, YOU WILL FALL.\",\"color\":\"dark_gray\",\"bold\":true}]");
 
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, 5, 0.8f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, SoundCategory.HOSTILE, 5, 0.8f);
 					if (mSvalgot != null) {
-						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, 5, 1f);
+						mBoss.getWorld().playSound(mSvalgot.getLocation(), Sound.ENTITY_VINDICATOR_CELEBRATE, SoundCategory.HOSTILE, 5, 1f);
 					}
 
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Ghalkor & Svalgot", ChatColor.GRAY + "Speakers of Remorse");
-						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 					}
 				}
 

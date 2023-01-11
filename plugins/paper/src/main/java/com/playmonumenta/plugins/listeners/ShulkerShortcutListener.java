@@ -164,32 +164,28 @@ public class ShulkerShortcutListener implements Listener {
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "You can't use this here");
 			event.setCancelled(true);
-		} else if (itemClicked != null
-				&& click == ClickType.RIGHT
-				&& isEnderExpansion(itemClicked)
-				&& !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
+		} else if (click == ClickType.RIGHT
+			&& isEnderExpansion(itemClicked)
+			&& !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
 			// Right clicked an Ender Chest Expansion shulker outside an ender chest
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
 			event.setCancelled(true);
-		} else if (itemClicked != null
-				&& click == ClickType.RIGHT
-				&& isPurpleTesseractContainer(itemClicked)) {
-			// Right clicked a purple tesseract shulker that can't be opened
+		} else if (click == ClickType.RIGHT
+			&& isPurpleTesseractContainer(itemClicked)) {
+			// Right-clicked a purple tesseract shulker that can't be opened
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
 			event.setCancelled(true);
-		} else if (itemClicked != null
-				&& click == ClickType.RIGHT
-				&& ChestUtils.isLootBox(itemClicked)) {
-			// Right clicked a lootbox - dump contents into player's inventory
+		} else if (click == ClickType.RIGHT
+			&& ChestUtils.isLootBox(itemClicked)) {
+			// Right-clicked a lootbox - dump contents into player's inventory
 			List<ItemStack> items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
 			if (items == null) {
 				// Lootbox empty
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			} else {
 				// Non-empty, got some items, drop them on the player
-				// /playsound minecraft:block.chest.open player @s ~ ~ ~ 0.6 1
 				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, SoundCategory.PLAYERS, 0.6f, 1f);
 				for (ItemStack item : items) {
 					if (item != null && !item.getType().isAir()) {
@@ -342,11 +338,11 @@ public class ShulkerShortcutListener implements Listener {
 				event.setBuild(false);
 
 				ItemStack item = event.getItemInHand();
-				ShulkerBox sbox = (ShulkerBox) ((BlockStateMeta) item.getItemMeta()).getBlockState();
-				@Nullable ItemStack[] contents = sbox.getInventory().getContents();
+				ShulkerBox shulkerBox = (ShulkerBox) ((BlockStateMeta) item.getItemMeta()).getBlockState();
+				@Nullable ItemStack[] contents = shulkerBox.getInventory().getContents();
 				final String lockStr;
-				if (sbox.isLocked()) {
-					lockStr = sbox.getLock();
+				if (shulkerBox.isLocked()) {
+					lockStr = shulkerBox.getLock();
 				} else {
 					lockStr = null;
 				}

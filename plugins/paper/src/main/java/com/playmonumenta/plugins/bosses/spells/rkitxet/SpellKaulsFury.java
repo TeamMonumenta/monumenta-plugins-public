@@ -16,6 +16,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,8 +68,8 @@ public class SpellKaulsFury extends Spell {
 			Player target = players.get(0);
 			mRKitxet.setFuryTarget(target);
 
-			target.playSound(target.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 2, 1.5f);
-			world.playSound(target.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+			target.playSound(target.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 2, 1.5f);
+			world.playSound(target.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 2);
 
 			BukkitRunnable furyRunnable = new BukkitRunnable() {
 				int mT = 0;
@@ -90,13 +91,13 @@ public class SpellKaulsFury extends Spell {
 						new PartialParticle(Particle.FLAME, mLocation, 8 + (int) (completionRatio * 25), chargingRadius / 2, chargingRadius / 2, chargingRadius / 2, 0).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.SMOKE_LARGE, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0).spawnAsEntityActive(mBoss);
 
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
-						target.playSound(mLocation, Sound.BLOCK_LAVA_POP, 3.5f, (float) (1.5 * (2 - completionRatio)));
+						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, (float) (2 - completionRatio));
+						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, (float) (2 - completionRatio));
+						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, (float) (2 - completionRatio));
+						target.playSound(mLocation, Sound.BLOCK_LAVA_POP, SoundCategory.HOSTILE, 3.5f, (float) (1.5 * (2 - completionRatio)));
 					} else if (mT < mChargeTime + mImpactTime) {
 						if (mT == mChargeTime) {
-							world.playSound(mLocation, Sound.ENTITY_RAVAGER_ROAR, 1.5f, 1);
+							world.playSound(mLocation, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 1.5f, 1);
 						}
 
 						// 5.0 because 5 ticks and mImpactTime is in ticks, and to make it a double
@@ -107,10 +108,10 @@ public class SpellKaulsFury extends Spell {
 						new PartialParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
 
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
-						world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, 1, 2.0f);
+						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+						world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 2.0f);
 					} else {
 						for (Player player : PlayerUtils.playersInRange(mLocation, DAMAGE_RADIUS, true)) {
 							DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Kaul's Fury");
@@ -126,7 +127,7 @@ public class SpellKaulsFury extends Spell {
 							DamageUtils.damage(null, mob, DamageType.BLAST, DAMAGE / 3, null, false, true, "Kaul's Fury");
 						}
 
-						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
+						world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1);
 
 						ParticleUtils.explodingRingEffect(mPlugin, mLocation, RADIUS, 1, 4,
 							Arrays.asList(

@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -71,7 +72,7 @@ public class DodgeBoss extends BossAbilityGroup {
 			for (int i = 0; i < mParams.TELEPORT_RANGE; i++) {
 				if (loc.getBlock().isPassable()) {
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 
 					mBoss.teleport(loc);
 					break;

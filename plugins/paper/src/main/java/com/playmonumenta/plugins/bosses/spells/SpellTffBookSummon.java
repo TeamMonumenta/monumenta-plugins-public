@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -49,12 +50,12 @@ public class SpellTffBookSummon extends Spell {
 	}
 
 	private void summon() {
-		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 1f, 0.75f);
+		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1f, 0.75f);
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, 1f, 1.5f);
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, SoundCategory.HOSTILE, 1f, 1.5f);
 				for (int i = 0; i < 4; i++) {
 					LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "MostlyHarmlessTome");
 				}

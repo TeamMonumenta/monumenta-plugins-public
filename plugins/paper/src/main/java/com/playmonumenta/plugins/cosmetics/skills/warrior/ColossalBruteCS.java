@@ -73,7 +73,7 @@ public class ColossalBruteCS extends BruteForceCS {
 		mPlayer.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.65f);
 		mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1f, 0.75f);
 		if (combo == 2) {
-			mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, 1f, 0.55f);
+			mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1f, 0.55f);
 			new PartialParticle(Particle.SMOKE_LARGE, loc, 16, 0, 0, 0, 0.125)
 				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SMOKE_NORMAL, loc, 40, 0, 0, 0, 0.15)

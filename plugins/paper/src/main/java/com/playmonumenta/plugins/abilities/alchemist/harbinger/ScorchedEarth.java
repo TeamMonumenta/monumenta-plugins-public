@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -112,7 +113,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 				new PartialParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timeRemaining % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timeRemaining % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 				if (timeRemaining % 120 == 60 && timeRemaining < mDuration) {
-					world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
+					world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, SoundCategory.PLAYERS, 1f, 0.5f);
 				}
 
 				PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
@@ -154,9 +155,9 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			new PartialParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
 
-			world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1f, 0.5f);
-			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
-			world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.5f, 1.5f);
+			world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.5f);
 
 			mCenters.put(loc, mDuration);
 		}

@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -134,7 +135,7 @@ public class DepthsDodging extends DepthsAbility {
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 2f);
 		return true;
 	}
 

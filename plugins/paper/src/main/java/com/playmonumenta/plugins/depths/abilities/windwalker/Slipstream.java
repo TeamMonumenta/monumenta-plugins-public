@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -70,7 +71,7 @@ public class Slipstream extends DepthsAbility {
 		Location loc = mPlayer.getEyeLocation();
 		loc.add(0, -0.75, 0);
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.25f);
 
 		new BukkitRunnable() {
 			double mRadius = 0;

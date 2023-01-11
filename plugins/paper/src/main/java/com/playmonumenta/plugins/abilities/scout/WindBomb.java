@@ -26,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -105,7 +106,7 @@ public class WindBomb extends Ability {
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.25f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.25f);
 		Snowball proj = world.spawn(mPlayer.getEyeLocation(), Snowball.class);
 		proj.setVelocity(loc.getDirection().normalize().multiply(VELOCITY));
 		proj.setShooter(mPlayer);
@@ -144,7 +145,7 @@ public class WindBomb extends Ability {
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
 
-			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.25f);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.25f);
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 			new BukkitRunnable() {
@@ -183,8 +184,8 @@ public class WindBomb extends Ability {
 				loc.add(0, 2, 0);
 				world.spawnParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125);
 				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125);
-				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1f);
-				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, 0.8f, 1);
+				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1f);
+				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
 
 				double pullVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_VELOCITY);
 				double pullRadius = CharmManager.getRadius(mPlayer, CHARM_VORTEX_RADIUS, PULL_RADIUS);

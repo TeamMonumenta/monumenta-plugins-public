@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +26,6 @@ import org.bukkit.potion.PotionEffectType;
 public class SoothingCombos extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Soothing Combos";
-	public static final int TIME = 20;
 	public static final double[] SPEED_PERCENT = {0.1, 0.125, 0.15, 0.175, 0.2, 0.25};
 	public static final String SPEED_EFFECT_NAME = "SoothingCombosPercentSpeedEffect";
 	public static final double[] DURATION = {2.0, 2.5, 3.0, 3.5, 4.0, 6.0}; //seconds
@@ -62,11 +62,11 @@ public class SoothingCombos extends DepthsAbility {
 					mPlugin.mEffectManager.addEffect(p, SPEED_EFFECT_NAME, new PercentSpeed((int) (20 * DURATION[mRarity - 1]), SPEED_PERCENT[mRarity - 1], SPEED_EFFECT_NAME));
 					new PartialParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
-					mPlayer.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
+					mPlayer.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
 				}
 
 				Location loc = mPlayer.getLocation().add(0, 1, 0);
-				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
+				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
 				new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 			}
 			return true;

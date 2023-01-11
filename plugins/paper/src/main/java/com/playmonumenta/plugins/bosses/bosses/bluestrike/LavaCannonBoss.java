@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -129,8 +130,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 				}
 
 				if (mT >= chargeTime(mPhase)) {
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 5, 0);
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 1);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.HOSTILE, 5, 0);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 1);
 					mShot = true;
 					launch(mVector);
 					this.cancel();
@@ -236,7 +237,7 @@ public class LavaCannonBoss extends BossAbilityGroup {
 				mPWarning4.location(particleLoc).spawnAsBoss();
 
 				if (mPlaceBlocks) {
-					mBoss.getWorld().playSound(particleLoc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10f, 1.5f);
+					mBoss.getWorld().playSound(particleLoc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.HOSTILE, 10f, 1.5f);
 					// Place 3 x 3 Square
 					for (int x = -1; x <= 1; x++) {
 						for (int z = -1; z <= 1; z++) {
@@ -291,8 +292,8 @@ public class LavaCannonBoss extends BossAbilityGroup {
 	private void hit(Location loc, Player player) {
 		if (!mHitMap.contains(player)) {
 			MovementUtils.knockAway(loc, player, 3f, 0.5f);
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 5, 0.5f);
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 5, 0.5f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 5, 0.5f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.HOSTILE, 5, 0.5f);
 			mHitMap.add(player);
 			BossUtils.bossDamagePercent(mBoss, player, 0.55, SPELL_NAME);
 		}

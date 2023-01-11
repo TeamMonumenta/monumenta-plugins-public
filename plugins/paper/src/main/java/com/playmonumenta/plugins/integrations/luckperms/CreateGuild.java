@@ -27,11 +27,12 @@ import net.luckperms.api.node.types.PrefixNode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CreateGuild {
-	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13]"};
+	private static final String[] SUGGESTIONS = {"@a[x=-770,y=106,z=-128,dx=7,dy=4,dz=13,gamemode=!spectator]"};
 
 	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
@@ -134,7 +135,7 @@ public class CreateGuild {
 					for (Player founder : founders) {
 						ScoreboardUtils.setScoreboardValue(founder, "Founder", 1);
 						founder.sendMessage(ChatColor.GOLD + "Congratulations! You have founded a new guild!");
-						founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
+						founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1f, 1.5f);
 
 						// Refresh chat name
 						MonumentaNetworkChatIntegration.refreshPlayer(founder);

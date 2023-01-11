@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -157,7 +158,7 @@ public class ElementalSpiritFire extends Ability {
 							Vector vectorIncrement = vector.normalize().multiply(increment);
 
 							// Fire spirit sound
-							world.playSound(playerLocation, Sound.ENTITY_BLAZE_AMBIENT, 1, 0.5f);
+							world.playSound(playerLocation, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 1, 0.5f);
 
 							// Damage action & particles
 							double maxIterations = maxDistance / increment * 1.1;

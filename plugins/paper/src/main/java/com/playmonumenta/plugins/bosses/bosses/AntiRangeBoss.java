@@ -7,6 +7,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -43,7 +44,7 @@ public class AntiRangeBoss extends BossAbilityGroup {
 			World world = mBoss.getWorld();
 			loc.add(0, 1, 0);
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
-			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.2f, 1.5f);
+			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.2f, 1.5f);
 		}
 	}
 

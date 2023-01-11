@@ -76,7 +76,7 @@ public class SpellShuraSmoke extends Spell {
 					new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
-					mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+					mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 					PartialParticle smokeMarker = new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 1.5, 0.15, 1.5, 0.025);
 					PPCircle indicator = new PPCircle(Particle.SPELL_WITCH, loc, mRadius).count(3).ringMode(true).delta(0.1, 0, 0.1);

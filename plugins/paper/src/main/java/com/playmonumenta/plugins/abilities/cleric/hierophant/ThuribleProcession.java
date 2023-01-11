@@ -23,6 +23,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -92,7 +93,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			applyBuffs(EFFECTS_DURATION);
 
 			World world = mPlayer.getWorld();
-			world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+			world.playSound(mPlayer.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1, 1);
 			new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 60, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 60, 0.4, 0.4, 0.4, 1).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 200, 5, 3, 5, 1).spawnAsPlayerActive(mPlayer);

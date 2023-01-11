@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -101,7 +102,7 @@ public class PairedUnnaturalForce extends Spell {
 				mChargeUp.setTitle(ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + options.get(0) + ABILITY_NAME);
 				if (mChargeUp.getTime() % 5 == 0 && mChargeUp.getTime() <= DISPLAY_TIME) {
 					if (mChargeUp.getTime() % 10 == 0) {
-						world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 10.5f, 2f);
+						world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 10.5f, 2f);
 					}
 					for (double deg = 0; deg < 360; deg += P_INCREMENT_RATE) {
 						double cos = FastUtils.cosDeg(deg);
@@ -117,8 +118,8 @@ public class PairedUnnaturalForce extends Spell {
 
 				if (mChargeUp.nextTick()) {
 					mChargeUp.setTitle(ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + options.get(1) + ABILITY_NAME);
-					world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 10.5f, 2);
-					world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 10.5f, 1);
+					world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 10.5f, 2);
+					world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 10.5f, 1);
 
 					for (double deg = 0; deg < 360; deg += P_INCREMENT_RATE * 2) {
 						double cos = FastUtils.cosDeg(deg);
@@ -157,7 +158,7 @@ public class PairedUnnaturalForce extends Spell {
 
 							if (progress % 0.1 == 0) {
 								if (progress % 0.2 == 0) {
-									world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 10.5f, 2f);
+									world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 10.5f, 2f);
 								}
 								for (double deg = 0; deg < 360; deg += P_INCREMENT_RATE) {
 									double cos = FastUtils.cosDeg(deg);
@@ -173,8 +174,8 @@ public class PairedUnnaturalForce extends Spell {
 
 							if (mT > EXECUTION_TIME) {
 
-								world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 10.5f, 2);
-								world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 10.5f, 1);
+								world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 10.5f, 2);
+								world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 10.5f, 1);
 								for (double deg = 0; deg < 360; deg += P_INCREMENT_RATE * 2) {
 									double cos = FastUtils.cosDeg(deg);
 									double sin = FastUtils.sinDeg(deg);

@@ -126,8 +126,8 @@ public class SpellRealitySlash extends Spell {
 						}
 					}
 				}
-				world.playSound(mLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.25f, mPitch);
-				world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 1.25f, mPitch);
+				world.playSound(mLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.25f, mPitch);
+				world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1.25f, mPitch);
 				new PartialParticle(Particle.CLOUD, mLoc, 8, 1, 0.1, 1, 0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SMOKE_LARGE, mLoc, 5, 1, 0.1, 1, 0.25).spawnAsEntityActive(mBoss);
 

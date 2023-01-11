@@ -47,6 +47,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -199,7 +200,7 @@ public class Kaul extends BossAbilityGroup {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
-						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
 				}
 				if (mDefeated || mBoss.isDead() || !mBoss.isValid()) {
@@ -249,7 +250,7 @@ public class Kaul extends BossAbilityGroup {
 				if (BossUtils.bossDamagePercent(mBoss, player, 0.4)) {
 					/* Player survived the damage */
 					MovementUtils.knockAway(mSpawnLoc, player, -2.5f, 0.85f);
-					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 1.3f);
+					world.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 1.3f);
 					new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 80, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 					cd.add(player.getUniqueId());
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> cd.remove(player.getUniqueId()), 10);
@@ -378,7 +379,7 @@ public class Kaul extends BossAbilityGroup {
 						@Override
 						public void run() {
 							mJ++;
-							world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 3, 0.5f + (mJ / 25));
+							world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 3, 0.5f + (mJ / 25));
 							for (int i = 0; i < 5; i++) {
 								double radian1 = Math.toRadians(mRotation + (72 * i));
 								mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
@@ -434,7 +435,7 @@ public class Kaul extends BossAbilityGroup {
 
 								}.runTaskTimer(mPlugin, 0, 1);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-									player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1,
+									player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1,
 										0.75f);
 								}
 								new BukkitRunnable() {
@@ -499,8 +500,8 @@ public class Kaul extends BossAbilityGroup {
 					mRadius -= 0.15;
 					if (mRadius <= 0) {
 						this.cancel();
-						world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
-						world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
+						world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
+						world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
 						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsBoss();
 						new PartialParticle(Particle.BLOCK_CRACK, mLoc, 150, 0.1, 0.1, 0.1, 0.5,
 							Material.DIRT.createBlockData()).spawnAsBoss();
@@ -573,7 +574,7 @@ public class Kaul extends BossAbilityGroup {
 					if (!points.isEmpty()) {
 						teleport(mSpawnLoc.clone().add(0, 5, 0));
 						for (ArmorStand point : points) {
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 5, 0.75f);
+							world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 0.75f);
 							new BukkitRunnable() {
 								Location mLoc = point.getLocation().add(0, 15, 0);
 								Vector mDir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), mLoc);
@@ -627,8 +628,8 @@ public class Kaul extends BossAbilityGroup {
 										new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175).spawnAsBoss();
 										new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
 										new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 75, 0, 0, 0, 0.25).spawnAsBoss();
-										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_GENERIC_EXPLODE, 5, 0.9f);
-										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
+										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 5, 0.9f);
+										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
 
 										new BukkitRunnable() {
 											Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
@@ -746,8 +747,8 @@ public class Kaul extends BossAbilityGroup {
 				mRadius -= 0.25;
 				if (mRadius <= 0) {
 					this.cancel();
-					world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0);
-					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
+					world.playSound(mLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0);
+					world.playSound(mLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
 					new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsBoss();
 					LivingEntity miniboss = spawnImmortal(mLoc);
 					if (miniboss != null) {
@@ -780,9 +781,9 @@ public class Kaul extends BossAbilityGroup {
 
 	private void knockback(Plugin plugin, double r) {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2, 0f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
@@ -824,12 +825,12 @@ public class Kaul extends BossAbilityGroup {
 
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
 		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
 		mBoss.teleport(loc);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
 		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
@@ -851,7 +852,7 @@ public class Kaul extends BossAbilityGroup {
 				World world = mBoss.getWorld();
 				new PartialParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1).spawnAsBoss();
 				new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1).spawnAsBoss();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 0);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0);
 			}
 		}
 	}
@@ -1005,7 +1006,7 @@ public class Kaul extends BossAbilityGroup {
 						@Override
 						public void run() {
 							if (mT <= 0) {
-								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 10, 1);
+								world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 10, 1);
 							}
 							mT++;
 							if (mT <= 60) {
@@ -1022,7 +1023,7 @@ public class Kaul extends BossAbilityGroup {
 									this.cancel();
 									for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 										MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_GREEN + "Kaul, Soul of the Jungle");
-										player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+										player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 									}
 									mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 									mBoss.remove();
@@ -1064,7 +1065,7 @@ public class Kaul extends BossAbilityGroup {
 				mBoss.setInvulnerable(true);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 100, 10));
 				World world = mBoss.getWorld();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 0f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
 				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
@@ -1080,7 +1081,7 @@ public class Kaul extends BossAbilityGroup {
 					@Override
 					public void run() {
 						if (mT == 0) {
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3, 0f);
+							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0f);
 						}
 
 						if (mT % (20 * 4) == 0) {
@@ -1101,7 +1102,7 @@ public class Kaul extends BossAbilityGroup {
 							mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999, 0));
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 9999, 0));
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3, 0f);
+							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3, 0f);
 							new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsBoss();
 							new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsBoss();
 							new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsBoss();
@@ -1113,7 +1114,7 @@ public class Kaul extends BossAbilityGroup {
 								MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GREEN + "Kaul", ChatColor.GREEN + "Soul of the Jungle");
 								player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 							}
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5, 0f);
+							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
 						}
 
 					}

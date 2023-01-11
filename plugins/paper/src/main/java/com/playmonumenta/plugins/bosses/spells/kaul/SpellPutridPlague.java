@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -32,7 +33,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 /*
  * Putrid Plague (Holds one of four colored wools reflecting a pillar):
- * Ground around the arena starts smoking, with the exception of the selected color area.
+ * Ground around the arena starts smoking, except the selected color area.
  * After a delay, all players in the arena not within the area are inflicted with poison,
  * wither and slowness for 2m.
 
@@ -82,8 +83,8 @@ public class SpellPutridPlague extends Spell {
 		}.runTaskLater(mPlugin, mTime);
 
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 10, 0.8f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 10, 0f);
+		world.playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 10, 0.8f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.HOSTILE, 10, 0f);
 		List<ArmorStand> points = new ArrayList<ArmorStand>();
 		for (Entity e : mBoss.getNearbyEntities(mRange, mRange, mRange)) {
 			if ((e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
@@ -179,7 +180,7 @@ public class SpellPutridPlague extends Spell {
 								PotionEffect resistance = player.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 								if ((resistance == null || resistance.getAmplifier() < 4)
 									    && !StasisListener.isInStasis(player)) {
-									player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 1, 2);
+									player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 2);
 									new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0,
 										Material.LIME_CONCRETE.createBlockData()).spawnAsEntityActive(mBoss);
@@ -191,7 +192,7 @@ public class SpellPutridPlague extends Spell {
 							} else {
 								new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 35, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
-								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
+								player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1);
 								if (!mPhase3) {
 									player.removePotionEffect(PotionEffectType.WITHER);
 									player.removePotionEffect(PotionEffectType.SLOW);

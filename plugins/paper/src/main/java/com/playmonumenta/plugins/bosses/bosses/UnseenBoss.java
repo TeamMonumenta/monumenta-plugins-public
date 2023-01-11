@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -38,7 +39,7 @@ public class UnseenBoss extends BossAbilityGroup {
 			Vector mobToPlayer = mBoss.getLocation().toVector().subtract(player.getLocation().toVector());
 			// If the mob is outside of 75 degrees to left or right increase damage (previously 60)
 			if (lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0)) {
-				player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1f, 0.8f);
+				player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, SoundCategory.HOSTILE, 1f, 0.8f);
 				event.setDamage(event.getDamage() * mParam.DAMAGE_INCREASE);
 			}
 		}

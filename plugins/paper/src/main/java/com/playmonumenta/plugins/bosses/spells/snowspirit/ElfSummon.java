@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.loot.Lootable;
@@ -86,7 +87,7 @@ public class ElfSummon extends Spell {
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 0.8f, 0.5f);
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 0.8f, 0.5f);
 				new PartialParticle(Particle.CRIMSON_SPORE, centerLoc, 20, 1.5, 1.5, 1.5, 0.01).spawnAsEntityActive(mLauncher);
 			}
 		};

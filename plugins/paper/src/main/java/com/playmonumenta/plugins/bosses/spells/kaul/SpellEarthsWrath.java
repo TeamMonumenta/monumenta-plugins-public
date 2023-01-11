@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -51,13 +52,13 @@ public class SpellEarthsWrath extends Spell {
 			public void run() {
 
 				if (mChargeUp.getTime() % 2 == 0) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 2, 1);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 2, 1);
 				}
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.reset();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2, 1);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2, 1);
 					Location loc = mBoss.getLocation().add(0, 0.25, 0);
 					loc.setY(mY);
 					for (int i = 0; i < 48; i++) {

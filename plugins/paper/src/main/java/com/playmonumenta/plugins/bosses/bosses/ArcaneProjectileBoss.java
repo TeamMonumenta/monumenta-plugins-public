@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -63,25 +64,25 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2, 1);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 2, 1);
 					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 1.5f);
 				},
 				// Projectile Aesthetic
 				(World world, Location loc, int ticks) -> {
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 					if (ticks % 40 == 0) {
-						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f);
+						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, SoundCategory.HOSTILE, 0.5f, 0.2f);
 					}
 				},
 				// Hit Action
 				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
-					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
 						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);

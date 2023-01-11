@@ -29,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -184,7 +185,7 @@ public class AstralOmen extends Ability {
 					new PartialParticle(Particle.REDSTONE, loc, e.getValue() * 5, 0.2, 0.2, 0.2, 0.1, e.getKey().mColor).spawnAsPlayerActive(mPlayer);
 				}
 			}
-			world.playSound(loc, Sound.ENTITY_BLAZE_HURT, 1.3f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.3f, 1.5f);
 		} else {
 			// Effect implements Comparable in compareTo(), which uses the internal magnitude
 			// When EffectManager does addEffect(), it add()s to NavigableSet, which presumably uses compareTo()

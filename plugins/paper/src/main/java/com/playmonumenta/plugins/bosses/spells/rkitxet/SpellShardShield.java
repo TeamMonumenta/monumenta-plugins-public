@@ -9,6 +9,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -81,10 +82,10 @@ public class SpellShardShield extends Spell {
 			}
 
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 3f, 0.5f);
-			world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 3f, 2f);
+			world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 3f, 0.5f);
+			world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 3f, 2f);
 			if (forced) {
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1.2f, 0.6f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1.2f, 0.6f);
 			}
 		}
 	}
@@ -99,7 +100,7 @@ public class SpellShardShield extends Spell {
 			}
 
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 1);
+			world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 			new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 15, 0.5, 0, 0.5).spawnAsEntityActive(mBoss);
 		}
 	}

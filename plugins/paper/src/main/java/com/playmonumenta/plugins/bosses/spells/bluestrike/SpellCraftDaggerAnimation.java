@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
@@ -34,7 +35,7 @@ public class SpellCraftDaggerAnimation extends Spell {
 		// Every 2 seconds or so, spawn a new particle.
 		if (mTicks % 10 == 0) {
 			mParticleLocationList.add(mBoss.getLocation().add(0, 1, 0));
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_AMBIENT, 1, 1);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_AMBIENT, SoundCategory.HOSTILE, 1, 1);
 		}
 
 		// For every location:

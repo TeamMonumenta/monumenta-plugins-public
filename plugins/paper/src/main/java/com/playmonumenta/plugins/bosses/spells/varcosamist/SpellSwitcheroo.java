@@ -14,6 +14,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -83,11 +84,11 @@ public class SpellSwitcheroo extends Spell {
 				target.teleport(mobLoc);
 				new PartialParticle(Particle.SPELL_WITCH, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
 				new PartialParticle(Particle.SMOKE_LARGE, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
-				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
+				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 
 				new PartialParticle(Particle.SMOKE_LARGE, targetLoc, 65, 0, 0, 0, 0.1).spawnAsEntityActive(mLauncher);
 				new PartialParticle(Particle.EXPLOSION_LARGE, targetLoc, 4, 0, 0, 0, 0).spawnAsEntityActive(mLauncher);
-				world.playSound(targetLoc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+				world.playSound(targetLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 
 				if (mLauncher instanceof LivingEntity le) {
@@ -129,7 +130,7 @@ public class SpellSwitcheroo extends Spell {
 	}
 
 	private void animation(Player target) {
-		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
+		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 1.4f, 0.5f);
 
 		PlayerUtils.executeCommandOnNearbyPlayers(mLauncher.getLocation(), 50, "tellraw @s [\"\",{\"text\":\"" + mDio + "\",\"color\":\"red\"}]");
 

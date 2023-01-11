@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -151,7 +152,7 @@ public class RestlessSouls extends Ability {
 						if (isOutOfTime && mBoss.isValid()) {
 							Location vexLoc = mBoss.getLocation();
 
-							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, 1.5f, 1.0f);
+							world.playSound(vexLoc, Sound.ENTITY_VEX_DEATH, SoundCategory.PLAYERS, 1.5f, 1.0f);
 							new PartialParticle(Particle.SOUL, vexLoc, 20, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 						}
 						mBoss.remove();
@@ -172,7 +173,7 @@ public class RestlessSouls extends Ability {
 								LivingEntity randomMob = nearbyMobs.get(0);
 								if (randomMob != null) {
 									mBoss.setTarget(randomMob);
-									world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_AMBIENT, 1.5f, 1.0f);
+									world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_AMBIENT, SoundCategory.PLAYERS, 1.5f, 1.0f);
 								}
 							}
 						}

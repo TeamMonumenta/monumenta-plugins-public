@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -72,7 +73,7 @@ public class CloakOfShadows extends DepthsAbility {
 		tinctureMeta.displayName(Component.text("Shadow Bomb", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 		itemTincture.setItemMeta(tinctureMeta);
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1, 0.15f);
+		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
 		Item tincture = world.dropItem(loc, itemTincture);
 		tincture.setPickupDelay(Integer.MAX_VALUE);
 
@@ -102,7 +103,7 @@ public class CloakOfShadows extends DepthsAbility {
 				if (tincture.isOnGround()) {
 					new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, tincture.getLocation(), 30, 3, 0, 3).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, tincture.getLocation(), 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
-					world.playSound(tincture.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.15f);
+					world.playSound(tincture.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0.15f);
 					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(tincture.getLocation(), RADIUS);
 					for (LivingEntity mob : mobs) {
 						EntityUtils.applyWeaken(mPlugin, WEAKEN_DURATION, WEAKEN_AMPLIFIER[mRarity - 1], mob);

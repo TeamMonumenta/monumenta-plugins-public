@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -36,7 +37,7 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 		if (projectile instanceof AbstractArrow arrow && FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
 			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
 			if (refunded) {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.2f, 1.0f);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.2f, 1.0f);
 			}
 		}
 		return true;

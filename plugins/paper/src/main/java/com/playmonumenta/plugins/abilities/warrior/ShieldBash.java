@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -83,8 +84,8 @@ public class ShieldBash extends Ability {
 					new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
-					world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, 1.5f, 1);
-					world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.5f, 0.5f);
+					world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1);
+					world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
 
 					bash(mob, ClassAbility.SHIELD_BASH);
 					if (isLevelTwo()) {
@@ -115,7 +116,7 @@ public class ShieldBash extends Ability {
 		if (isEnhanced() && mPlayer.getHandRaisedTime() < ENHANCEMENT_BLOCKING_DURATION && event.isBlockedByShield() && isOnCooldown() && !mIsEnhancementUsed) {
 			// Reduce cooldown by half of shield bash's CD.
 			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.SHIELD_BASH, getModifiedCooldown() / 2);
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 2);
+			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1, 2);
 
 			mIsEnhancementUsed = true;
 			// mPlayer.sendMessage("Shield bash CD reduced!");

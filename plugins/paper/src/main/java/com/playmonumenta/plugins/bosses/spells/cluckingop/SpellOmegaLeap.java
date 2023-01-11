@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -32,8 +33,8 @@ public class SpellOmegaLeap extends Spell {
 		mBoss.setVelocity(new Vector(0, 1.5, 0));
 		new PartialParticle(Particle.FLAME, mBoss.getLocation(), 175, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 75, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.5f, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1.5f, 0f);
 		new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -46,10 +47,10 @@ public class SpellOmegaLeap extends Spell {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1.5f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.5f, 0f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1.5f, 0f);
 					new BukkitRunnable() {
 						double mRotation = 0;
 						double mRadius = 1;

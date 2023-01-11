@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -56,7 +57,7 @@ public class MidnightToll extends Spell {
 					}
 
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
-						p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 5f, 2.0f);
+						p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, SoundCategory.HOSTILE, 5f, 2.0f);
 					});
 				}
 				if (mChargeDamage.nextTick()) {
@@ -69,8 +70,8 @@ public class MidnightToll extends Spell {
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, "Stasis");
 						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, VoodooBonds.EFFECT_NAME);
 						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, ABILITY_NAME);
-						p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2f, 0.0f);
-						p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2f, 2f);
+						p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.HOSTILE, 2f, 0.0f);
+						p.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 2f, 2f);
 					});
 					this.cancel();
 				}

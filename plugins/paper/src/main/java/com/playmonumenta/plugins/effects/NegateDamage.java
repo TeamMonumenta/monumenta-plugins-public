@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,7 +48,7 @@ public class NegateDamage extends Effect {
 			event.setCancelled(true);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation();
-			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, 1, 1.2f);
+			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 1.2f);
 			if (mParticleData != null) {
 				mParticleData.spawnAsPlayerActive((Player) entity);
 			}

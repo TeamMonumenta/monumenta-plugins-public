@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -54,7 +55,7 @@ public class Fireball extends DepthsAbility {
 
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 2);
 		new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 		Vector dir = loc.getDirection().normalize();
 		for (int i = 0; i < DISTANCE; i++) {
@@ -76,7 +77,7 @@ public class Fireball extends DepthsAbility {
 		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 1.5, 1.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 25, 1.5, 1.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1);
 
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
 			EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer);

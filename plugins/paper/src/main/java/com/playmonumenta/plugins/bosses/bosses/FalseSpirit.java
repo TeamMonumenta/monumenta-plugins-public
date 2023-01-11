@@ -298,7 +298,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			player.sendMessage(Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED));
 			MessagingUtils.sendBoldTitle(player, ChatColor.RED + "False Spirit", ChatColor.DARK_RED + "Remnant of Olive");
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 		}
 	}
 
@@ -401,7 +401,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 						public void run() {
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 								MessagingUtils.sendBoldTitle(player, ChatColor.RED + "VICTORY", ChatColor.DARK_RED + "False Spirit, Remnant of Olive");
-								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							}
 
 							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -58,24 +59,24 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
 					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-					world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 1f, 0.5f);
+					world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
 					new PartialParticle(Particle.SPELL_WITCH, loc, 40, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Projectile Aesthetic
 				(World world, Location loc, int ticks) -> {
 					new PartialParticle(Particle.SPELL_WITCH, loc, 6, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(boss);
 					if (ticks % 40 == 0) {
-						world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, 0.4f, 0.5f);
+						world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 0.4f, 0.5f);
 					}
 				},
 				// Hit Action
 				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, 2f, 0.5f);
+					world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 2f, 0.5f);
 					new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (player != null) {
 						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, prevLoc);

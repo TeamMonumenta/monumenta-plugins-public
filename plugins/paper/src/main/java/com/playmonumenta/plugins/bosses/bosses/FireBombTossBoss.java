@@ -13,6 +13,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -63,7 +64,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellBombToss(plugin, boss, p.DETECTION, p.LOBS, p.FUSE_TIME, p.COOLDOWN,
 				(World world, TNTPrimed tnt, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4).spawnAsEntityActive(boss);
 

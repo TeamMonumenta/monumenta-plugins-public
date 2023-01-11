@@ -15,6 +15,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -85,7 +86,7 @@ public class SuspendedBallistae extends Spell {
 
 	private void executeBlast(Location targetLoc) {
 		World world = targetLoc.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ARROW_SHOOT, 2.0f, 0.2f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.HOSTILE, 2.0f, 0.2f);
 		Location shotLoc = mBoss.getEyeLocation();
 		new PPLine(Particle.WAX_OFF, shotLoc, targetLoc)
 			.delta(0.4, 0.4, 0.4)
@@ -97,7 +98,7 @@ public class SuspendedBallistae extends Spell {
 			@Override
 			public void run() {
 				if (mT % 2 == 0) {
-					world.playSound(shotLoc, Sound.ENTITY_CAT_HISS, 0.1f, 1.5f);
+					world.playSound(shotLoc, Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 0.1f, 1.5f);
 				}
 				new PartialParticle(Particle.WAX_OFF, shotLoc, 5, 0.2, 0.2, 0.2, 0.05).spawnAsEntityActive(mBoss);
 				new PPCircle(Particle.SMOKE_LARGE, targetLoc, mRadius)
@@ -110,7 +111,7 @@ public class SuspendedBallistae extends Spell {
 					.data(new Particle.DustOptions(Color.fromRGB(252, 3, 3), 1.65f))
 					.spawnAsBoss();
 				if (mT >= mExecutionTime) {
-					world.playSound(targetLoc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2.0f, 0.5f);
+					world.playSound(targetLoc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.HOSTILE, 2.0f, 0.5f);
 					new PPLine(Particle.WAX_OFF, shotLoc, targetLoc)
 						.delta(0.4, 0.4, 0.4)
 						.countPerMeter(5)

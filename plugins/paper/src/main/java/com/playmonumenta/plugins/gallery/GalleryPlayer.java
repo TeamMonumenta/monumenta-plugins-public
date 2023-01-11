@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -136,10 +137,11 @@ public class GalleryPlayer {
 		}
 	}
 
-	public void playSound(Sound sound, float pich, float volume) {
+	// TODO Add sound category argument
+	public void playSound(Sound sound, float pitch, float volume) {
 		Player player = getPlayer();
 		if (player != null) {
-			player.getWorld().playSound(player.getEyeLocation(), sound, volume, pich);
+			player.getWorld().playSound(player.getEyeLocation(), sound, SoundCategory.HOSTILE, volume, pitch);
 		}
 	}
 

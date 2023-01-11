@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -119,8 +120,8 @@ public class Bodyguard extends Ability {
 					Location userLoc = mPlayer.getLocation();
 					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
 
-					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, 0.75f, 0.75f);
-					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
+					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.75f, 0.75f);
+					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
 
 					giveAbsorption(player);
 
@@ -141,7 +142,7 @@ public class Bodyguard extends Ability {
 
 		putOnCooldown();
 
-		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, 1, 0.75f);
+		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
 		new PartialParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 
 		giveAbsorption(mPlayer);

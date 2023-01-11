@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -36,7 +37,7 @@ public class FocusFireBoss extends BossAbilityGroup {
 				}
 			}
 			//Let the players know something happened
-			player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 0.3f, 0.9f);
+			player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 0.3f, 0.9f);
 			new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsEntityActive(mBoss);
 		}
 	}

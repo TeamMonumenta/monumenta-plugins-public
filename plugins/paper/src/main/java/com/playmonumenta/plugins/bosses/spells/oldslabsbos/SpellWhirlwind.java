@@ -12,6 +12,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,8 +35,8 @@ public class SpellWhirlwind extends Spell {
 
 	@Override
 	public void run() {
-		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.8f);
-		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.5f, 1.5f);
+		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.8f);
+		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.5f, 1.5f);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 4));
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -67,7 +68,7 @@ public class SpellWhirlwind extends Spell {
 
 					List<Player> playersNearby = PlayerUtils.playersInRange(loc, 40, true);
 
-					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, 1.5f, 0.85f);
+					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.HOSTILE, 1.5f, 0.85f);
 					new BukkitRunnable() {
 						double mRotation = 0;
 						double mSin = 0;
@@ -78,7 +79,7 @@ public class SpellWhirlwind extends Spell {
 							Location loc = mBoss.getLocation();
 							new PartialParticle(Particle.CLOUD, loc, 4, 0.1, 0.1, 0.1, 0.15).spawnAsEntityActive(mBoss);
 							new PartialParticle(Particle.CRIT, loc, 12, 0.1, 0.1, 0.1, 0.85).spawnAsEntityActive(mBoss);
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.85f + ((float) FastUtils.RANDOM.nextDouble() * 0.5f));
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.85f + ((float) FastUtils.RANDOM.nextDouble() * 0.5f));
 							for (int i = 0; i < 2; i++) {
 								mRotation += 10;
 								mSin += 0.1;

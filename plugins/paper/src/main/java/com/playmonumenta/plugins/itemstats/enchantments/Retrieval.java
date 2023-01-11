@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class Retrieval implements Enchantment {
 		if ((proj.getType() == EntityType.ARROW || proj.getType() == EntityType.SPECTRAL_ARROW) && FastUtils.RANDOM.nextDouble() < chance) {
 			boolean refunded = AbilityUtils.refundArrow(player, (AbstractArrow) proj);
 			if (refunded) {
-				player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.3f, 1.0f);
+				player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.3f, 1.0f);
 			}
 		}
 	}

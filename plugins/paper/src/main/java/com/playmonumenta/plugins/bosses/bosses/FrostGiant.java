@@ -387,7 +387,7 @@ public class FrostGiant extends BossAbilityGroup {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
 						player.sendMessage(Component.text("YOU DARE MOCK OUR BATTLE?", NamedTextColor.DARK_AQUA));
-						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1, 0.85f);
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
 				}
 				if (mBoss.isDead() || !mBoss.isValid()) {
@@ -712,7 +712,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 										for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
 											MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Eldrask", ChatColor.BLUE + "The Waking Giant");
-											player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+											player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 										}
 
 										BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, events, false);
@@ -908,7 +908,7 @@ public class FrostGiant extends BossAbilityGroup {
 
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, fighterRange, true)) {
 						MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "VICTORY", ChatColor.DARK_AQUA + "Eldrask, The Waking Giant");
-						player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+						player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 					}
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 

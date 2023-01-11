@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -80,10 +81,10 @@ public class IntoxicatingWarmth implements Enchantment {
 					switch (mT) {
 						case 0:
 						case 2:
-							player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EAT, 1.0F, 2);
+							player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1.0F, 2);
 							break;
 						case 1:
-							player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EAT, 1.0F, 1.5F);
+							player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1.0F, 1.5F);
 							break;
 						default:
 							this.cancel();
@@ -103,7 +104,7 @@ public class IntoxicatingWarmth implements Enchantment {
 					}, (entity) -> {
 					// Lose effect
 					Location loc = player.getLocation();
-					player.playSound(loc, Sound.ENTITY_LLAMA_EAT, 1f, 0.5f);
+					player.playSound(loc, Sound.ENTITY_LLAMA_EAT, SoundCategory.PLAYERS, 1f, 0.5f);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, PEACH_COLOR).spawnAsPlayerBuff(player);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, YELLOW_COLOR).spawnAsPlayerBuff(player);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, PEACH_COLOR).spawnAsPlayerBuff(player);

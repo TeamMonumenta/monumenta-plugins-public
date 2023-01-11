@@ -29,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -90,7 +91,7 @@ public class TotemOfSalvation extends DepthsAbility {
 
 		item.setVelocity(vel);
 		item.setGlowing(true);
-		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, 1.0f, 2.5f);
+		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1.0f, 2.5f);
 
 		new BukkitRunnable() {
 			int mTicks = 0;

@@ -13,12 +13,15 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
@@ -42,15 +45,21 @@ public class AnvilOverride extends BaseOverride {
 		item = player.getInventory().getItemInMainHand();
 		if (block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 			boolean unshattered = Shattered.unshatterOneLevel(item);
-			if (unshattered
-				    || (item.getDurability() > 0 && !item.getType().isBlock() && item.hasItemMeta() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0)) {
-				if (!unshattered) {
-					item.setDurability((short) 0);
-				}
+			ItemMeta itemMeta = item.getItemMeta();
 
+			boolean canRepair = !unshattered;
+			if (unshattered
+				&& itemMeta instanceof Damageable damageable
+				&& damageable.getDamage() > 0
+				&& ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0) {
+				canRepair = true;
+				damageable.setDamage(0);
+			}
+
+			if (canRepair) {
 				Location loc = block.getLocation().add(0.5, 0.5, 0.5);
 				World world = loc.getWorld();
-				world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, 1.0f, 1.0f);
+				world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 1.0f, 1.0f);
 				new BukkitRunnable() {
 					int mTicks = 0;
 					final Location mParticleLoc = block.getLocation().add(0.5, 1.1, 0.5);
@@ -61,8 +70,8 @@ public class AnvilOverride extends BaseOverride {
 						if (mTicks >= 3) {
 							this.cancel();
 							world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
-							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
+							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
+							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
 						} else {
 							world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
 						}

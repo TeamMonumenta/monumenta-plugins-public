@@ -67,7 +67,6 @@ public class DivineJusticeCS implements CosmeticSkill {
 		partialParticle.mParticle = Particle.FLAME;
 		partialParticle.spawnAsPlayerActive(mPlayer);
 
-		// /playsound block.anvil.land master @p ~ ~ ~ 0.15 1.5
 		mPlayer.getWorld().playSound(
 			enemy.getLocation(),
 			Sound.BLOCK_ANVIL_LAND,

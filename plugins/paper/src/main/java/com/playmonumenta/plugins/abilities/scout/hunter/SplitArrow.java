@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -90,7 +91,7 @@ public class SplitArrow extends Ability {
 				if (!EntityUtils.hasArrowIframes(mPlugin, nearestMob)) {
 					new PartialParticle(Particle.CRIT, eye, 30, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.CRIT_MAGIC, eye, 20, 0, 0, 0, 0.6).spawnAsPlayerActive(mPlayer);
-					world.playSound(eye, Sound.ENTITY_ARROW_HIT, 1, 1.2f);
+					world.playSound(eye, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, 1.2f);
 
 					DamageUtils.damage(mPlayer, nearestMob, DamageType.OTHER, damage, mInfo.getLinkedSpell(), true, true);
 					MovementUtils.knockAway(sourceEnemy, nearestMob, 0.125f, 0.35f, true);

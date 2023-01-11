@@ -26,6 +26,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -112,14 +113,14 @@ public class SanguineHarvest extends Ability {
 		box.shift(direction);
 
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1, 0.9f);
+		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.9f);
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, range));
 
 		if (isEnhanced()) {
 			mMarkedLocations.clear();
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 1);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1, 1);
 			Vector v;
 			for (double degree = -40; degree < 40; degree += 10) {
 				for (double r = 0; r <= range; r += 0.55) {
@@ -195,8 +196,8 @@ public class SanguineHarvest extends Ability {
 		new PartialParticle(Particle.FALLING_DUST, loc, 75, mRadius, mRadius, mRadius, Material.RED_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, mRadius, mRadius, mRadius, 0.25).spawnAsPlayerActive(mPlayer);
 
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.3f);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1, 0.5f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.3f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.5f);
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {

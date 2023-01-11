@@ -43,19 +43,20 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -100,7 +101,7 @@ import org.jetbrains.annotations.Nullable;
 
 /*
  * Lich:
- * I'm too lazy so here's the formal write up for reference :) -Fwap
+ * I'm too lazy so here's the formal write-up for reference :) -Fwap
  * https://docs.google.com/document/d/149Wa83eyxaJ_EuOn1oCZl4ivoDzj-tw5m04i_xVA87M/edit?usp=sharing
  */
 public final class Lich extends BossAbilityGroup {
@@ -112,7 +113,6 @@ public final class Lich extends BossAbilityGroup {
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
-	private static final Set<UUID> mSummoned = new HashSet<UUID>();
 	private static final String START_TAG = "lich_center";
 	private static final String mShieldCrystal = "DeathCrystal";
 	private static final String mCrystalShield = "CrystalShield";
@@ -124,16 +124,16 @@ public final class Lich extends BossAbilityGroup {
 	private static final double mY = 14.5;
 	private static final double mS = 8.5;
 	private int mPhase;
-	private final Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
-	private final List<Location> mCrystalLoc = new ArrayList<Location>();
-	private final List<Location> mPassive2Loc = new ArrayList<Location>();
-	private final List<Location> mTower0 = new ArrayList<Location>();
-	private final List<Location> mTower1 = new ArrayList<Location>();
-	private final List<Location> mTower2 = new ArrayList<Location>();
-	private final List<Location> mTower3 = new ArrayList<Location>();
-	private final List<List<Location>> mTowerGroup = new ArrayList<List<Location>>();
-	private final List<Location> mTp = new ArrayList<Location>();
-	private static final List<Player> mCursed = new ArrayList<Player>();
+	private final Collection<EnderCrystal> mCrystal = new ArrayList<>();
+	private final List<Location> mCrystalLoc = new ArrayList<>();
+	private final List<Location> mPassive2Loc = new ArrayList<>();
+	private final List<Location> mTower0 = new ArrayList<>();
+	private final List<Location> mTower1 = new ArrayList<>();
+	private final List<Location> mTower2 = new ArrayList<>();
+	private final List<Location> mTower3 = new ArrayList<>();
+	private final List<List<Location>> mTowerGroup = new ArrayList<>();
+	private final List<Location> mTp = new ArrayList<>();
+	private static final List<Player> mCursed = new ArrayList<>();
 	private static boolean mActivated = false;
 	private static boolean mGotHit = false;
 	private boolean mTrigger = false;
@@ -148,12 +148,11 @@ public final class Lich extends BossAbilityGroup {
 	private static final double SCALING_X = 0.7;
 	private static final double SCALING_Y = 0.575;
 
-	private double mPhylactHealth = 0.0;
+	private double mPhylactHealth;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Lich(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new Lich(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -257,26 +256,24 @@ public final class Lich extends BossAbilityGroup {
 						mT = 0;
 						Collections.shuffle(mTp);
 						World world = mBoss.getWorld();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-						world.playSound(mTp.get(0), Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
+						world.playSound(mTp.get(0), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mTp.get(0));
 					}
 				}
 
 				// key glow color + prevent log spam
-				if (mKey != null) {
-					double health = mKey.getHealth();
-					if (health / mPhylactHealth <= 0.34 && mColor == 1) {
-						mColor++;
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color red");
-					} else if (health / mPhylactHealth <= 0.67 && mColor == 0) {
-						mColor++;
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color yellow");
-					}
+				double health = mKey.getHealth();
+				if (health / mPhylactHealth <= 0.34 && mColor == 1) {
+					mColor++;
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color red");
+				} else if (health / mPhylactHealth <= 0.67 && mColor == 0) {
+					mColor++;
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color yellow");
 				}
 
 				// key death
-				if (mKey == null || ((mKey.isDead() || !mKey.isValid()) && mKeyDead == false)) {
+				if ((mKey.isDead() || !mKey.isValid()) && !mKeyDead) {
 					mKeyDead = true;
 					List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
 					List<Player> shadowed = SpellDimensionDoor.getShadowed();
@@ -310,7 +307,7 @@ public final class Lich extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				// invuln crystals if ghast is present
+				// invulnerable crystals if ghast is present
 				for (Location loc : mCrystalLoc) {
 					Collection<EnderCrystal> c = loc.getNearbyEntitiesByType(EnderCrystal.class, 3);
 					if (c.size() > 0) {
@@ -329,7 +326,7 @@ public final class Lich extends BossAbilityGroup {
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
-					if (mKey != null && mKey.isValid()) {
+					if (mKey.isValid()) {
 						mKey.remove();
 					}
 				}
@@ -397,7 +394,7 @@ public final class Lich extends BossAbilityGroup {
 			new SpellAutoAttack(mPlugin, this, mBoss, mStart.getLocation(), 20 * 4, detectionRange, mCeiling, 3),
 			new SpellCrystalRespawn(mPlugin, this, mStart.getLocation(), detectionRange, mCrystalLoc, mShieldCrystal));
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
 			mCutscene = false;
 			List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
@@ -443,14 +440,14 @@ public final class Lich extends BossAbilityGroup {
 					mT++;
 					if (mT == 20 * 1) {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone().add(0, 14, 0));
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						switchArmor("LichTwo");
 					}
 					if (mT == 20 * 3) {
-						world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 5.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5.0f, 1.0f);
 					}
 					if (mT == 20 * 5) {
 						for (int i = 0; i < mCrystalLoc.size(); i++) {
@@ -465,7 +462,7 @@ public final class Lich extends BossAbilityGroup {
 								@Override
 								public void run() {
 									if (mInc == 0) {
-										world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 1.0f);
+										world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3.0f, 1.0f);
 										try {
 											mSkull = EntityUtils.getSummonEntityAt(
 												startLoc.clone().add(vec.multiply(2 / distance)),
@@ -483,27 +480,26 @@ public final class Lich extends BossAbilityGroup {
 										return;
 									}
 
-									new PartialParticle(Particle.SOUL_FIRE_FLAME, mSkull.getLocation(), 4, 0, 0, 0,
-										0.03).spawnAsEntityActive(boss);
+									new PartialParticle(Particle.SOUL_FIRE_FLAME, mSkull.getLocation(), 4,
+										0, 0, 0, 0.03).spawnAsEntityActive(boss);
 
-									// slight delay to prevent exploding too early incase the wither skull somehow
-									// despawned
+									// slight delay to prevent exploding too early in case the wither skull somehow despawned
 									if ((mInc >= 25 && !mSkull.isValid())) {
 										if (mSkull.isValid()) {
 											mSkull.remove();
 										}
-										List<Block> badBlockList = new ArrayList<Block>();
-										Location testloc = endLoc.clone();
+										List<Block> badBlockList = new ArrayList<>();
+										Location testLoc = endLoc.clone();
 										// get blocks around loc
 										Location bLoc = endLoc.clone();
 
 										for (int x = -3; x <= 2; x++) {
-											testloc.setX(bLoc.getX() + x);
+											testLoc.setX(bLoc.getX() + x);
 											for (int z = -3; z <= 2; z++) {
-												testloc.setZ(bLoc.getZ() + z);
+												testLoc.setZ(bLoc.getZ() + z);
 												for (int y = 0; y <= 5; y++) {
-													testloc.setY(bLoc.getY() + y);
-													badBlockList.add(testloc.getBlock());
+													testLoc.setY(bLoc.getY() + y);
+													badBlockList.add(testLoc.getBlock());
 												}
 											}
 										}
@@ -513,16 +509,16 @@ public final class Lich extends BossAbilityGroup {
 										}
 										new PartialParticle(Particle.EXPLOSION_NORMAL, endLoc.clone().add(0, 2, 0), 96,
 											2, 2, 2, 0).spawnAsEntityActive(boss);
-										world.playSound(endLoc, Sound.ENTITY_GENERIC_EXPLODE, 2.5f, 1.0f);
+										world.playSound(endLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.5f, 1.0f);
 										// spawn the crystal for holy chest
-										List<Location> loc = new ArrayList<Location>();
+										List<Location> loc = new ArrayList<>();
 										loc.add(endLoc);
 										spawnCrystal(loc, 1, mShieldCrystal);
 										this.cancel();
 									}
 									mInc++;
 								}
-							}.runTaskTimer(mPlugin, 2 * i, 1);
+							}.runTaskTimer(mPlugin, 2L * i, 1);
 						}
 					}
 					// finish the animation
@@ -531,10 +527,10 @@ public final class Lich extends BossAbilityGroup {
 						mCutscene = false;
 						mPhase = 2;
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone());
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
@@ -557,7 +553,7 @@ public final class Lich extends BossAbilityGroup {
 
 		events.put(50, mBoss -> {
 			forceCastSpell(SpellDiesIrae.class);
-			//prevent overkilling before ability is casted
+			//prevent overkilling before ability is cast
 			mPhase = 3;
 		});
 
@@ -599,14 +595,14 @@ public final class Lich extends BossAbilityGroup {
 					}
 					if (mT == 30) {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone().add(0, 14, 0));
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						switchArmor("LichThree");
 					}
 					if (mT == 20 * 2.5) {
-						world.playSound(mBoss.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 3.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, SoundCategory.HOSTILE, 3.0f, 1.0f);
 					}
 					if (mT >= 20 * 2.5 && mT < 64 * 2 + 20 * 2.5 && mT % 2 == 0) {
 						// blue flame from small pillar
@@ -623,8 +619,8 @@ public final class Lich extends BossAbilityGroup {
 					// also make a blast noise from boss
 					if (mT == 64 * 2 + 20 * 3.5) {
 						// blast noise
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 5.0f, 0.5f);
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 5.0f, 0.5f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 5.0f, 0.5f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5.0f, 0.5f);
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 150, 0, 0, 0, 0.75).spawnAsBoss();
 						// put out torches by growables
 						try {
@@ -679,10 +675,10 @@ public final class Lich extends BossAbilityGroup {
 						}
 
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						mBoss.teleport(mCenter.clone());
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2.0f, 1.0f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 2.0f, 1.0f);
 
 						mBoss.setInvulnerable(false);
 						mBoss.setAI(true);
@@ -710,7 +706,7 @@ public final class Lich extends BossAbilityGroup {
 
 		events.put(30, mBoss -> {
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5f, 10.0f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.5f, 10.0f);
 			Location southSpawn = mStart.getLocation();
 			Location northSpawn = mStart.getLocation();
 			southSpawn.setZ(southSpawn.getZ() + 23);
@@ -726,7 +722,7 @@ public final class Lich extends BossAbilityGroup {
 
 		events.put(20, mBoss -> {
 			World world = mBoss.getWorld();
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5f, 10.0f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 0.5f, 10.0f);
 			Location eastSpawn = mStart.getLocation();
 			Location westSpawn = mStart.getLocation();
 			eastSpawn.setX(eastSpawn.getX() + 23);
@@ -783,7 +779,7 @@ public final class Lich extends BossAbilityGroup {
 						// spawn crack from prerecorded locations
 						World world = mBoss.getWorld();
 						if (mT < ani.length) {
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 10.0f, 0.75f);
+							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 10.0f, 0.75f);
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
 								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
 								             + ani[mT];
@@ -812,7 +808,7 @@ public final class Lich extends BossAbilityGroup {
 							for (Player p : players) {
 								p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0));
 							}
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 5.0f, 0.5f);
+							world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 5.0f, 0.5f);
 
 							new BukkitRunnable() {
 								@Override
@@ -822,7 +818,7 @@ public final class Lich extends BossAbilityGroup {
 										             + end[1];
 									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
 									world.playSound(mStart.getLocation().add(0, 17, 0), Sound.BLOCK_ENDER_CHEST_CLOSE,
-										10.0f, 0.5f);
+										SoundCategory.HOSTILE, 10.0f, 0.5f);
 								}
 							}.runTaskLater(mPlugin, 50);
 
@@ -850,8 +846,9 @@ public final class Lich extends BossAbilityGroup {
 										mBoss.setInvulnerable(false);
 										mPhase = 1;
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.sendTitle(ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal",
-												ChatColor.GRAY + "" + ChatColor.BOLD + "Inheritor of Eternity", 10, 70, 20);
+											p.showTitle(Title.title(Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
+												Component.text("Inheritor of Eternity", NamedTextColor.GRAY, TextDecoration.BOLD),
+												Title.Times.times(Duration.ofMillis(500L), Duration.ofMillis(3500L), Duration.ofSeconds(1L))));
 											p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
 											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
@@ -886,8 +883,8 @@ public final class Lich extends BossAbilityGroup {
 	}
 
 	private void knockback(World world, int r) {
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0f, 1.0f);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 1.0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0f);
 		for (Player player : playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
@@ -1058,7 +1055,7 @@ public final class Lich extends BossAbilityGroup {
 		//damage immunity if over 15 blocks
 		if (source instanceof Player player && player.getLocation().distance(mBoss.getLocation()) > 15) {
 			event.setCancelled(true);
-			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 5);
+			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1, 5);
 			new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1).spawnAsBoss();
 			player.sendMessage(ChatColor.AQUA + "Hekawt has formed a miasma shield around himself! Get closer to pierce through the shield!");
 			//stop teleport
@@ -1079,26 +1076,26 @@ public final class Lich extends BossAbilityGroup {
 				while (!locFound) {
 					double x = FastUtils.randomDoubleInRange(-16, 16);
 					double z = FastUtils.randomDoubleInRange(-16, 16);
-					Location newloc = loc.clone().add(x, 0, z);
-					newloc.setY(mSpawnLoc.clone().getY());
-					if (newloc.distance(mSpawnLoc) < 30 && newloc.getBlock().getType() == Material.AIR) {
+					Location newLoc = loc.clone().add(x, 0, z);
+					newLoc.setY(mSpawnLoc.clone().getY());
+					if (newLoc.distance(mSpawnLoc) < 30 && newLoc.getBlock().getType() == Material.AIR) {
 						locFound = true;
 						for (int i = 0; i < 50; i++) {
-							Vector vec = LocationUtils.getDirectionTo(newloc, loc);
+							Vector vec = LocationUtils.getDirectionTo(newLoc, loc);
 							Location pLoc = mBoss.getEyeLocation();
 							pLoc.add(vec.multiply(i * 0.5));
-							if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
+							if (pLoc.distance(mBoss.getEyeLocation()) > newLoc.distance(loc)) {
 								break;
 							}
 							new PartialParticle(Particle.VILLAGER_ANGRY, pLoc, 1, 0, 0, 0, 0).spawnAsBoss();
 						}
 						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 							// 10 ticks + final check
-							Vector vector = LocationUtils.getDirectionTo(newloc, loc);
+							Vector vector = LocationUtils.getDirectionTo(newLoc, loc);
 							for (int i = 0; i < 32; i++) {
 								Location pLoc = mBoss.getEyeLocation();
 								pLoc.add(vector.multiply(i / 2));
-								if (pLoc.distance(mBoss.getEyeLocation()) > newloc.distance(loc)) {
+								if (pLoc.distance(mBoss.getEyeLocation()) > newLoc.distance(loc)) {
 									break;
 								}
 								BoundingBox box = BoundingBox.of(pLoc, 0.3, 0.3, 0.3);
@@ -1108,9 +1105,9 @@ public final class Lich extends BossAbilityGroup {
 									}
 								}
 							}
-							world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-							world.playSound(newloc, Sound.ENTITY_ENDERMAN_TELEPORT, 2.0f, 1.0f);
-							mBoss.teleport(newloc);
+							world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
+							world.playSound(newLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2.0f, 1.0f);
+							mBoss.teleport(newLoc);
 						}, 10);
 					}
 				}
@@ -1140,8 +1137,6 @@ public final class Lich extends BossAbilityGroup {
 
 		// summon undead + get undead
 		LivingEntity undead = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, summonNbt));
-
-		mSummoned.add(undead.getUniqueId());
 
 		if (summonNbt.equals("AdventurerUndead")) {
 			undead.setCustomName(ChatColor.WHITE + player.getName());
@@ -1212,7 +1207,7 @@ public final class Lich extends BossAbilityGroup {
 
 	public static void spawnCrystal(List<Location> crystalLoc, double count, String nbt) {
 		World world = mStart.getWorld();
-		List<Location> missing = new ArrayList<Location>();
+		List<Location> missing = new ArrayList<>();
 		// find pillars without crystal to spawn
 		for (Location l : crystalLoc) {
 			Collection<Entity> e = l.getWorld().getNearbyEntities(l, 1.5, 1.5, 1.5);
@@ -1234,7 +1229,7 @@ public final class Lich extends BossAbilityGroup {
 				if (nbt.equals(mShieldCrystal) && playersInRange(mStart.getLocation(), detectionRange, true).size() >= mShieldMin) {
 					LibraryOfSoulsIntegration.summon(spawnLoc.clone().subtract(0, 1, 0), mCrystalShield);
 				}
-				world.playSound(spawnLoc, Sound.BLOCK_BEACON_ACTIVATE, 5.0f, 1.0f);
+				world.playSound(spawnLoc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 5.0f, 1.0f);
 				missing.remove(spawnLoc);
 				count--;
 			}
@@ -1254,7 +1249,7 @@ public final class Lich extends BossAbilityGroup {
 		if (!mCursed.contains(p)) {
 			mCursed.add(p);
 		}
-		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 0.5f);
+		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 0.5f);
 		AbilityUtils.increaseHealingPlayer(p, 20 * time, -0.5, "CurseEffect");
 		AbilityUtils.increaseDamageRecievedPlayer(p, 20 * time, 1.0, "CurseEffect");
 		p.sendMessage(ChatColor.LIGHT_PURPLE + "I CAST DOWN DOOM UPON THEE, AND CURSE YOUR VERY BONES. YOU SHALL JOIN MY REVENANTS.");
@@ -1283,12 +1278,12 @@ public final class Lich extends BossAbilityGroup {
 		return mCursed;
 	}
 
-	public static void removemCursed(Player p) {
+	public static void removeCursed(Player p) {
 		mCursed.remove(p);
 	}
 
-	public static void bossGotHit(boolean gothit) {
-		mGotHit = gothit;
+	public static void bossGotHit(boolean gotHit) {
+		mGotHit = gotHit;
 	}
 
 	public static boolean getCD() {
@@ -1298,7 +1293,7 @@ public final class Lich extends BossAbilityGroup {
 	private void die() {
 		mDefeated = true;
 		List<Player> players = playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() <= 0) {
+		if (players.isEmpty()) {
 			return;
 		}
 		//force leave shadow realm
@@ -1370,7 +1365,7 @@ public final class Lich extends BossAbilityGroup {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, 15, 1f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.HOSTILE, 15, 1f);
 				Location loc = mBoss.getLocation();
 				// Lich BEGONE
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
@@ -1394,9 +1389,8 @@ public final class Lich extends BossAbilityGroup {
 				LibraryOfSoulsIntegration.summon(loc, "LichMainhand");
 				LibraryOfSoulsIntegration.summon(loc, "LichOffhand");
 				// get all armor stand
-				Collection<ArmorStand> armorstand = new ArrayList<ArmorStand>();
-				armorstand.addAll(loc.getNearbyEntitiesByType(ArmorStand.class, 1));
-				for (LivingEntity e : armorstand) {
+				Collection<ArmorStand> armorStands = new ArrayList<>(loc.getNearbyEntitiesByType(ArmorStand.class, 1));
+				for (LivingEntity e : armorStands) {
 					double x = FastUtils.randomDoubleInRange(-0.6, 0.6);
 					double z = FastUtils.randomDoubleInRange(-0.6, 0.6);
 					Vector vec = new Vector(x, 0.1, z);
@@ -1405,7 +1399,7 @@ public final class Lich extends BossAbilityGroup {
 
 						@Override
 						public void run() {
-							if (e.isOnGround() == true) {
+							if (e.isOnGround()) {
 								this.cancel();
 								e.setGravity(false);
 								if (e.getScoreboardTags().contains("lichhead")) {
@@ -1453,9 +1447,10 @@ public final class Lich extends BossAbilityGroup {
 								"scoreboard players set " + p.getUniqueId() + " MusicCooldown 10000");
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 								"execute as " + p.getUniqueId() + " run function monumenta:mechanisms/music/music_stop");
-							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
-							p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
-								ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
+							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
+							p.showTitle(Title.title(Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
+								Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
+								Title.Times.times(Duration.ofMillis(500L), Duration.ofSeconds(4L), Duration.ofMillis(500L))));
 						}
 
 						new BukkitRunnable() {
@@ -1488,21 +1483,25 @@ public final class Lich extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 10, 0.5f);
 
 		//prevent players above the barrier ceiling from seeing title
-		String title = ChatColor.GOLD + "" + ChatColor.BOLD + "VI" +
-			               ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "C" +
-			               ChatColor.GOLD + "" + ChatColor.BOLD + "T" +
-			               ChatColor.GOLD + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "OR" +
-			               ChatColor.GOLD + "" + ChatColor.BOLD + "Y";
+		Component title = Component.text("", NamedTextColor.GOLD, TextDecoration.BOLD)
+			.append(Component.text("VI"))
+			.append(Component.text("C").decoration(TextDecoration.OBFUSCATED, true))
+			.append(Component.text("T"))
+			.append(Component.text("OR").decoration(TextDecoration.OBFUSCATED, true))
+			.append(Component.text("Y"));
 
-		String subtitle = ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "H" +
-			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "ek" +
-			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "aw" +
-			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "t, Th" +
-			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "" + ChatColor.MAGIC + "e" +
-			                  ChatColor.DARK_GRAY + "" + ChatColor.BOLD + " Eternal";
+		Component subtitle = Component.text("", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
+			.append(Component.text("H").decoration(TextDecoration.OBFUSCATED, true))
+			.append(Component.text("ek"))
+			.append(Component.text("aw").decoration(TextDecoration.OBFUSCATED, true))
+			.append(Component.text("t, Th"))
+			.append(Component.text("e").decoration(TextDecoration.OBFUSCATED, true))
+			.append(Component.text(" Eternal"));
 
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-			p.sendTitle(title, subtitle, 0, 80, 20);
+			p.showTitle(Title.title(title,
+				subtitle,
+				Title.Times.times(Duration.ofMillis(0), Duration.ofSeconds(4L), Duration.ofSeconds(1L))));
 		}
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -1529,7 +1528,7 @@ public final class Lich extends BossAbilityGroup {
 				if (mT == dio.length) {
 					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 					mBoss.teleport(mStart.getLocation().add(0, 10, 0));
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3.0f, 0.5f);
 					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.1).spawnAsBoss();
 					particles(world);
 				}
@@ -1556,7 +1555,7 @@ public final class Lich extends BossAbilityGroup {
 				public void run() {
 					if (!mTrigger) {
 						mTrigger = true;
-						world.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1.25f);
+						world.playSound(p.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
 					}
 					Location pLoc = mStart.clone().add(mVec.clone().multiply(mT));
 					new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 2, 0.1, 0.1, 0.1, 0.02).spawnAsBoss();
@@ -1575,7 +1574,7 @@ public final class Lich extends BossAbilityGroup {
 	private void p4(World world) {
 		mDead = false;
 		mCounter = 0;
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 3.0f, 1.0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3.0f, 1.0f);
 		new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mBoss.getLocation(), 150, 0, 0, 0, 0.75).spawnAsBoss();
 		FallingBlock block = world.spawnFallingBlock(mBoss.getLocation().add(0, 3.5, 0), Bukkit.createBlockData(Material.OBSIDIAN));
 		block.setGravity(false);
@@ -1638,7 +1637,7 @@ public final class Lich extends BossAbilityGroup {
 		// spawn crystals, delay to allow for arena respawn
 		BossBar timer = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		timer.setVisible(true); //p4 substitute
-		double timelimit = 200.0d * 20.0d;
+		double timeLimit = 200.0d * 20.0d;
 
 		//initialize
 		mTowerGroup.add(mTower0);
@@ -1721,7 +1720,7 @@ public final class Lich extends BossAbilityGroup {
 					}
 				}
 				//boss bar stuff, 200s time limit
-				double progress = (timelimit - mT) / timelimit;
+				double progress = (timeLimit - mT) / timeLimit;
 				if (progress >= 0) {
 					timer.setProgress(progress);
 				}
@@ -1731,7 +1730,7 @@ public final class Lich extends BossAbilityGroup {
 					timer.setColor(BarColor.YELLOW);
 				}
 				if (mT % 20 == 0) {
-					int chat = (int) timelimit;
+					int chat = (int) timeLimit;
 					timer.setTitle(ChatColor.YELLOW + "Soul dissipating in " + (chat - mT) / 20 + " seconds!");
 				}
 				for (Player player : remaining) {
@@ -1741,7 +1740,7 @@ public final class Lich extends BossAbilityGroup {
 						timer.addPlayer(player);
 					}
 					//kill player if time runs out. show that they are dying extremely quickly
-					if (mT > timelimit) {
+					if (mT > timeLimit) {
 						player.setNoDamageTicks(0);
 						BossUtils.bossDamagePercent(mBoss, player, 0.1);
 					}
@@ -1750,7 +1749,7 @@ public final class Lich extends BossAbilityGroup {
 
 				//Psychological bell ringing
 				int bellCD = 4 * 20;
-				if (mT >= timelimit - 11 * bellCD && mT % bellCD == 0 && mT <= timelimit) {
+				if (mT >= timeLimit - 11 * bellCD && mT % bellCD == 0 && mT <= timeLimit) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 						//play bell sound multiple times to make it louder
 						p.playSound(p.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.HOSTILE, 5, 0.5f);
@@ -1855,7 +1854,7 @@ public final class Lich extends BossAbilityGroup {
 	}
 
 	private void finalAnimation(FallingBlock block) {
-		// invuln players
+		// invulnerable players
 		List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
 		for (Player player : players) {
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
@@ -1868,19 +1867,19 @@ public final class Lich extends BossAbilityGroup {
 			public void run() {
 				mDead = true;
 				World world = mBoss.getWorld();
-				String[] finaldio = new String[] {
+				String[] finalDialog = new String[] {
 					"I SHOULD NOT HAVE EMERGED... THE VEIL IS FRAYING.",
 					"THERE IS POWER OUT THERE THAT COULD BE MINE, IF ONLY I HAD REMAINED.",
 					"SEARCHING... SOMETHING HAS BROKEN..."
 				};
-				String[] enddio = new String[] {
+				String[] endDialog = new String[] {
 					"REALITY...",
 					"WOULD...",
 					"BE...",
 					"MINE..."
 				};
 				// beams
-				Collection<EnderCrystal> crystals = new ArrayList<EnderCrystal>();
+				Collection<EnderCrystal> crystals = new ArrayList<>();
 				spawnCrystal(mPassive2Loc, 4, "WarpedCrystal");
 				for (Location l : mPassive2Loc) {
 					crystals.addAll(l.getNearbyEntitiesByType(EnderCrystal.class, 10));
@@ -1901,9 +1900,9 @@ public final class Lich extends BossAbilityGroup {
 							new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation().add(0, 5, 0), 5, 10, 5, 10, 0).spawnAsBoss();
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 10, 1);
 						}
-						if (mT % 3 == 0 && mDio < finaldio.length) {
+						if (mT % 3 == 0 && mDio < finalDialog.length) {
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.LIGHT_PURPLE + finaldio[mDio].toUpperCase());
+								p.sendMessage(ChatColor.LIGHT_PURPLE + finalDialog[mDio].toUpperCase());
 							}
 							mDio++;
 						}
@@ -1917,7 +1916,7 @@ public final class Lich extends BossAbilityGroup {
 							new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 2, 0.5, 0.5, 0.5, 0).spawnAsBoss();
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE,
 								15, 0.8f);
-							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, 15, 0.75f);
+							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.HOSTILE, 15, 0.75f);
 
 							// Lich BEGONE
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
@@ -1946,9 +1945,9 @@ public final class Lich extends BossAbilityGroup {
 							LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "LichMainhand");
 							LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "LichOffhand");
 							// get all armor stand
-							Collection<ArmorStand> armorstand = new ArrayList<ArmorStand>();
-							armorstand.addAll(mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, 1));
-							for (LivingEntity e : armorstand) {
+							Collection<ArmorStand> armorStands = new ArrayList<>();
+							armorStands.addAll(mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, 1));
+							for (LivingEntity e : armorStands) {
 								double x = FastUtils.randomDoubleInRange(-1.2, 1.2);
 								double z = FastUtils.randomDoubleInRange(-1.2, 1.2);
 								Vector vec = new Vector(x, 0, z);
@@ -1957,7 +1956,7 @@ public final class Lich extends BossAbilityGroup {
 
 									@Override
 									public void run() {
-										if (e.isOnGround() == true) {
+										if (e.isOnGround()) {
 											this.cancel();
 											e.setGravity(false);
 											if (e.getScoreboardTags().contains("lichhead")) {
@@ -2001,13 +2000,13 @@ public final class Lich extends BossAbilityGroup {
 
 								@Override
 								public void run() {
-									if (mT != 1 && mDio < enddio.length) {
+									if (mT != 1 && mDio < endDialog.length) {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.sendMessage(ChatColor.LIGHT_PURPLE + enddio[mDio].toUpperCase());
+											p.sendMessage(ChatColor.LIGHT_PURPLE + endDialog[mDio].toUpperCase());
 										}
 										mDio++;
 									}
-									if (mT >= enddio.length + 4) {
+									if (mT >= endDialog.length + 4) {
 										this.cancel();
 										mBoss.remove();
 										// kill mobs again
@@ -2017,10 +2016,11 @@ public final class Lich extends BossAbilityGroup {
 											e.setHealth(0);
 										}
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 100f, 0.8f);
+											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
 											ScoreboardUtils.setScoreboardValue(p, "MusicCooldown", 0);
-											p.sendTitle(ChatColor.GOLD + "" + ChatColor.BOLD + "VICTORY",
-												ChatColor.DARK_GRAY + "" + ChatColor.BOLD + "Hekawt, The Eternal", 10, 80, 10);
+											p.showTitle(Title.title(Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
+												Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
+												Title.Times.times(Duration.ofMillis(500L), Duration.ofSeconds(4L), Duration.ofMillis(500L))));
 										}
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
@@ -2052,7 +2052,7 @@ public final class Lich extends BossAbilityGroup {
 
 	public static List<Player> playersInRange(Location bossLoc, double range, boolean stealth) {
 		List<Player> players = PlayerUtils.playersInRange(bossLoc, range, stealth);
-		List<Player> toRemove = new ArrayList<Player>();
+		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
 			Location playerLoc = p.getLocation();
 			playerLoc.setY(mStart.getLocation().getY());

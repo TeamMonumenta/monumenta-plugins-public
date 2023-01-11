@@ -29,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,7 +69,7 @@ public class EarthenWrath extends DepthsAbility {
 		mDamageAbsorbed = 0;
 
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 10, 1);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 10, 1);
 
 		DepthsParty party = DepthsManager.getInstance().getDepthsParty(mPlayer);
 		if (party == null) {
@@ -104,7 +105,7 @@ public class EarthenWrath extends DepthsAbility {
 					new PartialParticle(Particle.CRIT_MAGIC, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.BLOCK_DUST, mPlayer.getLocation().add(0, 0.5, 0), 30, 1, 0.5, 1, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 
-					world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, 10, mPitch);
+					world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 10, mPitch);
 
 					mPitch += 0.1f;
 				}
@@ -120,12 +121,12 @@ public class EarthenWrath extends DepthsAbility {
 							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.getLinkedSpell());
 						}
 
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0.5f);
 						new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsPlayerActive(mPlayer);
 					} else {
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1f, 2f);
+						world.playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 1f, 2f);
 					}
 
 				}
@@ -159,8 +160,8 @@ public class EarthenWrath extends DepthsAbility {
 			Location wrathLoc = mPlayer.getLocation();
 			Location otherLoc = otherPlayer.getLocation();
 
-			world.playSound(wrathLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 2);
-			world.playSound(otherLoc, Sound.ITEM_SHIELD_BLOCK, 1, 2);
+			world.playSound(wrathLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 1, 2);
+			world.playSound(otherLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 2);
 			new PartialParticle(Particle.TOTEM, otherLoc, 30, 0.1, 0.1, 0.1, 0.6).spawnAsPlayerActive(mPlayer);
 
 			Location pLoc = otherLoc.clone().add(0, 0.5, 0);

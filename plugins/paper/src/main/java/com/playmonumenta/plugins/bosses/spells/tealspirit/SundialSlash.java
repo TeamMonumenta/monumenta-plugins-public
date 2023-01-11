@@ -13,6 +13,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,11 +69,11 @@ public class SundialSlash extends Spell {
 
 					mDeg += DEGREES;
 
-					world.playSound(bossLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.75f);
+					world.playSound(bossLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.75f);
 				}
 
 				if (mT % TIME_PER == 2) {
-					world.playSound(bossLoc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 0.5f);
+					world.playSound(bossLoc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 0.5f);
 				}
 
 				if (mT >= TIME_PER * 4) {

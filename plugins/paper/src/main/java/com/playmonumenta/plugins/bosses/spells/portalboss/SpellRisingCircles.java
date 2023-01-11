@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -66,12 +67,12 @@ public class SpellRisingCircles extends Spell {
 
 				//Play knockup sound
 				if (mT % 20 == 0 && mT < 100) {
-					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 10, 0f + (mT / 100.0f));
+					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 10, 0f + (mT / 100.0f));
 				}
 
 				if (mT == 100) {
-					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 10.5f, 2);
-					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 10.5f, 1);
+					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 10.5f, 2);
+					world.playSound(mStartLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 10.5f, 1);
 
 					//Increments the x counter based on how large the circle is
 					int inc = 3;

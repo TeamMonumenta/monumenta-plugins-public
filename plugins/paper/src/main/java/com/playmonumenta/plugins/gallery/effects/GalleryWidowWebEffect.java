@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +35,8 @@ public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 	public void onPlayerHurt(GalleryPlayer player, DamageEvent event, @Nullable LivingEntity enemy) {
 		if (mTimer <= 0 && enemy != null) {
 			new PartialParticle(Particle.SOUL, player.getPlayer().getEyeLocation()).delta(3, 1, 3).count(50).spawnAsPlayerBuff(player.getPlayer());
-			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, 0.64f, 0.5f);
-			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, 2, 0.5f);
+			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 0.64f, 0.5f);
+			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 2, 0.5f);
 			mTimer = EFFECT_COOLDOWN;
 			for (LivingEntity le : EntityUtils.getNearbyMobs(player.getPlayer().getLocation(), EFFECT_STUN_RADIUS)) {
 				EntityUtils.applyStun(GalleryManager.mPlugin, EFFECT_STUN_DURATION, le);

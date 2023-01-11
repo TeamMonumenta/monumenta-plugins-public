@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.boss.BarColor;
@@ -46,7 +47,7 @@ public class RewriteHistory extends Spell {
 			public void run() {
 				if (mChargeHealth.getTime() % 2 == 0) {
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
-						p.playSound(p.getLocation(), Sound.ENTITY_CAT_HISS, 2f, 0.5f + (mChargeHealth.getTime() / 80f) * 1.5f);
+						p.playSound(p.getLocation(), Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 2f, 0.5f + (mChargeHealth.getTime() / 80f) * 1.5f);
 					});
 				}
 				if (mChargeHealth.nextTick()) {
@@ -58,7 +59,7 @@ public class RewriteHistory extends Spell {
 							.count(120)
 							.extraRange(0.15, 1)
 							.spawnAsBoss();
-						p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 0.0f);
+						p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 1f, 0.0f);
 					});
 					mStack += 1;
 					this.cancel();

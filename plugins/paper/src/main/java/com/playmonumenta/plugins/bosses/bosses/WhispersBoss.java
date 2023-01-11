@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
@@ -49,7 +50,7 @@ public class WhispersBoss extends BossAbilityGroup {
 				public void run() {
 					if (!player.isDead() && !mBoss.isDead() && !event.isCancelled()) {
 						mStolenPlayers.add(player);
-						player.playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 5, 1f);
+						player.playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 5, 1f);
 						EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("Whispers" + mBoss.getUniqueId(), -mParam.PERCENT_DAMAGE / 100.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 						BukkitRunnable cleanse = new BukkitRunnable() {
 							@Override

@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -27,7 +28,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SWEEP_ATTACK, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15).spawnAsEntityActive(boss);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0f);
 			},
 			// Warning particles
 			(Location loc) -> {
@@ -37,8 +38,8 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SWEEP_ATTACK, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 1.65f);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.85f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 1.65f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 0.85f);
 			},
 			// Attack hit a player
 			(LivingEntity target) -> {
@@ -46,7 +47,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 					Bukkit.getScheduler().runTaskLater(plugin, () -> {
 						new PartialParticle(Particle.LAVA, player.getLocation(), 80, 1.25, 0.1, 1.25, 0).spawnAsEntityActive(boss);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 50, 1.25, 0.1, 1.25, 0).spawnAsEntityActive(boss);
-						boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.85f, 1f);
+						boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.85f, 1f);
 						BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
 						player.setVelocity(new Vector(0, 1.15, 0));
 						boss.setVelocity(new Vector(0, 1.23, 0));
@@ -54,8 +55,8 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 
 						Bukkit.getScheduler().runTaskLater(plugin, () -> {
 							BossUtils.blockableDamage(boss, player, DamageType.MELEE, 12);
-							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.3F, 1);
-							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.3F, 0);
+							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.3F, 1);
+							boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.3F, 0);
 							Location loc = player.getLocation().add(0, 1, 0);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 							new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.175).spawnAsEntityActive(boss);

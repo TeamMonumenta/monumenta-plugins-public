@@ -10,6 +10,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -41,7 +42,7 @@ public class ShadePossessedBoss extends BossAbilityGroup {
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
 
-		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 20, 0.2, 0.3, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 200, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 

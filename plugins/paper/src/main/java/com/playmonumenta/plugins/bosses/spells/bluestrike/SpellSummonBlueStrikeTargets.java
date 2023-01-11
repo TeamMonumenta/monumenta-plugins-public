@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
@@ -60,7 +61,7 @@ public class SpellSummonBlueStrikeTargets extends Spell {
 		mTimer--;
 		if (mTimer < 0) {
 			mTimer = mTimeBetween;
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1.0f, 0.8f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GHAST_SCREAM, SoundCategory.HOSTILE, 1.0f, 0.8f);
 			int spawns = mMobsPer * PlayerUtils.playersInRange(mCenter, 100, true).size() + BASE_SPAWNS;
 
 			if (EntityUtils.getNearbyMobs(mCenter, 100, EnumSet.of(EntityType.SHULKER)).size() == 0) {

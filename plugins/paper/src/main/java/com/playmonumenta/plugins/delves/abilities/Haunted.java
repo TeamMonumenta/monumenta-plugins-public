@@ -14,6 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -88,14 +89,14 @@ public class Haunted {
 
 				// Hit detection
 				if (mHitTimer <= 0 && distance < 1) {
-					p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1f, 2f);
-					p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_PLAYER_HURT, 1f, 0.5f);
+					p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, SoundCategory.HOSTILE, 1f, 2f);
+					p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 
 					Location loc = p.getLocation().add(0, 1, 0);
 					BossUtils.bossDamagePercent(armorStand, p, DAMAGE);
 					if (p.isDead()) {
-						p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_GHAST_HURT, 1f, 0.5f);
-						p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1f, 0.65f);
+						p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_GHAST_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
+						p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 1f, 0.65f);
 
 						new PartialParticle(Particle.SOUL, loc, 70, 0, 0, 0, 0.15)
 							.minimumMultiplier(false).spawnAsPlayerActive(p);
@@ -118,7 +119,7 @@ public class Haunted {
 				//Sounds
 				distance = mSLoc.distance(p.getLocation());
 				if (distance <= 16 && mRangeCD <= 0) {
-					p.playSound(armorStand.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 1.75f, 0f);
+					p.playSound(armorStand.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, SoundCategory.HOSTILE, 1.75f, 0f);
 					mRangeCD = 70;
 				}
 				mRangeCD--;

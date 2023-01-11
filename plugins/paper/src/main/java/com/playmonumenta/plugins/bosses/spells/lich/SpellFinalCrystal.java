@@ -129,18 +129,18 @@ public class SpellFinalCrystal extends Spell {
 				//exit function
 				mCrystal.removeIf(en -> !en.isValid());
 				if (mCrystal.size() == 0 || Lich.bossDead()) {
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, 4.0f, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 4.0f, 0.5f);
 					bar.setVisible(false);
 					this.cancel();
 				}
 				//warning 1
 				if (mT == 20 * 2) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3.0f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color yellow");
 				}
 				//warning 2
 				if (mT == 20 * 4) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3.0f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color red");
 				}
 				//execute order 66
@@ -180,7 +180,7 @@ public class SpellFinalCrystal extends Spell {
 	private void attack() {
 		mBombActive = true;
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10.0f, 0.5f);
 		//kill ghast shield
 		for (Location loc : mCrystalLoc) {
 			List<LivingEntity> enList = EntityUtils.getNearbyMobs(loc, 3);
@@ -211,7 +211,7 @@ public class SpellFinalCrystal extends Spell {
 							block.remove();
 							block.getLocation().getBlock().setType(Material.AIR);
 							//limit particle count for ability stacking
-							world.playSound(block.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+							world.playSound(block.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 							Location loc = block.getLocation();
 
 							BukkitRunnable runC = new BukkitRunnable() {

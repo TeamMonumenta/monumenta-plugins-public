@@ -33,6 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -51,8 +52,8 @@ public class YellowTesseractOverride extends BaseOverride {
 	private static final String CLASS_STR = "Class: ";
 	private static final String SPEC_STR = "Specialization: ";
 	private static final String PREFIX = " - ";
-	private static final String CLASSL_STR = "Class Level: ";
-	private static final String SPECL_STR = "Specialization Level: ";
+	private static final String CLASS_LEVEL_STR = "Class Level: ";
+	private static final String SPEC_LEVEL_STR = "Specialization Level: ";
 	private static final String ENHANCE_STR = "Enhancement Level: ";
 
 	private static final double MOB_RANGE = 20;
@@ -173,7 +174,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
 		new PartialParticle(Particle.BLOCK_DUST, pLoc, 10, 0.5, 0.5, 0.5, 0, Material.BLACK_CONCRETE.createBlockData()).spawnAsPlayerActive(player);
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 2.5f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has been reset!", NamedTextColor.YELLOW));
 	}
 
@@ -190,7 +191,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
 		new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
-		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 2.5f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
 
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
@@ -210,7 +211,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
 		new PartialParticle(Particle.SNOWBALL, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
-		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1, 2.5f);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
 
 		ItemStatUtils.generateItemStats(item);
@@ -226,8 +227,8 @@ public class YellowTesseractOverride extends BaseOverride {
 			String line = lore.get(i);
 			if (line.startsWith(CLASS_STR)
 				|| line.startsWith(SPEC_STR)
-				|| line.startsWith(CLASSL_STR)
-				|| line.startsWith(SPECL_STR)
+				|| line.startsWith(CLASS_LEVEL_STR)
+				|| line.startsWith(SPEC_LEVEL_STR)
 				|| line.startsWith(ENHANCE_STR)
 				|| line.startsWith(PREFIX)) {
 				ItemStatUtils.removeLore(item, i);
@@ -257,9 +258,9 @@ public class YellowTesseractOverride extends BaseOverride {
 		}
 
 		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(CLASS_STR + AbilityUtils.getClass(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(CLASSL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(CLASS_LEVEL_STR + (totalLevel - classLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(SPEC_STR + AbilityUtils.getSpec(player), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
-		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(SPECL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
+		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(SPEC_LEVEL_STR + (totalSpec - specLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		ItemStatUtils.addLore(copyItem, newLoreIdx++, Component.text(ENHANCE_STR + (totalEnhance - enhanceLevel), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 
 		MonumentaClasses mClasses = new MonumentaClasses();

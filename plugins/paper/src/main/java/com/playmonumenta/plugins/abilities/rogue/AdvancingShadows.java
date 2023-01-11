@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -244,7 +245,7 @@ public class AdvancingShadows extends Ability {
 								new BukkitRunnable() {
 									@Override
 									public void run() {
-										world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_RESONATE, 1, pitch);
+										world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1, pitch);
 									}
 								}.runTaskLater(mPlugin, i);
 							}

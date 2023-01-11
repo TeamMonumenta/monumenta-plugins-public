@@ -30,11 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.boss.BarColor;
@@ -74,9 +78,8 @@ public final class Nucleus extends BossAbilityGroup {
 	public boolean mCanSpawnMobs = true;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Nucleus(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new Nucleus(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -126,7 +129,7 @@ public final class Nucleus extends BossAbilityGroup {
 		}
 
 		new BukkitRunnable() {
-			Mob mTendrils = (Mob) mBoss;
+			final Mob mTendrils = (Mob) mBoss;
 			@Override
 			public void run() {
 				if (!mBoss.isValid() || mBoss.isDead()) {
@@ -204,21 +207,35 @@ public final class Nucleus extends BossAbilityGroup {
 			music
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		events.put(90, (mBoss) -> {
-			mCanSpawnMobs = true;
-		});
+		Map<Integer, BossHealthAction> events = new HashMap<>();
+		events.put(90, (mBoss) -> mCanSpawnMobs = true);
 		events.put(60, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase2Spells, phase2Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" Beyond... I \",\"color\":\"red\"},{\"text\":\"nb\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" push further into \",\"color\":\"red\"},{\"text\":\"nbff\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"this reality... Quickness... Yes... \",\"color\":\"red\"},{\"text\":\"hggghg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\" Sink...\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
+					.append(Component.text(" Beyond... I "))
+					.append(Component.text("nb").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" push further into "))
+					.append(Component.text("nbff").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("this reality... Quickness... Yes... "))
+					.append(Component.text("hggghg").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text(" Sink...")));
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
 		events.put(20, (mBoss) -> {
 			mCooldownTicks -= 30;
 			changePhase(phase3Spells, phase3Passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" This \",\"color\":\"red\"},{\"text\":\"ygg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Void sustains me... Faster now... \",\"color\":\"red\"},{\"text\":\"hfhu\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"Faster...\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.RED)
+					.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
+					.append(Component.text(" This "))
+					.append(Component.text("ygg").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("Void sustains me... Faster now... "))
+					.append(Component.text("hfhu").decoration(TextDecoration.OBFUSCATED, true))
+					.append(Component.text("Faster...")));
 			forceCastSpell(SpellTectonicDevastation.class);
 			hide();
 		});
@@ -232,12 +249,12 @@ public final class Nucleus extends BossAbilityGroup {
 		mEyesKilled++;
 
 		if (mEyesKilled >= EYE_KILL_COUNT) {
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"The nucleus is exposed!\",\"color\":\"red\"}]");
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("The nucleus is exposed!", NamedTextColor.RED));
 			expose();
 		} else {
-			for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), 50, true)) {
-				p.sendMessage(ChatColor.RED + "You killed an eye! You need to take down " + (EYE_KILL_COUNT - mEyesKilled) + " more!");
-			}
+			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				.sendMessage(Component.text("You killed an eye! You need to take down " + (EYE_KILL_COUNT - mEyesKilled) + " more!", NamedTextColor.RED));
 		}
 	}
 
@@ -306,8 +323,8 @@ public final class Nucleus extends BossAbilityGroup {
 				newEye.setGlowing(true);
 				loc.getBlock().getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.FIRE);
 
-				mBoss.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, 20.0f, 1.0f);
-				mBoss.getWorld().playSound(loc, Sound.BLOCK_GRASS_PLACE, 20.0f, 1.0f);
+				mBoss.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 20.0f, 1.0f);
+				mBoss.getWorld().playSound(loc, Sound.BLOCK_GRASS_PLACE, SoundCategory.HOSTILE, 20.0f, 1.0f);
 
 				new BukkitRunnable() {
 
@@ -332,7 +349,7 @@ public final class Nucleus extends BossAbilityGroup {
 
 		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
-		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, party == null ? 0 : (party.getFloor() - 1) / 3));
+		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, party == null ? 0 : (party.getFloor() - 1) / 3.0));
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
@@ -345,7 +362,7 @@ public final class Nucleus extends BossAbilityGroup {
 			@Override
 			public void run() {
 				mTicks += 5;
-				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 20.0f, 0.5f + (mTicks / 25));
+				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, SoundCategory.HOSTILE, 20.0f, 0.5f + (mTicks / 25.0f));
 
 				//launch event related spawn commands
 				if (mTicks >= 6 * 20) {
@@ -353,7 +370,7 @@ public final class Nucleus extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Gyrhaeddant", ChatColor.DARK_RED + "The Nucleus");
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 					}
 				}
 
@@ -366,9 +383,19 @@ public final class Nucleus extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"[Gyrhaeddant Nucleus]\",\"color\":\"gold\"},{\"text\":\" B\",\"color\":\"red\"},{\"text\":\"ngrbgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"A\",\"color\":\"red\"},{\"text\":\"gbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"C\",\"color\":\"red\"},{\"text\":\"bggbg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"K!!! AWAY!!! This world... \",\"color\":\"red\"},{\"text\":\"hhgg\",\"obfuscated\":\"true\",\"color\":\"red\"},{\"text\":\"is poison...\",\"color\":\"red\"}]");
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+			player.sendMessage(Component.text("", NamedTextColor.RED)
+				.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
+				.append(Component.text(" B"))
+				.append(Component.text("ngrbgg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("A"))
+				.append(Component.text("gbg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("C"))
+				.append(Component.text("bggbg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("K!!! AWAY!!! This world... "))
+				.append(Component.text("hhgg").decoration(TextDecoration.OBFUSCATED, true))
+				.append(Component.text("is poison...")));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 2));
 		}

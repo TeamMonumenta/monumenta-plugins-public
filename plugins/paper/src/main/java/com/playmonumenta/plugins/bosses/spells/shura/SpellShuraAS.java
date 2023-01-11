@@ -50,7 +50,7 @@ public class SpellShuraAS extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 		Collections.shuffle(players);
 		mTarget = players.get(0);
-		world.playSound(mTarget.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
+		world.playSound(mTarget.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 1.4f, 0.5f);
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			if (mTarget == null) {

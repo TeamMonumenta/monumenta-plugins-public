@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -41,7 +42,7 @@ public class InfestedBoss extends BossAbilityGroup {
 		new SpellDelayedAction(mPlugin, mBoss.getLocation(), 25,
 			// Sound effect when boss dies
 			(Location loc) -> {
-				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_DEATH, 1f, 0.65f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_DEATH, SoundCategory.HOSTILE, 1f, 0.65f);
 			},
 			// Particles while maggots incubate
 			(Location loc) -> {
@@ -50,7 +51,7 @@ public class InfestedBoss extends BossAbilityGroup {
 			},
 			// Maggots spawn
 			(Location loc) -> {
-				loc.getWorld().playSound(loc, Sound.ENTITY_SLIME_DEATH, 1f, 0.1f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_SLIME_DEATH, SoundCategory.HOSTILE, 1f, 0.1f);
 				new PartialParticle(Particle.VILLAGER_ANGRY, loc.clone().add(0, -1, 0), 20, 0.6, 0.6, 0.6, 0).spawnAsEntityActive(mBoss);
 				//TODO: Raise location up to avoid spawning in blocks?
 				for (int i = 0; i < 4; i++) {

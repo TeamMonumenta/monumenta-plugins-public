@@ -177,7 +177,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "???", ChatColor.RED + "Beast of the Blackflame");
-						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.75f);
+						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 					}
 				} else if (mTicks >= 20 * 2 && mBoss.getLocation().getY() < mSpawnLoc.getY()) {
 					mBoss.teleport(mBoss.getLocation().add(0, mYInc, 0));
@@ -223,8 +223,8 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 				World world = mBoss.getWorld();
 				Location loc = mBoss.getLocation();
-				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 5f, 0.6f);
-				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 5f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 5f, 0.6f);
+				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 5f, 1.5f);
 				new PartialParticle(Particle.SPELL_WITCH, loc.add(0, mBoss.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.VILLAGER_ANGRY, loc.add(0, mBoss.getHeight() / 2, 0), 10, 0.35, 0.5, 0.35, 0).spawnAsEntityActive(boss);
 			}
@@ -269,7 +269,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 						public void run() {
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 								MessagingUtils.sendBoldTitle(player, ChatColor.GRAY + "VICTORY", ChatColor.DARK_GRAY + "Ghalkor, Svalgot, and The Beast");
-								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 0.8f);
+								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							}
 						}
 					}.runTaskLater(mPlugin, 20 * 3);

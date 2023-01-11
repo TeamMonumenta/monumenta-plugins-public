@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
@@ -68,7 +69,7 @@ public class UnyieldingBoss extends BossAbilityGroup {
 						return;
 					}
 					if (mTicks == 0) {
-						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 2f, 1f);
+						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 2f, 1f);
 					}
 					if (mTicks % mParam.TICKS_TO_HEAL == 0 && mBoss.getHealth() > 0) {
 						double hp = mBoss.getHealth() + maxHealth * mParam.HEALING;
@@ -90,7 +91,7 @@ public class UnyieldingBoss extends BossAbilityGroup {
 		if (mHealingRunnable != null) {
 			mHealingRunnable.cancel();
 			mHealingRunnable = null;
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ITEM_BREAK, 2f, 1f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ITEM_BREAK, SoundCategory.HOSTILE, 2f, 1f);
 		}
 	}
 

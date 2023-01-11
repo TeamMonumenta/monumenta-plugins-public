@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -84,7 +85,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	                          LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
 	                          Ability[] abilities, int duration) {
 		if (p != null || playerItemStats != null) {
-			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.5f, 1.0f);
+			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 1.0f);
 
 			// tag mob to prevent it from spawning more stuff
 			damagee.addScoreboardTag("TeneGhost");

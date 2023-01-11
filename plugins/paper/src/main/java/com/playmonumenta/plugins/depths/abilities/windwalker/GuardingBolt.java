@@ -122,7 +122,7 @@ public class GuardingBolt extends DepthsAbility {
 						hasTeleported = true;
 					}
 
-					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, 0.75f, 0.9f);
+					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
 				}
 			}
 		}

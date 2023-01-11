@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -57,11 +58,11 @@ public class RadiantBlessing extends DepthsAbility {
 			mPlugin.mEffectManager.addEffect(p, ABILITY_NAME, new PercentDamageDealt(DURATION, PERCENT_DAMAGE[mRarity - 1]));
 			new PartialParticle(Particle.VILLAGER_HAPPY, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
+			world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		}
 
-		world.playSound(userLoc, Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
-		world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, 0.05f, 1.0f);
+		world.playSound(userLoc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
+		world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.05f, 1.0f);
 
 		putOnCooldown();
 	}

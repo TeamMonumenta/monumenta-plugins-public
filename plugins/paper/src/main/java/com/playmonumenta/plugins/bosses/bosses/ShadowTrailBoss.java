@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -44,7 +45,7 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 				},
 				// Hit Action
 				(World world, Player player, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					DamageUtils.damage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE);
 				},

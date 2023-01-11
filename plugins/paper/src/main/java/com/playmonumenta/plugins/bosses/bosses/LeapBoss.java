@@ -14,6 +14,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -44,12 +45,12 @@ public class LeapBoss extends BossAbilityGroup {
 				// Initiate Aesthetic
 				(World world, Location loc) -> {
 					new PartialParticle(Particle.VILLAGER_ANGRY, loc, 15, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_RAVAGER_ROAR, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Leap Aesthetic
 				(World world, Location loc) -> {
 					new PartialParticle(Particle.CLOUD, loc, 30, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.5f, 0.5f);
 				},
 				// Leaping Aesthetic
 				(World world, Location loc) -> {
@@ -66,7 +67,7 @@ public class LeapBoss extends BossAbilityGroup {
 						)
 					);
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 0.5f);
 					for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
 						BossUtils.blockableDamage(boss, p, DamageType.MELEE, DAMAGE);
 					}

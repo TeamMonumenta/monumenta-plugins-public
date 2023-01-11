@@ -109,7 +109,7 @@ public class SpellDiesIrae extends Spell {
 		mBoss.setAI(false);
 		mBoss.setGravity(false);
 		mBoss.setInvulnerable(true);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3.0f, 0.5f);
 		mCloud.location(mBoss.getLocation()).spawnAsBoss();
 
 		//get all active crystals
@@ -139,7 +139,7 @@ public class SpellDiesIrae extends Spell {
 				//exit function
 				mCrystal.removeIf(en -> !en.isValid());
 				if (mCrystal.size() == 0) {
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, 4.0f, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 4.0f, 0.5f);
 					Lich.bossGotHit(true);
 					mBoss.setAI(true);
 					mBoss.setGravity(true);
@@ -150,12 +150,12 @@ public class SpellDiesIrae extends Spell {
 				}
 				//warning 1
 				if (mT == 20 * 2) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3.0f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color yellow");
 				}
 				//warning 2
 				if (mT == 20 * 4) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3.0f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
 					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color red");
 				}
 				//execute order 66
@@ -200,7 +200,7 @@ public class SpellDiesIrae extends Spell {
 		double keyheal = mKey.getHealth() + EntityUtils.getMaxHealth(mKey) * mCrystal.size() * 0.05;
 		double keyHealthFinal = Math.min(keyheal, EntityUtils.getMaxHealth(mKey));
 
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10.0f, 0.5f);
 		//kill ghast shield
 		for (Location loc : mCrystalLoc) {
 			List<LivingEntity> enList = EntityUtils.getNearbyMobs(loc, 3);
@@ -235,7 +235,7 @@ public class SpellDiesIrae extends Spell {
 				}
 				if (mInc == 20 * 2) {
 					mHeart.location(mBoss.getEyeLocation()).spawnAsBoss();
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 3.0f, 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 3.0f, 1.5f);
 					mBoss.setHealth(healthFinal);
 					if (mKey.isValid()) {
 						mKey.setHealth(keyHealthFinal);
@@ -247,7 +247,7 @@ public class SpellDiesIrae extends Spell {
 					mBoss.teleport(pitch);
 				}
 				if (mInc == 20 * 4) {
-					world.playSound(mBoss.getLocation().clone(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 0.5f);
+					world.playSound(mBoss.getLocation().clone(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10.0f, 0.5f);
 				}
 				if (mInc >= 20 * 4 && mInc < 20 * (4 + 1)) {
 					Vector vec = LocationUtils.getVectorTo(mCenter, mBoss.getLocation()).multiply((mInc - 4 * 20) / 20d);
@@ -265,7 +265,7 @@ public class SpellDiesIrae extends Spell {
 						AbilityUtils.increaseHealingPlayer(p, debuffTicks, -1.0, "Lich");
 						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.SLOW, debuffTicks, 0));
 						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.WEAKNESS, debuffTicks, 1));
-						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.5f);
+						world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.0f, 0.5f);
 
 						// If the attack was larger than 5, mark the player with a scoreboard tag for DayOfWrath
 						if (countCrystal >= 5) {
@@ -282,7 +282,7 @@ public class SpellDiesIrae extends Spell {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
 					mCrystalDmg = 0;
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 3.0f, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 3.0f, 0.5f);
 					this.cancel();
 				}
 			}

@@ -11,6 +11,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -55,7 +56,7 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 			World world = mBoss.getWorld();
 			Location loc = target.getLocation();
-			world.playSound(loc, Sound.EVENT_RAID_HORN, 50f, 1.5f);
+			world.playSound(loc, Sound.EVENT_RAID_HORN, SoundCategory.HOSTILE, 50f, 1.5f);
 			new PartialParticle(Particle.VILLAGER_ANGRY, loc, 30, 2, 0, 2, 0).spawnAsEntityActive(mBoss);
 			new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 0.5, 0), 30, 2, 0.5, 2, 0).spawnAsEntityActive(mBoss);
 

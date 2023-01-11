@@ -12,6 +12,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -52,7 +53,7 @@ public class VindictiveBoss extends BossAbilityGroup {
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(mBoss.getLocation(), RANGE)) {
 			Location loc = mob.getEyeLocation();
-			world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 0.5f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 			new PartialParticle(Particle.FLAME, loc, 20, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 
 			plugin.mEffectManager.addEffect(mob, PERCENT_SPEED_EFFECT_NAME,

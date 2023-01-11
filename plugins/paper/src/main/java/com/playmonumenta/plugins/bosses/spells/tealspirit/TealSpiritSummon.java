@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -47,7 +48,7 @@ public class TealSpiritSummon extends Spell {
 					break;
 				}
 
-				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 0.5f, 0.4f);
+				world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 0.5f, 0.4f);
 				loc.subtract(0, 0.5, 0);
 
 				LoSPool pool = FastUtils.RANDOM.nextDouble() < ELITE_CHANCE ? ELITE_POOL : NORMAL_POOL;
@@ -68,7 +69,7 @@ public class TealSpiritSummon extends Spell {
 						for (LivingEntity summon : summoned) {
 							summon.setAI(true);
 							summon.setInvulnerable(false);
-							world.playSound(summon.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_UP, 0.5f, 0.5f);
+							world.playSound(summon.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_UP, SoundCategory.HOSTILE, 0.5f, 0.5f);
 						}
 						this.cancel();
 						return;
@@ -77,7 +78,7 @@ public class TealSpiritSummon extends Spell {
 					for (LivingEntity summon : summoned) {
 						Location summonLoc = summon.getLocation();
 						summon.teleport(summonLoc.add(0, 0.05, 0));
-						world.playSound(summonLoc, Sound.BLOCK_CALCITE_BREAK, 0.5f, 1.5f);
+						world.playSound(summonLoc, Sound.BLOCK_CALCITE_BREAK, SoundCategory.HOSTILE, 0.5f, 1.5f);
 					}
 
 					mT += 2;

@@ -199,7 +199,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 			new PartialParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(boss);
-			world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
+			world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 2);
 		} else {
@@ -240,7 +240,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 
 					new PartialParticle(Particle.SPELL_WITCH, as.getLocation(), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, as.getLocation(), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(boss);
-					world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
+					world.playSound(as.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 
 					//After 60 seconds, kill mob
 					new BukkitRunnable() {
@@ -275,7 +275,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					item.setCanPlayerPickup(true);
 					item.setGlowing(true);
 
-					world.playSound(item.getLocation(), Sound.ITEM_TOTEM_USE, 15, 0);
+					world.playSound(item.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 15, 0);
 					new PartialParticle(Particle.CRIT, item.getLocation(), 20, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 
 					PlayerUtils.executeCommandOnNearbyPlayers(item.getLocation(), 75, "tellraw @s [\"\",{\"text\":\"[Bhairavi]\",\"color\":\"gold\"},{\"text\":\" Quickly! On the hanging bookshelves! The Spear has formed! Take it and throw it at the gate!\",\"color\":\"white\"}]");

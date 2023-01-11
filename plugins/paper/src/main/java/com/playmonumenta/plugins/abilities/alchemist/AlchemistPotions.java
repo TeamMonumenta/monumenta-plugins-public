@@ -46,6 +46,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -455,7 +456,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		String mode = mGruesomeMode ? "Gruesome" : "Brutal";
 
 		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemist's Potions swapped to " + mode + " mode");
-		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, brewPitch);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, brewPitch);
 		updateAlchemistItem(mPlayer.getInventory().getItem(mSlot), mCharges);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}

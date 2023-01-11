@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -84,7 +85,7 @@ class VanityBuyScreen extends Gui {
 			mTwistedStrand = InventoryUtils.getItemFromLootTable(mPlayer, TWISTED_STRAND_LOOT_TABLE);
 		}
 		if (!mPlayer.getInventory().containsAtLeast(mTwistedStrand, VanityGUI.STRAND_COST_PER_VANITY_UNLOCK)) {
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 			mPlayer.sendMessage(Component.text("You don't have enough Twisted Strands to pay for this!", NamedTextColor.RED));
 			close();
 			return;

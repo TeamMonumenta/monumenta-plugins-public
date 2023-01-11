@@ -15,6 +15,7 @@ import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -63,7 +64,7 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 		List<Spell> passiveList = List.of(
 			new SpellRunAction(() -> {
 				if (mTarget != null && mBoss.getLocation().distance(mTarget.getLocation()) < 2) {
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.8f);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.8f);
 					PartialParticle particles = new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 10, 1, 1, 1);
 					particles.spawnAsEnemy();
 					BlueStrikeDaggerCraftingBoss targetAbility = BossUtils.getBossOfClass(mTarget, BlueStrikeDaggerCraftingBoss.class);

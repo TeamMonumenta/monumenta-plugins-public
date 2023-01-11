@@ -20,6 +20,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -188,7 +189,7 @@ public class DepthsListener implements Listener {
 			event.setCancelled(true);
 		} else if (damagee instanceof Slime && damagee.getName().contains("Eye") && shooter instanceof Player player) {
 			// Sound on shooting an eye
-			player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, 0.4f, 0.2f);
+			player.playSound(player.getLocation(), Sound.ENTITY_BAT_HURT, SoundCategory.PLAYERS, 0.4f, 0.2f);
 		}
 	}
 

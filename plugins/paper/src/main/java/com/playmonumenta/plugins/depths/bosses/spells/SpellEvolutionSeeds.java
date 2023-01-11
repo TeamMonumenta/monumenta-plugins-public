@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -65,7 +66,7 @@ public class SpellEvolutionSeeds extends Spell {
 				mPlantTypes.put(loc, evolvedType);
 				mPlants.put(loc, newPlant);
 				//Particle effects
-				newPlant.getWorld().playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 20.0f, 1.0f);
+				newPlant.getWorld().playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 20.0f, 1.0f);
 
 				break;
 			}

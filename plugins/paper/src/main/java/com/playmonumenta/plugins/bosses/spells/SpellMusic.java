@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -83,7 +84,7 @@ public class SpellMusic extends Spell {
 
 	private void play(Player player) {
 		stop(player);
-		PlayerUtils.executeCommandOnPlayer(player, "playsound " + mTrack + " record @s ~ ~ ~ 2");
+		player.playSound(player.getLocation(), mTrack, SoundCategory.RECORDS, 2.0f, 1.0f);
 	}
 
 	private void stop(Player player) {

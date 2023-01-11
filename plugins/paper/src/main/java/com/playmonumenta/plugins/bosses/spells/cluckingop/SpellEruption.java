@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,7 +39,7 @@ public class SpellEruption extends Spell {
 			public void run() {
 				mT++;
 				new PartialParticle(Particle.LAVA, mBoss.getLocation(), 20, 0.15, 0, 0.15, 0.175).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.5f, 1f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.5f, 1f);
 				for (Player player : players) {
 					new PartialParticle(Particle.LAVA, player.getLocation(), 10, 0.15, 0, 0.15, 0.175).spawnAsEntityActive(mBoss);
 				}
@@ -50,7 +51,7 @@ public class SpellEruption extends Spell {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 10));
 						new PartialParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-						world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+						world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
 						BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 						new BukkitRunnable() {
 
@@ -59,7 +60,7 @@ public class SpellEruption extends Spell {
 								BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 								new PartialParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-								world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+								world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
 								player.setVelocity(new Vector(0, -2, 0));
 								new BukkitRunnable() {
 
@@ -75,8 +76,8 @@ public class SpellEruption extends Spell {
 													BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, 1);
 													new PartialParticle(Particle.FLAME, player.getLocation(), 150, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 													new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-													world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-													world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1, 0);
+													world.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
+													world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, SoundCategory.HOSTILE, 1, 0);
 												}
 
 											}.runTaskLater(mPlugin, 1);

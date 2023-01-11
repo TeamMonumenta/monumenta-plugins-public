@@ -20,6 +20,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -125,9 +126,9 @@ public class AutoAttackTowerAbility extends TowerAbility {
 									}
 								}
 							}
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0f, 1.0f);
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3.0f, 1.0f);
-							mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3.0f, 0.5f);
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.0f, 1.0f);
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3.0f, 1.0f);
+							mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 3.0f, 0.5f);
 							this.cancel();
 						}
 					}
@@ -172,7 +173,7 @@ public class AutoAttackTowerAbility extends TowerAbility {
 
 									mPSmoke2.location(loc).spawnAsBoss();
 									mPYellow.location(loc).spawnAsBoss();
-									w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
+									w.playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0.75f);
 									this.cancel();
 								}
 							}
@@ -180,7 +181,7 @@ public class AutoAttackTowerAbility extends TowerAbility {
 							if (loc.getBlock().getType().isSolid()) {
 								mPSmoke2.location(loc).spawnAsBoss();
 								mPYellow.location(loc).spawnAsBoss();
-								w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
+								w.playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0.75f);
 								this.cancel();
 							}
 						}

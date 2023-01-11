@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -110,7 +111,7 @@ public class FireworkBlast extends DepthsAbility {
 						new PartialParticle(Particle.REDSTONE, e.getLocation(), 10, 0.25, 0.25, 0.25, GRAY_COLOR).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.REDSTONE, e.getLocation(), 5, 0.25, 0.25, 0.25, RED_COLOR).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.REDSTONE, e.getLocation(), 5, 0.25, 0.25, 0.25, ORANGE_COLOR).spawnAsPlayerActive(mPlayer);
-						world.playSound(e.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1, 2);
+						world.playSound(e.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, SoundCategory.PLAYERS, 1, 2);
 					}
 
 					this.cancel();

@@ -24,6 +24,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -429,7 +430,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			MasterworkUtils.payCost(cost, p, true);
 			item.setItemMeta(nextItem.getItemMeta());
 			ItemStatUtils.generateItemStats(item);
-			p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, 1.f, 1.f);
+			p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f);
 			return;
 		}
 
@@ -490,7 +491,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 					} else if (currMasterwork >= MAX_MASTERWORK_LEVEL && currMasterwork != 7) {
 						mInventory.setItem((row * 9) + currMasterwork + 2, mNoPossibleUpgradeItem);
 						mMapFunction.put((row * 9) + currMasterwork + 2, (p, inventory, slot) -> {
-							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_FALL, 1.f, 1.f);
+							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.f, 1.f);
 							mIsPreview = true;
 							mMagicRow = rowF;
 						});

@@ -11,6 +11,7 @@ import java.util.Collection;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class SpellPortalPassiveLava extends Spell {
 		for (ArmorStand stand : nearbyStands) {
 
 			if (stand.getScoreboardTags().contains(CUBE_TAG)) {
-				mBoss.getWorld().playSound(stand.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 5.0f, 1.0f);
+				mBoss.getWorld().playSound(stand.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.HOSTILE, 5.0f, 1.0f);
 				stand.remove();
 				mPortalBoss.cubeBrought();
 			}
@@ -57,7 +58,7 @@ public class SpellPortalPassiveLava extends Spell {
 				PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
 				p.sendMessage(ChatColor.RED + "You feel the pure, flowing energy infest you, then spit you out.");
 				p.teleport(mStartLoc.clone().add(new Vector(0, 5, 0)), PlayerTeleportEvent.TeleportCause.UNKNOWN);
-				p.playSound(p.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 1.0f, 0.6f);
+				p.playSound(p.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.HOSTILE, 1.0f, 0.6f);
 			}
 		}
 

@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -159,8 +160,8 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 				}
 
 				World world = mBoss.getWorld();
-				mFuryTarget.playSound(mFuryTarget.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 2, 1.5f);
-				world.playSound(mFuryTarget.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 2);
+				mFuryTarget.playSound(mFuryTarget.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 2, 1.5f);
+				world.playSound(mFuryTarget.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 2);
 
 				new BukkitRunnable() {
 					int mT = 0;
@@ -189,13 +190,13 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							new PartialParticle(Particle.FLAME, mLocation, 8 + (int) (completionRatio * 25), chargingRadius / 2, chargingRadius / 2, chargingRadius / 2, 0).spawnAsBoss();
 							new PartialParticle(Particle.SMOKE_LARGE, mLocation, 5 + (int) (completionRatio * 20), chargingRadius / 2.5, chargingRadius / 2.5, chargingRadius / 2.5, 0).spawnAsBoss();
 
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, (float) (2 - completionRatio));
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_LAVA_POP, 3.5f, (float) (1.5 * (2 - completionRatio)));
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, (float) (2 - completionRatio));
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, (float) (2 - completionRatio));
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, (float) (2 - completionRatio));
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_LAVA_POP, SoundCategory.HOSTILE, 3.5f, (float) (1.5 * (2 - completionRatio)));
 						} else if (mT < CHARGE_TIME + IMPACT_TIME) {
 							if (mT == CHARGE_TIME) {
-								world.playSound(mLocation, Sound.ENTITY_RAVAGER_ROAR, 1.5f, 1);
+								world.playSound(mLocation, Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 1.5f, 1);
 							}
 
 							// 5.0 because 5 ticks and impact time is in ticks, and to make it a double
@@ -206,10 +207,10 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 							new PartialParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsBoss();
 							new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsBoss();
 
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
-							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, 3.0f, 1);
-							world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, 1, 2.0f);
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+							mFuryTarget.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+							world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 2.0f);
 						} else {
 							for (Player player : PlayerUtils.playersInRange(mLocation, DAMAGE_RADIUS, true)) {
 								DamageUtils.damage(mBoss, player, DamageType.BLAST, DAMAGE, null, false, true, "Kaul's Fury");
@@ -225,7 +226,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 								DamageUtils.damage(null, mob, DamageType.BLAST, DAMAGE / 2, null, false, true, "Kaul's Fury");
 							}
 
-							world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1);
+							world.playSound(mLocation, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1);
 
 							ParticleUtils.explodingRingEffect(mPlugin, mLocation, RADIUS, 1, 4,
 								Arrays.asList(
@@ -254,7 +255,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 			}
 			if (event.getSource() instanceof Player player) {
 				player.sendMessage(ChatColor.AQUA + "The shield absorbs your attack.");
-				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1, 1);
+				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 			}
 		}
 	}
@@ -265,7 +266,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 			player.sendMessage(ChatColor.AQUA + "The shield shatters.");
 		}
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, 1, 1);
+		world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);
 		new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 15, 0.5, 0, 0.5).spawnAsBoss();
 
 		//Add new spell
@@ -313,7 +314,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 				// Warning sound/particles at boss location and slow boss
 				(LivingEntity player) -> {
 					new PartialParticle(Particle.VILLAGER_ANGRY, mBoss.getLocation(), 50, 2, 2, 2).spawnAsBoss();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1, 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1, 1.5f);
 					mBoss.setAI(false);
 				},
 				// Warning particles
@@ -323,7 +324,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 				// Charge attack sound/particles at boss location
 				(LivingEntity player) -> {
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsBoss();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1, 1.5f);
 				},
 				// Attack hit a player
 				(LivingEntity target) -> {
@@ -339,7 +340,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 				// Ending particles on boss
 				() -> {
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 125, 0.3, 0.3, 0.3, 0.15).spawnAsBoss();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1, 1.5f);
 					mBoss.setAI(true);
 				})
 		));
@@ -349,7 +350,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 		return new SpellManager(Arrays.asList(
 			new SpellBombToss(mPlugin, mBoss, detectionRange, 2, 50, 160,
 				(World world, TNTPrimed tnt, Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
 					new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4).spawnAsBoss();
 

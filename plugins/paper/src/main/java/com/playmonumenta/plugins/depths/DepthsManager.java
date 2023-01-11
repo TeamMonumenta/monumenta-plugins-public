@@ -113,6 +113,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -717,7 +718,7 @@ public class DepthsManager {
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
 			dp.mEarnedRewards.poll();
-			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
+			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		}
 	}
 
@@ -731,7 +732,7 @@ public class DepthsManager {
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp != null) {
 			dp.mHasWeaponAspect = true;
-			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 1.0f);
+			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		} else {
 			return;
 		}
@@ -1139,7 +1140,7 @@ public class DepthsManager {
 		DepthsPlayer dp = getDepthsPlayer(uuid);
 		if (dp != null) {
 			dp.mEarnedRewards.poll();
-			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
+			p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		}
 	}
 

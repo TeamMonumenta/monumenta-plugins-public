@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -50,7 +51,7 @@ public class WindAspect implements Enchantment {
 		}
 
 		World world = e.getWorld();
-		world.playSound(e.getLocation(), Sound.ENTITY_HORSE_BREATHE, 1.0f, 0.30f);
+		world.playSound(e.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.30f);
 
 		double widthDelta = PartialParticle.getWidthDelta(e);
 		double doubleWidthDelta = widthDelta * 2;

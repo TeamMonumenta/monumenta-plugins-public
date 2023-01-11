@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -52,7 +53,7 @@ public class HauntingShadesCS implements CosmeticSkill {
 	}
 
 	public void shadesStartSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, 1.0f, 0.65f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.PLAYERS, 1.0f, 0.65f);
 	}
 
 	public void shadesTrailParticle(Player mPlayer, Location bLoc, Vector dir, double distance) {
@@ -79,14 +80,14 @@ public class HauntingShadesCS implements CosmeticSkill {
 		}
 
 		if (mT % 20 == 0) {
-			world.playSound(bLoc, Sound.ENTITY_BLAZE_HURT, 0.3f, 0.5f);
+			world.playSound(bLoc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.3f, 0.5f);
 		}
 	}
 
 	public void shadesEndEffect(World world, Player mPlayer, Location bLoc, double radius) {
 		new PartialParticle(Particle.REDSTONE, bLoc, 45, 0.2, 1.1, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 40, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
-		world.playSound(bLoc, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);
+		world.playSound(bLoc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.7f, 0.5f);
 	}
 }
 

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -18,7 +19,7 @@ public class SpellTsunamiCharge extends SpellBaseCharge {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1f, 1.5f);
 			},
 			// Warning particles
 			(Location loc) -> {
@@ -27,7 +28,7 @@ public class SpellTsunamiCharge extends SpellBaseCharge {
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.CLOUD, boss.getLocation(), 100, 2, 2, 2, 0).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, 1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 1f, 1.5f);
 			},
 			// Attack hit a player
 			(LivingEntity player) -> {

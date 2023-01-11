@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -114,8 +115,8 @@ public class HolyJavelin extends Ability {
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 1.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, 1, 0.9f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.9f);
 		Location playerLoc = mPlayer.getEyeLocation();
 		Location location = playerLoc.clone();
 		Vector increment = location.getDirection();
@@ -149,8 +150,8 @@ public class HolyJavelin extends Ability {
 			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
 				loc.subtract(increment.multiply(0.5));
 				new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
-				world.playSound(loc, Sound.ENTITY_ARROW_HIT, 1, 0.9f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
+				world.playSound(loc, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, 0.9f);
 				break;
 			}
 		}

@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -89,11 +90,11 @@ public class Apocalypse extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 100, 3.5, 3.5, 3.5, 0).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0.5f);
 
 		new PartialParticle(Particle.HEART, loc.clone().add(0, 1, 0), count * 7, 0.5, 0.5, 0.5).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.5f * count, 1.6f);
+		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f * count, 1.6f);
 		MessagingUtils.sendActionBarMessage(mPlayer, "Apocalypse has been activated!");
 		event.setCancelled(true);
 	}

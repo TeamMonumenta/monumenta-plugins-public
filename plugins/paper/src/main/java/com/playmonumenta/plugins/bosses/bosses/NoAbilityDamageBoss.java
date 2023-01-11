@@ -8,6 +8,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -32,8 +33,8 @@ public class NoAbilityDamageBoss extends BossAbilityGroup {
 
 			Location loc = event.getDamagee().getLocation().add(0, 1, 0);
 			World world = loc.getWorld();
-			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.25f, 1.5f);
-			world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 0.25f, 0.75f);
+			world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 0.25f, 1.5f);
+			world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.25f, 0.75f);
 			new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
 		}
 	}

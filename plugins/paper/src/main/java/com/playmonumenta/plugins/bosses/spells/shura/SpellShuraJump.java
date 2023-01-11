@@ -167,7 +167,7 @@ public class SpellShuraJump extends Spell {
 					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
 				})
 			));
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 		Location tloc = mBoss.getLocation().setDirection(v);
 		BukkitRunnable runB = new BukkitRunnable() {
 			int mT = 0;
@@ -210,7 +210,7 @@ public class SpellShuraJump extends Spell {
 							}
 						}
 					}
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.3f, 1f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.3f, 1f);
 					this.cancel();
 				}
 			}

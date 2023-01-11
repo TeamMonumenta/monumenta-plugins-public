@@ -88,13 +88,13 @@ public class PrestigiousBlitzCS extends BodkinBlitzCS implements PrestigeCS {
 
 	@Override
 	public void blitzEndEffect(World world, Player mPlayer, Location tpLoc) {
-		world.playSound(tpLoc, Sound.BLOCK_ENDER_CHEST_CLOSE, 1.25f, 2f);
-		world.playSound(tpLoc, Sound.ITEM_TRIDENT_RETURN, 1.5f, 0.65f);
-		world.playSound(tpLoc, Sound.ITEM_TRIDENT_THROW, 1.2f, 0.5f);
-		world.playSound(tpLoc, Sound.ITEM_TRIDENT_RIPTIDE_2, 0.75f, 1.6f);
-		world.playSound(tpLoc, Sound.ITEM_TRIDENT_HIT_GROUND, 1f, 0.75f);
-		world.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, 1f, 0.75f);
-		world.playSound(tpLoc, Sound.ENTITY_WITHER_SHOOT, 0.8f, 0.7f);
+		world.playSound(tpLoc, Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.25f, 2f);
+		world.playSound(tpLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.5f, 0.65f);
+		world.playSound(tpLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.2f, 0.5f);
+		world.playSound(tpLoc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.75f, 1.6f);
+		world.playSound(tpLoc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1f, 0.75f);
+		world.playSound(tpLoc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1f, 0.75f);
+		world.playSound(tpLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.8f, 0.7f);
 
 		new PartialParticle(Particle.CLOUD, tpLoc.clone().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 0.2).spawnAsPlayerActive(mPlayer);
 		new BukkitRunnable() {

@@ -10,6 +10,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -42,7 +43,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 			if (damager instanceof Damageable) {
 				((Damageable) damager).setHealth(0);
 				World world = damager.getWorld();
-				world.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
+				world.playSound(damager.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.7f);
 				new PartialParticle(Particle.EXPLOSION_LARGE, damager.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 			}
 		}
@@ -56,7 +57,7 @@ public final class KamikazeBoss extends BossAbilityGroup {
 			if (shooter instanceof Damageable entity) {
 				entity.setHealth(0);
 				World world = event.getEntity().getWorld();
-				world.playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
+				world.playSound(entity.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.7f);
 				new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 			}
 		}

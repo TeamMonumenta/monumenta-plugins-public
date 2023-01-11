@@ -58,7 +58,7 @@ public class LapseOfReality extends Spell {
 			},
 			// Launch Aesthetic
 			(World world, Location loc, int ticks) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 0.5f);
 				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
 			},
 			// Projectile Aesthetic
@@ -69,7 +69,7 @@ public class LapseOfReality extends Spell {
 			},
 			// Hit Action
 			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
 				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 				if (player != null) {
@@ -82,7 +82,7 @@ public class LapseOfReality extends Spell {
 	public void run() {
 		mBoss.teleport(mBoss.getLocation().add(0, 10, 0));
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 5, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 5, 0.5f);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FalseSpirit.detectionRange, true);
 

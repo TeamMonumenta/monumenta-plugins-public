@@ -12,6 +12,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -66,7 +67,7 @@ public class SpellDuelist extends Spell {
 		((Mob) mBoss).setTarget(target);
 
 
-		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
+		mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 		int random = FastUtils.RANDOM.nextInt(3);
 
 		if (random == 0) {
@@ -93,7 +94,7 @@ public class SpellDuelist extends Spell {
 					Location loc2 = mBoss.getLocation().add(0, 2, 0);
 					BoundingBox hitbox1 = new BoundingBox().shift(loc1).expand(1, 0.25, 1);
 					BoundingBox hitbox2 = new BoundingBox().shift(loc2).expand(1, 0.25, 1);
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.3f, 1f);
+					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.3f, 1f);
 
 					for (int i = 0; i < RANGE; i++) {
 						loc1.add(shift1);
@@ -142,7 +143,7 @@ public class SpellDuelist extends Spell {
 					Vector shift = new Vector(0, 0, 0).add(mDirection.clone().multiply(Math.sin(Math.PI * mTime / 8))).add(upwards.clone().multiply(Math.cos(Math.PI * mTime / 8)));
 					Location loc = mBoss.getLocation();
 					BoundingBox hitbox = new BoundingBox().shift(loc).expand(1);
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.3f, 1f);
+					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.3f, 1f);
 					for (int i = 0; i < RANGE; i++) {
 						loc.add(shift);
 						hitbox.shift(shift);
@@ -191,7 +192,7 @@ public class SpellDuelist extends Spell {
 					Location loc2 = mBoss.getLocation();
 					BoundingBox hitbox1 = new BoundingBox().shift(loc1).expand(1, 0.25, 1);
 					BoundingBox hitbox2 = new BoundingBox().shift(loc2).expand(1, 0.25, 1);
-					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.3f, 1f);
+					mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.3f, 1f);
 
 					for (int i = 0; i < RANGE; i++) {
 						loc1.add(shift1);

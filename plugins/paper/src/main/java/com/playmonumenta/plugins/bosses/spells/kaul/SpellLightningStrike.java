@@ -132,7 +132,6 @@ public class SpellLightningStrike extends Spell {
 
 
 		// S: Thunder & distant sparks
-		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 1 1.25
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
@@ -140,7 +139,6 @@ public class SpellLightningStrike extends Spell {
 			1,
 			1.25f
 		);
-		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 0.75 1.5
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
@@ -148,7 +146,6 @@ public class SpellLightningStrike extends Spell {
 			0.75f,
 			1.5f
 		);
-		// /playsound entity.lightning_bolt.thunder master @p ~ ~ ~ 1 1.75
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
@@ -156,7 +153,6 @@ public class SpellLightningStrike extends Spell {
 			1,
 			1.75f
 		);
-		// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.75 1.75
 		world.playSound(
 			strikeLocation,
 			Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
@@ -214,7 +210,6 @@ public class SpellLightningStrike extends Spell {
 					}
 
 					// S: Electricity courses
-					// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 1 1.25
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
@@ -222,7 +217,6 @@ public class SpellLightningStrike extends Spell {
 						1,
 						1.25f
 					);
-					// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 1 1.5
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
@@ -287,7 +281,6 @@ public class SpellLightningStrike extends Spell {
 					).spawnAsBoss();
 
 					// S: Booms & fire ignites
-					// /playsound entity.lightning_bolt.impact master @p ~ ~ ~ 0.75 0.5
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_LIGHTNING_BOLT_IMPACT,
@@ -295,7 +288,6 @@ public class SpellLightningStrike extends Spell {
 						0.75f,
 						0.5f
 					);
-					// /playsound entity.lightning_bolt.impact master @p ~ ~ ~ 0.75 0.75
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_LIGHTNING_BOLT_IMPACT,
@@ -303,7 +295,6 @@ public class SpellLightningStrike extends Spell {
 						0.75f,
 						0.75f
 					);
-					// /playsound entity.blaze.shoot master @p ~ ~ ~ 1 0.75
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_BLAZE_SHOOT,
@@ -311,7 +302,6 @@ public class SpellLightningStrike extends Spell {
 						1,
 						0.75f
 					);
-					// /playsound entity.blaze.shoot master @p ~ ~ ~ 1 1
 					world.playSound(
 						strikeLocation,
 						Sound.ENTITY_BLAZE_SHOOT,
@@ -428,7 +418,6 @@ public class SpellLightningStrike extends Spell {
 
 				// S: Flames burn
 				if (mRemainingTicks == FIRE_DURATION_TICKS) {
-					// /playsound entity.blaze.burn master @p ~ ~ ~ 1 0
 					world.playSound(
 						fireLocation,
 						Sound.ENTITY_BLAZE_BURN,
@@ -436,7 +425,6 @@ public class SpellLightningStrike extends Spell {
 						1,
 						0
 					);
-					// /playsound entity.blaze.burn master @p ~ ~ ~ 1 1
 					world.playSound(
 						fireLocation,
 						Sound.ENTITY_BLAZE_BURN,
@@ -444,7 +432,6 @@ public class SpellLightningStrike extends Spell {
 						1,
 						1
 					);
-					// /playsound entity.blaze.burn master @p ~ ~ ~ 1 1.5f
 					world.playSound(
 						fireLocation,
 						Sound.ENTITY_BLAZE_BURN,

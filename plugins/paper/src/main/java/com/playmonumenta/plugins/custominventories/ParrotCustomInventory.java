@@ -672,7 +672,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 	public ParrotCustomInventory(Player owner) throws Exception {
 		super(owner, ROWS * COLUMNS, "Parrots");
 		loadItem(owner);
-		owner.playSound(owner.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 3f, 1.2f);
+		owner.playSound(owner.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.NEUTRAL, 3f, 1.2f);
 
 		new BukkitRunnable() {
 			@Override

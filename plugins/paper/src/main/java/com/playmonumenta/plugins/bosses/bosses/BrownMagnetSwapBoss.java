@@ -19,6 +19,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
@@ -128,7 +129,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 
 					mBoss.customName(Component.text(name));
 
-					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 2);
+					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1, 2);
 					new PartialParticle(Particle.VILLAGER_HAPPY, mBoss.getLocation().add(0, 1, 0), 10, 0.5, 1).spawnAsEnemy();
 				}
 
@@ -186,7 +187,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 
 	private void playAesthetic() {
 		if (mLastDamageTick < mBoss.getTicksLived() - 10) {
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, 1f, 0.5f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 			new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation().add(0, 1, 0), 10, 0.5, 1).spawnAsEnemy();
 			mLastDamageTick = mBoss.getTicksLived();
 		}

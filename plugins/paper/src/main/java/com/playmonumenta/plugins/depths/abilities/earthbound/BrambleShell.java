@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -45,7 +46,7 @@ public class BrambleShell extends DepthsAbility {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.BLOCK_CRACK, loc.add(0, source.getHeight() / 2, 0), 25, 0.5, 0.5, 0.5, 0.125, Bukkit.createBlockData(Material.SWEET_BERRY_BUSH)).spawnAsPlayerPassive(mPlayer);
-			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, 1, 0.8f);
+			world.playSound(loc, Sound.BLOCK_SWEET_BERRY_BUSH_BREAK, SoundCategory.PLAYERS, 1, 0.8f);
 
 			DamageUtils.damage(mPlayer, source, DamageType.MELEE_SKILL, BRAMBLE_DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
 		}

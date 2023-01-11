@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
@@ -80,7 +81,7 @@ public class IceLance extends DepthsAbility {
 			if (bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
 				new PartialParticle(Particle.CLOUD, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.BLOCKS, 1, 1.65f);
 				break;
 			}
 			Iterator<LivingEntity> iter = mobs.iterator();
@@ -112,7 +113,7 @@ public class IceLance extends DepthsAbility {
 			}
 		}
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1, 2.0f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.BLOCKS, 1, 2.0f);
 	}
 
 	private static String getDescription(int rarity) {

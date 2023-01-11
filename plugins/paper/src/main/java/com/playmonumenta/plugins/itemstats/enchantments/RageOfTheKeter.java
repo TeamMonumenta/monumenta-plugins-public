@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -94,7 +95,7 @@ public class RageOfTheKeter implements Enchantment {
 					}, (entity) -> {
 					// Lose effect
 					Location loc = player.getLocation();
-					world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, 1f, 0.65f);
+					world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 1f, 0.65f);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, OLIVE_COLOR).spawnAsPlayerBuff(player);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0, GREEN_COLOR).spawnAsPlayerBuff(player);
 					new PartialParticle(Particle.REDSTONE, loc, 2, 0.5, 0.5, 0.5, 0.1, OLIVE_COLOR).spawnAsPlayerBuff(player);
@@ -106,7 +107,7 @@ public class RageOfTheKeter implements Enchantment {
 
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1, OLIVE_COLOR).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1, GREEN_COLOR).spawnAsPlayerBuff(player);
-			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, 1, 0.85f);
+			world.playSound(player.getLocation(), Sound.ENTITY_STRIDER_EAT, SoundCategory.PLAYERS, 1, 0.85f);
 			int cooldown = CharmManager.getCooldown(player, CHARM_COOLDOWN, Refresh.reduceCooldown(plugin, player, COOLDOWN));
 			plugin.mEffectManager.addEffect(player, ItemCooldown.toSource(getEnchantmentType()), new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 		}

@@ -22,6 +22,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SpawnEggMeta;
@@ -57,7 +58,7 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 				meta -> meta.displayName(Component.text("Back to current Season Pass").decoration(TextDecoration.ITALIC, false)));
 			setItem(0, 0, back)
 				.onLeftClick(() -> {
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					if (SeasonalEventManager.mActivePass != null) {
 						new SeasonalEventGUI(SeasonalEventManager.mActivePass, mPlayer).open();
 					}
@@ -79,7 +80,7 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 				setItem(2 + (i / 8), 1 + (i % 8), passItem)
 					.onLeftClick(() -> {
 						mSelectedPass = pass;
-						mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						update();
 					});
 				i++;
@@ -91,7 +92,7 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 			setItem(0, 0, back)
 				.onLeftClick(() -> {
 					mSelectedPass = null;
-					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					update();
 				});
 			// can only but from passes that aren't the previous one
@@ -207,7 +208,7 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 							return;
 						}
 						if (!canBuy) {
-							mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
+							mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1, 1);
 							return;
 						}
 						if (mPlayer.getInventory().containsAtLeast(mMetamorphosisToken, cost)) {
@@ -215,11 +216,11 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 							toRemove.setAmount(cost);
 							mPlayer.getInventory().removeItem(toRemove);
 							buy.run();
-							mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 2);
+							mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1, 2);
 							update();
 						} else {
 							mPlayer.sendMessage(Component.text("You don't have enough " + ItemUtils.getPlainName(mMetamorphosisToken) + "s!", NamedTextColor.RED));
-							mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
+							mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1, 1);
 						}
 					});
 				i++;

@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -86,11 +87,11 @@ public class BulletHellBoss extends BossAbilityGroup {
 				(Entity entity, int tick) -> {
 					float t = tick / 10;
 					if (tick % 5 == 0) {
-						world.playSound(mBoss.getLocation(), p.CHARGE_SOUND, p.CHARGE_VOLUME, t);
+						world.playSound(mBoss.getLocation(), p.CHARGE_SOUND, SoundCategory.HOSTILE, p.CHARGE_VOLUME, t);
 					}
 				},
 				(Entity entity) -> {
-					world.playSound(mBoss.getLocation(), p.SHOOT_SOUND, p.SHOOT_VOLUME, 0);
+					world.playSound(mBoss.getLocation(), p.SHOOT_SOUND, SoundCategory.HOSTILE, p.SHOOT_VOLUME, 0);
 				},
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {

@@ -14,6 +14,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -56,12 +57,12 @@ public class WrathBoss extends BossAbilityGroup {
 			// Initiate Aesthetic
 			(World world, Location loc) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 10, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_VINDICATOR_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 			},
 			// Leap Aesthetic
 			(World world, Location loc) -> {
 				new PartialParticle(Particle.CLOUD, loc, 20, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
 			},
 			// Leaping Aesthetic
 			(World world, Location loc) -> {
@@ -93,8 +94,8 @@ public class WrathBoss extends BossAbilityGroup {
 							if (mTime == 2) {
 								new PartialParticle(Particle.CRIT, mLocation, 100, 0, 0, 0, 0.5).spawnAsEntityActive(boss);
 								new PartialParticle(Particle.CRIT_MAGIC, mLocation, 100, 2, 2, 2, 0).spawnAsEntityActive(boss);
-								mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+								mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1f);
+								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1f, 1f);
 								for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
 									BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, mParams.SPELL_NAME, mBoss.getLocation());
 								}
@@ -112,8 +113,8 @@ public class WrathBoss extends BossAbilityGroup {
 							if (mTime == 7) {
 								new PartialParticle(Particle.CRIT, mLocation, 200, 0, 0, 0, 1).spawnAsEntityActive(boss);
 								new PartialParticle(Particle.CRIT_MAGIC, mLocation, 200, 2, 2, 2, 0).spawnAsEntityActive(boss);
-								mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f);
-								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+								mWorld.playSound(mLocation, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1f);
+								mWorld.playSound(mLocation, Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1f, 1f);
 								for (Player p : PlayerUtils.playersInRange(mLocation.add(mDirection), mParams.DAMAGE_RADIUS, true)) {
 									// Bypasses iframes
 									BossUtils.blockableDamage(mBoss, p, DamageType.MELEE, mParams.DAMAGE, true, true, mParams.SPELL_NAME, mBoss.getLocation(), (int) (20 * mParams.DAMAGE / 2.5), (int) (mParams.DAMAGE / 5));

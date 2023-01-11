@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -49,7 +50,7 @@ public class RebornBoss extends BossAbilityGroup {
 			World world = mBoss.getWorld();
 			event.setCancelled(true);
 			event.setDamage(0);
-			world.playSound(mBoss.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1);
+			world.playSound(mBoss.getLocation(), Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 1, 1);
 			mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * mParams.REBORN_PERCENT_HEALTH);
 			mBoss.setFireTicks(-1);
 

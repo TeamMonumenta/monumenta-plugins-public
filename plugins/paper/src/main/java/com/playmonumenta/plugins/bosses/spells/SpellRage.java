@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -25,7 +26,7 @@ public class SpellRage extends SpellBaseAoE {
 		World world = loc.getWorld();
 
 		if (!mIsCasting) {
-			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1f, 0.6f);
+			world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 1f, 0.6f);
 			mIsCasting = true;
 		}
 
@@ -40,9 +41,9 @@ public class SpellRage extends SpellBaseAoE {
 	@Override
 	protected void outburstAction(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_RAVAGER_HURT, 1.5f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1.5f, 0.75f);
+		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.HOSTILE, 1.5f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_RAVAGER_HURT, SoundCategory.HOSTILE, 1.5f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.5f, 0.75f);
 	}
 
 	@Override

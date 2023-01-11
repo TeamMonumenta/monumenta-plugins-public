@@ -14,6 +14,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -88,7 +89,7 @@ public class DepthsRemoveAbilityGUI extends CustomInventory {
 						depthsplayer.mUsedAbilityDeletion = true;
 						instance.setPlayerLevelInAbility(ability.getDisplayName(), player, 0);
 						event.getWhoClicked().closeInventory();
-						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 1.0f, 1.0f);
+						player.getWorld().playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						MessagingUtils.sendActionBarMessage(player, "Ability removed!");
 						return;
 					}

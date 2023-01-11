@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -68,48 +69,42 @@ public final class TCalin extends BossAbilityGroup {
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.VILLAGER_ANGRY, boss.getLocation(), 50, 2, 2, 2, 0).spawnAsEntityActive(boss);
 				boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 4));
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 1f, 1.5f);
 			},
 			// Warning particles
-			(Location loc) -> {
-				new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0).spawnAsEntityActive(boss);
-			},
+			(Location loc) -> new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 1, 1, 1, 0).spawnAsEntityActive(boss),
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 100, 2, 2, 2, 0).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1f, 0.5f);
+				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
 			},
 			// Attack hit a player
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.SMOKE_NORMAL, player.getLocation(), 80, 1, 1, 1, 0).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1, 0.15).spawnAsEntityActive(boss);
-				boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 0.85f);
+				boss.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1f, 0.85f);
 				BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, 14);
 				MovementUtils.knockAway(mBoss.getLocation(), player, 0.25f, 0.4f);
 			},
 			// Attack particles
-			(Location loc) -> {
-				new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(boss);
-			},
+			(Location loc) -> new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(boss),
 			// Ending particles on boss
-			() -> {
-				new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0).spawnAsEntityActive(boss);
-			}
+			() -> new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0).spawnAsEntityActive(boss)
 		);
 
 		SpellBaseBolt bolt = new SpellBaseBolt(plugin, mBoss, (int) (20 * 2.25), 20 * 5, 1.15, detectionRange, 0.5, true, true, 2, 10,
 			(Entity entity, int tick) -> {
-				float t = tick / 15;
+				float t = tick / 15.0f;
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 1, 0.35, 0, 0.35, 0.05).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.BLOCK_CRACK, mBoss.getLocation().add(0, 1, 0), 5, 0.25, 0.45, 0.25,
 					0.5, Material.OAK_LEAVES.createBlockData()).spawnAsEntityActive(boss);
-				world.playSound(mBoss.getLocation(), Sound.BLOCK_GRASS_BREAK, 10, t);
+				world.playSound(mBoss.getLocation(), Sound.BLOCK_GRASS_BREAK, SoundCategory.HOSTILE, 10, t);
 				mBoss.removePotionEffect(PotionEffectType.SLOW);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 2, 1));
 			},
 
 			(Entity entity) -> {
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 1f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 1f);
 				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation().add(0, 1, 0), 80, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 30, 0.2, 0.45, 0.2,
 					0.1).spawnAsEntityActive(boss);
@@ -130,7 +125,7 @@ public final class TCalin extends BossAbilityGroup {
 					Material.OAK_LEAVES.createBlockData()).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1.25f);
 			},
 			null
 		);
@@ -150,7 +145,7 @@ public final class TCalin extends BossAbilityGroup {
 						Location loc = mBoss.getLocation();
 						mJ++;
 						new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 2, 0.25, 0.45, 0.25).spawnAsEntityActive(boss);
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (mJ / 20));
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 0.5f + (mJ / 20));
 						for (int i = 0; i < 5; i++) {
 							double radian1 = Math.toRadians(mRotation + (72 * i));
 							loc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
@@ -187,28 +182,26 @@ public final class TCalin extends BossAbilityGroup {
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(bolt, charge, aoe));
 
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellBaseAura(mBoss, 8, 5, 8, 10, Particle.FALLING_DUST,
-				Material.ANVIL.createBlockData(), (Player player) -> {
-				player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 0, true, true));
-			}
+				Material.ANVIL.createBlockData(), (Player player) ->
+				player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 0, true, true))
 			)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Thank you for foolishly opening the way into this town, hero.\",\"color\":\"white\"}]");
-		});
+		Map<Integer, BossHealthAction> events = new HashMap<>();
+		events.put(100, mBoss ->
+			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Thank you for foolishly opening the way into this town, hero.\",\"color\":\"white\"}]"));
 
 		events.put(50, mBoss -> {
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 1f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1f);
 			new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(boss);
 			mBoss.setAI(false);
 			mBoss.setInvulnerable(true);
 			mBoss.teleport(mSpawnLoc);
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1, 0f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 0f);
 			new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
 			new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(boss);
@@ -223,7 +216,7 @@ public final class TCalin extends BossAbilityGroup {
 				public void run() {
 					mJ++;
 					new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 2, 0.25, 0.45, 0.25, 0).spawnAsEntityActive(boss);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 3, 0.5f + (mJ / 20));
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 0.5f + (mJ / 20));
 					for (int i = 0; i < 5; i++) {
 						double radian1 = Math.toRadians(mRotation + (72 * i));
 						mLoc.add(FastUtils.cos(radian1) * mRadius, 0, FastUtils.sin(radian1) * mRadius);
@@ -235,7 +228,7 @@ public final class TCalin extends BossAbilityGroup {
 					mRadius -= 0.25;
 					if (mRadius <= 0) {
 						this.cancel();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1.5f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1, 1.5f);
 						new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45,
 							0.25, 0.15).spawnAsEntityActive(boss);
 						new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1,
@@ -258,9 +251,7 @@ public final class TCalin extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"Know the true power of the Sons of the Forest!\",\"color\":\"white\"}]");
 		});
 
-		events.put(50, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"This cannot be!\",\"color\":\"white\"}]");
-		});
+		events.put(50, mBoss -> PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[T'Calin] \",\"color\":\"gold\"},{\"text\":\"This cannot be!\",\"color\":\"white\"}]"));
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
 
@@ -269,8 +260,8 @@ public final class TCalin extends BossAbilityGroup {
 
 	private void knockback(Plugin plugin, double r) {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.5f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.4f, false);
 		}
@@ -279,7 +270,7 @@ public final class TCalin extends BossAbilityGroup {
 			final Location mLoc = mBoss.getLocation();
 			double mRadius = 0;
 			double mY = 2.5;
-			double mYminus = 0.35;
+			double mYMinus = 0.35;
 
 			@Override
 			public void run() {
@@ -294,10 +285,10 @@ public final class TCalin extends BossAbilityGroup {
 					mLoc.subtract(FastUtils.cos(radian1) * mRadius, mY, FastUtils.sin(radian1) * mRadius);
 
 				}
-				mY -= mY * mYminus;
-				mYminus += 0.02;
-				if (mYminus >= 1) {
-					mYminus = 1;
+				mY -= mY * mYMinus;
+				mYMinus += 0.02;
+				if (mYMinus >= 1) {
+					mYMinus = 1;
 				}
 				if (mRadius >= r) {
 					this.cancel();
@@ -310,7 +301,9 @@ public final class TCalin extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
@@ -329,7 +322,7 @@ public final class TCalin extends BossAbilityGroup {
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "T'Calin", ChatColor.DARK_GREEN + "Forest Battlemage");
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 1.25f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
 	}
 }

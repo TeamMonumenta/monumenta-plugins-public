@@ -65,7 +65,7 @@ public class SpellHealUndead extends Spell {
 				if (mRadius <= 0) {
 					this.cancel();
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1, 1.25f);
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 3, 2f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 3, 2f);
 					mSpark.location(loc).spawnAsEnemy();
 					mSpell3.location(loc).spawnAsEnemy();
 					for (LivingEntity le : loc.getNearbyLivingEntities(10, 10)) {

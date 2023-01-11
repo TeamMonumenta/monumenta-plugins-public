@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -65,7 +66,7 @@ public class SteelStallion extends DepthsAbility {
 			if (effect == null || effect.isDebuff() || (effect.isBuff() && effect.getMagnitude() < 1.0)) {
 				// Only hurt horse if the player doesn't have +100% resistance
 				mHorse.setHealth(Math.max(0, mHorse.getHealth() - event.getFinalDamage(false)));
-				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, 0.8f, 1.0f);
+				mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_HURT, SoundCategory.NEUTRAL, 0.8f, 1.0f);
 			}
 			event.setDamage(0);
 			event.setCancelled(true);
@@ -116,7 +117,7 @@ public class SteelStallion extends DepthsAbility {
 					if (isOutOfTime && mHorse != null) {
 						Location horseLoc = mHorse.getLocation();
 						World world = horseLoc.getWorld();
-						world.playSound(horseLoc, Sound.ENTITY_HORSE_DEATH, 0.8f, 1.0f);
+						world.playSound(horseLoc, Sound.ENTITY_HORSE_DEATH, SoundCategory.NEUTRAL, 0.8f, 1.0f);
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, horseLoc, 15).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SMOKE_NORMAL, horseLoc, 20).spawnAsPlayerActive(mPlayer);
 					}
@@ -133,8 +134,8 @@ public class SteelStallion extends DepthsAbility {
 
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.HEART, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, 1, 0.5f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1, 1);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.NEUTRAL, 1, 0.5f);
 
 		MessagingUtils.sendActionBarMessage(mPlayer, "Steel Stallion has been activated!");
 	}

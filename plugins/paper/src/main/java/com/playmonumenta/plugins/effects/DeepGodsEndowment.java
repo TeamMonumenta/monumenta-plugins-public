@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,11 +69,11 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 			Plugin.getInstance().mEffectManager.addEffect(p, SoothingCombos.SPEED_EFFECT_NAME, new PercentSpeed(20 * 2, 0.1, SoothingCombos.SPEED_EFFECT_NAME));
 			new PartialParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
 			new PartialParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
-			entity.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
+			entity.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
 		}
 
 		Location loc = entity.getLocation().add(0, 1, 0);
-		entity.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 1.6f);
+		entity.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
 		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
 	}
 
@@ -83,8 +84,8 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		Location loc = entity.getLocation().add(0, 1, 0);
 		World world = entity.getWorld();
 		Location entityLoc = enemy.getLocation();
-		world.playSound(loc, Sound.BLOCK_GRASS_BREAK, 0.8f, 0.65f);
-		world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, 0.8f, 0.45f);
+		world.playSound(loc, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
+		world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
 		new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65);
 		new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsEntityActive(entity);
 		new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsEntityActive(entity);
@@ -104,14 +105,14 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 			new PartialParticle(Particle.FLAME, location, 1).spawnAsEntityActive(entity);
 			location.subtract(locationDelta);
 		}
-		world.playSound(location, Sound.ITEM_FIRECHARGE_USE, 0.5f, 1);
+		world.playSound(location, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1);
 	}
 
 	public void frigidCombo(LivingEntity entity, LivingEntity enemy) {
 		Location targetLoc = enemy.getLocation();
 		World world = targetLoc.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, 4)) {
-			if (!(mob.getHealth() <= 0 || mob == null)) {
+			if (!(mob.getHealth() <= 0)) {
 				new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65).spawnAsEntityActive(entity);
 				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, 0.2, mob);
 				DamageUtils.damage(entity, mob, DamageType.MAGIC, 2, null, true);
@@ -119,15 +120,15 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		}
 
 		Location playerLoc = entity.getLocation().add(0, 1, 0);
-		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.65f);
-		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.45f);
+		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
+		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
 		new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsEntityActive(entity);
 	}
 
 	public void darkCombo(LivingEntity entity, LivingEntity enemy) {
 		EntityUtils.applyVulnerability(Plugin.getInstance(), 20 * 3, 0.15, enemy);
 
-		((Player) entity).playSound(entity.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.6f, 0.5f);
+		((Player) entity).playSound(entity.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.6f, 0.5f);
 		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsEntityActive(entity);
 		PotionUtils.applyPotion(entity, enemy,
 			new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, true, false));

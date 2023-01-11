@@ -64,7 +64,7 @@ public class Rewind extends Spell {
 	@Override
 	public void run() {
 		World world = mCenter.getWorld();
-		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1.0f, 0.7f));
+		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 0.7f));
 
 		PPCircle back = new PPCircle(Particle.TOTEM, mCenter, 1.5).ringMode(true).count(12);
 		PPCircle surround = new PPCircle(Particle.REDSTONE, mCenter, RADIUS).data(new Particle.DustOptions(Color.WHITE, 1)).ringMode(true);
@@ -109,7 +109,7 @@ public class Rewind extends Spell {
 					HashMap<Player, Location> origins = new HashMap<>();
 					players.forEach(player -> origins.put(player, player.getLocation()));
 
-					players.forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 1.0f, 1.5f));
+					players.forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 1.0f, 1.5f));
 
 					mWindDown.setTime(REWIND_TIME);
 
@@ -180,7 +180,7 @@ public class Rewind extends Spell {
 										}
 									}
 
-									player.playSound(origin, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.8f, 1.5f);
+									player.playSound(origin, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 0.8f, 1.5f);
 									new PartialParticle(Particle.FALLING_OBSIDIAN_TEAR, origin.clone().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0.1).spawnAsEntityActive(mBoss);
 								}
 								mTeal.changePhase(mActiveSpells, mPassiveSpells, null);
@@ -199,7 +199,7 @@ public class Rewind extends Spell {
 
 									Location loc = player.getLocation();
 									double ratio = ((double) REWIND_TIME - time) / REWIND_TIME;
-									player.playSound(loc, Sound.BLOCK_CONDUIT_AMBIENT, 1.0f + (float) ratio, 0.8f * (time % 10 == 0 ? 1 : 2));
+									player.playSound(loc, Sound.BLOCK_CONDUIT_AMBIENT, SoundCategory.HOSTILE, 1.0f + (float) ratio, 0.8f * (time % 10 == 0 ? 1 : 2));
 									surround.location(loc.clone().add(0, 0.05, 0)).count(10 + (int) (70 * ratio)).spawnAsBoss();
 									inside.location(loc).count(10 + (int) (20 * ratio)).spawnAsBoss();
 								}

@@ -12,12 +12,14 @@ import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Collections;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -82,20 +84,20 @@ public class SheepGodBoss extends BossAbilityGroup {
 				Location loc = mBoss.getLocation().add(FastUtils.randomDoubleInRange(-10, 10), FastUtils.randomDoubleInRange(0, 3), FastUtils.randomDoubleInRange(-10, 10));
 				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.175).spawnAsEntityActive(mBoss);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1f);
 
 				if (mT >= 12) {
 					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"BAAAAAAAAAAAAAAAAAAAAAAAAAAAA!!!!!!!\",\"color\":\"dark_red\"}]");
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_SHEEP_DEATH, 1.5f, 0.75f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_SHEEP_DEATH, 1.5f, 1f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_SHEEP_DEATH, SoundCategory.HOSTILE, 1.5f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_SHEEP_DEATH, SoundCategory.HOSTILE, 1.5f, 1f);
 					mBoss.remove();
 					this.cancel();
 					new PartialParticle(Particle.FLAME, mBoss.getLocation(), 300, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 150, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 150, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, 1.5f, 0f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_DEATH, SoundCategory.HOSTILE, 1.5f, 0f);
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 						player.removePotionEffect(PotionEffectType.HEALTH_BOOST);
 						player.removePotionEffect(PotionEffectType.ABSORPTION);
@@ -110,7 +112,7 @@ public class SheepGodBoss extends BossAbilityGroup {
 						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 							MessagingUtils.sendBoldTitle(p, ChatColor.GOLD + "VICTORY", ChatColor.DARK_GREEN + "April Clucking Fools");
-							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 100, 1.15f);
+							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 1.15f);
 						}
 					}, 20 * 3);
 				}
@@ -132,11 +134,11 @@ public class SheepGodBoss extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
-		mBoss.setCustomName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "The Sheep God");
+		mBoss.customName(Component.text("The Sheep God", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "The Sheep God", ChatColor.RED + "Master of the Hundred Wools");
 			player.sendMessage(Component.text("BAA BAA!!! BAA BAAA, BAA BAAAAA!?!?", NamedTextColor.DARK_RED));
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 1.25f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
 	}
 }

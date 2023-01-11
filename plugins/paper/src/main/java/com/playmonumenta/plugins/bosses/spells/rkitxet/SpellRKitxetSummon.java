@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -59,7 +60,7 @@ public class SpellRKitxetSummon extends Spell {
 			Location randomSpreadLoc = loc.clone().add(r * FastUtils.cos(theta), 0, r * FastUtils.sin(theta));
 
 			Location loweredLoc = randomSpreadLoc.clone().subtract(0, 1.5, 0); //Starts spawning in the ground
-			loweredLoc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, 1, 0.75f);
+			loweredLoc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 0.75f);
 			new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.LIME_WOOL.createBlockData()).spawnAsEntityActive(mBoss);
 			Collections.shuffle(mSummonOptions);
 			Entity summon = LibraryOfSoulsIntegration.summon(loweredLoc, mSummonOptions.get(0));

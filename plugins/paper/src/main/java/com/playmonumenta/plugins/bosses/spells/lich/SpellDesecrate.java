@@ -78,7 +78,7 @@ public class SpellDesecrate extends Spell {
 				float ft = fTick / 25;
 				mSmoke.location(mBoss.getLocation()).spawnAsBoss();
 				mWitch.location(mBoss.getLocation().add(0, 1, 0)).spawnAsBoss();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 7, 0.5f + ft);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 7, 0.5f + ft);
 				Location loc = mBoss.getLocation();
 
 				indicator.radius(mRadius).location(loc).spawnAsBoss();
@@ -150,8 +150,8 @@ public class SpellDesecrate extends Spell {
 								if (pHoriLoc.distance(mBossLoc) < mRadius) {
 									DamageUtils.damage(mBoss, p, DamageType.MAGIC, 65, null, false, true, "Desecrate");
 									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f, false);
-									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.75f);
-									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 0.5f);
+									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.0f, 0.75f);
+									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 2.0f, 0.5f);
 									mHeart.location(mBoss.getEyeLocation()).spawnAsBoss();
 									double newHealth = mBoss.getHealth() * 1.03;
 									mBoss.setHealth(Math.min(newHealth, EntityUtils.getMaxHealth(mBoss)));

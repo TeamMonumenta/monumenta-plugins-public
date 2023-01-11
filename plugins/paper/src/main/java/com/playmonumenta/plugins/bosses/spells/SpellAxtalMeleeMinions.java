@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
@@ -84,7 +85,7 @@ public class SpellAxtalMeleeMinions extends Spell {
 			public void run() {
 				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
 				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 1f, 0.5f);
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
 			}
 		};

@@ -51,6 +51,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -333,7 +334,7 @@ public class EntityListener implements Listener {
 					!(edbee.getDamager() instanceof Player player)
 						// OR The damage is from a player but the item frame/painting is invulnerable and the player is not in creative
 						|| (damagee.isInvulnerable() && !player.getGameMode().equals(GameMode.CREATIVE))
-						// OR the damage is from a player and they are in adventure mode, and the item frame is not tagged "Removable"
+						// OR the damage is from a player, and they are in adventure mode, and the item frame is not tagged "Removable"
 						|| (player.getGameMode().equals(GameMode.ADVENTURE) && !damagee.getScoreboardTags().contains("Removable"))) {
 					// Don't allow it
 					event.setCancelled(true);
@@ -540,13 +541,13 @@ public class EntityListener implements Listener {
 					&& ItemStatUtils.getAttributeAmount(itemInMainHand, ItemStatUtils.AttributeType.THROW_RATE, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) == 0) {
 					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
-					// Copy the item's name/etc so it can be textured
+					// Copy the item's name/etc. so it can be textured
 					newBall.getItem().setItemMeta(itemInMainHand.getItemMeta());
 					ItemUtils.setPlainTag(newBall.getItem());
 
 					newBall.setShooter(player);
 					newBall.setVelocity(origBall.getVelocity());
-					player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, 0.4f, 0.5f);
+					player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 0.4f, 0.5f);
 					event.setCancelled(true);
 					return;
 				}
@@ -559,7 +560,7 @@ public class EntityListener implements Listener {
 					    && itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
 					EnderPearl newPearl = (EnderPearl) origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 
-					// Copy the item's name/etc so it can be textured
+					// Copy the item's name/etc. so it can be textured
 					newPearl.getItem().setItemMeta(itemInMainHand.getItemMeta());
 					ItemUtils.setPlainTag(newPearl.getItem());
 

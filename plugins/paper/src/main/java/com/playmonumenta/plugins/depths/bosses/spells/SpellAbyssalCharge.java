@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -44,8 +45,8 @@ public class SpellAbyssalCharge extends Spell {
 		//Jump back
 		MovementUtils.knockAway(e, mBoss, 2.0f, false);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, DURATION, 1));
-		loc.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 5, 1.25f);
-		loc.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 5, 0.5f);
+		loc.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 1.25f);
+		loc.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 5, 0.5f);
 		mEmpoweredAttack = true;
 
 		//Disabled empowered attack later
@@ -54,7 +55,7 @@ public class SpellAbyssalCharge extends Spell {
 			@Override
 			public void run() {
 				mEmpoweredAttack = false;
-				loc.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 5, 1.25f);
+				loc.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 5, 1.25f);
 			}
 
 
@@ -71,7 +72,7 @@ public class SpellAbyssalCharge extends Spell {
 		//Extra damage
 		if (mEmpoweredAttack && damagee instanceof Player) {
 			event.setDamage(event.getDamage() * DAMAGE_MULTIPLIER);
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 5, 1.25f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.HOSTILE, 5, 1.25f);
 			mEmpoweredAttack = false;
 		}
 	}

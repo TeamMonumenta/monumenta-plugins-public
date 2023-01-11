@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -38,9 +39,9 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 	@Override
 	protected void outburstAction(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 1f);
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 0.6f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.6f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.6f, 1f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.6f, 1.5f);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 125, 0, 0, 0, 0.5, null, true).spawnAsEntityActive(mLauncher);
 	}
 

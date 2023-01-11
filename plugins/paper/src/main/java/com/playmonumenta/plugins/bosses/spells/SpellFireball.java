@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -78,7 +79,7 @@ public class SpellFireball extends Spell {
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
 				for (Player player : mPlayers) {
-					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 2f);
+					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 				}
 				if (mTicks >= mDelay) {
 					mLaunches++;

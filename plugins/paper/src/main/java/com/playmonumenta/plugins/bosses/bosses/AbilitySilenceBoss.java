@@ -9,6 +9,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -57,7 +58,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 		if (damagee instanceof Player player) {
 			World world = player.getWorld();
 			Location loc = player.getLocation().add(0, 1, 0);
-			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 0.25f, 2f);
+			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 0.25f, 2f);
 			new PartialParticle(Particle.REDSTONE, loc, 100, 0, 0, 0, 0.5, mParams.COLOR).spawnAsEntityActive(mBoss);
 
 			AbilityUtils.silencePlayer(player, mParams.DURATION);

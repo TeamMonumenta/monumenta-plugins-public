@@ -98,7 +98,6 @@ public class IceAspect implements Enchantment {
 
 				World world = enemy.getWorld();
 				Location enemyLocation = enemy.getLocation();
-				// /playsound block.soul_sand.place master @p ~ ~ ~ 1 0.5
 				world.playSound(
 					enemyLocation,
 					Sound.BLOCK_SOUL_SAND_PLACE,
@@ -106,7 +105,6 @@ public class IceAspect implements Enchantment {
 					1f,
 					0.5f
 				);
-				// /playsound block.glass.break master @p ~ ~ ~ 0.75 1.1
 				world.playSound(
 					enemyLocation,
 					Sound.BLOCK_GLASS_BREAK,
@@ -114,7 +112,6 @@ public class IceAspect implements Enchantment {
 					0.75f,
 					1.1f
 				);
-				// /playsound block.glass.break master @p ~ ~ ~ 0.5 1.3
 				world.playSound(
 					enemyLocation,
 					Sound.BLOCK_GLASS_BREAK,

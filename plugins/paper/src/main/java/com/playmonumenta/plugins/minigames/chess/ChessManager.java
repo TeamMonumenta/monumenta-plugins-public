@@ -480,7 +480,7 @@ public class ChessManager implements Listener {
 				ChessPlayer nextPlayer = teamPlaying == ChessTeam.WHITE ? event.getBlackPlayer() : event.getWhitePlayer();
 
 				if (nextPlayer != null && nextPlayer.mPlayer != null) {
-					nextPlayer.mPlayer.playSound(nextPlayer.mPlayer.getLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+					nextPlayer.mPlayer.playSound(nextPlayer.mPlayer.getLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.PLAYERS, 10f, 0.6f);
 				}
 
 				board.updateState(teamPlaying == ChessTeam.WHITE ? BoardState.BLACK_TURN : BoardState.WHITE_TURN);

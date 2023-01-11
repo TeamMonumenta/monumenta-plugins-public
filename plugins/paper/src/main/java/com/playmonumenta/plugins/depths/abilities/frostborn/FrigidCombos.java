@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,7 +50,7 @@ public class FrigidCombos extends DepthsAbility {
 				Location targetLoc = enemy.getLocation();
 				World world = targetLoc.getWorld();
 				for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, RADIUS)) {
-					if (!(mob.getHealth() <= 0 || mob == null)) {
+					if (!(mob.getHealth() <= 0)) {
 						new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 						EntityUtils.applySlow(mPlugin, TIME, SLOW_AMPLIFIER[mRarity - 1], mob);
 						DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true);
@@ -60,8 +61,8 @@ public class FrigidCombos extends DepthsAbility {
 
 				//Particles
 				Location playerLoc = mPlayer.getLocation().add(0, 1, 0);
-				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.65f);
-				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, 0.8f, 0.45f);
+				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
+				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
 				new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			}
 			return true;

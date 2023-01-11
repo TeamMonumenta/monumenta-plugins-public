@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,7 +31,7 @@ public class SpellBladeDance extends Spell {
 	public void run() {
 		World world = mCaster.getWorld();
 		mCaster.setInvulnerable(true);
-		world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1.5f);
+		world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1f, 1.5f);
 		new PartialParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0).spawnAsEntityActive(mCaster);
 		new BukkitRunnable() {
 			int mIndex = 0;
@@ -45,7 +46,7 @@ public class SpellBladeDance extends Spell {
 
 				mIndex += 2;
 				new PartialParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 10, 4, 4, 4, 0).spawnAsEntityActive(mCaster);
-				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 0.75f, mPitch);
+				world.playSound(mCaster.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 0.75f, mPitch);
 				mPitch += 0.2f;
 				Location loc1 = mCaster.getLocation().add(6, 6, 6);
 				Location loc2 = mCaster.getLocation().add(-6, -1, -6);
@@ -115,8 +116,8 @@ public class SpellBladeDance extends Spell {
 						}
 
 					}.runTaskTimer(mPlugin, 0, 1);
-					world.playSound(mCaster.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-					world.playSound(mCaster.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
+					world.playSound(mCaster.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
+					world.playSound(mCaster.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.5f);
 					new PartialParticle(Particle.FLAME, mCaster.getLocation(), 150, 0, 0, 0, 0.25).spawnAsEntityActive(mCaster);
 					new PartialParticle(Particle.CLOUD, mCaster.getLocation(), 70, 0, 0, 0, 0.25).spawnAsEntityActive(mCaster);
 					new PartialParticle(Particle.SWEEP_ATTACK, mCaster.getLocation(), 150, 4, 4, 4, 0).spawnAsEntityActive(mCaster);

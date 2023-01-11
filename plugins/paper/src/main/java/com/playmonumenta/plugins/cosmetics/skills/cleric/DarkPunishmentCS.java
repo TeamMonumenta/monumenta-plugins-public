@@ -163,6 +163,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 				healedPlayer.playSound(
 					healedPlayer.getLocation(),
 					Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED,
+					SoundCategory.PLAYERS,
 					0.5f,
 					pitch
 				);

@@ -14,6 +14,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -55,11 +56,11 @@ public class SpellGhostlyCannons extends Spell {
 				float ft = fTick / 25;
 				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.CRIT, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10, 0.5f + ft);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.HOSTILE, 10, 0.5f + ft);
 				if (mTicks >= 20 * 2) {
 					this.cancel();
 					mActiveRunnables.remove(this);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 3, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 0.5f);
 					BukkitRunnable runnable = new BukkitRunnable() {
 
 						int mI = 0;
@@ -134,13 +135,13 @@ public class SpellGhostlyCannons extends Spell {
 				if (FastUtils.RANDOM.nextBoolean()) {
 					new PartialParticle(Particle.CRIT, particle, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
 				}
-				mWorld.playSound(particle, Sound.ENTITY_ARROW_SHOOT, 1, 1);
+				mWorld.playSound(particle, Sound.ENTITY_ARROW_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mTicks <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mLoc, 15, 0, 0, 0, 0.175, null, false).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.CRIT, mLoc, 10, 0, 0, 0, 0.25, null, false).spawnAsEntityActive(mBoss);
-					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 3, 3, 3);
 					for (Player player : PlayerUtils.playersInRange(mLoc, 3, true)) {
 						BoundingBox pBox = player.getBoundingBox();

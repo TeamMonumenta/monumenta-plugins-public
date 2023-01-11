@@ -95,7 +95,7 @@ public abstract class GrayStrongSummonerBase extends BossAbilityGroup {
 					}
 				}
 			}, (summonLoc, times) -> {
-				summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
+				summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 0.8f, 1.4f);
 				return LibraryOfSoulsIntegration.summon(summonLoc, mobName);
 			}, (LivingEntity bos, Location loc, int ticks) -> {
 				if (ticks == 0) {

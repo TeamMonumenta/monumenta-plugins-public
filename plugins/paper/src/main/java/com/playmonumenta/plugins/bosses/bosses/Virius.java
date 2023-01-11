@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -56,8 +57,8 @@ public class Virius extends BossAbilityGroup {
 			new SpellBaseLaser(plugin, boss, detectionRange, 100, false, false, 160,
 				// Tick action per player
 				(LivingEntity player, int ticks, boolean blocked) -> {
-					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
-					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
 					if (ticks == 0) {
 						boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
 					}
@@ -69,7 +70,7 @@ public class Virius extends BossAbilityGroup {
 				},
 				// Damage generated at the end of the attack
 				(LivingEntity player, Location loc, boolean blocked) -> {
-					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
 					new PartialParticle(Particle.WATER_WAKE, loc, 300, 0.8, 0.8, 0.8, 0).spawnAsEntityActive(boss);
 					if (!blocked) {
 						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, 20);

@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -75,7 +76,7 @@ public class Swiftness extends Ability {
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.CLOUD, loc, 40, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_WITCH_THROW, 1, 2f);
+			world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1, 2f);
 		}
 	}
 
@@ -105,12 +106,12 @@ public class Swiftness extends Ability {
 			mJumpBoost = false;
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned off");
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 2.0f, 1.6f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		} else {
 			mJumpBoost = true;
 			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, 21, SWIFTNESS_EFFECT_JUMP_LVL + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST), true, false));
 			MessagingUtils.sendActionBarMessage(mPlayer, "Jump Boost has been turned on");
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.6f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		}
 		ClientModHandler.updateAbility(mPlayer, this);
 	}

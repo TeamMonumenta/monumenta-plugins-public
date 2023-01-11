@@ -126,7 +126,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 				@Override
 				protected void outburstAction(Location loc) {
 					World world = loc.getWorld();
-					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1.5f, 0.65F);
+					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.HOSTILE, 1.5f, 0.65F);
 				}
 
 				@Override

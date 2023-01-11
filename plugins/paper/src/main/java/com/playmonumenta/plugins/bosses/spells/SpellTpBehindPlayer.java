@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
@@ -25,7 +26,7 @@ import org.bukkit.util.Vector;
 
 public class SpellTpBehindPlayer extends Spell {
 
-	private static final int TP_STUN_CREEPER_INCRISED = 20; // Increased time for creepers
+	private static final int TP_STUN_CREEPER_INCREASED = 20; // Increased time for creepers
 	private static final int DISTANCE_TO_PLAYER = 2 * 4; // How many half-blocks behind the player maximum
 	private static final int VERTICAL_DISTANCE_TO_PLAYER = 3;
 
@@ -126,11 +127,11 @@ public class SpellTpBehindPlayer extends Spell {
 							locTest.add(0, mLauncher.getHeight() / 2, 0);
 							new PartialParticle(Particle.SPELL_WITCH, locTest, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
 							new PartialParticle(Particle.SMOKE_LARGE, locTest, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
-							world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, 3f, 0.7f);
+							world.playSound(locTest, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 
 							// The mPlugin here is of the incorrect type for some reason
 							if (mLauncher instanceof Creeper) {
-								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun + TP_STUN_CREEPER_INCRISED, mLauncher);
+								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun + TP_STUN_CREEPER_INCREASED, mLauncher);
 							} else {
 								EntityUtils.applyCooling(com.playmonumenta.plugins.Plugin.getInstance(), mTPStun, mLauncher);
 							}
@@ -153,7 +154,7 @@ public class SpellTpBehindPlayer extends Spell {
 	}
 
 	protected void animation(Player target) {
-		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 1.4f, 0.5f);
+		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 1.4f, 0.5f);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;

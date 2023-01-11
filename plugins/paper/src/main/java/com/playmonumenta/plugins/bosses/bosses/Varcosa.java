@@ -22,11 +22,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -73,8 +76,8 @@ public final class Varcosa extends BossAbilityGroup {
 
 				// Tick action per player
 				(LivingEntity player, int ticks, boolean blocked) -> {
-					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
-					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (ticks / 80f) * 1.5f);
+					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (ticks / 80f) * 1.5f);
 
 					if (ticks == 0) {
 						boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
@@ -89,7 +92,7 @@ public final class Varcosa extends BossAbilityGroup {
 
 				// Damage generated at the end of the attack
 				(LivingEntity target, Location loc, boolean blocked) -> {
-					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1.5f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
 					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 300, 0.8, 0.8, 0.8, 0).spawnAsEntityActive(boss);
 
 					if (!blocked) {
@@ -149,14 +152,18 @@ public final class Varcosa extends BossAbilityGroup {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_PURPLE + "Captain Varcosa", ChatColor.RED + "The Legendary Pirate King");
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 	}
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.enderdragon.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Ye thought I be the one in control here? Yarharhar! N'argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!\",\"color\":\"purple\"}]");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+			player.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Captain Varcosa] ", NamedTextColor.GOLD))
+				.append(Component.text("Ye thought I be the one in control here? Yarharhar! N'argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!")));
+		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 

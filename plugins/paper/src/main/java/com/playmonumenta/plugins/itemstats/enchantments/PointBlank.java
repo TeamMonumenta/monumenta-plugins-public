@@ -12,6 +12,7 @@ import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -68,6 +69,6 @@ public class PointBlank implements Enchantment {
 	public static void particles(Location loc, Player player) {
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 30, 0, 0, 0, 0.25).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 30, 0, 0, 0, 0.65).spawnAsPlayerActive(player);
-		player.playSound(player.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, 1.5f, 0.75f);
+		player.playSound(player.getLocation(), Sound.ENTITY_ARMOR_STAND_BREAK, SoundCategory.PLAYERS, 1.5f, 0.75f);
 	}
 }

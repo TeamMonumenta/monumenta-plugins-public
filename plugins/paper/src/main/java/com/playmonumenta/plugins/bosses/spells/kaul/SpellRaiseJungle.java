@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
@@ -177,13 +178,13 @@ public class SpellRaiseJungle extends Spell {
 						mChargeUp.nextTick();
 						if (mChargeUp.getTime() % 5 == 0) {
 							for (Player player : players) {
-								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1f, 0.5f);
+								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 1f, 0.5f);
 							}
 						}
 
 						if (mSummonTime <= mChargeUp.getTime() && !mSummoned.isEmpty()) {
 							for (Player player : players) {
-								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, 1, 1f);
+								player.playSound(player.getLocation(), Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 1f);
 							}
 							this.cancel();
 						}
@@ -207,7 +208,7 @@ public class SpellRaiseJungle extends Spell {
 	public void onHurt(DamageEvent event) {
 		if (mSummoned.size() > 0) {
 			event.setDamage(event.getDamage() * 0.4);
-			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, 1, 0.5f);
+			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 1, 0.5f);
 			new PartialParticle(Particle.BLOCK_DUST, mBoss.getLocation().add(0, 1, 0), 20, 0.4, 0.5, 0.4, 0.25, PARTICLE_DATA).spawnAsEntityActive(mBoss);
 		}
 	}

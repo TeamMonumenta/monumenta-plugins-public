@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
@@ -55,7 +56,7 @@ public class SpellSummonBlazes extends Spell {
 			public void run() {
 				Location centerLoc = mLoc.clone().add(0, 1, 0);
 				mLauncher.teleport(mLoc);
-				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, 4f, 2f);
+				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 4f, 2f);
 				for (int j = 0; j < 5; j++) {
 					Location particleLoc = centerLoc.clone().add(((double) (FastUtils.RANDOM.nextInt(4000) - 2000) / 1000),
 						((double) (FastUtils.RANDOM.nextInt(4000) - 2000) / 1000),

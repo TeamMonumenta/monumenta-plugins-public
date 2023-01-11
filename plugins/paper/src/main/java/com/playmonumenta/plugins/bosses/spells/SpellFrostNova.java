@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,9 +43,9 @@ public class SpellFrostNova extends SpellBaseAoE {
 	@Override
 	protected void outburstAction(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.77F);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.5F);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, 1.5f, 0.65F);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.5f, 0.77F);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.5f, 0.5F);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.5f, 0.65F);
 	}
 
 	@Override

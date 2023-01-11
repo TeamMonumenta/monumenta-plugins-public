@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,7 +50,7 @@ public class SpellFluffingDeath extends Spell {
 				float fTick = mTicks;
 				float ft = fTick / 25;
 				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 3, 0.35, 0, 0.35, 0.1).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.5f + ft);
 				if (mTicks >= 20 * 2) {
 					this.cancel();
 					new BukkitRunnable() {
@@ -99,12 +100,12 @@ public class SpellFluffingDeath extends Spell {
 				Location particle = loc.clone().add(0, mY, 0);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, particle, 1, 0.2f, 0.2f, 0.2f, 0.05, null, true).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.CLOUD, particle, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
-				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
 					new PartialParticle(Particle.FLAME, loc, 25, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.CLOUD, loc, 75, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MAGIC, 1);
 						MovementUtils.knockAway(loc, player, 0.5f, 0.65f, false);
@@ -117,12 +118,12 @@ public class SpellFluffingDeath extends Spell {
 
 	private void teleport(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
 		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);
 		mBoss.teleport(loc);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0f);
 		new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(mBoss);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(mBoss);

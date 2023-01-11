@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -54,7 +55,7 @@ public class Detonation extends DepthsAbility {
 		}
 		new PartialParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, location.add(0, 1, 0), 3).spawnAsPlayerActive(mPlayer);
-		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 1);
+		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 1);
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,8 +75,8 @@ public class DefensiveLine extends Ability {
 		putOnCooldown();
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation();
-		world.playSound(location, Sound.BLOCK_ANVIL_PLACE, 1.25f, 1.35f);
-		world.playSound(location, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.25f, 1.1f);
+		world.playSound(location, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1.25f, 1.35f);
+		world.playSound(location, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.25f, 1.1f);
 		new PartialParticle(Particle.FIREWORKS_SPARK, location, 35, 0.2, 0, 0.2, 0.25).spawnAsPlayerActive(mPlayer);
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);

@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -52,8 +53,8 @@ public class PulseLaserBoss extends BossAbilityGroup {
 			new SpellBaseLaser(plugin, boss, p.DETECTION, p.DURATION, false, p.SINGLE_TARGET, p.COOLDOWN,
 				// Tick action per player
 				(LivingEntity player, int ticks, boolean blocked) -> {
-					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
-					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
+					player.getWorld().playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
+					boss.getLocation().getWorld().playSound(boss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 0.8f, 0.5f + (ticks / 80f) * 1.5f);
 					if (ticks == 0) {
 						boss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 110, 4));
 					}
@@ -68,7 +69,7 @@ public class PulseLaserBoss extends BossAbilityGroup {
 				3,
 				// Damage generated at the end of the attack
 				(LivingEntity player, Location loc, boolean blocked) -> {
-					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.6f, 1.5f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 0.6f, 1.5f);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (!blocked) {
 						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, p.DAMAGE);

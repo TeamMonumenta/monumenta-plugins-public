@@ -24,6 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
@@ -55,7 +56,7 @@ public class Earthquake extends DepthsAbility {
 			.displayItem(new ItemStack(Material.COARSE_DIRT))
 			.descriptions(Earthquake::getDescription, MAX_RARITY);
 
-	private WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public Earthquake(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -108,16 +109,16 @@ public class Earthquake extends DepthsAbility {
 
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 30, RADIUS / 2, 0.1, RADIUS / 2, 0.1).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.LAVA, loc, 20, RADIUS / 2, 0.3, RADIUS / 2, 0.1).spawnAsPlayerActive(mPlayer);
-						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 3, 1.0f);
-						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1, 1.0f);
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.75f, 1.0f);
+						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 3, 1.0f);
+						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1.0f);
+						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1.0f);
 						this.cancel();
 					} else {
 						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.PODZOL)).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.GRANITE)).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2, 0.25, RADIUS / 2, 0.1, Bukkit.createBlockData(Material.IRON_ORE)).spawnAsPlayerActive(mPlayer);
-						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
-						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.75f, 0.5f);
+						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 2, 1.0f);
+						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.75f, 0.5f);
 					}
 
 					mTicks += 5;
@@ -141,7 +142,7 @@ public class Earthquake extends DepthsAbility {
 		}
 		putOnCooldown(getModifiedCooldown((int) (COOLDOWN * BowAspect.getCooldownReduction(mPlayer))));
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.PLAYERS, 2, 1.0f);
 
 		if (projectile instanceof AbstractArrow arrow) {
 			arrow.setPierceLevel(0);

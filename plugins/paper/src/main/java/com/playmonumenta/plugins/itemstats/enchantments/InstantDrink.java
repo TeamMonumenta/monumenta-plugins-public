@@ -13,6 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -44,7 +45,7 @@ public class InstantDrink implements Enchantment {
 
 				Starvation.apply(player, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.STARVATION));
 
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, 1, 1);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 1, 1);
 				Color color = meta.getColor();
 				if (color != null) {
 					double red = color.getRed() / 255D;

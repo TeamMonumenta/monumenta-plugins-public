@@ -32,6 +32,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.LivingEntity;
@@ -150,13 +151,13 @@ public class AlchemicalArtillery extends PotionAbility {
 		String active;
 		if (mActive) {
 			active = "activated";
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 1.25f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, SoundCategory.PLAYERS, 1, 1.25f);
 		} else {
 			active = "deactivated";
-			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1, 0.75f);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, SoundCategory.PLAYERS, 1, 0.75f);
 		}
 		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemical Artillery has been " + active + "!");
-		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 0.9f, 1.2f);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, 1.2f);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -167,8 +168,8 @@ public class AlchemicalArtillery extends PotionAbility {
 			cancelOnDeath(Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 				new PartialParticle(Particle.EXPLOSION_LARGE, loc, (int) (4 * radius * radius / 9), radius, radius / 2.0, radius, 0.1).spawnAsPlayerActive(mPlayer);
 				World world = loc.getWorld();
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.6f, 1.2f);
-				world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 0.6f, 0.8f);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.6f, 1.2f);
+				world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.PLAYERS, 0.6f, 0.8f);
 
 				List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
 				double damage = ((mAlchemistPotions == null ? 0 : mAlchemistPotions.getDamage()) + MetadataUtils.getMetadata(potion, AlchemicalArtillery.ARTILLERY_POTION_TAG, 0.0)) * (ENHANCEMENT_EXPLOSION_POT_PERCENT_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_EXPLOSION_MULTIPLIER));

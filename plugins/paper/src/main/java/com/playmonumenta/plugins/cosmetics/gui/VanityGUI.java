@@ -19,6 +19,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -262,7 +263,7 @@ public class VanityGUI extends Gui {
 		if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
 			    && !mPlayer.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
 			mPlayer.sendMessage(Component.text("This item is soulbound to another player!", NamedTextColor.RED));
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 			return;
 		}
 		item = VanityManager.cleanCopyForDisplay(item);
@@ -276,7 +277,7 @@ public class VanityGUI extends Gui {
 		}
 		if (slot == EquipmentSlot.OFF_HAND && !VanityManager.isValidOffhandVanityItem(item)) {
 			mPlayer.sendMessage(Component.text("Cannot use items of this type as offhand vanity!", NamedTextColor.RED));
-			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 			return;
 		}
 		if (VanityManager.hasVanityUnlocked(mPlayer, item)) {

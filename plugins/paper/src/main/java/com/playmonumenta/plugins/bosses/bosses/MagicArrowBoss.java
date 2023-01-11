@@ -11,6 +11,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -67,7 +68,7 @@ public class MagicArrowBoss extends BossAbilityGroup {
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 1.5f);
 				},
 				// Projectile Aesthetic
 				(World world, Location loc, int ticks) -> {
@@ -76,7 +77,7 @@ public class MagicArrowBoss extends BossAbilityGroup {
 				},
 				// Hit Action
 				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.5f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
 					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
 						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);

@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
@@ -203,9 +204,9 @@ public class Bezoar extends Ability {
 
 					item.remove();
 
-					world.playSound(itemLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					world.playSound(itemLoc, Sound.BLOCK_STONE_BREAK, 1, 0.75f);
-					world.playSound(itemLoc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1f);
+					world.playSound(itemLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+					world.playSound(itemLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+					world.playSound(itemLoc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1, 1f);
 					new PartialParticle(Particle.BLOCK_CRACK, itemLoc, 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.TOTEM, itemLoc, 20, 0, 0, 0, 0.35F).spawnAsPlayerActive(mPlayer);
 

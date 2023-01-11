@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
@@ -68,7 +69,7 @@ public class SpellBurningVengence extends Spell {
 					public void run() {
 
 						if (mTicks % 2 == 0) {
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3, 0.5f + mTicks / 32f);
+							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 3, 0.5f + mTicks / 32f);
 						}
 						mTicks++;
 						Location loc = horse.getLocation();
@@ -94,8 +95,8 @@ public class SpellBurningVengence extends Spell {
 						if (mRadius <= 0) {
 							this.cancel();
 							horse.removePotionEffect(PotionEffectType.SLOW);
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 1.25f);
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 3, 0.85f);
+							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1.25f);
+							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 0.85f);
 							new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.125).spawnAsBoss();
 							new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsBoss();
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.125).spawnAsBoss();

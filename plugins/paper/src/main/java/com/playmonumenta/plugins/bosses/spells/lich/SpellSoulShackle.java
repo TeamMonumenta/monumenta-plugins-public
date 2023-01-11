@@ -65,7 +65,7 @@ public class SpellSoulShackle extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, 6.0f, 1.0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 6.0f, 1.0f);
 		mPortal.location(mBoss.getLocation().add(0, 5, 0)).spawnAsBoss();
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
@@ -130,7 +130,7 @@ public class SpellSoulShackle extends Spell {
 		DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, "Soul Shackle");
 		AbilityUtils.silencePlayer(p, 5 * 20);
 		mRod.location(pLoc).spawnAsBoss();
-		world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.7f, 0.5f);
+		world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 0.7f, 0.5f);
 		BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setVisible(true);
 		bar.addPlayer(p);
@@ -166,7 +166,7 @@ public class SpellSoulShackle extends Spell {
 					pCheckLoc.setY(mCenter.getY());
 					if (pGroundLoc.distance(pCheckLoc) > 3) {
 						p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
-						world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 2.0f, 1.0f);
+						world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 2.0f, 1.0f);
 						BossUtils.bossDamagePercent(mBoss, p, 0.15, "Soul Shackle");
 						MovementUtils.knockAway(pCheckLoc, p, -0.75f, false);
 					}

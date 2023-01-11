@@ -74,8 +74,8 @@ public class EarthquakeTowerAbility extends TowerAbility {
 
 
 							if (mTicks % 20 == 0 && mTicks > 0) {
-								mWorld.playSound(mTargetLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 0.5f);
-								mWorld.playSound(mTargetLoc, Sound.BLOCK_GRAVEL_BREAK, 1f, 0.5f);
+								mWorld.playSound(mTargetLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1f, 0.5f);
+								mWorld.playSound(mTargetLoc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1f, 0.5f);
 								for (int i = 0; i < 360; i += 18) {
 									new PartialParticle(Particle.SMOKE_NORMAL, mTargetLoc.clone().add(FastUtils.cos(Math.toRadians(i)) * ((double) RADIUS), 0.2, FastUtils.sin(Math.toRadians(i)) * ((double) RADIUS)), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 								}
@@ -108,9 +108,9 @@ public class EarthquakeTowerAbility extends TowerAbility {
 											return;
 										}
 
-										mWorld.playSound(mTargetLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1.35f);
-										mWorld.playSound(mTargetLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-										mWorld.playSound(mTargetLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
+										mWorld.playSound(mTargetLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1.35f);
+										mWorld.playSound(mTargetLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.5f);
+										mWorld.playSound(mTargetLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 0.5f);
 
 										new PartialParticle(Particle.CLOUD, mTargetLoc, 150, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
 										new PartialParticle(Particle.LAVA, mTargetLoc, 35, ((double) RADIUS) / 2, 0.1, ((double) RADIUS) / 2, 0).spawnAsEntityActive(mBoss);

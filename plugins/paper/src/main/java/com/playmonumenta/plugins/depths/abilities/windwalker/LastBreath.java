@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -102,8 +103,8 @@ public class LastBreath extends DepthsAbility {
 		new PartialParticle(Particle.CLOUD, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.VILLAGER_HAPPY, loc.clone().add(0, 1, 0), 20, 1.25, 1.25, 1.25).spawnAsPlayerActive(mPlayer);
 
-		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, 2.0f, 1.2f);
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 2.0f, 0.4f);
+		world.playSound(loc, Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 2.0f, 0.4f);
 
 		MessagingUtils.sendActionBarMessage(mPlayer, "Last Breath has been activated!");
 

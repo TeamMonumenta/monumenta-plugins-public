@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -39,7 +40,7 @@ public class DummyDecoyBoss extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.7f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.7f);
 		new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 10, 0.5, 1, 0.5, 0.05).spawnAsEntityActive(mBoss);
 		List<LivingEntity> mobsToStun = EntityUtils.getNearbyMobs(mBoss.getLocation(), DummyDecoy.STUN_RADIUS);
 		for (LivingEntity le : mobsToStun) {

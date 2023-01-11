@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -42,8 +43,8 @@ public class SpellBash extends Spell {
 				return;
 			}
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 25, 1));
-			mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
-			mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.75f);
+			mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.7f);
+			mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1.5f, 1.75f);
 			new BukkitRunnable() {
 				int mTicks = 0;
 
@@ -57,8 +58,8 @@ public class SpellBash extends Spell {
 						Location loc = mBoss.getEyeLocation().subtract(0, 0.15, 0);
 						Vector direction = LocationUtils.getDirectionTo(target.getLocation().add(0, 1.25, 0), loc);
 						loc.setDirection(direction);
-						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.5f, 0.7f);
-						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5f, 1.25f);
+						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0.7f);
+						mWorld.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.HOSTILE, 1.5f, 1.25f);
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 25, 0.1, 0.1, 0.1, 0.25).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 15, 0.1, 0.1, 0.1, 0.2).spawnAsEntityActive(mBoss);
 						new BukkitRunnable() {

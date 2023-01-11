@@ -17,6 +17,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -68,7 +69,7 @@ public class TemporalBender implements Enchantment {
 			player.setSaturation(Math.min(player.getFoodLevel(), Math.min(player.getSaturation() + 6, 20)));
 
 			// Sound and Particles
-			player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 2);
+			player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1, 2);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0, BLUE1_COLOR).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 10, 0.5, 0.5, 0.5, 0, BLUE2_COLOR).spawnAsPlayerBuff(player);
 

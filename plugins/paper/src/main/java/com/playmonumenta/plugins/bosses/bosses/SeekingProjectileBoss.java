@@ -14,6 +14,7 @@ import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -64,24 +65,24 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
 					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
-					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				},
 				// Projectile Aesthetic
 				(World world, Location loc, int ticks) -> {
 					new PartialParticle(Particle.FLAME, loc, 3, 0, 0, 0, 0.1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 					if (ticks % 40 == 0) {
-						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, 0.5f, 0.2f);
+						world.playSound(loc, Sound.ENTITY_BLAZE_BURN, SoundCategory.HOSTILE, 0.5f, 0.2f);
 					}
 				},
 				// Hit Action
 				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
 					new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 					if (target != null) {
 						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);

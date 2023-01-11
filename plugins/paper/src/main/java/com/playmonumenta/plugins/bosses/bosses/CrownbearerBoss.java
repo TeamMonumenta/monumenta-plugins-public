@@ -15,11 +15,14 @@ import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -40,9 +43,8 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 	private final Location mEndLoc;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new CrownbearerBoss(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new CrownbearerBoss(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -58,13 +60,15 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 		mBoss.addScoreboardTag("Boss");
 		mBoss.setRemoveWhenFarAway(false);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"So my identity has been revealed? No matter, I'll take out you and the King in one fell swoop!\",\"color\":\"white\"}]");
-		});
-		events.put(75, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Don't underestimate me! After you fall, so will the King, and all of Sierhaven with him!\",\"color\":\"white\"}]");
-		});
+		Map<Integer, BossHealthAction> events = new HashMap<>();
+		events.put(100, mBoss -> PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
+			.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Onyx Crownbearer] ", NamedTextColor.GOLD))
+				.append(Component.text("So my identity has been revealed? No matter, I'll take out you and the King in one fell swoop!"))));
+		events.put(75, mBoss -> PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
+			.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Onyx Crownbearer] ", NamedTextColor.GOLD))
+				.append(Component.text("Don't underestimate me! After you fall, so will the King, and all of Sierhaven with him!"))));
 		events.put(50, mBoss -> {
 			new BukkitRunnable() {
 				int mTicks = 0;
@@ -76,19 +80,25 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 					summonSOTF(loc);
 					new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
+					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
 					if (mTicks >= 4) {
 						this.cancel();
 					}
 				}
 
 			}.runTaskTimer(plugin, 30, 10);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Sons of the Forest, come to me! Let us conquer this place once and for all!\",\"color\":\"white\"}]");
+			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.WHITE)
+					.append(Component.text("[Onyx Crownbearer] ", NamedTextColor.GOLD))
+					.append(Component.text("Sons of the Forest, come to me! Let us conquer this place once and for all!")));
 		});
 		events.put(30, mBoss -> {
 			knockback(plugin, 6);
 			changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Agh! This battle ends here and now! I will not let you stall this any longer!\",\"color\":\"white\"}]");
+			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.WHITE)
+					.append(Component.text("[Onyx Crownbearer] ", NamedTextColor.GOLD))
+					.append(Component.text("Agh! This battle ends here and now! I will not let you stall this any longer!")));
 		});
 		events.put(20, mBoss -> {
 			new BukkitRunnable() {
@@ -101,14 +111,17 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 					summonSOTF(loc);
 					new PartialParticle(Particle.SPELL_WITCH, loc.clone().add(0, 1, 0), 50, 0.25, 0.45, 0.25, 0.175).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 10, 0, 0.45, 0, 0.15).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 0.75f);
+					world.playSound(loc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 0.75f);
 					if (mTicks >= 5) {
 						this.cancel();
 					}
 				}
 
 			}.runTaskTimer(plugin, 15, 7);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"My allies, aid me! Let us finish this fight!\",\"color\":\"white\"}]");
+			PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.WHITE)
+					.append(Component.text("[Onyx Crownbearer] ", NamedTextColor.GOLD))
+					.append(Component.text("My allies, aid me! Let us finish this fight!")));
 		});
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.GREEN, BarStyle.SEGMENTED_10, events);
@@ -122,8 +135,8 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 
 	private void knockback(Plugin plugin, double r) {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.5f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f, false);
 		}
@@ -163,8 +176,13 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Onyx Crownbearer] \",\"color\":\"gold\"},{\"text\":\"Damn you... The King... Must meet... His...\",\"color\":\"white\"}]");
+		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+		}
+		PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+			.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Onyx Crownbearer] ", NamedTextColor.GOLD))
+				.append(Component.text("Damn you... The King... Must meet... His...")));
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 
@@ -183,7 +201,7 @@ public final class CrownbearerBoss extends BossAbilityGroup {
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Onyx Crownbearer", ChatColor.DARK_RED + "The King's Assassinator");
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 1.25f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
 	}
 

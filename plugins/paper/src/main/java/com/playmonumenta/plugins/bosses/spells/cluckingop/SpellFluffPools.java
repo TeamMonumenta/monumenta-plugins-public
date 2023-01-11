@@ -10,6 +10,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -50,7 +51,7 @@ public class SpellFluffPools extends Spell {
 
 	private void fluff(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1, 0.5f);
+		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE, 1, 0.5f);
 		new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -62,7 +63,7 @@ public class SpellFluffPools extends Spell {
 				if (mTicks >= 20) {
 					this.cancel();
 					new PartialParticle(Particle.CLOUD, loc, 250, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
-					world.playSound(loc, Sound.ITEM_TOTEM_USE, 1, 1f);
+					world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.HOSTILE, 1, 1f);
 					new BukkitRunnable() {
 						int mInnerTicks = 0;
 

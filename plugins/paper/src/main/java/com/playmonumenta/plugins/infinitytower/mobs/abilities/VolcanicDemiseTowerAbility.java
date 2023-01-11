@@ -15,6 +15,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -54,13 +55,13 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 
 						new PartialParticle(Particle.LAVA, mBoss.getLocation(), 4, 0.35, 0, 0.35, 0.005).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 3, 0.3, 0, 0.3, 0.125).spawnAsEntityActive(mBoss);
-						mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.5f + ft);
+						mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.5f + ft);
 
 
 						if (mTicks >= 20 * 2) {
 							cancel();
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.5f);
-							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1, 0.7f);
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 0.5f);
+							mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1, 0.7f);
 
 							BukkitRunnable runnable1 = new BukkitRunnable() {
 
@@ -161,12 +162,12 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 				if (FastUtils.RANDOM.nextBoolean()) {
 					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
 				}
-				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
 					this.cancel();
 					new PartialParticle(Particle.FLAME, mLoc, 50, 0, 0, 0, 0.175, null, true).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, mLoc, 10, 0, 0, 0, 0.25, null, true).spawnAsEntityActive(mBoss);
-					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.9f);
+					mWorld.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					BoundingBox box = BoundingBox.of(mLoc, 4, 10, 4);
 					for (LivingEntity target : mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()) {
 						if (target.isValid() && !target.isDead() && !mGame.isTurnEnded()) {

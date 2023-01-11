@@ -73,15 +73,14 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 		mTriggerTickParticle = true;
 		// Add this effect immediately afterwards to avoid causing a ConcurrentModificationException
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, damage, percentDamage, mPlugin));
-		});
+		Bukkit.getScheduler().runTask(mPlugin, () ->
+			mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, damage, percentDamage, mPlugin)));
 
 		Location loc = entity.getLocation();
 		World world = loc.getWorld();
 		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 2f, 0.75f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 2f, 0.75f);
 	}
 
 	@Override

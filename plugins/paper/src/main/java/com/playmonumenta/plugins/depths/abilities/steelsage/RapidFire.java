@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
@@ -90,8 +91,8 @@ public class RapidFire extends DepthsAbility {
 
 					mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.ASH);
 					Location loc = mPlayer.getLocation().add(0, 1, 0);
-					loc.getWorld().playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, 1, 0.65f);
-					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, 1, 0.45f);
+					loc.getWorld().playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1, 0.65f);
+					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 0.45f);
 					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 					Bukkit.getPluginManager().callEvent(eventLaunch);
 					if (arrow.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {

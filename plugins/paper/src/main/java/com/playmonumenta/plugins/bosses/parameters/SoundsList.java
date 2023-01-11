@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -41,7 +42,7 @@ public class SoundsList {
 			float fVolume = mVolume != 0 ? mVolume : volume;
 			float fPitch = mPitch != 0 ? mPitch : pitch;
 			World world = loc.getWorld();
-			world.playSound(loc, mSound, fVolume, fPitch);
+			world.playSound(loc, mSound, SoundCategory.HOSTILE, fVolume, fPitch);
 		}
 
 		public void play(Player player) {

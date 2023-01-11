@@ -114,7 +114,6 @@ public class ThunderAspect implements Enchantment {
 						partialParticle.spawnAsEnemy();
 
 						Location enemyLocation = enemy.getLocation();
-						// /playsound entity.firework_rocket.twinkle master @p ~ ~ ~ 0.5 1.5
 						world.playSound(
 							enemyLocation,
 							Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,
@@ -122,7 +121,6 @@ public class ThunderAspect implements Enchantment {
 							0.5f,
 							1.5f
 						);
-						// /playsound entity.firework_rocket.twinkle_far master @p ~ ~ ~ 0.5 1.2
 						world.playSound(
 							enemyLocation,
 							Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR,
@@ -148,7 +146,7 @@ public class ThunderAspect implements Enchantment {
 			if (particles && !(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
 				Location loc = enemy.getLocation();
 				World world = enemy.getWorld();
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.65f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 0.65f, 1.5f);
 				loc = loc.add(0, 1, 0);
 				new PartialParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_YELLOW).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.REDSTONE, loc, 12, 0.5, 0.5, 0.5, COLOR_FAINT_YELLOW).spawnAsPlayerActive(player);

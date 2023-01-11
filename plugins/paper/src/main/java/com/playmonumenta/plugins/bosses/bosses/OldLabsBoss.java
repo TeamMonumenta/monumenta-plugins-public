@@ -18,11 +18,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -43,7 +46,7 @@ public class OldLabsBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
-	private String[] mDio = new String[] {
+	private static final String[] mDialog = new String[] {
 		"Well, this is very peculiar...",
 		"The rats causing such a ruckus down here are mere commoners? How feeble are those bandits?",
 		"Now as a noble, I'm supposed to take pity on you. Where's the fun in that when I can cut you down instead?",
@@ -51,9 +54,8 @@ public class OldLabsBoss extends BossAbilityGroup {
 	};
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new OldLabsBoss(plugin, boss, spawnLoc, endLoc, false);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new OldLabsBoss(plugin, boss, spawnLoc, endLoc, false));
 	}
 
 	@Override
@@ -83,21 +85,29 @@ public class OldLabsBoss extends BossAbilityGroup {
 			tempLoc.setY(300);
 			mBoss.teleport(tempLoc);
 
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.witch.ambient master @s ~ ~ ~ 10 0.6");
+			for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+				player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 10.0f, 0.6f);
+			}
 			new BukkitRunnable() {
 				int mIdx = 0;
 
 				@Override
 				public void run() {
-					String line = mDio[mIdx];
+					String line = mDialog[mIdx];
 
 					if (mIdx < 3) {
-						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[???] \",\"color\":\"gold\"},{\"text\":\"" + line + "\",\"color\":\"white\"}]");
+						PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+							.sendMessage(Component.text("", NamedTextColor.WHITE)
+								.append(Component.text("[???] ", NamedTextColor.GOLD))
+								.append(Component.text(line)));
 						mIdx += 1;
 					} else {
 						this.cancel();
 						Location loc = mSpawnLoc.clone().add(0, 1, 0);
-						PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"" + line + "\",\"color\":\"white\"}]");
+						PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+							.sendMessage(Component.text("", NamedTextColor.WHITE)
+								.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
+								.append(Component.text(line)));
 
 						mBoss.teleport(mSpawnLoc);
 						mBoss.setAI(true);
@@ -109,8 +119,8 @@ public class OldLabsBoss extends BossAbilityGroup {
 						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0.2, 0.45, 0.2, 0.15).spawnAsEntityActive(boss);
 						for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 							MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Elcard", ChatColor.RED + "The Ignoble");
-							player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 10, 1.65f);
-							player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, 10, 0.6f);
+							player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 10, 1.65f);
+							player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 10, 0.6f);
 						}
 
 						resumeBossFight(plugin, boss);
@@ -134,20 +144,28 @@ public class OldLabsBoss extends BossAbilityGroup {
 		));
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
-		events.put(75, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"Do not interfere with my affairs! I will see that crown-head fall and assert myself as King!\",\"color\":\"white\"}]");
-		});
+		events.put(75, mBoss -> PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+			.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
+				.append(Component.text("Do not interfere with my affairs! I will see that crown-head fall and assert myself as King!"))));
 		events.put(50, mBoss -> {
 			changePhase(phase2Spells, Collections.emptyList(), null);
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"Agh! You think you're so strong? Let me show you true swordsmanship!\",\"color\":\"white\"}]");
+			PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.WHITE)
+					.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
+					.append(Component.text("Agh! You think you're so strong? Let me show you true swordsmanship!")));
 		});
 
-		events.put(35, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"Even if you stop this, city leeches like you will never step foot outside of Sierhaven! Where you do you think you'll go? Back to the slums!?\",\"color\":\"white\"}]");
-		});
+		events.put(35, mBoss -> PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+			.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
+				.append(Component.text("Even if you stop this, city leeches like you will never step foot outside of Sierhaven! Where you do you think you'll go? Back to the slums!?"))));
 
 		events.put(20, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard the Ignoble] \",\"color\":\"gold\"},{\"text\":\"Ugh, looks like I might need help from those bandits after all...\",\"color\":\"white\"}]");
+			PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange)
+				.sendMessage(Component.text("", NamedTextColor.WHITE)
+					.append(Component.text("[Elcard the Ignoble] ", NamedTextColor.GOLD))
+					.append(Component.text("Ugh, looks like I might need help from those bandits after all...")));
 			Location spawnLoc = mSpawnLoc.clone().add(-1, -1, 13);
 			try {
 				new PartialParticle(Particle.SMOKE_LARGE, spawnLoc, 15, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
@@ -174,8 +192,12 @@ public class OldLabsBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "playsound minecraft:entity.wither.death master @s ~ ~ ~ 100 0.8");
-		PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Elcard The Ignoble] \",\"color\":\"gold\"},{\"text\":\"You are no commoner... Who... Are you...?\",\"color\":\"white\"}]");
+		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
+			player.sendMessage(Component.text("", NamedTextColor.WHITE)
+				.append(Component.text("[Elcard The Ignoble] ", NamedTextColor.GOLD))
+				.append(Component.text("You are no commoner... Who... Are you...?")));
+		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
 

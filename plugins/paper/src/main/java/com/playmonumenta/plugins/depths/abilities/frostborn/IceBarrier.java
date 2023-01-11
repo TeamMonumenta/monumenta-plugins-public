@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -72,7 +73,7 @@ public class IceBarrier extends DepthsAbility {
 			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
 			new PartialParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1.4f);
+			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 1.4f);
 			if (!mIsPrimed || mPrimedLoc == null) {
 				mIsPrimed = true;
 				mPrimedLoc = block.getLocation();
@@ -85,7 +86,7 @@ public class IceBarrier extends DepthsAbility {
 						if (mIsPrimed && mPrimedLoc != null) {
 							mIsPrimed = false;
 							mPrimedLoc = null;
-							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 0.5f);
+							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.BLOCKS, 2.0f, 0.5f);
 							//Reset cd
 							mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
 						}
@@ -114,7 +115,7 @@ public class IceBarrier extends DepthsAbility {
 					new PartialParticle(Particle.CRIT, b.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.CRIT_MAGIC, b.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 				}
-				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, 2.0f, 2.0f);
+				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.BLOCKS, 2.0f, 2.0f);
 				mPrimedLoc = null;
 			}
 		}

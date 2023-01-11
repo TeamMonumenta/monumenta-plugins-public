@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
@@ -73,7 +74,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 				return;
 			}
 
-			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 3, 0.75f);
+			world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 0.75f);
 			//choose random players until amt
 			for (int i = 0; i < amt; i++) {
 				Collections.shuffle(players);
@@ -98,7 +99,7 @@ public class SpellPhantomOfTheOpera extends Spell {
 						if (mInc >= 30) {
 							this.cancel();
 							Location sLoc = pLoc.clone().add(0, 7.5, 0);
-							world.playSound(sLoc, Sound.ENTITY_WITHER_HURT, 3, 0.75f);
+							world.playSound(sLoc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 0.75f);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, sLoc, 20, 0.3, 0.3, 0.3, 0.1).spawnAsEntityActive(mBoss);
 							Phantom nightTerror = (Phantom) LibraryOfSoulsIntegration.summon(sLoc, "NightTerror");
 

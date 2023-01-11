@@ -24,6 +24,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -151,7 +152,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				return;
 			}
 			if (item.getType() == LOCKED) {
-				player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+				player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 				player.sendMessage(Component.text("You don't match the requirement to unlock this content!", NamedTextColor.RED));
 				return;
 			}
@@ -178,7 +179,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							// Try to buy
 							if (player.getGameMode() == GameMode.CREATIVE) {
 								CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("Because you are in creative mode, this is free!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
@@ -187,7 +188,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							NamespacedKey talismanLoot = NamespacedKeyUtils.fromString(TALISMAN_LOOTTABLE_FOLDER + DEPTHS_CS.get(entry).getToken());
 							if (talismanLoot == null) {
 								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
 								player.sendMessage(Component.text("EX[" + skin + "]1: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
 								close();
 								return;
@@ -199,7 +200,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
 								!player.getInventory().containsAtLeast(mTalisman, TALISMAN_PER_DEPTH_SKIN) ||
 								!player.getInventory().containsAtLeast(mGeode, GEODE_PER_DEPTH_SKIN)) {
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
 							}
@@ -211,20 +212,20 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 								player.getInventory().removeItem(mGeode);
 								player.getInventory().removeItem(mPigment);
 								player.getInventory().removeItem(mTalisman);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("You successfully bought " + skin + "! Go to Cosmetic Manager to equip it!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
 							} else {
 								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
 								player.sendMessage(Component.text("EX[" + skin + "]2: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
 								close();
 								return;
 							}
 						} else {
 							// Already bought
-							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 							player.sendMessage(Component.text("You already have this cosmetic skill. Go to Cosmetic Manager to equip it!", NamedTextColor.RED));
 							return;
 						}
@@ -233,12 +234,12 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					// Changing page
 					if (slot == PREV_PAGE_LOC) {
 						mPageNumber--;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
 						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
 						return;
 					}
@@ -254,7 +255,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							// Try to buy
 							if (player.getGameMode() == GameMode.CREATIVE) {
 								CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("Because you are in creative mode, this is free!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
@@ -265,7 +266,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mPigment = InventoryUtils.getItemFromLootTable(player, PIGMENT_LOOTTABLE);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
 								!player.getInventory().containsAtLeast(mStrand, STRAND_PER_DELVE_SKIN)) {
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
 							}
@@ -275,20 +276,20 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							if (CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
 								player.getInventory().removeItem(mStrand);
 								player.getInventory().removeItem(mPigment);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("You successfully bought " + skin + "! Go to Cosmetic Manager to equip it!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
 							} else {
 								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
 								player.sendMessage(Component.text("EX[" + skin + "]2: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
 								close();
 								return;
 							}
 						} else {
 							// Already bought
-							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 							player.sendMessage(Component.text("You already have this cosmetic skill. Go to Cosmetic Manager to equip it!", NamedTextColor.RED));
 							return;
 						}
@@ -297,12 +298,12 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					// Changing page
 					if (slot == PREV_PAGE_LOC) {
 						mPageNumber--;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
 						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
 						return;
 					}
@@ -318,7 +319,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							// Try to buy
 							if (player.getGameMode() == GameMode.CREATIVE) {
 								CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("Because you are in creative mode, this is free!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
@@ -329,28 +330,28 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							int priceNum = PRESTIGE_CS.get(entry).getPrice();
 							int removed = InventoryUtils.removeSoulboundItemFromInventory(player.getInventory(), ItemUtils.getPlainName(mStar), priceNum, player);
 							if (removed == 0) {
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 							} else if (removed == priceNum) {
 								// Successfully removed items
 								if (CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
-									player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+									player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 									player.sendMessage(Component.text("You successfully bought " + skin + "! Go to Cosmetic Manager to equip it!", NamedTextColor.GREEN));
 									reloadPage(player);
 								} else {
 									// Shouldn't be here! But leave it as a handler to avoid typo in code.
-									player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+									player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
 									player.sendMessage(Component.text("EX[" + skin + "]2: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
 									close();
 								}
 							} else {
 								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
 								player.sendMessage(Component.text("EX[" + skin + "]3: An exception occurred when consuming Soulbound tokens. Contact a moder if you lose items.", NamedTextColor.DARK_RED));
 							}
 						} else {
 							// Already bought
-							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 							player.sendMessage(Component.text("You already have this cosmetic skill. Go to Cosmetic Manager to equip it!", NamedTextColor.RED));
 						}
 						return;
@@ -359,12 +360,12 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					// Changing page
 					if (slot == PREV_PAGE_LOC) {
 						mPageNumber--;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
 						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadDepthPage(player);
 						return;
 					}
@@ -380,7 +381,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							// Try to buy
 							if (player.getGameMode() == GameMode.CREATIVE) {
 								CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("Because you are in creative mode, this is free!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
@@ -391,7 +392,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							ItemStack mCanvas = InventoryUtils.getItemFromLootTable(player, CANVAS_LOOTTABLE);
 							if (!player.getInventory().containsAtLeast(mPigment, PIGMENT_PER_SKIN) ||
 								!player.getInventory().containsAtLeast(mCanvas, CANVAS_PER_GALLERY_SKIN)) {
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
 								return;
 							}
@@ -401,20 +402,20 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							if (CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
 								player.getInventory().removeItem(mPigment);
 								player.getInventory().removeItem(mCanvas);
-								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1.5f);
+								player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 								player.sendMessage(Component.text("You successfully bought " + skin + "! Go to Cosmetic Manager to equip it!", NamedTextColor.GREEN));
 								reloadPage(player);
 								return;
 							} else {
 								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 0.5f);
+								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
 								player.sendMessage(Component.text("EX[" + skin + "]2: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
 								close();
 								return;
 							}
 						} else {
 							// Already bought
-							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 							player.sendMessage(Component.text("You already have this cosmetic skill. Go to Cosmetic Manager to equip it!", NamedTextColor.RED));
 							return;
 						}
@@ -423,12 +424,12 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 					// Changing page
 					if (slot == PREV_PAGE_LOC) {
 						mPageNumber--;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadGalleryPage(player);
 						return;
 					} else if (slot == NEXT_PAGE_LOC) {
 						mPageNumber++;
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						loadGalleryPage(player);
 						return;
 					}
@@ -468,7 +469,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	private void loadPage(CSGUIPage page, Player player) {
 		mCurrentPage = page;
-		player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+		player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 		// Set filler to start
 		mInventory.clear();
 		GUIUtils.fillWithFiller(mInventory, FILLER);

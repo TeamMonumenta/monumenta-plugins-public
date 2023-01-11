@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -62,7 +63,7 @@ public class Sidearm extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 2);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 2);
 
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);
@@ -74,7 +75,7 @@ public class Sidearm extends DepthsAbility {
 			if (bLoc.getBlock().getType().isSolid()) {
 				bLoc.subtract(dir.multiply(0.5));
 				new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
+				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 				break;
 			}
 			for (LivingEntity mob : mobs) {
@@ -87,7 +88,7 @@ public class Sidearm extends DepthsAbility {
 					mob.setVelocity(new Vector(0, 0, 0));
 
 					new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-					world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
+					world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 
 					return;
 				}
@@ -95,7 +96,7 @@ public class Sidearm extends DepthsAbility {
 
 			if (i == 5) {
 				new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0);
+				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 			}
 		}
 

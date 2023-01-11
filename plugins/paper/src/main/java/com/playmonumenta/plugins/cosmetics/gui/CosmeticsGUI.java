@@ -25,6 +25,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -83,12 +84,12 @@ public class CosmeticsGUI extends CustomInventory {
 		int slot = event.getSlot();
 		if (mDisplayPage == null && slot == TITLE_LOC) {
 			mDisplayPage = CosmeticType.TITLE;
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			setUpCosmetics(player);
 			return;
 		} else if (mDisplayPage == null && slot == ELITE_FINISHER_LOC) {
 			mDisplayPage = CosmeticType.ELITE_FINISHER;
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			setUpCosmetics(player);
 			return;
 		} else if (mDisplayPage == null && slot == VANITY_LOC) {
@@ -96,12 +97,12 @@ public class CosmeticsGUI extends CustomInventory {
 			return;
 		} else if (mDisplayPage == null && slot == UNLOCKED_VANITY_LOC) {
 			mDisplayPage = CosmeticType.VANITY;
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			setUpCosmetics(player);
 			return;
 		} else if (mDisplayPage == null && slot == COSMETIC_SKILL_LOC) {
 			mDisplayPage = CosmeticType.COSMETIC_SKILL;
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			setUpClassSelectionPage();
 			return;
 		}
@@ -120,7 +121,7 @@ public class CosmeticsGUI extends CustomInventory {
 				for (int i = 0; i < CosmeticSkillGUIConfig.CLASS_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.CLASS_LOCS[i]) {
 						mCurrentClass = mClasses.mClasses.get(i);
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						setUpClassPage();
 						return;
 					}
@@ -130,7 +131,7 @@ public class CosmeticsGUI extends CustomInventory {
 				for (int i = 0; i < CosmeticSkillGUIConfig.SKILL_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.SKILL_LOCS[i]) {
 						mCurrentAbility = mCurrentClass.mAbilities.get(i);
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						setUpCosmetics(player);
 						return;
 					}
@@ -139,12 +140,12 @@ public class CosmeticsGUI extends CustomInventory {
 				// Choose spec
 				if (slot == CosmeticSkillGUIConfig.SPEC_ONE_LOC) {
 					mCurrentSpec = mCurrentClass.mSpecOne;
-					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					setUpSpecPage();
 					return;
 				} else if (slot == CosmeticSkillGUIConfig.SPEC_TWO_LOC) {
 					mCurrentSpec = mCurrentClass.mSpecTwo;
-					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					setUpSpecPage();
 					return;
 				}
@@ -152,16 +153,16 @@ public class CosmeticsGUI extends CustomInventory {
 				// Return to class selection
 				if (slot == BACK_LOC) {
 					mCurrentClass = null;
-					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					setUpClassSelectionPage();
 					return;
 				}
-			} else if (mCurrentAbility == null && mCurrentSpec != null) {
+			} else if (mCurrentAbility == null) {
 				// Choose spec skills
 				for (int i = 0; i < CosmeticSkillGUIConfig.SPEC_SKILL_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.SPEC_SKILL_LOCS[i]) {
 						mCurrentAbility = mCurrentSpec.mAbilities.get(i);
-						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+						player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 						setUpCosmetics(player);
 						return;
 					}
@@ -170,7 +171,7 @@ public class CosmeticsGUI extends CustomInventory {
 				// Return to class page
 				if (slot == BACK_LOC) {
 					mCurrentSpec = null;
-					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					setUpClassPage();
 					return;
 				}
@@ -178,7 +179,7 @@ public class CosmeticsGUI extends CustomInventory {
 				// Chosen ability, override back to go to previous page
 				if (slot == BACK_LOC) {
 					mCurrentAbility = null;
-					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+					player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 					if (mCurrentSpec == null) {
 						setUpClassPage();
 					} else {
@@ -192,21 +193,21 @@ public class CosmeticsGUI extends CustomInventory {
 
 		//Page control items
 		if (slot == NEXT_PAGE_LOC && item.getType() == Material.ARROW) {
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			mPageNumber++;
 			setUpCosmetics(player);
 			return;
 		}
 
 		if (slot == PREV_PAGE_LOC && item.getType() == Material.ARROW) {
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			mPageNumber--;
 			setUpCosmetics(player);
 			return;
 		}
 
 		if (slot == BACK_LOC && item.getType() == Material.REDSTONE_BLOCK && mCurrentAbility == null) {
-			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1f);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 0.5f, 1f);
 			mDisplayPage = null;
 			mCurrentClass = null;
 			mCurrentSpec = null;
@@ -222,20 +223,20 @@ public class CosmeticsGUI extends CustomInventory {
 				int index = (slot - COSMETICS_START) + (COSMETICS_PER_PAGE * (mPageNumber - 1));
 				if (mDisplayPage.canEquipMultiple()) {
 					if (!playerCosmetics.get(index).mEquipped) {
-						player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.8f, 1f);
+						player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
 						playerCosmetics.get(index).mEquipped = true;
 					} else {
-						player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 0.8f, 1f);
+						player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
 						playerCosmetics.get(index).mEquipped = false;
 					}
 				} else {
 					for (int i = 0; i < playerCosmetics.size(); i++) {
 						if (i == index) {
 							if (!playerCosmetics.get(i).mEquipped) {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.8f, 1f);
+								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
 								playerCosmetics.get(i).mEquipped = true;
 							} else {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 0.8f, 1f);
+								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
 								playerCosmetics.get(i).mEquipped = false;
 							}
 						} else {

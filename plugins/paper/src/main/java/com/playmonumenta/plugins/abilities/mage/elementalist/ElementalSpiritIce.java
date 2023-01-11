@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -132,8 +133,8 @@ public class ElementalSpiritIce extends Ability {
 									partialParticle.particle(Particle.FIREWORKS_SPARK)
 										.count(30)
 										.spawnAsPlayerActive(mPlayer);
-									world.playSound(centre, Sound.ENTITY_TURTLE_HURT_BABY, 1, 0.2f);
-									world.playSound(centre, Sound.BLOCK_GLASS_BREAK, 0.5f, 0.05f);
+									world.playSound(centre, Sound.ENTITY_TURTLE_HURT_BABY, SoundCategory.PLAYERS, 1, 0.2f);
+									world.playSound(centre, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 0.05f);
 
 									if (mPulses >= PULSES) {
 										this.cancel();

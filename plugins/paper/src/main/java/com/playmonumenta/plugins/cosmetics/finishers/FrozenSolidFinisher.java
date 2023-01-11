@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -68,7 +69,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 						ice.setMarker(true);
 						ice.setCollidable(false);
 						ice.getEquipment().setHelmet(new ItemStack(Material.ICE));
-						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, 0.25f, Constants.NotePitches.F11);
+						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.25f, Constants.NotePitches.F11);
 						mArmorStands.add(ice);
 					}
 				} else if (mTicks == 29) {
@@ -82,7 +83,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 						ice.remove();
 						new PartialParticle(Particle.BLOCK_DUST, ice.getLocation().add(0, 1.5, 0), 5, Bukkit.createBlockData(Material.ICE)).spawnAsPlayerActive(p);
 					}
-					loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, 2f, Constants.NotePitches.F11);
+					loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 2f, Constants.NotePitches.F11);
 				}
 				if (mTicks > 30) {
 					this.cancel();

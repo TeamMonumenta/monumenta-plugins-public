@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -109,7 +110,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		new PartialParticle(Particle.TOTEM, loc, 50, 1.5, 1, 1.5, 0).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 1, 0);
+		world.playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.PLAYERS, 1, 0);
 
 		putOnCooldown();
 	}

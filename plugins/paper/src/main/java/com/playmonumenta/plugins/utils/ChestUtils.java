@@ -150,7 +150,6 @@ public class ChestUtils {
 
 				if (!otherLootBoxPlayers.isEmpty()) {
 					// Sound to indicate loot was split
-					// /playsound minecraft:block.note_block.bass player @s ~ ~ ~ 0.2 1.4
 					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 0.2f, 1.4f);
 
 					StringJoiner otherPlayersJoiner = new StringJoiner(", ");
@@ -195,7 +194,7 @@ public class ChestUtils {
 
 				// warning on build server
 				if (!Plugin.IS_PLAY_SERVER) {
-					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.MASTER, 1, 1);
+					player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 1, 1);
 					player.sendMessage(Component.text("Loot table rolled!", NamedTextColor.RED).decorate(TextDecoration.BOLD)
 						                   .append(Component.text(" (this message is only shown on the build server)", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 				}
@@ -533,17 +532,14 @@ public class ChestUtils {
 		if (foundLootBox) {
 			if (numAvailSpaces > LOOTBOX_WARN_FREE_SPACES) {
 				// Plenty of space
-				// /playsound minecraft:block.note_block.chime player @s ~ ~ ~ 0.8 1.2
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 0.8f, 1.2f);
 				MessagingUtils.sendActionBarMessage(player, "LOOTBOX chest added", NamedTextColor.GREEN);
 			} else if (numAvailSpaces > 0) {
 				// Only a few spaces left
-				// /playsound minecraft:block.note_block.pling player @s ~ ~ ~ 0.5 1.5
 				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.PLAYERS, 0.5f, 1.5f);
 				MessagingUtils.sendActionBarMessage(player, "LOOTBOX chest added, " + (numAvailSpaces - 1) + " spaces left", NamedTextColor.YELLOW);
 			} else {
 				// No space left
-				// /playsound minecraft:block.beacon.deactivate player @s ~ ~ ~ 0.8 1.8
 				player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1.8f);
 				MessagingUtils.sendActionBarMessage(player, "LOOTBOX is full", NamedTextColor.RED);
 			}

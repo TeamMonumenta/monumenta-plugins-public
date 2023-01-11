@@ -26,7 +26,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
-	//Steely predator stirke. Depth set: steel
+	//Steely predator strike. Depth set: steel
 
 	public static final String NAME = "Firework Strike";
 
@@ -126,7 +126,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.85f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, EXPLODE_VOLUME, 1.5f);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, EXPLODE_VOLUME, 0.8f);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.8f);
 		}, 10);
 		new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.2)
 			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);

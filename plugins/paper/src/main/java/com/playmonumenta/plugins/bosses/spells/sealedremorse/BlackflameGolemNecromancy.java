@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -150,13 +151,13 @@ public class BlackflameGolemNecromancy extends Spell {
 					public void run() {
 						if (mTicks % 10 == 0) {
 							for (Player player : players) {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1f, 0f);
+								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 1f, 0f);
 							}
 						}
 
 						if (mSummonTime <= mTicks && !mSummoned.isEmpty()) {
 							for (Player player : players) {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1f);
+								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 1, 1f);
 							}
 							this.cancel();
 						}

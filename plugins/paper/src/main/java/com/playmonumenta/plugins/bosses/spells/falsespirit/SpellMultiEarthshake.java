@@ -84,7 +84,7 @@ public class SpellMultiEarthshake extends Spell {
 				continue;
 			}
 			locs.add(target.getLocation());
-			target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, 1f, 0.75f);
+			target.getWorld().playSound(target.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1f, 0.75f);
 		}
 
 		new BukkitRunnable() {
@@ -111,8 +111,8 @@ public class SpellMultiEarthshake extends Spell {
 					new PartialParticle(Particle.BLOCK_CRACK, targetLocation, 2, mRadius / 2.0, 0.1, mRadius / 2.0, Bukkit.createBlockData(Material.STONE)).spawnAsEntityActive(mBoss);
 
 					if (particleCounter1 % 20 == 0 && particleCounter1 > 0) {
-						mWorld.playSound(targetLocation, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1f, 0.5f);
-						mWorld.playSound(targetLocation, Sound.BLOCK_GRAVEL_BREAK, 1f, 0.5f);
+						mWorld.playSound(targetLocation, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1f, 0.5f);
+						mWorld.playSound(targetLocation, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1f, 0.5f);
 						for (int i = 0; i < 360; i += 18) {
 							new PartialParticle(Particle.SMOKE_NORMAL, targetLocation.clone().add(FastUtils.cos(Math.toRadians(i)) * mRadius, 0.2, FastUtils.sin(Math.toRadians(i)) * mRadius), 1, 0.1, 0.1, 0.1, 0).spawnAsEntityActive(mBoss);
 						}
@@ -208,7 +208,7 @@ public class SpellMultiEarthshake extends Spell {
 
 						//Knock up player
 						for (Player p : PlayerUtils.playersInRange(loc, mRadius * 2, true)) {
-							mWorld.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f);
+							mWorld.playSound(p.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 1.0f, 1.0f);
 
 							double yVelocity = p.getLocation().distance(loc) <= mRadius ? 1.5 : 1;
 							p.setVelocity(p.getVelocity().add(new Vector(0.0, yVelocity, 0.0)));
@@ -223,9 +223,9 @@ public class SpellMultiEarthshake extends Spell {
 						}
 
 
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1.35f);
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.5f);
-						mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0.5f);
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1.35f);
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 0.5f);
+						mWorld.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 0.5f);
 
 						new PartialParticle(Particle.CLOUD, loc, 150, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.LAVA, loc, 35, mRadius / 2.0, 0.1, mRadius / 2.0, 0).spawnAsEntityActive(mBoss);

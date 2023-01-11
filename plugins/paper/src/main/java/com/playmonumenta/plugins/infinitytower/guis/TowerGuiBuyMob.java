@@ -74,7 +74,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 	public TowerGuiBuyMob(Player owner, TowerGame game) {
 		super(owner, 9 * 3, "Buy a new mob");
 		mGame = game;
-		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1, 2);
+		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1, 2);
 
 		ITEM_MAP.computeIfAbsent(mGame, game1 -> new ArrayList<>());
 
@@ -167,7 +167,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 						Objects.requireNonNull(ITEM_MAP.get(mGame)).remove(info);
 						TowerGameUtils.pay(info, player);
 						mGame.addNewMob(info);
-						player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+						player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.PLAYERS, 10f, 0.6f);
 					} else {
 						player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
 							Component.text(" You can't use more then " + info.mMobStats.mLimit + " " + info.mDisplayName + " in the same team!", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
@@ -190,7 +190,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 			if (slot == 21) {
 				if (TowerGameUtils.canBuyXP(mGame, player)) {
 					TowerGameUtils.upgradeLvl(mGame, player);
-					player.playSound(player.getEyeLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2f);
+					player.playSound(player.getEyeLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 2f);
 				}
 			}
 
@@ -200,7 +200,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 					if (!mGame.mFreeRoll) {
 						TowerGameUtils.pay(player, TowerConstants.COST_REROLL);
 					}
-					player.playSound(player.getEyeLocation(), Sound.UI_LOOM_SELECT_PATTERN, 1, 0.9f);
+					player.playSound(player.getEyeLocation(), Sound.UI_LOOM_SELECT_PATTERN, SoundCategory.PLAYERS, 1, 0.9f);
 					mGame.mRoll++;
 					mGame.mFreeRoll = false;
 				}

@@ -23,6 +23,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -128,7 +129,7 @@ public class Twisted {
 		mobsInArea.remove(mob);
 		Location spawningLoc = mob.getLocation().clone();
 
-		mob.getWorld().playSound(spawningLoc, Sound.ENTITY_WITHER_SPAWN, 10, 0.5f);
+		mob.getWorld().playSound(spawningLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.5f);
 		int count = MAX_SPIRAL_ANIMATOR_COUNT;
 		for (LivingEntity le : mobsInArea) {
 			final int countFinal = count;
@@ -201,7 +202,7 @@ public class Twisted {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				twistedMobFinal.setGravity(true);
 				twistedMobFinal.setInvulnerable(false);
-				twistedMobFinal.getWorld().playSound(twistedMobFinal.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 10, 0.8f);
+				twistedMobFinal.getWorld().playSound(twistedMobFinal.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.HOSTILE, 10, 0.8f);
 			}, ANIMATION_DURATION / 2);
 		}, ANIMATION_DURATION / 2);
 	}

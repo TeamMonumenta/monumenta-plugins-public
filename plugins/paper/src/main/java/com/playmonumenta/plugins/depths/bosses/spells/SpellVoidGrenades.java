@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -59,7 +60,7 @@ public class SpellVoidGrenades extends Spell {
 
 				new PartialParticle(Particle.SOUL, mBoss.getLocation(), 40, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 35, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.BLOCK_DISPENSER_LAUNCH, 3, 0.75f);
+				world.playSound(mBoss.getLocation(), Sound.BLOCK_DISPENSER_LAUNCH, SoundCategory.HOSTILE, 3, 0.75f);
 				Collections.shuffle(players);
 				for (Player player : players) {
 					if (LocationUtils.hasLineOfSight(mBoss, player)) {
@@ -109,7 +110,7 @@ public class SpellVoidGrenades extends Spell {
 						new PartialParticle(Particle.SOUL, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 						new PartialParticle(Particle.SPELL_WITCH, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
 						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
 							DamageUtils.damage(mBoss, player, DamageType.MAGIC, 35, null, false, true, "Void Grenades");

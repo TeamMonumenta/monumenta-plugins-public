@@ -95,7 +95,7 @@ public abstract class GraySwarmSummonerBase extends BossAbilityGroup {
 					}
 				}
 			}, (summonLoc, times) -> {
-				summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.4f);
+				summonLoc.getWorld().playSound(summonLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 0.8f, 1.4f);
 				Entity entity = LibraryOfSoulsIntegration.summon(summonLoc, mobName);
 				return entity;
 			}, (LivingEntity bos, Location loc, int ticks) -> {

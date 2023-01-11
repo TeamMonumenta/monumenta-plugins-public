@@ -16,6 +16,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -69,7 +70,7 @@ public class DoomsdayClock extends Spell {
 					length = ratio * RADIUS;
 
 					if (mT % 4 == 0) {
-						players.forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 2.0f, (float) (0.1 + ratio * 0.3)));
+						players.forEach(player -> player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, SoundCategory.HOSTILE, 2.0f, (float) (0.1 + ratio * 0.3)));
 					}
 				} else {
 					length = RADIUS;
@@ -88,7 +89,7 @@ public class DoomsdayClock extends Spell {
 				 */
 
 				if (mT == 0) {
-					world.playSound(mCenter, Sound.BLOCK_ANVIL_PLACE, 1.5f, 1.4f);
+					world.playSound(mCenter, Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1.5f, 1.4f);
 				}
 
 				if (mT > 0 && mT % 10 == 0) {
@@ -111,7 +112,7 @@ public class DoomsdayClock extends Spell {
 				}
 
 				 */
-						player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 0.1f, 0.4f);
+						player.playSound(player.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, SoundCategory.HOSTILE, 0.1f, 0.4f);
 					}
 				}
 				if (!mIsActive) {

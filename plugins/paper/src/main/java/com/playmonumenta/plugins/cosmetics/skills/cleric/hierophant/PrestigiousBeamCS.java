@@ -75,7 +75,7 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.2f, 0.8f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.3f, 0.5f);
 		world.playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, SoundCategory.PLAYERS, 0.75f, 0.75f);
-		world.playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, 2.5f, 1.75f);
+		world.playSound(loc, Sound.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 2.5f, 1.75f);
 
 		double distance = loc.distance(pe.getEyeLocation()) - 0.75;
 		double beamRadius;
@@ -94,8 +94,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 
 			// Sound near target
 			if (loc.distance(pe.getEyeLocation()) < 1.25) {
-				loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.2f, 1.5f);
-				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.0f, 1.5f);
+				loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.2f, 1.5f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.0f, 1.5f);
 				break;
 			}
 		}
@@ -143,8 +143,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 				);
 			}
 			if (loc.distance(e.getEyeLocation()) < 1.25) {
-				loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, 1.0f, 1.25f);
-				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.25f, 1.25f);
+				loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.0f, 1.25f);
+				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.25f, 1.25f);
 				break;
 			}
 		}

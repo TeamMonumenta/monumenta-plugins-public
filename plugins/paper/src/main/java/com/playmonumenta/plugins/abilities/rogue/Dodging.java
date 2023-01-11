@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
@@ -62,7 +63,7 @@ public class Dodging extends Ability {
 	private static final String ATTR_NAME = "DodgingExtraSpeed";
 	private static final int DODGING_COOLDOWN_1 = 12 * 20;
 	private static final int DODGING_COOLDOWN_2 = 10 * 20;
-	private static final double ENHANCMENT_DAMAGE = 3.0;
+	private static final double ENHANCEMENT_DAMAGE = 3.0;
 
 	public static final String CHARM_COOLDOWN = "Dodging Cooldown";
 	public static final String CHARM_SPEED = "Dodging Speed Amplifier";
@@ -114,7 +115,7 @@ public class Dodging extends Ability {
 				if (source != null) {
 					deflectParticles(source);
 
-					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * ENHANCMENT_DAMAGE, mInfo.getLinkedSpell(), true);
+					DamageUtils.damage(mPlayer, source, DamageType.PROJECTILE_SKILL, event.getOriginalDamage() * ENHANCEMENT_DAMAGE, mInfo.getLinkedSpell(), true);
 					// mPlayer.sendMessage(source.getName() + " HP: " + source.getHealth() + " / " + source.getMaxHealth() + " (-" + event.getOriginalDamage() + ")");
 
 					// If applicable (either arrow or trident), apply knockback
@@ -194,7 +195,7 @@ public class Dodging extends Ability {
 			// (I am pretty sure the only potion throwers are in fact, witches)
 			// (But for a more general case, I will default use the enemy's attack damage stat, like how witches do.)
 			double damage = EntityUtils.getAttributeOrDefault(enemy, Attribute.GENERIC_ATTACK_DAMAGE, 1);
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * ENHANCMENT_DAMAGE, mInfo.getLinkedSpell(), true);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage * ENHANCEMENT_DAMAGE, mInfo.getLinkedSpell(), true);
 
 			for (PotionEffect potionEffect : potion.getEffects()) {
 				PotionUtils.applyPotion(mPlayer, enemy, potionEffect);
@@ -238,10 +239,10 @@ public class Dodging extends Ability {
 			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
 				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
 			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1.35f);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1, 1.35f);
 		}
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 2f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 2f);
 		return true;
 	}
 

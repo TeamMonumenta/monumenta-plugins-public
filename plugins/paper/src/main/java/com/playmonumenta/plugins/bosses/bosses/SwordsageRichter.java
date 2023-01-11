@@ -31,6 +31,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
@@ -79,18 +80,18 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					float t = tick / 10;
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation().add(0, 1, 0), 3, 0.35, 0.45, 0.35, 0.005).spawnAsEntityActive(boss);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, t);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, t);
 					mBoss.removePotionEffect(PotionEffectType.SLOW);
 					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, 1));
 				},
 
 				(Entity entity) -> {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 2, 0);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 2, 0);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation().add(0, 1, 0), 30, 0.2, 0, 0.2, 0.15).spawnAsEntityActive(boss);
 				},
 
 				(Location loc) -> {
-					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 2);
+					world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 2);
 					new PartialParticle(Particle.CLOUD, loc, 3, 0.05, 0.05, 0.05, 0.03).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.REDSTONE, loc, 40, 0.25, 0.25, 0.25, BOLT_COLOR).spawnAsEntityActive(boss);
@@ -156,7 +157,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 				@Override
 				public void run() {
 					mBoss.remove();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 2, 1);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 2, 1);
 					new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
 
@@ -176,8 +177,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 									if (mT >= 20 * 2 && !mAttacked) {
 										mAttacked = true;
 										for (Player player : players) {
-											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.5f);
+											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
+											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.5f);
 											new PartialParticle(Particle.FLAME, player.getLocation(), 200, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 											new PartialParticle(Particle.CLOUD, player.getLocation(), 100, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
 											new PartialParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0).spawnAsEntityActive(boss);
@@ -187,7 +188,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 										double offset = 2.5 - pitch;
 										for (Player player : players) {
 											Location loc = player.getLocation().add(0, 1, 0);
-											player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, pitch);
+											player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, pitch);
 											new PartialParticle(Particle.SWEEP_ATTACK, loc, 20, offset, offset, offset, 0).spawnAsEntityActive(boss);
 											new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, offset, offset, offset, 0).spawnAsEntityActive(boss);
 										}
@@ -270,7 +271,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 					mRadius -= 0.25;
 					if (mRadius <= 0) {
 						this.cancel();
-						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1.25f);
+						world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1, 1.25f);
 						new PartialParticle(Particle.SPELL_INSTANT, mLoc, 50, 0.1, 0.1, 0.1, 1).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.CRIT_MAGIC, mLoc, 150, 0.1, 0.1, 0.1, 1).spawnAsEntityActive(mBoss);
 						LibraryOfSoulsIntegration.summon(mLoc, mobdata);
@@ -282,8 +283,8 @@ public final class SwordsageRichter extends BossAbilityGroup {
 
 	private void knockback(Plugin plugin, double r) {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 1);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.5f);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), r, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.45f, false);
 		}
@@ -337,7 +338,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Richter", ChatColor.DARK_AQUA + "Expert Swordsage");
-			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 	}
 

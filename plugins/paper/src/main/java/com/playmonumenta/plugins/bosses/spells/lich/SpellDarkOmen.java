@@ -14,6 +14,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -74,7 +75,7 @@ public class SpellDarkOmen extends Spell {
 			p.sendMessage(ChatColor.LIGHT_PURPLE + "THIS FLAME ETERNAL SHALL BE A PORTENT OF YOUR DEMISE!");
 		}
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1.0f, 1.0f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1.0f, 1.0f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT = 0.0;
@@ -94,7 +95,7 @@ public class SpellDarkOmen extends Spell {
 				if (mT < mTell) {
 					Vector dir = new Vector(4, 0, 0);
 					float pitch = (float) (0.5 + mT / 20);
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 5.0f, pitch);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 5.0f, pitch);
 					for (int i = 0; i < 4; i++) {
 						Vector quad = VectorUtils.rotateYAxis(dir.clone(), 90 * i);
 						Vector qlength = quad.multiply(1 - mT / mTell);
@@ -109,9 +110,9 @@ public class SpellDarkOmen extends Spell {
 					//clear all entries before launching blade
 					mDamaged.clear();
 
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 10.0f, 0.75f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, 10.0f, 1.0f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, 10.0f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 10.0f, 0.75f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, SoundCategory.HOSTILE, 10.0f, 1.0f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_VEX_CHARGE, SoundCategory.HOSTILE, 10.0f, 0.75f);
 
 					launchBlade(mBasevec, world, false);
 					this.cancel();
@@ -155,8 +156,8 @@ public class SpellDarkOmen extends Spell {
 							vex(anchor);
 							mPSpark.location(anchor).spawnAsBoss();
 							mPSmoke.location(anchor).spawnAsBoss();
-							world.playSound(anchor, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 3.0f, 1.5f);
-							world.playSound(anchor, Sound.ENTITY_VEX_AMBIENT, 5.0f, 0.75f);
+							world.playSound(anchor, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 3.0f, 1.5f);
+							world.playSound(anchor, Sound.ENTITY_VEX_AMBIENT, SoundCategory.HOSTILE, 5.0f, 0.75f);
 							this.cancel();
 						} else if (anchor.distance(mCenter) > mArenaRange || anchor.distance(startLoc) > mMaxRange || Lich.phase3over()) {
 							this.cancel();
@@ -210,8 +211,8 @@ public class SpellDarkOmen extends Spell {
 			for (Player p : damage) {
 				if (!mDamaged.contains(p)) {
 					mDamaged.add(p);
-					world.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1.0f, 1.5f);
-					world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 2.0f);
+					world.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1.0f, 1.5f);
+					world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.HOSTILE, 1.0f, 2.0f);
 					BossUtils.bossDamagePercent(mBoss, p, 0.75, "Dark Omen");
 					Lich.cursePlayer(mPlugin, p, 120);
 				}

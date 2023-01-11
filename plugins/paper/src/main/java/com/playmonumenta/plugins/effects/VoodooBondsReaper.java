@@ -15,6 +15,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
@@ -45,9 +46,7 @@ public class VoodooBondsReaper extends Effect {
 		mDamagePercent = damagePercent;
 		mPlugin = plugin;
 
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mVoodooBonds = mPlugin.mAbilityManager.getPlayerAbility(mPlayer, VoodooBonds.class);
-		});
+		Bukkit.getScheduler().runTask(mPlugin, () -> mVoodooBonds = mPlugin.mAbilityManager.getPlayerAbility(mPlayer, VoodooBonds.class));
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class VoodooBondsReaper extends Effect {
 		//replace with better particles
 		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, 2f, 0.75f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 2f, 0.75f);
 		mDone = true;
 		setDuration(0);
 	}
@@ -97,16 +96,16 @@ public class VoodooBondsReaper extends Effect {
 			World world = loc.getWorld();
 			new PartialParticle(Particle.SPELL_WITCH, loc, 60, 0.5, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.REDSTONE, loc, 60, 0.5, 0.5, 0.5, 0, COLOR).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, 1f, 0.75f);
-			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, 1f, 0.6f);
-			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, 1f, 0.5f);
+			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.HOSTILE, 1f, 0.75f);
+			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.HOSTILE, 1f, 0.6f);
+			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 		}
 	}
 
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (oneHertz) {
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 0.5f);
+			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 1f, 0.5f);
 		}
 		Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 		Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);

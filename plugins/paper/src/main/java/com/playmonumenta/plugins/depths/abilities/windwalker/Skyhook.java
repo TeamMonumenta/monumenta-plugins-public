@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.AbstractArrow;
@@ -92,7 +93,7 @@ public class Skyhook extends DepthsAbility {
 				new PartialParticle(Particle.CLOUD, pLoc, 10, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
 			}
 
-			world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 1, 1.5f);
+			world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 1.5f);
 			new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.CLOUD, loc, 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 5, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
@@ -111,7 +112,7 @@ public class Skyhook extends DepthsAbility {
 				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
 			}
 		}
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, 1, 1.5f);
+		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 1.5f);
 
 		arrow.remove();
 	}
@@ -127,7 +128,7 @@ public class Skyhook extends DepthsAbility {
 		putOnCooldown((int) (getModifiedCooldown() * BowAspect.getCooldownReduction(mPlayer)));
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, 1, 1.0f);
+		world.playSound(loc, Sound.ITEM_CROSSBOW_QUICK_CHARGE_3, SoundCategory.PLAYERS, 1, 1.0f);
 
 		if (projectile instanceof AbstractArrow arrow) {
 			arrow.setPierceLevel(0);

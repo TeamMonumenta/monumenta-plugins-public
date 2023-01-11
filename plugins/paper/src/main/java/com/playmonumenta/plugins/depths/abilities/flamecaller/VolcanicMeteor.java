@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -57,7 +58,7 @@ public class VolcanicMeteor extends DepthsAbility {
 
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1, 0.85f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.85f);
 		new PartialParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
@@ -67,7 +68,7 @@ public class VolcanicMeteor extends DepthsAbility {
 
 			new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
 			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-			if (loc.getBlock().getType().isSolid() || i >= 24 || size > 0) {
+			if (loc.getBlock().getType().isSolid() || i == 24 || size > 0) {
 				launchMeteor(loc, playerItemStats);
 				break;
 			}
@@ -88,7 +89,7 @@ public class VolcanicMeteor extends DepthsAbility {
 					loc.subtract(0, 0.2, 0);
 					if (loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1, 0);
+							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0);
 
 							new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);
 							new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);
@@ -101,16 +102,16 @@ public class VolcanicMeteor extends DepthsAbility {
 
 							for (LivingEntity e : EntityUtils.getNearbyMobs(loc, SIZE, mPlayer)) {
 								double distance = loc.distance(e.getLocation());
-								double mult = Math.min(Math.max(0, (6 - distance) / 4), 1);
+								double multiplier = Math.min(Math.max(0, (6 - distance) / 4), 1);
 
 								EntityUtils.applyFire(mPlugin, FIRE_TICKS, e, mPlayer, playerItemStats);
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage * mult, false, true, false);
+								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage * multiplier, false, true, false);
 							}
 							break;
 						}
 					}
 				}
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, 1, 1);
+				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1);
 				new PartialParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);

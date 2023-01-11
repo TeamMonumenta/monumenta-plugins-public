@@ -13,6 +13,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -47,8 +48,8 @@ public class FocusedCombos extends DepthsAbility {
 				event.setDamage(event.getDamage() * DAMAGE[mRarity - 1]);
 
 				Location playerLoc = mPlayer.getLocation();
-				mPlayer.playSound(playerLoc, Sound.BLOCK_WEEPING_VINES_BREAK, 2, 0.8f);
-				mPlayer.playSound(playerLoc, Sound.BLOCK_ANVIL_PLACE, 0.4f, 1.75f);
+				mPlayer.playSound(playerLoc, Sound.BLOCK_WEEPING_VINES_BREAK, SoundCategory.PLAYERS, 2, 0.8f);
+				mPlayer.playSound(playerLoc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.4f, 1.75f);
 			}
 			return true;
 		}

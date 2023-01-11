@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -70,8 +71,8 @@ public class SpellHellzoneGrenade extends Spell {
 
 				new PartialParticle(Particle.FLAME, mBoss.getLocation(), 40, 0, 0, 0, 0.1).spawnAsBoss();
 				new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 35, 0, 0, 0, 0.1).spawnAsBoss();
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3, 0.75f);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_SNOWBALL_THROW, 3, 0.65f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3, 0.75f);
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_SNOWBALL_THROW, SoundCategory.HOSTILE, 3, 0.65f);
 				Collections.shuffle(players);
 				for (Player player : players) {
 					if (LocationUtils.hasLineOfSight(mBoss, player)) {
@@ -122,7 +123,7 @@ public class SpellHellzoneGrenade extends Spell {
 						new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
 						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
-						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 0.85f);
+						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
 							if (mCenter.distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {

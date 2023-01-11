@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -51,7 +52,7 @@ public class SpellEarthenRupture extends Spell {
 
 				Location loc = mBoss.getLocation();
 				if (mChargeUp.getTime() % 2 == 0) {
-					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, 2, 0.9f);
+					world.playSound(loc, Sound.BLOCK_GRAVEL_HIT, SoundCategory.HOSTILE, 2, 0.9f);
 				}
 
 				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
@@ -62,7 +63,7 @@ public class SpellEarthenRupture extends Spell {
 				if (mChargeUp.nextTick()) {
 					this.cancel();
 					mChargeUp.reset();
-					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.5f, 0.9f);
+					world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 0.9f);
 					new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);

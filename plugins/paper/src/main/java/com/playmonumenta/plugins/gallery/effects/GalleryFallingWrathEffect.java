@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 
 public class GalleryFallingWrathEffect extends GalleryConsumableEffect {
@@ -40,7 +41,7 @@ public class GalleryFallingWrathEffect extends GalleryConsumableEffect {
 
 	protected void summonExplosion(GalleryPlayer player, DamageEvent event, Location loc) {
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc).delta(EXPLOSION_RADIUS, EXPLOSION_RADIUS, EXPLOSION_RADIUS).count(10).spawnAsPlayer(player.getPlayer(), ParticleCategory.OWN_ACTIVE, ParticleCategory.OTHER_ACTIVE);
-		loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 10);
+		loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 10);
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, EXPLOSION_RADIUS)) {
 			DamageUtils.damage(player.getPlayer(), entity, DamageEvent.DamageType.OTHER, event.getDamage() * DAMAGE);
 		}

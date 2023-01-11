@@ -58,7 +58,7 @@ public class TowerGuiMob extends CustomInventory {
 		super(owner, 54, Objects.requireNonNullElse(mob.mInfo.mDisplayName, "Unknown Blitz Mob"));
 		mMob = mob;
 		mGame = game;
-		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1, 2);
+		owner.playSound(owner.getEyeLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.HOSTILE, 1, 2);
 
 		loadInv();
 	}
@@ -112,7 +112,7 @@ public class TowerGuiMob extends CustomInventory {
 			player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
 				Component.text(" Unit removed from the team", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)
 			));
-			player.playSound(player.getEyeLocation(), Sound.ENTITY_CHICKEN_HURT, SoundCategory.MASTER, 1, 1.2f);
+			player.playSound(player.getEyeLocation(), Sound.ENTITY_CHICKEN_HURT, SoundCategory.NEUTRAL, 1, 1.2f);
 			mInventory.clear();
 			player.closeInventory();
 			new TowerGuiTeam(player, mGame).openInventory(player, TowerManager.mPlugin);
@@ -121,9 +121,9 @@ public class TowerGuiMob extends CustomInventory {
 
 		if (slot == MOVE_SLOT) {
 			TowerGameUtils.moveMob(mGame, mMob);
-			player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10f, 0.6f);
+			player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.HOSTILE, 10f, 0.6f);
 			TowerGameUtils.sendMessage(player, "Unit moved");
-			player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.MASTER, 10, 0.6f);
+			player.playSound(player.getEyeLocation(), Sound.ENTITY_ARMOR_STAND_HIT, SoundCategory.HOSTILE, 10, 0.6f);
 		}
 
 		if (slot == LEVEL_SLOT && mMob.mMobLevel < TowerConstants.MAX_MOB_LEVEL) {
@@ -131,7 +131,7 @@ public class TowerGuiMob extends CustomInventory {
 				TowerGameUtils.pay(player, TowerGameUtils.getNextLevelCost(mMob));
 				mMob.mMobLevel++;
 
-				player.playSound(player.getEyeLocation(), Sound.UI_BUTTON_CLICK, SoundCategory.MASTER, 1, 1.2f);
+				player.playSound(player.getEyeLocation(), Sound.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 1, 1.2f);
 			} else {
 				player.sendMessage(Component.text("[Plunderer's Blitz]", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true).append(
 					Component.text(" You don't have enough money to buy this item", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, false)

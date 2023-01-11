@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,9 +35,9 @@ public class SpellForceTwo extends SpellBaseAoE {
 	@Override
 	protected void outburstAction(Location loc) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 0.65f);
-		world.playSound(loc, Sound.ENTITY_GHAST_SHOOT, 1f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, 1f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1.5f, 0.65f);
+		world.playSound(loc, Sound.ENTITY_GHAST_SHOOT, SoundCategory.HOSTILE, 1f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.HOSTILE, 1f, 0.8f);
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f).spawnAsEntityActive(mLauncher);
 	}
 

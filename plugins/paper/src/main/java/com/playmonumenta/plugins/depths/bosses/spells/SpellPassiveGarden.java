@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -69,7 +70,7 @@ public class SpellPassiveGarden extends Spell {
 
 		//Give a warning if we're 2 seconds before plants spawn
 		if ((mTicks + 40) % PLANT_SPAWN_INTERVAL == 0) {
-			mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1, 1);
+			mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1, 1);
 			PlayerUtils.executeCommandOnNearbyPlayers(mLauncher.getLocation(), Hedera.detectionRange, "tellraw @s [\"\",{\"text\":\"[Hedera]\",\"color\":\"gold\"},{\"text\":\" Twisting vines, grow and rise! Bring forth ruin, spell demise!\",\"color\":\"dark_green\"}]");
 		}
 
@@ -116,8 +117,8 @@ public class SpellPassiveGarden extends Spell {
 				mPlants.put(loc, newPlant);
 				mPlantTypes.put(loc, plant);
 
-				mLauncher.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, 20.0f, 1.0f);
-				mLauncher.getWorld().playSound(loc, Sound.BLOCK_GRASS_PLACE, 20.0f, 1.0f);
+				mLauncher.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 20.0f, 1.0f);
+				mLauncher.getWorld().playSound(loc, Sound.BLOCK_GRASS_PLACE, SoundCategory.HOSTILE, 20.0f, 1.0f);
 
 				break;
 			}

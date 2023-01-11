@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
@@ -97,13 +98,13 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 
 				// Playsound
 				if (mTicks % 8 == 0) {
-					world.playSound(mTarget.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					world.playSound(mTarget.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				} else if (mTicks % 8 == 2) {
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				} else if (mTicks % 8 == 4) {
-					world.playSound(mTarget.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					world.playSound(mTarget.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				} else if (mTicks % 8 == 6) {
-					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, 2, 0.5f + (mTicks / 100f) * 1.5f);
+					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 0.5f + (mTicks / 100f) * 1.5f);
 				}
 
 				// Particles
@@ -132,7 +133,7 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 					BlueStrikeDaggerCraftingBoss targetAbility = BossUtils.getBossOfClass(mTarget, BlueStrikeDaggerCraftingBoss.class);
 					if (targetAbility != null) {
 						new PartialParticle(Particle.EXPLOSION_NORMAL, mTarget.getLocation(), 10, 1, 1, 1).spawnAsEnemy();
-						mBoss.getWorld().playSound(mTarget.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 0.8f);
+						mBoss.getWorld().playSound(mTarget.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.8f);
 						targetAbility.takeDamage();
 					}
 					mBoss.remove();

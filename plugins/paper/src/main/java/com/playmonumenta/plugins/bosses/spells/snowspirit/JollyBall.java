@@ -58,7 +58,7 @@ public class JollyBall extends SpellBaseSeekingProjectile {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.6, 0.6, 0.6, 0.1, RED_COLOR).spawnAsEntityActive(boss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(boss);
 				if (ticks % 2 == 0) {
-					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, 0.1f, 0.6f);
+					world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, SoundCategory.HOSTILE, 0.1f, 0.6f);
 				}
 			},
 			// Hit Action

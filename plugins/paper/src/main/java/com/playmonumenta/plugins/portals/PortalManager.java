@@ -26,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Rotation;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -140,7 +141,7 @@ public class PortalManager implements Listener {
 			} else {
 				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(255, 69, 0), 1.0f));
 			}
-			world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, .5f, 1f);
+			world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, .5f, 1f);
 			if (bLoc.getBlock().getType().isSolid()) {
 				break;
 			}

@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +45,7 @@ public class HallowedLanceCS extends ManaLanceCS {
 	@Override
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
 		new PartialParticle(Particle.CLOUD, bLoc, 20, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.65f);
+		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
 	}
 
 	@Override
@@ -55,6 +56,6 @@ public class HallowedLanceCS extends ManaLanceCS {
 
 	@Override
 	public void lanceSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, 1.0f, 1.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.75f);
 	}
 }

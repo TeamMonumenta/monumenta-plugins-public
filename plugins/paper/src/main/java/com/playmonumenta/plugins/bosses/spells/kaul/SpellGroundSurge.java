@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -62,7 +63,7 @@ public class SpellGroundSurge extends Spell {
 				Location loc = mBoss.getLocation();
 				mPitch += 0.025f;
 				if (mChargeUp.getTime() % 2 == 0) {
-					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, 3, mPitch);
+					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 3, mPitch);
 				}
 				new PartialParticle(Particle.BLOCK_DUST, loc, 8, 0.4, 0.1, 0.4, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.25, 0.1, 0.25, 0.25).spawnAsEntityActive(mBoss);
@@ -130,7 +131,7 @@ public class SpellGroundSurge extends Spell {
 									this.cancel();
 								}
 
-								world.playSound(bLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.75f, 1);
+								world.playSound(bLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.75f, 1);
 								new PartialParticle(Particle.BLOCK_DUST, bLoc, 20, 0.5, 0.5, 0.5, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.FLAME, bLoc, 15, 0.5, 0.5, 0.5, 0.075).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.LAVA, bLoc, 2, 0.5, 0.5, 0.5, 0.25).spawnAsEntityActive(mBoss);
@@ -142,7 +143,7 @@ public class SpellGroundSurge extends Spell {
 										MovementUtils.knockAway(mBoss.getLocation(), player, 0.3f, 1f);
 										new PartialParticle(Particle.SMOKE_LARGE, bLoc, 20, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 										new PartialParticle(Particle.FLAME, bLoc, 75, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-										world.playSound(bLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+										world.playSound(bLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
 
 										// Send surges to all other players now.
 										if (players.size() <= 1) {
@@ -184,7 +185,7 @@ public class SpellGroundSurge extends Spell {
 													}
 												}
 												innerBoxLoc.add(0, 1, 0);
-												world.playSound(innerBoxLoc, Sound.BLOCK_STONE_BREAK, 0f, 1);
+												world.playSound(innerBoxLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.HOSTILE, 0f, 1);
 												//Have particles with collision show only for the player who's targeted.
 												//This is to prevent lag from the numerous other surges that have these same
 												//Particles
@@ -201,7 +202,7 @@ public class SpellGroundSurge extends Spell {
 														MovementUtils.knockAway(loc, player, 0.3f, 1f);
 														new PartialParticle(Particle.SMOKE_LARGE, innerBoxLoc, 10, 0, 0, 0, 0.2).spawnAsEntityActive(mBoss);
 														new PartialParticle(Particle.FLAME, innerBoxLoc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-														world.playSound(innerBoxLoc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1.25f);
+														world.playSound(innerBoxLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1.25f);
 														mHits++;
 														mTicks = 0;
 														if (mHits < players.size() && mHits <= 2) {

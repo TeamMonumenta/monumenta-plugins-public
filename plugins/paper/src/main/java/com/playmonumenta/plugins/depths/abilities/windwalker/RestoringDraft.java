@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -125,7 +126,7 @@ public final class RestoringDraft extends DepthsAbility {
 
 		World world = mPlayer.getWorld();
 		Location location = mPlayer.getLocation();
-		world.playSound(location, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 2.0f, 1.2f);
+		world.playSound(location, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.2f);
 		new PartialParticle(Particle.FIREWORKS_SPARK, location, 40, 0F, 0F, 0F, 0.2F).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.HEART, location.add(0, 1, 0), (int) (5 * healing), 0.3, 0.3, 0.3, 0.3F).spawnAsPlayerActive(mPlayer);
 	}

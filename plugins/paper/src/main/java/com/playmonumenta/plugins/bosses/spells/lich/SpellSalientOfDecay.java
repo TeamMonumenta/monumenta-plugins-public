@@ -17,6 +17,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -58,7 +59,7 @@ public class SpellSalientOfDecay extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 5, 0.4f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 0.4f);
 		List<Player> players = Lich.playersInRange(mBoss.getLocation(), 50, true);
 		if (SpellDimensionDoor.getShadowed() != null && SpellDimensionDoor.getShadowed().size() > 0) {
 			players.removeAll(SpellDimensionDoor.getShadowed());
@@ -82,7 +83,7 @@ public class SpellSalientOfDecay extends Spell {
 					this.cancel();
 					mChargeUp.reset();
 				} else if (mT >= mTell) {
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 5, 0.4f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 5, 0.4f);
 					this.cancel();
 					mChargeUp.reset();
 				}

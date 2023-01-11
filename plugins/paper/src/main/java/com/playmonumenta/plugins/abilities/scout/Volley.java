@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
@@ -42,7 +43,7 @@ public class Volley extends Ability {
 	private static final double ENHANCEMENT_BLEED_POTENCY = 0.1;
 	private static final int ENHANCEMENT_BLEED_DURATION = 4 * 20;
 	public Set<Projectile> mVolley;
-	private Map<LivingEntity, Integer> mVolleyHitMap;
+	private final Map<LivingEntity, Integer> mVolleyHitMap;
 
 	public static final String CHARM_COOLDOWN = "Volley Cooldown";
 	public static final String CHARM_ARROWS = "Volley Arrows";
@@ -88,9 +89,9 @@ public class Volley extends Ability {
 		// Start the cooldown first so we don't cause an infinite loop of Volleys
 		putOnCooldown();
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 0.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1.33f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1.33f);
 		// Garbage Collector at home
 		mVolley.clear();
 		mVolleyHitMap.clear();

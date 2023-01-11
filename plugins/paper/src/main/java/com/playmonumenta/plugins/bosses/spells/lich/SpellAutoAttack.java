@@ -108,7 +108,7 @@ public class SpellAutoAttack extends Spell {
 						mTicks++;
 						if (mTicks == 1) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 0.75f);
-							world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.5f, 0);
+							world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 1.5f, 0);
 						}
 						mPSmoke1.location(mBoss.getLocation()).spawnAsBoss();
 						mBoss.removePotionEffect(PotionEffectType.SLOW);
@@ -156,7 +156,7 @@ public class SpellAutoAttack extends Spell {
 	}
 
 	private void attack(Player target, World world) {
-		world.playSound(mBoss.getLocation(), Sound.ENTITY_CAT_HISS, 3.0f, 0.5f);
+		world.playSound(mBoss.getLocation(), Sound.ENTITY_CAT_HISS, SoundCategory.HOSTILE, 3.0f, 0.5f);
 
 		Vector dir = LocationUtils.getDirectionTo(target.getLocation().add(0, 1, 0), mBoss.getLocation());
 		Location tloc = mBoss.getLocation().setDirection(dir);
@@ -201,9 +201,9 @@ public class SpellAutoAttack extends Spell {
 							}
 						}
 					}
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0f, 1.0f);
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 3.0f, 1.0f);
-					world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, 3.0f, 0.5f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.0f, 1.0f);
+					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 3.0f, 1.0f);
+					world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 3.0f, 0.5f);
 					this.cancel();
 				}
 			}
@@ -232,7 +232,7 @@ public class SpellAutoAttack extends Spell {
 							damage(player, false);
 							mPSmoke2.location(loc).spawnAsBoss();
 							mPYellow.location(loc).spawnAsBoss();
-							w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
+							w.playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0.75f);
 							this.cancel();
 						}
 					}
@@ -240,7 +240,7 @@ public class SpellAutoAttack extends Spell {
 					if (loc.getBlock().getType().isSolid() && (mPhase != 4 || loc.getY() <= mCenter.getY())) {
 						mPSmoke2.location(loc).spawnAsBoss();
 						mPYellow.location(loc).spawnAsBoss();
-						w.playSound(loc, Sound.ENTITY_WITHER_HURT, 1, 0.75f);
+						w.playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 1, 0.75f);
 						this.cancel();
 					}
 				}

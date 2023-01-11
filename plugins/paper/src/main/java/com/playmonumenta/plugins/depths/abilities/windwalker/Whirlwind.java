@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,9 +48,9 @@ public class Whirlwind extends DepthsAbility {
 		if (ItemUtils.isPickaxe(event.getPlayer().getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			World world = event.getPlayer().getWorld();
 			Location loc = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.2f, 0.25f);
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.2f, 0.35f);
-			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, 1.2f, 0.45f);
+			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.25f);
+			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.35f);
+			world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.2f, 0.45f);
 			new PartialParticle(Particle.CLOUD, loc, 30, 1, 1, 1, 0.8).spawnAsPlayerActive(mPlayer);
 			for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 				e.setVelocity(e.getVelocity().add(e.getLocation().toVector().subtract(loc.subtract(0, 0.5, 0).toVector()).normalize().multiply(KNOCKBACK_SPEED[mRarity - 1]).add(new Vector(0, 0.3, 0))));
