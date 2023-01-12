@@ -22,6 +22,7 @@ public class EliteFinishers {
 			.put(MegalovaniaFinisher.NAME, new MegalovaniaFinisher())
 			.put(FrozenSolidFinisher.NAME, new FrozenSolidFinisher())
 			.put(CornucopiaFinisher.NAME, new CornucopiaFinisher())
+			.put(DragonsBreathFinisher.NAME, new DragonsBreathFinisher())
 			.put(ExcaliburFinisher.NAME, new ExcaliburFinisher())
 			.put(SwordRainFinisher.NAME, new SwordRainFinisher())
 			.build();
