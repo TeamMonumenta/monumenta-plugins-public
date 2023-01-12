@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.classes.Rogue;
 import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
@@ -73,7 +74,7 @@ public class AbilityUtils {
 	public static final int MAX_SKILL_POINTS = 10;
 	public static final int MAX_SPEC_POINTS = 4;
 
-	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<Player, Integer>();
+	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<>();
 	private static @Nullable BukkitRunnable invisTracker = null;
 
 	public static final String IGNORE_TAG = "summon_ignore";
@@ -99,7 +100,7 @@ public class AbilityUtils {
 						if (entry.getValue() <= 0) {
 							// Run after this loop is complete to avoid concurrent modification
 							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false));
-						} else if (item == null || item.getType().isAir() || (!ItemUtils.isAxe(item) && !ItemUtils.isSword(item) && !ItemUtils.isHoe(item))) {
+						} else if (ItemUtils.isPickaxe(item) || !(DepthsUtils.isWeaponItem(item) || ItemUtils.isProjectileWeapon(item))) {
 							// Run after this loop is complete to avoid concurrent modification
 							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true));
 						} else {

@@ -20,6 +20,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -87,12 +88,7 @@ public class CloakOfShadows extends DepthsAbility {
 		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1]);
 
 		mBonusDamage = true;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mBonusDamage = false;
-			}
-		}.runTaskLater(mPlugin, DAMAGE_DURATION);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBonusDamage = false, DAMAGE_DURATION);
 
 		new BukkitRunnable() {
 
