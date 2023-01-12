@@ -28,12 +28,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -706,17 +708,22 @@ public class WalletManager implements Listener {
 						return;
 					}
 					int deposited = 0;
+					Map<String, Integer> depositedItems = new TreeMap<>();
 					PlayerInventory inventory = player.getInventory();
 					for (int i = 0; i < inventory.getSize(); i++) {
 						ItemStack item = inventory.getItem(i);
 						if (canPutIntoWallet(item)) {
 							deposited += item.getAmount();
+							depositedItems.merge(ItemUtils.getPlainName(item), item.getAmount(), Integer::sum);
 							wallet.add(player, item);
 						}
 					}
 					if (deposited > 0) {
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						player.sendMessage(Component.text(deposited + " item" + (deposited == 1 ? "" : "s") + " deposited into your Bag of Hoarding", NamedTextColor.GOLD));
+						player.sendMessage(Component.text(deposited + " item" + (deposited == 1 ? "" : "s") + " deposited into your Bag of Hoarding", NamedTextColor.GOLD)
+							                   .hoverEvent(HoverEvent.showText(Component.text(
+								                   depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
+									                   .collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
 					}
 				}
 			} else {
