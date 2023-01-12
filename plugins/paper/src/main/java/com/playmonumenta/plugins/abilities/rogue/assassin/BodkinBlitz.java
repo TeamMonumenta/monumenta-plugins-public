@@ -57,7 +57,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 			.scoreboardId("BodkinBlitz")
 			.shorthandName("BB")
 			.descriptions(
-				String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. This ability cannot be used in safe zones. Cooldown: %ss. Charges: %s.",
+				String.format("Sneak right click while holding two swords to teleport %s blocks forwards. Gain %s second of Stealth upon teleporting. Upon teleporting, your next melee attack deals %s bonus damage if your target is not focused on you. Cooldown: %ss. Charges: %s.",
 					DISTANCE_1,
 					STEALTH_DURATION_1 / 20,
 					BONUS_DMG_1,
