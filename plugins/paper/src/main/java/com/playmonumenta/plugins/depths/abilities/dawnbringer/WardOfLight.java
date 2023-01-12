@@ -37,7 +37,7 @@ public class WardOfLight extends DepthsAbility {
 			.linkedSpell(ClassAbility.WARD_OF_LIGHT)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardOfLight::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.LANTERN))
 			.descriptions(WardOfLight::getDescription, MAX_RARITY);
 

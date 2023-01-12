@@ -173,6 +173,7 @@ public enum ClassAbility {
 	SCRAPSHOT("Scrapshot"),
 	FIREWORKBLAST("Firework Blast"),
 	STEEL_STALLION("Steel Stallion"),
+	VOLLEY_DEPTHS("Volley"),
 
 	// WINDWALKER
 	GUARDING_BOLT("Guarding Bolt"),
@@ -181,8 +182,10 @@ public enum ClassAbility {
 	SLIPSTREAM("Slipstream"),
 	WHIRLWIND("Whirlwind"),
 	HOWLINGWINDS("Howling Winds"),
+	WIND_WALK_DEPTHS("Wind Walk"),
 
 	// SHADOW
+	ADVANCING_SHADOWS_DEPTHS("Advancing Shadows"),
 	BLADE_FLURRY("Blade Flurry"),
 	CLOAK_OF_SHADOWS("Cloak of Shadows"),
 	CHAOS_DAGGER("Chaos Dagger"),
@@ -198,6 +201,7 @@ public enum ClassAbility {
 	// FROSTBORN
 	ICE_LANCE("Ice Lance"),
 	ICE_BARRIER("Ice Barrier"),
+	FROST_NOVA_DEPTHS("Frost Nova"),
 	AVALANCHE("Avalanche"),
 	PIERCING_COLD("Piercing Cold"),
 	CRYOBOX("Cryobox"),

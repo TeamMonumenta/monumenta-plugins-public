@@ -49,7 +49,7 @@ public class IceLance extends DepthsAbility {
 			.linkedSpell(ClassAbility.ICE_LANCE)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceLance::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SNOWBALL))
 			.descriptions(IceLance::getDescription, MAX_RARITY);
 

@@ -46,7 +46,7 @@ public class Flamestrike extends DepthsAbility {
 			.linkedSpell(ClassAbility.FLAMESTRIKE)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Flamestrike::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.FLINT_AND_STEEL))
 			.descriptions(Flamestrike::getDescription, MAX_RARITY);
 

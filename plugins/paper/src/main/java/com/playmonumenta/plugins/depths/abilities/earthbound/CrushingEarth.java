@@ -40,7 +40,7 @@ public class CrushingEarth extends DepthsAbility {
 			.linkedSpell(ClassAbility.CRUSHING_EARTH)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrushingEarth::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SHIELD))
 			.descriptions(CrushingEarth::getDescription, MAX_RARITY);
 

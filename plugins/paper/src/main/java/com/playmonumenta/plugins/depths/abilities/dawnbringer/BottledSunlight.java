@@ -50,7 +50,7 @@ public class BottledSunlight extends DepthsAbility {
 			.linkedSpell(ClassAbility.BOTTLED_SUNLIGHT)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BottledSunlight::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.HONEY_BOTTLE))
 			.descriptions(BottledSunlight::getDescription, MAX_RARITY);
 

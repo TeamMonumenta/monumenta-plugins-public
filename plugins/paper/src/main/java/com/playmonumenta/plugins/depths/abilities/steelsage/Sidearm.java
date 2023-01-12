@@ -43,7 +43,7 @@ public class Sidearm extends DepthsAbility {
 			.linkedSpell(ClassAbility.SIDEARM)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Sidearm::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.CROSSBOW))
 			.descriptions(Sidearm::getDescription, MAX_RARITY);
 

@@ -46,7 +46,7 @@ public class DepthsVolley extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsVolley> INFO =
 		new DepthsAbilityInfo<>(DepthsVolley.class, ABILITY_NAME, DepthsVolley::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_BOW)
-			.linkedSpell(ClassAbility.VOLLEY)
+			.linkedSpell(ClassAbility.VOLLEY_DEPTHS)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.ARROW))
 			.descriptions(DepthsVolley::getDescription, MAX_RARITY)

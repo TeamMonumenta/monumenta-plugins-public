@@ -38,7 +38,7 @@ public class StoneSkin extends DepthsAbility {
 			.linkedSpell(ClassAbility.STONE_SKIN)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", StoneSkin::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.POLISHED_ANDESITE))
 			.descriptions(StoneSkin::getDescription, MAX_RARITY);
 

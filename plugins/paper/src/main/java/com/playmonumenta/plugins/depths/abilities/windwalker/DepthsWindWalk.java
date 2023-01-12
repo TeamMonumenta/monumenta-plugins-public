@@ -47,10 +47,10 @@ public class DepthsWindWalk extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsWindWalk> INFO =
 		new DepthsAbilityInfo<>(DepthsWindWalk.class, "Wind Walk", DepthsWindWalk::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_RIGHT_CLICK)
-			.linkedSpell(ClassAbility.WIND_WALK)
+			.linkedSpell(ClassAbility.WIND_WALK_DEPTHS)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.WHITE_DYE))
 			.descriptions(DepthsWindWalk::getDescription, MAX_RARITY);
 

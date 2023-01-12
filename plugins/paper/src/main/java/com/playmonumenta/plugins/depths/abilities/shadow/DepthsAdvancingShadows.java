@@ -45,10 +45,10 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsAdvancingShadows> INFO =
 		new DepthsAbilityInfo<>(DepthsAdvancingShadows.class, ABILITY_NAME, DepthsAdvancingShadows::new, DepthsTree.SHADOWDANCER, DepthsTrigger.RIGHT_CLICK)
-			.linkedSpell(ClassAbility.ADVANCING_SHADOWS)
+			.linkedSpell(ClassAbility.ADVANCING_SHADOWS_DEPTHS)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsAdvancingShadows::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.WITHER_SKELETON_SKULL))
 			.descriptions(DepthsAdvancingShadows::getDescription, MAX_RARITY);
 

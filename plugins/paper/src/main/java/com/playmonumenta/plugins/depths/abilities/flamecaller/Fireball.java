@@ -39,7 +39,7 @@ public class Fireball extends DepthsAbility {
 			.linkedSpell(ClassAbility.FIREBALL)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Fireball::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.FIREWORK_STAR))
 			.descriptions(Fireball::getDescription, MAX_RARITY);
 

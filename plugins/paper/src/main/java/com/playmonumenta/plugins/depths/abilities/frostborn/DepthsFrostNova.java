@@ -42,7 +42,7 @@ public class DepthsFrostNova extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsFrostNova> INFO =
 		new DepthsAbilityInfo<>(DepthsFrostNova.class, ABILITY_NAME, DepthsFrostNova::new, DepthsTree.FROSTBORN, DepthsTrigger.SHIFT_LEFT_CLICK)
-			.linkedSpell(ClassAbility.FROST_NOVA)
+			.linkedSpell(ClassAbility.FROST_NOVA_DEPTHS)
 			.cooldown(COOLDOWN_TICKS)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsFrostNova::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))

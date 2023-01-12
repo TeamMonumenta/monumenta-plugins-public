@@ -42,7 +42,7 @@ public class IceBarrier extends DepthsAbility {
 			.linkedSpell(ClassAbility.ICE_BARRIER)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceBarrier::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.PRISMARINE_WALL))
 			.descriptions(IceBarrier::getDescription, MAX_RARITY);
 

@@ -48,7 +48,7 @@ public class Slipstream extends DepthsAbility {
 			.linkedSpell(ClassAbility.SLIPSTREAM)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Slipstream::cast,
-				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS), HOLDING_WEAPON_RESTRICTION))
+				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.PHANTOM_MEMBRANE))
 			.descriptions(Slipstream::getDescription, MAX_RARITY);
 
