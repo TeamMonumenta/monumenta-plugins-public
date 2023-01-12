@@ -29,7 +29,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Stray;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.jetbrains.annotations.Nullable;
 
 
 public class ElementalArrows extends Ability {
@@ -46,6 +45,9 @@ public class ElementalArrows extends Ability {
 	public static final double SLOW_AMPLIFIER = 0.2;
 	public static final int ENHANCED_ARROW_COOLDOWN = 8 * Constants.TICKS_PER_SECOND;
 	public static final int ENHANCED_ARROW_STUN_DURATION = 1 * Constants.TICKS_PER_SECOND;
+	public static final String FIRE_ARROW_METAKEY = "ElementalArrowsFireArrow";
+	public static final String ICE_ARROW_METAKEY = "ElementalArrowsIceArrow";
+	public static final String THUNDER_ARROW_METAKEY = "ElementalArrowsThunderArrow";
 
 	public static final String CHARM_DAMAGE = "Elemental Arrows Damage";
 	public static final String CHARM_AREA_DAMAGE = "Elemental Arrows Area Damage";
@@ -76,7 +78,7 @@ public class ElementalArrows extends Ability {
 					(int) ELEMENTAL_ARROWS_RADIUS,
 					(int) (AOE_DAMAGE_MULTIPLIER * 100)
 				),
-				String.format("Your next elemental arrow every %ss also stuns enemies hit for %ss and deals an extra %s%% bow damage to affected enemies.",
+				String.format("Your next elemental arrow every %ss also stuns enemies hit for %ss and deals %s%% more damage.",
 					ENHANCED_ARROW_COOLDOWN / 20,
 					ENHANCED_ARROW_STUN_DURATION / 20,
 					(int) (ENHANCED_DAMAGE_MULTIPLIER * 100)
@@ -104,55 +106,53 @@ public class ElementalArrows extends Ability {
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, ELEMENTAL_ARROWS_DURATION);
 
-		if (proj.hasMetadata("ElementalArrowsFireArrow")) {
-			if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
-				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
-				putOnCooldown();
-				applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
-					EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
-					EntityUtils.applyStun(mPlugin, stunDuration, entity);
-				});
-			} else {
-				applyArrowEffects(event, enemy, 1, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
-					EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
-				});
-			}
-		} else if (proj.hasMetadata("ElementalArrowsIceArrow")) {
+		boolean thunder = proj.hasMetadata(THUNDER_ARROW_METAKEY);
+		if (proj.hasMetadata(FIRE_ARROW_METAKEY)) {
+			applyArrowEffects(event, enemy, thunder, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
+				EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
+			});
+		} else if (proj.hasMetadata(ICE_ARROW_METAKEY)) {
 			double slowAmplifier = SLOW_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
-			if (proj.hasMetadata("ElementalArrowsThunderArrow")) {
-				int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
-				putOnCooldown();
-				applyArrowEffects(event, enemy, 1 + ENHANCED_DAMAGE_MULTIPLIER, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
-					EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
-					EntityUtils.applyStun(mPlugin, stunDuration, entity);
-				});
-			} else {
-				applyArrowEffects(event, enemy, 1, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
-					EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
-				});
-			}
+			applyArrowEffects(event, enemy, thunder, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
+				EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
+			});
 		}
 		return false; // creates new damage instances, but of a type it doesn't handle again
 	}
 
-	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, double multiplier, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, @Nullable Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
+	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, boolean thunder, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
 		double baseDamage = playerItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 
 		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, baseDamage);
-		if (bonusEntity != null && bonusEntity.isInstance(enemy)) {
+		if (bonusEntity.isInstance(enemy)) {
 			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 		}
 		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getMainhandAddStats().get(ItemStatUtils.EnchantmentType.POINT_BLANK));
 		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getMainhandAddStats().get(ItemStatUtils.EnchantmentType.SNIPER));
-		targetDamage *= multiplier;
+		if (thunder) {
+			targetDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
+		}
 
 		mLastDamage = targetDamage;
 
-		Bukkit.getScheduler().runTask(mPlugin, () -> effectAction.accept(enemy));
+		if (thunder) {
+			int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
+			effectAction = effectAction.andThen(entity -> EntityUtils.applyStun(mPlugin, stunDuration, entity));
+		}
+		effectAction.accept(enemy);
+		//Jank fix - run the effect twice, before and after the damage
+		//For some reason, dealing the damage makes the fire clear later in the tick
+		//Should be ran beforehand as well so the effects can trigger stuff like Choler
+		Consumer<LivingEntity> finalEffectAction = effectAction;
+		Bukkit.getScheduler().runTask(mPlugin, () -> finalEffectAction.accept(enemy));
+
 		event.setDamage(0);
 		DamageUtils.damage(mPlayer, enemy, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats, NAME), targetDamage, false, true, false);
 
-		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, baseDamage * AOE_DAMAGE_MULTIPLIER) * multiplier;
+		double areaDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AREA_DAMAGE, baseDamage * AOE_DAMAGE_MULTIPLIER);
+		if (thunder) {
+			areaDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
+		}
 		double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, ELEMENTAL_ARROWS_RADIUS);
 
 		if (isLevelTwo()) {
@@ -162,7 +162,6 @@ public class ElementalArrows extends Ability {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, ability, playerItemStats), areaDamage, true, true, false);
 			}
 		}
-
 	}
 
 	public double getLastDamage() {
@@ -172,32 +171,31 @@ public class ElementalArrows extends Ability {
 	public static boolean isElementalArrowDamage(DamageEvent event) {
 		// Use the "boss spell name" as marker if it's the main projectile damage or AoE damage
 		return (event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_FIRE || event.getAbility() == ClassAbility.ELEMENTAL_ARROWS_ICE)
-			       && event.getBossSpellName() != null
-			       && event.getType() != DamageType.TRUE;
+			       && event.getBossSpellName() != null;
 	}
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
+			boolean thunderApplied = false;
 			if (isEnhanced() && !isOnCooldown()) {
-				projectile.setMetadata("ElementalArrowsThunderArrow", new FixedMetadataValue(mPlugin, 0));
+				projectile.setMetadata(THUNDER_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
 				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
-				// Apply additional fire or ice effect without adding particle trail
-				if (mPlayer.isSneaking()) {
-					projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
-					projectile.setFireTicks(0);
-				} else {
-					projectile.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
-					projectile.setFireTicks(ELEMENTAL_ARROWS_DURATION);
-				}
-			} else if (mPlayer.isSneaking()) {
-				projectile.setMetadata("ElementalArrowsIceArrow", new FixedMetadataValue(mPlugin, 0));
+				thunderApplied = true;
+			}
+
+			if (mPlayer.isSneaking()) {
+				projectile.setMetadata(ICE_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
 				projectile.setFireTicks(0);
-				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SNOW_SHOVEL);
+				if (!thunderApplied) {
+					mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.SNOW_SHOVEL);
+				}
 			} else {
-				projectile.setMetadata("ElementalArrowsFireArrow", new FixedMetadataValue(mPlugin, 0));
+				projectile.setMetadata(FIRE_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
 				projectile.setFireTicks(ELEMENTAL_ARROWS_DURATION);
-				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FLAME);
+				if (!thunderApplied) {
+					mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.FLAME);
+				}
 			}
 		}
 		return true;
