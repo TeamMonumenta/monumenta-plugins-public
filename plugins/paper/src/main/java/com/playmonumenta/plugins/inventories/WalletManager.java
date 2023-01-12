@@ -444,8 +444,9 @@ public class WalletManager implements Listener {
 						} else {
 							amount = "" + item.mAmount;
 						}
+						Component displayName = itemMeta.displayName();
 						Component name = Component.text(amount + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
-							                 .append(itemMeta.hasDisplayName() ? itemMeta.displayName() : item.mItem.displayName());
+							                 .append(displayName != null ? displayName : item.mItem.displayName());
 						for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 							boolean isBase = compressionInfo.mBase.isSimilar(item.mItem);
 							if (isBase || compressionInfo.mCompressed.isSimilar(item.mItem)) {
@@ -696,7 +697,7 @@ public class WalletManager implements Listener {
 				if (event.getClick() == ClickType.RIGHT) {
 					// open wallet
 					event.setCancelled(true);
-					if (!checkSoulbound(player, walletItem)) {
+					if (checkNotSoulbound(player, walletItem)) {
 						return;
 					}
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -704,7 +705,7 @@ public class WalletManager implements Listener {
 				} else if (event.getClick() == ClickType.SWAP_OFFHAND) {
 					// quick-fill wallet
 					event.setCancelled(true);
-					if (!checkSoulbound(player, walletItem)) {
+					if (checkNotSoulbound(player, walletItem)) {
 						return;
 					}
 					int deposited = 0;
@@ -729,7 +730,7 @@ public class WalletManager implements Listener {
 			} else {
 				if (event.getClick() == ClickType.RIGHT) {
 					event.setCancelled(true);
-					if (!checkSoulbound(player, walletItem)) {
+					if (checkNotSoulbound(player, walletItem)) {
 						return;
 					}
 					ItemStack cursor = event.getCursor();
@@ -747,21 +748,23 @@ public class WalletManager implements Listener {
 		}
 	}
 
-	private static boolean checkSoulbound(Player player, ItemStack item) {
+	private static boolean checkNotSoulbound(Player player, ItemStack item) {
 		if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
 			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
 			player.sendMessage(Component.text("This Bag of Hoarding does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	public static boolean canPutIntoWallet(ItemStack item) {
 		return item != null
-			       && item.getAmount() > 0
-			       && (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY || InventoryUtils.testForItemWithLore(item, "Can be put into a Bag of Hoarding."))
-			       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null;
+			&& item.getAmount() > 0
+			&& (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY
+				|| ItemStatUtils.getTier(item) == ItemStatUtils.Tier.EVENT_CURRENCY
+				|| InventoryUtils.testForItemWithLore(item, "Can be put into a Bag of Hoarding."))
+			&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null;
 	}
 
 	private static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {

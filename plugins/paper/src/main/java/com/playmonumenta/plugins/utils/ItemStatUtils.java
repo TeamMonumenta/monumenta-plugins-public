@@ -173,6 +173,7 @@ public class ItemStatUtils {
 		EVENT("event", Component.text("Event", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
 		LEGACY("legacy", Component.text("Legacy", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
 		CURRENCY("currency", Component.text("Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
+		EVENT_CURRENCY("event_currency", Component.text("Event Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
 		KEYTIER("key", Component.text("Key", TextColor.fromHexString("#47B6B5")).decoration(TextDecoration.ITALIC, false)),
 		TROPHY("trophy", Component.text("Trophy", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
