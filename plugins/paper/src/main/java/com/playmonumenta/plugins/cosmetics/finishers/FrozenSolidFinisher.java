@@ -45,6 +45,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 					mClonedKilledMob.setGravity(false);
 					mClonedKilledMob.setCollidable(false);
 					mClonedKilledMob.setAI(false);
+					mClonedKilledMob.addScoreboardTag("SkillImmune");
 					// Figure out where and when to generate ice
 					BoundingBox box = mClonedKilledMob.getBoundingBox();
 					for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {

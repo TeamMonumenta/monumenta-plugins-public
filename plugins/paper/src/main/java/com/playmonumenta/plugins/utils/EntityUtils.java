@@ -1459,16 +1459,20 @@ public class EntityUtils {
 		newSpawn.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
 		newSpawn.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
 		newSpawn.setCustomName(entity.getCustomName());
+		newSpawn.setInvisible(entity.isInvisible());
+		newSpawn.setGlowing(entity.isGlowing());
+		newSpawn.setRotation(entity.getLocation().getYaw(), entity.getLocation().getPitch());
 		if (newSpawn instanceof Slime newSlime && entity instanceof Slime slime) {
 			newSlime.setSize(slime.getSize());
-		} else if (newSpawn instanceof MagmaCube newCube && entity instanceof MagmaCube cube) {
-			newCube.setSize(cube.getSize());
 		} else if (newSpawn instanceof Phantom newPhantom && entity instanceof Phantom phantom) {
 			newPhantom.setSize(phantom.getSize());
 		} else if (newSpawn instanceof Creeper newCreeper && entity instanceof Creeper creeper) {
 			newCreeper.setPowered(creeper.isPowered());
 		} else if (newSpawn instanceof Zombie newZombie && entity instanceof Zombie zombie) {
 			newZombie.setBaby(zombie.isBaby());
+			if (newSpawn instanceof ZombieVillager newVillager && entity instanceof ZombieVillager villager) {
+				newVillager.setVillagerType(villager.getVillagerType());
+			}
 		} else if (newSpawn instanceof Shulker newShulker && entity instanceof Shulker shulker) {
 			newShulker.setColor(shulker.getColor());
 		}
