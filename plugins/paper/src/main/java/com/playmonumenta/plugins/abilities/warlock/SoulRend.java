@@ -103,52 +103,49 @@ public class SoulRend extends Ability {
 					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(currPactDuration, -1));
 
 					if (isEnhanced()) {
+						// All healing, minus the 2/4 healed through dark pact, converted to absorption
 						double absorption = heal - Math.min(mHeal, remainingHealth);
-						absorption = Math.min(ABSORPTION_CAP, absorption);
-						AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
-						mCosmetic.rendAbsorptionEffect(mPlayer, mPlayer, enemy);
+						absorptionPlayer(mPlayer, absorption, enemy);
 					}
 				} else if (isEnhanced()) {
-					double absorption = heal;
-					absorption = Math.min(ABSORPTION_CAP, absorption);
-					AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
-					mCosmetic.rendAbsorptionEffect(mPlayer, mPlayer, enemy);
+					// All healing converted to absorption
+					absorptionPlayer(mPlayer, heal, enemy);
 				}
 			} else {
-				mCosmetic.rendHealEffect(mPlayer, mPlayer, enemy);
-				if (isEnhanced()) {
-					double remainingHealth = EntityUtils.getMaxHealth(mPlayer) - mPlayer.getHealth();
-					if (heal > remainingHealth) {
-						double absorption = heal - remainingHealth;
-						heal = remainingHealth;
-						absorption = Math.min(ABSORPTION_CAP, absorption);
-						AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
-						mCosmetic.rendAbsorptionEffect(mPlayer, mPlayer, enemy);
-					}
-				}
-				PlayerUtils.healPlayer(mPlugin, mPlayer, heal);
+				healPlayer(mPlayer, heal, enemy);
 			}
 
 			if (isLevelTwo()) {
+				double allyHeal = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, heal);
 				for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), true)) {
-					mCosmetic.rendHealEffect(mPlayer, p, enemy);
-					if (isEnhanced()) {
-						double remainingHealth = EntityUtils.getMaxHealth(p) - p.getHealth();
-						if (heal > remainingHealth) {
-							double absorption = heal - remainingHealth;
-							heal = remainingHealth;
-							absorption = Math.min(ABSORPTION_CAP, absorption);
-							AbsorptionUtils.addAbsorption(p, absorption, absorption, ABSORPTION_DURATION);
-							mCosmetic.rendAbsorptionEffect(mPlayer, p, enemy);
-						}
-					}
-					PlayerUtils.healPlayer(mPlugin, p, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ALLY, heal), mPlayer);
+					healPlayer(p, allyHeal, enemy);
 				}
 			}
 
 			putOnCooldown();
 		}
 		return false;
+	}
+
+	private void healPlayer(Player player, double heal, LivingEntity enemy) {
+		double toHeal = heal;
+		mCosmetic.rendHealEffect(mPlayer, player, enemy);
+		if (isEnhanced()) {
+			double remainingHealth = EntityUtils.getMaxHealth(player) - player.getHealth();
+			if (toHeal > remainingHealth) {
+				double absorption = toHeal - remainingHealth;
+				toHeal = remainingHealth;
+				absorptionPlayer(player, absorption, enemy);
+			}
+		}
+		PlayerUtils.healPlayer(mPlugin, player, toHeal, mPlayer);
+	}
+
+	//Handles capping the absorption
+	private void absorptionPlayer(Player player, double absorption, LivingEntity enemy) {
+		absorption = Math.min(ABSORPTION_CAP, absorption);
+		AbsorptionUtils.addAbsorption(player, absorption, absorption, ABSORPTION_DURATION);
+		mCosmetic.rendAbsorptionEffect(mPlayer, player, enemy);
 	}
 
 }
