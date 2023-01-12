@@ -54,7 +54,7 @@ public class CluckingPotions extends Ability {
 					if (entity instanceof Player player) {
 						List<ItemStack> cluckingCandidates = new ArrayList<>(Arrays.asList(player.getInventory().getArmorContents()));
 						cluckingCandidates.add(player.getInventory().getItemInOffHand());
-						cluckingCandidates.removeIf(item -> item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CLUCKING) > 0);
+						cluckingCandidates.removeIf(item -> item == null || item.getType() == Material.AIR || ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CLUCKING) > 0);
 						if (!cluckingCandidates.isEmpty()) {
 							ItemStack item = cluckingCandidates.get(FastUtils.RANDOM.nextInt(cluckingCandidates.size()));
 							ItemStatUtils.addEnchantment(item, ItemStatUtils.EnchantmentType.CLUCKING, 1);
