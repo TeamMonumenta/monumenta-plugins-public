@@ -58,11 +58,11 @@ public class AbsorptionUtils {
 	public static void addAbsorption(LivingEntity entity, double amount, double maxAmount, int duration) {
 		double absorption = getAbsorption(entity);
 		double newAbsorption = Math.min(absorption + amount, maxAmount);
-		if (newAbsorption > absorption) {
+		if (newAbsorption >= absorption) {
 			setAbsorption(entity, newAbsorption, duration);
 		} else {
 			// Even if we don't set absorption, update the tracker to get proper amount/duration stacking
-			addAbsorptionInstance(entity, amount, duration);
+			addAbsorptionInstance(entity, maxAmount, duration);
 		}
 	}
 
