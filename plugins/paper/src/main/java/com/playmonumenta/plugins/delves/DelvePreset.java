@@ -27,7 +27,7 @@ public enum DelvePreset {
 		entry(DelvesModifier.LEGIONARY, 5),
 		entry(DelvesModifier.PERNICIOUS, 3)
 	)),
-	REMNANTS(4, "Returning Remnants", 1, Material.WITHER_SKELETON_SKULL, Map.ofEntries(
+	REMNANTS(4, "Returning Remnants", 1, Material.SKELETON_SKULL, Map.ofEntries(
 		entry(DelvesModifier.SPECTRAL, 3),
 		entry(DelvesModifier.LEGIONARY, 3),
 		entry(DelvesModifier.CARAPACE, 2)
@@ -84,13 +84,13 @@ public enum DelvePreset {
 	ARSENAL(12, "Ability Arsenal", 3, Material.END_CRYSTAL, Map.ofEntries(
 		entry(DelvesModifier.ARCANIC, 5),
 		entry(DelvesModifier.INFERNAL, 5),
+		entry(DelvesModifier.TRANSCENDENT, 4),
 		entry(DelvesModifier.LEGIONARY, 3),
-		entry(DelvesModifier.VENGEANCE, 3),
-		entry(DelvesModifier.TRANSCENDENT, 3),
-		entry(DelvesModifier.CHIVALROUS, 3)
+		entry(DelvesModifier.CHIVALROUS, 3),
+		entry(DelvesModifier.BLOODTHIRSTY, 2)
 	)),
 	TWO(13, "Take Two", 3, Material.ROSE_BUSH, Map.ofEntries(
-		entry(DelvesModifier.VENGEANCE, 2),
+		entry(DelvesModifier.PERNICIOUS, 2),
 		entry(DelvesModifier.ARCANIC, 2),
 		entry(DelvesModifier.INFERNAL, 2),
 		entry(DelvesModifier.TRANSCENDENT, 2),
@@ -119,6 +119,22 @@ public enum DelvePreset {
 		entry(DelvesModifier.BLOODTHIRSTY, 3),
 		entry(DelvesModifier.CARAPACE, 3),
 		entry(DelvesModifier.PERNICIOUS, 2)
+	)),
+	MOBILITY(16, "Mobility Mayhem", 3, Material.IRON_BOOTS, Map.ofEntries(
+		entry(DelvesModifier.CHIVALROUS, 5),
+		entry(DelvesModifier.BLOODTHIRSTY, 5),
+		entry(DelvesModifier.PERNICIOUS, 5),
+		entry(DelvesModifier.LEGIONARY, 4),
+		entry(DelvesModifier.COLOSSAL, 2),
+		entry(DelvesModifier.TRANSCENDENT, 1)
+	)),
+	REVENANTS(17, "Resurrecting Revenants", 3, Material.WITHER_SKELETON_SKULL, Map.ofEntries(
+		entry(DelvesModifier.SPECTRAL, 5),
+		entry(DelvesModifier.DREADFUL, 5),
+		entry(DelvesModifier.COLOSSAL, 3),
+		entry(DelvesModifier.PERNICIOUS, 3),
+		entry(DelvesModifier.TRANSCENDENT, 3),
+		entry(DelvesModifier.CHIVALROUS, 3)
 	));
 
 	public static final String PRESET_SCOREBOARD = "Daily3DelvePreset";
