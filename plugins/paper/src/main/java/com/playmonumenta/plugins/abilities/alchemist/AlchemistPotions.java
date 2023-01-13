@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -455,7 +456,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mGruesomeMode = !mGruesomeMode;
 		String mode = mGruesomeMode ? "Gruesome" : "Brutal";
 
-		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemist's Potions swapped to " + mode + " mode");
+		MessagingUtils.sendActionBarMessage(mPlayer, "Alchemist's Potions swapped to " + mode + " mode");
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, brewPitch);
 		updateAlchemistItem(mPlayer.getInventory().getItem(mSlot), mCharges);
 		ClientModHandler.updateAbility(mPlayer, this);

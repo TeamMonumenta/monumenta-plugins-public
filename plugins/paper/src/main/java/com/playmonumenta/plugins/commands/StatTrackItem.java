@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import dev.jorel.commandapi.CommandAPI;
@@ -16,15 +16,8 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 /*
@@ -125,7 +118,7 @@ public class StatTrackItem extends GenericCommand {
 		//Add the chosen stat tracking enchant to the item
 		ItemStatUtils.addInfusion(is, InfusionType.STAT_TRACK, 1, player.getUniqueId(), false);
 		ItemStatUtils.addInfusion(is, option, 1, player.getUniqueId());
-		animate(player);
+		EntityUtils.fireworkAnimation(player);
 	}
 
 	/**
@@ -149,7 +142,7 @@ public class StatTrackItem extends GenericCommand {
 		} else {
 			StatTrackManager.incrementStat(is, player, type, stat);
 			player.sendMessage("Updated the stat on your item to desired value!");
-			animate(player);
+			EntityUtils.fireworkAnimation(player);
 		}
 	}
 
@@ -172,30 +165,10 @@ public class StatTrackItem extends GenericCommand {
 			}
 			ItemStatUtils.generateItemStats(is);
 			player.sendMessage("Removed Stat Tracking from your item!");
-			animate(player);
+			EntityUtils.fireworkAnimation(player);
 
 		} else {
 			player.sendMessage("You cannot remove stat track from an item not tracked by you!");
 		}
-	}
-
-	//Firework effect for stat infusion
-	private static void animate(Player player) {
-		Location loc = player.getLocation();
-		Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-		FireworkMeta fwm = fw.getFireworkMeta();
-		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-		fwBuilder.withColor(Color.RED, Color.GREEN, Color.BLUE);
-		fwBuilder.with(FireworkEffect.Type.BURST);
-		FireworkEffect fwEffect = fwBuilder.build();
-		fwm.addEffect(fwEffect);
-		fw.setFireworkMeta(fwm);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-			}
-		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 }

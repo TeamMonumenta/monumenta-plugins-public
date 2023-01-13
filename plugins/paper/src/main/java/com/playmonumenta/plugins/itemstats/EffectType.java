@@ -346,10 +346,10 @@ public enum EffectType {
 				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
 			}
 			case VANILLA_HEAL -> {
-				PlayerUtils.healPlayer(plugin, player, player.getMaxHealth() * 0.2 * strength);
+				PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(player) * 0.2 * strength);
 				applyHealingSickness(entity, applySickness, player, plugin);
 			}
-			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, player.getMaxHealth() * 0.2 * strength);
+			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(player) * 0.2 * strength);
 			case VANILLA_SATURATION -> {
 				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
 				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
@@ -446,10 +446,10 @@ public enum EffectType {
 			case ANTI_HEAL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, -strength));
 
 			case INSTANT_HEALTH -> {
-				PlayerUtils.healPlayer(plugin, player, player.getMaxHealth() * strength);
+				PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(player) * strength);
 				applyHealingSickness(entity, applySickness, player, plugin);
 			}
-			case INSTANT_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, player.getMaxHealth() * strength);
+			case INSTANT_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(player) * strength);
 
 			case ARROW_SAVING -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, strength));
 			case ARROW_LOSS -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, -strength));

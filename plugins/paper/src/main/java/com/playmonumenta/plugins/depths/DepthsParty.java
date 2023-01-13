@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -243,7 +244,7 @@ public class DepthsParty {
 
 			l.getWorld().playSound(l, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 0.8f, 1.0f);
 			l.getWorld().playSound(l, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			DepthsUtils.animate(l);
+			EntityUtils.fireworkAnimation(l);
 			spawnRoomReward(l, spawnSlime);
 		}
 	}

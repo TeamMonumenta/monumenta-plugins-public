@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Collections;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -44,7 +46,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 100, null);
 
 		if (!creeper.isIgnited()) {
-			creeper.setCustomName(ChatColor.GOLD + "Tricky Creeper");
+			creeper.customName(Component.text("Tricky Creeper", NamedTextColor.GOLD));
 			creeper.setGlowing(true);
 			creeper.setExplosionRadius(20);
 			creeper.setMaxFuseTicks(100);

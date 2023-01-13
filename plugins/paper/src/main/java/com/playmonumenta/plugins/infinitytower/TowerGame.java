@@ -7,10 +7,12 @@ import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -504,7 +506,7 @@ public class TowerGame {
 				if (mTimer % 20 == 0) {
 					if (mPlayer != null) {
 						//send message to player
-						mPlayer.mPlayer.sendActionBar("The next round will start in " + (COOLDOWN_TURNS - (mTimer / 20)) + "s");
+						MessagingUtils.sendActionBarMessage(mPlayer.mPlayer, "The next round will start in " + (COOLDOWN_TURNS - (mTimer / 20)) + "s", NamedTextColor.WHITE);
 					}
 				}
 

@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalPassiveLava
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalSummons;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellRisingCircles;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellUltimateShulkerMania;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.portals.PortalManager;
@@ -347,6 +346,6 @@ public final class PortalBoss extends BossAbilityGroup {
 			sb.remove();
 		}
 
-		DepthsUtils.animate(mBoss.getLocation());
+		EntityUtils.fireworkAnimation(mBoss);
 	}
 }

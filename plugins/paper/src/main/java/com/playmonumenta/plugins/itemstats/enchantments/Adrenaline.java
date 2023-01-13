@@ -49,7 +49,7 @@ public class Adrenaline implements Enchantment {
 
 	@Override
 	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
-		if (ItemUtils.isPickaxe(player.getItemInHand()) && event.getBlock().getType() == Material.SPAWNER) {
+		if (ItemUtils.isPickaxe(player.getInventory().getItemInMainHand()) && event.getBlock().getType() == Material.SPAWNER) {
 			new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 12, 0.4, 0.5, 0.4, RED_COLOR).spawnAsPlayerBuff(player);
 			double speedAmount = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, PERCENT_SPEED_PER_LEVEL * value * 0.5);
 			int duration = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_DURATION, SPAWNER_DURATION);

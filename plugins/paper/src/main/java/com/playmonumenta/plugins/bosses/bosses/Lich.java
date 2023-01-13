@@ -37,13 +37,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,7 +56,6 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -846,9 +845,7 @@ public final class Lich extends BossAbilityGroup {
 										mBoss.setInvulnerable(false);
 										mPhase = 1;
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.showTitle(Title.title(Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
-												Component.text("Inheritor of Eternity", NamedTextColor.GRAY, TextDecoration.BOLD),
-												Title.Times.times(Duration.ofMillis(500L), Duration.ofMillis(3500L), Duration.ofSeconds(1L))));
+											MessagingUtils.sendBoldTitle(p, ChatColor.DARK_GRAY + "Hekawt, The Eternal", ChatColor.GRAY + "Inheritor of Eternity");
 											p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
 											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
@@ -1138,11 +1135,8 @@ public final class Lich extends BossAbilityGroup {
 		// summon undead + get undead
 		LivingEntity undead = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(loc, summonNbt));
 
-		if (summonNbt.equals("AdventurerUndead")) {
-			undead.setCustomName(ChatColor.WHITE + player.getName());
-		} else {
-			undead.setCustomName(ChatColor.GOLD + player.getName());
-		}
+		NamedTextColor color = summonNbt.equals("AdventurerUndead") ? NamedTextColor.WHITE : NamedTextColor.GOLD;
+		undead.customName(Component.text(player.getName(), color));
 
 		undead.addScoreboardTag("LichSpectre");
 		undead.addScoreboardTag("Undead" + player.getName());
@@ -1437,33 +1431,22 @@ public final class Lich extends BossAbilityGroup {
 
 					}.runTaskTimer(mPlugin, 0, 1);
 				}
-				new BukkitRunnable() {
 
-					@Override
-					public void run() {
-						//prevent players above the barrier ceiling from seeing title
-						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-								"scoreboard players set " + p.getUniqueId() + " MusicCooldown 10000");
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-								"execute as " + p.getUniqueId() + " run function monumenta:mechanisms/music/music_stop");
-							p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
-							p.showTitle(Title.title(Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
-								Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
-								Title.Times.times(Duration.ofMillis(500L), Duration.ofSeconds(4L), Duration.ofMillis(500L))));
-						}
-
-						new BukkitRunnable() {
-
-							@Override
-							public void run() {
-								surprise();
-							}
-
-						}.runTaskLater(mPlugin, 4 * 20);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					//prevent players above the barrier ceiling from seeing title
+					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							"scoreboard players set " + p.getUniqueId() + " MusicCooldown 10000");
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							"execute as " + p.getUniqueId() + " run function monumenta:mechanisms/music/music_stop");
+						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
+						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
+							Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
+							10, 80, 10);
 					}
 
-				}.runTaskLater(mPlugin, 4 * 20);
+					Bukkit.getScheduler().runTaskLater(mPlugin, Lich.this::surprise, 4 * 20);
+				}, 4 * 20);
 			}
 
 		}.runTaskLater(mPlugin, 2 * 20);
@@ -1499,9 +1482,7 @@ public final class Lich extends BossAbilityGroup {
 			.append(Component.text(" Eternal"));
 
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-			p.showTitle(Title.title(title,
-				subtitle,
-				Title.Times.times(Duration.ofMillis(0), Duration.ofSeconds(4L), Duration.ofSeconds(1L))));
+			MessagingUtils.sendTitle(p, title, subtitle, 0, 80, 20);
 		}
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -2018,9 +1999,9 @@ public final class Lich extends BossAbilityGroup {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
 											ScoreboardUtils.setScoreboardValue(p, "MusicCooldown", 0);
-											p.showTitle(Title.title(Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
+											MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
 												Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
-												Title.Times.times(Duration.ofMillis(500L), Duration.ofSeconds(4L), Duration.ofMillis(500L))));
+												10, 80, 10);
 										}
 										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 

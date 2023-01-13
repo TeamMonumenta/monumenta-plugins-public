@@ -170,7 +170,7 @@ public class GalleryGrave {
 		grave.addEquipmentLock(EquipmentSlot.OFF_HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
 		//TODO - set grave position like it is all on the floor
 		grave.setCustomNameVisible(true);
-		grave.setCustomName(bukkitPlayer.getName() + "'s grave");
+		grave.customName(Component.text(bukkitPlayer.getName() + "'s grave"));
 
 		return new GalleryGrave(grave, indicator, player, game);
 

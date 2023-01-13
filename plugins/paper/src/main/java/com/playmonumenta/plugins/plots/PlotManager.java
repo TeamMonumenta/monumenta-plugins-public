@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
+import com.playmonumenta.redissync.RBoardAPI;
 import com.playmonumenta.redissync.RemoteDataAPI;
 import com.playmonumenta.worlds.paper.MonumentaWorldManagementAPI;
 import dev.jorel.commandapi.CommandAPI;
@@ -228,7 +229,7 @@ public class PlotManager {
 								sender.sendMessage(ChatColor.RED + "Can't create new plot for player that has nonzero Plot score");
 								player.sendMessage(ChatColor.RED + "Can't create new plot for you because you have a nonzero Plot score. This is a bug, please report it.");
 							} else {
-								MonumentaRedisSyncAPI.rboardAdd("$Plot", "Plot", 1).whenComplete((newInstance, ex) -> {
+								RBoardAPI.add("$Plot", "Plot", 1).whenComplete((newInstance, ex) -> {
 									Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 										if (ex != null) {
 											sender.sendMessage(ChatColor.RED + "Failed to get new plot score: " + ex.getMessage());

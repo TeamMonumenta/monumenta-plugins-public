@@ -407,7 +407,7 @@ public final class Nucleus extends BossAbilityGroup {
 			e.damage(10000);
 		}
 
-		DepthsUtils.animate(mBoss.getLocation());
+		EntityUtils.fireworkAnimation(mBoss);
 
 		new BukkitRunnable() {
 

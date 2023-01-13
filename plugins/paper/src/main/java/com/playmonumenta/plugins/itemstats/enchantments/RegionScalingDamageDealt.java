@@ -47,7 +47,7 @@ public class RegionScalingDamageDealt implements Enchantment {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		ItemStack item = player.getItemInHand();
+		ItemStack item = player.getInventory().getItemInMainHand();
 		if (ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) > 0 || ItemUtils.isPickaxe(item) || ItemUtils.isAxe(item) || ItemUtils.isShovel(item)) {
 			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, MINING_FATIGUE_AMPLIFIER, false, false));
 		}

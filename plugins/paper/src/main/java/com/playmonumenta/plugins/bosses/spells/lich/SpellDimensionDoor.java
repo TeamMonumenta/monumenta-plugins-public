@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.lich;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Lich;
+import com.playmonumenta.plugins.bosses.bosses.ShieldSwitchBoss;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -10,9 +11,11 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -25,7 +28,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.boss.BarColor;
@@ -356,17 +358,10 @@ public class SpellDimensionDoor extends Spell {
 		Vector vec = LocationUtils.getVectorTo(tele, shadowLoc);
 		Location spectreLoc = shadowLoc.clone().subtract(vec);
 		LivingEntity spectre = Lich.summonSpectre(p, spectreLoc);
-		String name = p.getName();
-		spectre.setCustomName(ChatColor.GOLD + name);
-		spectre.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(200);
-		spectre.setHealth(200);
-		if (spectre.getScoreboardTags().contains("boss_shieldswitch")) {
-			spectre.setCustomName(ChatColor.WHITE + name);
-			spectre.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(150);
-			spectre.setHealth(150);
-		}
+		int health = ScoreboardUtils.checkTag(spectre, ShieldSwitchBoss.identityTag) ? 150 : 200;
+		EntityUtils.setMaxHealthAndHealth(spectre, health);
 		spectre.setGlowing(true);
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join Hekawt " + spectre.getUniqueId());
+		ScoreboardUtils.addEntityToTeam(spectre, "Hekawt");
 		((Creature) spectre).setTarget(p);
 
 		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);

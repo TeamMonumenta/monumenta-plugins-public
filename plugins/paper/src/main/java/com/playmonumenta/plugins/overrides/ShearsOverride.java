@@ -13,14 +13,11 @@ import org.jetbrains.annotations.Nullable;
 public class ShearsOverride extends BaseOverride {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
-		if (player.getGameMode() == GameMode.ADVENTURE) {
-			return false;
-		}
-		return true;
+		return player.getGameMode() != GameMode.ADVENTURE;
 	}
 
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack itemInHand) {
-		return clickedEntity == null || !(clickedEntity instanceof Snowman) || clickedEntity.getCustomName() == null;
+		return !(clickedEntity instanceof Snowman) || clickedEntity.customName() == null;
 	}
 }

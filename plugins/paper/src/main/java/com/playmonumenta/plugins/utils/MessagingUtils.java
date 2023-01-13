@@ -15,7 +15,6 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -127,13 +126,29 @@ public class MessagingUtils {
 		return GSON_SERIALIZER.deserialize(json);
 	}
 
-	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {
-		// Default values used by /title
-		player.showTitle(Title.title(Component.text(title != null ? title : ""), Component.text(subtitle != null ? subtitle : ""), Title.DEFAULT_TIMES));
+	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {
+		sendTitle(player, Component.text(title != null ? title : "").decorate(TextDecoration.BOLD), Component.text(subtitle != null ? subtitle : "").decorate(TextDecoration.BOLD));
 	}
 
-	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {
-		sendTitle(player, title == null ? null : ChatColor.BOLD + title, subtitle == null ? null : ChatColor.BOLD + subtitle);
+	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {
+		sendTitle(player, Component.text(title != null ? title : ""), Component.text(subtitle != null ? subtitle : ""));
+	}
+
+	public static void sendTitle(Player player, Component title, Component subtitle) {
+		sendTitle(player, title, subtitle, Title.DEFAULT_TIMES);
+	}
+
+	public static void sendTitle(Player player, Component title, Component subtitle, int fadeIn, int stay, int fadeOut) {
+		sendTitle(player, title, subtitle, Title.Times.times(ticks(fadeIn), ticks(stay), ticks(fadeOut)));
+	}
+
+	public static void sendTitle(Player player, Component title, Component subtitle, Title.Times times) {
+		player.showTitle(Title.title(title, subtitle, times));
+	}
+
+	private static Duration ticks(int t) {
+		// 50 milliseconds per tick
+		return Duration.ofMillis(t * 50L);
 	}
 
 }

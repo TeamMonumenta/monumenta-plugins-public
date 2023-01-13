@@ -127,10 +127,7 @@ public class ArcaneStrike extends Ability {
 
 			if (isEnhanced()) {
 				//Visual feedback
-				ItemStack item = mPlayer.getItemInHand();
-				if (item == null) {
-					return false;
-				}
+				ItemStack item = mPlayer.getInventory().getItemInMainHand();
 
 				//Get enchant levels on weapon
 				ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);

@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.custominventories;
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -18,7 +20,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,7 +28,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,7 +42,7 @@ public class InfusionCustomInventory extends CustomInventory {
 
 	private static final int ROW = 6;
 	private static final int COLUMNS = 9;
-	private static final int MAX_LORE_LENGHT = 30;
+	private static final int MAX_LORE_LENGTH = 30;
 	private static final Material JUNK_ITEM = Material.GRAY_STAINED_GLASS_PANE;
 
 	private static final ImmutableList<EquipmentSlot> SLOT_ORDER = ImmutableList.of(
@@ -62,7 +62,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack vitalityPanel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE, 1);
 		ItemMeta vitalityMeta = vitalityPanel.getItemMeta();
 		vitalityMeta.displayName(Component.text("Vitality", TextColor.fromCSSHexString("#FF8C00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(vitalityMeta, "Each level of Vitality gives you 1% bonus health.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(vitalityMeta, "Each level of Vitality gives you 1% bonus health.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		vitalityPanel.setItemMeta(vitalityMeta);
 		mPanelList.add(vitalityPanel);
 
@@ -70,7 +70,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack vigorPanel = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 		ItemMeta vigorMeta = vigorPanel.getItemMeta();
 		vigorMeta.displayName(Component.text("Vigor", TextColor.fromCSSHexString("#ff0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(vigorMeta, "Each level of Vigor gives you 0.75% bonus melee damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(vigorMeta, "Each level of Vigor gives you 0.75% bonus melee damage.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		vigorPanel.setItemMeta(vigorMeta);
 		mPanelList.add(vigorPanel);
 
@@ -78,7 +78,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack tenacityPanel = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
 		ItemMeta tenacityMeta = tenacityPanel.getItemMeta();
 		tenacityMeta.displayName(Component.text("Tenacity", TextColor.fromCSSHexString("#A9A9A9")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(tenacityMeta, "Each level of Tenacity gives you 0.5% damage reduction.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(tenacityMeta, "Each level of Tenacity gives you 0.5% damage reduction.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		tenacityPanel.setItemMeta(tenacityMeta);
 		mPanelList.add(tenacityPanel);
 
@@ -86,7 +86,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack perspicacityPanel = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1);
 		ItemMeta perspicacityMeta = perspicacityPanel.getItemMeta();
 		perspicacityMeta.displayName(Component.text("Perspicacity", TextColor.fromCSSHexString("#6666ff")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(perspicacityMeta, "Each level of Perspicacity gives you 0.75% bonus magic damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(perspicacityMeta, "Each level of Perspicacity gives you 0.75% bonus magic damage.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		perspicacityPanel.setItemMeta(perspicacityMeta);
 		mPanelList.add(perspicacityPanel);
 
@@ -94,7 +94,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack focusPanel = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE, 1);
 		ItemMeta focusMeta = focusPanel.getItemMeta();
 		focusMeta.displayName(Component.text("Focus", TextColor.fromCSSHexString("#FFFF00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(focusMeta, "Each level of Focus gives you 0.75% bonus projectile damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(focusMeta, "Each level of Focus gives you 0.75% bonus projectile damage.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		focusPanel.setItemMeta(focusMeta);
 		mPanelList.add(focusPanel);
 
@@ -102,7 +102,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		ItemStack acumenPanel = new ItemStack(Material.LIME_STAINED_GLASS_PANE, 1);
 		ItemMeta acumenMeta = acumenPanel.getItemMeta();
 		acumenMeta.displayName(Component.text("Acumen", TextColor.fromCSSHexString("#32CD32")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(acumenMeta, "Each level of Acumen gives you 2% bonus experience.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(acumenMeta, "Each level of Acumen gives you 2% bonus experience.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		acumenPanel.setItemMeta(acumenMeta);
 		mPanelList.add(acumenPanel);
 
@@ -115,7 +115,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Focus level " + (i + 1), TextColor.fromCSSHexString("#FFFF00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus projectile damage", MAX_LORE_LENGHT, ChatColor.GRAY);
+			GUIUtils.splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus projectile damage", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 			panel.setItemMeta(meta);
 			focusPanels.add(panel);
 		}
@@ -128,7 +128,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panels = new ItemStack(Material.LIME_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panels.getItemMeta();
 			meta.displayName(Component.text("Acumen level " + (i + 1), TextColor.fromCSSHexString("#32CD32")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 2 + "% bonus experience.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			GUIUtils.splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 2 + "% bonus experience.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 			panels.setItemMeta(meta);
 			acumenPanels.add(panels);
 		}
@@ -141,7 +141,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Perspicacity level " + (i + 1), TextColor.fromCSSHexString("#6666ff")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus magic damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			GUIUtils.splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus magic damage.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 			panel.setItemMeta(meta);
 			perspicacityPanels.add(panel);
 		}
@@ -154,7 +154,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Tenacity level " + (i + 1), TextColor.fromCSSHexString("#A9A9A9")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.5 + "% damage reduction.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			GUIUtils.splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.5 + "% damage reduction.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 			panel.setItemMeta(meta);
 			tenacityPanels.add(panel);
 		}
@@ -166,7 +166,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Vigor level " + (i + 1), TextColor.fromCSSHexString("#ff0000")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus melee damage.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			GUIUtils.splitLoreLine(meta, "You are currently receiving: " + (i + 1) * 0.75 + "% bonus melee damage.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 			panel.setItemMeta(meta);
 			vigorPanels.add(panel);
 		}
@@ -178,7 +178,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			ItemStack panel = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE, 1);
 			ItemMeta meta = panel.getItemMeta();
 			meta.displayName(Component.text("Vitality level " + (i + 1), TextColor.fromCSSHexString("#FF8C00")).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-			splitLoreLine(meta, "You are currently receiving: " + (i + 1) + "% bonus health.", MAX_LORE_LENGHT, ChatColor.GRAY);
+			GUIUtils.splitLoreLine(meta, "You are currently receiving: " + (i + 1) + "% bonus health.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 			panel.setItemMeta(meta);
 			vitalityPanels.add(panel);
 		}
@@ -231,7 +231,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		refundMeta.displayName(Component.text("Click to refund this item's infusions", NamedTextColor.DARK_GRAY)
 							.decoration(TextDecoration.ITALIC, false)
 							.decoration(TextDecoration.BOLD, true));
-		splitLoreLine(refundMeta, "You will receive " + (InfusionUtils.FULL_REFUND ? "100" : (int) (InfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", MAX_LORE_LENGHT, ChatColor.GRAY);
+		GUIUtils.splitLoreLine(refundMeta, "You will receive " + (InfusionUtils.FULL_REFUND ? "100" : (int) (InfusionUtils.REFUND_PERCENT * 100)) + "% of the experience, but all of the materials back.", MAX_LORE_LENGTH, NamedTextColor.GRAY, true);
 		mRefundItem.setItemMeta(refundMeta);
 
 		//Cake for max level reached
@@ -239,29 +239,8 @@ public class InfusionCustomInventory extends CustomInventory {
 		maxMeta.displayName(Component.text("Congratulations!", NamedTextColor.DARK_AQUA)
 						.decoration(TextDecoration.BOLD, true)
 						.decoration(TextDecoration.ITALIC, false));
-		splitLoreLine(maxMeta, "You've reached the max Infusion level on this item.", MAX_LORE_LENGHT, ChatColor.DARK_AQUA);
+		GUIUtils.splitLoreLine(maxMeta, "You've reached the max Infusion level on this item.", MAX_LORE_LENGTH, NamedTextColor.DARK_AQUA, true);
 		mMaxLevelReachedItem.setItemMeta(maxMeta);
-	}
-
-
-	private static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor) {
-		String[] splitLine = lore.split(" ");
-		String currentString = defaultColor + "";
-		List<String> finalLines = new ArrayList<String>();
-		int currentLength = 0;
-		for (String word : splitLine) {
-			if (currentLength + word.length() > maxLength) {
-				finalLines.add(currentString);
-				currentString = defaultColor + "";
-				currentLength = 0;
-			}
-			currentString += word + " ";
-			currentLength += word.length() + 1;
-		}
-		if (!currentString.equals(defaultColor + "")) {
-			finalLines.add(currentString);
-		}
-		meta.setLore(finalLines);
 	}
 
 	public InfusionCustomInventory(Player owner) {
@@ -450,23 +429,23 @@ public class InfusionCustomInventory extends CustomInventory {
 
 	private void attemptInfusion(Player p, ItemStack item, InfusionSelection infusion) {
 		if (item.getAmount() > 1) {
-			p.sendMessage(ChatColor.RED + "You cannot infuse stacked items.");
+			p.sendMessage(Component.text("You cannot infuse stacked items.", NamedTextColor.RED));
 			return;
 		}
 		if (!InfusionUtils.isInfusionable(item)) {
-			p.sendMessage(ChatColor.RED + "This item cannot be infused.");
+			p.sendMessage(Component.text("This item cannot be infused.", NamedTextColor.RED));
 			return;
 		}
 
 		if (InfusionUtils.canPayInfusion(p, item)) {
 			if (InfusionUtils.payInfusion(p, item)) {
-				InfusionUtils.animate(p);
+				EntityUtils.fireworkAnimation(p);
 				InfusionUtils.infuseItem(p, item, infusion);
 			} else {
-				p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in paying infusion cost)");
+				p.sendMessage(Component.text("If you see this message please contact a mod! (Error in paying infusion cost)", NamedTextColor.RED));
 			}
 		} else {
-			p.sendMessage(ChatColor.RED + "You don't have enough currency and/or experience for this infusion.");
+			p.sendMessage(Component.text("You don't have enough currency and/or experience for this infusion.", NamedTextColor.RED));
 		}
 	}
 

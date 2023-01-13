@@ -9,18 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class DelveInfusionUtils {
@@ -125,7 +118,7 @@ public class DelveInfusionUtils {
 		}
 		ItemStatUtils.addInfusion(item, infusionType, prevLvl + 1, player.getUniqueId());
 
-		animate(player);
+		EntityUtils.fireworkAnimation(player);
 	}
 
 	public static void refundInfusion(ItemStack item, Player player) {
@@ -177,25 +170,6 @@ public class DelveInfusionUtils {
 		for (ItemStack item : mats) {
 			InventoryUtils.giveItem(player, item);
 		}
-	}
-
-	private static void animate(Player player) {
-		Location loc = player.getLocation();
-		Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-		FireworkMeta fwm = fw.getFireworkMeta();
-		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-		fwBuilder.withColor(Color.RED, Color.GREEN, Color.BLUE);
-		fwBuilder.with(FireworkEffect.Type.BURST);
-		FireworkEffect fwEffect = fwBuilder.build();
-		fwm.addEffect(fwEffect);
-		fw.setFireworkMeta(fwm);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-			}
-		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
 	private static int getInfuseLevel(ItemStack item) {

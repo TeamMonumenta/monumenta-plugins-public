@@ -131,9 +131,8 @@ public class SheepGodBoss extends BossAbilityGroup {
 			hpDelta = (hpDelta / 2) + 25;
 			playerCount--;
 		}
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, bossTargetHp);
 		mBoss.customName(Component.text("The Sheep God", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "The Sheep God", ChatColor.RED + "Master of the Hundred Wools");

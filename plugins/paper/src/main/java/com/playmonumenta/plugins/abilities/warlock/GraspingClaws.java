@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -111,7 +112,7 @@ public class GraspingClaws extends Ability {
 		Snowball proj = world.spawn(eyeLoc, Snowball.class);
 		proj.setVelocity(direction.normalize().multiply(speed));
 		proj.setShooter(mPlayer);
-		proj.setCustomName("Grasping Claws Projectile");
+		proj.customName(Component.text("Grasping Claws Projectile"));
 		mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SPELL_WITCH);
 		mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		putOnCooldown();
@@ -244,7 +245,7 @@ public class GraspingClaws extends Ability {
 					List<Player> affectedPlayers = PlayerUtils.playersInRange(loc, CAGE_RADIUS, true);
 					for (Player p : affectedPlayers) {
 						if (mT % 20 == 0) {
-							PlayerUtils.healPlayer(mPlugin, p, p.getMaxHealth() * HEAL_AMOUNT, mPlayer);
+							PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * HEAL_AMOUNT, mPlayer);
 						}
 					}
 

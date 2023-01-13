@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.gallery.interactables.EffectInteractable;
 import com.playmonumenta.plugins.gallery.interactables.MysteryBoxInteractable;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.time.Duration;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,7 +26,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -821,11 +820,9 @@ public class GalleryGame {
 			Location deadLoc = player.getLocation();
 
 			player.teleport(new Location(player.getWorld(), mDeathBoxLoc.getX(), mDeathBoxLoc.getY(), mDeathBoxLoc.getZ()));
-			Title.Times times = Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(1));
 			Component mainTitle = Component.text("⎧", NamedTextColor.BLACK).append(Component.text("YOU DIED", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, true)).append(Component.text("⎫", NamedTextColor.BLACK).decoration(TextDecoration.BOLD, false));
 			Component subTitle = Component.text("⎩", NamedTextColor.BLACK).decoration(TextDecoration.BOLD, true).append(Component.text("ᴿᴵᴾ", NamedTextColor.BLACK)).append(Component.text("⎭", NamedTextColor.BLACK));
-			Title title = Title.title(mainTitle, subTitle, times);
-			player.showTitle(title);
+			MessagingUtils.sendTitle(player, mainTitle, subTitle, 20, 100, 20);
 
 			for (GalleryPlayer gPlayer : mPlayersMap.values()) {
 				if (gPlayer != realPlayer) {

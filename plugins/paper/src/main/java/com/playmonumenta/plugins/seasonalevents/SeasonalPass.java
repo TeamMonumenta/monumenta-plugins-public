@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.utils.DateUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -23,19 +23,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class SeasonalPass {
 	public static final int MP_PER_LEVEL = 75;
@@ -265,14 +258,14 @@ public class SeasonalPass {
 		for (int i = currentLevel + 1; i <= newLevel; i++) {
 			p.sendMessage(Component.text("You earned a new reward!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 
-			animate(p);
+			EntityUtils.fireworkAnimation(p);
 			givePassReward(p, i);
 		}
 
 		// Special case - finished all missions
 		if (newMP == mTotalMp && !CosmeticsManager.getInstance().playerHasCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME)) {
 			p.sendMessage(Component.text("You finished all the missions!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			animate(p);
+			EntityUtils.fireworkAnimation(p);
 			CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME);
 		}
 
@@ -486,27 +479,8 @@ public class SeasonalPass {
 		if (score + amount >= mission.mAmount) {
 			//Play an animation and notify player
 			p.sendMessage(Component.text("You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			animate(p);
+			EntityUtils.fireworkAnimation(p);
 		}
-	}
-
-	public void animate(Player player) {
-		Location loc = player.getLocation();
-		Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-		FireworkMeta fwm = fw.getFireworkMeta();
-		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-		fwBuilder.withColor(Color.RED, Color.GREEN, Color.BLUE);
-		fwBuilder.with(FireworkEffect.Type.BURST);
-		FireworkEffect fwEffect = fwBuilder.build();
-		fwm.addEffect(fwEffect);
-		fw.setFireworkMeta(fwm);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-			}
-		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
 	// Time Utils

@@ -17,10 +17,10 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,6 @@ import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,7 +36,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
@@ -163,8 +161,7 @@ public class CShura extends BossAbilityGroup {
 				} else {
 					this.cancel();
 					for (Player p : PlayerUtils.playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendTitle(ChatColor.GREEN + "" + ChatColor.BOLD + "C'Shura",
-							ChatColor.DARK_GREEN + "The Soulbinder", 10, 70, 20);
+						MessagingUtils.sendBoldTitle(p, ChatColor.GREEN + "C'Shura", ChatColor.DARK_GREEN + "The Soulbinder");
 						p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 					}
@@ -182,10 +179,8 @@ public class CShura extends BossAbilityGroup {
 	@Override
 	public void init() {
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mBoss, detectionRange);
-		double hpDelta = mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-		double hp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
-		mBoss.setHealth(hp);
+		double hp = EntityUtils.getMaxHealth(mBoss) * BossUtils.healthScalingCoef(playerCount, 0.5, 0.35);
+		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 	}
 
 	@Override
@@ -261,9 +256,9 @@ public class CShura extends BossAbilityGroup {
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 					for (Player p : players) {
 						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100f, 0.8f);
-						p.showTitle(Title.title(Component.text("VICTORY", NamedTextColor.GREEN, TextDecoration.BOLD),
+						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GREEN, TextDecoration.BOLD),
 							Component.text("C'Shura, The Soulbinder", NamedTextColor.DARK_GREEN, TextDecoration.BOLD),
-							Title.Times.times(Duration.ofMillis(500L), Duration.ofMillis(4000L), Duration.ofMillis(500L))));
+							10, 80, 10);
 					}
 				}
 			}

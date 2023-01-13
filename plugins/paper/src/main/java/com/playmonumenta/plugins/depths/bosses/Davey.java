@@ -259,7 +259,7 @@ public class Davey extends BossAbilityGroup {
 
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 
-		DepthsUtils.animate(mBoss.getLocation());
+		EntityUtils.fireworkAnimation(mBoss);
 
 		new BukkitRunnable() {
 

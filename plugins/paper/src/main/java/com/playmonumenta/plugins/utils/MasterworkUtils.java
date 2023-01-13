@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
@@ -17,17 +18,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class MasterworkUtils {
@@ -443,10 +440,6 @@ public class MasterworkUtils {
 	}
 
 	public static void animate(Player player, Masterwork tier) {
-		Location loc = player.getLocation();
-		Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-		FireworkMeta fwm = fw.getFireworkMeta();
-		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
 		Color colorChoice = Color.ORANGE;
 		if (getMasterworkAsInt(tier) == 7) {
 			if (tier == Masterwork.VIIA) {
@@ -457,20 +450,11 @@ public class MasterworkUtils {
 				colorChoice = Color.YELLOW;
 			}
 		}
-		fwBuilder.withColor(Color.GRAY, Color.WHITE, colorChoice);
-		fwBuilder.with(FireworkEffect.Type.BURST);
-		FireworkEffect fwEffect = fwBuilder.build();
-		fwm.addEffect(fwEffect);
-		fw.setFireworkMeta(fwm);
 
+		Location loc = player.getLocation();
+		EntityUtils.fireworkAnimation(loc, List.of(Color.GRAY, Color.WHITE, colorChoice), FireworkEffect.Type.BURST, 5);
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-				player.playSound(loc, Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f);
-			}
-		}.runTaskLater(Plugin.getInstance(), 5);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> player.playSound(loc, Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f), 5);
 	}
 
 	public static ItemStack preserveModified(ItemStack base, ItemStack upgrade) {

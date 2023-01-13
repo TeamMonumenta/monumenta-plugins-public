@@ -15,15 +15,8 @@ import java.util.TreeMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class SeasonalEventManager {
@@ -226,25 +219,6 @@ public class SeasonalEventManager {
 		if (mActivePass != null && mActivePass.isActive()) {
 			mActivePass.addWeeklyMissionProgress(p, mission, missionNumber, amount);
 		}
-	}
-
-	public static void animate(Player player) {
-		Location loc = player.getLocation();
-		Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-		FireworkMeta fwm = fw.getFireworkMeta();
-		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-		fwBuilder.withColor(Color.RED, Color.GREEN, Color.BLUE);
-		fwBuilder.with(FireworkEffect.Type.BURST);
-		FireworkEffect fwEffect = fwBuilder.build();
-		fwm.addEffect(fwEffect);
-		fw.setFireworkMeta(fwm);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-			}
-		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
 	// Time Utils

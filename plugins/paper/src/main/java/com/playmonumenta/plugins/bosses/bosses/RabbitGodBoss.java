@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -280,10 +281,10 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 									chicken.setAI(false);
 									chicken.setAdult();
 									chicken.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 999, 10));
-									chicken.setCustomName(ChatColor.AQUA + "" + ChatColor.BOLD + "Godly Clucking Spirit");
+									chicken.customName(Component.text("Godly Clucking Spirit", NamedTextColor.AQUA, TextDecoration.BOLD));
 									chicken.setCustomNameVisible(true);
 									world.playSound(chicken.getLocation(), Sound.ENTITY_CHICKEN_HURT, SoundCategory.HOSTILE, 1, 1);
-									PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Godly Clucking Spirit] \",\"color\":\"gold\"},{\"text\":\"Cluck Cluck!\",\"color\":\"white\"}]");
+									PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(p -> p.sendMessage(Component.text("[Godly Clucking Spirit] ", NamedTextColor.GOLD).append(Component.text("Cluck Cluck!", NamedTextColor.WHITE))));
 									new BukkitRunnable() {
 
 										@Override

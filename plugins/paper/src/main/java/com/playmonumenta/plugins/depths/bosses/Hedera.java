@@ -225,7 +225,7 @@ public class Hedera extends BossAbilityGroup {
 		}
 
 		//Finish animation
-		DepthsUtils.animate(mBoss.getLocation());
+		EntityUtils.fireworkAnimation(mBoss);
 
 		new BukkitRunnable() {
 

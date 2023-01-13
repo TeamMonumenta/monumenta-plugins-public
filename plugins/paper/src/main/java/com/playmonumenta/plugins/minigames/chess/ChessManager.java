@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.minigames.chess.events.ChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.EndGameChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.MovePieceChessEvent;
 import com.playmonumenta.plugins.minigames.chess.events.PromotingChessEvent;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -41,8 +42,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -53,7 +52,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -411,15 +409,7 @@ public class ChessManager implements Listener {
 					return;
 				}
 
-				Firework fw = (Firework) player.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-				FireworkMeta fwm = fw.getFireworkMeta();
-				FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-				fwBuilder.withColor(Color.LIME, Color.YELLOW, Color.ORANGE, Color.AQUA);
-				fwBuilder.with(FireworkEffect.Type.BURST);
-				FireworkEffect fwEffect = fwBuilder.build();
-				fwm.addEffect(fwEffect);
-				fw.setFireworkMeta(fwm);
-				fw.detonate();
+				EntityUtils.fireworkAnimation(loc, List.of(Color.LIME, Color.YELLOW, Color.ORANGE, Color.AQUA), FireworkEffect.Type.BURST, 0);
 
 				mTimer += 5;
 			}

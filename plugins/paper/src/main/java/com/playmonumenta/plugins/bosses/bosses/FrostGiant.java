@@ -30,6 +30,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -242,25 +243,19 @@ public class FrostGiant extends BossAbilityGroup {
 			Set<String> tags = e.getScoreboardTags();
 			for (String tag : tags) {
 				switch (tag) {
-					default:
-						break;
-					case START_TAG:
-						start = e;
-						break;
-					case NORTH:
-						mNorthStand = e;
-						break;
-					case EAST:
-						mEastStand = e;
-						break;
-					case SOUTH:
-						mSouthStand = e;
-						break;
-					case WEST:
-						mWestStand = e;
-						break;
+					default -> {
+					}
+					case START_TAG -> start = e;
+					case NORTH -> mNorthStand = e;
+					case EAST -> mEastStand = e;
+					case SOUTH -> mSouthStand = e;
+					case WEST -> mWestStand = e;
 				}
 			}
+		}
+
+		if (mNorthStand == null || mEastStand == null || mSouthStand == null || mWestStand == null) {
+			MMLog.warning("[Eldrask] Failed to find at least one directional armor stand when spawning");
 		}
 
 		mStartLoc = start != null ? start.getLocation() : boss.getLocation();

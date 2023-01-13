@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,6 +55,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -555,7 +557,7 @@ public class EntityUtils {
 				getStackedMobsBelow(getter, mobs);
 			}
 
-			if (getter.getPassenger() != null) {
+			if (!getter.getPassengers().isEmpty()) {
 				getStackedMobsAbove(getter, mobs);
 			}
 			for (LivingEntity mob : mobs) {
@@ -594,8 +596,8 @@ public class EntityUtils {
 			prior.add((LivingEntity) base);
 		}
 
-		if (base.getPassenger() != null) {
-			getStackedMobsAbove(base.getPassenger(), prior);
+		for (Entity entity : base.getPassengers()) {
+			getStackedMobsAbove(entity, prior);
 		}
 	}
 
@@ -1328,6 +1330,11 @@ public class EntityUtils {
 		}
 	}
 
+	public static void setMaxHealthAndHealth(LivingEntity entity, double value) {
+		setAttributeBase(entity, Attribute.GENERIC_MAX_HEALTH, value);
+		entity.setHealth(value);
+	}
+
 	public static boolean isSomeArrow(Entity projectile) {
 		return isSomeArrow(projectile.getType());
 	}
@@ -1478,6 +1485,27 @@ public class EntityUtils {
 			newShulker.setColor(shulker.getColor());
 		}
 		return newSpawn;
+	}
+
+	public static void fireworkAnimation(Entity entity) {
+		fireworkAnimation(entity.getLocation());
+	}
+
+	public static void fireworkAnimation(Location loc) {
+		fireworkAnimation(loc, List.of(Color.RED, Color.GREEN, Color.BLUE), FireworkEffect.Type.BURST, 5);
+	}
+
+	public static void fireworkAnimation(Location loc, List<Color> colors, FireworkEffect.Type type, int delay) {
+		Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+		FireworkMeta fwm = fw.getFireworkMeta();
+		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
+		fwBuilder.withColor(colors);
+		fwBuilder.with(type);
+		FireworkEffect fwEffect = fwBuilder.build();
+		fwm.addEffect(fwEffect);
+		fw.setFireworkMeta(fwm);
+
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), fw::detonate, delay);
 	}
 
 }

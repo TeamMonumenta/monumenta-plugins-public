@@ -3,9 +3,12 @@ package com.playmonumenta.plugins.bosses.spells.falsespirit;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -51,33 +54,21 @@ public class GatesOfHell extends Spell {
 		Entity portalEntity = Objects.requireNonNull(LibraryOfSoulsIntegration.summon(portal.getLocation(), "PortalGate"));
 		portalEntity.addScoreboardTag("PortalNum" + mNum);
 
-		switch (mNum) {
-			case 1:
-				portalEntity.setCustomName(portalEntity.getCustomName() + " - Hallud");
-				break;
-			case 2:
-				portalEntity.setCustomName(portalEntity.getCustomName() + " - Chasom");
-				break;
-			case 3:
-				portalEntity.setCustomName(portalEntity.getCustomName() + " - Midat");
-				break;
-			case 4:
-				portalEntity.setCustomName(portalEntity.getCustomName() + " - Daath");
-				break;
-			case 5:
-				portalEntity.setCustomName(portalEntity.getCustomName() + " - Keter");
-				break;
-			default:
-				break;
+		Component name = portalEntity.customName();
+		List<String> names = Arrays.asList("Hallud", "Chason", "Midat", "Daath", "Keter");
+		if (name == null || mNum > names.size()) {
+			MMLog.warning("Failed to summon a portal in GatesOfHell (could not process name): mNum = " + mNum);
+			return;
 		}
+		portalEntity.customName(name.append(Component.text(" - ").append(Component.text(names.get(mNum - 1)))));
 
 		mNum++;
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (mBoss.isDead() || !mBoss.isValid() || portalEntity == null || portalEntity.isDead() || !portalEntity.isValid()) {
-					if (portalEntity != null && !portalEntity.isDead()) {
+				if (mBoss.isDead() || !mBoss.isValid() || portalEntity.isDead() || !portalEntity.isValid()) {
+					if (!portalEntity.isDead()) {
 						portalEntity.remove();
 					}
 					mOpenPortals.remove(portal);

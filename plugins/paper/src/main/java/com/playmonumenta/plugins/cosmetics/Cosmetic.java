@@ -95,7 +95,7 @@ public class Cosmetic {
 					default -> "Offhand";
 				};
 				meta.lore(List.of(Component.text("Base material: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-						.append(Component.translatable(mat.getTranslationKey())),
+						.append(Component.translatable(mat.translationKey())),
 					Component.text("Slot: " + slot, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 				meta.addItemFlags(ItemFlag.values());
 				cosmeticItem.setItemMeta(meta);

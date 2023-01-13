@@ -16,20 +16,19 @@ public class GoldenAppleOverride extends BaseOverride {
 			return false;
 		}
 
-		return (clickedEntity == null || !(clickedEntity instanceof ZombieVillager));
+		return !(clickedEntity instanceof ZombieVillager);
 	}
 
 	@Override
 	public boolean playerItemConsume(Plugin plugin, Player player, PlayerItemConsumeEvent event) {
-		ItemStack mainhand = player.getItemInHand();
-
-		if (player == null || mainhand.getType() != event.getItem().getType()) {
+		ItemStack mainhand = player.getInventory().getItemInMainHand();
+		if (mainhand.getType() != event.getItem().getType()) {
 			return true;
 		}
 
 		event.setCancelled(true);
 
-		player.setItemInHand(mainhand.subtract(1));
+		player.getInventory().setItemInMainHand(mainhand.subtract(1));
 		player.setFoodLevel(Math.min(player.getFoodLevel() + 4, 20));
 		player.setSaturation(Math.min(player.getSaturation() + 9.6f, player.getFoodLevel()));
 

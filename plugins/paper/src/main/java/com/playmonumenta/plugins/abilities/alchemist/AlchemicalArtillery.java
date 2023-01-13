@@ -19,13 +19,13 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -156,7 +156,7 @@ public class AlchemicalArtillery extends PotionAbility {
 			active = "deactivated";
 			mPlayer.playSound(mPlayer.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, SoundCategory.PLAYERS, 1, 0.75f);
 		}
-		mPlayer.sendActionBar(ChatColor.YELLOW + "Alchemical Artillery has been " + active + "!");
+		MessagingUtils.sendActionBarMessage(mPlayer, "Alchemical Artillery has been " + active + "!");
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, 1.2f);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}

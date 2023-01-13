@@ -6,13 +6,19 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -106,12 +112,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	public void run() {
 		mOnCooldown = true;
 		World world = mBossLoc.getWorld();
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				mOnCooldown = false;
-			}
-		}.runTaskLater(mPlugin, 20 * 90);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, 20 * 90);
 
 		for (Entity e : world.getEntities()) {
 			if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_TAG)) {
@@ -119,29 +120,21 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			}
 		}
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				for (Entity e : world.getEntities()) {
-					if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_SPAWN_TAG)) {
-						Location loc = e.getLocation().add(0, 1, 0);
-						new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0.3, 0.45, 0.3, 1).spawnAsBoss();
-						LibraryOfSoulsIntegration.summon(loc, "StonebornImmortal");
-					}
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			for (Entity e : world.getEntities()) {
+				if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_SPAWN_TAG)) {
+					Location loc = e.getLocation().add(0, 1, 0);
+					new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0.3, 0.45, 0.3, 1).spawnAsBoss();
+					LibraryOfSoulsIntegration.summon(loc, "StonebornImmortal");
 				}
 			}
-		}.runTaskLater(mPlugin, 50);
+		}, 50);
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				for (Entity e : world.getEntities()) {
-					if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_TAG)) {
-						e.remove();
-					}
-				}
-			}
-		}.runTaskLater(mPlugin, KAULS_JUDGEMENT_TIME);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			world.getEntities().stream()
+				.filter(e -> ScoreboardUtils.checkTag(e, KAULS_JUDGEMENT_MOB_TAG))
+				.forEach(Entity::remove);
+		}, KAULS_JUDGEMENT_TIME);
 
 		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
@@ -207,7 +200,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 						player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
-						player.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "ESCAPE", "", 1, 20 * 3, 1);
+						MessagingUtils.sendTitle(player, Component.text("ESCAPE", NamedTextColor.RED, TextDecoration.BOLD), Component.empty(), 1, 20 * 3, 1);
 					}
 				} else if (mTicks < KAULS_JUDGEMENT_TIME) {
 					/* Judgement ticks - anyone who loses the tag early must have succeeded */

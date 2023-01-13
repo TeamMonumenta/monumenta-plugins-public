@@ -226,7 +226,7 @@ public final class Grave {
 			mEntity.setGravity(false);
 			mEntity.setCanMove(false);
 			mEntity.setSilent(true);
-			mEntity.setCustomName(mPlayer.getName() + (mPlayer.getName().endsWith("s") ? "' Grave" : "'s Grave"));
+			mEntity.customName(Component.text(mPlayer.getName() + (mPlayer.getName().endsWith("s") ? "' Grave" : "'s Grave")));
 			mEntity.setCustomNameVisible(!mSmall);
 			mEntity.addScoreboardTag("Grave");
 			mManager.addGrave(mEntity, this);

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellDreadnaughtParticle;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -47,7 +48,7 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 		mDamageCounter += event.getFinalDamage(false);
 
-		double regionCap = mBoss.getMaxHealth() * DREADLING_SPAWN_THRESHOLD;
+		double regionCap = EntityUtils.getMaxHealth(mBoss) * DREADLING_SPAWN_THRESHOLD;
 
 		if (mDamageCounter >= regionCap) {
 			mDamageCounter -= regionCap;

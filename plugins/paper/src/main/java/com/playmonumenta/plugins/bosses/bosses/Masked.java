@@ -15,13 +15,16 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -103,7 +106,9 @@ public class Masked extends BossAbilityGroup {
 					mWorld.playSound(mSpawnLoc, Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 2f, 1f);
 				} else if (mT == TIME_TITLE) {
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, DETECTION_RANGE, true)) {
-						player.sendTitle(ChatColor.BOLD + "" + ChatColor.LIGHT_PURPLE + "The Masked Man", ChatColor.LIGHT_PURPLE + "Harbinger of Shadow", 15, 100, 15);
+						MessagingUtils.sendTitle(player, Component.text("The Masked Man", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD),
+							Component.text("Harbinger of Shadow", NamedTextColor.LIGHT_PURPLE),
+							15, 100, 15);
 					}
 				} else if (mT == TIME_BEGIN) {
 					mBoss.setGravity(true);

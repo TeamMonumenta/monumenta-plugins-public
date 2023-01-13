@@ -340,11 +340,14 @@ public class InventoryUtils {
 		}
 	}
 
-	public static void giveItem(final Player player, final ItemStack item) {
+	public static void giveItem(final Player player, final @Nullable ItemStack item) {
 		giveItem(player, item, false);
 	}
 
-	public static void giveItem(final Player player, final ItemStack item, boolean silent) {
+	public static void giveItem(final Player player, final @Nullable ItemStack item, boolean silent) {
+		if (item == null) {
+			return;
+		}
 		final PlayerInventory inv = player.getInventory();
 		if (canFitInInventory(item, inv)) {
 			inv.addItem(item);

@@ -13,6 +13,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class GUIUtils {
 
+	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, NamedTextColor defaultColor, boolean clean) {
+		splitLoreLine(meta, lore, maxLength, namedTextColorToChatColor(defaultColor), clean);
+	}
+
 	public static void splitLoreLine(ItemMeta meta, String lore, int maxLength, ChatColor defaultColor, boolean clean) {
 		if (lore.isEmpty()) {
 			return;

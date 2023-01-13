@@ -28,21 +28,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.AbstractHorse;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -216,25 +211,6 @@ public class DepthsUtils {
 
 	public static boolean isValidComboAttack(DamageEvent event, Player player) {
 		return event.getType() == DamageType.MELEE && player.getCooledAttackStrength(0) == 1 && isWeaponItem(player.getInventory().getItemInMainHand());
-	}
-
-	//Firework effect
-	public static void animate(Location loc) {
-		Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
-		FireworkMeta fwm = fw.getFireworkMeta();
-		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-		fwBuilder.withColor(Color.RED, Color.GREEN, Color.BLUE);
-		fwBuilder.with(FireworkEffect.Type.BURST);
-		FireworkEffect fwEffect = fwBuilder.build();
-		fwm.addEffect(fwEffect);
-		fw.setFireworkMeta(fwm);
-
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-			}
-		}.runTaskLater(Plugin.getInstance(), 5);
 	}
 
 	public static @Nullable DepthsRewardType rewardFromRoom(@Nullable DepthsRoomType roomType) {

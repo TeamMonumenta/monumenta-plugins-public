@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -111,7 +112,7 @@ public class WindBomb extends Ability {
 		proj.setVelocity(loc.getDirection().normalize().multiply(VELOCITY));
 		proj.setShooter(mPlayer);
 		mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.CLOUD);
-		proj.setCustomName("Wind Bomb");
+		proj.customName(Component.text("Wind Bomb"));
 
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		double damage = ItemStatUtils.getAttributeAmount(mainhand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);

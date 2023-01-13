@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.time.Duration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -89,10 +90,7 @@ public class RespawnStasis extends Stasis {
 		} else {
 			subtitle = Component.text("Nothing shattered.", NamedTextColor.GRAY);
 		}
-		player.showTitle(
-			Title.title(Component.text("You Died", NamedTextColor.RED),
-				subtitle,
-				Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(5000), Duration.ofMillis(500))));
+		MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED), subtitle, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(5000), Duration.ofMillis(500)));
 
 		if (mShatter > 0 && getDuration() >= DURATION - 20 * 10) {
 			// For the first 10 seconds, show hint on how to repair gear if shattered

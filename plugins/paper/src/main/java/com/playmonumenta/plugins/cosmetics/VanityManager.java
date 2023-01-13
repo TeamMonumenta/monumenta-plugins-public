@@ -373,7 +373,7 @@ public class VanityManager implements Listener {
 			Component vanityDisplayName = vanityMeta.displayName();
 			if (originalMeta != null) {
 				vanityMeta.displayName(Objects.requireNonNullElseGet(originalMeta.displayName(),
-					() -> Component.translatable(itemStack.getType().getTranslationKey()).decoration(TextDecoration.ITALIC, false)));
+					() -> Component.translatable(itemStack.getType().translationKey()).decoration(TextDecoration.ITALIC, false)));
 			}
 			List<Component> lore = originalMeta == null || originalMeta.lore() == null ? new ArrayList<>() : new ArrayList<>(originalMeta.lore());
 			if (invisible) {
@@ -383,7 +383,7 @@ public class VanityManager implements Listener {
 				if (vanityDisplayName != null) {
 					vanityDisplayName = Component.text(MessagingUtils.plainText(vanityDisplayName));
 				} else {
-					vanityDisplayName = Component.translatable(vanityItem.getType().getTranslationKey());
+					vanityDisplayName = Component.translatable(vanityItem.getType().translationKey());
 				}
 				lore.add(0, Component.text("Vanity skin: ", NamedTextColor.GOLD).append(vanityDisplayName));
 			}

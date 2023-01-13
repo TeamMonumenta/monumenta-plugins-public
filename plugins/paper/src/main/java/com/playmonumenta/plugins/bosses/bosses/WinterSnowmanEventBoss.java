@@ -72,7 +72,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 				loc.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.HOSTILE, 2, 2);
 				new PartialParticle(Particle.CLOUD, loc, 100, 1, 1, 1, 0.1).spawnAsEntityActive(mBoss);
 				if (AbsorptionUtils.getAbsorption(player) <= 0) {
-					if (mBoss.getCustomName() != null) {
+					if (mBoss.customName() != null) {
 						player.setMetadata(deathMetakey, new FixedMetadataValue(mPlugin, mBoss.getUniqueId().toString()));
 					}
 					player.setHealth(0);

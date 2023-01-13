@@ -5,9 +5,11 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -54,7 +56,7 @@ public class SpellPortalPassiveLava extends Spell {
 			if (p.getLocation().getY() < mStartLoc.getY() - 4 && p.isInLava()) {
 				BossUtils.bossDamagePercent(mBoss, p, .35, "Iota's Domain");
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalLava", new PercentHeal(6 * 20, -0.50));
-				p.sendActionBar(ChatColor.RED + "You have 50% reduced healing for 6s");
+				MessagingUtils.sendActionBarMessage(p, "You have 50% reduced healing for 6s", NamedTextColor.RED);
 				PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
 				p.sendMessage(ChatColor.RED + "You feel the pure, flowing energy infest you, then spit you out.");
 				p.teleport(mStartLoc.clone().add(new Vector(0, 5, 0)), PlayerTeleportEvent.TeleportCause.UNKNOWN);

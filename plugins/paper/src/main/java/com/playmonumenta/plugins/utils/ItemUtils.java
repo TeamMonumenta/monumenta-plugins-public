@@ -1276,7 +1276,7 @@ public class ItemUtils {
 		if (hasPlainName(item)) {
 			return Component.text(getPlainNameIfExists(item));
 		} else {
-			return Component.translatable(item.getType().getTranslationKey());
+			return Component.translatable(item.getType().translationKey());
 		}
 	}
 
@@ -1303,7 +1303,7 @@ public class ItemUtils {
 		if (name != null) {
 			return name;
 		}
-		return Component.translatable(item.getType().getTranslationKey());
+		return Component.translatable(item.getType().translationKey());
 	}
 
 	public static final class ItemIdentifier {
