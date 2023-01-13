@@ -194,11 +194,11 @@ public class ShulkerShortcutListener implements Listener {
 				}
 			}
 			event.setCancelled(true);
-		} else if (itemClicked != null && ItemUtils.isShulkerBox(itemClicked.getType())
-				&& !ShulkerEquipmentListener.isEquipmentBox(itemClicked)
-				&& !ShulkerEquipmentListener.isCharmBox(itemClicked)
-				&& !PortableEnderListener.isPortableEnder(itemClicked)) {
-			// Player clicked a non-shattered non-equipment shulker box in an inventory.
+		} else if (itemClicked != null
+			           && ItemUtils.isShulkerBox(itemClicked.getType())
+			           && !ShulkerEquipmentListener.isAnyEquipmentBox(itemClicked)
+			           && !PortableEnderListener.isPortableEnder(itemClicked)) {
+			// Player clicked a non-equipment shulker box in an inventory.
 			if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 				// A currently open shulker box was clicked, cancel.
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -208,7 +208,7 @@ public class ShulkerShortcutListener implements Listener {
 				// A shulker box that isn't currently open was clicked.
 				if (player.hasPermission(PERMISSION)) {
 					if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
-							itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType()) &&
+						    itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType()) &&
 							!CurseOfEphemerality.isEphemeral(itemHeld)) {
 
 						// Player right-clicked shulker while holding an item on their cursor.
@@ -418,16 +418,39 @@ public class ShulkerShortcutListener implements Listener {
 	}
 
 	public static boolean isPurpleTesseractContainer(ItemStack item) {
-		return item != null &&
-			       ItemUtils.isShulkerBox(item.getType()) &&
-			       (InventoryUtils.testForItemWithName(item, "Carrier of Emotion", true)
-				        || InventoryUtils.testForItemWithName(item, "Carrier of Festivity", true));
+		return item != null
+			       && ItemUtils.isShulkerBox(item.getType())
+			       && (InventoryUtils.testForItemWithName(item, "Carrier of Emotion", true)
+				           || InventoryUtils.testForItemWithName(item, "Carrier of Festivity", true));
+	}
+
+	public static boolean isPurpleTesseract(ItemStack item) {
+		return item != null
+			       && ((item.getType() == Material.PURPLE_STAINED_GLASS && InventoryUtils.testForItemWithName(item, "Tesseract of Emotions", true))
+				           || isFestivePurpleTesseract(item));
+	}
+
+	public static boolean isFestivePurpleTesseract(ItemStack item) {
+		return item != null
+			       && item.getType() == Material.RED_DYE && InventoryUtils.testForItemWithName(item, "The Gift Wrapper", true);
 	}
 
 	public static boolean isEnderExpansion(ItemStack item) {
 		return item != null &&
 			       ItemUtils.isShulkerBox(item.getType()) &&
 			       InventoryUtils.testForItemWithName(item, "Ender Chest Expansion", true);
+	}
+
+	/**
+	 * Check if a given item is a restricted shulker, i.e. a shulker where a player cannot deposit items directly or take out items.
+	 * These have some special means of accessing their contents, e.g. require being placed or used to swap equipment.
+	 */
+	public static boolean isRestrictedShulker(ItemStack item) {
+		return isPurpleTesseractContainer(item)
+			       || isEnderExpansion(item)
+			       || ChestUtils.isLootBox(item)
+			       || ShulkerEquipmentListener.isAnyEquipmentBox(item)
+			       || PortableEnderListener.isPortableEnder(item);
 	}
 
 	private static boolean acceptsItem(ShulkerInventory shulkerInventory, ItemStack item) {

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -508,6 +509,14 @@ public class InventoryUtils {
 
 	public static int numEmptySlots(Inventory inventory) {
 		return (int) Arrays.stream(inventory.getStorageContents()).filter(ItemUtils::isNullOrAir).count();
+	}
+
+	public static int numInInventory(Inventory inventory, ItemStack item) {
+		return Arrays.stream(inventory.getStorageContents())
+			       .filter(Objects::nonNull)
+			       .filter(item::isSimilar)
+			       .mapToInt(ItemStack::getAmount)
+			       .sum();
 	}
 
 	/**

@@ -288,6 +288,11 @@ public class ShulkerEquipmentListener implements Listener {
 		return null;
 	}
 
+	public static boolean isAnyEquipmentBox(@Nullable ItemStack sboxItem) {
+		String lock = getShulkerLock(sboxItem);
+		return lock != null && (lock.equals(LOCK_STRING) || lock.equals(CHARM_STRING) || lock.equals(PORTAL_EPIC_STRING));
+	}
+
 	public static boolean isOmnilockbox(@Nullable ItemStack sboxItem) {
 		String lock = getShulkerLock(sboxItem);
 		return lock != null && lock.equals(PORTAL_EPIC_STRING);

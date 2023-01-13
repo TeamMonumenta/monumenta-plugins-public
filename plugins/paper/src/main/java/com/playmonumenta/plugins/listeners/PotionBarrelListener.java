@@ -8,8 +8,12 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import de.tr7zw.nbtapi.NBTItem;
+import java.util.Arrays;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +23,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,6 +42,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.Nullable;
 
@@ -159,7 +165,7 @@ public class PotionBarrelListener implements Listener {
 					// Fill inventory with potions
 					event.setCancelled(true);
 					if (!ItemUtils.isNullOrAir(clickedItem)) {
-						takeAll(barrelInventory, player);
+						takeAll(barrelInventory, player.getInventory());
 					}
 				}
 				case NUMBER_KEY -> {
@@ -251,7 +257,7 @@ public class PotionBarrelListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block clickedBlock = event.getClickedBlock();
 		if (event.getAction() == Action.LEFT_CLICK_BLOCK
@@ -259,25 +265,126 @@ public class PotionBarrelListener implements Listener {
 				&& isPotionBarrel(clickedBlock)) {
 			Barrel barrel = (Barrel) clickedBlock.getState(false);
 			Player player = event.getPlayer();
-			if (player.isSneaking()) {
-				// fill inventory
+			PlayerInventory playerInventory = player.getInventory();
+			Inventory barrelInventory = barrel.getInventory();
+			if (ShulkerShortcutListener.isPurpleTesseract(playerInventory.getItemInMainHand())) {
+				// Take out carriers (sneaking = as many as possible, not sneaking = only one)
+				int numChests = InventoryUtils.numInInventory(playerInventory, new ItemStack(Material.CHEST));
+				if (numChests == 0) {
+					player.sendMessage(Component.text("You need chests in your inventory to make Carriers!", NamedTextColor.RED));
+					return;
+				}
+				int remainingSpace = InventoryUtils.numEmptySlots(playerInventory);
+				if (remainingSpace == 0 && numChests != 1) {
+					return;
+				}
+				boolean festive = ShulkerShortcutListener.isFestivePurpleTesseract(playerInventory.getItemInMainHand());
+				boolean makeOne = !player.isSneaking();
 				CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
-				takeAll(barrel.getInventory(), player);
+				int carryOver = 0;
+				ItemStack barrelPotion = null;
+				for (int i = barrelInventory.getSize() - 1; i >= 0; i--) {
+					ItemStack item = barrelInventory.getItem(i);
+					if (!ItemUtils.isNullOrAir(item)) {
+						if (barrelPotion == null) {
+							barrelPotion = ItemUtils.clone(item);
+						}
+						while (carryOver + item.getAmount() >= 27) {
+							playerInventory.removeItem(new ItemStack(Material.CHEST));
+							playerInventory.addItem(makeCarrier(item, 27, festive));
+							remainingSpace--;
+							numChests--;
+							item.setAmount(item.getAmount() - 27 + carryOver);
+							carryOver = 0;
+							if (makeOne) {
+								return;
+							}
+							if (numChests <= 0 || remainingSpace < 0 || (remainingSpace == 0 && numChests != 1)) {
+								return;
+							}
+						}
+						carryOver += item.getAmount();
+						item.setAmount(0);
+					}
+				}
+				if (carryOver > 0) {
+					playerInventory.removeItem(new ItemStack(Material.CHEST));
+					playerInventory.addItem(makeCarrier(Objects.requireNonNull(barrelPotion), carryOver, festive));
+				}
+				return;
+			}
+			if (player.isSneaking()) {
+				// Fill inventory with potions
+				if (!barrelInventory.isEmpty()) {
+					CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
+					takeAll(barrelInventory, player.getInventory());
+				}
 			} else {
-				// deposit all matching potions
-				ItemStack barrelPotion = getBarrelPotion(barrel.getInventory());
+				// Deposit all matching potions
+				// Also refills potion injectors
+				ItemStack barrelPotion = getBarrelPotion(barrelInventory);
 				if (barrelPotion != null) {
 					CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
 					int added = 0;
-					for (ItemStack playerItem : player.getInventory()) {
-						if (playerItem != null && playerItem.isSimilar(barrelPotion)) {
-							if (addToBarrel(barrel.getInventory(), playerItem)) {
+					int injectorRefilled = 0;
+					String injectorName = null;
+					for (ItemStack playerItem : playerInventory) {
+						if (playerItem == null) {
+							continue;
+						}
+						if (playerItem.isSimilar(barrelPotion)) {
+							if (addToBarrel(barrelInventory, playerItem)) {
 								added++;
+							}
+						} else if (ShulkerEquipmentListener.isPotionInjectorItem(playerItem)
+							           && playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+							           && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+							if (InventoryUtils.numEmptySlots(shulkerBox.getInventory()) > 0
+								    && Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
+								injectorRefilled += takeAll(barrelInventory, shulkerBox.getInventory());
+								blockStateMeta.setBlockState(shulkerBox);
+								playerItem.setItemMeta(blockStateMeta);
+								if (injectorName == null) {
+									injectorName = ItemUtils.getPlainName(playerItem);
+								} else {
+									injectorName = "Potion Injectors";
+								}
+							}
+						} else if ((ShulkerShortcutListener.isPurpleTesseractContainer(playerItem)
+							            || (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
+							           && playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+							           && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+							boolean changed = false;
+							for (ItemStack shulkerItem : shulkerBox.getInventory()) {
+								if (shulkerItem != null
+									    && shulkerItem.isSimilar(barrelPotion)
+									    && addToBarrel(barrelInventory, shulkerItem)) {
+									added++;
+									changed = true;
+								}
+							}
+							if (changed) {
+								if (ShulkerShortcutListener.isPurpleTesseractContainer(playerItem) && shulkerBox.getInventory().isEmpty()) {
+									playerItem.setAmount(0);
+									ItemStack chest = new ItemStack(Material.CHEST);
+									String name = shulkerBox.getLock();
+									if (!name.isEmpty()) {
+										new NBTItem(chest, true).addCompound("display").setString("Name", name);
+										ItemUtils.setPlainName(chest);
+									}
+									InventoryUtils.giveItem(player, chest);
+								} else {
+									blockStateMeta.setBlockState(shulkerBox);
+									playerItem.setItemMeta(blockStateMeta);
+								}
 							}
 						}
 					}
 					if (added > 0) {
 						player.sendMessage(Component.text("Deposited " + added + " " + ItemUtils.getPlainName(barrelPotion) + ".", NamedTextColor.GRAY));
+					}
+					if (injectorRefilled > 0) {
+						player.sendMessage(Component.text("Removed " + injectorRefilled + " " + ItemUtils.getPlainName(barrelPotion) + " to refill your " + injectorName + ".", NamedTextColor.WHITE));
 					}
 				}
 			}
@@ -311,11 +418,12 @@ public class PotionBarrelListener implements Listener {
 		return potion.getAmount() == 0;
 	}
 
-	private void takeAll(Inventory barrelInventory, Player player) {
-		int remainingSpace = InventoryUtils.numEmptySlots(player.getInventory());
+	private int takeAll(Inventory barrelInventory, Inventory targetInventory) {
+		int remainingSpace = InventoryUtils.numEmptySlots(targetInventory);
 		if (remainingSpace == 0) {
-			return;
+			return 0;
 		}
+		int removed = 0;
 		for (int i = barrelInventory.getSize() - 1; i >= 0; i--) {
 			ItemStack item = barrelInventory.getItem(i);
 			if (!ItemUtils.isNullOrAir(item)) {
@@ -323,14 +431,16 @@ public class PotionBarrelListener implements Listener {
 					ItemStack clone = ItemUtils.clone(item);
 					clone.setAmount(1);
 					item.setAmount(item.getAmount() - 1);
-					player.getInventory().addItem(clone);
+					targetInventory.addItem(clone);
 					remainingSpace--;
+					removed++;
 					if (remainingSpace == 0) {
-						return;
+						return removed;
 					}
 				}
 			}
 		}
+		return removed;
 	}
 
 	private void removeOne(Inventory barrelInventory, ItemStack item) {
@@ -345,6 +455,23 @@ public class PotionBarrelListener implements Listener {
 
 	private static void errorSound(Player player) {
 		player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.BLOCKS, 1, 1);
+	}
+
+	private static ItemStack makeCarrier(ItemStack potion, int num, boolean festive) {
+		ItemStack carrier = new ItemStack(festive ? Material.GREEN_SHULKER_BOX : Material.PURPLE_SHULKER_BOX);
+		BlockStateMeta meta = (BlockStateMeta) carrier.getItemMeta();
+		meta.displayName(Component.text(festive ? "Carrier of Festivity" : "Carrier of Emotion", festive ? NamedTextColor.RED : NamedTextColor.DARK_PURPLE)
+			                 .decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		ShulkerBox shulkerBox = (ShulkerBox) meta.getBlockState();
+		for (int i = 0; i < num; i++) {
+			ItemStack singlePotion = ItemUtils.clone(potion);
+			singlePotion.setAmount(1);
+			shulkerBox.getInventory().addItem(singlePotion);
+		}
+		meta.setBlockState(shulkerBox);
+		carrier.setItemMeta(meta);
+		ItemUtils.setPlainTag(carrier);
+		return carrier;
 	}
 
 	// block handling
