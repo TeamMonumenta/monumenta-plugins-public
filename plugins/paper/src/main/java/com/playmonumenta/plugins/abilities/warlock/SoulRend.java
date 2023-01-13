@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.NavigableSet;
@@ -98,13 +97,12 @@ public class SoulRend extends Ability {
 					int currPactDuration = darkPactEffects.last().getDuration();
 					mPlugin.mEffectManager.clearEffects(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME);
 					mCosmetic.rendHealEffect(mPlayer, mPlayer, enemy);
-					double remainingHealth = EntityUtils.getMaxHealth(mPlayer) - mPlayer.getHealth();
-					PlayerUtils.healPlayer(mPlugin, mPlayer, mHeal);
+					double healed = PlayerUtils.healPlayer(mPlugin, mPlayer, mHeal);
 					mPlugin.mEffectManager.addEffect(mPlayer, DarkPact.PERCENT_HEAL_EFFECT_NAME, new PercentHeal(currPactDuration, -1));
 
 					if (isEnhanced()) {
 						// All healing, minus the 2/4 healed through dark pact, converted to absorption
-						double absorption = heal - Math.min(mHeal, remainingHealth);
+						double absorption = heal - healed;
 						absorptionPlayer(mPlayer, absorption, enemy);
 					}
 				} else if (isEnhanced()) {
@@ -128,17 +126,11 @@ public class SoulRend extends Ability {
 	}
 
 	private void healPlayer(Player player, double heal, LivingEntity enemy) {
-		double toHeal = heal;
 		mCosmetic.rendHealEffect(mPlayer, player, enemy);
+		double healed = PlayerUtils.healPlayer(mPlugin, player, heal, mPlayer);
 		if (isEnhanced()) {
-			double remainingHealth = EntityUtils.getMaxHealth(player) - player.getHealth();
-			if (toHeal > remainingHealth) {
-				double absorption = toHeal - remainingHealth;
-				toHeal = remainingHealth;
-				absorptionPlayer(player, absorption, enemy);
-			}
+			absorptionPlayer(player, heal - healed, enemy);
 		}
-		PlayerUtils.healPlayer(mPlugin, player, toHeal, mPlayer);
 	}
 
 	//Handles capping the absorption

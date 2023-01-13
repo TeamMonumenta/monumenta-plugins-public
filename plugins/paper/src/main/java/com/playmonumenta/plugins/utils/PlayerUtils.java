@@ -165,31 +165,37 @@ public class PlayerUtils {
 		}
 	}
 
-	public static void healPlayer(Plugin plugin, Player player, double healAmount) {
-		healPlayer(plugin, player, healAmount, null);
+	public static double healPlayer(Plugin plugin, Player player, double healAmount) {
+		return healPlayer(plugin, player, healAmount, null);
 	}
 
-	public static void healPlayer(Plugin plugin, Player player, double healAmount, @Nullable Player sourcePlayer) {
+	// Returns the change in player's health
+	public static double healPlayer(Plugin plugin, Player player, double healAmount, @Nullable Player sourcePlayer) {
 		if (healAmount <= 0) {
-			return;
+			return 0;
 		}
 
 		if ((sourcePlayer != null) && (player != sourcePlayer)) {
 			double healBonus = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.TRIAGE) * 0.05;
 			healAmount *= 1 + healBonus;
 		}
-		if (!player.isDead()) {
-			EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
-			Bukkit.getPluginManager().callEvent(event);
-			if (!event.isCancelled()) {
-				double newHealth = Math.min(player.getHealth() + event.getAmount(), EntityUtils.getMaxHealth(player));
-				player.setHealth(newHealth);
+
+		EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healAmount, EntityRegainHealthEvent.RegainReason.CUSTOM);
+		Bukkit.getPluginManager().callEvent(event);
+		if (!event.isCancelled()) {
+			double oldHealth = player.getHealth();
+			double newHealth = Math.min(oldHealth + event.getAmount(), EntityUtils.getMaxHealth(player));
+			player.setHealth(newHealth);
+
+			// Add to activity
+			if (sourcePlayer != null && player != sourcePlayer && ActivityManager.getManager().isActive(player)) {
+				ActivityManager.getManager().addHealingDealt(sourcePlayer, healAmount);
 			}
+
+			return newHealth - oldHealth;
 		}
-		// Add to activity
-		if (sourcePlayer != null && player != sourcePlayer && ActivityManager.getManager().isActive(player)) {
-			ActivityManager.getManager().addHealingDealt(sourcePlayer, healAmount);
-		}
+
+		return 0;
 	}
 
 	public static Location getRightSide(Location location, double distance) {
