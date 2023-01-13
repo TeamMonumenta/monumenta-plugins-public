@@ -139,6 +139,7 @@ public class BossManager implements Listener {
 	static {
 		/* Stateless bosses are those that have no end location set where a redstone block would be spawned when they die */
 		mStatelessBosses = new HashMap<>();
+		mStatelessBosses.put(BulletHellSurvivalBoss.identityTag, BulletHellSurvivalBoss::new);
 		mStatelessBosses.put(BlockLockBoss.identityTag, BlockLockBoss::new);
 		mStatelessBosses.put(ImmortalPassengerBoss.identityTag, ImmortalPassengerBoss::new);
 		mStatelessBosses.put(ChestLockBoss.identityTag, ChestLockBoss::new);
@@ -371,6 +372,7 @@ public class BossManager implements Listener {
 
 		/* All bosses have a deserializer which gives the boss back their abilities when chunks re-load */
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
+		mBossDeserializers.put(BulletHellSurvivalBoss.identityTag, BulletHellSurvivalBoss::deserialize);
 		mBossDeserializers.put(BlockLockBoss.identityTag, BlockLockBoss::deserialize);
 		mBossDeserializers.put(ImmortalPassengerBoss.identityTag, ImmortalPassengerBoss::deserialize);
 		mBossDeserializers.put(ChestLockBoss.identityTag, ChestLockBoss::deserialize);
@@ -599,6 +601,7 @@ public class BossManager implements Listener {
 		 Boss Parameters
 		 */
 		mBossParameters = new HashMap<>();
+		mBossParameters.put(BulletHellSurvivalBoss.identityTag, new BulletHellBoss.Parameters());
 		mBossParameters.put(BlockLockBoss.identityTag, new BlockLockBoss.Parameters());
 		mBossParameters.put(ChestLockBoss.identityTag, new ChestLockBoss.Parameters());
 		mBossParameters.put(AntiRangeBoss.identityTag, new AntiRangeBoss.Parameters());

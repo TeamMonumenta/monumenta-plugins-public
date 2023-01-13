@@ -22,6 +22,7 @@ public class Astral {
 
 	public static final String DESCRIPTION = "Sometimes, the stars gaze back.";
 	private static final List<String> MOB_POOL;
+	private static final List<String> SPECIAL_MOB_POOL;
 
 	private static final List<String> POSSIBLE_DESCRIPTIONS = Arrays.asList(
 		"Po" + ChatColor.MAGIC + "tesn" + ChatColor.RESET + "e co" + ChatColor.MAGIC + "nsp" + ChatColor.RESET + "icere ira" + ChatColor.MAGIC + "m c" + ChatColor.RESET + "aeli?",
@@ -40,6 +41,7 @@ public class Astral {
 
 	static {
 		MOB_POOL = Arrays.asList("PillarAlpha", "PillarBeta", "PillarGamma", "PillarDelta", "PillarEpsilon", "PillarNu");
+		SPECIAL_MOB_POOL = Arrays.asList("PillarMutatedAlpha", "PillarMutatedBeta", "PillarMutatedGamma", "PillarMutatedDelta", "PillarMutatedEpsilon", "PillarMutatedNu");
 	}
 
 	private static void summonAstral(Block block) {
@@ -57,7 +59,11 @@ public class Astral {
 		}
 		if (validSpawnLocs.size() > 0) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
-			LivingEntity boss = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, MOB_POOL.get(FastUtils.RANDOM.nextInt(MOB_POOL.size())));
+			List<String> mobPool = MOB_POOL;
+			if (FastUtils.RANDOM.nextDouble() < 0.0133) {
+				mobPool = SPECIAL_MOB_POOL;
+			}
+			LivingEntity boss = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, mobPool.get(FastUtils.RANDOM.nextInt(mobPool.size())));
 			if (boss != null) {
 				boss.addScoreboardTag(ChestLockBoss.identityTag + String.format("[x=%s,y=%s,z=%s]", block.getX(), block.getY(), block.getZ()));
 				boss.getWorld().playSound(loc, Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 10, 3f);

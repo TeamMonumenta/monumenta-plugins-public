@@ -55,6 +55,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -65,6 +66,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -279,6 +281,14 @@ public class DelvesManager implements Listener {
 		JsonObject data = convertPlayerData(event.getPlayer());
 		if (data != null) {
 			event.setPluginData(KEY_DELVES_PLUGIN_DATA, data);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void blockPlace(BlockPlaceEvent event) {
+		// Prevent players force spawning astrals
+		if (event.getBlockPlaced().getBlockData() instanceof Chest && !event.getBlockPlaced().hasMetadata("BulletHellChecked")) {
+			event.getBlockPlaced().setMetadata("BulletHellChecked", new FixedMetadataValue(Plugin.getInstance(), true));
 		}
 	}
 
