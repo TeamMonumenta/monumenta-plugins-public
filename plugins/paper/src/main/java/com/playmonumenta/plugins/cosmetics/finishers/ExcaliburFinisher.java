@@ -65,6 +65,7 @@ public class ExcaliburFinisher implements EliteFinisher {
 					mClonedKilledMob.setCollidable(false);
 					mClonedKilledMob.setAI(false);
 					mClonedKilledMob.addScoreboardTag("SkillImmune");
+					mClonedKilledMob.setSilent(true);
 				}
 				if (mTicks <= 20) {
 					mExcalibur.setRightArmPose(new EulerAngle(-Math.PI / 2.0 + 0.75 * Math.PI / 20.0 * mTicks, EntityUtils.getCounterclockwiseAngle(mExcalibur, killedMob), mSlashAngle));

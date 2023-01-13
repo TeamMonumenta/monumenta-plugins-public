@@ -1464,6 +1464,7 @@ public class EntityUtils {
 		newSpawn.setRotation(entity.getLocation().getYaw(), entity.getLocation().getPitch());
 		if (newSpawn instanceof Slime newSlime && entity instanceof Slime slime) {
 			newSlime.setSize(slime.getSize());
+			newSlime.addScoreboardTag("boss_nosplit");
 		} else if (newSpawn instanceof Phantom newPhantom && entity instanceof Phantom phantom) {
 			newPhantom.setSize(phantom.getSize());
 		} else if (newSpawn instanceof Creeper newCreeper && entity instanceof Creeper creeper) {
