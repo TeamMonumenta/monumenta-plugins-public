@@ -11,7 +11,7 @@ import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
 
 public class BlockUtils {
-	private static Set<Material> ALT_WATER_SOURCES = Set.of(
+	private static final Set<Material> ALT_WATER_SOURCES = Set.of(
 		Material.BUBBLE_COLUMN,
 		Material.KELP,
 		Material.KELP_PLANT,
@@ -35,7 +35,7 @@ public class BlockUtils {
 		Material.LIGHT
 	);
 
-	private static final EnumSet<Material> VALUABLES = EnumSet.of(
+	public static final EnumSet<Material> VALUABLES = EnumSet.of(
 		Material.SHULKER_BOX,
 		Material.BLACK_SHULKER_BOX,
 		Material.BLUE_SHULKER_BOX,
@@ -53,18 +53,22 @@ public class BlockUtils {
 		Material.WHITE_SHULKER_BOX,
 		Material.YELLOW_SHULKER_BOX,
 		Material.GRAY_SHULKER_BOX,
+
 		Material.CHEST,
 		Material.TRAPPED_CHEST,
+
 		Material.IRON_ORE,
 		Material.IRON_BLOCK,
 		Material.DEEPSLATE_IRON_ORE,
 		Material.RAW_IRON,
 		Material.RAW_IRON_BLOCK,
+
 		Material.COPPER_ORE,
 		Material.DEEPSLATE_COPPER_ORE,
 		Material.RAW_COPPER,
 		Material.RAW_COPPER_BLOCK,
 		Material.COPPER_BLOCK,
+
 		Material.GOLD_ORE,
 		Material.DEEPSLATE_GOLD_ORE,
 		Material.RAW_GOLD,
@@ -72,15 +76,21 @@ public class BlockUtils {
 		Material.GOLD_BLOCK,
 		Material.NETHER_GOLD_ORE,
 		Material.GILDED_BLACKSTONE,
+
 		Material.LAPIS_ORE,
+		Material.LAPIS_BLOCK,
+
 		Material.DEEPSLATE_LAPIS_ORE,
 		Material.EMERALD_ORE,
 		Material.DEEPSLATE_EMERALD_ORE,
-		Material.LAPIS_BLOCK,
+		Material.EMERALD_BLOCK,
+
 		Material.DIAMOND_ORE,
 		Material.DEEPSLATE_DIAMOND_ORE,
-		Material.EMERALD_ORE,
-		Material.DEEPSLATE_EMERALD_ORE,
+		Material.DIAMOND_BLOCK,
+
+		Material.NETHERITE_BLOCK,
+
 		Material.ANVIL,
 		Material.CHIPPED_ANVIL,
 		Material.DAMAGED_ANVIL
