@@ -35,7 +35,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
     compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
-    implementation("dev.jorel.CommandAPI:commandapi-shade:8.7.0")
+    implementation("dev.jorel.CommandAPI:commandapi-shade:8.7.1")
     compileOnly("me.clip:placeholderapi:2.10.4")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
     compileOnly("net.luckperms:api:5.3")
