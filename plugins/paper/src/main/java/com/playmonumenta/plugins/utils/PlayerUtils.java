@@ -171,7 +171,7 @@ public class PlayerUtils {
 
 	// Returns the change in player's health
 	public static double healPlayer(Plugin plugin, Player player, double healAmount, @Nullable Player sourcePlayer) {
-		if (healAmount <= 0) {
+		if (healAmount <= 0 || player.isDead()) {
 			return 0;
 		}
 
