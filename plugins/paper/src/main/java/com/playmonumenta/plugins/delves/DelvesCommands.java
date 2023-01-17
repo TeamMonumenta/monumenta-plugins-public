@@ -137,7 +137,7 @@ public class DelvesCommands {
 				dungeonArg,
 				delveModArg,
 				new MultiLiteralArgument("score"),
-				new ScoreHolderArgument.Multiple("score holder"),
+				new ScoreHolderArgument.Single("score holder"),
 				new ObjectiveArgument("objective")
 			).executes((commandSender, args) -> {
 				DelvesModifier mod = DelvesModifier.fromName((String) args[4]);
