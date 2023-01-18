@@ -76,7 +76,7 @@ class CustomContainerItemGui extends Gui {
 			if (showAmounts) {
 				displayItem.setAmount((int) Math.max(1, Math.min(64, showAmountsAsStacks ? amount / item.getMaxStackSize() : amount)));
 			}
-			setItem(9 + posInPage + posInPage / 9, new GuiItem(displayItem, false))
+			setItem(1 + posInPage / 9, posInPage % 9, new GuiItem(displayItem, false))
 				.onClick(event -> {
 					ItemStack movedItem = ItemUtils.clone(item);
 					ItemStatUtils.removePlayerModified(new NBTItem(movedItem, true));
