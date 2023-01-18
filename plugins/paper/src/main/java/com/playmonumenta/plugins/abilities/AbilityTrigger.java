@@ -72,7 +72,7 @@ public class AbilityTrigger {
 		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming",
 			player -> !(player.getInventory().getItemInMainHand().getType() == Material.COMPASS
 				|| Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0
-				|| (LocationUtils.isLocationInWater(player.getLocation()) && ItemStatUtils.hasEnchantment(player.getInventory().getItemInMainHand(), ItemStatUtils.EnchantmentType.RIPTIDE)))
+				|| ((LocationUtils.isLocationInWater(player.getLocation()) || player.isInRain()) && ItemStatUtils.hasEnchantment(player.getInventory().getItemInMainHand(), ItemStatUtils.EnchantmentType.RIPTIDE)))
 			),
 		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe",
 			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
