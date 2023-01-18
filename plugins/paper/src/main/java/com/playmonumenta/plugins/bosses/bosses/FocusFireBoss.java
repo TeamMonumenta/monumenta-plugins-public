@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -32,7 +34,7 @@ public class FocusFireBoss extends BossAbilityGroup {
 		if (damagee instanceof Player player) {
 			//Set all nearby mobs to target them
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mBoss.getLocation(), detectionRange)) {
-				if (le instanceof Mob mob) {
+				if (le instanceof Mob mob && !ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG)) {
 					mob.setTarget(player);
 				}
 			}
