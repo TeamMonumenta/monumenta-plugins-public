@@ -975,17 +975,28 @@ public class CharmManager {
 		List<CharmParsedInfo> effects = new ArrayList<>();
 		List<String> plainLoreLines = ItemStatUtils.getPlainCharmLore(new NBTItem(itemStack));
 		for (String plainLore : plainLoreLines) {
-			Matcher matcher = CHARM_LINE_PATTERN.matcher(plainLore);
-			if (!matcher.matches()) {
+			if (plainLore.isEmpty()) {
+				continue;
+			}
+			CharmParsedInfo info = readCharmLine(plainLore);
+			if (info == null) {
 				MMLog.warning("Unparseable charm lore line '" + plainLore + "' in charm '" + ItemUtils.getPlainName(itemStack) + "'!");
 				continue;
 			}
-			double value = Double.parseDouble(matcher.group(1));
-			boolean percent = matcher.group(2) != null;
-			String effect = matcher.group(3);
-			effects.add(new CharmParsedInfo(value, percent, effect));
+			effects.add(info);
 		}
 		return effects;
+	}
+
+	public static @Nullable CharmParsedInfo readCharmLine(String line) {
+		Matcher matcher = CHARM_LINE_PATTERN.matcher(line);
+		if (!matcher.matches()) {
+			return null;
+		}
+		double value = Double.parseDouble(matcher.group(1));
+		boolean percent = matcher.group(2) != null;
+		String effect = matcher.group(3);
+		return new CharmParsedInfo(value, percent, effect);
 	}
 
 	/**
@@ -1234,7 +1245,7 @@ public class CharmManager {
 		return outColor;
 	}
 
-	private static class CharmParsedInfo {
+	public static class CharmParsedInfo {
 		public double mValue;
 		public boolean mIsPercent;
 		public String mEffect;
