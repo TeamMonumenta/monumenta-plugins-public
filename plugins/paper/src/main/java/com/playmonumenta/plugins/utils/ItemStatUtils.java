@@ -1574,6 +1574,25 @@ public class ItemStatUtils {
 		return nbt.addCompound(MONUMENTA_KEY).addCompound(PLAYER_MODIFIED_KEY);
 	}
 
+	public static @Nullable ItemStack copyPlayerModified(final @Nullable ItemStack item, @Nullable ItemStack newItem) {
+		if (ItemUtils.isNullOrAir(item) || ItemUtils.isNullOrAir(newItem)) {
+			return null;
+		}
+
+		NBTItem oldNBT = new NBTItem(item);
+		NBTItem newNBT = new NBTItem(newItem);
+		NBTCompound playerModified = getPlayerModified(oldNBT);
+		if (playerModified == null) {
+			return newItem;
+		}
+
+		addPlayerModified(newNBT).mergeCompound(playerModified);
+		newItem = newNBT.getItem();
+		generateItemStats(newItem);
+
+		return newItem;
+	}
+
 	public static @Nullable NBTCompound getInfusions(final NBTItem nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {

@@ -241,6 +241,8 @@ public final class ItemOverrides {
 		mItems.put(Material.LIME_STAINED_GLASS, new LimeTesseractOverride());
 		mItems.put(Material.ICE, new FestiveTesseractOverride());
 
+		mItems.put(InflationOverride.itemMaterial, new InflationOverride());
+
 		BaseOverride anvilOverride = new AnvilOverride();
 		mItems.put(Material.ANVIL, anvilOverride);
 		mItems.put(Material.CHIPPED_ANVIL, anvilOverride);
@@ -449,6 +451,16 @@ public final class ItemOverrides {
 		}
 		BaseOverride override = mItems.get(item.getType());
 		return override == null || override.inventoryClickInteraction(plugin, player, item, event);
+	}
+
+	// Generalised inventoryClickEvent for overrides that don't necessarily care if there's an item on the cursor
+	public boolean inventoryClickEvent(Plugin plugin, Player player, InventoryClickEvent event) {
+		ItemStack item = event.getCurrentItem();
+		if (item == null) {
+			return true;
+		}
+		BaseOverride override = mItems.get(item.getType());
+		return override == null || override.inventoryClickEvent(plugin, player, item, event);
 	}
 
 	// Returns true is event swaphands is to be cancelled, this cancels player abilities too (like Shield Wall).

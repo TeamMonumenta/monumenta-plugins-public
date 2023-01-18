@@ -615,7 +615,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event)) {
+		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event) || !mPlugin.mItemOverrides.inventoryClickEvent(mPlugin, player, event)) {
 			event.setCancelled(true);
 		}
 

@@ -67,6 +67,9 @@ public class BaseOverride {
 		return true;
 	}
 
+	public boolean inventoryClickEvent(Plugin plugin, Player player, ItemStack item, InventoryClickEvent event) {
+		return true;
+	}
 	/**
 	 * Called when the player presses the swap key while this item is in the main hand
 	 * Return True to cancel the swap event.
