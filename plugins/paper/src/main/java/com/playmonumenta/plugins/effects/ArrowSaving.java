@@ -2,10 +2,9 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,9 +17,9 @@ public class ArrowSaving extends SingleArgumentEffect {
 	}
 
 	@Override
-	public void onProjectileLaunch(Player player, AbstractArrow arrow) {
+	public void onConsumeArrow(Player player, ArrowConsumeEvent event) {
 		if (FastUtils.RANDOM.nextDouble() < mAmount) {
-			AbilityUtils.refundArrow(player, arrow);
+			event.setCancelled(true);
 		}
 	}
 

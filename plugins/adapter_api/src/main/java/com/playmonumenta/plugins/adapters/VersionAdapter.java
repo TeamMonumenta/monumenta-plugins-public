@@ -163,4 +163,14 @@ public interface VersionAdapter {
 
 	void forceDismountVehicle(Entity entity);
 
+	/**
+	 * Gets the projectile that will be used if the player tries to shoot with the given projectile weapon.
+	 */
+	ItemStack getUsedProjectile(Player player, ItemStack weapon);
+
+	/**
+	 * Gets the display name of an item, without any additional styling, square brackets, or hover text.
+	 */
+	Component getDisplayName(ItemStack item);
+
 }

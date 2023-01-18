@@ -157,4 +157,14 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		entity.leaveVehicle();
 	}
 
+	@Override
+	public ItemStack getUsedProjectile(Player player, ItemStack weapon) {
+		return new ItemStack(Material.AIR);
+	}
+
+	@Override
+	public Component getDisplayName(ItemStack item) {
+		return item.displayName();
+	}
+
 }

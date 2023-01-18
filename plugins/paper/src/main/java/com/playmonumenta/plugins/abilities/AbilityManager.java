@@ -688,6 +688,10 @@ public class AbilityManager {
 		return conditionalCastCancellable(player, (ability) -> ability.playerShotProjectileEvent(projectile));
 	}
 
+	public boolean playerConsumeArrowEvent(Player player) {
+		return conditionalCastCancellable(player, (ability) -> ability.playerConsumeArrowEvent());
+	}
+
 	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion) {
 		return conditionalCastCancellable(player, (ability) -> ability.playerThrewSplashPotionEvent(potion));
 	}

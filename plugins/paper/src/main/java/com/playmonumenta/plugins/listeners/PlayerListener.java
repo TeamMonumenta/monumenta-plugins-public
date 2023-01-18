@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
@@ -68,6 +69,7 @@ import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Light;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -85,6 +87,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -1561,6 +1564,50 @@ public class PlayerListener implements Listener {
 	public void playerTakeLecternBookEvent(PlayerTakeLecternBookEvent event) {
 		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE) {
 			event.setCancelled(true);
+		}
+	}
+
+	// Bows: can set 'consume item' to false if not consumed
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityShootBowEvent(EntityShootBowEvent event) {
+		if (event.getEntity() instanceof Player player
+			    && event.shouldConsumeItem()
+			    && event.getBow() != null
+			    && event.getBow().getType() == Material.BOW) {
+			ArrowConsumeEvent arrowConsumeEvent = new ArrowConsumeEvent(player, event.getConsumable());
+			Bukkit.getPluginManager().callEvent(arrowConsumeEvent);
+			if (arrowConsumeEvent.isCancelled()) {
+				event.setConsumeItem(false);
+				((AbstractArrow) event.getProjectile()).setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+				player.updateInventory();
+			}
+		}
+	}
+
+	// Crossbows: cannot set 'consume item', must give back an arrow. Thus use MONITOR to make sure that the arrow is actually shot.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityShootBowEventMonitor(EntityShootBowEvent event) {
+		if (event.getEntity() instanceof Player player
+			    && event.getBow() != null
+			    && event.getBow().getType() == Material.CROSSBOW
+			    && event.getProjectile() instanceof AbstractArrow arrow
+			    && arrow.getPickupStatus() == AbstractArrow.PickupStatus.ALLOWED) {
+			ArrowConsumeEvent arrowConsumeEvent = new ArrowConsumeEvent(player, event.getConsumable());
+			Bukkit.getPluginManager().callEvent(arrowConsumeEvent);
+			if (arrowConsumeEvent.isCancelled()) {
+				InventoryUtils.giveItem(player, ItemUtils.clone(event.getConsumable()), true);
+				arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+				player.updateInventory();
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void arrowConsumeEvent(ArrowConsumeEvent event) {
+		if (!mPlugin.mAbilityManager.playerConsumeArrowEvent(event.getPlayer())) {
+			event.setCancelled(true);
+		} else {
+			mPlugin.mItemStatManager.onConsumeArrow(mPlugin, event.getPlayer(), event);
 		}
 	}
 

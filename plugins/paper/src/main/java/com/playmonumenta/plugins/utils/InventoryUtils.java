@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.listeners.GraveListener;
+import com.playmonumenta.plugins.listeners.QuiverListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -346,6 +347,10 @@ public class InventoryUtils {
 
 	public static void giveItem(final Player player, final @Nullable ItemStack item, boolean silent) {
 		if (item == null) {
+			return;
+		}
+		QuiverListener.attemptPickup(player, item);
+		if (item.getAmount() == 0) {
 			return;
 		}
 		final PlayerInventory inv = player.getInventory();

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import org.bukkit.entity.Entity;
@@ -123,6 +124,10 @@ public interface ItemStat {
 	 * @param projectile the Projectile being launched
 	 */
 	default void onProjectileLaunch(Plugin plugin, Player player, double value, ProjectileLaunchEvent event, Projectile projectile) {
+
+	}
+
+	default void onConsumeArrow(Plugin plugin, Player player, double level, ArrowConsumeEvent event) {
 
 	}
 

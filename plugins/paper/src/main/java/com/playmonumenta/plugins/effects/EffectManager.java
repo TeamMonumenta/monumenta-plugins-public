@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
@@ -852,6 +853,21 @@ public final class EffectManager implements Listener {
 				for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 					for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
 						effectGroup.last().onProjectileLaunch(player, arrow);
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void arrowConsumeEvent(ArrowConsumeEvent event) {
+		Effects effects = mEntities.get(event.getPlayer());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().onConsumeArrow(event.getPlayer(), event);
+					if (event.isCancelled()) {
+						return;
 					}
 				}
 			}

@@ -6,14 +6,11 @@ import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 
 public class BowAspect extends WeaponAspectDepthsAbility {
@@ -33,12 +30,10 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 	}
 
 	@Override
-	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (projectile instanceof AbstractArrow arrow && FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
-			boolean refunded = AbilityUtils.refundArrow(mPlayer, arrow);
-			if (refunded) {
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.2f, 1.0f);
-			}
+	public boolean playerConsumeArrowEvent() {
+		if (FastUtils.RANDOM.nextDouble() < PASSIVE_ARROW_SAVE) {
+			mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.2f, 1.0f);
+			return false;
 		}
 		return true;
 	}

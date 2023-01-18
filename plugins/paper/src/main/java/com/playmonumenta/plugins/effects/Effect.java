@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
@@ -93,6 +94,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	}
 
 	public void onProjectileLaunch(Player player, AbstractArrow arrow) {
+
+	}
+
+	public void onConsumeArrow(Player player, ArrowConsumeEvent event) {
 
 	}
 

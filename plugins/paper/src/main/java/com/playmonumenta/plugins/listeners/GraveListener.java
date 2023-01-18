@@ -255,7 +255,7 @@ public class GraveListener implements Listener {
 		if (!event.getKeepInventory()) {
 			/* Monumenta-custom keep inventory
 			 *
-			 * Keep inventory (bot not levels), and equipped items get one level of Shatter.
+			 * Keep inventory (but not levels), and equipped items get one level of Shatter.
 			 */
 
 			event.setKeepInventory(true);

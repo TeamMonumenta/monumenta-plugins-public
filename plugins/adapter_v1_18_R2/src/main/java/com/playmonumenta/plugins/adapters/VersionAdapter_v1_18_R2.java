@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import io.papermc.paper.adventure.PaperAdventure;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -537,6 +538,16 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public void forceDismountVehicle(Entity entity) {
 		((CraftEntity) entity).getHandle().stopRiding(true);
+	}
+
+	@Override
+	public org.bukkit.inventory.ItemStack getUsedProjectile(Player player, org.bukkit.inventory.ItemStack weapon) {
+		return CraftItemStack.asCraftMirror(((CraftPlayer) player).getHandle().getProjectile(CraftItemStack.asNMSCopy(weapon)));
+	}
+
+	@Override
+	public net.kyori.adventure.text.Component getDisplayName(org.bukkit.inventory.ItemStack item) {
+		return PaperAdventure.asAdventure(CraftItemStack.asNMSCopy(item).getHoverName());
 	}
 
 }

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.VirtualFirmament;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.ItemCooldown;
+import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.IntoxicatingWarmth;
 import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
@@ -22,7 +23,9 @@ import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTListCompound;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -130,16 +133,15 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
 				if (ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0
 					    && mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey()))) {
-					// Then we need to replace the item in the packet.
 					itemStack.setType(entry.getValue());
 					markVirtual(itemStack);
 					return;
 				}
 			}
 
+			// Worldshaper's Loom cooldown item
 			if (WorldshaperOverride.isWorldshaperItem(itemStack)
 				    && mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE)) {
-				// Then we need to replace the item in the packet.
 				itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
 				markVirtual(itemStack);
 				return;
@@ -158,6 +160,23 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					};
 					VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
 				}
+			}
+
+			// Quivers: fake a larger stack size to not have them disappear from the inventory on the client when a bow is shot (until the next inventory update happens)
+			if (ItemStatUtils.isQuiver(itemStack)) {
+				if (itemStack.getAmount() == 1) {
+					NBTCompoundList items = ItemStatUtils.addPlayerModified(new NBTItem(itemStack)).getCompoundList(ItemStatUtils.ITEMS_KEY);
+					long amount = 0;
+					for (NBTListCompound compound : items) {
+						amount += ItemStatUtils.addPlayerModified(compound.addCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
+						if (amount >= 64) {
+							break;
+						}
+					}
+					itemStack.setAmount(Math.max(1, (int) Math.min(amount, 64)));
+					markVirtual(itemStack);
+				}
+				return;
 			}
 		}
 

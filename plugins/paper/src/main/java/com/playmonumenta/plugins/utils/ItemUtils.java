@@ -1294,16 +1294,12 @@ public class ItemUtils {
 	}
 
 	/**
-	 * Gets the (styled) display name of the given item, or the default name of the material if no custom name is set.
+	 * Gets the (styled) display name of the given item, or the default name of the item if no custom name is set.
 	 *
 	 * @see #getPlainNameComponent(ItemStack)
 	 */
 	public static Component getDisplayName(ItemStack item) {
-		Component name = item.getItemMeta().displayName();
-		if (name != null) {
-			return name;
-		}
-		return Component.translatable(item.getType().translationKey());
+		return NmsUtils.getVersionAdapter().getDisplayName(item);
 	}
 
 	public static final class ItemIdentifier {

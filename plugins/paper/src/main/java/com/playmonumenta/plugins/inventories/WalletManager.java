@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -60,6 +61,12 @@ import org.jetbrains.annotations.Nullable;
 public class WalletManager implements Listener {
 
 	private static final String KEY_PLUGIN_DATA = "Wallet";
+
+	public static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
+		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
+		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
+		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Architect\\\\u0027s Ring\"}'}}}")
+	);
 
 	private static @MonotonicNonNull ImmutableList<ItemStack> MANUAL_SORT_ORDER;
 
@@ -430,8 +437,8 @@ public class WalletManager implements Listener {
 						firstOfRegion = true; // always place a region icon at the start of a new page
 						continue;
 					}
-					if (firstOfRegion && CustomContainerItemManager.REGION_ICONS.containsKey(region)) {
-						setItem(9 + posInPage + posInPage / 8, CustomContainerItemManager.REGION_ICONS.get(region));
+					if (firstOfRegion && REGION_ICONS.containsKey(region)) {
+						setItem(9 + posInPage + posInPage / 8, REGION_ICONS.get(region));
 					}
 					ItemStack displayItem = ItemUtils.clone(item.mItem);
 					ItemMeta itemMeta = displayItem.getItemMeta();
@@ -444,9 +451,8 @@ public class WalletManager implements Listener {
 						} else {
 							amount = "" + item.mAmount;
 						}
-						Component displayName = itemMeta.displayName();
 						Component name = Component.text(amount + " ", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)
-							                 .append(displayName != null ? displayName : item.mItem.displayName());
+							                 .append(ItemUtils.getDisplayName(item.mItem));
 						for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 							boolean isBase = compressionInfo.mBase.isSimilar(item.mItem);
 							if (isBase || compressionInfo.mCompressed.isSimilar(item.mItem)) {
@@ -797,7 +803,7 @@ public class WalletManager implements Listener {
 
 	private static final Pattern OPERATION_PATTERN = Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*([-+*/])\\s*(\\d+(?:\\.\\d+)?)");
 
-	private static double parseDoubleOrCalculation(String line) throws NumberFormatException {
+	public static double parseDoubleOrCalculation(String line) throws NumberFormatException {
 		try {
 			return Double.parseDouble(line);
 		} catch (NumberFormatException e) {

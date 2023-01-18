@@ -195,6 +195,10 @@ public abstract class Ability {
 		return true;
 	}
 
+	public boolean playerConsumeArrowEvent() {
+		return true;
+	}
+
 	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
 		return true;
 	}

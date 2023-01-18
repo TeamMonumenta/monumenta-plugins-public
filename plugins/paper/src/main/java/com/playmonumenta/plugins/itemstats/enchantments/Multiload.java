@@ -82,12 +82,16 @@ public class Multiload implements Enchantment {
 				}
 			}
 
-			player.sendActionBar(Component.text("Ammo: " + (maxArrows - arrowsToAccount) + " / " + maxArrows, NamedTextColor.YELLOW));
-			setAmmoCount(crossbow, maxArrows - arrowsToAccount);
+			afterLoad(player, crossbow, maxArrows, maxArrows - arrowsToAccount);
 		}, 1);
 	}
 
-	private void updateItemStack(ItemStack itemStack, AbstractArrow arrow) {
+	public static void afterLoad(Player player, ItemStack crossbow, int maxArrows, int loadedArrows) {
+		player.sendActionBar(Component.text("Ammo: " + loadedArrows + " / " + maxArrows, NamedTextColor.YELLOW));
+		setAmmoCount(crossbow, loadedArrows);
+	}
+
+	private static void updateItemStack(ItemStack itemStack, AbstractArrow arrow) {
 		if (itemStack.getType() != Material.CROSSBOW) {
 			return;
 		}
@@ -108,7 +112,7 @@ public class Multiload implements Enchantment {
 		}
 	}
 
-	private void setAmmoCount(ItemStack itemStack, int amount) {
+	private static void setAmmoCount(ItemStack itemStack, int amount) {
 		if (itemStack == null || itemStack.getType().isAir()) {
 			return;
 		}
@@ -120,7 +124,7 @@ public class Multiload implements Enchantment {
 		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
 	}
 
-	private int getAmmoCount(ItemStack itemStack) {
+	private static int getAmmoCount(ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir()) {
 			return 0;
 		}

@@ -37,14 +37,11 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -249,71 +246,6 @@ public class AbilityUtils {
 			return true;
 		}
 
-		return false;
-	}
-
-	/**
-	 * Refunds the shot arrow if possible
-	 *
-	 * @return Whether the arrow was refunded or not
-	 */
-	public static boolean refundArrow(Player player, AbstractArrow arrow) {
-		// Do not refund extra arrows shot my multishot crossbows (or bows with infinity, though that is checked later on again)
-		if (arrow.getPickupStatus() != AbstractArrow.PickupStatus.ALLOWED) {
-			return false;
-		}
-		ItemStack mainHand = player.getInventory().getItemInMainHand();
-		//Only refund arrow once
-		if (MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, ARROW_REFUNDED_METAKEY)) {
-			if (ItemUtils.isSomeBow(mainHand)) {
-				if (!mainHand.containsEnchantment(Enchantment.ARROW_INFINITE)) {
-
-					arrow.setPickupStatus(Arrow.PickupStatus.DISALLOWED);
-					Inventory playerInv = player.getInventory();
-					int firstArrow = playerInv.first(Material.ARROW);
-					int firstTippedArrow = playerInv.first(Material.TIPPED_ARROW);
-					int firstSpectralArrow = playerInv.first(Material.SPECTRAL_ARROW);
-					final int arrowSlot;
-					if (firstArrow == -1 && firstTippedArrow > -1 && firstSpectralArrow == -1) {
-						arrowSlot = firstTippedArrow;
-					} else if (firstArrow > - 1 && firstTippedArrow == -1 && firstSpectralArrow == -1) {
-						arrowSlot = firstArrow;
-					} else if (firstArrow == -1 && firstTippedArrow == -1 && firstSpectralArrow > -1) {
-						arrowSlot = firstSpectralArrow;
-					} else if (firstArrow > - 1 && firstTippedArrow > -1) {
-						arrowSlot = Math.min(firstArrow, firstTippedArrow);
-					} else if (firstArrow > -1 && firstSpectralArrow > -1) {
-						arrowSlot = Math.min(firstArrow, firstSpectralArrow);
-					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1) {
-						arrowSlot = Math.min(firstSpectralArrow, firstTippedArrow);
-					} else if (firstTippedArrow > -1 && firstSpectralArrow > -1 && firstArrow > -1) {
-						arrowSlot = Math.min(firstTippedArrow, Math.min(firstSpectralArrow, firstArrow));
-					} else {
-						// No arrow left - player must have shot their last arrow. Grab the arrow from the event and give it back to the player, then abort
-						InventoryUtils.giveItem(player, arrow.getItemStack());
-						return true;
-					}
-
-					//arrowStack has the count from before the arrow is shot
-					//so if from bow we just keep the same amount
-					//and if from crossbow we add one arrow
-					ItemStack arrowStack = playerInv.getItem(arrowSlot);
-					if (arrow.isShotFromCrossbow()) {
-						int stackSize = arrowStack.getAmount();
-						if (stackSize < arrowStack.getMaxStackSize()) {
-							arrowStack.setAmount(stackSize + 1);
-						} else {
-							ItemStack clone = arrowStack.clone();
-							clone.setAmount(1);
-							InventoryUtils.giveItem(player, clone);
-						}
-					} else {
-						playerInv.setItem(arrowSlot, arrowStack);
-					}
-					return true;
-				}
-			}
-		}
 		return false;
 	}
 

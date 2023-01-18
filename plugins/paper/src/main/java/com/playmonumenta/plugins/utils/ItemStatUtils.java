@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -64,7 +65,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemStatUtils {
@@ -86,6 +86,9 @@ public class ItemStatUtils {
 	static final String EFFECT_SOURCE_KEY = "EffectSource";
 	static final String DIRTY_KEY = "Dirty";
 	static final String SHULKER_SLOTS_KEY = "ShulkerSlots";
+	static final String CUSTOM_INVENTORY_TYPES_LIMIT_KEY = "CustomInventoryTypesLimit";
+	static final String CUSTOM_INVENTORY_TOTAL_ITEMS_LIMIT_KEY = "CustomInventoryTotalItemsLimit";
+	static final String CUSTOM_INVENTORY_ITEMS_PER_TYPE_LIMIT_KEY = "CustomInventoryItemsPerTypeLimit";
 	static final String IS_QUIVER_KEY = "IsQuiver";
 	static final String QUIVER_ARROW_TRANSFORM_MODE_KEY = "ArrowTransformMode";
 	static final String CHARGES_KEY = "Charges";
@@ -1159,6 +1162,38 @@ public class ItemStatUtils {
 		return nextNumeralValue.getValue() + toRomanNumerals(value - nextNumeralValue.getKey());
 	}
 
+	private static Optional<NBTCompound> getCompound(@Nullable NBTCompound compound, String... path) {
+		if (compound == null) {
+			return Optional.empty();
+		}
+		for (String p : path) {
+			compound = compound.getCompound(p);
+			if (compound == null) {
+				return Optional.empty();
+			}
+		}
+		return Optional.of(compound);
+	}
+
+	private static Optional<NBTCompound> getCompound(@Nullable ItemStack item, String... path) {
+		if (item == null || item.getType() == Material.AIR) {
+			return Optional.empty();
+		}
+		return getCompound(new NBTItem(item), path);
+	}
+
+	private static <T extends Enum<T>> @Nullable T getEnum(NBTCompound compound, String key, Class<T> enumClass) {
+		String value = compound.getString(key);
+		if (value == null) {
+			return null;
+		}
+		try {
+			return Enum.valueOf(enumClass, value.toUpperCase(Locale.ROOT));
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Masterwork masterwork, final Location location) {
 		if (item.getType() == Material.AIR) {
 			return;
@@ -1562,7 +1597,7 @@ public class ItemStatUtils {
 		return getEnchantmentLevel(item, type) > 0;
 	}
 
-	public static @Nullable NBTCompound getPlayerModified(final NBTItem nbt) {
+	public static @Nullable NBTCompound getPlayerModified(final NBTCompound nbt) {
 		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
 			return null;
@@ -1570,7 +1605,18 @@ public class ItemStatUtils {
 		return monumenta.getCompound(PLAYER_MODIFIED_KEY);
 	}
 
-	public static NBTCompound addPlayerModified(final NBTItem nbt) {
+	public static void removePlayerModified(final NBTCompound nbt) {
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return;
+		}
+		monumenta.removeKey(PLAYER_MODIFIED_KEY);
+		if (monumenta.getKeys().isEmpty()) {
+			nbt.removeKey(MONUMENTA_KEY);
+		}
+	}
+
+	public static NBTCompound addPlayerModified(final NBTCompound nbt) {
 		return nbt.addCompound(MONUMENTA_KEY).addCompound(PLAYER_MODIFIED_KEY);
 	}
 
@@ -1951,77 +1997,46 @@ public class ItemStatUtils {
 	}
 
 	public static int getShulkerSlots(@Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
-			return 27;
-		}
-		NBTItem nbt = new NBTItem(item);
-		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return 27;
-		}
+		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(SHULKER_SLOTS_KEY)).orElse(27);
+	}
 
-		NBTCompound stock = monumenta.getCompound(STOCK_KEY);
-		if (stock == null) {
-			return 27;
-		}
+	public static int getCustomInventoryItemTypesLimit(@Nullable ItemStack item) {
+		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(CUSTOM_INVENTORY_TYPES_LIMIT_KEY)).orElse(0);
+	}
 
-		Integer slots = stock.getInteger(SHULKER_SLOTS_KEY);
-		return slots == null ? 27 : slots;
+	public static int getCustomInventoryItemsPerTypeLimit(@Nullable ItemStack item) {
+		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(CUSTOM_INVENTORY_ITEMS_PER_TYPE_LIMIT_KEY)).orElse(0);
+	}
+
+	public static int getCustomInventoryTotalItemsLimit(@Nullable ItemStack item) {
+		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(CUSTOM_INVENTORY_TOTAL_ITEMS_LIMIT_KEY)).orElse(0);
 	}
 
 	/**
-	 * Checks if an item is a quiver, i.e. is a shulker box with the tag Monumenta.Stock.IsQuiver set to true.
+	 * Checks if an item is a quiver, i.e. is a tipped arrow with the tag Monumenta.Stock.IsQuiver set to true.
 	 */
 	public static boolean isQuiver(@Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR || !ItemUtils.isShulkerBox(item.getType())) {
+		if (item == null || item.getType() != Material.TIPPED_ARROW) {
 			return false;
 		}
-		NBTItem nbt = new NBTItem(item);
-		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
-		if (monumenta == null) {
-			return false;
-		}
-
-		NBTCompound stock = monumenta.getCompound(STOCK_KEY);
-		if (stock == null) {
-			return false;
-		}
-
-		return Boolean.TRUE.equals(stock.getBoolean(IS_QUIVER_KEY));
+		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getBoolean(IS_QUIVER_KEY)).orElse(false);
 	}
 
 	public static boolean isArrowTransformingQuiver(@Nullable ItemStack item) {
 		return isQuiver(item) && "Shaman's Quiver".equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
-	@Contract("!null, _ -> !null")
-	public static @Nullable ItemStack setArrowTransformMode(@Nullable ItemStack item, QuiverListener.ArrowTransformMode arrowTransformMode) {
+	public static void setArrowTransformMode(@Nullable ItemStack item, QuiverListener.ArrowTransformMode arrowTransformMode) {
 		if (item == null || item.getType() == Material.AIR) {
-			return item;
+			return;
 		}
-		NBTItem nbt = new NBTItem(item);
-		NBTCompound playerModified = addPlayerModified(nbt);
-		playerModified.setString(QUIVER_ARROW_TRANSFORM_MODE_KEY, arrowTransformMode.name().toLowerCase(Locale.ROOT));
-		return nbt.getItem();
+		addPlayerModified(new NBTItem(item, true)).setString(QUIVER_ARROW_TRANSFORM_MODE_KEY, arrowTransformMode.name().toLowerCase(Locale.ROOT));
 	}
 
 	public static QuiverListener.ArrowTransformMode getArrowTransformMode(@Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
-			return QuiverListener.ArrowTransformMode.NONE;
-		}
-		NBTCompound playerModified = getPlayerModified(new NBTItem(item));
-		if (playerModified == null) {
-			return QuiverListener.ArrowTransformMode.NONE;
-		}
-		String mode = playerModified.getString(QUIVER_ARROW_TRANSFORM_MODE_KEY);
-		if (mode == null || mode.isEmpty()) {
-			return QuiverListener.ArrowTransformMode.NONE;
-		}
-		try {
-			return QuiverListener.ArrowTransformMode.valueOf(mode.toUpperCase(Locale.ROOT));
-		} catch (IllegalArgumentException e) {
-			return QuiverListener.ArrowTransformMode.NONE;
-		}
+		return getCompound(item, MONUMENTA_KEY, PLAYER_MODIFIED_KEY)
+			       .map(playerModified -> getEnum(playerModified, QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.class))
+			       .orElse(QuiverListener.ArrowTransformMode.NONE);
 	}
 
 	public static boolean isUpgradedLimeTesseract(@Nullable ItemStack item) {
@@ -2031,15 +2046,7 @@ public class ItemStatUtils {
 	}
 
 	public static int getCharges(@Nullable ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) {
-			return 0;
-		}
-		NBTCompound playerModified = getPlayerModified(new NBTItem(item));
-		if (playerModified == null) {
-			return 0;
-		}
-		Integer charges = playerModified.getInteger(CHARGES_KEY);
-		return charges == null ? 0 : charges;
+		return getCompound(item, MONUMENTA_KEY, PLAYER_MODIFIED_KEY).map(playerModified -> playerModified.getInteger(CHARGES_KEY)).orElse(0);
 	}
 
 	public static void setCharges(@Nullable ItemStack item, int charges) {
@@ -2268,9 +2275,7 @@ public class ItemStatUtils {
 			}
 		}
 
-		if (CustomContainerItemManager.isCustomContainerItem(item)) {
-			CustomContainerItemManager.generateDescription(monumenta, lore::add);
-		}
+		CustomContainerItemManager.generateDescription(item, monumenta, lore::add);
 
 		if (isUpgradedLimeTesseract(item)) {
 			lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)

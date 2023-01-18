@@ -31,6 +31,7 @@ import com.playmonumenta.plugins.integrations.PlaceholderAPIIntegration;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.inventories.AnvilFixInInventory;
+import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.inventories.LootChestsInInventory;
 import com.playmonumenta.plugins.inventories.PlayerInventoryView;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
@@ -417,6 +418,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new InventoryUpdateListener(), this);
 		WalletManager.initialize(new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
 		manager.registerEvents(new WalletManager(), this);
+		manager.registerEvents(new CustomContainerItemManager(), this);
 		manager.registerEvents(StatTrackManager.getInstance(), this);
 		manager.registerEvents(new PotionBarrelListener(), this);
 

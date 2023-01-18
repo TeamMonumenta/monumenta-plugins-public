@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemstats;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
 import com.playmonumenta.plugins.itemstats.enchantments.AntiCritScaling;
@@ -623,6 +624,17 @@ public class ItemStatManager implements Listener {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onProjectileLaunch(plugin, player, entry.getValue(), event, projectile);
+			}
+		}
+	}
+
+	public void onConsumeArrow(Plugin plugin, Player player, ArrowConsumeEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onConsumeArrow(plugin, player, entry.getValue(), event);
+				if (event.isCancelled()) {
+					return;
+				}
 			}
 		}
 	}

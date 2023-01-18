@@ -13,6 +13,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Gui {
 
 	protected final Plugin mPlugin;
-	protected final Player mPlayer;
+	public final Player mPlayer;
 	protected int mSize;
 	private Component mTitle;
 	private boolean mTitleDirty = false;
@@ -147,11 +148,11 @@ public abstract class Gui {
 		mTitleDirty = true;
 	}
 
-	protected GuiItem setItem(int row, int column, GuiItem item) {
+	public GuiItem setItem(int row, int column, GuiItem item) {
 		return setItem(row * 9 + column, item);
 	}
 
-	protected GuiItem setItem(int index, GuiItem item) {
+	public GuiItem setItem(int index, GuiItem item) {
 		if (index < 0 || index >= 6 * 9) {
 			throw new IllegalArgumentException("Invalid item index " + index);
 		}
@@ -166,11 +167,11 @@ public abstract class Gui {
 		return item;
 	}
 
-	protected GuiItem setItem(int row, int column, ItemStack item) {
+	public GuiItem setItem(int row, int column, ItemStack item) {
 		return setItem(row, column, new GuiItem(item));
 	}
 
-	protected GuiItem setItem(int index, ItemStack item) {
+	public GuiItem setItem(int index, ItemStack item) {
 		return setItem(index, new GuiItem(item));
 	}
 
@@ -186,6 +187,10 @@ public abstract class Gui {
 	 * Called when the player clicks in the player inventory area. Useful to perform actions on player items.
 	 */
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
+
+	}
+
+	protected void onInventoryDrag(InventoryDragEvent event) {
 
 	}
 
@@ -224,6 +229,12 @@ public abstract class Gui {
 			} else if (event.getClickedInventory() != null) {
 				onPlayerInventoryClick(event);
 			}
+		}
+
+		@Override
+		protected void inventoryDrag(InventoryDragEvent event) {
+			event.setCancelled(true);
+			onInventoryDrag(event);
 		}
 
 		@Override
