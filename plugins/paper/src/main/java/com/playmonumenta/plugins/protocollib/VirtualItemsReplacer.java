@@ -23,18 +23,23 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.inventory.meta.BlockStateMeta;
 
 public class VirtualItemsReplacer extends PacketAdapter {
 
@@ -107,14 +112,15 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				    && ItemUtils.isShulkerBox(itemStack.getType())
 				    && VirtualFirmament.isEnabled(player)) {
 				String plainName = ItemUtils.getPlainNameIfExists(itemStack);
-				if ("Firmament".equals(plainName)) {
-					itemStack.setType(Material.PRISMARINE);
-					itemStack.setAmount(64);
-					markVirtual(itemStack);
-					return;
-				} else if ("Doorway from Eternity".equals(plainName)) {
-					itemStack.setType(Material.BLACKSTONE);
-					itemStack.setAmount(64);
+				if ("Firmament".equals(plainName) || "Doorway from Eternity".equals(plainName)) {
+					if (itemStack.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
+						new NBTItem(itemStack, true).setString("FirmamentColor", shulkerBox.getColor() == null ? "undyed" : shulkerBox.getColor().name().toLowerCase(Locale.ROOT));
+						int count = Arrays.stream(shulkerBox.getInventory().getContents())
+							            .filter(Objects::nonNull)
+							            .mapToInt(ItemStack::getAmount).sum();
+						itemStack.setAmount(Math.max(1, Math.min(count, 64)));
+					}
+					itemStack.setType("Firmament".equals(plainName) ? Material.PRISMARINE : Material.BLACKSTONE);
 					markVirtual(itemStack);
 					return;
 				}
