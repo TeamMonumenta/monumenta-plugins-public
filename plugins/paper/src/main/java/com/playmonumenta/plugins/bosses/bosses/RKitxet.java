@@ -144,7 +144,7 @@ public class RKitxet extends BossAbilityGroup {
 		//The SpellShardShield class stores the information about the shield and handles adding/removing the shield
 		mShieldSpell = new SpellShardShield(mBoss);
 
-		SpellMusic music = new SpellMusic(mBoss, "epic:music.kaul", MUSIC_DURATION * 20, 3 * 20, 0, detectionRange, detectionRange, false, 0);
+		SpellMusic music = new SpellMusic(mBoss, "epic:music.kaul", MUSIC_DURATION * 20, 2.0f, 0, detectionRange, detectionRange, false, 0, true);
 
 		//Only change between phase 1 and 2 is the cooldowns of the spells
 		SpellManager phase1Actives = new SpellManager(Arrays.asList(

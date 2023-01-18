@@ -2,10 +2,9 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.HashMap;
-import java.util.Iterator;
+import com.playmonumenta.scriptedquests.managers.SongManager;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.SoundCategory;
@@ -19,54 +18,51 @@ public class SpellMusic extends Spell {
 	private final LivingEntity mBoss;
 	private final String mTrack;
 	private final int mDuration;
-	private final int mInterval;
+	private final float mVolume;
 	private final int mDelay;
 	private final double mRadiusInner;
 	private final double mRadiusOuter;
 	private final boolean mClear;
 	private final int mClearDelay;
+	private final boolean mForce;
 
-	private final HashMap<Player, Integer> mListeners = new HashMap<>();
+	private final List<Player> mListeners = new ArrayList<>();
 
 	private int mT = 0;
 
-	public SpellMusic(LivingEntity boss, String track, int duration, int interval, int delay, double radiusInner, double radiusOuter, boolean clear, int clearDelay) {
+	public SpellMusic(LivingEntity boss, String track, int duration, float volume, int delay, double radiusInner, double radiusOuter, boolean clear, int clearDelay, boolean force) {
 		mBoss = boss;
 		mTrack = track;
 		mDuration = duration;
-		mInterval = interval;
+		mVolume = volume;
 		mDelay = delay;
 		mRadiusInner = radiusInner;
 		mRadiusOuter = radiusOuter;
 		mClear = clear;
 		mClearDelay = clearDelay;
+		mForce = force;
 	}
 
 	@Override
 	public void run() {
 		if (mT > mDelay) {
 			Location loc = mBoss.getLocation();
-			for (Iterator<Map.Entry<Player, Integer>> iterator = mListeners.entrySet().iterator(); iterator.hasNext(); ) {
-				Map.Entry<Player, Integer> entry = iterator.next();
-				Player player = entry.getKey();
-				int duration = entry.getValue() - 5;
-				if (duration <= 0 || !player.isOnline()) {
-					iterator.remove();
-					continue;
-				}
-				if (mClear && player.getLocation().distance(loc) > mRadiusOuter) {
-					iterator.remove();
-					clear(player);
-					continue;
-				}
-				entry.setValue(duration);
-			}
+			PlayerUtils.playersInRange(loc, mRadiusInner, true).stream()
+				.filter(p -> !mListeners.contains(p))
+				.toList()
+				.forEach(p -> {
+					play(p);
+					mListeners.add(p);
+				});
 
-			List<Player> players = PlayerUtils.playersInRange(loc, mRadiusInner, true);
-			players.removeIf(mListeners::containsKey);
-			for (Player player : players) {
-				mListeners.put(player, mDuration + mInterval);
-				play(player);
+			if (mClear) {
+				mListeners.stream()
+					.filter(p -> p.getLocation().distanceSquared(loc) > mRadiusOuter * mRadiusOuter)
+					.toList()
+					.forEach(p -> {
+						clear(p);
+						mListeners.remove(p);
+					});
 			}
 		}
 		mT += 5;
@@ -75,21 +71,26 @@ public class SpellMusic extends Spell {
 	@Override
 	public void onDeath(@Nullable EntityDeathEvent event) {
 		if (mClear) {
-			for (Player player : mListeners.keySet()) {
-				clear(player);
-			}
+			mListeners.forEach(this::clear);
 			mListeners.clear();
+		} else {
+			mListeners.forEach(p -> SongManager.stopSong(p, false));
 		}
 	}
 
+	private SongManager.Song getSong() {
+		return new SongManager.Song(mTrack, SoundCategory.RECORDS, mDuration / 20.0, true, mVolume, 1);
+	}
+
 	private void play(Player player) {
-		stop(player);
-		player.playSound(player.getLocation(), mTrack, SoundCategory.RECORDS, 2.0f, 1.0f);
+		SongManager.playSong(player, getSong(), mForce);
 	}
 
 	private void stop(Player player) {
-		// Stops all music to avoid overlapping
-		PlayerUtils.executeCommandOnPlayer(player, "stopsound @s record");
+		SongManager.Song current = SongManager.getCurrentSong(player);
+		if (current != null && current.mSongPath.equals(mTrack)) {
+			SongManager.stopSong(player, true);
+		}
 	}
 
 	private void clear(Player player) {

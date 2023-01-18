@@ -168,7 +168,7 @@ public final class Nucleus extends BossAbilityGroup {
 			}
 		}
 
-		SpellMusic music = new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 20, 0, detectionRange, detectionRange, false, 0);
+		SpellMusic music = new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 2.0f, 0, detectionRange, detectionRange, false, 0, true);
 
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(

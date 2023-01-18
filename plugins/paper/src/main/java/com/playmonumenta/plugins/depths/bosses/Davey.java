@@ -162,7 +162,7 @@ public class Davey extends BossAbilityGroup {
 			new SpellDaveyAnticheese(mBoss, mSpawnLoc),
 			new SpellAbyssalSpawnPassive(mBoss, mVexes),
 			new SpellShieldStun(20 * 30),
-			new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 20, 0, detectionRange, detectionRange, false, 0)
+			new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 2.0f, 0, detectionRange, detectionRange, false, 0, true)
 		);
 
 		//Summon vexes

@@ -173,7 +173,7 @@ public class Hedera extends BossAbilityGroup {
 			new SpellBlockBreak(mBoss, 2, 3, 2, true, Material.AIR),
 			new SpellHederaAnticheese(mBoss, mSpawnLoc),
 			new SpellPassiveGarden(mBoss, mPlantSpawns, mPlants, mPlantTypes, mSpawnLoc),
-			new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 20, 0, detectionRange, detectionRange, false, 0)
+			new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 2.0f, 0, detectionRange, detectionRange, false, 0, true)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();

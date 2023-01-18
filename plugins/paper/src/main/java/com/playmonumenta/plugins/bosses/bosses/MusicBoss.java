@@ -18,8 +18,8 @@ public class MusicBoss extends BossAbilityGroup {
 		@BossParam(help = "The duration of the track, in ticks")
 		public int DURATION = 1200;
 
-		@BossParam(help = "The amount of time before the track restarts, in ticks")
-		public int INTERVAL = 20;
+		@BossParam(help = "The volume the song is played at")
+		public float VOLUME = 2.0f;
 
 		@BossParam(help = "The amount of time before the track starts for the first time, in ticks")
 		public int DELAY = 0;
@@ -35,15 +35,16 @@ public class MusicBoss extends BossAbilityGroup {
 
 		@BossParam(help = "The amount of time after clearing is triggered that the sound is stopped, in ticks")
 		public int CLEAR_DELAY = 0;
-	}
 
-	private Parameters mParams;
+		@BossParam(help = "Whether or not the song is forced to play (i.e. replace an existing song if currently playing)")
+		public boolean FORCE = true;
+	}
 
 	public MusicBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
-		double range = Math.max(mParams.RADIUS_INNER, mParams.RADIUS_OUTER);
-		SpellMusic spell = new SpellMusic(boss, mParams.TRACK, mParams.DURATION, mParams.INTERVAL, mParams.DELAY, mParams.RADIUS_INNER, range, mParams.CLEAR, mParams.CLEAR_DELAY);
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
+		double range = Math.max(p.RADIUS_INNER, p.RADIUS_OUTER);
+		SpellMusic spell = new SpellMusic(boss, p.TRACK, p.DURATION, p.VOLUME, p.DELAY, p.RADIUS_INNER, range, p.CLEAR, p.CLEAR_DELAY, p.FORCE);
 		super.constructBoss(new SpellManager(List.of(spell)), Collections.emptyList(), (int) (range * 2), null);
 	}
 
