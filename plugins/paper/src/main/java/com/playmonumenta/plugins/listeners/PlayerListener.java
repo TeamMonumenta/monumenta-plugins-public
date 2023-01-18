@@ -58,12 +58,15 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CommandBlock;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.Light;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
@@ -363,6 +366,34 @@ public class PlayerListener implements Listener {
 		if (player.getGameMode() == GameMode.SURVIVAL && !ZoneUtils.playerCanMineBlock(player, block)) {
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void blockPlaceEventMonitor(BlockPlaceEvent event) {
+		// If replacing a light block in survival mode, place new light blocks around the replaced block to not suddenly make the area much darker
+		if (event.getPlayer().getGameMode() == GameMode.SURVIVAL
+			    && event.getBlockReplacedState().getType() == Material.LIGHT
+			    && event.getBlockReplacedState().getBlockData() instanceof Light light
+			    && light.getLevel() > light.getMinimumLevel()) {
+			Light lowerAirLight = (Light) Bukkit.createBlockData(Material.LIGHT);
+			lowerAirLight.setLevel(light.getLevel() - 1);
+			Light lowerWaterLight = (Light) Bukkit.createBlockData(Material.LIGHT);
+			lowerWaterLight.setLevel(light.getLevel() - 1);
+			lowerWaterLight.setWaterlogged(true);
+			for (BlockFace face : new BlockFace[] {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN}) {
+				Block relative = event.getBlock().getRelative(face);
+				if (!ZoneUtils.playerCanMineBlock(event.getPlayer(), relative)) {
+					continue;
+				}
+				if (relative.getType() == Material.AIR) {
+					relative.setBlockData(lowerAirLight, false);
+				} else if (relative.getType() == Material.WATER
+					           && relative.getBlockData() instanceof Levelled fluid
+					           && fluid.getLevel() == 0) { // 0 == full block of water
+					relative.setBlockData(lowerWaterLight, false);
+				}
+			}
 		}
 	}
 
