@@ -183,7 +183,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					List<Effect> effects = mPlugin.mEffectManager.getEffects(p);
 					if (effects != null) {
 						for (Effect e : effects) {
-							if (e.isBuff()) {
+							if (e.isBuff() && e.getDuration() < ENHANCEMENT_POTION_EFFECT_MAX_DURATION) {
 								e.setDuration(Math.min(e.getDuration() + Math.min((int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
 							}
 						}
