@@ -27,7 +27,7 @@ public class GruesomeAlchemy extends PotionAbility {
 
 	public static final double GRUESOME_POTION_DAMAGE_MULTIPLIER = 0.8;
 
-	public static final String CHARM_DAMAGE = "Gruesome Alchemy Damage Mutliplier";
+	public static final String CHARM_DAMAGE = "Gruesome Alchemy Damage Multiplier";
 	public static final String CHARM_SLOWNESS = "Gruesome Alchemy Slowness Amplifier";
 	public static final String CHARM_VULNERABILITY = "Gruesome Alchemy Vulnerability Amplifier";
 	public static final String CHARM_WEAKEN = "Gruesome Alchemy Weakness Amplifier";
