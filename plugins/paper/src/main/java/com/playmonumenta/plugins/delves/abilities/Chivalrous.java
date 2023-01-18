@@ -6,7 +6,9 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.EnumSet;
+import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -30,13 +32,28 @@ public class Chivalrous {
 			"MagmaCubeMount"
 	};
 
+	private static final String[] LAVA_MOUNTS = {
+		"ChivalrousBeeMount",
+		"ChivalrousStriderMount",
+		"MagmaCubeMount"
+	};
+
+	private static final String[] WATER_MOUNTS = {
+		"ChivalrousBeeMount",
+		"ChivalrousDolphinMount",
+		"ChivalrousPufferfishMount"
+	};
+
 	public static final String[] MOUNT_NAMES = {
 			"Chivalrous Bee Mount",
 			"Slime Mount",
-			"Magma Cube Mount"
+			"Magma Cube Mount",
+			"Chivalrous Strider Mount",
+			"Chivalrous Dolphin Mount",
+			"Chivalrous Pufferfish Mount"
 	};
 
-	public static final String DESCRIPTION = "Enemies become Knights of slime and bees.";
+	public static final String DESCRIPTION = "Enemies become Knights of slime, bees, dolphins, fish, and striders.";
 
 	public static final String[][] RANK_DESCRIPTIONS = {
 			{
@@ -64,7 +81,15 @@ public class Chivalrous {
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!mob.isInsideVehicle() && !CHIVALROUS_IMMUNE.contains(mob.getType()) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
 				&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1]) {
-			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), MOUNTS[FastUtils.RANDOM.nextInt(MOUNTS.length)]);
+			boolean isInWater = LocationUtils.isLocationInWater(mob.getLocation());
+			boolean isInLava = mob.getLocation().getBlock().getType() == Material.LAVA;
+			String [] possibleMounts = MOUNTS;
+			if (isInWater) {
+				possibleMounts = WATER_MOUNTS;
+			} else if (isInLava) {
+				possibleMounts = LAVA_MOUNTS;
+			}
+			Entity mount = LibraryOfSoulsIntegration.summon(mob.getLocation(), possibleMounts[FastUtils.RANDOM.nextInt(possibleMounts.length)]);
 			if (mount != null) {
 				mount.addScoreboardTag(EntityListener.BEES_BLOCK_HIVE_ENTER_EVENT);
 				mount.addPassenger(mob);
