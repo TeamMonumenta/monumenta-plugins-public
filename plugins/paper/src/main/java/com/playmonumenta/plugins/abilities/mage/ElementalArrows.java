@@ -182,6 +182,7 @@ public class ElementalArrows extends Ability {
 				projectile.setMetadata(THUNDER_ARROW_METAKEY, new FixedMetadataValue(mPlugin, 0));
 				mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.END_ROD);
 				thunderApplied = true;
+				putOnCooldown();
 			}
 
 			if (mPlayer.isSneaking()) {
