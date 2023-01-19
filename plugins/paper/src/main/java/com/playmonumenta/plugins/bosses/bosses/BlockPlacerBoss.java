@@ -4,6 +4,7 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -249,7 +250,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 					for (Location loc : bridgeLocations) {
 						Block block = loc.getBlock();
 						Material material = block.getType();
-						if (IGNORED_MATERIALS.contains(material) || block.isSolid()) {
+						if (IGNORED_MATERIALS.contains(material) || block.isSolid() || BlockUtils.containsWater(block)) {
 							continue;
 						}
 
