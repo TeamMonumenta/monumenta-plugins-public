@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
@@ -128,7 +129,7 @@ public class PlayerUtils {
 			if (player.getLocation().distanceSquared(loc) < rangeSquared
 				    && player.getGameMode() != GameMode.SPECTATOR
 				    && (includeNonTargetable || !AbilityUtils.isStealthed(player))
-				    && (includeDead || player.getHealth() > 0)) {
+				    && (includeDead || !Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class))) {
 				players.add(player);
 			}
 		}
