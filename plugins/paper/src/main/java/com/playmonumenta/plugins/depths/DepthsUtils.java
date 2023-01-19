@@ -12,11 +12,13 @@ import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.io.File;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -217,7 +219,7 @@ public class DepthsUtils {
 
 	public static void explodeEvent(EntityExplodeEvent event) {
 		// Check location of blocks to see if they were ice barrier placed
-		if (event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof AbstractHorse) {
+		if (event.getEntity().isDead() || !(event.getEntity() instanceof LivingEntity) || event.getEntity() instanceof AbstractHorse || ScoreboardUtils.checkTag(event.getEntity(), AbilityUtils.IGNORE_TAG)) {
 			return;
 		}
 		List<Block> blocks = event.blockList();
