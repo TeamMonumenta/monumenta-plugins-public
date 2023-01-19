@@ -33,8 +33,7 @@ public class AnvilOverride extends BaseOverride {
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block, PlayerInteractEvent event) {
 		if (player == null || player.getGameMode() == GameMode.CREATIVE) {
 			return true;
-		} else if (player.getGameMode() == GameMode.ADVENTURE
-			           && block.getLocation().subtract(0, 0.75, 0).getBlock().getType() != Material.DISPENSER) {
+		} else if (player.getGameMode() == GameMode.ADVENTURE) {
 			return false;
 		}
 
@@ -44,19 +43,18 @@ public class AnvilOverride extends BaseOverride {
 		 */
 		item = player.getInventory().getItemInMainHand();
 		if (block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
-			boolean unshattered = Shattered.unshatterOneLevel(item);
+			boolean repaired = Shattered.unshatterOneLevel(item);
 			ItemMeta itemMeta = item.getItemMeta();
-
-			boolean canRepair = !unshattered;
-			if (unshattered
+			if (!repaired
 				&& itemMeta instanceof Damageable damageable
 				&& damageable.getDamage() > 0
-				&& ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0) {
-				canRepair = true;
+				&& !ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_IRREPARIBILITY)) {
+				repaired = true;
 				damageable.setDamage(0);
+				item.setItemMeta(damageable);
 			}
 
-			if (canRepair) {
+			if (repaired) {
 				Location loc = block.getLocation().add(0.5, 0.5, 0.5);
 				World world = loc.getWorld();
 				world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 1.0f, 1.0f);
@@ -97,7 +95,7 @@ public class AnvilOverride extends BaseOverride {
 					public void run() {
 						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.2, 0, 0.2, 0);
 						mTicks++;
-						if (block.getType() == Material.AIR || !block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY) || block == null) {
+						if (block.getType() == Material.AIR || !block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 							this.cancel();
 						}
 						if (mTicks >= 20 * 4) {
