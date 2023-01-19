@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -17,8 +16,11 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -48,7 +50,7 @@ public class Flamestrike extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Flamestrike::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.FLINT_AND_STEEL))
-			.descriptions(Flamestrike::getDescription, MAX_RARITY);
+			.descriptions(Flamestrike::getDescription);
 
 	public Flamestrike(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -105,9 +107,10 @@ public class Flamestrike extends DepthsAbility {
 		putOnCooldown();
 	}
 
-	private static String getDescription(int rarity) {
-		return "Right click while sneaking to create a torrent of flames, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in front of you within " + RADIUS + " blocks, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while sneaking to create a torrent of flames, dealing ")
+			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
+			.append(Component.text(" magic damage to all enemies in front of you within " + RADIUS + " blocks, setting them on fire for " + FIRE_TICKS / 20 + " seconds and knocking them away. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
-
 
 }

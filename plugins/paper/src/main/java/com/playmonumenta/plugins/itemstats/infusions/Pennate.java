@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Pennate implements Infusion {
 
-	private static final double REDUCT_PCT_PER_LEVEL = 0.05;
+	public static final double REDUCT_PCT_PER_LEVEL = 0.05;
 
 	@Override
 	public String getName() {

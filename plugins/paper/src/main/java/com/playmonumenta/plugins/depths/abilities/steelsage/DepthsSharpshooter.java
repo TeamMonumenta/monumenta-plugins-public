@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -13,7 +12,10 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,7 +33,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	public static final DepthsAbilityInfo<DepthsSharpshooter> INFO =
 		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.TARGET))
-			.descriptions(DepthsSharpshooter::getDescription, MAX_RARITY);
+			.descriptions(DepthsSharpshooter::getDescription);
 
 	private int mStacks = 0;
 	private int mTicksToStackDecay = 0;
@@ -86,11 +88,13 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		if (rarity == 6) {
-			return "Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + DepthsUtils.getRarityColor(rarity) + TWISTED_SHARPSHOOTER_DECAY_TIMER / 20 + ChatColor.WHITE + " seconds of not gaining a stack. Each stack increases your projectile damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
-		}
-		return "Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after " + SHARPSHOOTER_DECAY_TIMER / 20 + " seconds of not gaining a stack. Each stack increases your projectile damage by " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(DAMAGE_PER_STACK[rarity - 1]) + "%" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component decay = rarity == 6 ? Component.text(TWISTED_SHARPSHOOTER_DECAY_TIMER / 20, color) : Component.text(SHARPSHOOTER_DECAY_TIMER);
+		return Component.text("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after ")
+			.append(decay)
+			.append(Component.text(" seconds of not gaining a stack. Each stack increases your projectile damage by "))
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE_PER_STACK[rarity - 1]) + "%", color))
+			.append(Component.text("."));
 	}
 
 	@Override

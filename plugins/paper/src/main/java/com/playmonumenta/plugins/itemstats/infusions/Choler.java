@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Choler implements Infusion {
 
-	private static final double DAMAGE_MLT_PER_LVL = 0.01;
+	public static final double DAMAGE_MLT_PER_LVL = 0.01;
 
 	@Override
 	public String getName() {

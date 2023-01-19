@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 public class Usurper implements Infusion {
 
-	private static final double HEAL_PCT_PER_LVL = 0.025;
+	public static final double HEAL_PCT_PER_LVL = 0.025;
 
 	@Override
 	public String getName() {

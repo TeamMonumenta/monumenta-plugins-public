@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -153,12 +152,8 @@ public class SeasonalEventRepurchaseGUI extends Gui {
 				}
 				String description = reward.mDescription;
 				if (description != null) {
-					NamedTextColor namedTextColor = reward.mDescriptionColor;
-					if (namedTextColor == null) {
-						namedTextColor = NamedTextColor.WHITE;
-					}
-					ChatColor chatColor = GUIUtils.namedTextColorToChatColor(namedTextColor);
-					ItemUtils.modifyMeta(icon, meta -> GUIUtils.splitLoreLine(meta, description, 30, chatColor, false));
+					NamedTextColor namedTextColor = reward.mDescriptionColor == null ? NamedTextColor.WHITE : reward.mDescriptionColor;
+					ItemUtils.modifyMeta(icon, meta -> GUIUtils.splitLoreLine(meta, description, namedTextColor, 30, false));
 				}
 				if (owned) {
 					ItemUtils.modifyMeta(icon, meta -> {

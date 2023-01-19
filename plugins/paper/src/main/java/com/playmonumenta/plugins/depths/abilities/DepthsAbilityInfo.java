@@ -17,10 +17,10 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -101,13 +101,18 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	@Override
-	public DepthsAbilityInfo<T> descriptions(IntFunction<String> supplier, int levels) {
+	public DepthsAbilityInfo<T> descriptions(IntFunction<TextComponent> supplier, int levels) {
 		super.descriptions(supplier, levels);
 		return this;
 	}
 
+	public DepthsAbilityInfo<T> descriptions(BiFunction<Integer, TextColor, TextComponent> supplier) {
+		descriptions(i -> supplier.apply(i, DepthsUtils.getRarityColor(i)), DepthsAbility.MAX_RARITY);
+		return this;
+	}
+
 	public DepthsAbilityInfo<T> description(String description) {
-		super.descriptions(i -> description, 1);
+		super.descriptions(i -> Component.text(description), 1);
 		return this;
 	}
 
@@ -183,13 +188,13 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			TextColor color = mDepthsTree == null ? NamedTextColor.WHITE : mDepthsTree.getColor();
-			meta.displayName(Component.text("" + ChatColor.BOLD + getDisplayName(), color).decoration(TextDecoration.ITALIC, false));
+			meta.displayName(Component.text(getDisplayName(), color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			if (mDepthsTree != null) {
 				List<Component> lore = new ArrayList<>();
 				lore.add(DepthsUtils.getLoreForItem(mDepthsTree, rarity));
 				meta.lore(lore);
 			}
-			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, ChatColor.WHITE, false);
+			GUIUtils.splitLoreLine(meta, getDescription(rarity), 30, false);
 			stack.setItemMeta(meta);
 			ItemUtils.setPlainName(stack, getDisplayName());
 			item.mItem = stack;

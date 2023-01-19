@@ -16,7 +16,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,7 +47,7 @@ public class Avalanche extends DepthsAbility {
 			.cooldown(COOLDOWN_TICKS)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Avalanche::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SNOW_BLOCK))
-			.descriptions(Avalanche::getDescription, MAX_RARITY);
+			.descriptions(Avalanche::getDescription);
 
 	public Avalanche(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -105,8 +107,10 @@ public class Avalanche extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to enemies on the shattered ice. Affected enemies are rooted for " + SLOW_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Swap hands to shatter all ice blocks within a radius of " + RADIUS + ", dealing ")
+			       .append(Component.text(DAMAGE[rarity - 1], color))
+			       .append(Component.text(" magic damage to enemies on the shattered ice. Affected enemies are rooted for " + SLOW_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s."));
 	}
 
 

@@ -13,7 +13,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class Empowered implements Infusion {
 
-	private static final double PERCENT_CHANCE = 0.0025;
+	public static final double PERCENT_CHANCE = 0.0025;
 	private static final double PERCENT_REPAIR = 0.01;
 	private static final float ACUMEN_BONUS = 0.02f;
 	private static final float INTUITION_BONUS = 0.5f;

@@ -13,7 +13,6 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -142,16 +141,16 @@ public class EmojiCustomInventory extends CustomInventory {
 					.decoration(TextDecoration.ITALIC, false));
 			}
 			if (!emoji.mLore.isEmpty()) {
-				GUIUtils.splitLoreLine(meta, emoji.mLore, 30, ChatColor.AQUA, true);
-				GUIUtils.splitLoreLine(meta, "Right click to set as your default emoji.", 30, ChatColor.GRAY, false);
+				GUIUtils.splitLoreLine(meta, emoji.mLore, NamedTextColor.AQUA, 30, true);
+				GUIUtils.splitLoreLine(meta, "Right click to set as your default emoji.", NamedTextColor.GRAY, 30, false);
 			}
 		} else {
 			meta.displayName(Component.text(emoji.mName + " (Locked)", NamedTextColor.DARK_RED)
 				.decoration(TextDecoration.ITALIC, false));
 			if (!emoji.mLore.isEmpty()) {
-				GUIUtils.splitLoreLine(meta, emoji.mLore, 30, ChatColor.GRAY, true);
+				GUIUtils.splitLoreLine(meta, emoji.mLore, NamedTextColor.GRAY, 30, true);
 			}
-			GUIUtils.splitLoreLine(meta, "Patron Tier 2+ Required to use.", 30, ChatColor.GRAY, false);
+			GUIUtils.splitLoreLine(meta, "Patron Tier 2+ Required to use.", NamedTextColor.GRAY, 30, false);
 		}
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
@@ -162,8 +161,8 @@ public class EmojiCustomInventory extends CustomInventory {
 	public void setLayout(Player player) {
 		mInventory.clear();
 
-		mInventory.setItem(4, createBasicItem(Material.ENCHANTING_TABLE, "Choose an emoji below!", NamedTextColor.AQUA,
-							true, "", ChatColor.GRAY));
+		mInventory.setItem(4, GUIUtils.createBasicItem(Material.ENCHANTING_TABLE, "Choose an emoji below!", NamedTextColor.AQUA,
+							true, "", NamedTextColor.GRAY));
 
 		int locationIndex = 0;
 		for (Emoji item : EMOJI_LIST) {
@@ -175,20 +174,5 @@ public class EmojiCustomInventory extends CustomInventory {
 				mInventory.setItem(i, new ItemStack(FILLER, 1));
 			}
 		}
-	}
-
-	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
-		ItemStack item = new ItemStack(mat, 1);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text(name, nameColor)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, nameBold));
-		if (!desc.isEmpty()) {
-			GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
-		}
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		item.setItemMeta(meta);
-		return item;
 	}
 }

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -10,8 +9,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,7 +34,7 @@ public class BrambleShell extends DepthsAbility {
 	public static final DepthsAbilityInfo<BrambleShell> INFO =
 		new DepthsAbilityInfo<>(BrambleShell.class, ABILITY_NAME, BrambleShell::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.SWEET_BERRIES))
-			.descriptions(BrambleShell::getDescription, MAX_RARITY);
+			.descriptions(BrambleShell::getDescription);
 
 	public BrambleShell(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -52,7 +54,9 @@ public class BrambleShell extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Whenever an enemy deals melee or projectile damage to you, they take " + DepthsUtils.getRarityColor(rarity) + BRAMBLE_DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Whenever an enemy deals melee or projectile damage to you, they take ")
+			.append(Component.text(StringUtils.to2DP(BRAMBLE_DAMAGE[rarity - 1]), color))
+			.append(Component.text(" melee damage."));
 	}
 }

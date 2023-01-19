@@ -10,7 +10,10 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,7 +35,7 @@ public class EarthenCombos extends DepthsAbility {
 	public static final DepthsAbilityInfo<EarthenCombos> INFO =
 		new DepthsAbilityInfo<>(EarthenCombos.class, ABILITY_NAME, EarthenCombos::new, DepthsTree.EARTHBOUND, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.WOODEN_SWORD))
-			.descriptions(EarthenCombos::getDescription, MAX_RARITY);
+			.descriptions(EarthenCombos::getDescription);
 
 	private int mComboCount = 0;
 
@@ -64,8 +67,10 @@ public class EarthenCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Every third melee attack gives you " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance for " + DURATION / 20 + " seconds and roots the enemy for " + ROOT_DURATION / 20.0 + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Every third melee attack gives you ")
+			.append(Component.text(StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%", color))
+			.append(Component.text(" resistance for " + DURATION / 20 + " seconds and roots the enemy for " + ROOT_DURATION / 20.0 + " seconds."));
 	}
 
 

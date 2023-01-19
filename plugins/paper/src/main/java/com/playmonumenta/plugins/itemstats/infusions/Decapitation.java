@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 public class Decapitation implements Infusion {
 
-	private static final double DAMAGE_MLT_PER_LVL = 0.0125;
+	public static final double DAMAGE_MLT_PER_LVL = 0.0125;
 
 	@Override public String getName() {
 		return "Decapitation";

@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 
 public class Acumen implements Infusion {
 
-	private static final double ACUMEN_MULTIPLIER = 0.02;
+	public static final double ACUMEN_MULTIPLIER = 0.02;
 
 	@Override
 	public String getName() {

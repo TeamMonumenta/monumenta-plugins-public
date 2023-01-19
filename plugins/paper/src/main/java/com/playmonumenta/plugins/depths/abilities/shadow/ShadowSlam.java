@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -14,7 +13,10 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -39,7 +41,7 @@ public final class ShadowSlam extends DepthsAbility {
 	public static final DepthsAbilityInfo<ShadowSlam> INFO =
 		new DepthsAbilityInfo<>(ShadowSlam.class, ABILITY_NAME, ShadowSlam::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.ANVIL))
-			.descriptions(ShadowSlam::getDescription, MAX_RARITY); // Minimum fall distance for landing to automatically trigger slam attack
+			.descriptions(ShadowSlam::getDescription);
 
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
@@ -141,8 +143,10 @@ public final class ShadowSlam extends DepthsAbility {
 	}
 
 
-	private static String getDescription(int rarity) {
-		return "When you fall more than " + AUTOMATIC_THRESHOLD + " blocks, landing causes a slam, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage per block fallen in a " + SIZE + " block radius. Falling more than " + MANUAL_THRESHOLD + " blocks and damaging an enemy also generates a slam and cancels fall damage.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When you fall more than " + AUTOMATIC_THRESHOLD + " blocks, landing causes a slam, dealing ")
+			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
+			.append(Component.text(" melee damage per block fallen in a " + SIZE + " block radius. Falling more than " + MANUAL_THRESHOLD + " blocks and damaging an enemy also generates a slam and cancels fall damage."));
 	}
 }
 

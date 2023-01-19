@@ -102,6 +102,10 @@ public class MessagingUtils {
 		return PLAIN_SERIALIZER.serialize(LEGACY_SERIALIZER.deserialize(legacyText));
 	}
 
+	public static int plainLengthFromMini(String mini) {
+		return plainText(fromMiniMessage(mini)).length();
+	}
+
 	public static Component fromGson(String gsonText) {
 		return fromGson(GSON.fromJson(gsonText, JsonElement.class));
 	}

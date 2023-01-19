@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,11 +14,13 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,7 +55,7 @@ public class CloakOfShadows extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakOfShadows::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.BLACK_CONCRETE))
-			.descriptions(CloakOfShadows::getDescription, MAX_RARITY);
+			.descriptions(CloakOfShadows::getDescription);
 
 	private boolean mBonusDamage = false;
 
@@ -128,8 +129,14 @@ public class CloakOfShadows extends DepthsAbility {
 		return false; // only changes event damage
 	}
 
-	private static String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(WEAKEN_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for " + DepthsUtils.getRarityColor(rarity) + STEALTH_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " additional damage. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying ")
+			.append(Component.text(StringUtils.multiplierToPercentage(WEAKEN_AMPLIFIER[rarity - 1]) + "%", color))
+			.append(Component.text(" weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for "))
+			.append(Component.text(StringUtils.to2DP(STEALTH_DURATION[rarity - 1] / 20.0), color))
+			.append(Component.text(" seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals ", color))
+			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
+			.append(Component.text(" additional damage. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

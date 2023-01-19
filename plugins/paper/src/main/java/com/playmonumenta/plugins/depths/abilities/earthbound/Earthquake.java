@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -18,7 +17,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.WeakHashMap;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,15 +47,13 @@ public class Earthquake extends DepthsAbility {
 	public static final int EARTHQUAKE_TIME = 20;
 	public static final double RADIUS = 4;
 	public static final double KNOCKBACK = 0.8;
-	public static final int MAX_TICKS = 4 * 20;
-	public static final String EARTHQUAKE_ARROW_METADATA = "EarthquakeArrow";
 
 	public static final DepthsAbilityInfo<Earthquake> INFO =
 		new DepthsAbilityInfo<>(Earthquake.class, ABILITY_NAME, Earthquake::new, DepthsTree.EARTHBOUND, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.EARTHQUAKE)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.COARSE_DIRT))
-			.descriptions(Earthquake::getDescription, MAX_RARITY);
+			.descriptions(Earthquake::getDescription);
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
@@ -178,8 +177,12 @@ public class Earthquake extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Shooting a projectile while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to mobs in a " + (int) RADIUS + " block radius, silencing for " + DepthsUtils.getRarityColor(rarity) + (float) SILENCE_DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Shooting a projectile while sneaking causes an earthquake " + EARTHQUAKE_TIME / 20 + " second after impact. The earthquake deals ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage to mobs in a " + (int) RADIUS + " block radius, silencing for "))
+			.append(Component.text((float) SILENCE_DURATION[rarity - 1] / 20, color))
+			.append(Component.text(" seconds and knocking upward. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

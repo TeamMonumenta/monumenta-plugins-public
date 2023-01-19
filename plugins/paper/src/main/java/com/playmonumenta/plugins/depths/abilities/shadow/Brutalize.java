@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -13,7 +12,10 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,7 +34,7 @@ public class Brutalize extends DepthsAbility {
 	public static final DepthsAbilityInfo<Brutalize> INFO =
 		new DepthsAbilityInfo<>(Brutalize.class, ABILITY_NAME, Brutalize::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.STONE_SWORD))
-			.descriptions(Brutalize::getDescription, MAX_RARITY);
+			.descriptions(Brutalize::getDescription);
 
 	public Brutalize(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -59,8 +61,10 @@ public class Brutalize extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "When you critically strike you deal " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " of the damage to all enemies in a " + RADIUS + " block radius and knock other enemies away from the target.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When you critically strike you deal ")
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]), color))
+			.append(Component.text(" of the damage to all enemies in a " + RADIUS + " block radius and knock other enemies away from the target."));
 	}
 
 

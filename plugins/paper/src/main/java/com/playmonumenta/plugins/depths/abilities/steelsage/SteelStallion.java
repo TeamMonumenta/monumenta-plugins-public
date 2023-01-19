@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -12,7 +11,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -46,7 +48,7 @@ public class SteelStallion extends DepthsAbility {
 			.linkedSpell(ClassAbility.STEEL_STALLION)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.IRON_HORSE_ARMOR))
-			.descriptions(SteelStallion::getDescription, MAX_RARITY)
+			.descriptions(SteelStallion::getDescription)
 			.priorityAmount(10000);
 
 	private @Nullable Mob mHorse;
@@ -152,8 +154,16 @@ public class SteelStallion extends DepthsAbility {
 		return entity instanceof Horse && ABILITY_NAME.equals(entity.getName());
 	}
 
-	private static String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, summon and ride a horse with " + DepthsUtils.getRarityColor(rarity) + HEALTH[rarity - 1] + ChatColor.WHITE + " health that disappears after " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. While you are riding the horse, all damage you receive is redirected to the horse, including the damage that triggered this ability. The horse has a speed of " + DepthsUtils.getRarityColor(rarity) + SPEED[rarity - 1] + ChatColor.WHITE + " and a jump strength of " + DepthsUtils.getRarityColor(rarity) + JUMP_STRENGTH[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, summon and ride a horse with ")
+			.append(Component.text(HEALTH[rarity - 1], color))
+			.append(Component.text(" health that disappears after "))
+			.append(Component.text(DURATION[rarity - 1] / 20, color))
+			.append(Component.text(" seconds. While you are riding the horse, all damage you receive is redirected to the horse, including the damage that triggered this ability. The horse has a speed of "))
+			.append(Component.text(SPEED[rarity - 1], color))
+			.append(Component.text(" and a jump strength of "))
+			.append(Component.text(JUMP_STRENGTH[rarity - 1], color))
+			.append(Component.text(". Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

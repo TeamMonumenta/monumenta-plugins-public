@@ -12,7 +12,9 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,7 +34,7 @@ public class VolcanicCombos extends DepthsAbility {
 	public static final DepthsAbilityInfo<VolcanicCombos> INFO =
 		new DepthsAbilityInfo<>(VolcanicCombos.class, ABILITY_NAME, VolcanicCombos::new, DepthsTree.FLAMECALLER, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.BLAZE_ROD))
-			.descriptions(VolcanicCombos::getDescription, MAX_RARITY);
+			.descriptions(VolcanicCombos::getDescription);
 
 	private int mComboCount = 0;
 
@@ -67,8 +69,10 @@ public class VolcanicCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to enemies in a " + RADIUS + " block radius and sets those enemies on fire for " + FIRE_TICKS / 20 + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Every third melee attack deals ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage to enemies in a " + RADIUS + " block radius and sets those enemies on fire for " + FIRE_TICKS / 20 + " seconds."));
 	}
 
 

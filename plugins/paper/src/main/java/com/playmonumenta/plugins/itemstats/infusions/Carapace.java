@@ -6,15 +6,15 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class Carapace implements Infusion {
 
-	private static final double DAMAGE_REDUCTION_PER_LEVEL = 0.0125;
+	public static final double DAMAGE_REDUCTION_PER_LEVEL = 0.0125;
 	private static final String DAMAGE_REDUCTION_EFFECT_NAME = "OrangeInfusionDamageReductionEffect";
 	private static final int DURATION = 5 * 20;
 
@@ -33,12 +33,7 @@ public class Carapace implements Infusion {
 		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		if (source != null) {
 			// Runs one tick later so that it does not affect this attack
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(modifiedLevel) - 1));
-				}
-			}.runTaskLater(plugin, 1);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(modifiedLevel) - 1)), 1);
 		}
 	}
 

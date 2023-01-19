@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,9 +14,13 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Iterator;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -52,7 +55,7 @@ public class DepthsWindWalk extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.WHITE_DYE))
-			.descriptions(DepthsWindWalk::getDescription, MAX_RARITY);
+			.descriptions(DepthsWindWalk::getDescription);
 
 	private boolean mIsWalking = false;
 
@@ -77,14 +80,7 @@ public class DepthsWindWalk extends DepthsAbility {
 		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
 		// Have them dodge melee attacks while casting
 		mIsWalking = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mIsWalking = false;
-			}
-
-		}.runTaskLater(mPlugin, 10);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mIsWalking = false, 10);
 
 		cancelOnDeath(new BukkitRunnable() {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
@@ -149,7 +145,11 @@ public class DepthsWindWalk extends DepthsAbility {
 	}
 
 
-	private static String getDescription(int rarity) {
-		return "Right click while sneaking to dash in the target direction, applying " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(VULNERABILITY[rarity - 1]) + "%" + ChatColor.WHITE + " vulnerability for 5 seconds to all enemies dashed through, and apply Levitation I to non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: " + DepthsUtils.getRarityColor(rarity) + (COOLDOWN[rarity - 1] / 20) + "s" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while sneaking to dash in the target direction, applying ")
+			.append(Component.text(StringUtils.multiplierToPercentage(VULNERABILITY[rarity - 1]) + "%", color))
+			.append(Component.text(" vulnerability for 5 seconds to all enemies dashed through, and apply Levitation I to non-elites dashed through for 2 seconds. Gain immunity to melee damage for half a second when triggered. Cooldown: "))
+			.append(Component.text((COOLDOWN[rarity - 1] / 20) + "s", color))
+			.append(Component.text("."));
 	}
 }

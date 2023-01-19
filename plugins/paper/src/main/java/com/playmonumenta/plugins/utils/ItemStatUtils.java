@@ -255,104 +255,112 @@ public class ItemStatUtils {
 
 	public enum Location {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
-		OVERWORLD1("overworld1", Component.text("King's Valley Overworld", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
-		OVERWORLD2("overworld2", Component.text("Celsian Isles Overworld", TextColor.fromHexString("#32D7DC")).decoration(TextDecoration.ITALIC, false)),
-		FOREST("forest", Component.text("The Wolfswood", TextColor.fromHexString("#4C8F4D")).decoration(TextDecoration.ITALIC, false)),
-		KEEP("keep", Component.text("Pelias' Keep", TextColor.fromHexString("#C4BBA5")).decoration(TextDecoration.ITALIC, false)),
-		CASINO1("casino1", Component.text("Rock's Little Casino", TextColor.fromHexString("#EDC863")).decoration(TextDecoration.ITALIC, false)),
-		CASINO2("casino2", Component.text("Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")).decoration(TextDecoration.ITALIC, false)),
-		CASINO3("casino3", Component.text("Sticks and Stones Tavern", TextColor.fromHexString("#C6C2B6")).decoration(TextDecoration.ITALIC, false)),
-		QUEST("quest", Component.text("Quest Reward", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
-		LABS("labs", Component.text("Alchemy Labs", TextColor.fromHexString("#B4ACC3")).decoration(TextDecoration.ITALIC, false)),
-		WHITE("white", Component.text("Halls of Wind and Blood", TextColor.fromHexString("#FFFFFF")).decoration(TextDecoration.ITALIC, false)),
-		ORANGE("orange", Component.text("Fallen Menagerie", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
-		MAGENTA("magenta", Component.text("Plagueroot Temple", TextColor.fromHexString("#FF55FF")).decoration(TextDecoration.ITALIC, false)),
-		LIGHTBLUE("lightblue", Component.text("Arcane Rivalry", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
-		YELLOW("yellow", Component.text("Vernal Nightmare", TextColor.fromHexString("#FFFF55")).decoration(TextDecoration.ITALIC, false)),
-		LIME("lime", Component.text("Salazar's Folly", TextColor.fromHexString("#55FF55")).decoration(TextDecoration.ITALIC, false)),
-		PINK("pink", Component.text("Harmonic Arboretum", TextColor.fromHexString("#FF69B4")).decoration(TextDecoration.ITALIC, false)),
-		GRAY("gray", Component.text("Valley of Forgotten Pharaohs", TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)),
-		LIGHTGRAY("lightgray", Component.text("Palace of Mirrors", TextColor.fromHexString("#AAAAAA")).decoration(TextDecoration.ITALIC, false)),
-		CYAN("cyan", Component.text("The Scourge of Lunacy", TextColor.fromHexString("#00AAAA")).decoration(TextDecoration.ITALIC, false)),
-		PURPLE("purple", Component.text("The Grasp of Avarice", TextColor.fromHexString("#AA00AA")).decoration(TextDecoration.ITALIC, false)),
-		TEAL("teal", Component.text("Echoes of Oblivion", TextColor.fromHexString("#47B6B5")).decoration(TextDecoration.ITALIC, false)),
-		WILLOWS("willows", Component.text("The Black Willows", TextColor.fromHexString("#006400")).decoration(TextDecoration.ITALIC, false)),
-		WILLOWSKIN("willowskin", Component.text("Storied Skin", TextColor.fromHexString("#006400")).decoration(TextDecoration.ITALIC, false)),
-		EPHEMERAL("ephemeral", Component.text("Ephemeral Corridors", TextColor.fromHexString("#8B0000")).decoration(TextDecoration.ITALIC, false)),
-		EPHEMERAL_ENHANCEMENTS("ephemeralenhancements", Component.text("Ephemeral Enhancements", TextColor.fromHexString("#8B0000")).decoration(TextDecoration.ITALIC, false)),
-		REVERIE("reverie", Component.text("Malevolent Reverie", TextColor.fromHexString("#790E47")).decoration(TextDecoration.ITALIC, false)),
-		SANCTUM("sanctum", Component.text("Forsworn Sanctum", TextColor.fromHexString("#52AA00")).decoration(TextDecoration.ITALIC, false)),
-		VERDANT("verdant", Component.text("Verdant Remnants", TextColor.fromHexString("#158315")).decoration(TextDecoration.ITALIC, false)),
-		VERDANTSKIN("verdantskin", Component.text("Threadwarped Skin", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false)),
-		AZACOR("azacor", Component.text("Azacor's Malice", TextColor.fromHexString("#FF6F55")).decoration(TextDecoration.ITALIC, false)),
-		KAUL("kaul", Component.text("Kaul's Judgment", TextColor.fromHexString("#00AA00")).decoration(TextDecoration.ITALIC, false)),
-		DIVINE("divine", Component.text("Divine Skin", TextColor.fromHexString("#C6EFF1")).decoration(TextDecoration.ITALIC, false)),
-		ROYAL("royal", Component.text("Royal Armory", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
-		SHIFTING("shifting", Component.text("City of Shifting Waters", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
-		FORUM("forum", Component.text("The Fallen Forum", TextColor.fromHexString("#808000")).decoration(TextDecoration.ITALIC, false)),
-		MIST("mist", Component.text("The Black Mist", TextColor.fromHexString("#674C5B")).decoration(TextDecoration.ITALIC, false)),
-		HOARD("hoard", Component.text("The Hoard", TextColor.fromHexString("#DAAD3E")).decoration(TextDecoration.ITALIC, false)),
-		GREEDSKIN("greedskin", Component.text("Greed Skin", TextColor.fromHexString("#DAAD3E")).decoration(TextDecoration.ITALIC, false)),
-		REMORSE("remorse", Component.text("Sealed Remorse", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
-		REMORSEFULSKIN("remorsefulskin", Component.text("Remorseful Skin", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
-		VIGIL("vigil", Component.text("The Eternal Vigil", TextColor.fromHexString("#72999C")).decoration(TextDecoration.ITALIC, false)),
-		DEPTHS("depths", Component.text("Darkest Depths", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false)),
-		HORSEMAN("horseman", Component.text("The Headless Horseman", TextColor.fromHexString("#8E3418")).decoration(TextDecoration.ITALIC, false)),
-		FROSTGIANT("frostgiant", Component.text("The Waking Giant", TextColor.fromHexString("#87CEFA")).decoration(TextDecoration.ITALIC, false)),
-		TITANICSKIN("titanicskin", Component.text("Titanic Skin", TextColor.fromHexString("#87CEFA")).decoration(TextDecoration.ITALIC, false)),
-		LICH("lich", Component.text("Hekawt's Fury", TextColor.fromHexString("#FFB43E")).decoration(TextDecoration.ITALIC, false)),
-		ETERNITYSKIN("eternityskin", Component.text("Eternity Skin", TextColor.fromHexString("#FFB43E")).decoration(TextDecoration.ITALIC, false)),
-		RUSH("rush", Component.text("Rush of Dissonance", TextColor.fromHexString("#C21E56")).decoration(TextDecoration.ITALIC, false)),
-		TREASURE("treasure", Component.text("Treasures of Viridia", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
-		INTELLECT("intellect", Component.text("Intellect Crystallizer", TextColor.fromHexString("#82DB17")).decoration(TextDecoration.ITALIC, false)),
-		DELVES("delves", Component.text("Dungeon Delves", TextColor.fromHexString("#B47028")).decoration(TextDecoration.ITALIC, false)),
-		MYTHIC("mythic", Component.text("Mythic Reliquary", TextColor.fromHexString("#C4971A")).decoration(TextDecoration.ITALIC, false)),
-		CARNIVAL("carnival", Component.text("Floating Carnival", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		LOWTIDE("lowtide", Component.text("Lowtide Smuggler", TextColor.fromHexString("#196383")).decoration(TextDecoration.ITALIC, false)),
-		DOCKS("docks", Component.text("Expedition Docks", TextColor.fromHexString("#196383")).decoration(TextDecoration.ITALIC, false)),
-		VALENTINE("valentine", Component.text("Valentine Event", TextColor.fromHexString("#FF7F7F")).decoration(TextDecoration.ITALIC, false)),
-		VALENTINESKIN("valentineskin", Component.text("Valentine Skin", TextColor.fromHexString("#FF7F7F")).decoration(TextDecoration.ITALIC, false)),
-		APRILFOOLS("aprilfools", Component.text("April Fools Event", TextColor.fromHexString("#D22AD2")).decoration(TextDecoration.ITALIC, false)),
-		APRILFOOLSSKIN("aprilfoolsskin", Component.text("April Fools Skin", TextColor.fromHexString("#D22AD2")).decoration(TextDecoration.ITALIC, false)),
-		EASTER("easter", Component.text("Easter Event", TextColor.fromHexString("#55FF55")).decoration(TextDecoration.ITALIC, false)),
-		EASTERSKIN("easterskin", Component.text("Easter Skin", TextColor.fromHexString("#55FF55")).decoration(TextDecoration.ITALIC, false)),
-		HALLOWEEN("halloween", Component.text("Halloween Event", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
-		HALLOWEENSKIN("halloweenskin", Component.text("Halloween Skin", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
-		TRICKSTER("trickster", Component.text("Trickster Challenge", TextColor.fromHexString("#FFAA00")).decoration(TextDecoration.ITALIC, false)),
-		WINTER("winter", Component.text("Winter Event", TextColor.fromHexString("#AFC2E3")).decoration(TextDecoration.ITALIC, false)),
-		HOLIDAYSKIN("holidayskin", Component.text("Holiday Skin", TextColor.fromHexString("#B00C2F")).decoration(TextDecoration.ITALIC, false)),
-		TRANSMOG("transmogrifier", Component.text("Transmogrifier", TextColor.fromHexString("#6F2DA8")).decoration(TextDecoration.ITALIC, false)),
-		UGANDA("uganda", Component.text("Uganda 2018", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		SILVER("silver", Component.text("Silver Knight's Tomb", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
-		BLUE("blue", Component.text("Coven's Gambit", TextColor.fromHexString("#0C2CA2")).decoration(TextDecoration.ITALIC, false)),
-		BROWN("brown", Component.text("Cradle of the Broken God", TextColor.fromHexString("#703608")).decoration(TextDecoration.ITALIC, false)),
-		GREEN("green", Component.text("Green Dungeon", TextColor.fromHexString("#4D6E23")).decoration(TextDecoration.ITALIC, false)),
-		RED("red", Component.text("Red Dungeon", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
-		BLACK("black", Component.text("Black Dungeon", TextColor.fromHexString("#454040")).decoration(TextDecoration.ITALIC, false)),
-		LIGHT("light", Component.text("Arena of Terth", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),
-		PASS("seasonpass", Component.text("Seasonal Pass", TextColor.fromHexString("#FFF63C")).decoration(TextDecoration.ITALIC, false)),
-		BLITZ("blitz", Component.text("Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")).decoration(TextDecoration.ITALIC, false)),
-		SOULTHREAD("soul", Component.text("Soulwoven", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
-		SCIENCE("science", Component.text("P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")).decoration(TextDecoration.ITALIC, false)),
-		BLUESTRIKE("bluestrike", Component.text("Masquerader's Ruin", TextColor.fromHexString("#326DA8")).decoration(TextDecoration.ITALIC, false)),
-		GODSPORE("godspore", Component.text("The Godspore's Domain", TextColor.fromHexString("#426B29")).decoration(TextDecoration.ITALIC, false)),
-		GALLERYOFFEAR("gallerybase", Component.text("Gallery of Fear", TextColor.fromHexString("#39B14E")).decoration(TextDecoration.ITALIC, false)),
-		GOFMAPONE("gallery1", Component.text("Sanguine Halls", TextColor.fromHexString("#AB0000")).decoration(TextDecoration.ITALIC, false)),
-		FALLENSTAR("fallenstar", Component.text("Shadow of a Fallen Star", TextColor.fromHexString("#00C0A3")).decoration(TextDecoration.ITALIC, false)),
-		AMBER("amber", Component.text("item name color", TextColor.fromHexString("#FFBF00")).decoration(TextDecoration.ITALIC, false)),
-		GOLD("gold", Component.text("item name color", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false)),
-		DARKBLUE("darkblue", Component.text("itemnamecolor", TextColor.fromHexString("#FFFFAA")).decoration(TextDecoration.ITALIC, false)),
-		INDIGO("indigo", Component.text("item name color", TextColor.fromHexString("#6F00FF")).decoration(TextDecoration.ITALIC, false)),
-		MIDBLUE("midblue", Component.text("itemnamecolor", TextColor.fromHexString("#366EF8")).decoration(TextDecoration.ITALIC, false));
+		OVERWORLD1("overworld1", "King's Valley Overworld", TextColor.fromHexString("#DCAE32")),
+		OVERWORLD2("overworld2", "Celsian Isles Overworld", TextColor.fromHexString("#32D7DC")),
+		FOREST("forest", "The Wolfswood", TextColor.fromHexString("#4C8F4D")),
+		KEEP("keep", "Pelias' Keep", TextColor.fromHexString("#C4BBA5")),
+		CASINO1("casino1", "Rock's Little Casino", TextColor.fromHexString("#EDC863")),
+		CASINO2("casino2", "Monarch's Cozy Casino", TextColor.fromHexString("#1773B1")),
+		CASINO3("casino3", "Sticks and Stones Tavern", TextColor.fromHexString("#C6C2B6")),
+		QUEST("quest", "Quest Reward", TextColor.fromHexString("#C8A2C8")),
+		LABS("labs", "Alchemy Labs", TextColor.fromHexString("#B4ACC3")),
+		WHITE("white", "Halls of Wind and Blood", TextColor.fromHexString("#FFFFFF")),
+		ORANGE("orange", "Fallen Menagerie", TextColor.fromHexString("#FFAA00")),
+		MAGENTA("magenta", "Plagueroot Temple", TextColor.fromHexString("#FF55FF")),
+		LIGHTBLUE("lightblue", "Arcane Rivalry", TextColor.fromHexString("#4AC2E5")),
+		YELLOW("yellow", "Vernal Nightmare", TextColor.fromHexString("#FFFF55")),
+		LIME("lime", "Salazar's Folly", TextColor.fromHexString("#55FF55")),
+		PINK("pink", "Harmonic Arboretum", TextColor.fromHexString("#FF69B4")),
+		GRAY("gray", "Valley of Forgotten Pharaohs", TextColor.fromHexString("#555555")),
+		LIGHTGRAY("lightgray", "Palace of Mirrors", TextColor.fromHexString("#AAAAAA")),
+		CYAN("cyan", "The Scourge of Lunacy", TextColor.fromHexString("#00AAAA")),
+		PURPLE("purple", "The Grasp of Avarice", TextColor.fromHexString("#AA00AA")),
+		TEAL("teal", "Echoes of Oblivion", TextColor.fromHexString("#47B6B5")),
+		WILLOWS("willows", "The Black Willows", TextColor.fromHexString("#006400")),
+		WILLOWSKIN("willowskin", "Storied Skin", TextColor.fromHexString("#006400")),
+		EPHEMERAL("ephemeral", "Ephemeral Corridors", TextColor.fromHexString("#8B0000")),
+		EPHEMERAL_ENHANCEMENTS("ephemeralenhancements", "Ephemeral Enhancements", TextColor.fromHexString("#8B0000")),
+		REVERIE("reverie", "Malevolent Reverie", TextColor.fromHexString("#790E47")),
+		SANCTUM("sanctum", "Forsworn Sanctum", TextColor.fromHexString("#52AA00")),
+		VERDANT("verdant", "Verdant Remnants", TextColor.fromHexString("#158315")),
+		VERDANTSKIN("verdantskin", "Threadwarped Skin", TextColor.fromHexString("#704C8A")),
+		AZACOR("azacor", "Azacor's Malice", TextColor.fromHexString("#FF6F55")),
+		KAUL("kaul", "Kaul's Judgment", TextColor.fromHexString("#00AA00")),
+		DIVINE("divine", "Divine Skin", TextColor.fromHexString("#C6EFF1")),
+		ROYAL("royal", "Royal Armory", TextColor.fromHexString("#CAFFFD")),
+		SHIFTING("shifting", "City of Shifting Waters", TextColor.fromHexString("#7FFFD4")),
+		FORUM("forum", "The Fallen Forum", TextColor.fromHexString("#808000")),
+		MIST("mist", "The Black Mist", TextColor.fromHexString("#674C5B")),
+		HOARD("hoard", "The Hoard", TextColor.fromHexString("#DAAD3E")),
+		GREEDSKIN("greedskin", "Greed Skin", TextColor.fromHexString("#DAAD3E")),
+		REMORSE("remorse", "Sealed Remorse", TextColor.fromHexString("#EEE6D6")),
+		REMORSEFULSKIN("remorsefulskin", "Remorseful Skin", TextColor.fromHexString("#EEE6D6")),
+		VIGIL("vigil", "The Eternal Vigil", TextColor.fromHexString("#72999C")),
+		DEPTHS("depths", "Darkest Depths", TextColor.fromHexString("#5D2D87")),
+		HORSEMAN("horseman", "The Headless Horseman", TextColor.fromHexString("#8E3418")),
+		FROSTGIANT("frostgiant", "The Waking Giant", TextColor.fromHexString("#87CEFA")),
+		TITANICSKIN("titanicskin", "Titanic Skin", TextColor.fromHexString("#87CEFA")),
+		LICH("lich", "Hekawt's Fury", TextColor.fromHexString("#FFB43E")),
+		ETERNITYSKIN("eternityskin", "Eternity Skin", TextColor.fromHexString("#FFB43E")),
+		RUSH("rush", "Rush of Dissonance", TextColor.fromHexString("#C21E56")),
+		TREASURE("treasure", "Treasures of Viridia", TextColor.fromHexString("#C8A2C8")),
+		INTELLECT("intellect", "Intellect Crystallizer", TextColor.fromHexString("#82DB17")),
+		DELVES("delves", "Dungeon Delves", TextColor.fromHexString("#B47028")),
+		MYTHIC("mythic", "Mythic Reliquary", TextColor.fromHexString("#C4971A")),
+		CARNIVAL("carnival", "Floating Carnival", TextColor.fromHexString("#D02E28")),
+		LOWTIDE("lowtide", "Lowtide Smuggler", TextColor.fromHexString("#196383")),
+		DOCKS("docks", "Expedition Docks", TextColor.fromHexString("#196383")),
+		VALENTINE("valentine", "Valentine Event", TextColor.fromHexString("#FF7F7F")),
+		VALENTINESKIN("valentineskin", "Valentine Skin", TextColor.fromHexString("#FF7F7F")),
+		APRILFOOLS("aprilfools", "April Fools Event", TextColor.fromHexString("#D22AD2")),
+		APRILFOOLSSKIN("aprilfoolsskin", "April Fools Skin", TextColor.fromHexString("#D22AD2")),
+		EASTER("easter", "Easter Event", TextColor.fromHexString("#55FF55")),
+		EASTERSKIN("easterskin", "Easter Skin", TextColor.fromHexString("#55FF55")),
+		HALLOWEEN("halloween", "Halloween Event", TextColor.fromHexString("#FFAA00")),
+		HALLOWEENSKIN("halloweenskin", "Halloween Skin", TextColor.fromHexString("#FFAA00")),
+		TRICKSTER("trickster", "Trickster Challenge", TextColor.fromHexString("#FFAA00")),
+		WINTER("winter", "Winter Event", TextColor.fromHexString("#AFC2E3")),
+		HOLIDAYSKIN("holidayskin", "Holiday Skin", TextColor.fromHexString("#B00C2F")),
+		TRANSMOG("transmogrifier", "Transmogrifier", TextColor.fromHexString("#6F2DA8")),
+		UGANDA("uganda", "Uganda 2018", TextColor.fromHexString("#D02E28")),
+		SILVER("silver", "Silver Knight's Tomb", TextColor.fromHexString("#C0C0C0")),
+		BLUE("blue", "Coven's Gambit", TextColor.fromHexString("#0C2CA2")),
+		BROWN("brown", "Cradle of the Broken God", TextColor.fromHexString("#703608")),
+		GREEN("green", "Green Dungeon", TextColor.fromHexString("#4D6E23")),
+		RED("red", "Red Dungeon", TextColor.fromHexString("#D02E28")),
+		BLACK("black", "Black Dungeon", TextColor.fromHexString("#454040")),
+		LIGHT("light", "Arena of Terth", TextColor.fromHexString("#FFFFAA")),
+		PASS("seasonpass", "Seasonal Pass", TextColor.fromHexString("#FFF63C")),
+		BLITZ("blitz", "Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")),
+		SOULTHREAD("soul", "Soulwoven", TextColor.fromHexString("#7FFFD4")),
+		SCIENCE("science", "P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")),
+		BLUESTRIKE("bluestrike", "Masquerader's Ruin", TextColor.fromHexString("#326DA8")),
+		GODSPORE("godspore", "The Godspore's Domain", TextColor.fromHexString("#426B29")),
+		GALLERYOFFEAR("gallerybase", "Gallery of Fear", TextColor.fromHexString("#39B14E")),
+		GOFMAPONE("gallery1", "Sanguine Halls", TextColor.fromHexString("#AB0000")),
+		FALLENSTAR("fallenstar", "Shadow of a Fallen Star", TextColor.fromHexString("#00C0A3")),
+		AMBER("amber", "item name color", TextColor.fromHexString("#FFBF00")),
+		GOLD("gold", "item name color", TextColor.fromHexString("#FFD700")),
+		DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
+		INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
+		MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8"));
 
 		static final String KEY = "Location";
 
 		final String mName;
 		final Component mDisplay;
+		final TextColor mColor;
+
+		Location(String name, String display, TextColor color) {
+			mName = name;
+			mDisplay = Component.text(display, color).decoration(TextDecoration.ITALIC, false);
+			mColor = color;
+		}
 
 		Location(String name, Component display) {
 			mName = name;
 			mDisplay = display;
+			mColor = display.color();
 		}
 
 		public String getName() {
@@ -361,6 +369,10 @@ public class ItemStatUtils {
 
 		public Component getDisplay() {
 			return mDisplay;
+		}
+
+		public TextColor getColor() {
+			return mColor;
 		}
 
 		public static Location getLocation(String name) {
@@ -1868,7 +1880,7 @@ public class ItemStatUtils {
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta.hasDisplayName()) {
-			String name = meta.getDisplayName();
+			String name = MessagingUtils.plainText(Objects.requireNonNull(meta.displayName()));
 			if (name.contains("Alchemist's Bag")) {
 				return Region.VALLEY;
 			} else if (name.contains("Experiencinator")) {
@@ -1902,7 +1914,7 @@ public class ItemStatUtils {
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta.hasDisplayName()) {
-			String itemName = meta.getDisplayName();
+			String itemName = MessagingUtils.plainText(Objects.requireNonNull(meta.displayName()));
 			if (itemName.contains("Alchemist's Bag")) {
 				return Tier.RARE;
 			}

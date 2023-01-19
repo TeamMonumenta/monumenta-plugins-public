@@ -11,7 +11,10 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,7 +36,7 @@ public class FrigidCombos extends DepthsAbility {
 	public static final DepthsAbilityInfo<FrigidCombos> INFO =
 		new DepthsAbilityInfo<>(FrigidCombos.class, ABILITY_NAME, FrigidCombos::new, DepthsTree.FROSTBORN, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.BLUE_DYE))
-			.descriptions(FrigidCombos::getDescription, MAX_RARITY);
+			.descriptions(FrigidCombos::getDescription);
 
 	private int mComboCount = 0;
 
@@ -70,8 +73,12 @@ public class FrigidCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Every third melee attack deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all mobs within " + RADIUS + " blocks and applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SLOW_AMPLIFIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + TIME / 20.0 + " seconds to affected mobs.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Every third melee attack deals ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage to all mobs within " + RADIUS + " blocks and applies "))
+			.append(Component.text(StringUtils.multiplierToPercentage(SLOW_AMPLIFIER[rarity - 1]) + "%", color))
+			.append(Component.text(" slowness for " + TIME / 20.0 + " seconds to affected mobs."));
 	}
 
 

@@ -2,13 +2,14 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,7 +23,7 @@ public class DeadlyStrike extends DepthsAbility {
 	public static final DepthsAbilityInfo<DeadlyStrike> INFO =
 		new DepthsAbilityInfo<>(DeadlyStrike.class, ABILITY_NAME, DeadlyStrike::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.BLACK_CONCRETE_POWDER))
-			.descriptions(DeadlyStrike::getDescription, MAX_RARITY);
+			.descriptions(DeadlyStrike::getDescription);
 
 	public DeadlyStrike(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -36,8 +37,10 @@ public class DeadlyStrike extends DepthsAbility {
 		return false; // only changes event damage
 	}
 
-	private static String getDescription(int rarity) {
-		return "Your melee damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Your melee damage is multiplied by ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text("."));
 	}
 
 

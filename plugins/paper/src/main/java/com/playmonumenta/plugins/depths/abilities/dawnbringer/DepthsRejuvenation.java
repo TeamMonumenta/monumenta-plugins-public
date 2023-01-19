@@ -3,17 +3,19 @@ package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -31,7 +33,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 	public static final DepthsAbilityInfo<DepthsRejuvenation> INFO =
 		new DepthsAbilityInfo<>(DepthsRejuvenation.class, ABILITY_NAME, DepthsRejuvenation::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.NETHER_STAR))
-			.descriptions(DepthsRejuvenation::getDescription, MAX_RARITY);
+			.descriptions(DepthsRejuvenation::getDescription);
 
 	private int mTimer = 0;
 
@@ -73,8 +75,10 @@ public class DepthsRejuvenation extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "All players within " + RADIUS + " blocks of you (including yourself) heal " + (int) DepthsUtils.roundPercent(PERCENT_HEAL) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + HEAL_INTERVAL[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. A given player will only be healed by the highest Rejuvenation that affects them.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("All players within " + RADIUS + " blocks of you (including yourself) heal " + StringUtils.multiplierToPercentage(PERCENT_HEAL) + "% of their max health every ")
+			.append(Component.text(StringUtils.to2DP(HEAL_INTERVAL[rarity - 1] / 20.0), color))
+			.append(Component.text(" seconds. A given player will only be healed by the highest Rejuvenation that affects them."));
 	}
 
 }

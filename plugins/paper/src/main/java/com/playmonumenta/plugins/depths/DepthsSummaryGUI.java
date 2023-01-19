@@ -10,7 +10,6 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -227,13 +226,7 @@ public class DepthsSummaryGUI extends CustomInventory {
 			Player actualPlayer = Bukkit.getPlayer(player.mPlayerId);
 			if (actualPlayer != null && actualPlayer.isOnline()) {
 				if (actualPlayer.getUniqueId().equals(targetPlayer.getUniqueId())) {
-					ItemStack activePlayerIndicator = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-					ItemMeta activeMeta = activePlayerIndicator.getItemMeta();
-					activeMeta.displayName(Component.text(actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW)
-						.decoration(TextDecoration.ITALIC, false));
-					GUIUtils.splitLoreLine(activeMeta, "Currently Shown", 30, ChatColor.GRAY, true);
-					activePlayerIndicator.setItemMeta(activeMeta);
-					ItemUtils.setPlainName(activePlayerIndicator);
+					ItemStack activePlayerIndicator = GUIUtils.createBasicItem(Material.GREEN_STAINED_GLASS_PANE, actualPlayer.getName() + "'s Abilities", NamedTextColor.YELLOW, false, "Currently Shown", NamedTextColor.GRAY);
 					mInventory.setItem(HEAD_LOCATIONS.get(i), activePlayerIndicator);
 
 					ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);

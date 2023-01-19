@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -11,12 +10,15 @@ import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,7 +51,7 @@ public class DepthsVolley extends DepthsAbility {
 			.linkedSpell(ClassAbility.VOLLEY_DEPTHS)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.ARROW))
-			.descriptions(DepthsVolley::getDescription, MAX_RARITY)
+			.descriptions(DepthsVolley::getDescription)
 			.priorityAmount(900); // cancels damage events of volley arrows, so needs to run before other abilities
 	public Set<Projectile> mDepthsVolley;
 	public Map<LivingEntity, Integer> mDepthsVolleyHitMap;
@@ -155,8 +157,13 @@ public class DepthsVolley extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Shooting a projectile while sneaking shoots a volley consisting of " + DepthsUtils.getRarityColor(rarity) + ARROWS[rarity - 1] + ChatColor.WHITE + " projectiles instead. Only one arrow is consumed, and each projectile's damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE_MULTIPLIER[rarity - 1] + ChatColor.WHITE + ". Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Shooting a projectile while sneaking shoots a volley consisting of ")
+			.append(Component.text(ARROWS[rarity - 1], color))
+			.append(Component.text(" projectiles instead. Only one arrow is consumed, and each projectile's damage is multiplied by "))
+			.append(Component.text(StringUtils.to2DP(DAMAGE_MULTIPLIER[rarity - 1]), color))
+			.append(Component.text(". Cooldown: " + COOLDOWN / 20 + "s."));
+
 	}
 
 

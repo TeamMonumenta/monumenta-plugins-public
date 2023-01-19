@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -12,7 +11,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,7 +36,7 @@ public class FlameSpirit extends DepthsAbility {
 	public static final DepthsAbilityInfo<FlameSpirit> INFO =
 		new DepthsAbilityInfo<>(FlameSpirit.class, ABILITY_NAME, FlameSpirit::new, DepthsTree.FLAMECALLER, DepthsTrigger.SPAWNER)
 			.displayItem(new ItemStack(Material.SOUL_CAMPFIRE))
-			.descriptions(FlameSpirit::getDescription, MAX_RARITY);
+			.descriptions(FlameSpirit::getDescription);
 
 	public FlameSpirit(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -108,8 +109,10 @@ public class FlameSpirit extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Breaking a spawner summons a spirit that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius every second for " + DAMAGE_COUNT + " seconds and sets affected mobs on fire for " + FIRE_TICKS / 20 + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Breaking a spawner summons a spirit that deals ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage in a " + RADIUS + " block radius every second for " + DAMAGE_COUNT + " seconds and sets affected mobs on fire for " + FIRE_TICKS / 20 + " seconds."));
 	}
 
 

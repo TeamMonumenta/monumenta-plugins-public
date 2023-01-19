@@ -1,15 +1,12 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public enum DepthsTree {
 	DAWNBRINGER("Dawnbringer", DepthsUtils.DAWNBRINGER, Material.SUNFLOWER, "Bestows passive and active buffs to allies including speed, damage, resistance, and healing."),
@@ -41,19 +38,11 @@ public enum DepthsTree {
 	}
 
 	public Component getNameComponent() {
-		return Component.text(mDisplayName, mColor);
+		return Component.text(mDisplayName, mColor).decoration(TextDecoration.ITALIC, false);
 	}
 
 	public ItemStack createItem() {
-		ItemStack buildItem = new ItemStack(mMaterial, 1);
-		ItemMeta buildMeta = buildItem.getItemMeta();
-		buildMeta.displayName(getNameComponent().decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
-		buildMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		GUIUtils.splitLoreLine(buildMeta, mDescription, 30, ChatColor.GRAY, true);
-		buildItem.setItemMeta(buildMeta);
-		ItemUtils.setPlainName(buildItem);
-
-		return buildItem;
+		return GUIUtils.createBasicItem(mMaterial, 1, getNameComponent(), mDescription, NamedTextColor.GRAY, 30, true);
 	}
 
 }

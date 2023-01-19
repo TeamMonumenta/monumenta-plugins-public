@@ -9,7 +9,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 
 public class Quench implements Infusion {
 
-	private static final double DURATION_BONUS_PER_LVL = 0.025;
+	public static final double DURATION_BONUS_PER_LVL = 0.025;
 
 	@Override
 	public String getName() {

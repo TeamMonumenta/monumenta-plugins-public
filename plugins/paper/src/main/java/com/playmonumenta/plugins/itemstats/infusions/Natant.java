@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class Natant implements Infusion {
 
 	private static final int DURATION = 10;
-	private static final double PERCENT_SPEED_PER_LEVEL = 0.04;
+	public static final double PERCENT_SPEED_PER_LEVEL = 0.04;
 	private static final String PERCENT_SPEED_EFFECT_NAME = "NatantPercentSpeedEffect";
 
 	@Override

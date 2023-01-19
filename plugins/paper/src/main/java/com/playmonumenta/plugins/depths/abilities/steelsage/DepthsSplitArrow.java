@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -14,7 +13,10 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -41,7 +43,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 	public static final DepthsAbilityInfo<DepthsSplitArrow> INFO =
 		new DepthsAbilityInfo<>(DepthsSplitArrow.class, ABILITY_NAME, DepthsSplitArrow::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.CHAIN))
-			.descriptions(DepthsSplitArrow::getDescription, MAX_RARITY);
+			.descriptions(DepthsSplitArrow::getDescription);
 
 	public DepthsSplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -83,8 +85,10 @@ public class DepthsSplitArrow extends DepthsAbility {
 		return false; // applies damage of type OTHER for damage of type PROJECTILE, which should not cause recursion with any other ability (or itself)
 	}
 
-	private static String getDescription(int rarity) {
-		return "When you shoot an enemy with a projectile, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE_MOD[rarity - 1]) + "%" + ChatColor.WHITE + " of the projectile's damage.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When you shoot an enemy with a projectile, the nearest enemy within " + SPLIT_ARROW_CHAIN_RANGE + " blocks takes ")
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE_MOD[rarity - 1]) + "%", color))
+			.append(Component.text(" of the projectile's damage."));
 	}
 }
 

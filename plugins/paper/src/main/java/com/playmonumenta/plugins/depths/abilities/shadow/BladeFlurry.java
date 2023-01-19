@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -14,8 +13,11 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -43,7 +45,7 @@ public class BladeFlurry extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeFlurry::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.IRON_SWORD))
-			.descriptions(BladeFlurry::getDescription, MAX_RARITY);
+			.descriptions(BladeFlurry::getDescription);
 
 	public BladeFlurry(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -96,8 +98,12 @@ public class BladeFlurry extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1));
 	}
 
-	private static String getDescription(int rarity) {
-		return "Right click while sneaking and holding a weapon to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for " + DepthsUtils.getRarityColor(rarity) + (SILENCE_DURATION[rarity - 1] / 20.0) + ChatColor.WHITE + " seconds and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while sneaking and holding a weapon to deal ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" melee damage in a " + RADIUS + " block radius around you. Affected mobs are silenced for "))
+			.append(Component.text(StringUtils.to2DP(SILENCE_DURATION[rarity - 1] / 20.0), color))
+			.append(Component.text(" seconds and knocked away slightly. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

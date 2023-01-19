@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsPlayer;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -19,11 +18,14 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -52,7 +54,7 @@ public class EarthenWrath extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.TURTLE_HELMET))
-			.descriptions(EarthenWrath::getDescription, MAX_RARITY);
+			.descriptions(EarthenWrath::getDescription);
 
 	public boolean mAbsorbDamage = false;
 	private double mDamageAbsorbed;
@@ -205,7 +207,8 @@ public class EarthenWrath extends DepthsAbility {
 					}
 				}
 			} catch (Exception e) {
-				Plugin.getInstance().getLogger().log(Level.INFO, "Exception for depths on entity damage- earthen wrath", e);
+				MMLog.warning("Exception for depths on entity damage- earthen wrath", e);
+				e.printStackTrace();
 			}
 		}
 	}
@@ -222,8 +225,12 @@ public class EarthenWrath extends DepthsAbility {
 		mAbsorbDamage = false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + " damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%" + ChatColor.WHITE + " of original damage absorbed as melee damage. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Swap while holding a weapon to redirect all damage allies take from mobs (excluding percent health damage) to you at a ")
+			.append(Component.text(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_REDUCTION[rarity - 1]) + "%", color))
+			.append(Component.text(" damage reduction for " + DURATION / 20 + " seconds, then do a burst damage in a " + DAMAGE_RADIUS + " block radius around you, dealing "))
+			.append(Component.text(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_REFLECTED[rarity - 1]) + "%", color))
+			.append(Component.text(" of original damage absorbed as melee damage. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

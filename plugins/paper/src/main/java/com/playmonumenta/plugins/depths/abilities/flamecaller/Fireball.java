@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -13,7 +12,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,7 +31,7 @@ public class Fireball extends DepthsAbility {
 	public static final String ABILITY_NAME = "Fireball";
 	private static final int COOLDOWN = 6 * 20;
 	private static final int DISTANCE = 10;
-	private static final double[] DAMAGE = {8, 10, 12, 14, 16, 20};
+	private static final int[] DAMAGE = {8, 10, 12, 14, 16, 20};
 	private static final int RADIUS = 3;
 	private static final int FIRE_TICKS = 3 * 20;
 
@@ -41,7 +42,7 @@ public class Fireball extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Fireball::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.FIREWORK_STAR))
-			.descriptions(Fireball::getDescription, MAX_RARITY);
+			.descriptions(Fireball::getDescription);
 
 	public Fireball(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -85,7 +86,9 @@ public class Fireball extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Right click to summon a " + RADIUS + " block radius fireball at the location you are looking, up to " + DISTANCE + " blocks away. The fireball deals " + DepthsUtils.getRarityColor(rarity) + (float) DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and sets enemies ablaze for " + FIRE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click to summon a " + RADIUS + " block radius fireball at the location you are looking, up to " + DISTANCE + " blocks away. The fireball deals ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage and sets enemies ablaze for " + FIRE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 }

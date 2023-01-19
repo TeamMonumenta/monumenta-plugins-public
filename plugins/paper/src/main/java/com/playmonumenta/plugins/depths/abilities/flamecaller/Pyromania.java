@@ -2,13 +2,15 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,7 +26,7 @@ public class Pyromania extends DepthsAbility {
 	public static final DepthsAbilityInfo<Pyromania> INFO =
 		new DepthsAbilityInfo<>(Pyromania.class, ABILITY_NAME, Pyromania::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.CAMPFIRE))
-			.descriptions(Pyromania::getDescription, MAX_RARITY);
+			.descriptions(Pyromania::getDescription);
 
 	public Pyromania(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -46,12 +48,13 @@ public class Pyromania extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		if (rarity == 6) {
-			return "For every mob on fire within " + DepthsUtils.getRarityColor(rarity) + TWISTED_RADIUS + ChatColor.WHITE + " blocks of you, gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " increased damage.";
-		} else {
-			return "For every mob on fire within " + RADIUS + " blocks of you, gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " increased damage.";
-		}
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component radius = rarity == 6 ? Component.text(TWISTED_RADIUS, color) : Component.text(RADIUS);
+		return Component.text("For every mob on fire within ")
+			.append(radius)
+			.append(Component.text(" blocks of you, gain "))
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]) + "%", color))
+			.append(Component.text(" increased damage."));
 	}
 }
 

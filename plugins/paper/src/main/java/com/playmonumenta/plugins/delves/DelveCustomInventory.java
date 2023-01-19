@@ -18,7 +18,6 @@ import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -203,15 +202,7 @@ public class DelveCustomInventory extends CustomInventory {
 			if (mDungeonName.equals("ring")) {
 				DelvePreset delvePreset = DelvePreset.getDelvePreset(ScoreboardUtils.getScoreboardValue(mOwner, DelvePreset.PRESET_SCOREBOARD).orElse(0));
 				if (delvePreset != null) {
-					ItemStack presetItem = new ItemStack(delvePreset.mDisplayItem, 1);
-					ItemMeta meta = presetItem.getItemMeta();
-					meta.displayName(Component.text("Use Bounty Preset", NamedTextColor.WHITE)
-						                 .decoration(TextDecoration.ITALIC, false)
-						                 .decoration(TextDecoration.BOLD, true));
-					GUIUtils.splitLoreLine(meta, delvePreset.mName, 30, ChatColor.AQUA, true);
-					meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-					meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-					presetItem.setItemMeta(meta);
+					ItemStack presetItem = GUIUtils.createBasicItem(delvePreset.mDisplayItem, "Use Bounty Preset", NamedTextColor.WHITE, true, delvePreset.mName, NamedTextColor.AQUA);
 					mInventory.setItem(PRESET_SLOT, presetItem);
 				}
 			}

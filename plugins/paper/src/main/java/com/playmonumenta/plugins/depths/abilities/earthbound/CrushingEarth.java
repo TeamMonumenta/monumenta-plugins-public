@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,8 +14,11 @@ import com.playmonumenta.plugins.point.Raycast;
 import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -42,7 +44,7 @@ public class CrushingEarth extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrushingEarth::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SHIELD))
-			.descriptions(CrushingEarth::getDescription, MAX_RARITY);
+			.descriptions(CrushingEarth::getDescription);
 
 	public CrushingEarth(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -83,8 +85,12 @@ public class CrushingEarth extends DepthsAbility {
 	}
 
 
-	private static String getDescription(int rarity) {
-		return "Right click while looking at an enemy within " + CAST_RANGE + " blocks to deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " melee damage and stun them for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while looking at an enemy within " + CAST_RANGE + " blocks to deal ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" melee damage and stun them for "))
+			.append(Component.text(StringUtils.to2DP(STUN_DURATION[rarity - 1] / 20.0), color))
+			.append(Component.text(" seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

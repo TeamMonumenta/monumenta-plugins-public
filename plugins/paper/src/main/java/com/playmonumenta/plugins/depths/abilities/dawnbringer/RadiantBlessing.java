@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -13,7 +12,10 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,7 +42,7 @@ public class RadiantBlessing extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RadiantBlessing::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SUNFLOWER))
-			.descriptions(RadiantBlessing::getDescription, MAX_RARITY);
+			.descriptions(RadiantBlessing::getDescription);
 
 	public RadiantBlessing(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -67,8 +69,10 @@ public class RadiantBlessing extends DepthsAbility {
 		putOnCooldown();
 	}
 
-	private static String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to enchant players within " + HEALING_RADIUS + " blocks, including yourself, with " + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance and " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(PERCENT_DAMAGE[rarity - 1]) + "%" + ChatColor.WHITE + " increased damage for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Left click while sneaking and holding a weapon to enchant players within " + HEALING_RADIUS + " blocks, including yourself, with " + StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED) + "% resistance and ")
+			.append(Component.text(StringUtils.multiplierToPercentage(PERCENT_DAMAGE[rarity - 1]) + "%", color))
+			.append(Component.text(" increased damage for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 }

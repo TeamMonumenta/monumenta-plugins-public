@@ -10,7 +10,10 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -32,7 +35,7 @@ public class FrozenDomain extends DepthsAbility {
 	public static final DepthsAbilityInfo<FrozenDomain> INFO =
 		new DepthsAbilityInfo<>(FrozenDomain.class, ABILITY_NAME, FrozenDomain::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.IRON_BOOTS))
-			.descriptions(FrozenDomain::getDescription, MAX_RARITY);
+			.descriptions(FrozenDomain::getDescription);
 	private boolean mWasOnIce = false;
 	private int mSecondWhenIce = 0;
 	private int mSeconds = 0;
@@ -109,13 +112,15 @@ public class FrozenDomain extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		String s = "s";
-		if (REGEN_TIME[rarity - 1] == 20) {
-			s = "";
-		}
-		return "When standing on ice, gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(EXTRA_SPEED_PCT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and regain " + (int) DepthsUtils.roundPercent(PERCENT_HEAL) + "% of your max health every "
-			       + DepthsUtils.getRarityColor(rarity) + REGEN_TIME[rarity - 1] + ChatColor.WHITE + " second" + s + ". Effects last for " + DURATION_TICKS / 20 + " seconds after leaving ice.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component s = REGEN_TIME[rarity - 1] == 20 ? Component.empty() : Component.text("s");
+		return Component.text("When standing on ice, gain ")
+			.append(Component.text(StringUtils.multiplierToPercentage(EXTRA_SPEED_PCT[rarity - 1]) + "%", color))
+			.append(Component.text(" speed and regain " + StringUtils.multiplierToPercentage(PERCENT_HEAL) + "% of your max health every "))
+			.append(Component.text(StringUtils.to2DP(REGEN_TIME[rarity - 1]), color))
+			.append(Component.text(" second"))
+			.append(s)
+			.append(Component.text(". Effects last for " + DURATION_TICKS / 20 + " seconds after leaving ice."));
 	}
 }
 

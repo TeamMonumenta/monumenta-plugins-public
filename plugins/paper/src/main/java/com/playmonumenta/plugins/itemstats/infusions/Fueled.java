@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Fueled implements Infusion {
 
-	private static final double DR_PER_MOB = 0.003;
+	public static final double DR_PER_MOB = 0.003;
 	private static final int MOB_CAP = 4;
 	private static final double RADIUS = 8;
 

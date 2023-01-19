@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -13,7 +12,9 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -38,7 +39,7 @@ public final class RestoringDraft extends DepthsAbility {
 	public static final DepthsAbilityInfo<RestoringDraft> INFO =
 		new DepthsAbilityInfo<>(RestoringDraft.class, ABILITY_NAME, RestoringDraft::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.GOLDEN_BOOTS))
-			.descriptions(RestoringDraft::getDescription, MAX_RARITY);
+			.descriptions(RestoringDraft::getDescription);
 
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
@@ -139,8 +140,10 @@ public final class RestoringDraft extends DepthsAbility {
 	}
 
 
-	private static String getDescription(int rarity) {
-		return "Falling more than " + AUTOMATIC_THRESHOLD + " blocks heals you by " + DepthsUtils.getRarityColor(rarity) + HEALING[rarity - 1] + ChatColor.WHITE + " health per block fallen (up to " + HEIGHT_CAP + " blocks). All fall damage is canceled.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Falling more than " + AUTOMATIC_THRESHOLD + " blocks heals you by ")
+			.append(Component.text(HEALING[rarity - 1], color))
+			.append(Component.text(" health per block fallen (up to " + HEIGHT_CAP + " blocks). All fall damage is canceled."));
 	}
 }
 

@@ -16,7 +16,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -46,7 +49,7 @@ public class Cryobox extends DepthsAbility {
 			.linkedSpell(ClassAbility.CRYOBOX)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.GHAST_TEAR))
-			.descriptions(Cryobox::getDescription, MAX_RARITY)
+			.descriptions(Cryobox::getDescription)
 			.priorityAmount(10000);
 
 	public Cryobox(Plugin plugin, Player player) {
@@ -122,8 +125,8 @@ public class Cryobox extends DepthsAbility {
 			center.clone().add(0, -1, 0),
 			};
 
-		for (int i = 0; i < locs.length; i++) {
-			DepthsUtils.spawnIceTerrain(locs[i], ICE_DURATION, mPlayer);
+		for (Location loc : locs) {
+			DepthsUtils.spawnIceTerrain(loc, ICE_DURATION, mPlayer);
 		}
 	}
 
@@ -132,8 +135,10 @@ public class Cryobox extends DepthsAbility {
 		onHurt(event, null, null);
 	}
 
-	private static String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, gain " + DepthsUtils.getRarityColor(rarity) + (ABSORPTION_HEALTH[rarity - 1] / 2) + ChatColor.WHITE + " absorption hearts for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, gain ")
+			.append(Component.text(ABSORPTION_HEALTH[rarity - 1] / 2, color))
+			.append(Component.text(" absorption hearts for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

@@ -6,14 +6,16 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,7 +46,7 @@ public class HowlingWinds extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HowlingWinds::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.HOPPER))
-			.descriptions(HowlingWinds::getDescription, MAX_RARITY);
+			.descriptions(HowlingWinds::getDescription);
 
 	public HowlingWinds(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -109,8 +111,13 @@ public class HowlingWinds extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	private static String getDescription(int rarity) {
-		return "Swap hands to summon a hurricane that lasts " + DURATION_TICKS / 20 + " seconds at the location you are looking at, up to " + DISTANCE + " blocks away. The hurricane pulls enemies within " + PULL_RADIUS + " blocks towards its center every " + DepthsUtils.getRarityColor(rarity) + PULL_INTERVAL[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component s = PULL_INTERVAL[rarity - 1] == 20 ? Component.empty() : Component.text("s");
+		return Component.text("Swap hands to summon a hurricane that lasts " + DURATION_TICKS / 20 + " seconds at the location you are looking at, up to " + DISTANCE + " blocks away. The hurricane pulls enemies within " + PULL_RADIUS + " blocks towards its center every ")
+			.append(Component.text(StringUtils.to2DP(PULL_INTERVAL[rarity - 1] / 20.0), color))
+			.append(Component.text(" second"))
+			.append(s)
+			.append(Component.text(". Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

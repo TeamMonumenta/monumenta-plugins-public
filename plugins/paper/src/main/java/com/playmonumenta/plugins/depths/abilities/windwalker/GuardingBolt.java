@@ -4,9 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -17,8 +15,12 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,7 +52,7 @@ public class GuardingBolt extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GuardingBolt::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.HORN_CORAL))
-			.descriptions(GuardingBolt::getDescription, MAX_RARITY);
+			.descriptions(GuardingBolt::getDescription);
 
 	public GuardingBolt(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -68,10 +70,8 @@ public class GuardingBolt extends DepthsAbility {
 		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE, true);
 		players.remove(mPlayer);
 
-		//Do not teleport to players who aren't in the depths system
-		//This allows players to teleport into another players loot room (stuck spot as well as abusable)
-		DepthsManager manager = DepthsManager.getInstance();
-		players.removeIf(p -> !manager.mPlayers.containsKey(p.getUniqueId()));
+		//Do not teleport to players who are in loot rooms
+		players.removeIf(p -> ZoneUtils.hasZoneProperty(p, ZoneUtils.ZoneProperty.LOOTROOM));
 
 		for (int i = 0; i < RANGE; i++) {
 			box.shift(dir);
@@ -154,8 +154,11 @@ public class GuardingBolt extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage, knocked back, and stunned for " + DepthsUtils.getRarityColor(rarity) + STUN_DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Left click the air while sneaking and looking directly at a player within " + RANGE + " blocks to dash to their location. Mobs in a " + RADIUS + " block radius of the destination are dealt ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage, knocked back, and stunned for "))
+			.append(Component.text(StringUtils.to2DP(STUN_DURATION[rarity - 1] / 20.0), color))
+			.append(Component.text(" seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
-
 }

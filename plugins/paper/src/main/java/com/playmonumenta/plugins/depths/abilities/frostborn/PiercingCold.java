@@ -15,7 +15,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -48,7 +50,7 @@ public class PiercingCold extends DepthsAbility {
 			.linkedSpell(ClassAbility.PIERCING_COLD)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.PRISMARINE_SHARD))
-			.descriptions(PiercingCold::getDescription, MAX_RARITY);
+			.descriptions(PiercingCold::getDescription);
 
 	public PiercingCold(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -151,8 +153,10 @@ public class PiercingCold extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Shooting a projectile while sneaking instead shoots an enchanted beam of frost that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage and leaves a trail of ice below it that lasts for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Shooting a projectile while sneaking instead shoots an enchanted beam of frost that deals ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage and leaves a trail of ice below it that lasts for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 public class Execution implements Infusion {
 
 	private static final int DURATION = 4 * 20;
-	private static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
+	public static final double PERCENT_DAMAGE_PER_LEVEL = 0.015;
 	private static final String PERCENT_DAMAGE_EFFECT_NAME = "ExecutionPercentDamageEffect";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 			DamageType.MELEE,

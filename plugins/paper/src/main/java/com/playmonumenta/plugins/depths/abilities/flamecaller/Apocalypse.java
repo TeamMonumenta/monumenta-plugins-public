@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,8 +14,11 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,7 +46,7 @@ public class Apocalypse extends DepthsAbility {
 			.linkedSpell(ClassAbility.APOCALYPSE)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.ORANGE_DYE))
-			.descriptions(Apocalypse::getDescription, MAX_RARITY)
+			.descriptions(Apocalypse::getDescription)
 			.priorityAmount(10000);
 
 	public Apocalypse(Plugin plugin, Player player) {
@@ -78,14 +80,10 @@ public class Apocalypse extends DepthsAbility {
 		}
 
 		double totalHealing = maxHealth * count * HEALING;
-		double absorption = 0;
-		double remainingHealth = maxHealth - mPlayer.getHealth();
-		if (totalHealing > remainingHealth) {
-			absorption = Math.min(totalHealing - remainingHealth, maxHealth * MAX_ABSORPTION);
-		}
+		double healed = PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * count * HEALING);
 
-		PlayerUtils.healPlayer(mPlugin, mPlayer, maxHealth * count * HEALING);
-		AbsorptionUtils.addAbsorption(mPlayer, absorption, absorption, ABSORPTION_DURATION);
+		double absorption = totalHealing - healed;
+		AbsorptionUtils.addAbsorption(mPlayer, absorption, maxHealth * MAX_ABSORPTION, ABSORPTION_DURATION);
 
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 10, 2, 2, 2).spawnAsPlayerActive(mPlayer);
@@ -104,8 +102,10 @@ public class Apocalypse extends DepthsAbility {
 		onHurt(event, null, null);
 	}
 
-	private static String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, ignore the hit and instead deal " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + (int) DepthsUtils.roundPercent(HEALING) + "% of your max health. Healing above your max health is converted into absorption, up to absorption equal to " + (int) DepthsUtils.roundPercent(MAX_ABSORPTION) + "% of your max health that lasts " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, ignore the hit and instead deal ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage in a " + RADIUS + " block radius. For each mob that is killed, heal " + StringUtils.multiplierToPercentage(HEALING) + "% of your max health. Healing above your max health is converted into absorption, up to absorption equal to " + StringUtils.multiplierToPercentage(MAX_ABSORPTION) + "% of your max health that lasts " + ABSORPTION_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

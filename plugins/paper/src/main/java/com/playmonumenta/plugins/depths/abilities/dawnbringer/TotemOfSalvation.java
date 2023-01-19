@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -16,14 +15,16 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -58,7 +59,7 @@ public class TotemOfSalvation extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemOfSalvation::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.TOTEM_OF_UNDYING))
-			.descriptions(TotemOfSalvation::getDescription, MAX_RARITY);
+			.descriptions(TotemOfSalvation::getDescription);
 
 	private static final Collection<Map.Entry<Double, SpawnParticleAction>> PARTICLES =
 		List.of(new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.4, (Location loc) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0.1, 0.1, 0.1, PARTICLE_COLOR).spawnAsOtherPlayerActive()));
@@ -112,14 +113,13 @@ public class TotemOfSalvation extends DepthsAbility {
 				if (mTicks % TICK_FREQUENCY[mRarity - 1] == 0) {
 					for (Player p : PlayerUtils.playersInRange(item.getLocation(), EFFECT_RADIUS, true)) {
 						double maxHealth = EntityUtils.getMaxHealth(p);
-						double healthFromFull = maxHealth - p.getHealth();
 						double healthToHeal = maxHealth * PERCENT_HEALING;
 						if (p != mPlayer) {
 							healthToHeal *= 1.5;
 						}
-						PlayerUtils.healPlayer(mPlugin, p, healthToHeal);
+						double healed = PlayerUtils.healPlayer(mPlugin, p, healthToHeal);
 
-						double remainingHealing = healthToHeal - healthFromFull;
+						double remainingHealing = healthToHeal - healed;
 						if (remainingHealing > 0) {
 							AbsorptionUtils.addAbsorption(p, remainingHealing, MAX_ABSORPTION, ABSORPTION_DURATION);
 						}
@@ -143,12 +143,13 @@ public class TotemOfSalvation extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 5);
 	}
 
-	private static String getDescription(int rarity) {
-		String s = "s";
-		if (TICK_FREQUENCY[rarity - 1] == 20) {
-			s = "";
-		}
-		return "Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + (int) DepthsUtils.roundPercent(PERCENT_HEALING) + "% of their max health every " + DepthsUtils.getRarityColor(rarity) + TICK_FREQUENCY[rarity - 1] / 20.0 + ChatColor.WHITE + " second" + s + ". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Healing from the totem is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component s = TICK_FREQUENCY[rarity - 1] == 20 ? Component.empty() : Component.text("s");
+		return Component.text("Swap hands while holding a weapon to summon a totem that lasts " + DURATION / 20 + " second. The totem heals all players within " + EFFECT_RADIUS + " blocks by " + StringUtils.multiplierToPercentage(PERCENT_HEALING) + "% of their max health every ")
+			.append(Component.text(StringUtils.to2DP(TICK_FREQUENCY[rarity - 1] / 20.0), color))
+			.append(Component.text(" second"))
+			.append(s)
+			.append(Component.text(". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Healing from the totem is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 }

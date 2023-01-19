@@ -6,7 +6,10 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -23,21 +26,25 @@ public class InfusionUtils {
 	public static final String PULSATING_DIAMOND = "epic:r3/items/currency/pulsating_diamond";
 
 	public enum InfusionSelection {
-		ACUMEN("acumen", InfusionType.ACUMEN),
-		FOCUS("focus", InfusionType.FOCUS),
-		PERSPICACITY("perspicacity", InfusionType.PERSPICACITY),
-		TENACITY("tenacity", InfusionType.TENACITY),
-		VIGOR("vigor", InfusionType.VIGOR),
-		VITALITY("vitality", InfusionType.VITALITY),
-		REFUND("refund", null),
-		SPEC_REFUND("special", null);
+		VITALITY("vitality", InfusionType.VITALITY, TextColor.fromHexString("#FF8C00"), Material.ORANGE_STAINED_GLASS_PANE),
+		TENACITY("tenacity", InfusionType.TENACITY, TextColor.fromCSSHexString("#A9A9A9"), Material.BLACK_STAINED_GLASS_PANE),
+		VIGOR("vigor", InfusionType.VIGOR, TextColor.fromHexString("#FF0000"), Material.RED_STAINED_GLASS_PANE),
+		FOCUS("focus", InfusionType.FOCUS, TextColor.fromHexString("#FFFF00"), Material.YELLOW_STAINED_GLASS_PANE),
+		PERSPICACITY("perspicacity", InfusionType.PERSPICACITY, TextColor.fromHexString("#6666FF"), Material.LIGHT_BLUE_STAINED_GLASS_PANE),
+		ACUMEN("acumen", InfusionType.ACUMEN, TextColor.fromHexString("#32CD32"), Material.LIME_STAINED_GLASS_PANE),
+		REFUND("refund", null, NamedTextColor.WHITE, Material.GRINDSTONE),
+		SPEC_REFUND("special", null, NamedTextColor.WHITE, Material.GRINDSTONE);
 
 		private final String mLabel;
 		private final @Nullable InfusionType mInfusionType;
+		private final TextColor mColor;
+		private final Material mMaterial;
 
-		InfusionSelection(String label, @Nullable InfusionType infusionType) {
+		InfusionSelection(String label, @Nullable InfusionType infusionType, TextColor color, Material material) {
 			mLabel = label;
 			mInfusionType = infusionType;
+			mColor = color;
+			mMaterial = material;
 		}
 
 		public static @Nullable InfusionSelection getInfusionSelection(@Nullable String label) {
@@ -56,8 +63,20 @@ public class InfusionUtils {
 			return mLabel;
 		}
 
+		public String getCapitalizedLabel() {
+			return StringUtils.capitalizeWords(mLabel);
+		}
+
 		public @Nullable InfusionType getInfusionType() {
 			return mInfusionType;
+		}
+
+		public TextColor getColor() {
+			return mColor;
+		}
+
+		public Material getMaterial() {
+			return mMaterial;
 		}
 	}
 

@@ -2,11 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,17 +24,19 @@ public class Enlightenment extends DepthsAbility {
 	public static final DepthsAbilityInfo<Enlightenment> INFO =
 		new DepthsAbilityInfo<>(Enlightenment.class, ABILITY_NAME, Enlightenment::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.EXPERIENCE_BOTTLE))
-			.descriptions(Enlightenment::getDescription, MAX_RARITY);
+			.descriptions(Enlightenment::getDescription);
 
 
 	public Enlightenment(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 	}
 
-	private static String getDescription(int rarity) {
-		return "All players in your party gain " + DepthsUtils.getRarityColor(rarity) + XP_MULTIPLIER[rarity - 1] + "x" + ChatColor.WHITE + " experience. " +
-			       "Does not stack if multiple players in the party have the skill. " +
-			       "Additionally, your chances of finding higher rarity abilities are increased by " + DepthsUtils.getRarityColor(rarity) + RARITY_INCREASE[rarity - 1] + "%" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("All players in your party gain ")
+			.append(Component.text(StringUtils.to2DP(XP_MULTIPLIER[rarity - 1]) + "x", color))
+			.append(Component.text(" experience. Does not stack if multiple players in the party have the skill. Additionally, your chances of finding higher rarity abilities are increased by "))
+			.append(Component.text(RARITY_INCREASE[rarity - 1] + "%", color))
+			.append(Component.text("."));
 	}
 
 }

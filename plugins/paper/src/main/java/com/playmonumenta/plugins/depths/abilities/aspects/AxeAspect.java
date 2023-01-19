@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.aspects;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
@@ -9,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,7 +23,7 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 	public static final DepthsAbilityInfo<AxeAspect> INFO =
 		new DepthsAbilityInfo<>(AxeAspect.class, ABILITY_NAME, AxeAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
 			.displayItem(new ItemStack(Material.IRON_AXE))
-			.description("You deal " + DAMAGE + " extra melee damage and gain " + (int) DepthsUtils.roundPercent(ATTACK_SPEED) + "% attack speed when holding an axe.");
+			.description("You deal " + DAMAGE + " extra melee damage and gain " + StringUtils.multiplierToPercentage(ATTACK_SPEED) + "% attack speed when holding an axe.");
 
 	public AxeAspect(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

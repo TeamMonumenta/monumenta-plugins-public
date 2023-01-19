@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -11,7 +10,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collection;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -42,7 +43,7 @@ public class DepthsDodging extends DepthsAbility {
 			.linkedSpell(ClassAbility.DODGING)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.COBWEB))
-			.descriptions(DepthsDodging::getDescription, MAX_RARITY);
+			.descriptions(DepthsDodging::getDescription);
 
 	private int mTriggerTick = 0;
 
@@ -139,8 +140,10 @@ public class DepthsDodging extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "You dodge the next projectile or potion attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("You dodge the next projectile or potion attack that would have hit you, nullifying the damage. Cooldown: ")
+			.append(Component.text(COOLDOWN[rarity - 1] / 20 + "s", color))
+			.append(Component.text("."));
 	}
 }
 

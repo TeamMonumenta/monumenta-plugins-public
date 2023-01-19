@@ -5,14 +5,16 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,7 +42,7 @@ public class StoneSkin extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", StoneSkin::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.POLISHED_ANDESITE))
-			.descriptions(StoneSkin::getDescription, MAX_RARITY);
+			.descriptions(StoneSkin::getDescription);
 
 	public StoneSkin(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -70,8 +72,12 @@ public class StoneSkin extends DepthsAbility {
 	}
 
 
-	private static String getDescription(int rarity) {
-		return "Right click while sneaking to gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and +" + DepthsUtils.getRarityColor(rarity) + (int) (DepthsUtils.roundPercent(KNOCKBACK_RESISTANCE[rarity - 1]) / 10) + ChatColor.WHITE + " knockback resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while sneaking to gain ")
+			.append(Component.text(StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%", color))
+			.append(Component.text(" resistance and +"))
+			.append(Component.text(StringUtils.multiplierToPercentage(KNOCKBACK_RESISTANCE[rarity - 1] / 10), color))
+			.append(Component.text(" knockback resistance for " + DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

@@ -74,10 +74,10 @@ public class SanguineHarvest extends Ability {
 					 "Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
 					 "Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
 					 "This projectile travels up to %s blocks and upon contact with a surface or an enemy, it explodes, " +
-					 "knocking back and marking all mobs within %s blocks of the explosion for a harvest. " +
-					 "Any player that kills a marked mob is healed for %s%% of max health. Cooldown: %ss.")
+					 "knocking back all mobs within %s blocks. " +
+					 "Any player that kills a mob knocked back by this ability is healed for %s%% of max health. Cooldown: %ss.")
 					.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
-				"Increase passive Bleed level to II, and increase the radius to %s blocks. Players killing a marked mob are healed by %s%%."
+				"Increase passive Bleed level to II, and increase the radius to %s blocks. Healing from killing affected mobs is increased to %s%%."
 					.formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)),
 				("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
 					 "Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")

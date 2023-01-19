@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -81,41 +81,26 @@ public class DepthsUtils {
 	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
 
 	public static Component getLoreForItem(DepthsTree tree, int rarity) {
-		TextComponent loreLine = Component.text("");
-		loreLine = loreLine.append(tree.getNameComponent());
+		return tree.getNameComponent()
+			       .append(Component.text(" : ", NamedTextColor.DARK_GRAY))
+			       .append(getRarityComponent(rarity))
+			       .decoration(TextDecoration.ITALIC, false);
+	}
 
-		loreLine = loreLine.append(Component.text(" : ", NamedTextColor.DARK_GRAY));
-		TextComponent rarityText = Component.text(getRarityColor(rarity) + getRarityText(rarity));
-		if (rarity == 6) {
-			rarityText = Component.text(ChatColor.MAGIC + getRarityText(rarity), TextColor.color(LEVELSIX));
-		}
-		loreLine = loreLine.append(rarityText);
+	public static DepthsRarity getRarity(int rarity) {
+		return DepthsRarity.values()[rarity - 1];
+	}
 
-		return loreLine;
+	public static Component getRarityComponent(int rarity) {
+		return getRarity(rarity).getDisplay();
 	}
 
 	public static String getRarityText(int rarity) {
-		String[] rarities = {
-				"Common",
-				"Uncommon",
-				"Rare",
-				"Epic",
-				"Legendary",
-				"XXXXXX"
-		};
-		return rarities[rarity - 1];
+		return getRarity(rarity).getName();
 	}
 
-	public static ChatColor getRarityColor(int rarity) {
-		ChatColor[] colors = {
-				ChatColor.GRAY,
-				ChatColor.GREEN,
-				ChatColor.BLUE,
-				ChatColor.LIGHT_PURPLE,
-				ChatColor.GOLD,
-				ChatColor.DARK_PURPLE
-		};
-		return colors[rarity - 1];
+	public static TextColor getRarityColor(int rarity) {
+		return getRarity(rarity).getColor();
 	}
 
 	public static void spawnIceTerrain(Location l, int ticks, Player p) {
@@ -170,14 +155,6 @@ public class DepthsUtils {
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
 		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
 			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || (item.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RIPTIDE) == 0));
-	}
-
-	public static double roundDouble(double num) {
-		return Math.round(num * 100.0) / 100.0;
-	}
-
-	public static double roundPercent(double num) {
-		return Math.round(num * 100.0 * 100.0) / 100.0;
 	}
 
 	public static boolean isWeaponAspectAbility(String s) {

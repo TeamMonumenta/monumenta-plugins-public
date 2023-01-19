@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -23,7 +24,7 @@ public class DepthsToughness extends DepthsAbility {
 	public static final DepthsAbilityInfo<DepthsToughness> INFO =
 		new DepthsAbilityInfo<>(DepthsToughness.class, ABILITY_NAME, DepthsToughness::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.CRYING_OBSIDIAN))
-			.descriptions(DepthsToughness::getDescription, MAX_RARITY);
+			.descriptions(DepthsToughness::getDescription);
 
 	public DepthsToughness(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -33,7 +34,9 @@ public class DepthsToughness extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Gain " + DepthsUtils.getRarityColor(rarity) + PERCENT_MAX_HEALTH[rarity - 1] * 100 + "%" + ChatColor.WHITE + " max health.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Gain ")
+			.append(Component.text(PERCENT_MAX_HEALTH[rarity - 1] * 100 + "%", color))
+			.append(Component.text(" max health."));
 	}
 }

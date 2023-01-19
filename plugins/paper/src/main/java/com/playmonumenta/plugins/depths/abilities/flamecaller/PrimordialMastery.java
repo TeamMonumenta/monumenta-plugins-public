@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,7 +22,7 @@ public class PrimordialMastery extends DepthsAbility {
 	public static final DepthsAbilityInfo<PrimordialMastery> INFO =
 		new DepthsAbilityInfo<>(PrimordialMastery.class, ABILITY_NAME, PrimordialMastery::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.FIRE_CORAL_FAN))
-			.descriptions(PrimordialMastery::getDescription, MAX_RARITY);
+			.descriptions(PrimordialMastery::getDescription);
 
 	public PrimordialMastery(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -35,8 +36,10 @@ public class PrimordialMastery extends DepthsAbility {
 		return false; // only changes event damage
 	}
 
-	private static String getDescription(int rarity) {
-		return "All ability damage is multiplied by " + DepthsUtils.getRarityColor(rarity) + SPELL_MOD[rarity - 1] + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("All ability damage is multiplied by ")
+			.append(Component.text(SPELL_MOD[rarity - 1], color))
+			.append(Component.text("."));
 	}
 }
 

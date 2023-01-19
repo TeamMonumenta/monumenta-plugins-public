@@ -2,13 +2,14 @@ package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ public class DepthsDethroner extends DepthsAbility {
 	public static final DepthsAbilityInfo<DepthsDethroner> INFO =
 		new DepthsAbilityInfo<>(DepthsDethroner.class, ABILITY_NAME, DepthsDethroner::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.DRAGON_HEAD))
-			.descriptions(DepthsDethroner::getDescription, MAX_RARITY);
+			.descriptions(DepthsDethroner::getDescription);
 
 	public DepthsDethroner(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -39,8 +40,12 @@ public class DepthsDethroner extends DepthsAbility {
 		return false; // only changes event damage
 	}
 
-	private static String getDescription(int rarity) {
-		return "All damage you deal to elites is multiplied by " + DepthsUtils.getRarityColor(rarity) + ELITE_DAMAGE[rarity - 1] + ChatColor.WHITE + ". All damage you deal to bosses is multiplied by " + DepthsUtils.getRarityColor(rarity) + BOSS_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("All damage you deal to elites is multiplied by ")
+			.append(Component.text(ELITE_DAMAGE[rarity - 1], color))
+			.append(Component.text(". All damage you deal to bosses is multiplied by "))
+			.append(Component.text(BOSS_DAMAGE[rarity - 1], color))
+			.append(Component.text("."));
 	}
 
 

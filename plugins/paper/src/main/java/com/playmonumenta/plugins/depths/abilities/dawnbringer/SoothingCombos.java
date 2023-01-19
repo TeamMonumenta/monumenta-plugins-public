@@ -10,8 +10,11 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -34,7 +37,7 @@ public class SoothingCombos extends DepthsAbility {
 	public static final DepthsAbilityInfo<SoothingCombos> INFO =
 		new DepthsAbilityInfo<>(SoothingCombos.class, ABILITY_NAME, SoothingCombos::new, DepthsTree.DAWNBRINGER, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.HONEYCOMB))
-			.descriptions(SoothingCombos::getDescription, MAX_RARITY);
+			.descriptions(SoothingCombos::getDescription);
 
 	private int mComboCount = 0;
 
@@ -74,11 +77,15 @@ public class SoothingCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		if (rarity == 6) {
-			return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste " + DepthsUtils.getRarityColor(rarity) + "II" + ChatColor.WHITE + " for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
-		}
-		return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED_PERCENT[rarity - 1]) + "%" + ChatColor.WHITE + " speed and Haste I for " + DepthsUtils.getRarityColor(rarity) + (int) DURATION[rarity - 1] + ChatColor.WHITE + " seconds to players within " + RANGE + " blocks, including the user.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component haste = rarity == 6 ? Component.text("II", color) : Component.text("I");
+		return Component.text("Every third melee attack applies ")
+			.append(Component.text(StringUtils.multiplierToPercentage(SPEED_PERCENT[rarity - 1]) + "%", color))
+			.append(Component.text(" speed and Haste "))
+			.append(haste)
+			.append(Component.text(" for "))
+			.append(Component.text(StringUtils.to2DP(DURATION[rarity - 1]), color))
+			.append(Component.text(" seconds to players within " + RANGE + " blocks, including the user."));
 	}
 
 

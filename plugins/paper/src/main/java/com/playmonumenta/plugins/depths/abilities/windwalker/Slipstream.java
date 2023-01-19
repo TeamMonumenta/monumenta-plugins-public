@@ -18,7 +18,9 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,7 +52,7 @@ public class Slipstream extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Slipstream::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.PHANTOM_MEMBRANE))
-			.descriptions(Slipstream::getDescription, MAX_RARITY);
+			.descriptions(Slipstream::getDescription);
 
 	public Slipstream(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -63,11 +65,12 @@ public class Slipstream extends DepthsAbility {
 		putOnCooldown();
 
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(DURATION, SPEED_AMPLIFIER, PERCENT_SPEED_EFFECT_NAME));
+		int jump = JUMP_AMPLIFIER;
 		if (mRarity == 6) {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_AMPLIFIER + 1));
-		} else {
-			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, JUMP_AMPLIFIER));
+			jump++;
 		}
+		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, DURATION, jump));
+
 		Location loc = mPlayer.getEyeLocation();
 		loc.add(0, -0.75, 0);
 		World world = mPlayer.getWorld();
@@ -98,11 +101,13 @@ public class Slipstream extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		if (rarity == 6) {
-			return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + DepthsUtils.getRarityColor(rarity) + "IV" + ChatColor.WHITE + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + StringUtils.ticksToSeconds(COOLDOWN[rarity - 1]) + "s" + ChatColor.WHITE + ".";
-		}
-		return "Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost " + (JUMP_AMPLIFIER + 1) + " and " + (int) DepthsUtils.roundPercent(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: " + DepthsUtils.getRarityColor(rarity) + StringUtils.ticksToSeconds(COOLDOWN[rarity - 1]) + "s" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component jump = rarity == 6 ? Component.text("IV", color) : Component.text("III");
+		return Component.text("Right click to knock all enemies within " + RADIUS + " blocks away from you and gain Jump Boost ")
+			.append(jump)
+			.append(Component.text(" and " + StringUtils.multiplierToPercentage(SPEED_AMPLIFIER) + "% speed for " + DURATION / 20 + " seconds. Cooldown: "))
+			.append(Component.text(StringUtils.ticksToSeconds(COOLDOWN[rarity - 1]) + "s", color))
+			.append(Component.text("."));
 	}
 
 }

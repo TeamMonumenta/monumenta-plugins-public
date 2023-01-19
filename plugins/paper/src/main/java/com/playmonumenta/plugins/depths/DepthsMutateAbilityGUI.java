@@ -11,7 +11,6 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -167,18 +166,6 @@ public class DepthsMutateAbilityGUI extends CustomInventory {
 	}
 
 	public ItemStack createCustomItem(Material type, String name, String lore) {
-		ItemStack newItem = new ItemStack(type, 1);
-		ItemMeta meta = newItem.getItemMeta();
-		if (!name.isEmpty()) {
-			meta.displayName(Component.text(name, NamedTextColor.WHITE)
-					.decoration(TextDecoration.ITALIC, false)
-					.decoration(TextDecoration.BOLD, true));
-		}
-		ChatColor defaultColor = ChatColor.GRAY;
-		if (!lore.isEmpty()) {
-			GUIUtils.splitLoreLine(meta, lore, 30, defaultColor, true);
-		}
-		newItem.setItemMeta(meta);
-		return newItem;
+		return GUIUtils.createBasicItem(type, name, NamedTextColor.WHITE, true, lore, NamedTextColor.GRAY);
 	}
 }

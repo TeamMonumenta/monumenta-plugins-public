@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 public class Unyielding implements Infusion {
 
 	public static final String MODIFIER = "UnyieldingMod";
-	private static final double KB_PER_LEVEL = 0.06;
+	public static final double KB_PER_LEVEL = 0.06;
 
 	@Override
 	public String getName() {
@@ -38,15 +38,13 @@ public class Unyielding implements Infusion {
 			}
 		}
 		if (plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.UNYIELDING) > 0) {
-			if (player != null) {
-				double level = plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.UNYIELDING);
-				double finalLvl = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) level);
-				AttributeInstance knockBack = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-				if (knockBack != null) {
-					AttributeModifier mod = new AttributeModifier(MODIFIER, getKnockbackResistance(finalLvl),
-						AttributeModifier.Operation.ADD_SCALAR);
-					knockBack.addModifier(mod);
-				}
+			double level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNYIELDING);
+			double finalLvl = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) level);
+			AttributeInstance knockBack = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			if (knockBack != null) {
+				AttributeModifier mod = new AttributeModifier(MODIFIER, getKnockbackResistance(finalLvl),
+					AttributeModifier.Operation.ADD_SCALAR);
+				knockBack.addModifier(mod);
 			}
 		}
 	}

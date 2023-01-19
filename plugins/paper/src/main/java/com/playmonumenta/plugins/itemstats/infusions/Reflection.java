@@ -22,7 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class Reflection implements Infusion {
-	private static final double REFLECT_PCT_PER_LEVEL = 0.06;
+	public static final double REFLECT_PCT_PER_LEVEL = 0.06;
 	private static final int RADIUS = 4;
 
 	@Override

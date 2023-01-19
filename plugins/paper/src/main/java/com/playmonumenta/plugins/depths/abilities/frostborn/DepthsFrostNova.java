@@ -15,8 +15,11 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -47,7 +50,7 @@ public class DepthsFrostNova extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsFrostNova::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.ICE))
-			.descriptions(DepthsFrostNova::getDescription, MAX_RARITY);
+			.descriptions(DepthsFrostNova::getDescription);
 
 	public DepthsFrostNova(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -136,8 +139,12 @@ public class DepthsFrostNova extends DepthsAbility {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 0.5f, 1f);
 	}
 
-	private static String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to unleash a frost nova, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage to all enemies in a " + SIZE + " block cube around you and afflicting them with " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SLOW_MULTIPLIER[rarity - 1]) + "%" + ChatColor.WHITE + " slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Left click while sneaking and holding a weapon to unleash a frost nova, dealing ")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage to all enemies in a " + SIZE + " block cube around you and afflicting them with "))
+			.append(Component.text(StringUtils.multiplierToPercentage(SLOW_MULTIPLIER[rarity - 1]), color))
+			.append(Component.text(" slowness for " + DURATION_TICKS / 20 + " seconds. All mobs and players within range are extinguished if they are on fire. Nearby blocks are replaced with ice for " + ICE_TICKS / 20 + " seconds. Cooldown: " + COOLDOWN_TICKS / 20 + "s."));
 	}
 
 

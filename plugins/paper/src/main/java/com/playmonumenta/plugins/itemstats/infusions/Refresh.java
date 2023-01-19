@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class Refresh implements Infusion {
 
-	private static final double REDUCTION_PER_LEVEL = 0.02;
+	public static final double REDUCTION_PER_LEVEL = 0.02;
 
 	@Override
 	public String getName() {

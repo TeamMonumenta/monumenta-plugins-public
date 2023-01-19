@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -14,7 +13,10 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -39,7 +41,7 @@ public class WardOfLight extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardOfLight::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.LANTERN))
-			.descriptions(WardOfLight::getDescription, MAX_RARITY);
+			.descriptions(WardOfLight::getDescription);
 
 	public WardOfLight(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -51,7 +53,7 @@ public class WardOfLight extends DepthsAbility {
 		}
 
 		Vector playerDir = mPlayer.getEyeLocation().getDirection().setY(0).normalize();
-		int count = 0;
+		boolean healed = false;
 		for (Player p : PlayerUtils.otherPlayersInRange(mPlayer, HEALING_RADIUS, true)) {
 			Vector toMobVector = p.getLocation().toVector().subtract(mPlayer.getLocation().toVector()).setY(0).normalize();
 
@@ -59,11 +61,10 @@ public class WardOfLight extends DepthsAbility {
 			// Don't heal players that have their class disabled (so it doesn't work on arena contenders)
 			// Don't heal players with PvP enabled
 			// If the source player was included (because PvP is on), heal them
-			if (p.equals(mPlayer)
-			    || (!p.getScoreboardTags().contains("disable_class")
+			if (!p.getScoreboardTags().contains("disable_class")
 			        && !AbilityManager.getManager().isPvPEnabled(mPlayer)
 			        && (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
-			        || p.getLocation().distance(mPlayer.getLocation()) < 2))) {
+			        || p.getLocation().distance(mPlayer.getLocation()) < 2)) {
 
 				PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * HEAL[mRarity - 1], mPlayer);
 
@@ -73,11 +74,11 @@ public class WardOfLight extends DepthsAbility {
 				mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 				mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.05f, 1.0f);
 
-				count++;
+				healed = true;
 			}
 		}
 
-		if (count > 0) {
+		if (healed) {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.05f, 1.0f);
 
@@ -86,8 +87,10 @@ public class WardOfLight extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(HEAL[rarity - 1]) + "%" + ChatColor.WHITE + " of their max health. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while holding a weapon and not sneaking to heal nearby players within " + HEALING_RADIUS + " blocks in front of you for ")
+			.append(Component.text(StringUtils.multiplierToPercentage(HEAL[rarity - 1]) + "%", color))
+			.append(Component.text(" of their max health. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 }

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.flamecaller;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -12,7 +11,10 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,7 +37,7 @@ public class Detonation extends DepthsAbility {
 	public static final DepthsAbilityInfo<Detonation> INFO =
 		new DepthsAbilityInfo<>(Detonation.class, ABILITY_NAME, Detonation::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.TNT))
-			.descriptions(Detonation::getDescription, MAX_RARITY);
+			.descriptions(Detonation::getDescription);
 
 	public Detonation(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -63,7 +65,9 @@ public class Detonation extends DepthsAbility {
 		return DEATH_RADIUS;
 	}
 
-	private static String getDescription(int rarity) {
-		return "If an enemy dies within " + DEATH_RADIUS + " blocks of you it explodes, dealing " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage in a " + DAMAGE_RADIUS + " block radius to other enemies. Bypasses iframes, and deaths from Detonation can trigger Detonation again.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("If an enemy dies within " + DEATH_RADIUS + " blocks of you it explodes, dealing ")
+			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
+			.append(Component.text(" magic damage in a " + DAMAGE_RADIUS + " block radius to other enemies."));
 	}
 }

@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,8 +14,11 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -56,7 +58,7 @@ public class FireworkBlast extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FireworkBlast::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.FIREWORK_ROCKET))
-			.descriptions(FireworkBlast::getDescription, MAX_RARITY);
+			.descriptions(FireworkBlast::getDescription);
 
 	public FireworkBlast(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -124,7 +126,11 @@ public class FireworkBlast extends DepthsAbility {
 		return fw.hasMetadata(ABILITY_METAKEY);
 	}
 
-	private static String getDescription(int rarity) {
-		return "Right click while sneaking and holding a weapon to shoot a firework that deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " projectile damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + (int) DepthsUtils.roundPercent(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to " + DepthsUtils.getRarityColor(rarity) + DAMAGE_CAP[rarity - 1] + ChatColor.WHITE + " damage. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right click while sneaking and holding a weapon to shoot a firework that deals")
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" projectile damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + StringUtils.multiplierToPercentage(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to "))
+			.append(Component.text(DAMAGE_CAP[rarity - 1], color))
+			.append(Component.text(" damage. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 }

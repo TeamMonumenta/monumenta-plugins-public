@@ -12,7 +12,9 @@ import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.ArrayList;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,7 +46,7 @@ public class IceBarrier extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceBarrier::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.PRISMARINE_WALL))
-			.descriptions(IceBarrier::getDescription, MAX_RARITY);
+			.descriptions(IceBarrier::getDescription);
 
 	public boolean mIsPrimed;
 	public @Nullable Location mPrimedLoc;
@@ -121,8 +123,14 @@ public class IceBarrier extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within " + DepthsUtils.getRarityColor(rarity) + MAX_LENGTH[rarity - 1] + ChatColor.WHITE + " blocks of the first marker forms a wall of ice connecting the two points, lasting for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Mobs that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Right clicking while sneaking and holding a weapon to place an ice marker up to " + CAST_RANGE + " blocks away. Placing a second marker within " + CAST_TIME / 20 + " seconds and within ")
+			.append(Component.text(MAX_LENGTH[rarity - 1], color))
+			.append(Component.text(" blocks of the first marker forms a wall of ice connecting the two points, lasting for "))
+			.append(Component.text(ICE_TICKS[rarity - 1] / 20, color))
+			.append(Component.text(" seconds. Mobs that break the barrier are stunned for 2s. Cooldown is refunded if no second marker is placed. Cooldown: "))
+			.append(Component.text(COOLDOWN[rarity - 1] / 20 + "s", color))
+			.append(Component.text("."));
 	}
 
 

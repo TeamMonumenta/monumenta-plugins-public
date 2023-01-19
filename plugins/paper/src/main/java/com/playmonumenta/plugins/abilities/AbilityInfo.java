@@ -16,7 +16,9 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
@@ -38,7 +40,7 @@ public class AbilityInfo<T extends Ability> {
 	// Ability name shorthand (for statistic purposes; no use in-game. Should be the fewest characters that identifies this)
 	private @Nullable String mShorthandName;
 	// List of descriptions to aid ability selection
-	private List<String> mDescriptions = new ArrayList<>();
+	private List<TextComponent> mDescriptions = new ArrayList<>();
 
 	// If the ability does not require a scoreboardID and just a classId, leave this as null.
 	private @Nullable String mScoreboardId = null;
@@ -123,16 +125,16 @@ public class AbilityInfo<T extends Ability> {
 	}
 
 	public AbilityInfo<T> descriptions(String level1, String level2) {
-		mDescriptions = List.of(level1, level2);
+		mDescriptions = Stream.of(level1, level2).map(Component::text).toList();
 		return this;
 	}
 
 	public AbilityInfo<T> descriptions(String level1, String level2, String enhancement) {
-		mDescriptions = List.of(level1, level2, enhancement);
+		mDescriptions = Stream.of(level1, level2, enhancement).map(Component::text).toList();
 		return this;
 	}
 
-	public AbilityInfo<T> descriptions(IntFunction<String> supplier, int levels) {
+	public AbilityInfo<T> descriptions(IntFunction<TextComponent> supplier, int levels) {
 		mDescriptions = IntStream.range(1, levels + 1).mapToObj(supplier).toList();
 		return this;
 	}
@@ -254,19 +256,17 @@ public class AbilityInfo<T extends Ability> {
 		return mDisplayItem == null ? null : mDisplayItem.clone();
 	}
 
-	public List<String> getDescriptions() {
+	public List<TextComponent> getDescriptions() {
 		return Collections.unmodifiableList(mDescriptions);
 	}
 
-	public String getDescription(int level) {
+	public TextComponent getDescription(int level) {
 		return mDescriptions.get(level - 1);
 	}
 
 	public Component getFormattedDescription(int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
-		String strDescription = mDescriptions.get(skillLevel - 1);
-		if (strDescription == null) {
-			strDescription = "NULL! Set description properly!";
-		}
+		Component description = getDescription(skillLevel);
+
 		String displayName = mDisplayName;
 		if (displayName == null) {
 			displayName = "NULL! Set name properly!";
@@ -284,11 +284,11 @@ public class AbilityInfo<T extends Ability> {
 
 		return Component.text("")
 			       .append(Component.text(skillHeader, coloured ? NamedTextColor.GREEN : NamedTextColor.GRAY, TextDecoration.BOLD))
-			       .append(Component.text(strDescription, coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
+			       .append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
 	public Component getFormattedDescriptions(int level, boolean isEnhanced, boolean enabled) {
-		if (mDescriptions.size() == 0) {
+		if (mDescriptions.isEmpty()) {
 			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
 		}
 
@@ -353,8 +353,8 @@ public class AbilityInfo<T extends Ability> {
 		}
 		if (!mDescriptions.isEmpty()) {
 			JsonArray descriptions = new JsonArray();
-			for (String strDescription : mDescriptions) {
-				descriptions.add(strDescription);
+			for (TextComponent description : mDescriptions) {
+				descriptions.add(description.content());
 			}
 			info.add("descriptions", descriptions);
 		}

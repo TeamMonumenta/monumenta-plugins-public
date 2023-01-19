@@ -3,14 +3,15 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,7 +34,7 @@ public class Bulwark extends DepthsAbility {
 			.linkedSpell(ClassAbility.BULWARK)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.NETHERITE_HELMET))
-			.descriptions(Bulwark::getDescription, MAX_RARITY);
+			.descriptions(Bulwark::getDescription);
 
 	public Bulwark(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -56,7 +57,9 @@ public class Bulwark extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "You block the next melee attack that would have hit you, nullifying the damage. Cooldown: " + DepthsUtils.getRarityColor(rarity) + COOLDOWN[rarity - 1] / 20 + "s" + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("You block the next melee attack that would have hit you, nullifying the damage. Cooldown: ")
+			.append(Component.text(COOLDOWN[rarity - 1] / 20 + "s", color))
+			.append(Component.text("."));
 	}
 }

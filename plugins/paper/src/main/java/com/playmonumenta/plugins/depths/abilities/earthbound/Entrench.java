@@ -2,14 +2,16 @@ package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -33,7 +35,7 @@ public class Entrench extends DepthsAbility {
 	public static final DepthsAbilityInfo<Entrench> INFO =
 		new DepthsAbilityInfo<>(Entrench.class, ABILITY_NAME, Entrench::new, DepthsTree.EARTHBOUND, DepthsTrigger.SPAWNER)
 			.displayItem(new ItemStack(Material.SOUL_SAND))
-			.descriptions(Entrench::getDescription, MAX_RARITY);
+			.descriptions(Entrench::getDescription);
 
 	public Entrench(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -56,8 +58,10 @@ public class Entrench extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Breaking a spawner roots mobs within " + RADIUS + " blocks for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20.0 + ChatColor.WHITE + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Breaking a spawner roots mobs within " + RADIUS + " blocks for ")
+			.append(Component.text(StringUtils.to2DP(DURATION[rarity - 1] / 20.0), color))
+			.append(Component.text(" seconds."));
 	}
 
 

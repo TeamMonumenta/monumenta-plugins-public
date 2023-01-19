@@ -22,13 +22,9 @@ import java.util.stream.IntStream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -138,9 +134,9 @@ public class BountyGui extends Gui {
 	private void pickR3DelveLevel() {
 		setTitle(Component.text("Choose your preset level!"));
 		if (mLevel == 0) {
-			setItem(PRESET_L1_LOCATIONS.get(0), createBasicItem(
+			setItem(PRESET_L1_LOCATIONS.get(0), GUIUtils.createBasicItem(
 				Material.LANTERN, 1, "None", NamedTextColor.AQUA,
-				false, "Delve presets will not be applied.", ChatColor.WHITE))
+				false, "Delve presets will not be applied.", NamedTextColor.WHITE, 30, true))
 				.onLeftClick(() -> {
 					mPresetLevel = 0;
 					update();
@@ -152,10 +148,10 @@ public class BountyGui extends Gui {
 					                                         .mapToInt(preset -> preset.mModifiers.entrySet().stream().mapToInt(e -> e.getKey().getPointsPerLevel() * e.getValue()).sum());
 				int minPoints = presetPoints.get().min().orElse(0);
 				int maxPoints = presetPoints.get().max().orElse(0);
-				setItem(PRESET_L1_LOCATIONS.get(i), createBasicItem(
+				setItem(PRESET_L1_LOCATIONS.get(i), GUIUtils.createBasicItem(
 					Material.SOUL_LANTERN, i, "Level " + i, NamedTextColor.AQUA,
 					false, "Delve presets will be rolled from level " + i + ".\n" +
-						       "Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " delve points.", ChatColor.WHITE))
+						       "Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " delve points.", NamedTextColor.WHITE, 30, true))
 					.onLeftClick(() -> {
 						mPresetLevel = level;
 						update();
@@ -208,10 +204,10 @@ public class BountyGui extends Gui {
 				final int finalI = i;
 				BountyData bounty = mBountyChoices.get(i);
 				if (bounty != null) {
-					setItem(BOUNTY_L1_LOCATIONS.get(i), createBasicItem(
+					setItem(BOUNTY_L1_LOCATIONS.get(i), GUIUtils.createBasicItem(
 						bounty.mMaterial, bounty.mName, NamedTextColor.AQUA,
 						false, ((bounty.mLevel != 0) ? "Tier " + bounty.mLevel : "")
-							       + (i < mPresetChoices.size() && mPresetChoices.get(i) != null ? (bounty.mLevel != 0 ? "\n" : "") + "This bounty will be a delve, using the delve preset shown below." : ""), ChatColor.WHITE))
+							       + (i < mPresetChoices.size() && mPresetChoices.get(i) != null ? (bounty.mLevel != 0 ? "\n" : "") + "This bounty will be a delve, using the delve preset shown below." : ""), NamedTextColor.WHITE))
 						.onLeftClick(() -> {
 							setBounty(mPlayer, mBountyChoices.get(finalI), finalI < mPresetChoices.size() ? mPresetChoices.get(finalI) : null);
 							close();
@@ -223,9 +219,9 @@ public class BountyGui extends Gui {
 				DelvePreset preset = mPresetChoices.get(i);
 				if (preset != null) {
 					setSize(5 * 9);
-					setItem(BOUNTY_L1_LOCATIONS.get(i) + 9, createBasicItem(
+					setItem(BOUNTY_L1_LOCATIONS.get(i) + 9, GUIUtils.createBasicItem(
 						preset.mDisplayItem, preset.mName, NamedTextColor.DARK_AQUA,
-						false, "Delve preset of level " + preset.mLevel + ".\nClick to view delve modifiers in this preset.", ChatColor.WHITE))
+						false, "Delve preset of level " + preset.mLevel + ".\nClick to view delve modifiers in this preset.", NamedTextColor.WHITE))
 						.onLeftClick(() -> {
 							close();
 							new DelveCustomInventory(mPlayer, "ring", false, mPresetChoices.get(finalI)).openInventory(mPlayer, mPlugin);
@@ -276,23 +272,6 @@ public class BountyGui extends Gui {
 		}
 	}
 
-	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
-		return createBasicItem(mat, 1, name, nameColor, nameBold, desc, loreColor);
-	}
-
-	public ItemStack createBasicItem(Material mat, int amt, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
-		ItemStack item = new ItemStack(mat, amt);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text(name, nameColor)
-			                 .decoration(TextDecoration.ITALIC, false)
-			                 .decoration(TextDecoration.BOLD, nameBold));
-		GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		item.setItemMeta(meta);
-		return item;
-	}
-
 	public static List<BountyData> parseData(int region) throws Exception {
 		List<BountyData> bounties = new ArrayList<>();
 		String bountyContent = FileUtils.readFile(Plugin.getInstance().getDataFolder().getPath() + "/bounties/region" + region + ".json");
@@ -320,15 +299,15 @@ public class BountyGui extends Gui {
 	}
 
 	public void createInfoItem() {
-		setItem(4, createBasicItem(
+		setItem(4, GUIUtils.createBasicItem(
 			Material.SCUTE, "Choose your bounty!", NamedTextColor.AQUA,
-			false, "Click the bounty you'd like to complete today.", ChatColor.WHITE));
+			false, "Click the bounty you'd like to complete today.", NamedTextColor.WHITE));
 	}
 
 	public void createDelveInfoItem() {
-		setItem(4, createBasicItem(
+		setItem(4, GUIUtils.createBasicItem(
 			Material.SCUTE, "Choose your preset level!", NamedTextColor.AQUA,
-			false, "Click the level of the delve preset you want to roll from.", ChatColor.WHITE));
+			false, "Click the level of the delve preset you want to roll from.", NamedTextColor.WHITE));
 	}
 
 	private static String getBountyChoiceObjective(int region, int bountyNum) {

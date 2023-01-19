@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -23,7 +24,7 @@ public class Aeromancy extends DepthsAbility {
 	public static final DepthsAbilityInfo<Aeromancy> INFO =
 		new DepthsAbilityInfo<>(Aeromancy.class, ABILITY_NAME, Aeromancy::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.FEATHER))
-			.descriptions(Aeromancy::getDescription, MAX_RARITY);
+			.descriptions(Aeromancy::getDescription);
 
 	public Aeromancy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -46,8 +47,12 @@ public class Aeromancy extends DepthsAbility {
 		return multiplier;
 	}
 
-	private static String getDescription(int rarity) {
-		return "All damage you deal while airborne is multiplied by " + DepthsUtils.getRarityColor(rarity) + PLAYER_DAMAGE[rarity - 1] + ChatColor.WHITE + ". Additionally, all damage you deal against airborne enemies is multiplied by " + DepthsUtils.getRarityColor(rarity) + MOB_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("All damage you deal while airborne is multiplied by ")
+			.append(Component.text(PLAYER_DAMAGE[rarity - 1], color))
+			.append(Component.text(". Additionally, all damage you deal against airborne enemies is multiplied by "))
+			.append(Component.text(MOB_DAMAGE[rarity - 1], color))
+			.append(Component.text("."));
 	}
 
 

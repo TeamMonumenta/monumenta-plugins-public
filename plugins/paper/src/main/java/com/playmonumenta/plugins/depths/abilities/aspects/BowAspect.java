@@ -2,11 +2,11 @@ package com.playmonumenta.plugins.depths.abilities.aspects;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -22,8 +22,8 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 	public static final DepthsAbilityInfo<BowAspect> INFO =
 		new DepthsAbilityInfo<>(BowAspect.class, ABILITY_NAME, BowAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
 			.displayItem(new ItemStack(Material.BOW))
-			.description("Your sneak fire with bow ability has " + (int) DepthsUtils.roundPercent(COOLDOWN_REDUCTION) + "% reduced cooldown, and you have a " +
-				             (int) DepthsUtils.roundPercent(PASSIVE_ARROW_SAVE) + "% chance for arrows to not be consumed when using a bow or crossbow.");
+			.description("Your sneak fire with bow ability has " + StringUtils.multiplierToPercentage(COOLDOWN_REDUCTION) + "% reduced cooldown, and you have a " +
+				             StringUtils.multiplierToPercentage(PASSIVE_ARROW_SAVE) + "% chance for arrows to not be consumed when using a bow or crossbow.");
 
 	public BowAspect(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

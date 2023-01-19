@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class Aura implements Infusion {
 
-	private static final double SLOW_PER_LEVEL = 0.02;
+	public static final double SLOW_PER_LEVEL = 0.02;
 	private static final int DURATION = 15;
 	private static final int RADIUS = 3;
 

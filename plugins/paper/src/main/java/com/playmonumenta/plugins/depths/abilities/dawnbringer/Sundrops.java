@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -11,10 +10,12 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -44,7 +45,7 @@ public class Sundrops extends DepthsAbility {
 	public static final DepthsAbilityInfo<Sundrops> INFO =
 		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SPAWNER)
 			.displayItem(new ItemStack(Material.HONEYCOMB_BLOCK))
-			.descriptions(Sundrops::getDescription, MAX_RARITY);
+			.descriptions(Sundrops::getDescription);
 
 	public Sundrops(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -98,8 +99,10 @@ public class Sundrops extends DepthsAbility {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
-	private static String getDescription(int rarity) {
-		return "Whenever a player in your party breaks a spawner, there is a " + DepthsUtils.getRarityColor(rarity) + DROP_CHANCE[rarity - 1] + "%" + ChatColor.WHITE + " chance of spawning a sundrop. Picking up a sundrop gives " + (int) DepthsUtils.roundPercent(PERCENT_SPEED) + "% speed and " + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Whenever a player in your party breaks a spawner, there is a ")
+			.append(Component.text(DROP_CHANCE[rarity - 1], color))
+			.append(Component.text(" chance of spawning a sundrop. Picking up a sundrop gives " + StringUtils.multiplierToPercentage(PERCENT_SPEED) + "% speed and " + StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%."));
 	}
 
 }

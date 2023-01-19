@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -10,7 +9,10 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +30,7 @@ public class OneWithTheWind extends DepthsAbility {
 	public static final DepthsAbilityInfo<OneWithTheWind> INFO =
 		new DepthsAbilityInfo<>(OneWithTheWind.class, ABILITY_NAME, OneWithTheWind::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.LIGHT_GRAY_BANNER))
-			.descriptions(OneWithTheWind::getDescription, MAX_RARITY);
+			.descriptions(OneWithTheWind::getDescription);
 
 	private boolean mActive = false;
 
@@ -51,8 +53,12 @@ public class OneWithTheWind extends DepthsAbility {
 		}
 	}
 
-	private static String getDescription(int rarity) {
-		return "If there are no other players in an " + RANGE + " block radius, you gain " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%" + ChatColor.WHITE + " resistance and " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("If there are no other players in an " + RANGE + " block radius, you gain ")
+			.append(Component.text(StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED[rarity - 1]) + "%", color))
+			.append(Component.text(" resistance and "))
+			.append(Component.text(StringUtils.multiplierToPercentage(SPEED[rarity - 1]) + "%", color))
+			.append(Component.text(" speed."));
 	}
 
 

@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,7 +14,10 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -48,7 +50,7 @@ public class LastBreath extends DepthsAbility {
 			.linkedSpell(ClassAbility.LAST_BREATH)
 			.cooldown(COOLDOWN)
 			.displayItem(new ItemStack(Material.DRAGON_BREATH))
-			.descriptions(LastBreath::getDescription, MAX_RARITY)
+			.descriptions(LastBreath::getDescription)
 			.priorityAmount(10000);
 
 	public LastBreath(Plugin plugin, Player player) {
@@ -110,8 +112,14 @@ public class LastBreath extends DepthsAbility {
 
 	}
 
-	private static String getDescription(int rarity) {
-		return "When your health drops below " + (int) DepthsUtils.roundPercent(TRIGGER_HEALTH) + "%, all your other Windwalker abilities' cooldowns are reset, and abilities from other trees have their cooldowns reduced by " + DepthsUtils.getRarityColor(rarity) + (int) DepthsUtils.roundPercent(COOLDOWN_REDUCTION[rarity - 1]) + "%" + ChatColor.WHITE + ". You gain " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed for " + SPEED_DURATION / 20 + " seconds, Resistance V for " + DepthsUtils.getRarityColor(rarity) + (RESISTANCE_TICKS[rarity - 1] / 20) + ChatColor.WHITE + " seconds, and mobs within " + RADIUS + " blocks are knocked away. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, all your other Windwalker abilities' cooldowns are reset, and abilities from other trees have their cooldowns reduced by ")
+			.append(Component.text(StringUtils.multiplierToPercentage(COOLDOWN_REDUCTION[rarity - 1]) + "%", color))
+			.append(Component.text(". You gain "))
+			.append(Component.text(StringUtils.multiplierToPercentage(SPEED[rarity - 1]) + "%", color))
+			.append(Component.text(" speed for " + SPEED_DURATION / 20 + " seconds, Resistance V for "))
+			.append(Component.text(RESISTANCE_TICKS[rarity - 1] / 20, color))
+			.append(Component.text(" seconds, and mobs within " + RADIUS + " blocks are knocked away. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

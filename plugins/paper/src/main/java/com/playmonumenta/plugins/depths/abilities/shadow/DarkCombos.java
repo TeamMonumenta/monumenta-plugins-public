@@ -10,7 +10,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -30,7 +32,7 @@ public class DarkCombos extends DepthsAbility {
 	public static final DepthsAbilityInfo<DarkCombos> INFO =
 		new DepthsAbilityInfo<>(DarkCombos.class, ABILITY_NAME, DarkCombos::new, DepthsTree.SHADOWDANCER, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.FLINT))
-			.descriptions(DarkCombos::getDescription, MAX_RARITY);
+			.descriptions(DarkCombos::getDescription);
 
 	private int mComboCount = 0;
 
@@ -57,8 +59,10 @@ public class DarkCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Every third melee attack applies " + DepthsUtils.getRarityColor(rarity) + VULN_AMPLIFIER[rarity - 1] + ChatColor.WHITE + " vulnerability for " + DURATION / 20 + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Every third melee attack applies ")
+			       .append(Component.text(VULN_AMPLIFIER[rarity - 1], color))
+			       .append(Component.text(" vulnerability for " + DURATION / 20 + " seconds."));
 	}
 
 

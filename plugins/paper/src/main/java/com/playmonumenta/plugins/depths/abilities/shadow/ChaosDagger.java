@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -15,11 +14,14 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -55,7 +57,7 @@ public class ChaosDagger extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChaosDagger::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.ITEM_FRAME))
-			.descriptions(ChaosDagger::getDescription, MAX_RARITY);
+			.descriptions(ChaosDagger::getDescription);
 
 	private @Nullable Entity mHitMob;
 
@@ -92,7 +94,6 @@ public class ChaosDagger extends DepthsAbility {
 		new BukkitRunnable() {
 
 			int mExpire = 0;
-			final World mWorld = mPlayer.getWorld();
 			@Nullable LivingEntity mTarget = EntityUtils.getNearestMob(dagger.getLocation(), 20.0);
 			@Nullable Location mLastLocation = null;
 
@@ -135,16 +136,12 @@ public class ChaosDagger extends DepthsAbility {
 					}
 					mTarget.setGlowing(true);
 
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							if (mHitMob != null && !(mHitMob instanceof MagmaCube && mHitMob.getName().contains("Gyrhaeddant"))) {
-								mHitMob.setGlowing(false);
-							}
-							mHitMob = null;
-							this.cancel();
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+						if (mHitMob != null && !(mHitMob instanceof MagmaCube && mHitMob.getName().contains("Gyrhaeddant"))) {
+							mHitMob.setGlowing(false);
 						}
-					}.runTaskLater(mPlugin, DAMAGE_DURATION);
+						mHitMob = null;
+					}, DAMAGE_DURATION);
 
 					dagger.remove();
 					this.cancel();
@@ -182,22 +179,19 @@ public class ChaosDagger extends DepthsAbility {
 			if (!enemy.isInvisible()) {
 				enemy.setGlowing(false);
 			}
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					if (enemy.isDead() || enemy.getHealth() < 0) {
-						AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION);
-					}
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				if (enemy.isDead() || enemy.getHealth() < 0) {
+					AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION);
 				}
-
-			}.runTaskLater(mPlugin, 1);
+			}, 1);
 		}
 		return false; // only changes event damage, and also prevents multiple calls itself by clearing mHitMob
 	}
 
-	private static String getDescription(int rarity) {
-		return "Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of melee or projectile damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + ". If this damage kills the target, gain stealth for 1.5s. The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Swap hands to throw a cursed dagger that stuns an enemy for " + STUN_DURATION / 20 + " seconds (rooting bosses instead). The next instance of melee or projectile damage you deal to this mob within " + DAMAGE_DURATION / 20 + " seconds is multiplied by ")
+			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
+			.append(Component.text(". If this damage kills the target, gain stealth for 1.5s. The dagger prioritizes nearby Elites and Bosses but can hit any mob in its path. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

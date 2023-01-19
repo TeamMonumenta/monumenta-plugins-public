@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,43 +33,49 @@ public class DelveInfusionUtils {
 	public static final NamespacedKey DEPTHS_MAT_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 
 	public enum DelveInfusionSelection {
-		PENNATE("pennate", InfusionType.PENNATE, NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material"), "White"),
-		CARAPACE("carapace", InfusionType.CARAPACE, NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material"), "Orange"),
-		AURA("aura", InfusionType.AURA, NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material"), "Magenta"),
-		EXPEDITE("expedite", InfusionType.EXPEDITE, NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material"), "LightBlue"),
-		CHOLER("choler", InfusionType.CHOLER, NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material"), "Yellow"),
-		UNYIELDING("unyielding", InfusionType.UNYIELDING, NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil"), "R1Bonus"),
-		USURPER("usurper", InfusionType.USURPER, NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material"), "Corrupted"),
-		VENGEFUL("vengeful", InfusionType.VENGEFUL, NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinished", "RogFinishedN", "RogFinishedC", "RogFinishedD"),
+		PENNATE("pennate", InfusionType.PENNATE, ItemStatUtils.Location.WHITE, Material.WHITE_WOOL, "Soul Essences", NamespacedKeyUtils.fromString("epic:r1/delves/white/auxiliary/delve_material"), "White"),
+		CARAPACE("carapace", InfusionType.CARAPACE, ItemStatUtils.Location.ORANGE, Material.ORANGE_WOOL, "Beastly Broods", NamespacedKeyUtils.fromString("epic:r1/delves/orange/auxiliary/delve_material"), "Orange"),
+		AURA("aura", InfusionType.AURA, ItemStatUtils.Location.MAGENTA, Material.MAGENTA_WOOL, "Plagueroot Saps", NamespacedKeyUtils.fromString("epic:r1/delves/magenta/auxiliary/delve_material"), "Magenta"),
+		EXPEDITE("expedite", InfusionType.EXPEDITE, ItemStatUtils.Location.LIGHTBLUE, Material.LIGHT_BLUE_WOOL, "Arcane Crystals", NamespacedKeyUtils.fromString("epic:r1/delves/lightblue/auxiliary/delve_material"), "LightBlue"),
+		CHOLER("choler", InfusionType.CHOLER, ItemStatUtils.Location.YELLOW, Material.YELLOW_WOOL, "Season's Wraths", NamespacedKeyUtils.fromString("epic:r1/delves/yellow/auxiliary/delve_material"), "Yellow"),
+		UNYIELDING("unyielding", InfusionType.UNYIELDING, ItemStatUtils.Location.WILLOWS, Material.MOSSY_COBBLESTONE, "Echoes of the Veil", NamespacedKeyUtils.fromString("epic:r1/delves/willows/auxiliary/echoes_of_the_veil"), "R1Bonus"),
+		USURPER("usurper", InfusionType.USURPER, ItemStatUtils.Location.REVERIE, Material.NETHER_WART_BLOCK, "Nightmare Fuels", NamespacedKeyUtils.fromString("epic:r1/delves/reverie/auxiliary/delve_material"), "Corrupted"),
+		VENGEFUL("vengeful", InfusionType.VENGEFUL, ItemStatUtils.Location.EPHEMERAL, Material.MAGMA_BLOCK, "Persistent Parchments", NamespacedKeyUtils.fromString("epic:r1/delves/rogue/persistent_parchment"), "RogFinished", "RogFinishedN", "RogFinishedC", "RogFinishedD"),
 
-		EMPOWERED("empowered", InfusionType.EMPOWERED, NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material"), "Lime"),
-		NUTRIMENT("nutriment", InfusionType.NUTRIMENT, NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material"), "Pink"),
-		EXECUTION("execution", InfusionType.EXECUTION, NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material"), "Gray"),
-		REFLECTION("reflection", InfusionType.REFLECTION, NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material"), "LightGray"),
-		MITOSIS("mitosis", InfusionType.MITOSIS, NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
-		ARDOR("ardor", InfusionType.ARDOR, NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
-		EPOCH("epoch", InfusionType.EPOCH, NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
-		NATANT("natant", InfusionType.NATANT, NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
-		UNDERSTANDING("understanding", InfusionType.UNDERSTANDING, NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
+		EMPOWERED("empowered", InfusionType.EMPOWERED, ItemStatUtils.Location.LIME, Material.LIME_WOOL, "Refound Knowledge", NamespacedKeyUtils.fromString("epic:r2/delves/lime/auxiliary/delve_material"), "Lime"),
+		NUTRIMENT("nutriment", InfusionType.NUTRIMENT, ItemStatUtils.Location.PINK, Material.PINK_WOOL, "Roots of Balance", NamespacedKeyUtils.fromString("epic:r2/delves/pink/auxiliary/delve_material"), "Pink"),
+		EXECUTION("execution", InfusionType.EXECUTION, ItemStatUtils.Location.GRAY, Material.GRAY_WOOL, "Forgotten Ashes", NamespacedKeyUtils.fromString("epic:r2/delves/gray/auxiliary/delve_material"), "Gray"),
+		REFLECTION("reflection", InfusionType.REFLECTION, ItemStatUtils.Location.LIGHTGRAY, Material.LIGHT_GRAY_WOOL, "Aurora Shards", NamespacedKeyUtils.fromString("epic:r2/delves/lightgray/auxiliary/delve_material"), "LightGray"),
+		MITOSIS("mitosis", InfusionType.MITOSIS, ItemStatUtils.Location.CYAN, Material.CYAN_WOOL, "Feverish Flesh", NamespacedKeyUtils.fromString("epic:r2/delves/cyan/auxiliary/delve_material"), "Cyan"),
+		ARDOR("ardor", InfusionType.ARDOR, ItemStatUtils.Location.PURPLE, Material.PURPLE_WOOL, "Despondent Doubloons", NamespacedKeyUtils.fromString("epic:r2/delves/purple/auxiliary/delve_material"), "Purple"),
+		EPOCH("epoch", InfusionType.EPOCH, ItemStatUtils.Location.TEAL, Material.CYAN_CONCRETE_POWDER, "Weathered Runes", NamespacedKeyUtils.fromString("epic:r2/delves/teal/auxiliary/delve_material"), "Teal"),
+		NATANT("natant", InfusionType.NATANT, ItemStatUtils.Location.SHIFTING, Material.BLUE_CONCRETE, "Primordial Clay", NamespacedKeyUtils.fromString("epic:r2/delves/shiftingcity/auxiliary/delve_material"), "Fred"),
+		UNDERSTANDING("understanding", InfusionType.UNDERSTANDING, ItemStatUtils.Location.FORUM, Material.BOOKSHELF, "Binah Leaves", NamespacedKeyUtils.fromString("epic:r2/delves/forum/auxiliary/delve_material"), "Forum"),
 
-		REFRESH("refresh", InfusionType.REFRESH, NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT", "SKTH"),
-		SOOTHING("soothing", InfusionType.SOOTHING, NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
-		QUENCH("quench", InfusionType.QUENCH, NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
-		GRACE("grace", InfusionType.GRACE, NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
-		GALVANIC("galvanic", InfusionType.GALVANIC, NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
-		DECAPITATION("decapitation", InfusionType.DECAPITATION, NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
-		FUELED("fueled", InfusionType.FUELED, NamespacedKeyUtils.fromString("epic:r3/items/currency/broken_god_gearframe"), "Brown"),
+		SOOTHING("soothing", InfusionType.SOOTHING, ItemStatUtils.Location.BLUE, Material.BLUE_WOOL, "Sorceress' Staves", NamespacedKeyUtils.fromString("epic:r3/items/currency/sorceress_stave"), "Blue"),
+		FUELED("fueled", InfusionType.FUELED, ItemStatUtils.Location.BROWN, Material.BROWN_WOOL, "Broken God Gearframes", NamespacedKeyUtils.fromString("epic:r3/items/currency/broken_god_gearframe"), "Brown"),
+		REFRESH("refresh", InfusionType.REFRESH, ItemStatUtils.Location.SILVER, Material.POLISHED_DEEPSLATE, "Silver Remnants", NamespacedKeyUtils.fromString("epic:r3/items/currency/silver_remnant"), "SKT", "SKTH"),
+		QUENCH("quench", InfusionType.QUENCH, ItemStatUtils.Location.FOREST, Material.DARK_OAK_WOOD, "Fenian Flowers", NamespacedKeyUtils.fromString("epic:r3/items/currency/fenian_flower"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		GRACE("grace", InfusionType.GRACE, ItemStatUtils.Location.KEEP, Material.CRACKED_STONE_BRICKS, "Iridium Catalysts", NamespacedKeyUtils.fromString("epic:r3/items/currency/iridium_catalyst"), ClassSelectionCustomInventory.R3_UNLOCK_SCOREBOARD),
+		GALVANIC("galvanic", InfusionType.GALVANIC, ItemStatUtils.Location.SCIENCE, Material.IRON_BLOCK, "Corrupted Circuits", NamespacedKeyUtils.fromString("epic:r3/items/currency/corrupted_circuit"), "Portal"),
+		DECAPITATION("decapitation", InfusionType.DECAPITATION, ItemStatUtils.Location.BLUESTRIKE, Material.WITHER_SKELETON_SKULL, "Shattered Masks", NamespacedKeyUtils.fromString("epic:r3/items/currency/shattered_mask"), "MasqueradersRuin"),
 
-		REFUND("refund", null, null, (String[]) null);
+		REFUND("refund", null, null, Material.GRINDSTONE, null, null, (String[]) null);
 
 		private final String mLabel;
 		private final @Nullable InfusionType mInfusionType;
+		private final @Nullable ItemStatUtils.Location mLocation;
+		private final Material mMaterial;
+		private final @Nullable String mDelveMatPlural;
 		private final @Nullable NamespacedKey mLootTable;
 		private final @Nullable List<String> mScoreboard;
 
-		DelveInfusionSelection(String label, @Nullable InfusionType infusionType, @Nullable NamespacedKey lootTable, @Nullable String... scoreboard) {
+		DelveInfusionSelection(String label, @Nullable InfusionType infusionType, @Nullable ItemStatUtils.Location location, Material material, @Nullable String delveMatPlural, @Nullable NamespacedKey lootTable, @Nullable String... scoreboard) {
 			mLabel = label;
 			mInfusionType = infusionType;
+			mLocation = location;
+			mMaterial = material;
+			mDelveMatPlural = delveMatPlural;
 			mLootTable = lootTable;
 			mScoreboard = scoreboard == null ? null : Arrays.asList(scoreboard);
 		}
@@ -87,8 +96,20 @@ public class DelveInfusionUtils {
 			return mLabel;
 		}
 
+		public String getCapitalizedLabel() {
+			return StringUtils.capitalizeWords(mLabel);
+		}
+
 		public @Nullable InfusionType getInfusionType() {
 			return mInfusionType;
+		}
+
+		public Material getMaterial() {
+			return mMaterial;
+		}
+
+		public String getDelveMatPlural() {
+			return mDelveMatPlural == null ? "" : mDelveMatPlural;
 		}
 
 		public @Nullable NamespacedKey getLootTable() {
@@ -97,6 +118,13 @@ public class DelveInfusionUtils {
 
 		public boolean isUnlocked(Player player) {
 			return mScoreboard == null || mScoreboard.stream().anyMatch(s -> s == null || ScoreboardUtils.getScoreboardValue(player, s).orElse(0) >= 1);
+		}
+
+		public TextColor getColor() {
+			if (mLocation == null) {
+				return NamedTextColor.WHITE;
+			}
+			return mLocation.getColor();
 		}
 	}
 

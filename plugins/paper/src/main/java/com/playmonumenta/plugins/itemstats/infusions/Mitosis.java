@@ -22,7 +22,7 @@ public class Mitosis implements Infusion {
 
 	private static final int DURATION = 3 * 20;
 	private static final int RADIUS = 5;
-	private static final double PERCENT_WEAKEN_PER_LEVEL = 0.0375;
+	public static final double PERCENT_WEAKEN_PER_LEVEL = 0.0375;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(214, 148, 181), 1.0f);
 
 	@Override

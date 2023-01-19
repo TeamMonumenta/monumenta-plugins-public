@@ -9,7 +9,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 public class Nutriment implements Infusion {
 
-	private static final double HEALING_PERCENT_PER_LEVEL = 0.015;
+	public static final double HEALING_PERCENT_PER_LEVEL = 0.015;
 
 	@Override
 	public String getName() {

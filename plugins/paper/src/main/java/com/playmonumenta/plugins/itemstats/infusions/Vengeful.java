@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Vengeful implements Infusion {
 
-	private static final double DAMAGE_MLT_PER_LVL = 0.02;
+	public static final double DAMAGE_MLT_PER_LVL = 0.02;
 	private static final int DURATION = 30 * 20;
 	private static final String EFFECT_NAME = "VengefulEffect";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(139, 0, 0), 1f);

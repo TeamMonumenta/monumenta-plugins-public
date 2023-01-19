@@ -8,7 +8,9 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -26,7 +28,7 @@ public class Permafrost extends DepthsAbility {
 	public static final DepthsAbilityInfo<Permafrost> INFO =
 		new DepthsAbilityInfo<>(Permafrost.class, ABILITY_NAME, Permafrost::new, DepthsTree.FROSTBORN, DepthsTrigger.SPAWNER)
 			.displayItem(new ItemStack(Material.QUARTZ))
-			.descriptions(Permafrost::getDescription, MAX_RARITY);
+			.descriptions(Permafrost::getDescription);
 
 	public Permafrost(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -61,11 +63,14 @@ public class Permafrost extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		if (rarity >= 6) {
-			return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer." + DepthsUtils.getRarityColor(rarity) + " Additionally, all ice you place is packed ice, which when Avalanched becomes normal ice.";
-		}
-		return "Breaking a spawner spawns ice around it that lasts for " + DepthsUtils.getRarityColor(rarity) + ICE_TICKS[rarity - 1] / 20 + ChatColor.WHITE + " seconds. All ice you place with abilities lasts " + DepthsUtils.getRarityColor(rarity) + ICE_BONUS_DURATION_SECONDS[rarity - 1] + ChatColor.WHITE + " seconds longer.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		Component twisted = rarity == 6 ? Component.text(" Additionally, all ice you place is packed ice, which when Avalanched becomes normal ice.", color) : Component.empty();
+		return Component.text("Breaking a spawner spawns ice around it that lasts for ")
+			.append(Component.text(ICE_TICKS[rarity - 1] / 20, color))
+			.append(Component.text(" seconds. All ice you place with abilities lasts "))
+			.append(Component.text(ICE_BONUS_DURATION_SECONDS[rarity - 1], color))
+			.append(Component.text(" seconds longer."))
+			.append(twisted);
 	}
 
 

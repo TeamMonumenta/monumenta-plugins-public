@@ -21,7 +21,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -126,7 +125,7 @@ public class CosmeticsGUI extends CustomInventory {
 						return;
 					}
 				}
-			} else if (mCurrentSpec == null && mCurrentAbility == null && mCurrentClass != null) {
+			} else if (mCurrentSpec == null && mCurrentAbility == null) {
 				// Choose skill
 				for (int i = 0; i < CosmeticSkillGUIConfig.SKILL_LOCS.length; i++) {
 					if (slot == CosmeticSkillGUIConfig.SKILL_LOCS[i]) {
@@ -251,7 +250,6 @@ public class CosmeticsGUI extends CustomInventory {
 					mCosmeticSkillChanged = true;
 				}
 				setUpCosmetics(player);
-				return;
 			}
 		}
 	}
@@ -482,8 +480,8 @@ public class CosmeticsGUI extends CustomInventory {
 
 		//Display intro items
 		{
-			ItemStack pageItem = createBasicItem(mCurrentClass.mDisplayItem.getType(), mCurrentClass.mClassName, mCurrentClass.mClassColor,
-				true, "Click to edit cosmetics for a skill!", ChatColor.YELLOW);
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mDisplayItem.getType(), mCurrentClass.mClassName, mCurrentClass.mClassColor,
+				true, "Click to edit cosmetics for a skill!", NamedTextColor.YELLOW);
 			mInventory.setItem(CosmeticSkillGUIConfig.INTRO_LOC, pageItem);
 		}
 
@@ -495,14 +493,14 @@ public class CosmeticsGUI extends CustomInventory {
 
 		// Display spec items
 		{
-			ItemStack pageItem = createBasicItem(mCurrentClass.mSpecOne.mDisplayItem.getType(), mCurrentClass.mSpecOne.mSpecName, NamedTextColor.RED,
-				true, "Click to edit cosmetics for " + mCurrentClass.mSpecOne.mSpecName + "!", ChatColor.GRAY);
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mSpecOne.mDisplayItem.getType(), mCurrentClass.mSpecOne.mSpecName, NamedTextColor.RED,
+				true, "Click to edit cosmetics for " + mCurrentClass.mSpecOne.mSpecName + "!", NamedTextColor.GRAY);
 			mInventory.setItem(CosmeticSkillGUIConfig.SPEC_ONE_LOC, pageItem);
 		}
 
 		{
-			ItemStack pageItem = createBasicItem(mCurrentClass.mSpecTwo.mDisplayItem.getType(), mCurrentClass.mSpecTwo.mSpecName, NamedTextColor.RED,
-				true, "Click to edit cosmetics for " + mCurrentClass.mSpecTwo.mSpecName + "!", ChatColor.GRAY);
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mSpecTwo.mDisplayItem.getType(), mCurrentClass.mSpecTwo.mSpecName, NamedTextColor.RED,
+				true, "Click to edit cosmetics for " + mCurrentClass.mSpecTwo.mSpecName + "!", NamedTextColor.GRAY);
 			mInventory.setItem(CosmeticSkillGUIConfig.SPEC_TWO_LOC, pageItem);
 		}
 
@@ -530,8 +528,8 @@ public class CosmeticsGUI extends CustomInventory {
 
 		//Display intro items
 		{
-			ItemStack pageItem = createBasicItem(mCurrentSpec.mDisplayItem.getType(), mCurrentSpec.mSpecName, NamedTextColor.RED,
-				true, "Click to edit cosmetics for a skill!", ChatColor.YELLOW);
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentSpec.mDisplayItem.getType(), mCurrentSpec.mSpecName, NamedTextColor.RED,
+				true, "Click to edit cosmetics for a skill!", NamedTextColor.YELLOW);
 			mInventory.setItem(CosmeticSkillGUIConfig.INTRO_LOC, pageItem);
 		}
 
@@ -563,34 +561,23 @@ public class CosmeticsGUI extends CustomInventory {
 	}
 
 	private ItemStack createClassItem(PlayerClass classToItemize) {
-		return createBasicItem(classToItemize.mDisplayItem.getType(), classToItemize.mClassName, classToItemize.mClassColor,
-			true, "Click to choose cosmetics for " + classToItemize.mClassName + "!", ChatColor.GRAY);
+		return GUIUtils.createBasicItem(classToItemize.mDisplayItem.getType(), classToItemize.mClassName, classToItemize.mClassColor,
+			true, "Click to choose cosmetics for " + classToItemize.mClassName + "!", NamedTextColor.GRAY);
 	}
 
 	private ItemStack createSkillItem(AbilityInfo<?> abilityToItemize) {
-		Objects.requireNonNull(mCurrentClass);
-		return createBasicItem(abilityToItemize.getDisplayItem().getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
-			true, "View cosmetics of this skill!", ChatColor.GRAY);
+		return createItem(abilityToItemize, "View cosmetics of this skill!", NamedTextColor.GRAY);
 	}
 
 	private ItemStack createSkillItemForCosmetic(AbilityInfo<?> abilityToItemize) {
-		Objects.requireNonNull(mCurrentClass);
-		return createBasicItem(abilityToItemize.getDisplayItem().getType(), abilityToItemize.getDisplayName(), mCurrentClass.mClassColor,
-			true, "Current skill", ChatColor.YELLOW);
+		return createItem(abilityToItemize, "Current skill", NamedTextColor.YELLOW);
 	}
 
-	// Copy from class GUI
-	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
-		ItemStack item = new ItemStack(mat, 1);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text(name, nameColor)
-			                 .decoration(TextDecoration.ITALIC, false)
-			                 .decoration(TextDecoration.BOLD, nameBold));
-		GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		item.setItemMeta(meta);
-		return item;
+	private ItemStack createItem(AbilityInfo<?> abilityToItemize, String desc, NamedTextColor loreColor) {
+		Objects.requireNonNull(mCurrentClass);
+		ItemStack baseItem = Objects.requireNonNull(abilityToItemize.getDisplayItem());
+		return GUIUtils.createBasicItem(baseItem.getType(), Objects.requireNonNull(abilityToItemize.getDisplayName()), mCurrentClass.mClassColor,
+			true, desc, loreColor);
 	}
 
 }

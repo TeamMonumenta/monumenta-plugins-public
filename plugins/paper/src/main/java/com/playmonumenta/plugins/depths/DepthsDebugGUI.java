@@ -1,20 +1,17 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 public class DepthsDebugGUI extends CustomInventory {
@@ -90,13 +87,7 @@ public class DepthsDebugGUI extends CustomInventory {
 	}
 
 	public void createCustomItem(DebugGUIItem targetItem) {
-		ItemStack newItem = new ItemStack(targetItem.mMaterial, 1);
-		ItemMeta meta = newItem.getItemMeta();
-		meta.displayName(Component.text(targetItem.mName, NamedTextColor.GOLD)
-				.decoration(TextDecoration.ITALIC, false));
-		GUIUtils.splitLoreLine(meta, targetItem.mLore, 30, ChatColor.GRAY, true);
-		newItem.setItemMeta(meta);
-		ItemUtils.setPlainTag(newItem);
-		mInventory.setItem(targetItem.mSlot, newItem);
+		ItemStack item = GUIUtils.createBasicItem(targetItem.mMaterial, targetItem.mName, NamedTextColor.GOLD, targetItem.mLore);
+		mInventory.setItem(targetItem.mSlot, item);
 	}
 }

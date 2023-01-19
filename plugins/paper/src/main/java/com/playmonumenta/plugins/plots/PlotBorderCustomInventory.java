@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import com.playmonumenta.structures.StructuresAPI;
@@ -14,17 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class PlotBorderCustomInventory extends CustomInventory {
@@ -217,17 +211,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	}
 
 	public ItemStack createCustomItem(TeleportEntry location) {
-		ItemStack newItem = new ItemStack(location.mType, 1);
-		ItemMeta meta = newItem.getItemMeta();
-		meta.displayName(Component.text(location.mName, NamedTextColor.GOLD)
-				.decoration(TextDecoration.ITALIC, false));
-		if (!location.mLore.isEmpty()) {
-			GUIUtils.splitLoreLine(meta, location.mLore, 30, ChatColor.DARK_PURPLE, true);
-		}
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		newItem.setItemMeta(meta);
-		ItemUtils.setPlainName(newItem, location.mName);
-		return newItem;
+		return GUIUtils.createBasicItem(location.mType, location.mName, NamedTextColor.GOLD, false, location.mLore, NamedTextColor.DARK_PURPLE);
 	}
 
 	public void setLayout(Player player) {

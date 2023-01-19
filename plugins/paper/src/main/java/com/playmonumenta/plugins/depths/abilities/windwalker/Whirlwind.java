@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -10,7 +9,10 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,7 +38,7 @@ public class Whirlwind extends DepthsAbility {
 	public static final DepthsAbilityInfo<Whirlwind> INFO =
 		new DepthsAbilityInfo<>(Whirlwind.class, ABILITY_NAME, Whirlwind::new, DepthsTree.WINDWALKER, DepthsTrigger.SPAWNER)
 			.displayItem(new ItemStack(Material.IRON_PICKAXE))
-			.descriptions(Whirlwind::getDescription, MAX_RARITY);
+			.descriptions(Whirlwind::getDescription);
 
 	public Whirlwind(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -61,10 +63,13 @@ public class Whirlwind extends DepthsAbility {
 		return true;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Breaking a spawner knocks back all mobs within " + RADIUS + " blocks with a speed of " + DepthsUtils.getRarityColor(rarity) + KNOCKBACK_SPEED[rarity - 1] + ChatColor.WHITE + ". Additionally, you receive " + DepthsUtils.getRarityColor(rarity) + DepthsUtils.roundPercent(SPEED[rarity - 1]) + "%" + ChatColor.WHITE + " speed for " + SPEED_DURATION / 20 + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Breaking a spawner knocks back all mobs within " + RADIUS + " blocks with a speed of ")
+			.append(Component.text(StringUtils.to2DP(KNOCKBACK_SPEED[rarity - 1]), color))
+			.append(Component.text(". Additionally, you receive "))
+			.append(Component.text(StringUtils.multiplierToPercentage(SPEED[rarity - 1]) + "%", color))
+			.append(Component.text(" speed for " + SPEED_DURATION / 20 + " seconds."));
 	}
-
 
 }
 

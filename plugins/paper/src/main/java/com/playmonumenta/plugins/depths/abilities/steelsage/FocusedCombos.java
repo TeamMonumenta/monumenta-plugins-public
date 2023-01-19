@@ -2,14 +2,16 @@ package com.playmonumenta.plugins.depths.abilities.steelsage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -29,7 +31,7 @@ public class FocusedCombos extends DepthsAbility {
 	public static final DepthsAbilityInfo<FocusedCombos> INFO =
 		new DepthsAbilityInfo<>(FocusedCombos.class, ABILITY_NAME, FocusedCombos::new, DepthsTree.STEELSAGE, DepthsTrigger.COMBO)
 			.displayItem(new ItemStack(Material.SPECTRAL_ARROW))
-			.descriptions(FocusedCombos::getDescription, MAX_RARITY);
+			.descriptions(FocusedCombos::getDescription);
 
 	private int mComboCount = 0;
 
@@ -56,8 +58,10 @@ public class FocusedCombos extends DepthsAbility {
 		return false;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Every third critical projectile shot deals " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " times damage and applies " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Every third critical projectile shot deals ")
+			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]) + "x", color))
+			.append(Component.text(" damage and applies " + StringUtils.multiplierToPercentage(BLEED_AMOUNT) + "% Bleed for " + BLEED_DURATION / 20 + " seconds."));
 	}
 
 

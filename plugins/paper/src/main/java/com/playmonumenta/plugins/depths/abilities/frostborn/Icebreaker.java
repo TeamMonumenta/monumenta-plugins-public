@@ -11,7 +11,9 @@ import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -29,7 +31,7 @@ public class Icebreaker extends DepthsAbility {
 	public static final DepthsAbilityInfo<Icebreaker> INFO =
 		new DepthsAbilityInfo<>(Icebreaker.class, ABILITY_NAME, Icebreaker::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
 			.displayItem(new ItemStack(Material.TUBE_CORAL_FAN))
-			.descriptions(Icebreaker::getDescription, MAX_RARITY);
+			.descriptions(Icebreaker::getDescription);
 
 	public Icebreaker(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -58,8 +60,12 @@ public class Icebreaker extends DepthsAbility {
 		return 1;
 	}
 
-	private static String getDescription(int rarity) {
-		return "Damage you deal to mobs that are on ice is multiplied by " + DepthsUtils.getRarityColor(rarity) + ICE_DAMAGE[rarity - 1] + ChatColor.WHITE + ". Damage you deal to mobs that are debuffed but not on ice is multiplied by " + DepthsUtils.getRarityColor(rarity) + EFFECT_DAMAGE[rarity - 1] + ChatColor.WHITE + ".";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Damage you deal to mobs that are on ice is multiplied by ")
+			.append(Component.text(ICE_DAMAGE[rarity - 1], color))
+			.append(Component.text(". Damage you deal to mobs that are debuffed but not on ice is multiplied by "))
+			.append(Component.text(EFFECT_DAMAGE[rarity - 1], color))
+			.append(Component.text("."));
 	}
 }
 

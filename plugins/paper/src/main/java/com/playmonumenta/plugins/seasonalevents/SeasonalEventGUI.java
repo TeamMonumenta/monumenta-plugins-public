@@ -13,7 +13,6 @@ import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -154,7 +153,7 @@ public class SeasonalEventGUI extends Gui {
 				if (missionDescription == null) {
 					missionDescription = "Mission description not set";
 				}
-				GUIUtils.splitLoreLine(meta, missionDescription, 30, ChatColor.RED, false);
+				GUIUtils.splitLoreLine(meta, missionDescription, NamedTextColor.RED, 30, false);
 				lore = meta.lore();
 				if (lore == null) {
 					lore = new ArrayList<>();
@@ -237,7 +236,7 @@ public class SeasonalEventGUI extends Gui {
 				if (namedTextColor == null) {
 					namedTextColor = NamedTextColor.WHITE;
 				}
-				GUIUtils.splitLoreLine(meta, description, 30, GUIUtils.namedTextColorToChatColor(namedTextColor), false);
+				GUIUtils.splitLoreLine(meta, description, namedTextColor, 30, false);
 				rewardItem.setItemMeta(meta);
 
 				setItem(rewardLocation, rewardItem);

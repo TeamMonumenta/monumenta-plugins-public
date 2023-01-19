@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -18,9 +17,13 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -49,7 +52,7 @@ public class RingOfFlames extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RingOfFlames::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.BLAZE_POWDER))
-			.descriptions(RingOfFlames::getDescription, MAX_RARITY);
+			.descriptions(RingOfFlames::getDescription);
 
 	public RingOfFlames(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -69,12 +72,7 @@ public class RingOfFlames extends DepthsAbility {
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 50, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0);
-			}
-		}.runTaskLater(mPlugin, 5);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0), 5);
 
 		Location tempLoc = loc.clone();
 		List<BoundingBox> boxes = new ArrayList<>();
@@ -137,7 +135,11 @@ public class RingOfFlames extends DepthsAbility {
 	}
 
 
-	private static String getDescription(int rarity) {
-		return "Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for " + DepthsUtils.getRarityColor(rarity) + DURATION[rarity - 1] / 20 + ChatColor.WHITE + " seconds. Enemies on the flame perimeter are dealt " + DepthsUtils.getRarityColor(rarity) + DAMAGE[rarity - 1] + ChatColor.WHITE + " magic damage every second, and they are inflicted with " + DepthsUtils.roundPercent(BLEED_AMOUNT) + "% Bleed and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s.";
+	private static TextComponent getDescription(int rarity, TextColor color) {
+		return Component.text("Left click while sneaking and holding a weapon to summon a ring of flames around you that lasts for ")
+			.append(Component.text(DURATION[rarity - 1] / 20, color))
+			.append(Component.text(" seconds. Enemies on the flame perimeter are dealt "))
+			.append(Component.text(DAMAGE[rarity - 1], color))
+			.append(Component.text(" magic damage every second, and they are inflicted with " + StringUtils.multiplierToPercentage(BLEED_AMOUNT) + "% Bleed and set on fire for " + EFFECT_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 }

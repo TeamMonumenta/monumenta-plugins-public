@@ -12,13 +12,11 @@ import java.util.Comparator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,15 +111,15 @@ public class PlotAccessCustomInventory extends CustomInventory {
 	}
 
 	private void makeControlButtons() {
-		mInventory.setItem(4, createBasicItem(Material.SCUTE, "Plot Selection", NamedTextColor.AQUA, false, "Click the head of the plot you would like to visit.",
-		                                      ChatColor.GOLD));
+		mInventory.setItem(4, GUIUtils.createBasicItem(Material.SCUTE, "Plot Selection", NamedTextColor.AQUA, false, "Click the head of the plot you would like to visit.",
+		                                      NamedTextColor.GOLD));
 		if (mCurrentPage != 1) {
-			mInventory.setItem(0, createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage - 1),
-			                                      ChatColor.GRAY));
+			mInventory.setItem(0, GUIUtils.createBasicItem(Material.ARROW, "Back", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage - 1),
+			                                      NamedTextColor.GRAY));
 		}
 		if (mCurrentPage < mNumPages) {
-			mInventory.setItem(8, createBasicItem(Material.ARROW, "Next", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage + 1),
-			                                      ChatColor.GRAY));
+			mInventory.setItem(8, GUIUtils.createBasicItem(Material.ARROW, "Next", NamedTextColor.GRAY, false, "Click to go to page " + (mCurrentPage + 1),
+			                                      NamedTextColor.GRAY));
 		}
 	}
 
@@ -152,20 +150,6 @@ public class PlotAccessCustomInventory extends CustomInventory {
 		head.setItemMeta(meta);
 		return head;
 	}
-
-	public ItemStack createBasicItem(Material mat, String name, NamedTextColor nameColor, boolean nameBold, String desc, ChatColor loreColor) {
-		ItemStack item = new ItemStack(mat, 1);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text(name, nameColor)
-				.decoration(TextDecoration.ITALIC, false)
-				.decoration(TextDecoration.BOLD, nameBold));
-		GUIUtils.splitLoreLine(meta, desc, 30, loreColor, true);
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		item.setItemMeta(meta);
-		return item;
-	}
-
 
 	private void fillJunk() {
 		for (int i = 0; i < 54; i++) {

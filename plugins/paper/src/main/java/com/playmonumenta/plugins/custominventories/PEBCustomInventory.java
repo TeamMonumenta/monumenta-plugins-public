@@ -15,9 +15,10 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -48,27 +49,28 @@ public class PEBCustomInventory extends CustomInventory {
 	private static class PebItem {
 		int mSlot;
 		Function<PEBCustomInventory, String> mName;
-		Function<PEBCustomInventory, String> mLore;
+		Function<PEBCustomInventory, TextComponent> mLore;
 		Material mType;
 		@Nullable BiConsumer<PEBCustomInventory, InventoryClickEvent> mAction;
-		ChatColor mChatColor;
 		boolean mCloseAfter;
 
-		public PebItem(int slot, String name, String lore, ChatColor color, Material type, boolean closeAfter) {
-			mSlot = slot;
-			mName = gui -> name;
-			mLore = gui -> lore;
-			mType = type;
-			mChatColor = color;
-			mCloseAfter = closeAfter;
+		public PebItem(int slot, String name, String lore, TextColor color, Material type, boolean closeAfter) {
+			this(slot, name, Component.text(lore, color), type, closeAfter);
 		}
 
-		public PebItem(int slot, Function<PEBCustomInventory, String> name, Function<PEBCustomInventory, String> lore, ChatColor color, Material type, boolean closeAfter) {
+		public PebItem(int slot, String name, TextComponent lore, Material type, boolean closeAfter) {
+			this(slot, gui -> name, gui -> lore, type, closeAfter);
+		}
+
+		public PebItem(int slot, Function<PEBCustomInventory, String> name, Function<PEBCustomInventory, String> lore, TextColor color, Material type, boolean closeAfter) {
+			this(slot, name, lore.andThen(s -> Component.text(s, color)), type, closeAfter);
+		}
+
+		public PebItem(int slot, Function<PEBCustomInventory, String> name, Function<PEBCustomInventory, TextComponent> lore, Material type, boolean closeAfter) {
 			mSlot = slot;
 			mName = name;
 			mLore = lore;
 			mType = type;
-			mChatColor = color;
 			mCloseAfter = closeAfter;
 		}
 
@@ -116,265 +118,266 @@ public class PEBCustomInventory extends CustomInventory {
 
 		// Common items for all but main menu
 		definePage(PebPage.COMMON,
-			new PebItem(0, "Back to Main Menu", "Returns you to page 1.", ChatColor.GOLD, Material.OBSERVER, false).switchToPage(PebPage.MAIN),
-			new PebItem(8, "Exit PEB", "Exits this menu.", ChatColor.GOLD, Material.RED_CONCRETE, false).action((gui, event) -> gui.mPlayer.closeInventory()),
+			new PebItem(0, "Back to Main Menu", "Returns you to page 1.", NamedTextColor.GOLD, Material.OBSERVER, false).switchToPage(PebPage.MAIN),
+			new PebItem(8, "Exit PEB", "Exits this menu.", NamedTextColor.GOLD, Material.RED_CONCRETE, false).action((gui, event) -> gui.mPlayer.closeInventory()),
 			new PebItem(45, "Delete P.E.B.s \u2717",
-				"Click to remove P.E.B.s from your inventory.", ChatColor.LIGHT_PURPLE,
+				"Click to remove P.E.B.s from your inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.FLINT_AND_STEEL, true).playerCommand("clickable peb_delete")
 		);
 
 		// main menu
 		definePage(PebPage.MAIN,
-			new PebItem(0, "", "", ChatColor.LIGHT_PURPLE, FILLER, false),
+			new PebItem(0, "", "", NamedTextColor.LIGHT_PURPLE, FILLER, false),
 			new PebItem(4, "Main Menu",
-				"A list of commonly used options, along with menu buttons to reach the full lists.", ChatColor.LIGHT_PURPLE,
+				"A list of commonly used options, along with menu buttons to reach the full lists.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false),
 			new PebItem(20, "Filtered Pickup and Disabled Drop",
-				"Click to choose your pickup and disabled drop preferences.", ChatColor.LIGHT_PURPLE,
+				"Click to choose your pickup and disabled drop preferences.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIRT, false).switchToPage(PebPage.PICKUP_AND_DISABLE_DROP),
 			new PebItem(21, "Toggle Darksight",
-				"Click to toggle whether Darksight provides Night Vision", ChatColor.LIGHT_PURPLE,
+				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
 				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
 			new PebItem(23, "Dailies",
-				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
+				"Click to see what daily content you have and haven't done today.", NamedTextColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, true).playerCommand("clickable peb_dailies"),
 			new PebItem(24, "Dungeon Instances",
-				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
+				"Click to view what dungeon instances you have open, and how old they are.", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, true).playerCommand("clickable peb_dungeoninfo"),
 			new PebItem(37, "Player Information",
-				"Details about Housing, Dailies, and other player-focused options.", ChatColor.LIGHT_PURPLE,
+				"Details about Housing, Dailies, and other player-focused options.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false).switchToPage(PebPage.PLAYER_INFO),
 			new PebItem(39, "Toggle-able Options",
-				"Inventory Sort, Filtered Pickup, and more toggleable choices.", ChatColor.LIGHT_PURPLE,
+				"Inventory Sort, Filtered Pickup, and more toggleable choices.", NamedTextColor.LIGHT_PURPLE,
 				Material.LEVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
 			new PebItem(41, "Server Information",
-				"Information such as how to use the PEB and random tips.", ChatColor.LIGHT_PURPLE,
+				"Information such as how to use the PEB and random tips.", NamedTextColor.LIGHT_PURPLE,
 				Material.DISPENSER, false).switchToPage(PebPage.SERVER_INFO),
 			new PebItem(43, "Book Skins",
-				"Change the color of the cover on your P.E.B.", ChatColor.LIGHT_PURPLE,
+				"Change the color of the cover on your P.E.B.", NamedTextColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, false).switchToPage(PebPage.BOOK_SKINS)
 		);
 
 		//Player Info
 		definePage(PebPage.PLAYER_INFO,
 			new PebItem(4, "Player Information",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false),
 			new PebItem(20, "Housing",
-				"Click to view housing information.", ChatColor.LIGHT_PURPLE,
+				"Click to view housing information.", NamedTextColor.LIGHT_PURPLE,
 				Material.OAK_DOOR, true).playerCommand("clickable peb_housing"),
 			new PebItem(22, "Class",
-				"Click to view your class and skills.", ChatColor.LIGHT_PURPLE,
+				"Click to view your class and skills.", NamedTextColor.LIGHT_PURPLE,
 				Material.STONE_SWORD, true).playerCommand("clickable peb_class"),
 			new PebItem(24, "Dungeon Instances",
-				"Click to view what dungeon instances you have open, and how old they are.", ChatColor.LIGHT_PURPLE,
+				"Click to view what dungeon instances you have open, and how old they are.", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, true).playerCommand("clickable peb_dungeoninfo"),
 			new PebItem(38, "Patron",
-				"Click to view patron information. Use /donate to learn about donating.", ChatColor.LIGHT_PURPLE,
+				"Click to view patron information. Use /donate to learn about donating.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, true).playerCommand("clickable peb_patroninfo"),
 			new PebItem(40, "Dailies",
-				"Click to see what daily content you have and haven't done today.", ChatColor.LIGHT_PURPLE,
+				"Click to see what daily content you have and haven't done today.", NamedTextColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, true).playerCommand("clickable peb_dailies"),
 			new PebItem(42, "Item Stats",
-				"Click to view your current item stats and compare items.", ChatColor.LIGHT_PURPLE,
+				"Click to view your current item stats and compare items.", NamedTextColor.LIGHT_PURPLE,
 				Material.KNOWLEDGE_BOOK, true).playerCommand("playerstats")
 		);
 
 		// Toggle-able Options
 		definePage(PebPage.TOGGLEABLE_OPTIONS,
 			new PebItem(4, "Toggleable Options",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.LEVER, false),
 			new PebItem(19, "Particle Options",
-				"Click to choose how many particles will be shown for different categories.", ChatColor.LIGHT_PURPLE,
+				"Click to choose how many particles will be shown for different categories.", NamedTextColor.LIGHT_PURPLE,
 				Material.NETHER_STAR, false).switchToPage(PebPage.PARTIAL_PARTICLES),
 			new PebItem(20, "Glowing options",
-				"Click to choose your preferences for the \"glowing\" effect.", ChatColor.LIGHT_PURPLE,
+				"Click to choose your preferences for the \"glowing\" effect.", NamedTextColor.LIGHT_PURPLE,
 				Material.SPECTRAL_ARROW, false).switchToPage(PebPage.GLOWING),
 			new PebItem(21, "Show name on patron buff announcement.",
-				"Toggles whether the player has their IGN in the buff announcement when they"
-					+ " activate " + ChatColor.GOLD + "Patreon " + ChatColor.LIGHT_PURPLE + "buffs.", ChatColor.LIGHT_PURPLE,
+				Component.text("Toggles whether the player has their IGN in the buff announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
+					.append(Component.text("Patreon ", NamedTextColor.GOLD))
+					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
 				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
 			new PebItem(23, "Inventory Drink",
-				"Click to toggle drinking potions with a right click in any inventory.", ChatColor.LIGHT_PURPLE,
+				"Click to toggle drinking potions with a right click in any inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, false).playerCommand("clickable peb_tid"),
 			new PebItem(24, "Filtered Pickup and Disabled Drop",
-				"Click to choose your pickup and disabled drop preferences.", ChatColor.LIGHT_PURPLE,
+				"Click to choose your pickup and disabled drop preferences.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIRT, false).switchToPage(PebPage.PICKUP_AND_DISABLE_DROP),
 			new PebItem(25, "Compass Particles",
-				"Click to toggle a trail of guiding particles when following the quest compass.", ChatColor.LIGHT_PURPLE,
+				"Click to toggle a trail of guiding particles when following the quest compass.", NamedTextColor.LIGHT_PURPLE,
 				Material.COMPASS, false).playerCommand("clickable peb_comp_particles"),
 			new PebItem(29, "Rocket Jump",
-				"Click to enable or disable Rocket Jump", ChatColor.LIGHT_PURPLE,
+				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
 			new PebItem(32, "Auto-abandon completed dungeons",
-				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", ChatColor.LIGHT_PURPLE,
+				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", NamedTextColor.LIGHT_PURPLE,
 				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),
 			new PebItem(33, "Spawner Equipment",
-				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", ChatColor.LIGHT_PURPLE,
+				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", NamedTextColor.LIGHT_PURPLE,
 				Material.SPAWNER, false).playerCommand("clickable peb_spawnerequipment"),
 			new PebItem(34, "Virtual Firmament",
-				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", ChatColor.LIGHT_PURPLE,
+				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", NamedTextColor.LIGHT_PURPLE,
 				Material.PRISMARINE, false).playerCommand("virtualfirmament"),
 			new PebItem(37, "Spoof World Names",
-				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", ChatColor.LIGHT_PURPLE,
+				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
 				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
 			new PebItem(38, "Toggle Darksight",
-				"Click to toggle whether Darksight provides Night Vision", ChatColor.LIGHT_PURPLE,
+				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
 				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
 			new PebItem(39, "Toggle Radiant",
-				"Click to toggle whether Radiant provides Night Vision.", ChatColor.LIGHT_PURPLE,
+				"Click to toggle whether Radiant provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
 			new PebItem(41, "Block Interactions",
-				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", ChatColor.LIGHT_PURPLE,
+				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", NamedTextColor.LIGHT_PURPLE,
 				Material.LOOM, false).playerCommand("blockinteractions"),
 			new PebItem(42, "Offhand Swapping",
-				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", ChatColor.LIGHT_PURPLE,
+				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", NamedTextColor.LIGHT_PURPLE,
 				Material.SHIELD, false).playerCommand("toggleswap"),
 			new PebItem(43, "Offhand Swapping in Inventory",
-				"Click to toggle whether pressing your swap key in an inventory will perform its vanilla action", ChatColor.LIGHT_PURPLE,
+				"Click to toggle whether pressing your swap key in an inventory will perform its vanilla action", NamedTextColor.LIGHT_PURPLE,
 				Material.SHIELD, false).playerCommand("toggleinventoryswap")
 		);
 
 		// Server Info
 		definePage(PebPage.SERVER_INFO,
 			new PebItem(4, "Server Information",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.DISPENSER, false),
 			new PebItem(20, "P.E.B. Introduction",
-				"Click to hear the P.E.B. Introduction.", ChatColor.LIGHT_PURPLE,
+				"Click to hear the P.E.B. Introduction.", NamedTextColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, true).playerCommand("clickable peb_intro"),
 			new PebItem(24, "Get a random tip!",
-				"Click to get a random tip!", ChatColor.LIGHT_PURPLE,
+				"Click to get a random tip!", NamedTextColor.LIGHT_PURPLE,
 				Material.REDSTONE_TORCH, true).playerCommand("clickable peb_tip")
 		);
 
 		// Book Skins
 		definePage(PebPage.BOOK_SKINS,
 			new PebItem(4, "Book Skins",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, false),
 			new PebItem(40, "Wool Colors",
-				"Click to jump to a page of wool colors.", ChatColor.LIGHT_PURPLE,
+				"Click to jump to a page of wool colors.", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, false).switchToPage(PebPage.WOOL_BOOK_SKINS),
 			new PebItem(19, "Enchanted Book",
-				"Click to change skin to Enchanted Book. (Default)", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Enchanted Book. (Default)", NamedTextColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, true).playerCommand("clickable peb_skin_enchantedbook"),
 			new PebItem(21, "Regal",
-				"Click to change skin to Regal.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Regal.", NamedTextColor.LIGHT_PURPLE,
 				Material.YELLOW_CONCRETE, true).playerCommand("clickable peb_skin_regal"),
 			new PebItem(23, "Crimson King",
-				"Upon the ancient powers creep...", ChatColor.DARK_RED,
+				"Upon the ancient powers creep...", NamedTextColor.DARK_RED,
 				Material.RED_TERRACOTTA, true).playerCommand("clickable peb_skin_ck"),
 			new PebItem(25, "Rose",
-				"Red like roses!", ChatColor.RED,
+				"Red like roses!", NamedTextColor.RED,
 				Material.RED_CONCRETE, true).playerCommand("clickable peb_skin_rose")
 		);
 
 		// Wool book skins
 		definePage(PebPage.WOOL_BOOK_SKINS,
 			new PebItem(9, "Back to Book Skins",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, false).switchToPage(PebPage.BOOK_SKINS),
 			new PebItem(4, "Wool Skins",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.ENCHANTED_BOOK, false),
 			new PebItem(11, "White",
-				"Click to change skin to White.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to White.", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, true).playerCommand("clickable peb_skin_white"),
 			new PebItem(12, "Orange",
-				"Click to change skin to Orange.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Orange.", NamedTextColor.LIGHT_PURPLE,
 				Material.ORANGE_WOOL, true).playerCommand("clickable peb_skin_orange"),
 			new PebItem(20, "Magenta",
-				"Click to change skin to Magenta.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Magenta.", NamedTextColor.LIGHT_PURPLE,
 				Material.MAGENTA_WOOL, true).playerCommand("clickable peb_skin_magenta"),
 			new PebItem(21, "Light Blue",
-				"Click to change skin to Light Blue.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Light Blue.", NamedTextColor.LIGHT_PURPLE,
 				Material.LIGHT_BLUE_WOOL, true).playerCommand("clickable peb_skin_lightblue"),
 			new PebItem(29, "Yellow",
-				"Click to change skin to Yellow.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Yellow.", NamedTextColor.LIGHT_PURPLE,
 				Material.YELLOW_WOOL, true).playerCommand("clickable peb_skin_yellow"),
 			new PebItem(30, "Lime",
-				"Click to change skin to Lime.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Lime.", NamedTextColor.LIGHT_PURPLE,
 				Material.LIME_WOOL, true).playerCommand("clickable peb_skin_lime"),
 			new PebItem(38, "Pink",
-				"Click to change skin to Pink.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Pink.", NamedTextColor.LIGHT_PURPLE,
 				Material.PINK_WOOL, true).playerCommand("clickable peb_skin_pink"),
 			new PebItem(39, "Gray",
-				"Click to change skin to Gray.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Gray.", NamedTextColor.LIGHT_PURPLE,
 				Material.GRAY_WOOL, true).playerCommand("clickable peb_skin_gray"),
 			new PebItem(14, "Light Gray",
-				"Click to change skin to Light Gray.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Light Gray.", NamedTextColor.LIGHT_PURPLE,
 				Material.LIGHT_GRAY_WOOL, true).playerCommand("clickable peb_skin_lightgray"),
 			new PebItem(15, "Cyan",
-				"Click to change skin to Cyan.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Cyan.", NamedTextColor.LIGHT_PURPLE,
 				Material.CYAN_WOOL, true).playerCommand("clickable peb_skin_cyan"),
 			new PebItem(23, "Purple",
-				"Click to change skin to Purple.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Purple.", NamedTextColor.LIGHT_PURPLE,
 				Material.PURPLE_WOOL, true).playerCommand("clickable peb_skin_purple"),
 			new PebItem(24, "Blue",
-				"Click to change skin to Blue.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Blue.", NamedTextColor.LIGHT_PURPLE,
 				Material.BLUE_WOOL, true).playerCommand("clickable peb_skin_blue"),
 			new PebItem(32, "Brown",
-				"Click to change skin to Brown.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Brown.", NamedTextColor.LIGHT_PURPLE,
 				Material.BROWN_WOOL, true).playerCommand("clickable peb_skin_brown"),
 			new PebItem(33, "Green",
-				"Click to change skin to Green.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Green.", NamedTextColor.LIGHT_PURPLE,
 				Material.GREEN_WOOL, true).playerCommand("clickable peb_skin_green"),
 			new PebItem(41, "Red",
-				"Click to change skin to Red.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Red.", NamedTextColor.LIGHT_PURPLE,
 				Material.RED_WOOL, true).playerCommand("clickable peb_skin_red"),
 			new PebItem(42, "Black",
-				"Click to change skin to Black.", ChatColor.LIGHT_PURPLE,
+				"Click to change skin to Black.", NamedTextColor.LIGHT_PURPLE,
 				Material.BLACK_WOOL, true).playerCommand("clickable peb_skin_black")
 		);
 
 		// Pickup and Disable Drop
 		definePage(PebPage.PICKUP_AND_DISABLE_DROP,
 			new PebItem(0, "Back to Toggleable Options",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
 			new PebItem(4, "Pickup and Disable Drop Settings",
-				"Choose the appropriate level of pickup filter and drop filter below.", ChatColor.LIGHT_PURPLE,
+				"Choose the appropriate level of pickup filter and drop filter below.", NamedTextColor.LIGHT_PURPLE,
 				Material.PRISMARINE_CRYSTALS, false),
 			new PebItem(11, "Disable Drop:",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.BLACK_CONCRETE, false),
 			new PebItem(19, "None",
-				"Disable no drops, the vanilla drop behavior.", ChatColor.LIGHT_PURPLE,
+				"Disable no drops, the vanilla drop behavior.", NamedTextColor.LIGHT_PURPLE,
 				Material.BARRIER, false).playerCommand("disabledrop none"),
 			new PebItem(20, "Equipped",
-				"Disable dropping of only equipped items.", ChatColor.LIGHT_PURPLE,
+				"Disable dropping of only equipped items.", NamedTextColor.LIGHT_PURPLE,
 				Material.LEATHER_HELMET, false).playerCommand("disabledrop equipped"),
 			new PebItem(21, "Tiered",
-				"Disable dropping of tiered items.", ChatColor.LIGHT_PURPLE,
+				"Disable dropping of tiered items.", NamedTextColor.LIGHT_PURPLE,
 				Material.OAK_STAIRS, false).playerCommand("disabledrop tiered"),
 			new PebItem(28, "Lore",
-				"Disable the drop of items with custom lore.", ChatColor.LIGHT_PURPLE,
+				"Disable the drop of items with custom lore.", NamedTextColor.LIGHT_PURPLE,
 				Material.LECTERN, false).playerCommand("disabledrop lore"),
 			new PebItem(29, "Interesting",
-				"Disable the dropping of anything that matches the default pickup filter of interesting items.", ChatColor.LIGHT_PURPLE,
+				"Disable the dropping of anything that matches the default pickup filter of interesting items.", NamedTextColor.LIGHT_PURPLE,
 				Material.GOLD_NUGGET, false).playerCommand("disabledrop interesting"),
 			new PebItem(30, "All",
-				"Disable all drops.", ChatColor.LIGHT_PURPLE,
+				"Disable all drops.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIRT, false).playerCommand("disabledrop all"),
 			new PebItem(15, "Pickup Filter:",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_CONCRETE, false),
 			new PebItem(23, "Tiered",
-				"Only pick up items that have a tier.", ChatColor.LIGHT_PURPLE,
+				"Only pick up items that have a tier.", NamedTextColor.LIGHT_PURPLE,
 				Material.OAK_STAIRS, false).playerCommand("pickup tiered"),
 			new PebItem(24, "Lore",
-				"Only pick up items that have custom lore.", ChatColor.LIGHT_PURPLE,
+				"Only pick up items that have custom lore.", NamedTextColor.LIGHT_PURPLE,
 				Material.LECTERN, false).playerCommand("pickup lore"),
 			new PebItem(25, "Interesting",
-				"Only pick up items are of interest for the adventuring player, like arrows, torches, and anything with custom lore.", ChatColor.LIGHT_PURPLE,
+				"Only pick up items are of interest for the adventuring player, like arrows, torches, and anything with custom lore.", NamedTextColor.LIGHT_PURPLE,
 				Material.GOLD_NUGGET, false).playerCommand("pickup interesting"),
 			new PebItem(41, "All",
-				"Pick up anything and everything, matching vanilla functionality.", ChatColor.LIGHT_PURPLE,
+				"Pick up anything and everything, matching vanilla functionality.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIRT, false).playerCommand("pickup all"),
 			new PebItem(43, "Threshold",
-				"Set the minimum size of a stack of uninteresting items to pick up.", ChatColor.LIGHT_PURPLE,
+				"Set the minimum size of a stack of uninteresting items to pick up.", NamedTextColor.LIGHT_PURPLE,
 				Material.OAK_SIGN, false)
 				.action((gui, event) -> {
 					gui.mPlayer.closeInventory();
@@ -385,67 +388,67 @@ public class PEBCustomInventory extends CustomInventory {
 		// Glowing options
 		definePage(PebPage.GLOWING,
 			new PebItem(0, "Back to Toggleable Options",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
 			new PebItem(4, "Glowing Settings",
 				"Choose for which entity types the glowing effect may be shown. " +
-					"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", ChatColor.LIGHT_PURPLE,
+					"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", NamedTextColor.LIGHT_PURPLE,
 				Material.SPECTRAL_ARROW, false),
 			new PebItem(22, "Enable All",
-				"Enable glowing for all entities (default).", ChatColor.LIGHT_PURPLE,
+				"Enable glowing for all entities (default).", NamedTextColor.LIGHT_PURPLE,
 				Material.GOLD_INGOT, false).playerCommand("glowing enable all"),
 			new PebItem(28, "Other Players",
-				"Toggle glowing for other players.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for other players.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_WALL_HEAD, false).playerCommand("glowing toggle other_players"),
 			new PebItem(29, "Yourself",
-				"Toggle glowing for yourself (visible in third-person). Disable this if glowing causes rendering issues.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for yourself (visible in third-person). Disable this if glowing causes rendering issues.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false).playerCommand("glowing toggle self"),
 			new PebItem(30, "Mobs",
-				"Toggle glowing for mobs.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for mobs.", NamedTextColor.LIGHT_PURPLE,
 				Material.ZOMBIE_HEAD, false).playerCommand("glowing toggle mobs"),
 			new PebItem(31, "Bosses",
-				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, so are affected by that option as well.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for bosses. Note that pretty much all bosses are mobs, so are affected by that option as well.", NamedTextColor.LIGHT_PURPLE,
 				Material.DRAGON_HEAD, false).playerCommand("glowing toggle bosses"),
 			new PebItem(32, "Invisible Entities",
-				"Toggle glowing for invisible entities.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for invisible entities.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS, false).playerCommand("glowing toggle invisible"),
 			new PebItem(33, "Experience Orbs",
-				"Toggle glowing for experience orbs.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for experience orbs.", NamedTextColor.LIGHT_PURPLE,
 				Material.EXPERIENCE_BOTTLE, false).playerCommand("glowing toggle experience_orbs"),
 			new PebItem(34, "Miscellaneous",
-				"Toggle glowing for miscellaneous entities, i.e. entities that don't fit into any other category.", ChatColor.LIGHT_PURPLE,
+				"Toggle glowing for miscellaneous entities, i.e. entities that don't fit into any other category.", NamedTextColor.LIGHT_PURPLE,
 				Material.IRON_NUGGET, false).playerCommand("glowing toggle misc"),
 			new PebItem(40, "Disable All",
-				"Disable glowing for all entities.", ChatColor.LIGHT_PURPLE,
+				"Disable glowing for all entities.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIRT, false).playerCommand("glowing disable all")
 		);
 
 		// Rocket Jump Option
 		definePage(PebPage.ROCKET_JUMP,
 			new PebItem(0, "Back to Toggleable Options",
-				"", ChatColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
 			new PebItem(4, "Rocket Jump Settings",
-				"Choose how Unstable Amalgam should interact with you.", ChatColor.LIGHT_PURPLE,
+				"Choose how Unstable Amalgam should interact with you.", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false),
 			new PebItem(20, "Enable All",
-				"Enable to rocket jump from ANY Unstable Amalgam.", ChatColor.LIGHT_PURPLE,
+				"Enable to rocket jump from ANY Unstable Amalgam.", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_STAR, false).serverCommand("scoreboard players set @S RocketJumper 100"),
 			new PebItem(22, "Enable your",
-				"Enable to rocket jump only from YOUR Unstable Amalgam.", ChatColor.LIGHT_PURPLE,
+				"Enable to rocket jump only from YOUR Unstable Amalgam.", NamedTextColor.LIGHT_PURPLE,
 				Material.CLAY_BALL, false).serverCommand("scoreboard players set @S RocketJumper 1"),
 			new PebItem(24, "Disable all",
-				"Disable to rocket jump from ANY Unstable Amalgam.", ChatColor.LIGHT_PURPLE,
+				"Disable to rocket jump from ANY Unstable Amalgam.", NamedTextColor.LIGHT_PURPLE,
 				Material.SKELETON_SKULL, false).serverCommand("scoreboard players set @S RocketJumper 0")
 		);
 
 		// Partial particle settings
 		definePage(PebPage.PARTIAL_PARTICLES,
 			new PebItem(0, "Back to Toggleable Options",
-				"", ChatColor.GRAY,
+				"", NamedTextColor.GRAY,
 				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
 			new PebItem(4, "Particle Settings",
-				"Choose how many particles are shown for abilities of various categories. These settings can also be changed using the /particles command.", ChatColor.GRAY,
+				"Choose how many particles are shown for abilities of various categories. These settings can also be changed using the /particles command.", NamedTextColor.GRAY,
 				Material.NETHER_STAR, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
 			makePartialParticlePebItem(19, "Own Active Abilities", "Particle multiplier for your own active abilities", Material.PLAYER_HEAD, ParticleCategory.OWN_ACTIVE),
 			makePartialParticlePebItem(20, "Own Passive Abilities", "Particle multiplier for your own passive abilities", Material.FIREWORK_STAR, ParticleCategory.OWN_PASSIVE),
@@ -463,7 +466,7 @@ public class PEBCustomInventory extends CustomInventory {
 	private static PebItem makePartialParticlePebItem(int slot, String name, String description, Material material, ParticleCategory category) {
 		String objectiveName = Objects.requireNonNull(category.mObjectiveName);
 		return new PebItem(slot, gui -> name + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
-				gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", ChatColor.GRAY,
+				gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", NamedTextColor.GRAY,
 				material, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS)
 				.action((gui, event) -> {
 					int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
@@ -553,11 +556,8 @@ public class PEBCustomInventory extends CustomInventory {
 			meta.displayName(Component.text(name, NamedTextColor.WHITE)
 				.decoration(TextDecoration.ITALIC, false));
 		}
-		ChatColor defaultColor = (item.mChatColor != null) ? item.mChatColor : ChatColor.LIGHT_PURPLE;
-		String lore = item.mLore.apply(this);
-		if (!lore.isEmpty()) {
-			GUIUtils.splitLoreLine(meta, lore, 30, defaultColor, true);
-		}
+		TextComponent lore = item.mLore.apply(this);
+		GUIUtils.splitLoreLine(meta, lore, 30, true);
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		newItem.setItemMeta(meta);
 		ItemUtils.setPlainName(newItem);

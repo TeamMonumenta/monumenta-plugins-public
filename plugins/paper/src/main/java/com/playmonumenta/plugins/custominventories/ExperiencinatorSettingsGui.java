@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -27,7 +30,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import static org.bukkit.ChatColor.AQUA;
-import static org.bukkit.ChatColor.BOLD;
 import static org.bukkit.ChatColor.GOLD;
 import static org.bukkit.ChatColor.GRAY;
 import static org.bukkit.ChatColor.ITALIC;
@@ -141,8 +143,8 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 		// back button
 		ItemStack backButton = new ItemStack(Material.OBSERVER);
 		ItemMeta meta = backButton.getItemMeta();
-		meta.setDisplayName(GRAY + "" + BOLD + "Back");
-		meta.setLore(List.of(GRAY + "Return to the main menu"));
+		meta.displayName(Component.text("Back", NamedTextColor.GRAY, TextDecoration.BOLD));
+		meta.lore(List.of(Component.text("Return to the main menu", NamedTextColor.GRAY)));
 		backButton.setItemMeta(meta);
 		mInventory.setItem(0, backButton);
 
@@ -177,9 +179,10 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 			if (conversionId == 0) {
 				ItemStack item = new ItemStack(Material.BARRIER, 1);
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName(GRAY + "Disabled");
-				meta.setLore(List.of(AQUA + "Will not convert ",
-					WHITE + "" + region.getPlainDisplay() + tier.getPlainDisplay() + AQUA + " items."));
+				meta.displayName(Component.text("Disabled", NamedTextColor.GRAY));
+				meta.lore(List.of(Component.text("Will not convert ", NamedTextColor.AQUA)
+					                     .append(Component.text(region.getPlainDisplay() + tier.getPlainDisplay(), NamedTextColor.WHITE))
+					                     .append(Component.text(" items.", NamedTextColor.AQUA))));
 				item.setItemMeta(meta);
 				mInventory.setItem(offset + 1 + i, item);
 			} else {
@@ -215,7 +218,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				ItemUtils.setPlainName(item, ItemUtils.getPlainNameIfExists(conversionResult.getItem()));
 
 				ItemMeta meta = item.getItemMeta();
-				meta.setDisplayName(WHITE + "Convert to " + GOLD + conversion.getName());
+				meta.displayName(Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)));
 				List<String> lore = new ArrayList<>();
 				lore.add(AQUA + "Will convert " + WHITE + region.getPlainDisplay() + tier.getPlainDisplay());
 				lore.add(AQUA + "items to " + GOLD + (rawAmount < 0 ? "" : item.getAmount() + " ") + (rawAmount > 0 && item.getAmount() == 1 ? conversionResult.getNameSingular() : conversionResult.getName()) + AQUA + ".");

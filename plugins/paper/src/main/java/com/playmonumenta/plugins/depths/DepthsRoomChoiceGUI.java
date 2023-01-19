@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.utils.GUIUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -9,13 +8,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class DepthsRoomChoiceGUI extends CustomInventory {
 	private static final Material NO_CHOICE = Material.BLACK_STAINED_GLASS_PANE;
@@ -38,40 +34,41 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 
 	static {
 		ROOM_LOCATIONS.add(new RoomChoice(0, DepthsRoomType.ABILITY,
-			createBasicItem(Material.BOOK, "Normal Room with Ability Reward",
+			GUIUtils.createBasicItem(Material.BOOK, "Normal Room with Ability Reward",
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants an ability upon clearing the room.")));
 		ROOM_LOCATIONS.add(new RoomChoice(18, DepthsRoomType.ABILITY_ELITE,
-			createBasicItem(Material.ENCHANTED_BOOK, "Elite Room with Ability Reward",
+			GUIUtils.createBasicItem(Material.ENCHANTED_BOOK, "Elite Room with Ability Reward",
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants a powerful ability upon clearing the room.")));
 		ROOM_LOCATIONS.add(new RoomChoice(22, DepthsRoomType.BOSS,
-			createBasicItem(Material.WITHER_ROSE, "Boss Challenge",
+			GUIUtils.createBasicItem(Material.WITHER_ROSE, "Boss Challenge",
 				NamedTextColor.LIGHT_PURPLE,
 				"")));
 		ROOM_LOCATIONS.add(new RoomChoice(8, DepthsRoomType.UPGRADE,
-			createBasicItem(Material.DAMAGED_ANVIL, "Normal Room with Upgrade Reward",
+			GUIUtils.createBasicItem(Material.DAMAGED_ANVIL, "Normal Room with Upgrade Reward",
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants an upgrade upon clearing the room.")));
 		ROOM_LOCATIONS.add(new RoomChoice(26, DepthsRoomType.UPGRADE_ELITE,
-			createBasicItem(Material.ANVIL, "Elite Room with Upgrade Reward",
+			GUIUtils.createBasicItem(Material.ANVIL, "Elite Room with Upgrade Reward",
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants a powerful upgrade upon clearing the room.")));
 		ROOM_LOCATIONS.add(new RoomChoice(11, DepthsRoomType.TREASURE,
-			createBasicItem(Material.GOLD_NUGGET, "Normal Room with Treasure Reward",
+			GUIUtils.createBasicItem(Material.GOLD_NUGGET, "Normal Room with Treasure Reward",
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants 3 treasure score for room completion.")));
 		ROOM_LOCATIONS.add(new RoomChoice(15, DepthsRoomType.TREASURE_ELITE,
-			createBasicItem(Material.GOLD_INGOT, "Elite Room with Treasure Reward",
+			GUIUtils.createBasicItem(Material.GOLD_INGOT, "Elite Room with Treasure Reward",
 				NamedTextColor.LIGHT_PURPLE,
 				"Grants 5 treasure score for room completion.")));
 		ROOM_LOCATIONS.add(new RoomChoice(4, DepthsRoomType.UTILITY,
-			createBasicItem(Material.ENDER_CHEST, "Utility Room",
+			GUIUtils.createBasicItem(Material.ENDER_CHEST, "Utility Room",
 				NamedTextColor.LIGHT_PURPLE,
 				"A non-combat room with a random other benefit.")));
 		ROOM_LOCATIONS.add(new RoomChoice(13, DepthsRoomType.TWISTED,
-			createBasicItem(Material.BLACK_CONCRETE, ChatColor.MAGIC + "XXXXXX",
-				TextColor.color(LEVELSIX), "")));
+			GUIUtils.createBasicItem(Material.BLACK_CONCRETE, 1,
+				Component.text("XXXXXX", TextColor.color(LEVELSIX), TextDecoration.OBFUSCATED),
+				"", NamedTextColor.GRAY, 30, true)));
 	}
 
 
@@ -113,21 +110,6 @@ public class DepthsRoomChoiceGUI extends CustomInventory {
 		}
 
 		event.getWhoClicked().closeInventory();
-	}
-
-	private static ItemStack createBasicItem(Material mat, String name, TextColor nameColor, String desc) {
-		ItemStack item = new ItemStack(mat, 1);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text(name, nameColor)
-			.decoration(TextDecoration.ITALIC, false));
-		if (!desc.isEmpty()) {
-			GUIUtils.splitLoreLine(meta, desc, 30, ChatColor.GRAY, true);
-		}
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		item.setItemMeta(meta);
-		ItemUtils.setPlainName(item);
-		return item;
 	}
 
 	public void fillEmpty() {
