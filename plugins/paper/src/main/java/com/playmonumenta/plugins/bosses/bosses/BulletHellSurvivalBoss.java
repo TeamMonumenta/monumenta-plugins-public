@@ -37,7 +37,7 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 
 	final Parameters mParam;
 	private static double PLAYER_BOUNDING_BOX_XZ = 0.61;
-	private static double PLAYER_JUMP_HEIGHT = 1.2523;
+	private static double PLAYER_BASE_JUMP_HEIGHT = 1.2523;
 	private static double BULLET_HITBOX_RADIUS = 0.3125 / 2.0;
 	private static List<Material> cheeseBlocks = Arrays.asList(Material.TWISTING_VINES, Material.CAVE_VINES, Material.LADDER, Material.WATER, Material.LAVA, Material.VINE, Material.WEEPING_VINES, Material.SCAFFOLDING);
 
@@ -68,14 +68,12 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 		for (Player player : players) {
 			if (!EffectManager.getInstance().hasEffect(player, RespawnStasis.class) && !player.isDead() && player.getGameMode() != GameMode.SPECTATOR) {
 				double heightdiff = player.getLocation().getY() - boss.getLocation().getY();
-				PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP);
-				double jumpLevel = (jump == null ? 0 : jump.getAmplifier() + 1);
-				double jumpMod = 1 + jumpLevel * 0.5;
+				double jumpHeight = PlayerUtils.getJumpHeight(player);
 				if (heightdiff > BULLET_HITBOX_RADIUS && playerOnBlock(player)) {
 					return -1;
-				} else if (heightdiff < -PLAYER_JUMP_HEIGHT || heightdiff > jumpMod * PLAYER_JUMP_HEIGHT) {
+				} else if (heightdiff < -PLAYER_BASE_JUMP_HEIGHT || heightdiff > jumpHeight) {
 					return -1;
-				} else if (jumpMod != 1) {
+				} else if (jumpHeight != PLAYER_BASE_JUMP_HEIGHT) {
 					return 0;
 				}
 			}
@@ -111,10 +109,8 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 		Location loc = mBoss.getLocation();
 		if (source instanceof Player p) {
 			double heightdiff = p.getLocation().getY() - loc.getY();
-			PotionEffect jump = p.getPotionEffect(PotionEffectType.JUMP);
-			double jumpLevel = (jump == null ? 0 : jump.getAmplifier() + 1);
-			double jumpMod = 1 + jumpLevel * 0.5;
-			if (heightdiff > jumpMod * PLAYER_JUMP_HEIGHT || heightdiff < -PLAYER_JUMP_HEIGHT || (heightdiff > BULLET_HITBOX_RADIUS && playerOnBlock(p))) {
+			double jumpHeight = PlayerUtils.getJumpHeight(p);
+			if (heightdiff > jumpHeight || heightdiff < -PLAYER_BASE_JUMP_HEIGHT || (heightdiff > BULLET_HITBOX_RADIUS && playerOnBlock(p))) {
 				event.setCancelled(true);
 
 				World world = mBoss.getWorld();

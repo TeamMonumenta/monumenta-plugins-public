@@ -486,4 +486,11 @@ public class PlayerUtils {
 	public static void resetAttackCooldown(Player player) {
 		NmsUtils.getVersionAdapter().setAttackCooldown(player, 0);
 	}
+
+	public static double getJumpHeight(Player player) {
+		PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP);
+		double jumpLevel = (jump == null ? -1 : jump.getAmplifier());
+		double jumpHeight = (jumpLevel < 0 ? 1.2523 : 0.0308354 * jumpLevel * jumpLevel + 0.744631 * jumpLevel + 1.836131); // Quadratic function taken from mc wiki - thanks mojank!
+		return jumpHeight;
+	}
 }
