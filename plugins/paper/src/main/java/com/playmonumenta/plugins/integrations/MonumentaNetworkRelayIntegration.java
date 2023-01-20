@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public class MonumentaNetworkRelayIntegration {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
 	public static final String AUDIT_LOG_SEVERE_CHANNEL = "Monumenta.Automation.AuditLogSevere";
+	public static final String AUDIT_LOG_DEATH_CHANNEL = "Monumenta.Automation.DeathAuditLog";
 	public static final String ADMIN_ALERT_CHANNEL = "Monumenta.Automation.AdminNotification";
 
 	private final Logger mLogger;
@@ -17,6 +18,19 @@ public class MonumentaNetworkRelayIntegration {
 		logger.info("Enabling MonumentaNetworkRelay integration");
 		mLogger = logger;
 		INSTANCE = this;
+	}
+
+	public static void sendDeathAuditLogMessage(String message) {
+		if (INSTANCE != null) {
+			JsonObject data = new JsonObject();
+			data.addProperty("message", message);
+			try {
+				NetworkRelayAPI.sendMessage("automation-bot", AUDIT_LOG_DEATH_CHANNEL, data);
+			} catch (Exception ex) {
+				INSTANCE.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	public static void sendAuditLogSevereMessage(String message) {

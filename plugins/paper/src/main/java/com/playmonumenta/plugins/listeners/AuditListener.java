@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -118,7 +119,7 @@ public class AuditListener implements Listener {
 		Player player = event.getEntity();
 
 		// TODO Update MessageUtils.plain() to accept a language file to translate with
-		log("Death: " + player.getName() + " " + event.getDeathMessage());
+		logDeath("<" + player.getWorld().getName() + ">" + " Death: " + player.getName() + " " + event.getDeathMessage());
 
 		checkDestroy(player);
 	}
@@ -266,15 +267,27 @@ public class AuditListener implements Listener {
 	public static void logSevere(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
-			MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(message);
+			MonumentaNetworkRelayIntegration.sendAuditLogSevereMessage(createLocationData() + " " + message);
 		}
 	}
 
 	public static void log(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
-			MonumentaNetworkRelayIntegration.sendAuditLogMessage(message);
+			MonumentaNetworkRelayIntegration.sendAuditLogMessage(createLocationData() + " " + message);
 		}
+	}
+
+	public static void logDeath(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + createLocationData() + " " + message);
+			MonumentaNetworkRelayIntegration.sendDeathAuditLogMessage(createLocationData() + " " + message);
+		}
+	}
+
+	public static String createLocationData() {
+		String playerShard = PlaceholderAPI.setPlaceholders(null, "%network-relay_shard%");
+		return "<" + playerShard + ">";
 	}
 
 	private void checkDestroy(HumanEntity player) {
