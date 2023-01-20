@@ -25,7 +25,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -40,6 +39,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
@@ -202,14 +202,18 @@ public class QuiverListener implements Listener {
 		return result;
 	}
 
+	private boolean mCallProjectileLaunchEvent = false;
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityShootBowEvent(EntityShootBowEvent event) {
+		mCallProjectileLaunchEvent = false;
 		if (event.getEntity() instanceof Player player
 			    && ItemStatUtils.isQuiver(event.getConsumable())) {
 			ItemStack quiver = event.getConsumable();
+			boolean hasInfinity = ItemStatUtils.hasEnchantment(event.getBow(), ItemStatUtils.EnchantmentType.INFINITY);
 			Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, 1, item -> {
 				// infinity with normal arrows: don't consume
-				if (item.getType() == Material.ARROW && ItemStatUtils.hasEnchantment(event.getBow(), ItemStatUtils.EnchantmentType.INFINITY)) {
+				if (hasInfinity && item.getType() == Material.ARROW) {
 					return false;
 				}
 				ArrowConsumeEvent arrowConsumeEvent = new ArrowConsumeEvent(player, item);
@@ -240,16 +244,30 @@ public class QuiverListener implements Listener {
 				if (newArrow instanceof Arrow newPotionArrow
 					    && projectileItem.getItemMeta() instanceof PotionMeta itemMeta) {
 					newPotionArrow.setBasePotionData(itemMeta.getBasePotionData());
-					Color color = itemMeta.getColor();
-					newPotionArrow.setColor(Color.fromRGB(-1).equals(color) ? null : color);
+					newPotionArrow.setColor(itemMeta.getColor());
 					for (PotionEffect customEffect : itemMeta.getCustomEffects()) {
 						newPotionArrow.addCustomEffect(customEffect, true);
 					}
 				}
+
+				// We need to call a new ProjectileLaunchEvent as we changed the projectile entity (which causes the event to no longer get fired automatically)
+				// Delay to MONITOR to see if we actually shoot the projectile, and also allow the crossbow listener to add fire aspect and similar to the arrow
+				mCallProjectileLaunchEvent = true;
 			} else {
 				event.setCancelled(true);
 			}
 			player.updateInventory();
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityShootBowEventMonitor(EntityShootBowEvent event) {
+		if (mCallProjectileLaunchEvent) {
+			ProjectileLaunchEvent newEvent = new ProjectileLaunchEvent(event.getProjectile());
+			Bukkit.getPluginManager().callEvent(newEvent);
+			if (newEvent.isCancelled()) {
+				newEvent.getEntity().remove();
+			}
 		}
 	}
 
@@ -275,6 +293,10 @@ public class QuiverListener implements Listener {
 						projectileItem.setAmount(1);
 					}
 					crossbowMeta.addChargedProjectile(projectileItem);
+					if (ItemStatUtils.hasEnchantment(crossbow, ItemStatUtils.EnchantmentType.MULTISHOT)) {
+						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
+						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
+					}
 					crossbow.setItemMeta(crossbowMeta);
 
 					// Sound copied from vanilla (won't play due to cancelled event)

@@ -96,6 +96,7 @@ public class WalletManager implements Listener {
 				"epic:r3/items/currency/hyperchromatic_archos_ring",
 				"epic:r3/items/currency/archos_ring"
 			).map(path -> InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(path)))
+			                  .filter(Objects::nonNull) // for build shard
 			                  .collect(ImmutableList.toImmutableList());
 
 		MANUAL_SORT_ORDER = Stream.of(
@@ -125,6 +126,7 @@ public class WalletManager implements Listener {
 				"epic:r3/items/currency/pulsating_shard",
 				"epic:r3/transmog/pulsating_shard_fragment"
 			).map(path -> InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(path)))
+			                    .filter(Objects::nonNull) // for build shard
 			                    .collect(ImmutableList.toImmutableList());
 
 		COMPRESSIBLE_CURRENCIES = ImmutableList.of(

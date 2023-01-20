@@ -513,11 +513,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			// We already have a crossbowListener, we don't want to run the onLaunchProjectile twice.
-			// We do want it to run for everything else though
-			if (player.getInventory().getItemInMainHand().getType() != Material.CROSSBOW) {
-				mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
-			}
+			mPlugin.mItemStatManager.onLaunchProjectile(mPlugin, player, event, proj);
 
 			/* NOTE:
 			 * Ignore IntelliJ's warning about the method annotation here. onLaunchProjectile can cancel the event.

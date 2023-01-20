@@ -231,7 +231,7 @@ public class CustomContainerItemManager implements Listener {
 			}
 		}
 
-		if (config.mTotalItemsLimit > 0 && totalCount >= config.mTotalItemsLimit) {
+		if (foundCompound == null && config.mTotalItemsLimit > 0 && totalCount >= config.mTotalItemsLimit) {
 			if (!silent) {
 				player.sendMessage(Component.text("Cannot store any more items in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
