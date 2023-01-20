@@ -450,9 +450,17 @@ public class DelvesUtils {
 		// In dungeons, all players in the same world (i.e. the entire dungeon) are in range
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
-			return loc.getWorld().getPlayers().stream()
-				       .filter(PlayerUtils::playerCountsForLootScaling)
-				       .toList();
+			List<Player> players = loc.getWorld().getPlayers();
+			if (players.size() > 1) {
+				Player player = players.get(0);
+				players.removeIf(p -> !PlayerUtils.playerCountsForLootScaling(p));
+				if (players.isEmpty()) {
+					//Always have at least one player
+					//In a dungeon all players' points are equal so we can choose arbitrarily
+					players = List.of(player);
+				}
+			}
+			return players;
 		}
 
 		List<Player> players = PlayerUtils.playersInRange(loc, DelvesManager.DELVES_MAX_PARTY_DISTANCE, true);
