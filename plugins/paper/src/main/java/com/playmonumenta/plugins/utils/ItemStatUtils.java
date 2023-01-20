@@ -874,6 +874,7 @@ public class ItemStatUtils {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 				}
 			} else if (slot == Slot.MAINHAND && attribute == PROJECTILE_SPEED) {
+				// Hack for mainhands using projectile speed multiply instead of add
 				return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 			}
 

@@ -286,8 +286,14 @@ public class ItemStatManager implements Listener {
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
 						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
-						newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
-						newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
+						if (attribute instanceof ProjectileSpeed) {
+							// Hack for mainhands using projectile speed multiply instead of add
+							newMainhandAddStats.add(stat, (ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND)
+								                               + ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
+						} else {
+							newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
+							newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
+						}
 					} else if (stat instanceof Enchantment enchantment) {
 						double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
 						if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
@@ -310,11 +316,7 @@ public class ItemStatManager implements Listener {
 				double newAdd = newArmorAddStats.mMap.getOrDefault(stat, 0.0) + newMainhandAddStats.mMap.getOrDefault(stat, 0.0);
 				double newMultiply = newArmorMultiplyStats.mMap.getOrDefault(stat, 0.0) + newMainhandMultiplyStats.mMap.getOrDefault(stat, 0.0);
 				if (newAdd == 0 && newMultiply != 0 && stat instanceof Attribute) {
-					if (stat instanceof ProjectileSpeed) {
-						newStats.set(stat, newMultiply);
-					} else {
-						newStats.set(stat, 1 + newMultiply);
-					}
+					newStats.set(stat, 1 + newMultiply);
 				} else if (stat instanceof Phylactery) {
 					newStats.set(stat, newAdd * (1 + newMultiply) + Phylactery.BASE_POTION_KEEP_LEVEL);
 				} else {
