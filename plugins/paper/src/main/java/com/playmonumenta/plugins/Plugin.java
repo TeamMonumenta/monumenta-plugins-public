@@ -68,8 +68,6 @@ import com.playmonumenta.plugins.utils.FileUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPIConfig;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -154,14 +152,6 @@ public class Plugin extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
-		// Load the CommandAPI. We enable verbose logging and allow the CommandAPI
-		// to generate a file command_registration.json for debugging purposes
-		CommandAPI.onLoad(
-			new CommandAPIConfig()
-				.verboseOutput(true)
-				.dispatcherFile(new File(getDataFolder(), "monumenta_command_registration.json"))
-		);
-
 		if (mLogger == null) {
 			mLogger = new CustomLogger(super.getLogger(), Level.INFO);
 		}
@@ -284,10 +274,6 @@ public class Plugin extends JavaPlugin {
 	//  Logic that is performed upon enabling the plugin.
 	@Override
 	public void onEnable() {
-
-		// Enable the CommandAPI
-		CommandAPI.onEnable(this);
-
 		INSTANCE = this;
 
 		/*

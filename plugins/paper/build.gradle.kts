@@ -35,7 +35,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
     compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
-    implementation("dev.jorel.CommandAPI:commandapi-shade:8.7.1")
+    compileOnly("dev.jorel.CommandAPI:commandapi-core:8.7.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
     compileOnly("net.luckperms:api:5.3")
@@ -72,7 +72,7 @@ bukkit {
     apiVersion = "1.18"
     name = "Monumenta"
     authors = listOf("The Monumenta Team")
-    depend = listOf("ScriptedQuests", "NBTAPI")
+    depend = listOf("CommandAPI", "ScriptedQuests", "NBTAPI")
     softDepend = listOf(
         "MonumentaRedisSync",
         "PlaceholderAPI",
@@ -131,7 +131,6 @@ tasks {
         relocate("org.json", "com.playmonumenta.plugins.internal.org.json") // NameMC API dependency
         relocate("org.openjdk.jmh", "com.playmonumenta.plugins.internal.org.openjdk.jmh") // Benchmarking Sin/Cos
         relocate("joptsimple", "com.playmonumenta.plugins.internal.joptsimple") // Dependency of jmh
-        relocate("dev.jorel.commandapi", "com.playmonumenta.plugins.internal.dev.jorel.commandapi")
         relocate(
             "org.apache.commons.lang3",
             "com.playmonumenta.plugins.internal.org.apache.commons.lang3"
