@@ -41,46 +41,59 @@ public class Multitool implements Enchantment {
 	// (that code prevents using abilities with right clicks when holding a multitool)
 	@Override
 	public void onPlayerInteract(Plugin plugin, Player player, double level, PlayerInteractEvent event) {
-		//Material of the block clicked
+		// Material of the block clicked
 		Material eventMat = event.getClickedBlock() == null ? null : event.getClickedBlock().getType();
-		//Does not swap when clicking an interactable
-		// The clicked block may be air if something deleted the block in an event handler, but didn't cancel the event, e.g. opening strike chests.
-		if (event.getAction() == Action.RIGHT_CLICK_AIR
-			    || (event.getAction() == Action.RIGHT_CLICK_BLOCK && (!ItemUtils.interactableBlocks.contains(eventMat) || eventMat == Material.PUMPKIN) && eventMat != Material.AIR)) {
-			ItemStack item = player.getInventory().getItemInMainHand();
-			//Does not swap when player is sneaking
-			if (player.isSneaking()) {
+		Action eventAction = event.getAction();
+		if (eventAction.equals(Action.RIGHT_CLICK_BLOCK)) {
+			// The clicked block may be air if something deleted the block in an event handler, but didn't cancel the event, e.g. opening strike chests.
+			if (Material.AIR.equals(eventMat)) {
 				return;
 			}
-			// You can swap your itemslot in the same tick, the event will begin when you right click the multitool item
-			// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
-			level = plugin.mItemStatManager.getEnchantmentLevel(player, getEnchantmentType());
-			if (level > 0) {
-				if (MetadataUtils.checkOnceThisTick(plugin, player, "MultitoolMutex")) {
-					String[] str = item.getType().toString().split("_");
-					if (ItemUtils.isAxe(item)) {
-						Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
-						item.setType(mat);
-					} else if (ItemUtils.isShovel(item)) {
-						if (level > 1) {
-							Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
-							item.setType(mat);
-						} else {
-							Material mat = Material.valueOf(str[0] + "_" + "AXE");
-							item.setType(mat);
-						}
-					} else if (ItemUtils.isPickaxe(item)) {
-						Material mat = Material.valueOf(str[0] + "_" + "AXE");
-						item.setType(mat);
-					}
-					player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2F);
-					player.updateInventory();
-				}
-
-				if (eventMat == Material.GRASS_BLOCK || ItemUtils.isStrippable(eventMat)) {
-					event.setCancelled(true);
-				}
+			// Does not swap when clicking an interactable
+			if (ItemUtils.interactableBlocks.contains(eventMat) && !Material.PUMPKIN.equals(eventMat)) {
+				return;
 			}
+		} else if (!eventAction.equals(Action.RIGHT_CLICK_AIR)) {
+			return;
+		}
+
+		ItemStack item = player.getInventory().getItemInMainHand();
+		// Does not swap when player is sneaking
+		if (player.isSneaking()) {
+			return;
+		}
+
+		// You can swap your item slot in the same tick, the event will begin when you right-click the multitool item
+		// and then perform actions on the swapped to item. Re-get the level for the item being changed to safeguard this.
+		level = plugin.mItemStatManager.getEnchantmentLevel(player, getEnchantmentType());
+		if (level <= 0) {
+			return;
+		}
+
+		// Check this and the previous tick
+		if (!MetadataUtils.checkOnceInRecentTicks(plugin, player, "MultitoolMutex", 1)) {
+			String[] str = item.getType().toString().split("_");
+			if (ItemUtils.isAxe(item)) {
+				Material mat = Material.valueOf(str[0] + "_" + "SHOVEL");
+				item.setType(mat);
+			} else if (ItemUtils.isShovel(item)) {
+				if (level > 1) {
+					Material mat = Material.valueOf(str[0] + "_" + "PICKAXE");
+					item.setType(mat);
+				} else {
+					Material mat = Material.valueOf(str[0] + "_" + "AXE");
+					item.setType(mat);
+				}
+			} else if (ItemUtils.isPickaxe(item)) {
+				Material mat = Material.valueOf(str[0] + "_" + "AXE");
+				item.setType(mat);
+			}
+			player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2F);
+			player.updateInventory();
+		}
+
+		if (eventMat == Material.GRASS_BLOCK || ItemUtils.isStrippable(eventMat)) {
+			event.setCancelled(true);
 		}
 	}
 }
