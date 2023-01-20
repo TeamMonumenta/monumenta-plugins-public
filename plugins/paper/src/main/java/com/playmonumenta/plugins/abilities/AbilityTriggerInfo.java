@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,8 +117,13 @@ public class AbilityTriggerInfo<T extends Ability> {
 		return new AbilityTriggerInfo<>(mId, mDisplayName, mAction, customTrigger != null ? customTrigger : mTrigger, mRestriction);
 	}
 
-	public String getDescription() {
-		return mTrigger.getDescription() + (mRestriction == null || !mTrigger.isEnabled() ? "" : ChatColor.RED + "- unchangeable: " + ChatColor.WHITE + mRestriction.getDisplay());
+	public Component getDescription() {
+		Component desc = Component.text(mTrigger.getDescription(), NamedTextColor.WHITE);
+		if (mRestriction != null && mTrigger.isEnabled()) {
+			desc = desc.append(Component.text("- unchangeable: ", NamedTextColor.RED))
+				       .append(Component.text(mRestriction.getDisplay()));
+		}
+		return desc;
 	}
 
 }

@@ -63,7 +63,7 @@ public class AbilityTriggersGui extends Gui {
 						                         Component.text("Custom Trigger:", NamedTextColor.AQUA));
 					setItem(2 + (i / 7), 1 + (i % 7), GUIUtils.createBasicItem(info.getDisplayItem().getType(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
-						triggerLore.append(Component.newline()).append(Component.text(trigger.getDescription(), NamedTextColor.WHITE)), 40, true))
+						triggerLore.append(Component.newline()).append(trigger.getDescription()), 40, true))
 							.onLeftClick(() -> {
 								mSelectedAbility = info;
 								mSelectedTrigger = trigger;
