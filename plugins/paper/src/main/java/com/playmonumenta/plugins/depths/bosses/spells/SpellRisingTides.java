@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -79,7 +80,7 @@ public class SpellRisingTides extends Spell {
 			public void run() {
 				mT += 5;
 
-				//Play knockup sound
+				//Play knockup sound & particles
 				if (mT % 5 == 0 && mT < 55) {
 					int t = mT / 5;
 					float dPitch = t * 0.2f;
@@ -88,25 +89,21 @@ public class SpellRisingTides extends Spell {
 					} else {
 						world.playSound(mStartLoc, Sound.ITEM_FIRECHARGE_USE, SoundCategory.HOSTILE, 10, 2.0f - dPitch);
 					}
-					for (double deg = 0; deg < 360; deg += 6) {
-						double cos = FastUtils.cosDeg(deg);
-						double sin = FastUtils.sinDeg(deg);
 
-						for (double x = 1; x <= 30; x += 1.25) {
-							Location loc = mStartLoc.clone().add(cos * x, 0, sin * x);
-							for (Player player : players) {
-								double dist = player.getLocation().distance(loc);
+					Location loc = mStartLoc.clone().add(0, tide ? -.5 + (dPitch / 2) : 2.5 - (dPitch / 2), 0);
+					PPCircle particles = new PPCircle(Particle.REDSTONE, loc, 30)
+						                     .ringMode(false)
+						                     .count(1300)
+						                     .delta(0.1, 0.05, 0.1)
+						                     .data(tide ? UP_COLOR : DOWN_COLOR)
+						                     .distanceFalloff(20);
+					particles.spawnAsEntityActive(mBoss);
 
-								if (dist < 10 || x % 4 == 0) {
-									if (tide) {
-										new PartialParticle(Particle.REDSTONE, loc.add(0, -.5 + (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, UP_COLOR).spawnAsEntityActive(mBoss);
-									} else {
-										new PartialParticle(Particle.REDSTONE, loc.add(0, 2.5 - (dPitch / 2), 0), 1, 0.1, 0.05, 0.1, DOWN_COLOR).spawnAsEntityActive(mBoss);
-									}
-								}
-							}
-						}
-					}
+					// spawn a few particles also far away
+					particles
+						.count(100)
+						.distanceFalloff(0)
+						.spawnAsEntityActive(mBoss);
 
 				}
 

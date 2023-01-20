@@ -52,6 +52,18 @@ public class FastUtils {
 	}
 
 	/**
+	 * Turns a double value into an integer, rounding randomly, but weighted towards the closer integer.
+	 * For example, 1.2 will result in 1 80% of the time, and 2 20% of the time.
+	 */
+	public static int roundRandomly(double value) {
+		double fraction = ((value % 1) + 1) % 1;
+		if (fraction == 0) {
+			return (int) value;
+		}
+		return (int) Math.floor(value) + (RANDOM.nextDouble() <= fraction ? 1 : 0);
+	}
+
+	/**
 	 * Fast, reduced-accuracy sin implementation
 	 *
 	 * @param rad Angle measure in radians

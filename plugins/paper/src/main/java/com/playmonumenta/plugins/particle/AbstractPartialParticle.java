@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.particle;
 import com.destroystokyo.paper.ParticleBuilder;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.FastUtils;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.bukkit.Location;
@@ -343,14 +344,23 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 * applies them to a clone of the specified packagedValues,
 	 * looping internally as needed.
 	 */
-	protected void spawnUsingSettings(
-		ParticleBuilder packagedValues
-	) {
+	protected void spawnUsingSettings(ParticleBuilder packagedValues) {
+		if (mDistanceFalloff != 0) {
+			double distance = Objects.requireNonNull(packagedValues.location()).distance(Objects.requireNonNull(packagedValues.receivers()).get(0).getLocation());
+			if (distance > mDistanceFalloff) {
+				return;
+			}
+			int count = FastUtils.roundRandomly(packagedValues.count() * (1 - distance / mDistanceFalloff));
+			if (count == 0) {
+				return;
+			}
+			packagedValues.count(count);
+		}
 		if (!(mDirectionalMode || isDeltaVaried() || isExtraVaried())) {
 			packagedValues.spawn();
 		} else {
 			ParticleBuilder variedClone = new ParticleBuilder(packagedValues.particle());
-			variedClone.location(packagedValues.location());
+			variedClone.location(Objects.requireNonNull(packagedValues.location()));
 			variedClone.extra(packagedValues.extra());
 			variedClone.data(packagedValues.data());
 			variedClone.receivers(packagedValues.receivers());
@@ -429,13 +439,6 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		double multipliedCount = mCount * PlayerData.getParticleMultiplier(player, source);
 		if (multipliedCount == 0) {
 			return;
-		}
-		if (mDistanceFalloff != 0) {
-			double distance = mLocation.distance(player.getLocation());
-			if (distance > mDistanceFalloff) {
-				return;
-			}
-			multipliedCount *= 1 - distance / mDistanceFalloff;
 		}
 
 		int partialCount = getPartialCount(multipliedCount, player, source);
