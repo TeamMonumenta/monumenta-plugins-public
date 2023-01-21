@@ -17,7 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class InflationOverride extends BaseOverride {
-	public static final Material itemMaterial = Material.GOLDEN_SWORD;
+	public static final Material itemMaterial = Material.DIAMOND_SWORD;
 
 	@Override
 	public boolean inventoryClickEvent(Plugin plugin, Player player, ItemStack item, InventoryClickEvent event) {
