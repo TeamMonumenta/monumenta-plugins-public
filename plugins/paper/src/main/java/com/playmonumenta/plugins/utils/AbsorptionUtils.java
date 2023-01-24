@@ -24,6 +24,10 @@ public class AbsorptionUtils {
 		final ConcurrentNavigableMap<Double, Integer> mAbsorptionInstances = new ConcurrentSkipListMap<>();
 
 		private void addAbsorptionInstance(double amount, int duration) {
+			if (amount < 0) {
+				MMLog.warning("Tried giving negative absorption!", new Exception());
+				amount = 0;
+			}
 			Integer currentDuration = mAbsorptionInstances.get(amount);
 			if (currentDuration == null || currentDuration < duration) {
 				mAbsorptionInstances.put(amount, duration);
@@ -76,6 +80,10 @@ public class AbsorptionUtils {
 	}
 
 	public static void setAbsorption(LivingEntity entity, double amount, int duration) {
+		if (amount < 0) {
+			MMLog.warning("Tried giving negative absorption!", new Exception());
+			amount = 0;
+		}
 		entity.setAbsorptionAmount(amount);
 		addAbsorptionInstance(entity, amount, duration);
 	}
