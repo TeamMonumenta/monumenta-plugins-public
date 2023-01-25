@@ -111,8 +111,6 @@ public class DelveCustomInventory extends CustomInventory {
 	private static final int PAGE_LEFT_SLOT = 45;
 	private static final int PAGE_RIGHT_SLOT = 53;
 
-	private static final int TOTAL_DELVE_MOD = DelvesModifier.values().length;
-
 	private final Player mOwner;
 	private final boolean mEditableDelvePoint;
 	private final String mDungeonName;
@@ -210,7 +208,7 @@ public class DelveCustomInventory extends CustomInventory {
 			mInventory.setItem(PAGE_LEFT_SLOT, BOUNTY_SELECTION_ITEM);
 		}
 
-		if (TOTAL_DELVE_MOD - ((mPage + 1) * 7) > 0) {
+		if (mods.size() > ((mPage + 1) * 7)) {
 			mInventory.setItem(PAGE_RIGHT_SLOT, getNextPage());
 		} else if (mEditableDelvePoint) {
 			mInventory.setItem(PAGE_RIGHT_SLOT, SELECT_ALL_MOD_ITEM);
@@ -339,58 +337,23 @@ public class DelveCustomInventory extends CustomInventory {
 	}
 
 	private static ItemStack getResetModifiers() {
-		ItemStack item = new ItemStack(Material.BARRIER, 1);
-
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text("Reset Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		item.setItemMeta(meta);
-		ItemUtils.setPlainName(item);
-
-		return item;
+		return GUIUtils.createBasicItem(Material.BARRIER, "Reset Modifiers", NamedTextColor.WHITE, true, "");
 	}
 
 	private static ItemStack getBountySelection() {
-		ItemStack item = new ItemStack(Material.BARRIER, 1);
-
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text("Bounty Selection", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		item.setItemMeta(meta);
-		ItemUtils.setPlainName(item);
-
-		return item;
+		return GUIUtils.createBasicItem(Material.BARRIER, "Bounty Selection", NamedTextColor.WHITE, true, "");
 	}
 
 	private static ItemStack getSelectAllModifiers() {
-		ItemStack item = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
-
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text("Select All Modifiers", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		item.setItemMeta(meta);
-		ItemUtils.setPlainName(item);
-
-		return item;
+		return GUIUtils.createBasicItem(Material.ENCHANTED_GOLDEN_APPLE, "Select All Modifiers", NamedTextColor.WHITE, true, "");
 	}
 
 	private ItemStack getNextPage() {
-		ItemStack item = new ItemStack(Material.ARROW, 1);
-
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text("Next Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		item.setItemMeta(meta);
-		ItemUtils.setPlainName(item);
-
-		return item;
+		return GUIUtils.createBasicItem(Material.ARROW, "Next Page", NamedTextColor.WHITE, true, "");
 	}
 
 	private ItemStack getPreviousPage() {
-		ItemStack item = new ItemStack(Material.ARROW, 1);
-
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text("Previous Page", NamedTextColor.WHITE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
-		item.setItemMeta(meta);
-		ItemUtils.setPlainName(item);
-
-		return item;
+		return GUIUtils.createBasicItem(Material.ARROW, "Previous Page", NamedTextColor.WHITE, true, "");
 	}
 
 	@Override
@@ -403,12 +366,13 @@ public class DelveCustomInventory extends CustomInventory {
 		Player playerWhoClicked = (Player) event.getWhoClicked();
 		int slot = event.getSlot();
 
+		List<DelvesModifier> mods = getAvailableModifiers();
+
 		int column = slot % 9;
 		int row = slot / 9;
 		if (mEditableDelvePoint) {
 			for (int i : COLUMN_INDEX_SLOT) {
 				if (i == column) {
-					List<DelvesModifier> mods = getAvailableModifiers();
 
 					int index = column - 1 + (mPage * 7);
 					if (index >= mods.size()) {
@@ -439,7 +403,7 @@ public class DelveCustomInventory extends CustomInventory {
 		}
 
 		if (slot == PAGE_RIGHT_SLOT) {
-			if (TOTAL_DELVE_MOD - ((mPage + 1) * 7) > 0) {
+			if (mods.size() > ((mPage + 1) * 7)) {
 				mPage++;
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.5f);
 			} else if (mEditableDelvePoint) {
@@ -482,21 +446,21 @@ public class DelveCustomInventory extends CustomInventory {
 
 					int entropyPoint = Entropy.getDepthPointsAssigned(mPointSelected.get(DelvesModifier.ENTROPY)) - Entropy.getDepthPointsAssigned(mIgnoreOldEntropyPoint);
 
-					List<DelvesModifier> mods = DelvesModifier.valuesList();
-					mods.remove(DelvesModifier.ENTROPY);
-					mods.remove(DelvesModifier.FRAGILE);
-					mods.removeAll(DelvesModifier.rotatingDelveModifiers());
-					mods.remove(DelvesModifier.TWISTED);
+					List<DelvesModifier> entropyableMods = DelvesModifier.valuesList();
+					entropyableMods.remove(DelvesModifier.ENTROPY);
+					entropyableMods.remove(DelvesModifier.FRAGILE);
+					entropyableMods.removeAll(DelvesModifier.rotatingDelveModifiers());
+					entropyableMods.remove(DelvesModifier.TWISTED);
 
 					while (entropyPoint > 0) {
-						if (mods.isEmpty()) {
+						if (entropyableMods.isEmpty()) {
 							break;
 						}
-						Collections.shuffle(mods);
-						DelvesModifier mod = mods.get(0);
+						Collections.shuffle(entropyableMods);
+						DelvesModifier mod = entropyableMods.get(0);
 						int oldValue = mPointSelected.getOrDefault(mod, 0);
 						if (oldValue == DelvesUtils.getMaxPointAssignable(mod, oldValue + 1)) {
-							mods.remove(mod);
+							entropyableMods.remove(mod);
 							continue;
 						}
 						mPointSelected.put(mod, oldValue + 1);
