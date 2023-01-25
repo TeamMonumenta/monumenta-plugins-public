@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -75,9 +76,9 @@ public class SpellShardShield extends Spell {
 
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), RKitxet.detectionRange, true)) {
 				if (!forced) {
-					player.sendMessage(ChatColor.AQUA + "The protective shield reforms around R'Kitxet.");
+					player.sendMessage(Component.text("The protective shield reforms around R'Kitxet.", NamedTextColor.AQUA));
 				} else {
-					player.sendMessage(ChatColor.AQUA + "R'Kitxet drained someone's lifeforce, reforming the protective shield.");
+					player.sendMessage(Component.text("R'Kitxet drained someone's lifeforce, reforming the protective shield.", NamedTextColor.AQUA));
 				}
 			}
 
@@ -96,7 +97,7 @@ public class SpellShardShield extends Spell {
 			mUnshieldableTime = mMinTimeUntilShield;
 
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), RKitxet.detectionRange, true)) {
-				player.sendMessage(ChatColor.AQUA + "The shield shatters.");
+				player.sendMessage(Component.text("The shield shatters.", NamedTextColor.AQUA));
 			}
 
 			World world = mBoss.getWorld();

@@ -501,7 +501,7 @@ public final class RabbitGodBoss extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 		mBoss.setHealth(bossTargetHp);
-		mBoss.setCustomName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "The Pig God");
+		mBoss.customName(Component.text("The Pig God", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			player.sendMessage(Component.text("OINK OINK!!! OINK OINK, OINK OINK OINK!?!?", NamedTextColor.DARK_RED));

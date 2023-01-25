@@ -28,7 +28,6 @@ import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -297,10 +296,11 @@ public final class PortalBoss extends BossAbilityGroup {
 				if (mTicks >= 6 * 20) {
 					this.cancel();
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Iota", ChatColor.DARK_RED + "Corrupted Construct");
-						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + " INTRUSION DETECTED -- INTRUDERS ENTERING INNER CHAMBER. RIFT PROXIMITY… 100%");
-						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + " DELETION PROTOCOL COMMENCING. INTRUDERS ARE FRAIL: CHANCE OF SURVIVAL….. 0.00001%.");
-						player.sendMessage(ChatColor.GOLD + "[Iota]" + ChatColor.RED + ChatColor.BOLD + " BRING IT ON.");
+						MessagingUtils.sendTitle(player, Component.text("Iota", NamedTextColor.DARK_RED, TextDecoration.BOLD), Component.text("Corrupted Construct", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+						Component pre = Component.text("[Iota] ", NamedTextColor.GOLD);
+						player.sendMessage(pre.append(Component.text("INTRUSION DETECTED -- INTRUDERS ENTERING INNER CHAMBER. RIFT PROXIMITY… 100%", NamedTextColor.RED)));
+						player.sendMessage(pre.append(Component.text("DELETION PROTOCOL COMMENCING. INTRUDERS ARE FRAIL: CHANCE OF SURVIVAL….. 0.00001%.", NamedTextColor.RED)));
+						player.sendMessage(pre.append(Component.text("BRING IT ON.", NamedTextColor.RED, TextDecoration.BOLD)));
 
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);

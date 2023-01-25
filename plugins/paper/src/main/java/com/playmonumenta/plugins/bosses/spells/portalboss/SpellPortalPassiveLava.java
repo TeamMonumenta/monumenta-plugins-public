@@ -9,8 +9,8 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -58,7 +58,7 @@ public class SpellPortalPassiveLava extends Spell {
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, "PortalLava", new PercentHeal(6 * 20, -0.50));
 				MessagingUtils.sendActionBarMessage(p, "You have 50% reduced healing for 6s", NamedTextColor.RED);
 				PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
-				p.sendMessage(ChatColor.RED + "You feel the pure, flowing energy infest you, then spit you out.");
+				p.sendMessage(Component.text("You feel the pure, flowing energy infest you, then spit you out.", NamedTextColor.RED));
 				p.teleport(mStartLoc.clone().add(new Vector(0, 5, 0)), PlayerTeleportEvent.TeleportCause.UNKNOWN);
 				p.playSound(p.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, SoundCategory.HOSTILE, 1.0f, 0.6f);
 			}

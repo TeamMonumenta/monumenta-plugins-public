@@ -39,7 +39,7 @@ public class Eggify {
 			return;
 		}
 		EntityType entityType = entity.getType();
-		String entityName = ChatColor.stripColor(entity.getCustomName());
+		String entityName = MessagingUtils.plainText(entity.customName());
 		List<ItemStack> spawnEggs = ServerProperties.getEggifySpawnEggs().stream()
 			.flatMap(key -> InventoryUtils.getItemsFromLootTable(player.getLocation(), key).stream())
 			.filter(Objects::nonNull)

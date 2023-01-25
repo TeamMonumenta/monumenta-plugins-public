@@ -26,7 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -247,17 +250,14 @@ public class SnowSpirit extends BossAbilityGroup {
 					this.cancel();
 					mBoss.remove();
 
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-								MessagingUtils.sendBoldTitle(player, ChatColor.RED + "VICTORY", ChatColor.DARK_RED + "Snow Spirit, Remnant of Snow");
-								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
-							}
-
-							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+							MessagingUtils.sendTitle(player, Component.text("VICTORY", NamedTextColor.RED, TextDecoration.BOLD), Component.text("Snow Spirit, Remnant of Snow", NamedTextColor.DARK_RED, TextDecoration.BOLD));
+							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 						}
-					}.runTaskLater(mPlugin, 20 * 3);
+
+						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+					}, 20 * 3);
 				}
 
 				if (mTicks % 10 == 0) {
@@ -276,10 +276,9 @@ public class SnowSpirit extends BossAbilityGroup {
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
 		int hpDel = 2500;
 		double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 
 		mBoss.setPersistent(true);
 
@@ -294,11 +293,8 @@ public class SnowSpirit extends BossAbilityGroup {
 				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 				List<Entity> living = new ArrayList<>(mActiveMinibosses);
 				living.removeIf(miniboss -> miniboss.isDead() || !miniboss.isValid());
-				if (living.size() <= 1) {
-					player.sendMessage(ChatColor.AQUA + "Your weapon glides cleanly through the spirit, seemingly doing nothing. There is a ghost alive.");
-				} else {
-					player.sendMessage(ChatColor.AQUA + "Your weapon glides cleanly through the spirit, seemingly doing nothing. There are " + living.size() + " ghosts alive.");
-				}
+				String ghosts = living.size() <= 1 ? "is a ghost" : "are " + living.size() + " ghosts";
+				player.sendMessage(Component.text("Your weapon glides cleanly through the spirit, seemingly doing nothing. There " + ghosts + " alive.", NamedTextColor.AQUA));
 			}
 		}
 	}

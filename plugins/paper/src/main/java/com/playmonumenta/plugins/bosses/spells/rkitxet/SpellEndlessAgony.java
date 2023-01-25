@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -69,7 +71,7 @@ public class SpellEndlessAgony extends Spell {
 		world.playSound(target.getLocation(), Sound.BLOCK_BASALT_STEP, SoundCategory.HOSTILE, 3, 0.8f);
 		world.playSound(target.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 2, 1);
 		target.playSound(target.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.HOSTILE, 3, 1);
-		target.sendMessage(ChatColor.LIGHT_PURPLE + "Pain and suffering haunt you with every step you take.");
+		target.sendMessage(Component.text("Pain and suffering haunt you with every step you take.", NamedTextColor.LIGHT_PURPLE));
 
 		PPCircle indicator = new PPCircle(Particle.REDSTONE, target.getLocation(), RADIUS).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(ENDLESS_AGONY_COLOR);
 

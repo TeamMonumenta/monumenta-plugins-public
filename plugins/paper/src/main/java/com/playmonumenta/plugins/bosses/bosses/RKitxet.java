@@ -29,6 +29,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -197,7 +201,7 @@ public class RKitxet extends BossAbilityGroup {
 			}
 
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-				player.sendMessage(ChatColor.GREEN + "I have seen something, something terrifying...");
+				player.sendMessage(Component.text("I have seen something, something terrifying...", NamedTextColor.GREEN));
 			}
 		});
 		events.put(25, (mBoss) -> {
@@ -209,7 +213,7 @@ public class RKitxet extends BossAbilityGroup {
 			mShieldSpell.activatePhase2();
 
 			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-				player.sendMessage(ChatColor.GREEN + "Please, end this.");
+				player.sendMessage(Component.text("Please, end this.", NamedTextColor.GREEN));
 			}
 		});
 
@@ -224,6 +228,7 @@ public class RKitxet extends BossAbilityGroup {
 			@Override
 			public void run() {
 				String message;
+				TextColor color = NamedTextColor.GREEN;
 				if (mCount == 0) {
 					message = "You must leave...";
 				} else if (mCount == 1) {
@@ -231,7 +236,8 @@ public class RKitxet extends BossAbilityGroup {
 				} else if (mCount == 2) {
 					message = "I'm sorry...";
 				} else if (mCount == 3) {
-					message = ChatColor.DARK_GREEN + "THIS PLACE BELONGS TO THE JUNGLE ALONE. YOU ALL SHALL PAY FOR YOUR TRANSGRESSIONS.";
+					message = "THIS PLACE BELONGS TO THE JUNGLE ALONE. YOU ALL SHALL PAY FOR YOUR TRANSGRESSIONS.";
+					color = NamedTextColor.DARK_GREEN;
 				} else {
 					// Do health scaling here because players might not have been teleported in yet when init() would be run
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
@@ -244,7 +250,7 @@ public class RKitxet extends BossAbilityGroup {
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GREEN + "R'Kitxet", ChatColor.GREEN + "Forsaken Elder");
+						MessagingUtils.sendTitle(player, Component.text("R'Kitxet", NamedTextColor.DARK_GREEN, TextDecoration.BOLD), Component.text("Forsaken Elder", NamedTextColor.GREEN, TextDecoration.BOLD));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 					}
@@ -254,7 +260,7 @@ public class RKitxet extends BossAbilityGroup {
 					return;
 				}
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-					player.sendMessage(ChatColor.GREEN + message);
+					player.sendMessage(Component.text(message, color));
 				}
 				mCount++;
 			}

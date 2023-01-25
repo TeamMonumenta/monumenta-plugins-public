@@ -48,7 +48,7 @@ class VanityBuyScreen extends Gui {
 				default -> "Offhand";
 			};
 			meta.lore(List.of(Component.text("Base material: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-				                  .append(Component.translatable(vanityItem.getType().getTranslationKey())),
+				                  .append(Component.translatable(vanityItem.getType().translationKey())),
 				Component.text("Slot: " + slot, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 			meta.addItemFlags(ItemFlag.values());
 			vanityItem.setItemMeta(meta);

@@ -22,7 +22,8 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -254,7 +255,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 				arrow.removeCustomEffect(PotionEffectType.SLOW);
 			}
 			if (event.getSource() instanceof Player player) {
-				player.sendMessage(ChatColor.AQUA + "The shield absorbs your attack.");
+				player.sendMessage(Component.text("The shield absorbs your attack.", NamedTextColor.AQUA));
 				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 			}
 		}
@@ -263,7 +264,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	private void removeShield() {
 		mShielded = false;
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			player.sendMessage(ChatColor.AQUA + "The shield shatters.");
+			player.sendMessage(Component.text("The shield shatters.", NamedTextColor.AQUA));
 		}
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.HOSTILE, 1, 1);

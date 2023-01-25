@@ -9,8 +9,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Collections;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -71,7 +71,7 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 								    && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.BLOCKBREAK_DISABLED)) {
 								block.setType(Material.CHEST);
 								if (block.getState() instanceof Chest chest) {
-									chest.setCustomName(ChatColor.GOLD + "" + ChatColor.BOLD + "Creeperween Chest");
+									chest.customName(Component.text("Creeperween Chest", NamedTextColor.GOLD, TextDecoration.BOLD));
 									chest.setLootTable(Bukkit.getLootTable(LOOT_TABLE));
 									chest.update();
 								}
