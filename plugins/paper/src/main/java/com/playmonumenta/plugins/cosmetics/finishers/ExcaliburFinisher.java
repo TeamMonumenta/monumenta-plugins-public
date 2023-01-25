@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashMap;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -28,7 +29,7 @@ import org.bukkit.util.Vector;
 public class ExcaliburFinisher implements EliteFinisher {
 	public static final String NAME = "Excalibur";
 
-	private static HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
+	private static final HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
@@ -39,12 +40,12 @@ public class ExcaliburFinisher implements EliteFinisher {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-			Vector mDirection = p.getLocation().toVector().subtract(killedMob.getLocation().toVector());
-			Location mStart = killedMob.getLocation().clone().add(mDirection.clone().normalize().multiply(0.92 * radius));
-			Location mEnd = killedMob.getLocation();
-			ArmorStand mExcalibur = spawnExcalibur(mStart.clone());
-			double mSlashAngle = FastUtils.RANDOM.nextDouble(Math.PI) - Math.PI/2.0;
-			LivingEntity mClonedKilledMob = (LivingEntity)killedMob;
+			final Vector mDirection = LocationUtils.getDirectionTo(p.getLocation(), killedMob.getLocation());
+			final Location mStart = killedMob.getLocation().clone().add(mDirection.clone().multiply(0.92 * radius));
+			final Location mEnd = killedMob.getLocation();
+			final ArmorStand mExcalibur = spawnExcalibur(mStart.clone());
+			final double mSlashAngle = FastUtils.RANDOM.nextDouble(Math.PI) - Math.PI / 2.0;
+			LivingEntity mClonedKilledMob = (LivingEntity) killedMob;
 
 			@Override
 			public void run() {

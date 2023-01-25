@@ -35,10 +35,11 @@ public class LocationUtils {
 		Vector vFrom = from.toVector();
 		Vector vTo = to.toVector();
 		Vector diff = vTo.subtract(vFrom);
-		if (diff.lengthSquared() == 0) {
+		Vector normalized = diff.normalize();
+		if (!Double.isFinite(normalized.getX())) {
 			return new Vector(0, 1, 0);
 		}
-		return diff.normalize();
+		return normalized;
 	}
 
 	public static Location getEntityCenter(Entity e) {
