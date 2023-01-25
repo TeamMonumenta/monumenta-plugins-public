@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.utils;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
@@ -38,10 +37,16 @@ public class GUIUtils {
 	}
 
 	public static void splitLoreLine(ItemMeta meta, TextComponent lore, int maxLength, boolean clean) {
+		List<Component> prevLore = meta.lore();
+		List<Component> lines = clean || prevLore == null ? new ArrayList<>() : prevLore;
+		lines.addAll(splitLoreLine(lore, maxLength));
+		meta.lore(lines);
+	}
+
+	private static List<Component> splitLoreLine(TextComponent lore, int maxLength) {
 		String content = lore.content();
 		if (lore.content().length() <= maxLength && !content.contains("\n")) {
-			meta.lore(List.of(lore));
-			return;
+			return List.of(fixLoreFormatting(lore));
 		}
 		String mini = MessagingUtils.toMiniMessage(lore);
 		String[] splitLine = mini.split(" |(?=\n)"); // split on spaces, and on the empty string just before a line break
@@ -74,21 +79,10 @@ public class GUIUtils {
 			finalMinis.add(currentLine.toString());
 		}
 
-		List<Component> finalLines = new ArrayList<>();
-		if (!clean && meta.hasLore()) {
-			finalLines.addAll(Objects.requireNonNull(meta.lore()));
-		}
-		finalLines.addAll(finalMinis.stream()
+		return finalMinis.stream()
 			.map(MessagingUtils::fromMiniMessage)
-			.map(c -> {
-				if (c.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET) {
-					return c.decoration(TextDecoration.ITALIC, false);
-				}
-				return c;
-			})
-			.map(c -> c.colorIfAbsent(NamedTextColor.WHITE))
-			.toList());
-		meta.lore(finalLines);
+			.map(GUIUtils::fixLoreFormatting)
+			.toList();
 	}
 
 	private static @Nullable String findLastColor(String mini) {
@@ -96,13 +90,20 @@ public class GUIUtils {
 		Matcher matcher = Pattern.compile(pattern).matcher(mini);
 		String match = null;
 		while (matcher.find()) {
-			MMLog.info(matcher.group());
 			match = matcher.group();
 		}
 		if (match == null || match.contains("/")) {
 			return null;
 		}
 		return match;
+	}
+
+	private static Component fixLoreFormatting(Component c) {
+		if (c.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET) {
+			c = c.decoration(TextDecoration.ITALIC, false);
+		}
+		c = c.colorIfAbsent(NamedTextColor.WHITE);
+		return c;
 	}
 
 	public static ItemStack createBasicItem(Material mat, String name, TextColor nameColor, String desc) {
@@ -126,10 +127,7 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor, boolean nameBold, String desc, TextColor loreColor, int maxLoreLength, boolean setPlainTag) {
-		Component nameComponent = Component.text(name, nameColor)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, nameBold);
-		return createBasicItem(mat, amount, nameComponent, desc, loreColor, maxLoreLength, setPlainTag);
+		return createBasicItem(mat, amount, formatName(name, nameColor, nameBold), desc, loreColor, maxLoreLength, setPlainTag);
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, Component name, String desc, TextColor loreColor, int maxLoreLength, boolean setPlainTag) {
@@ -137,17 +135,22 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor, boolean nameBold, TextComponent desc, int maxLoreLength, boolean setPlainTag) {
-		Component nameComponent = Component.text(name, nameColor)
-			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, nameBold);
-		return createBasicItem(mat, amount, nameComponent, desc, maxLoreLength, setPlainTag);
+		return createBasicItem(mat, amount, formatName(name, nameColor, nameBold), desc, maxLoreLength, setPlainTag);
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, Component name, TextComponent desc, int maxLoreLength, boolean setPlainTag) {
+		return createBasicItem(mat, amount, name, splitLoreLine(desc, maxLoreLength), setPlainTag);
+	}
+
+	public static ItemStack createBasicItem(Material mat, int amount, String name, TextColor nameColor, boolean nameBold, List<Component> desc, boolean setPlainTag) {
+		return createBasicItem(mat, amount, formatName(name, nameColor, nameBold), desc, setPlainTag);
+	}
+
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag) {
 		ItemStack item = new ItemStack(mat, amount);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(name);
-		splitLoreLine(meta, desc, maxLoreLength, true);
+		meta.lore(desc.stream().map(GUIUtils::fixLoreFormatting).toList());
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		item.setItemMeta(meta);
@@ -155,6 +158,12 @@ public class GUIUtils {
 			ItemUtils.setPlainTag(item);
 		}
 		return item;
+	}
+
+	private static Component formatName(String name, TextColor nameColor, boolean nameBold) {
+		return Component.text(name, nameColor)
+			       .decoration(TextDecoration.ITALIC, false)
+			       .decoration(TextDecoration.BOLD, nameBold);
 	}
 
 	public static void fillWithFiller(Inventory inventory, Material fillerMaterial) {

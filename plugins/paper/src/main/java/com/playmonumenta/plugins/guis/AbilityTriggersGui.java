@@ -8,14 +8,15 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -58,12 +59,16 @@ public class AbilityTriggersGui extends Gui {
 			for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilitiesInTriggerOrder()) {
 				AbilityInfo<?> info = ability.getInfo();
 				for (AbilityTriggerInfo<?> trigger : ability.getCustomTriggers()) {
-					TextComponent triggerLore = (trigger.getTrigger().equals(info.getTrigger(trigger.getId()).getTrigger()) ?
-						                         Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
-						                         Component.text("Custom Trigger:", NamedTextColor.AQUA));
-					setItem(2 + (i / 7), 1 + (i % 7), GUIUtils.createBasicItem(info.getDisplayItem().getType(), 1,
+					List<Component> lore = new ArrayList<>();
+					lore.add(trigger.getTrigger().equals(info.getTrigger(trigger.getId()).getTrigger()) ?
+						Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
+						Component.text("Custom Trigger:", NamedTextColor.AQUA));
+					lore.addAll(trigger.getDescription());
+					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem().getType(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
-						triggerLore.append(Component.newline()).append(trigger.getDescription()), 40, true))
+						lore, true);
+
+					setItem(2 + (i / 7), 1 + (i % 7), item)
 							.onLeftClick(() -> {
 								mSelectedAbility = info;
 								mSelectedTrigger = trigger;
@@ -99,15 +104,20 @@ public class AbilityTriggersGui extends Gui {
 						update();
 					});
 
-			TextComponent summary = Component.text("Trigger summary:\n", NamedTextColor.GRAY);
+			Objects.requireNonNull(mNewTrigger);
+			Objects.requireNonNull(mSelectedTrigger);
+
+			List<Component> summary = new ArrayList<>();
+			summary.add(Component.text("Trigger summary:", NamedTextColor.GRAY));
+			summary.addAll(mNewTrigger.getDescription());
 			if (mSelectedTrigger.getRestriction() != null && mNewTrigger.isEnabled()) {
-				summary = summary.append(Component.text("- unchangeable: ", NamedTextColor.RED))
-					.append(Component.text(mSelectedTrigger.getRestriction().getDisplay(), NamedTextColor.WHITE));
+				summary.add(Component.text("- unchangeable: ", NamedTextColor.RED)
+					.append(Component.text(mSelectedTrigger.getRestriction().getDisplay(), NamedTextColor.WHITE)));
 			}
 			// summary icon
 			setItem(0, 4, GUIUtils.createBasicItem(mSelectedAbility.getDisplayItem().getType(), 1,
 					mSelectedAbility.getDisplayName() + " - " + mSelectedAbility.getDisplayName(), NamedTextColor.GOLD, false,
-					summary, 40, true));
+					summary, true));
 
 			// options
 			makeOptionIcons(1, 0, GUIUtils.createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,

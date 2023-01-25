@@ -134,7 +134,7 @@ public class CloakOfShadows extends DepthsAbility {
 			.append(Component.text(StringUtils.multiplierToPercentage(WEAKEN_AMPLIFIER[rarity - 1]) + "%", color))
 			.append(Component.text(" weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for "))
 			.append(Component.text(StringUtils.to2DP(STEALTH_DURATION[rarity - 1] / 20.0), color))
-			.append(Component.text(" seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals ", color))
+			.append(Component.text(" seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals "))
 			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
 			.append(Component.text(" additional damage. Cooldown: " + COOLDOWN / 20 + "s."));
 	}

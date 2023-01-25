@@ -24,16 +24,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import static org.bukkit.ChatColor.AQUA;
-import static org.bukkit.ChatColor.GOLD;
-import static org.bukkit.ChatColor.GRAY;
-import static org.bukkit.ChatColor.ITALIC;
-import static org.bukkit.ChatColor.WHITE;
 
 /*
  * Experiencinator Settings default GUI layout:
@@ -141,11 +133,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 	private void setupInventory() {
 
 		// back button
-		ItemStack backButton = new ItemStack(Material.OBSERVER);
-		ItemMeta meta = backButton.getItemMeta();
-		meta.displayName(Component.text("Back", NamedTextColor.GRAY, TextDecoration.BOLD));
-		meta.lore(List.of(Component.text("Return to the main menu", NamedTextColor.GRAY)));
-		backButton.setItemMeta(meta);
+		ItemStack backButton = GUIUtils.createBasicItem(Material.OBSERVER, "Back", NamedTextColor.GRAY, true, "Return to the main menu", NamedTextColor.GRAY);
 		mInventory.setItem(0, backButton);
 
 		// setup tier icons
@@ -177,13 +165,10 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 			}
 			int conversionId = mSettings.getConversion(region, tier);
 			if (conversionId == 0) {
-				ItemStack item = new ItemStack(Material.BARRIER, 1);
-				ItemMeta meta = item.getItemMeta();
-				meta.displayName(Component.text("Disabled", NamedTextColor.GRAY));
-				meta.lore(List.of(Component.text("Will not convert ", NamedTextColor.AQUA)
-					                     .append(Component.text(region.getPlainDisplay() + tier.getPlainDisplay(), NamedTextColor.WHITE))
-					                     .append(Component.text(" items.", NamedTextColor.AQUA))));
-				item.setItemMeta(meta);
+				ItemStack item = GUIUtils.createBasicItem(Material.BARRIER, 1, "Disabled", NamedTextColor.GRAY, false,
+					Component.text("Will not convert ", NamedTextColor.AQUA)
+						.append(Component.text(region.getPlainDisplay() + tier.getPlainDisplay(), NamedTextColor.WHITE))
+						.append(Component.text(" items.", NamedTextColor.AQUA)), 30, true);
 				mInventory.setItem(offset + 1 + i, item);
 			} else {
 				Conversion conversion = mConfig.findConversion(conversionId, region);
@@ -204,32 +189,29 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 					rawAmount = -1;
 				}
 
-				ItemStack item;
+				int amount;
 				ExperiencinatorConfig.ConversionResult conversionResult;
 				if (rawAmount > 0
 					    && conversionResults.size() >= 2
 					    && rawAmount % conversionResults.get(1).getValue() == 0) {
 					conversionResult = conversionResults.get(1);
-					item = new ItemStack(conversionResult.getItem().getType(), rawAmount / conversionResult.getValue());
+					amount = rawAmount / conversionResult.getValue();
 				} else {
 					conversionResult = conversionResults.get(0);
-					item = new ItemStack(conversionResult.getItem().getType(), rawAmount < 0 ? 1 : rawAmount);
+					amount = rawAmount < 0 ? 1 : rawAmount;
 				}
-				ItemUtils.setPlainName(item, ItemUtils.getPlainNameIfExists(conversionResult.getItem()));
 
-				ItemMeta meta = item.getItemMeta();
-				meta.displayName(Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)));
-				List<String> lore = new ArrayList<>();
-				lore.add(AQUA + "Will convert " + WHITE + region.getPlainDisplay() + tier.getPlainDisplay());
-				lore.add(AQUA + "items to " + GOLD + (rawAmount < 0 ? "" : item.getAmount() + " ") + (rawAmount > 0 && item.getAmount() == 1 ? conversionResult.getNameSingular() : conversionResult.getName()) + AQUA + ".");
+				List<Component> lore = new ArrayList<>();
+				lore.add(Component.text("Will convert ", NamedTextColor.AQUA).append(Component.text(region.getPlainDisplay() + tier.getPlainDisplay(), NamedTextColor.WHITE)));
+				lore.add(Component.text("items to ", NamedTextColor.AQUA).append(Component.text((rawAmount < 0 ? "" : amount + " ") + (rawAmount > 0 && amount == 1 ? conversionResult.getNameSingular() : conversionResult.getName()), NamedTextColor.GOLD)).append(Component.text(".", NamedTextColor.AQUA)));
 				if (rawAmount < 0) {
-					lore.add("" + GRAY + ITALIC + "This conversion is not available");
-					lore.add("" + GRAY + ITALIC + "for the " + mExperiencinator.getName() + ",");
-					lore.add("" + GRAY + ITALIC + "thus it will not convert items of this type.");
+					lore.add(Component.text("This conversion is not available", NamedTextColor.GRAY, TextDecoration.ITALIC));
+					lore.add(Component.text("for the " + mExperiencinator.getName() + ",", NamedTextColor.GRAY, TextDecoration.ITALIC));
+					lore.add(Component.text("thus it will not convert items of this type.", NamedTextColor.GRAY, TextDecoration.ITALIC));
 				}
-				meta.setLore(lore);
-				meta.addItemFlags(ItemFlag.values());
-				item.setItemMeta(meta);
+				ItemStack item = GUIUtils.createBasicItem(conversionResult.getItem().getType(), amount, Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)), lore, false);
+
+				ItemUtils.setPlainName(item, ItemUtils.getPlainNameIfExists(conversionResult.getItem()));
 				ItemUtils.setPlainLore(item, List.of("This is a placeholder item."));
 
 				mInventory.setItem(offset + 1 + i, item);

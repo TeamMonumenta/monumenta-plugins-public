@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
@@ -117,11 +118,11 @@ public class AbilityTriggerInfo<T extends Ability> {
 		return new AbilityTriggerInfo<>(mId, mDisplayName, mAction, customTrigger != null ? customTrigger : mTrigger, mRestriction);
 	}
 
-	public Component getDescription() {
-		Component desc = Component.text(mTrigger.getDescription(), NamedTextColor.WHITE);
+	public List<Component> getDescription() {
+		List<Component> desc = mTrigger.getDescription();
 		if (mRestriction != null && mTrigger.isEnabled()) {
-			desc = desc.append(Component.text("- unchangeable: ", NamedTextColor.RED))
-				       .append(Component.text(mRestriction.getDisplay()));
+			desc.add(Component.text("- unchangeable: ", NamedTextColor.RED)
+				.append(Component.text(mRestriction.getDisplay(), NamedTextColor.WHITE)));
 		}
 		return desc;
 	}

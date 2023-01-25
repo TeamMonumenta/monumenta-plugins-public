@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -36,7 +37,7 @@ public class DepthsToughness extends DepthsAbility {
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("Gain ")
-			.append(Component.text(PERCENT_MAX_HEALTH[rarity - 1] * 100 + "%", color))
+			.append(Component.text(StringUtils.multiplierToPercentage(PERCENT_MAX_HEALTH[rarity - 1]) + "%", color))
 			.append(Component.text(" max health."));
 	}
 }

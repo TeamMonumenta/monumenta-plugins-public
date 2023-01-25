@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -16,8 +17,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -359,35 +361,36 @@ public class AbilityTrigger {
 		return Objects.hash(mEnabled, mKey, mKeyOptions, mSneaking, mSprinting, mOnGround, mLookDirections, mDoubleClick);
 	}
 
-	public String getDescription() {
+	public List<Component> getDescription() {
 		if (!mEnabled) {
-			return ChatColor.RED + "Trigger is disabled!";
+			return List.of(Component.text("Trigger is disabled!", NamedTextColor.RED));
 		}
-		StringBuilder description = new StringBuilder(ChatColor.GOLD + mKey.mDisplay + ChatColor.RESET + "\n");
+		List<Component> desc = new ArrayList<>();
+		desc.add(Component.text(mKey.mDisplay, NamedTextColor.GOLD));
 		if (mDoubleClick) {
-			description.append("- double click\n");
+			desc.add(Component.text("- double click"));
 		}
 		if (mSneaking != BinaryOption.EITHER) {
-			description.append("- ").append(mSneaking == BinaryOption.FALSE ? "not " : "").append("sneaking\n");
+			desc.add(Component.text("- " + (mSneaking == BinaryOption.FALSE ? "not " : "") + "sneaking"));
 		}
 		if (mSprinting != BinaryOption.EITHER) {
-			description.append("- ").append(mSprinting == BinaryOption.FALSE ? "not " : "").append("sprinting\n");
+			desc.add(Component.text("- " + (mSprinting == BinaryOption.FALSE ? "not " : "") + "sprinting"));
 		}
 		if (mOnGround != BinaryOption.EITHER) {
-			description.append("- ").append(mOnGround == BinaryOption.FALSE ? "not " : "").append("on ground\n");
+			desc.add(Component.text("- " + (mOnGround == BinaryOption.FALSE ? "not " : "") + "on ground"));
 		}
 		if (mLookDirections.size() < 3) {
-			description.append("- looking ").append(mLookDirections.stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or "))).append("\n");
+			desc.add(Component.text("- looking " + mLookDirections.stream().map(d -> d.name().toLowerCase(Locale.ROOT)).collect(Collectors.joining(" or "))));
 		}
 		EnumSet<KeyOptions> keyOptions = EnumSet.copyOf(mKeyOptions);
 		if (keyOptions.containsAll(List.of(KeyOptions.NO_USABLE_ITEMS))) {
-			description.append("- not holding a usable item\n");
-			keyOptions.removeAll(List.of(KeyOptions.NO_USABLE_ITEMS));
+			desc.add(Component.text("- not holding a usable item"));
+			List.of(KeyOptions.NO_USABLE_ITEMS).forEach(keyOptions::remove);
 		}
 		for (KeyOptions keyOption : keyOptions) {
-			description.append("- ").append(keyOption.mEnabledDisplay).append("\n");
+			desc.add(Component.text("- " + keyOption.mEnabledDisplay));
 		}
-		return description.toString();
+		return desc;
 	}
 
 }
