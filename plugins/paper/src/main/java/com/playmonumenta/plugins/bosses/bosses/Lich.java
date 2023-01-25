@@ -44,6 +44,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1435,10 +1436,7 @@ public final class Lich extends BossAbilityGroup {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					//prevent players above the barrier ceiling from seeing title
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							"scoreboard players set " + p.getUniqueId() + " MusicCooldown 10000");
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							"execute as " + p.getUniqueId() + " run function monumenta:mechanisms/music/music_stop");
+						SongManager.stopSong(p, true);
 						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
 						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
 							Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
@@ -1486,10 +1484,8 @@ public final class Lich extends BossAbilityGroup {
 		}
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-					"execute as " + p.getUniqueId() + " at @s run function monumenta:mechanisms/music/music_hekawtp4");
-			}
+			List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
+			SongManager.playSong(players, new SongManager.Song("epic:music.hekawtp4", SoundCategory.RECORDS, 239, true, 1, 1), true);
 		}, 20 * 3 + 15);
 
 		// haha surprise fuck you I'm not dead dialogues
@@ -1998,7 +1994,6 @@ public final class Lich extends BossAbilityGroup {
 										}
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 											p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
-											ScoreboardUtils.setScoreboardValue(p, "MusicCooldown", 0);
 											MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
 												Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
 												10, 80, 10);
