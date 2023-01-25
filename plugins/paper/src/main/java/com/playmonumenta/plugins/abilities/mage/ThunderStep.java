@@ -95,7 +95,7 @@ public class ThunderStep extends Ability {
 					DISTANCE_1,
 					DISTANCE_2
 				),
-				String.format("Within %ss of casting, use the same trigger to return to the original starting location, dealing %s%% of the skills damage." +
+				String.format("Within %ss of casting, use the same trigger to return to the original starting location, dealing %s%% of the skill's damage." +
 					              " If you do not do so, your next Thunder Step within %ss will paralyze enemies for %ss.",
 					BACK_TELEPORT_MAX_DELAY / 20,
 					(int) (ENHANCEMENT_DAMAGE_RATIO * 100),
