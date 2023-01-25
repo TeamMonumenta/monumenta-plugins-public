@@ -442,6 +442,14 @@ public class InventoryUtils {
 		throw new IllegalStateException("Could not find item from loot table " + key);
 	}
 
+	public static @Nullable ItemStack getItemFromLootTableOrWarn(Location loc, NamespacedKey key) {
+		for (ItemStack item : getItemsFromLootTable(loc, key)) {
+			return item;
+		}
+		MMLog.warning("Could not find item in loot table " + key);
+		return null;
+	}
+
 	public static Collection<ItemStack> getItemsFromLootTable(Location loc, NamespacedKey key) {
 		LootContext context = new LootContext.Builder(loc).build();
 		LootTable table = Bukkit.getLootTable(key);

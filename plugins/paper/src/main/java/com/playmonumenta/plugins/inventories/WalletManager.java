@@ -95,7 +95,7 @@ public class WalletManager implements Listener {
 				// r3
 				"epic:r3/items/currency/hyperchromatic_archos_ring",
 				"epic:r3/items/currency/archos_ring"
-			).map(path -> InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(path)))
+			).map(path -> InventoryUtils.getItemFromLootTableOrWarn(loc, NamespacedKeyUtils.fromString(path)))
 			                  .filter(Objects::nonNull) // for build shard
 			                  .collect(ImmutableList.toImmutableList());
 
@@ -125,37 +125,37 @@ public class WalletManager implements Listener {
 				"epic:r3/items/currency/potency_augment",
 				"epic:r3/items/currency/pulsating_shard",
 				"epic:r3/transmog/pulsating_shard_fragment"
-			).map(path -> InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(path)))
+			).map(path -> InventoryUtils.getItemFromLootTableOrWarn(loc, NamespacedKeyUtils.fromString(path)))
 			                    .filter(Objects::nonNull) // for build shard
 			                    .collect(ImmutableList.toImmutableList());
 
-		COMPRESSIBLE_CURRENCIES = ImmutableList.of(
+		COMPRESSIBLE_CURRENCIES = Stream.of(
 			// r1
-			new CompressionInfo("epic:r1/items/currency/hyper_experience",
+			CompressionInfo.create("epic:r1/items/currency/hyper_experience",
 				"epic:r1/items/currency/experience", 64 * 8, loc),
-			new CompressionInfo("epic:r1/items/currency/concentrated_experience",
+			CompressionInfo.create("epic:r1/items/currency/concentrated_experience",
 				"epic:r1/items/currency/experience", 8, loc),
 
 			// r2
-			new CompressionInfo("epic:r2/items/currency/hyper_crystalline_shard",
+			CompressionInfo.create("epic:r2/items/currency/hyper_crystalline_shard",
 				"epic:r2/items/currency/crystalline_shard", 64 * 8, loc),
-			new CompressionInfo("epic:r2/items/currency/compressed_crystalline_shard",
+			CompressionInfo.create("epic:r2/items/currency/compressed_crystalline_shard",
 				"epic:r2/items/currency/crystalline_shard", 8, loc),
 
 			// r3
-			new CompressionInfo("epic:r3/items/currency/hyperchromatic_archos_ring",
+			CompressionInfo.create("epic:r3/items/currency/hyperchromatic_archos_ring",
 				"epic:r3/items/currency/archos_ring", 64, loc),
 
 			// misc
-			new CompressionInfo("epic:soul/twisted_soul_thread",
+			CompressionInfo.create("epic:soul/twisted_soul_thread",
 				"epic:soul/soul_thread", 8, loc),
-			new CompressionInfo("epic:r2/blackmist/spectral_maradevi",
+			CompressionInfo.create("epic:r2/blackmist/spectral_maradevi",
 				"epic:r2/blackmist/spectral_doubloon", 8, loc),
-			new CompressionInfo("epic:r2/items/currency/carnival_ticket_wheel",
+			CompressionInfo.create("epic:r2/items/currency/carnival_ticket_wheel",
 				"epic:r2/items/currency/carnival_ticket_bundle", 10, loc),
-			new CompressionInfo("epic:r2/dungeons/rushdown/a_dis_energy",
+			CompressionInfo.create("epic:r2/dungeons/rushdown/a_dis_energy",
 				"epic:r2/dungeons/rushdown/dis_energy", 100, loc)
-		);
+		).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
 	}
 
 	private static final Map<UUID, Wallet> mWallets = new HashMap<>();
@@ -165,10 +165,22 @@ public class WalletManager implements Listener {
 		private final ItemStack mBase;
 		private final int mAmount;
 
-		CompressionInfo(String compressed, String base, int amount, Location loc) {
-			mCompressed = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(compressed)));
-			mBase = Objects.requireNonNull(InventoryUtils.getItemFromLootTable(loc, NamespacedKeyUtils.fromString(base)));
+		CompressionInfo(ItemStack compressed, ItemStack base, int amount) {
+			mCompressed = compressed;
+			mBase = base;
 			mAmount = amount;
+		}
+
+		static @Nullable CompressionInfo create(String compressed, String base, int amount, Location loc) {
+			ItemStack compressedItem = InventoryUtils.getItemFromLootTableOrWarn(loc, NamespacedKeyUtils.fromString(compressed));
+			if (compressedItem == null) {
+				return null;
+			}
+			ItemStack baseItem = InventoryUtils.getItemFromLootTableOrWarn(loc, NamespacedKeyUtils.fromString(base));
+			if (baseItem == null) {
+				return null;
+			}
+			return new CompressionInfo(compressedItem, baseItem, amount);
 		}
 	}
 
