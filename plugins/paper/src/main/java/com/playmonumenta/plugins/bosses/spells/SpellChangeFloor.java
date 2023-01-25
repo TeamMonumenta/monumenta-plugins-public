@@ -30,6 +30,8 @@ public class SpellChangeFloor extends Spell {
 
 	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
 		Material.AIR,
+		Material.CAVE_AIR,
+		Material.VOID_AIR,
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,
