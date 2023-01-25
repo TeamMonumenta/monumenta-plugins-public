@@ -94,7 +94,7 @@ public class SignOverride extends BaseOverride {
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block, PlayerInteractEvent event) {
 		Sign sign = (Sign) block.getState();
-		boolean output = item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && ItemUtils.isDye(item.getType()));
+		boolean output = item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && (ItemUtils.isDye(item.getType()) || item.getType() == Material.GLOW_INK_SAC));
 
 		// Compile all the lines of text together and make sure it is not a leaderboard that is being clicked
 		StringBuilder display = new StringBuilder();
