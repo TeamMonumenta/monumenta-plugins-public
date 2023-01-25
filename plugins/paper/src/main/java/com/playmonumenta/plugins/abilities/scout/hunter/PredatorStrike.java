@@ -22,6 +22,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -176,16 +177,20 @@ public class PredatorStrike extends Ability {
 
 	private void explode(Location loc) {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
-		double damage = ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
-		damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.POINT_BLANK));
-		damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.SNIPER));
-		damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-		damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
-		for (LivingEntity mob : hitbox.getHitMobs()) {
-			MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
-			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+		List<LivingEntity> mobs = hitbox.getHitMobs();
+		if (!mobs.isEmpty()) {
+			double damage = ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
+			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.POINT_BLANK));
+			damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.SNIPER));
+			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
+
+			for (LivingEntity mob : mobs) {
+				MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
+				DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+			}
 		}
 
 		//Get enchant levels on weapon
