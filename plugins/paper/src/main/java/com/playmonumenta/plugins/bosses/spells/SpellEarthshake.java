@@ -74,7 +74,6 @@ public class SpellEarthshake extends Spell {
 			@Override
 			public void run() {
 				if (mLauncher.isDead() || !mLauncher.isValid() || EntityUtils.isStunned(mLauncher) || EntityUtils.isSilenced(mLauncher)) {
-					mLauncher.setAI(true);
 					this.cancel();
 					return;
 				}
