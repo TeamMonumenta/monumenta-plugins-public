@@ -89,7 +89,9 @@ public class Quickdraw extends Ability {
 	private boolean shootProjectile(ItemStack inMainHand, int deviation) {
 		Vector direction = mPlayer.getLocation().getDirection();
 		if (deviation != 0) {
-			direction.rotateAroundY(deviation * 10.0 * Math.PI / 180);
+			Location l = mPlayer.getLocation();
+			l.setPitch(l.getPitch() - 90);
+			direction.rotateAroundNonUnitAxis(l.getDirection(), deviation * 10.0 * Math.PI / 180);
 		}
 
 		World world = mPlayer.getWorld();
