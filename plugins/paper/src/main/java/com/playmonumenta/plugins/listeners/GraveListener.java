@@ -9,13 +9,18 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
+import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import de.tr7zw.nbtapi.NBTEntity;
 import java.util.HashMap;
 import java.util.UUID;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -34,6 +39,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -42,7 +48,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 public class GraveListener implements Listener {
@@ -212,23 +217,32 @@ public class GraveListener implements Listener {
 		};
 	}
 
-	// An item on the player breaks.
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerItemDamageEvent(PlayerItemDamageEvent event) {
+		// If a tiered item breaks, shatter it instead of destroying it
+		ItemStack item = event.getItem();
+		if (item.getItemMeta() instanceof Damageable meta
+			    && event.getDamage() + meta.getDamage() >= item.getType().getMaxDurability()
+			    && ItemStatUtils.getTier(item) != ItemStatUtils.Tier.NONE) {
+			event.setCancelled(true);
+			meta.setDamage(item.getType().getMaxDurability());
+			item.setItemMeta(meta);
+			if (Shattered.shatter(item, Shattered.DURABILITY_SHATTER)) {
+				Component itemName = ItemUtils.getDisplayName(item).decoration(TextDecoration.UNDERLINED, false);
+				String translatedMessage = TranslationsManager.translate(event.getPlayer(), "Your %s shattered because it ran out of durability!");
+				Component message = Component.text(translatedMessage).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
+					                    .replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(itemName).build());
+				event.getPlayer().sendMessage(message);
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
-		// If an item breaks, attempt to shatter it
 		ItemStack item = event.getBrokenItem();
 		if (ItemStatUtils.getTier(item) != ItemStatUtils.Tier.NONE) {
-			Player player = event.getPlayer();
-			if (Shattered.shatter(item, Shattered.DURABILITY_SHATTER)) {
-				// If the item shatters, drop it on the player with instant pickup, grave item if it couldn't be picked up.
-				player.sendMessage(ChatColor.RED + "An item shattered because it ran out of durability!");
-			}
+			MMLog.warning("Reached PlayerItemBreakEvent for tiered item " + ItemUtils.getPlainName(item) + "!");
 			item.setAmount(item.getAmount() + 1);
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				Damageable meta = (Damageable) item.getItemMeta();
-				meta.setDamage(item.getType().getMaxDurability());
-				item.setItemMeta((ItemMeta) meta);
-			});
 		}
 	}
 

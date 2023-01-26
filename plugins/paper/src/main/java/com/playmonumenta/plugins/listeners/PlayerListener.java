@@ -1005,12 +1005,7 @@ public class PlayerListener implements Listener {
 				BlockData fallingDustData = Material.ANVIL.createBlockData();
 				world.spawnParticle(Particle.FALLING_DUST, loc.add(0, 1, 0), 20,
 					1.1, 0.6, 1.1, fallingDustData);
-				Component itemName = item.hasItemMeta() ? item.getItemMeta().displayName() : null;
-				if (itemName == null) {
-					itemName = Component.translatable(mat.getTranslationKey());
-				} else {
-					itemName = itemName.decoration(TextDecoration.UNDERLINED, false);
-				}
+				Component itemName = ItemUtils.getDisplayName(item).decoration(TextDecoration.UNDERLINED, false);
 				String translatedMessage = TranslationsManager.translate(player, "Your %s is about to break!");
 				Component message = Component.text(translatedMessage).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
 					.replaceText(TextReplacementConfig.builder().matchLiteral("%s").replacement(itemName).build());
