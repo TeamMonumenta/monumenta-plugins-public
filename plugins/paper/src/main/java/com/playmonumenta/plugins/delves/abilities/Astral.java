@@ -5,17 +5,20 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.ChestLockBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
 public class Astral {
@@ -23,6 +26,8 @@ public class Astral {
 	public static final String DESCRIPTION = "Sometimes, the stars gaze back.";
 	private static final List<String> MOB_POOL;
 	private static final List<String> SPECIAL_MOB_POOL;
+
+	private static final NamespacedKey CHEST_CHECKED_PERSISTENT_DATA_KEY = NamespacedKeyUtils.fromString("epic:astral_checked");
 
 	private static final List<String> POSSIBLE_DESCRIPTIONS = Arrays.asList(
 		"Po" + ChatColor.MAGIC + "tesn" + ChatColor.RESET + "e co" + ChatColor.MAGIC + "nsp" + ChatColor.RESET + "icere ira" + ChatColor.MAGIC + "m c" + ChatColor.RESET + "aeli?",
@@ -86,14 +91,15 @@ public class Astral {
 		return null;
 	}
 
-	public static void applyModifiers(Block block, int level) {
-		if (level == 0 || ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
+	public static void applyModifiers(Chest chest, int level) {
+		if (level == 0 || ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
 			return;
 		}
-		if (!block.hasMetadata("BulletHellChecked")) {
-			block.setMetadata("BulletHellChecked", new FixedMetadataValue(Plugin.getInstance(), true));
+		if (!chest.getPersistentDataContainer().has(CHEST_CHECKED_PERSISTENT_DATA_KEY)) {
+			chest.getPersistentDataContainer().set(CHEST_CHECKED_PERSISTENT_DATA_KEY, PersistentDataType.BYTE, (byte) 1);
+			chest.update();
 			if (FastUtils.RANDOM.nextDouble() < 0.33) {
-				summonAstral(block);
+				summonAstral(chest.getBlock());
 			}
 		}
 	}

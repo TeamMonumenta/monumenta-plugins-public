@@ -55,7 +55,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -66,7 +65,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -284,14 +282,6 @@ public class DelvesManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void blockPlace(BlockPlaceEvent event) {
-		// Prevent players force spawning astrals
-		if (event.getBlockPlaced().getBlockData() instanceof Chest && !event.getBlockPlaced().hasMetadata("BulletHellChecked")) {
-			event.getBlockPlaced().setMetadata("BulletHellChecked", new FixedMetadataValue(Plugin.getInstance(), true));
-		}
-	}
-
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
@@ -381,9 +371,12 @@ public class DelvesManager implements Listener {
 		if (resistanceLevel < 5) {
 			List<Chunk> chunkList = LocationUtils.getSurroundingChunks(event.getTo().getBlock(), 32);
 			for (Chunk chunk : chunkList) {
-				for (BlockState interestingBlock : chunk.getTileEntities()) {
-					if (ChestUtils.isAstrableChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32) && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
-						Astral.applyModifiers(interestingBlock.getBlock(), getRank(player, DelvesModifier.ASTRAL));
+				for (BlockState interestingBlock : chunk.getTileEntities(b -> b.getType() == Material.CHEST, false)) {
+					if (interestingBlock instanceof Chest chest
+						    && LocationUtils.blocksAreWithinRadius(event.getTo().getBlock(), interestingBlock.getBlock(), 32)
+						    && ChestUtils.isAstrableChest(chest)
+						    && PlayerUtils.hasLineOfSight(player, interestingBlock.getBlock())) {
+						Astral.applyModifiers(chest, getRank(player, DelvesModifier.ASTRAL));
 					}
 				}
 			}

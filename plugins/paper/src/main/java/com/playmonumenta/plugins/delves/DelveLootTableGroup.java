@@ -207,4 +207,9 @@ public class DelveLootTableGroup {
 			map.put(regularTable, this);
 		}
 	}
+
+	public static boolean hasDelveableLootTable(Chest chest) {
+		return chest.getLootTable() != null && DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS.containsKey(chest.getLootTable().getKey().getKey());
+	}
+
 }

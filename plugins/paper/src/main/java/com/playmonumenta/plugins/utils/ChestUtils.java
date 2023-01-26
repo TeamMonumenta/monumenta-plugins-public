@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.delves.DelveLootTableGroup;
 import com.playmonumenta.plugins.listeners.LootTableManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -642,39 +643,39 @@ public class ChestUtils {
 			if (amountRemaining > 1) {
 				MMLog.finer("generateLootInventory: Adding slot " + splitSlot + " to multiple items list");
 				slotsWithMultipleItems.add(splitSlot);
-		    }
+			}
 		}
 	}
 
 	public static boolean isUnscaledChest(Block block) {
 		return block.getState() instanceof Chest chest && chest.getLootTable() != null &&
-			       chest.getSeed() == 0 && isChestEmpty(chest);
+			       chest.getSeed() == 0 && isChestBlockEmpty(chest);
 	}
 
-	public static boolean isAstrableChest(Block block) {
-		return block.getState() instanceof Chest chest && chest.getLootTable() != null && isChestEmpty(chest);
+	public static boolean isAstrableChest(Chest chest) {
+		return DelveLootTableGroup.hasDelveableLootTable(chest) && isChestBlockEmpty(chest);
 	}
 
-	public static boolean isChestEmpty(Chest chest) {
-		for (ItemStack slot : chest.getBlockInventory().getContents()) {
-			if (slot != null && !slot.getType().isAir()) {
-				return false;
-			}
-		}
-		return true;
+	/**
+	 * Checks if the inventory of this chest block is empty (i.e. only checks one half of a double chest)
+	 *
+	 * @see #isEmpty(Chest)
+	 */
+	public static boolean isChestBlockEmpty(Chest chest) {
+		return Arrays.stream(chest.getBlockInventory().getContents()).allMatch(ItemUtils::isNullOrAir);
 	}
 
 	public static boolean isEmpty(Block block) {
-		return block.getState() instanceof Chest && isEmpty((Chest)block.getState());
+		return block.getState() instanceof Chest && isEmpty((Chest) block.getState());
 	}
 
+	/**
+	 * Checks if the inventory of this entire chest is empty (i.e. checks both halves of a double chest)
+	 *
+	 * @see #isChestBlockEmpty(Chest)
+	 */
 	public static boolean isEmpty(Chest chest) {
-		for (ItemStack slot : chest.getInventory()) {
-			if (slot != null) {
-				return false;
-			}
-		}
-		return true;
+		return Arrays.stream(chest.getInventory().getContents()).allMatch(ItemUtils::isNullOrAir);
 	}
 
 	public static boolean isChestWithLootTable(Block block) {

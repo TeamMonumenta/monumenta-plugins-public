@@ -687,7 +687,7 @@ public class PlayerListener implements Listener {
 		Inventory inventory = event.getInventory();
 		InventoryHolder holder = inventory.getHolder();
 		if (holder instanceof Chest chest) {
-			// Break empty graves or Halloween creeper chests in safe zones automatically when closed
+			// Break Halloween creeper chests in safe zones automatically when closed
 			if (ChestUtils.isEmpty(chest) && (chest.getCustomName() != null && chest.getCustomName().contains("Creeperween Chest"))) {
 				chest.getBlock().breakNaturally();
 			}

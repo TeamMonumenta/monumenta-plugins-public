@@ -22,8 +22,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class BulletHellSurvivalBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bullet_hell_survival";
@@ -67,6 +65,9 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 		List<Player> players = PlayerUtils.playersInRange(boss.getLocation(), 13, false);
 		for (Player player : players) {
 			if (!EffectManager.getInstance().hasEffect(player, RespawnStasis.class) && !player.isDead() && player.getGameMode() != GameMode.SPECTATOR) {
+				if (player.isSleeping()) {
+					return -1;
+				}
 				double heightdiff = player.getLocation().getY() - boss.getLocation().getY();
 				double jumpHeight = PlayerUtils.getJumpHeight(player);
 				if (heightdiff > BULLET_HITBOX_RADIUS && playerOnBlock(player)) {
