@@ -80,8 +80,8 @@ public class GraveListener implements Listener {
 	public void playerInteractEntity(PlayerInteractEntityEvent event) {
 		if (GraveManager.isGrave(event.getRightClicked())
 			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
-			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
+			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 		}
 	}
 
@@ -89,8 +89,8 @@ public class GraveListener implements Listener {
 	public void playerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
 		if (GraveManager.isGrave(event.getRightClicked())
 			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
-			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
+			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 		}
 	}
 
@@ -98,8 +98,8 @@ public class GraveListener implements Listener {
 	public void playerInteractAtEntity(PlayerInteractAtEntityEvent event) {
 		if (GraveManager.isGrave(event.getRightClicked())
 			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
-			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 			event.setCancelled(true);
+			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
 		}
 	}
 
@@ -110,8 +110,8 @@ public class GraveListener implements Listener {
 			    && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
 			    && GraveManager.isGrave(event.getEntity())
 			    && MetadataUtils.checkOnceThisTick(mPlugin, player, INTERACT_METAKEY)) {
-			GraveManager.onInteract(player, event.getEntity());
 			event.setCancelled(true);
+			GraveManager.onInteract(player, event.getEntity());
 		}
 	}
 

@@ -564,11 +564,11 @@ public class EntityListener implements Listener {
 					newPearl.setVelocity(origPearl.getVelocity());
 					event.setCancelled(true);
 					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES)) {
-						new EnderPearlTracker(player, newPearl);
+						EnderPearlTracker.startTracking(player, newPearl);
 					}
 				} else {
 					if (!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.NO_MOBILITY_ABILITIES)) {
-						new EnderPearlTracker(player, origPearl);
+						EnderPearlTracker.startTracking(player, origPearl);
 					}
 				}
 			} else if (event.getEntity() instanceof AbstractArrow arrow) {

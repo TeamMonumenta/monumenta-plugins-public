@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.ParticleCategory;
+import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.poi.POIManager;
 import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.portals.PortalManager;
@@ -1059,10 +1060,16 @@ public class PlayerListener implements Listener {
 	public void playerTeleportEvent(PlayerTeleportEvent event) {
 		// Cancel teleports caused by forbidden sources
 		TeleportCause cause = event.getCause();
+
+		if (cause == TeleportCause.ENDER_PEARL) {
+			EnderPearlTracker.allowTeleport(event.getPlayer());
+			event.setCancelled(true);
+			return;
+		}
+
 		if (cause.equals(TeleportCause.CHORUS_FRUIT)
 			    || cause.equals(TeleportCause.END_GATEWAY)
 			    || cause.equals(TeleportCause.END_PORTAL)
-			    || cause.equals(TeleportCause.ENDER_PEARL) // ender pearl teleportation is handled manually by EnderPearlTracker
 			    || cause.equals(TeleportCause.NETHER_PORTAL)) {
 			event.setCancelled(true);
 			return;
