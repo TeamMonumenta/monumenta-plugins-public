@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
@@ -50,51 +52,57 @@ public class MobRisingBoss extends BossAbilityGroup {
 
 		if (p.MOB_POOL != LoSPool.EMPTY) {
 			SpellManager activeSpells = new SpellManager(List.of(
-				new SpellBaseSummon(
-					plugin,
-					boss,
-					p.COOLDOWN,
-					p.DURATION,
-					p.RANGE,
-					p.DEPTH,
-					p.CAN_BE_STOPPED,
-					p.CAN_MOVE,
-					p.SINGLE_TARGET,
-					() -> {
-						return p.MOB_NUMBER;
-					},
-					() -> {
-						return p.TARGETS.getTargetsLocationList(boss);
-					},
-					(Location loc, int times) -> {
-						return p.MOB_POOL.spawn(loc);
-					},
-					(LivingEntity bos, Location loc, int ticks) -> {
-						if (ticks == 0) {
-							bos.setGlowing(true);
-						}
+					new SpellBaseSummon(
+							plugin,
+							boss,
+							p.COOLDOWN,
+							p.DURATION,
+							p.RANGE,
+							p.DEPTH,
+							p.CAN_BE_STOPPED,
+							p.CAN_MOVE,
+							p.SINGLE_TARGET,
+							() -> {
+								return p.MOB_NUMBER;
+							},
+							() -> {
+								if (ZoneUtils.hasZoneProperty(boss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5)) {
+									return new ArrayList<Location>();
+								}
+								return p.TARGETS.getTargetsLocationList(boss);
+							},
+							(Location loc, int times) -> {
+								if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESIST_5)) {
+									return null;
+								}
+								return p.MOB_POOL.spawn(loc);
+							},
+							(LivingEntity bos, Location loc, int ticks) -> {
+								if (ticks == 0) {
+									bos.setGlowing(true);
+								}
 
-						if (p.SOUNDS != SoundsList.EMPTY) {
-							p.SOUNDS.play(bos.getLocation());
-						}
+								if (p.SOUNDS != SoundsList.EMPTY) {
+									p.SOUNDS.play(bos.getLocation());
+								}
 
-						new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
-						if (ticks >= p.DURATION) {
-							bos.setGlowing(false);
-						}
+								if (ticks >= p.DURATION) {
+									bos.setGlowing(false);
+								}
 
-					},
-					(LivingEntity mob, Location loc, int ticks) -> {
-						if (ticks == 0) {
-							mob.setGlowing(true);
-						}
-						new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
+							},
+							(LivingEntity mob, Location loc, int ticks) -> {
+								if (ticks == 0) {
+									mob.setGlowing(true);
+								}
+								new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
-						if (ticks >= p.DURATION) {
-							mob.setGlowing(false);
-						}
-					})
+								if (ticks >= p.DURATION) {
+									mob.setGlowing(false);
+								}
+							})
 			));
 
 
