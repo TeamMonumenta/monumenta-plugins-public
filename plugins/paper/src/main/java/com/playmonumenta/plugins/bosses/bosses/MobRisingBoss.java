@@ -66,13 +66,15 @@ public class MobRisingBoss extends BossAbilityGroup {
 								return p.MOB_NUMBER;
 							},
 							() -> {
-								if (ZoneUtils.hasZoneProperty(boss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5)) {
+								if (ZoneUtils.hasZoneProperty(boss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5)
+										&& !ZoneUtils.hasZoneProperty(boss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
 									return new ArrayList<Location>();
 								}
 								return p.TARGETS.getTargetsLocationList(boss);
 							},
 							(Location loc, int times) -> {
-								if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESIST_5)) {
+								if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.RESIST_5)
+										&& !ZoneUtils.hasZoneProperty(boss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
 									return null;
 								}
 								return p.MOB_POOL.spawn(loc);

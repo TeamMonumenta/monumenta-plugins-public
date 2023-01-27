@@ -50,7 +50,7 @@ public class SpellSpawnMobs extends Spell {
 
 			Location sLoc = loc.clone().add(x, 0.25, z);
 			//Can skip some summons but doesn't matter I don't think - this is the edgiest of edge cases
-			if (ZoneUtils.hasZoneProperty(sLoc, ZoneUtils.ZoneProperty.RESIST_5)) {
+			if (ZoneUtils.hasZoneProperty(sLoc, ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
 				continue;
 			}
 			Entity entity = LibraryOfSoulsIntegration.summon(sLoc, mSummonName);
@@ -68,7 +68,7 @@ public class SpellSpawnMobs extends Spell {
 	@Override
 	public boolean canRun() {
 		if (EntityUtils.getNearbyMobs(mBoss.getLocation(), mMobCapRange).size() > mMobCap
-				|| ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5)) {
+				|| (ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ))) {
 			return false;
 		}
 		return true;

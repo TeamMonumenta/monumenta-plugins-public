@@ -51,7 +51,8 @@ public class ZoneUtils {
 		OVERWORLD_BLOCK_RESET("OverworldBlockReset"),
 		LOOTROOM("Lootroom"),
 		MONUMENT("Monument"),
-		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled");
+		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
+		BLITZ("Blitz");
 
 		private final String mPropertyName;
 
