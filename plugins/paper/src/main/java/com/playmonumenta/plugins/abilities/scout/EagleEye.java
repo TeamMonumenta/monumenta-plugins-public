@@ -133,6 +133,11 @@ public class EagleEye extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		DamageEvent.DamageType type = event.getType();
+		if (type == DamageEvent.DamageType.TRUE || type == DamageEvent.DamageType.OTHER || type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.FIRE || type == DamageEvent.DamageType.POISON) {
+			return false;
+		}
+
 		if (isEnhanced() && mEntitiesAffected.contains(enemy)) {
 			event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
 			mEntitiesAffected.remove(enemy);
