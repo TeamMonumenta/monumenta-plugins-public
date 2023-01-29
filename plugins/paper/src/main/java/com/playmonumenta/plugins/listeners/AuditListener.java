@@ -69,6 +69,7 @@ public class AuditListener implements Listener {
 		exactOptionalArguments("lfg"),
 		exactOptionalArguments("m"),
 		exactOptionalArguments("mh"),
+		exactOptionalArguments("tr"),
 		exactOptionalArguments("join"),
 		exactOptionalArguments("leave"),
 		exactOptionalArguments("ignore"),
