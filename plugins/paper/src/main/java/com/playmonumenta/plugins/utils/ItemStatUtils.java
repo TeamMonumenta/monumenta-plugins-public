@@ -488,6 +488,7 @@ public class ItemStatUtils {
 		SLAYER(new Slayer(), true, false, false, true),
 		SMITE(new Smite(), true, false, false, true),
 		SNIPER(new Sniper(), true, false, false, true),
+		REVERB(new Reverb(), true, false, false, true),
 		STAMINA(new Stamina(), true, false, false, true),
 		STARVATION(new Starvation(), false, true, false, false),
 		SUSTENANCE(new Sustenance(), true, false, false, true),

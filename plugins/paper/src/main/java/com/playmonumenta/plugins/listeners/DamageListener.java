@@ -196,6 +196,16 @@ public class DamageListener implements Listener {
 			mPlugin.mEffectManager.damageEvent(event);
 		}
 
+		// Reverb custom enchant needs to calculate final damage after effects are applied.
+		if (source instanceof Player player) {
+			PlayerItemStats eventPlayerItemStats = event.getPlayerItemStats();
+			if (eventPlayerItemStats != null) {
+				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, eventPlayerItemStats, event, damagee);
+			} else {
+				mPlugin.mItemStatManager.onDamageDelayed(mPlugin, player, event, damagee);
+			}
+		}
+
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
 		if (source instanceof Player player
 			    && (damager instanceof Projectile || ElementalArrows.isElementalArrowDamage(event))

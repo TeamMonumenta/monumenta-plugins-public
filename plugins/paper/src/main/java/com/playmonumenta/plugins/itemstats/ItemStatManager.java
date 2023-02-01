@@ -592,6 +592,21 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
+	public void onDamageDelayed(Plugin plugin, Player player, DamageEvent event, LivingEntity enemy) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			onDamageDelayed(plugin, player, mPlayerItemStatsMappings.get(player.getUniqueId()), event, enemy);
+		}
+	}
+
+	public void onDamageDelayed(Plugin plugin, Player player, PlayerItemStats stats, DamageEvent event, LivingEntity enemy) {
+		for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
+			if (event.isCancelled()) {
+				return;
+			}
+			entry.getKey().onDamageDelayed(plugin, player, entry.getValue(), event, enemy);
+		}
+	}
+
 	public void onHurt(Plugin plugin, Player player, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {

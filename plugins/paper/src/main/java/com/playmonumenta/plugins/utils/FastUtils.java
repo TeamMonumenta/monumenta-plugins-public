@@ -39,8 +39,11 @@ public class FastUtils {
 		}
 	}
 
+	/**
+	 * Generates random int from given range, min AND max INCLUSIVE.
+	 */
 	public static int randomIntInRange(int min, int max) {
-		return min == max ? min : (RANDOM.nextInt() * (max - min)) + min;
+		return min == max ? min : RANDOM.nextInt(1 + max - min) + min;
 	}
 
 	public static double randomDoubleInRange(double min, double max) {

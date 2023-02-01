@@ -125,6 +125,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
 import com.playmonumenta.plugins.itemstats.enchantments.Regicide;
 import com.playmonumenta.plugins.itemstats.enchantments.Retrieval;
+import com.playmonumenta.plugins.itemstats.enchantments.Reverb;
 import com.playmonumenta.plugins.itemstats.enchantments.Sapper;
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Slayer;
@@ -243,6 +244,8 @@ public class CharmManager {
 			Eruption.CHARM_RADIUS,
 			Explosive.CHARM_DAMAGE,
 			Explosive.CHARM_RADIUS,
+			Reverb.CHARM_DAMAGE,
+			Reverb.CHARM_RADIUS,
 
 			// Classes
 			// Mage

@@ -314,4 +314,17 @@ public interface ItemStat {
 	default void onPlayerPotionSplash(Plugin plugin, Player player, double value, PotionSplashEvent event) {
 
 	}
+
+	/**
+	 * Player dealt damage (NOT including Projectiles) to a LivingEntity delayed to run after abilities and effects.
+	 *
+	 * @param plugin monumenta plugin
+	 * @param player the Player damaging the LivingEntity
+	 * @param value  the value of ItemStat possessed by the Player
+	 * @param event  the associated DamageEvent
+	 * @param enemy  the LivingEntity being damaged
+	 */
+	default void onDamageDelayed(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+
+	}
 }
