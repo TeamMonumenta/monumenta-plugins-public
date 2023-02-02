@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -90,6 +91,14 @@ public class MetadataUtils {
 			return (T) metadata.value();
 		}
 		return defaultValue;
+	}
+
+	public static <T> Optional<T> getMetadata(Metadatable metadatable, String key) {
+		MetadataValue metadata = getMetadataValue(metadatable, key);
+		if (metadata != null) {
+			return Optional.of((T) metadata.value());
+		}
+		return Optional.empty();
 	}
 
 	public static <T> T getOrSetMetadata(Metadatable metadatable, String key, T value) {

@@ -75,6 +75,7 @@ import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -194,6 +195,8 @@ public class EntityListener implements Listener {
 	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
 
 	private static final String FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY = "MonumentaFallingBlockAdventureMode";
+
+	private static final String AREA_EFFECT_CLOUD_POTION_METAKEY = "MonumentaAreaEffectCloudPotion";
 
 	Plugin mPlugin;
 	AbilityManager mAbilities;
@@ -707,6 +710,15 @@ public class EntityListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void lingeringPotionSplashEvent(LingeringPotionSplashEvent event) {
+		MetadataUtils.setMetadata(event.getAreaEffectCloud(), AREA_EFFECT_CLOUD_POTION_METAKEY, event.getEntity().getItem());
+		if (!event.getAreaEffectCloud().hasCustomEffects()) {
+			// Area effect clouds without potion effects do not call AreaEffectCloudApplyEvent, so add a dummy effect
+			event.getAreaEffectCloud().addCustomEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 0, 0, true, false, false), false);
+		}
+	}
+
 	// Entity ran into the effect cloud.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void areaEffectCloudApplyEvent(AreaEffectCloudApplyEvent event) {
@@ -736,6 +748,7 @@ public class EntityListener implements Listener {
 		List<PotionEffect> effects = cloud.hasCustomEffects() ? cloud.getCustomEffects() : null;
 
 		// All affected players need to have the effect added to their potion manager.
+		ItemStack potion = MetadataUtils.<ItemStack>getMetadata(cloud, AREA_EFFECT_CLOUD_POTION_METAKEY).orElse(null);
 		for (LivingEntity entity : affectedEntities) {
 			if (entity instanceof Player player) {
 				if (info != null) {
@@ -745,8 +758,13 @@ public class EntityListener implements Listener {
 				if (effects != null) {
 					mPlugin.mPotionManager.addPotion(player, PotionID.APPLIED_POTION, effects);
 				}
+
+				if (potion != null) {
+					ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
+				}
 			}
 		}
+
 	}
 
 	// Cancel explosions in adventure zones
