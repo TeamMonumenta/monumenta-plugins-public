@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import it.unimi.dsi.util.XoRoShiRo128PlusRandom;
 import java.math.BigInteger;
+import java.util.List;
 
 public class FastUtils {
 	public static final XoRoShiRo128PlusRandom RANDOM = new XoRoShiRo128PlusRandom();
@@ -110,5 +111,9 @@ public class FastUtils {
 
 	public static BigInteger bigFact(int num) throws RuntimeException {
 		return fact[num];
+	}
+
+	public static <U> U getRandomElement(List<U> list) {
+		return list.get(randomIntInRange(0, list.size() - 1));
 	}
 }

@@ -18,24 +18,26 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Creature;
@@ -45,6 +47,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -113,6 +116,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 
+	private List<Player> mPlayers = new ArrayList<>();
 	private boolean mCooldown = false;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -150,10 +154,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 						}
 					}
 				} else {
-					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, false);
-					if (players != null && players.size() > 0) {
-						Collections.shuffle(players);
-						mHorse.setTarget(players.get(0));
+					if (!mPlayers.isEmpty()) {
+						mHorse.setTarget(FastUtils.getRandomElement(mPlayers));
 					}
 				}
 			}
@@ -178,9 +180,9 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			new SpellRemoveLevitation(mBoss)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"You? You're who they sent? Oh ho ho, \",\"color\":\"gold\"},{\"text\":\"we're \",\"color\":\"dark_red\"},{\"text\":\"going to have some fun.\",\"color\":\"gold\"}]");
+			mPlayers.forEach(p -> p.sendMessage(Component.text("[The Horseman] ", NamedTextColor.DARK_RED).append(Component.text("You? You're who they sent? Oh ho ho, ", NamedTextColor.GOLD)).append(Component.text("we're ", NamedTextColor.DARK_RED)).append(Component.text("going to have some fun.", NamedTextColor.GOLD))));
 		});
 
 		events.put(50, mBoss -> {
@@ -192,7 +194,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 				new SpellReaperOfLife(plugin, boss, mSpawnLoc, detectionRange, 9 * 20)
 			));
 			changePhase(p2C9Spells, passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ha ha ha! I haven't felt this alive for what feels like eternity! \",\"color\":\"gold\"},{\"text\":\"We'll \",\"color\":\"dark_red\"},{\"text\":\"have to speed this up!.\",\"color\":\"gold\"}]");
+			mPlayers.forEach(p -> p.sendMessage(Component.text("[The Horseman] ", NamedTextColor.DARK_RED).append(Component.text("Ha ha ha! I haven't felt this alive for what feels like eternity! ", NamedTextColor.GOLD)).append(Component.text("We'll ", NamedTextColor.DARK_RED)).append(Component.text("have to speed this up!", NamedTextColor.GOLD))));
 			forceCastSpell(SpellReaperOfLife.class);
 		});
 
@@ -206,11 +208,11 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			));
 			//to enforce the new cooldown
 			changePhase(p2C6Spells, passives, null);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Let's speed this up just a bit more!\",\"color\":\"gold\"}]");
+			mPlayers.forEach(p -> p.sendMessage(Component.text("[The Horseman] ", NamedTextColor.DARK_RED).append(Component.text("Let's speed this up just a bit more!", NamedTextColor.GOLD))));
 		});
 
 		events.put(10, mBoss -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[The Horseman] \",\"color\":\"dark_red\"},{\"text\":\"Ready or not, here they come!\",\"color\":\"gold\"}]");
+			mPlayers.forEach(p -> p.sendMessage(Component.text("[The Horseman] ", NamedTextColor.DARK_RED).append(Component.text("Ready or not, here they come!", NamedTextColor.GOLD))));
 			forceCastSpell(SpellHellzoneGrenade.class);
 		});
 
@@ -229,33 +231,28 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(mBoss.getLocation()) <= 2) {
+		Location loc = mBoss.getLocation();
+		if (event.getType() == DamageType.MELEE && damagee.getLocation().distance(loc) <= 2) {
 			if (!mCooldown) {
 				mCooldown = true;
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 20);
-				UUID uuid = damagee.getUniqueId();
-				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 4, true)) {
-					if (!player.getUniqueId().equals(uuid)) {
+				for (Player player : mPlayers) {
+					if (player != damagee && player.getLocation().distance(loc) <= 4) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, event.getDamage());
 					}
 				}
 				World world = mBoss.getWorld();
-				new PartialParticle(Particle.DAMAGE_INDICATOR, mBoss.getLocation(), 30, 2, 2, 2, 0.1).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.SWEEP_ATTACK, mBoss.getLocation(), 10, 2, 2, 2, 0.1).spawnAsEntityActive(mBoss);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0);
+				new PartialParticle(Particle.DAMAGE_INDICATOR, loc, 30, 2, 2, 2, 0.1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, 10, 2, 2, 2, 0.1).spawnAsEntityActive(mBoss);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, 0);
 			}
 		}
 
-		if (damagee.getLocation().distance(mBoss.getLocation()) < 2.5) {
-			List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, false);
-			if (players.contains(damagee)) {
-				players.remove(damagee);
-			}
-
+		if (damagee.getLocation().distance(loc) < 2.5) {
 			double dist = 100;
 			Player target = null;
-			for (Player p : players) {
-				if (p.getLocation().distance(mBoss.getLocation()) < dist) {
+			for (Player p : mPlayers) {
+				if (p != damagee && p.getLocation().distance(mBoss.getLocation()) < dist) {
 					target = p;
 					dist = p.getLocation().distance(mBoss.getLocation());
 				}
@@ -267,26 +264,29 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 		}
 	}
 
+	@Override
+	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+		if (source instanceof Player player && !mPlayers.contains(player)) {
+			event.setCancelled(true);
+		}
+	}
+
 	public LivingEntity getEntity() {
 		return mBoss;
 	}
 
 	@Override
 	public void init() {
-		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
+		mPlayers = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true);
+		// Players are given the HorsemanFight tag upon starting the fight
+		mPlayers.removeIf(p -> !ScoreboardUtils.checkTag(p, "HorsemanFight"));
+		int playerCount = mPlayers.size();
 		int hpDelta = 2500;
 		double finalHp = hpDelta * BossUtils.healthScalingCoef(playerCount, 0.6, 0.35);
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(finalHp);
-		mBoss.setHealth(finalHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, finalHp);
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			if (player.hasPotionEffect(PotionEffectType.GLOWING)) {
-				player.removePotionEffect(PotionEffectType.GLOWING);
-			}
-		}
-
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Headless Horseman", ChatColor.RED + "Scourge of the Isles");
+		for (Player player : mPlayers) {
+			MessagingUtils.sendTitle(player, Component.text("Headless Horseman", NamedTextColor.DARK_RED, TextDecoration.BOLD), Component.text("Scourge of the Isles", NamedTextColor.RED, TextDecoration.BOLD));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
@@ -294,8 +294,8 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			player.sendMessage(ChatColor.DARK_RED + "[The Horseman] No matter. I'll be seeing you all again soon.");
+		for (Player player : mPlayers) {
+			player.sendMessage(Component.text("[The Horseman] No matter. I'll be seeing you all again soon.", NamedTextColor.DARK_RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_HORSE_DEATH, SoundCategory.HOSTILE, 1.0f, 0.1f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 10, 2));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 4));
@@ -306,5 +306,15 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			}
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mPlayers.remove(event.getPlayer());
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
 	}
 }
