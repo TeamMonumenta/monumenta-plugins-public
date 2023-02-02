@@ -1432,8 +1432,8 @@ public class EntityUtils {
 	public static List<BlockState> getTileEntitiesInRange(Location location, int radius, Predicate<Block> blockPredicate) {
 		double radiusSquared = 1.0 * radius * radius;
 		List<BlockState> result = new ArrayList<>();
-		for (int x = -radius; x <= radius; x += 16) {
-			for (int z = -radius; z <= radius; z += 16) {
+		for (int x = -radius; x < radius + 16; x += 16) {
+			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()) {
 					result.addAll(offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false));
@@ -1445,8 +1445,8 @@ public class EntityUtils {
 
 	public static boolean hasTileEntityInRange(Location location, int radius, Predicate<Block> blockPredicate) {
 		double radiusSquared = 1.0 * radius * radius;
-		for (int x = -radius; x <= radius; x += 16) {
-			for (int z = -radius; z <= radius; z += 16) {
+		for (int x = -radius; x < radius + 16; x += 16) {
+			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()
 					    && !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
