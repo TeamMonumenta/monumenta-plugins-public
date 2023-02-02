@@ -90,7 +90,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		addItems(DelveInfusionSelection.AURA, (i, perLevel) -> "Mobs in a 3 block radius from you are slowed by " + StringUtils.multiplierToPercentage(Aura.SLOW_PER_LEVEL * i) + "%" + perLevel + " for 0.5 seconds. This is refreshed as long as they are in range.");
 		addItems(DelveInfusionSelection.EXPEDITE, (i, perLevel) -> "Damaging an enemy with an ability increases your movement speed by " + StringUtils.multiplierToPercentage(Expedite.PERCENT_SPEED_PER_LEVEL * i) + "%" + perLevel + " for 5 seconds, stacking up to 3 times.");
 		addItems(DelveInfusionSelection.CHOLER, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Choler.DAMAGE_MLT_PER_LVL * i) + "% more damage" + perLevel + " to any mob that is on fire, slowed, or stunned.");
-		addItems(DelveInfusionSelection.UNYIELDING, (i, perLevel) -> "Gain " + String.format("%,.1f", (Unyielding.KB_PER_LEVEL * i)) + " Knockback Resistance" + perLevel + ".");
+		addItems(DelveInfusionSelection.UNYIELDING, (i, perLevel) -> "Gain " + StringUtils.to2DP(Unyielding.KB_PER_LEVEL * i * 10) + " Knockback Resistance" + perLevel + ".");
 		addItems(DelveInfusionSelection.USURPER, (i, perLevel) -> "Heal " + StringUtils.multiplierToPercentage(Usurper.HEAL_PCT_PER_LVL * i) + "% of your max health" + perLevel + " whenever you slay an elite or boss enemy.");
 		addItems(DelveInfusionSelection.VENGEFUL, (i, perLevel) -> "Deal " + StringUtils.multiplierToPercentage(Vengeful.DAMAGE_MLT_PER_LVL * i) + "% more damage" + perLevel + " against the last enemy that damaged you.");
 		//R2
