@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -12,11 +11,13 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,6 +31,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 /*
  * Volcanic Demise:
@@ -168,21 +170,29 @@ public class SpellVolcanicDemise extends Spell {
 				players.removeIf(p -> p.getLocation().distance(mCenter) > 50 || p.getLocation().getY() >= 61);
 
 				mY -= 1;
-				if (mY > 0 && (int) mY % 3 == 0) {
-					new PPCircle(Particle.LAVA, mLoc, DEATH_RADIUS / 2)
-						.ringMode(false)
-						.count(10)
-						.distanceFalloff(20)
-						.spawnAsBoss();
+				// Impact Zone
+				if (mY % 8 == 0) {
+					ParticleUtils.drawRing(mLoc.clone().add(0, 0.2, 0), 180, new Vector(0, 1, 0), DEATH_RADIUS,
+							(l, t) -> {
+								Vector toCenter = l.clone().subtract(mLoc).toVector().normalize();
+								new PartialParticle(Particle.FLAME, l).delta(toCenter.getX(), toCenter.getY(), toCenter.getZ())
+										.count(1).extra(0.15).directionalMode(true).distanceFalloff(15).spawnAsBoss();
+							}
+					);
+					ParticleUtils.drawRing(mLoc.clone().add(0, 0.2, 0), 60, new Vector(0, 1, 0), 2, (l, t) -> {
+						new PartialParticle(Particle.REDSTONE, l).count(1).extra(0).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1)).distanceFalloff(15).spawnAsBoss();
+					});
 				}
-				Location particle = mLoc.clone().add(0, mY, 0);
-				new PartialParticle(Particle.FLAME, particle, 2, 0.2f, 0.2f, 0.2f, 0.05)
-					.distanceFalloff(20).spawnAsBoss();
-				if (FastUtils.RANDOM.nextBoolean()) {
-					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0)
+				new PartialParticle(Particle.LAVA, mLoc, 3, 2.5, 0, 2.5, 0.05)
 						.distanceFalloff(20).spawnAsBoss();
-				}
+				// Meteor Trail
+				Location particle = mLoc.clone().add(0, mY, 0);
+				new PartialParticle(Particle.FLAME, particle, 10, 0.2f, 0.2f, 0.2f, 0.1)
+						.distanceFalloff(20).spawnAsBoss();
+				new PartialParticle(Particle.SMOKE_LARGE, particle, 5, 0, 0, 0, 0.05)
+						.distanceFalloff(20).spawnAsBoss();
 				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
+				// Impact
 				if (mY <= 0) {
 					this.cancel();
 					mActiveRunnables.remove(this);
