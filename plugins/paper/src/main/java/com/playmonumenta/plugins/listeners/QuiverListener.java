@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
@@ -68,9 +69,10 @@ public class QuiverListener implements Listener {
 		NONE("disabled", null),
 		NORMAL("Normal Arrows", new ItemStack(Material.ARROW)),
 		SPECTRAL("Spectral Arrows", new ItemStack(Material.SPECTRAL_ARROW)),
-		WEAKNESS("Arrows of Weakness", makeTippedArrowStack(PotionType.WEAKNESS)),
-		SLOWNESS("Arrows of Slowness", makeTippedArrowStack(PotionType.SLOWNESS)),
-		POISON("Arrows of Poison", makeTippedArrowStack(PotionType.POISON)),
+		// NB: don't change these enum constants' names, they are stored in quiver NBT and would break existing items when changed
+		WEAKNESS("epic:items/arrows/ateoq_arrow"),
+		SLOWNESS("epic:items/arrows/axcanyotl_arrow"),
+		POISON("epic:items/arrows/tencualac_arrow"),
 		;
 
 		private final String mArrowName;
@@ -80,6 +82,12 @@ public class QuiverListener implements Listener {
 		ArrowTransformMode(String arrowName, @Nullable ItemStack itemStack) {
 			mArrowName = arrowName;
 			mItemStack = itemStack;
+		}
+
+		ArrowTransformMode(String lootTable) {
+			ItemStack item = InventoryUtils.getItemFromLootTable(Bukkit.getWorlds().get(0).getSpawnLocation(), NamespacedKeyUtils.fromString(lootTable));
+			mArrowName = ItemUtils.getPlainName(item);
+			mItemStack = item;
 		}
 
 		public String getArrowName() {
