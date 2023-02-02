@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
@@ -79,7 +80,11 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 					.formatted(DAMAGE_1, RADIUS, StringUtils.multiplierToPercentage(BLEED_PERCENT), StringUtils.ticksToSeconds(BLEED_TIME), RADIUS),
 				"Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
 					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING))
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
+				new AbilityTriggerInfo.TriggerRestriction("holding a sword or axe", p -> {
+					ItemStack mainhand = p.getInventory().getItemInMainHand();
+					return ItemUtils.isSword(mainhand) || ItemUtils.isAxe(mainhand);
+				})))
 			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
 
 	private int mStacks;
