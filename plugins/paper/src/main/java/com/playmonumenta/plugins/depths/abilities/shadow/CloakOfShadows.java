@@ -8,8 +8,7 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -21,7 +20,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -43,7 +41,7 @@ public class CloakOfShadows extends DepthsAbility {
 	public static final int WEAKEN_DURATION = 20 * 6;
 	public static final int[] STEALTH_DURATION = {30, 35, 40, 45, 50, 60};
 	public static final double[] WEAKEN_AMPLIFIER = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
-	public static final double[] DAMAGE = {10, 12.5, 15, 17.5, 20, 25};
+	public static final double[] DAMAGE = {0.4, 0.5, 0.6, 0.7, 0.8, 1};
 	public static final int DAMAGE_DURATION = 4 * 20;
 	private static final double VELOCITY = 0.7;
 	private static final int RADIUS = 5;
@@ -56,8 +54,6 @@ public class CloakOfShadows extends DepthsAbility {
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.BLACK_CONCRETE))
 			.descriptions(CloakOfShadows::getDescription);
-
-	private boolean mBonusDamage = false;
 
 	public CloakOfShadows(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -88,8 +84,7 @@ public class CloakOfShadows extends DepthsAbility {
 		putOnCooldown();
 		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1]);
 
-		mBonusDamage = true;
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mBonusDamage = false, DAMAGE_DURATION);
+		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, DAMAGE[mRarity - 1]));
 
 		new BukkitRunnable() {
 
@@ -118,25 +113,14 @@ public class CloakOfShadows extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE) {
-			if (mBonusDamage) {
-				event.setDamage(event.getDamage() + DAMAGE[mRarity - 1]);
-				mBonusDamage = false;
-			}
-		}
-		return false; // only changes event damage
-	}
-
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("Left click while sneaking and holding a weapon to throw a shadow bomb, which explodes on landing, applying ")
 			.append(Component.text(StringUtils.multiplierToPercentage(WEAKEN_AMPLIFIER[rarity - 1]) + "%", color))
 			.append(Component.text(" weaken for " + WEAKEN_DURATION / 20 + " seconds in a " + RADIUS + " block radius. You enter stealth for "))
 			.append(Component.text(StringUtils.to2DP(STEALTH_DURATION[rarity - 1] / 20.0), color))
 			.append(Component.text(" seconds upon casting and the next instance of melee damage you deal within " + DAMAGE_DURATION / 20 + " seconds deals "))
-			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
-			.append(Component.text(" additional damage. Cooldown: " + COOLDOWN / 20 + "s."));
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]) + "%", color))
+			.append(Component.text(" more damage. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

@@ -10,7 +10,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.EffectManager;
-import com.playmonumenta.plugins.effects.FlatDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.point.Raycast;
@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -37,7 +38,7 @@ import org.bukkit.util.Vector;
 public class DepthsAdvancingShadows extends DepthsAbility {
 
 	public static final String ABILITY_NAME = "Advancing Shadows";
-	public static final int[] DAMAGE = {5, 6, 7, 8, 9, 11};
+	public static final double[] DAMAGE = {0.2, 0.25, 0.3, 0.35, 0.4, 0.5};
 
 	private static final int ADVANCING_SHADOWS_RANGE = 12;
 	private static final double ADVANCING_SHADOWS_OFFSET = 2.7;
@@ -148,7 +149,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new FlatDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageType.MELEE)));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageType.MELEE, DamageType.MELEE_SKILL)));
 
 			new PartialParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);
@@ -158,9 +159,9 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Right click and holding a weapon to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE + " blocks and your melee attack damage will be increased by ")
-			.append(Component.text(DAMAGE[rarity - 1], color))
-			.append(Component.text(" finally, for " + DAMAGE_DURATION / 20 + " seconds. If you are holding a shield in your offhand, you will gain the attack damage but not be teleported. Cooldown: " + COOLDOWN / 20 + "s."));
+		return Component.text("Right click and holding a weapon to teleport to the target hostile enemy within " + ADVANCING_SHADOWS_RANGE + " blocks and you gain ")
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]) + "%", color))
+			.append(Component.text(" melee damage for " + DAMAGE_DURATION / 20 + " seconds. If you are holding a shield in your offhand, you will gain the damage buff but not be teleported. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 
