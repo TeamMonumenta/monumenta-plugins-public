@@ -262,15 +262,21 @@ class CustomContainerItemGui extends Gui {
 			case SHIFT_RIGHT -> {
 				ItemStack currentItem = event.getCurrentItem();
 				if (currentItem != null && mConfig.canPutIntoContainer(currentItem)) {
-					ItemStack combinedItems = ItemUtils.clone(currentItem);
-					currentItem.setAmount(0);
-					for (ItemStack item : mPlayer.getInventory().getStorageContents()) {
-						if (item != null && item.isSimilar(combinedItems)) {
-							combinedItems.setAmount(combinedItems.getAmount() + item.getAmount());
-							item.setAmount(0);
+					ItemStack clickedItem = ItemUtils.clone(currentItem);
+					CustomContainerItemManager.addToContainer(mPlayer, mContainer, mConfig, currentItem, false, false);
+					if (currentItem.getAmount() == 0) {
+						for (ItemStack item : mPlayer.getInventory().getStorageContents()) {
+							if (item != null && item.isSimilar(clickedItem)) {
+								CustomContainerItemManager.addToContainer(mPlayer, mContainer, mConfig, item, false, false);
+								if (item.getAmount() != 0) {
+									break;
+								}
+							}
 						}
 					}
-					CustomContainerItemManager.addToContainer(mPlayer, mContainer, mConfig, combinedItems, true, false);
+					if (clickedItem.getAmount() != currentItem.getAmount()) {
+						ItemStatUtils.generateItemStats(mContainer);
+					}
 					update();
 				} else if (!ItemUtils.isNullOrAir(currentItem)) {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
