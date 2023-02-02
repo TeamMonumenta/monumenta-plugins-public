@@ -172,7 +172,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Click to view what dungeon instances you have open, and how old they are.", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, true).playerCommand("clickable peb_dungeoninfo"),
 			new PebItem(38, "Patron",
-				"Click to view patron information. Use /donate to learn about donating.", NamedTextColor.LIGHT_PURPLE,
+				"Click to view patron information. Use /help donate to learn about donating.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLOWSTONE_DUST, true).playerCommand("clickable peb_patroninfo"),
 			new PebItem(40, "Dailies",
 				"Click to see what daily content you have and haven't done today.", NamedTextColor.LIGHT_PURPLE,
