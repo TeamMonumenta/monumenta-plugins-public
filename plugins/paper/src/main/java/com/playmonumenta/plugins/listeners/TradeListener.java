@@ -79,6 +79,10 @@ public class TradeListener implements Listener {
 		int numTrades = trades.size();
 		for (int i = 0; i < numTrades; i++) {
 			TradeWindowOpenEvent.Trade trade = trades.get(i);
+			if (trade.getOriginalResult() != null) {
+				// Only not null if we are modifying the count, which will never happen when we are reskinning
+				continue;
+			}
 			MerchantRecipe recipe = trade.getRecipe();
 			handleReskinTrades(player, trades, trade, recipe);
 			handleDyedTrades(player, trades, trade, recipe);
@@ -196,7 +200,9 @@ public class TradeListener implements Listener {
 				List<ItemStack> newIngredients = new ArrayList<>(recipe.getIngredients());
 				newIngredients.set(slot, newSource);
 				newRecipe.setIngredients(newIngredients);
-				trades.add(new TradeWindowOpenEvent.Trade(newRecipe, trade.getActions()));
+				TradeWindowOpenEvent.Trade newTrade = new TradeWindowOpenEvent.Trade(trade);
+				newTrade.setRecipe(newRecipe);
+				trades.add(newTrade);
 
 				createdTrades.add(playerItem);
 			}
@@ -274,13 +280,20 @@ public class TradeListener implements Listener {
 				ItemStack newSource = ItemUtils.clone(source);
 				copyDye.accept(playerItem, newSource);
 
+				ItemStack originalResult = trade.getOriginalResult();
+				if (originalResult != null) {
+					copyDye.accept(playerItem, originalResult);
+				}
+
 				// create the new trade
 				MerchantRecipe newRecipe = new MerchantRecipe(recipe.getResult(), recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
 					recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.shouldIgnoreDiscounts());
 				List<ItemStack> newIngredients = new ArrayList<>(recipe.getIngredients());
 				newIngredients.set(slot, newSource);
 				newRecipe.setIngredients(newIngredients);
-				trades.add(new TradeWindowOpenEvent.Trade(newRecipe, trade.getActions()));
+				TradeWindowOpenEvent.Trade newTrade = new TradeWindowOpenEvent.Trade(trade);
+				newTrade.setRecipe(newRecipe);
+				trades.add(newTrade);
 
 				createdTrades.add(playerItem);
 			}

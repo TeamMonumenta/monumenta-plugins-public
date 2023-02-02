@@ -396,13 +396,15 @@ public class CustomContainerItemManager implements Listener {
 			MerchantRecipe recipe = trade.getRecipe();
 			ItemStack result = recipe.getResult();
 			CustomContainerItemConfiguration configuration = getConfiguration(result);
-			if (configuration != null && configuration.soulBoundOnTrade()) {
+			if (configuration != null && configuration.soulBoundOnTrade() && trade.getOriginalResult() == null) {
 				result = ItemUtils.clone(result);
 				ItemStatUtils.addInfusion(result, ItemStatUtils.InfusionType.SOULBOUND, 1, event.getPlayer().getUniqueId());
 				MerchantRecipe newRecipe = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(),
 					recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice(), recipe.shouldIgnoreDiscounts());
 				newRecipe.setIngredients(recipe.getIngredients().stream().map(ItemUtils::clone).toList());
-				trades.set(i, new TradeWindowOpenEvent.Trade(newRecipe, trade.getActions()));
+				TradeWindowOpenEvent.Trade newTrade = new TradeWindowOpenEvent.Trade(trade);
+				newTrade.setRecipe(newRecipe);
+				trades.set(i, newTrade);
 			}
 		}
 	}
