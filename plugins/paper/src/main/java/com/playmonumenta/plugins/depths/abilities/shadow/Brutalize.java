@@ -49,11 +49,12 @@ public class Brutalize extends DepthsAbility {
 			Location loc = enemy.getLocation();
 			mPlayer.getWorld().playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, 1.65f);
 			mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
-			new PartialParticle(Particle.SPELL_WITCH, loc, 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
-			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, enemy)) {
-				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, brutalizeDamage, null, false, true);
-				MovementUtils.knockAway(enemy, mob, 0.5f, true);
-
+			new PartialParticle(Particle.SPELL_WITCH, loc, 5, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
+			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+				if (mob != enemy) {
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, brutalizeDamage, null, false, true);
+				}
+				MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.5f, true);
 				new PartialParticle(Particle.SPELL_WITCH, mob.getLocation(), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 			}
 			return true;
