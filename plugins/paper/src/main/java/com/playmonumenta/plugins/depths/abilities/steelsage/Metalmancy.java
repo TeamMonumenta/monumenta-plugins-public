@@ -71,6 +71,7 @@ public class Metalmancy extends DepthsAbility {
 
 	public void cast() {
 		if (isOnCooldown()) {
+			resetTarget();
 			return;
 		}
 
@@ -116,10 +117,9 @@ public class Metalmancy extends DepthsAbility {
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, golemLoc, 15).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SMOKE_NORMAL, golemLoc, 20).spawnAsPlayerActive(mPlayer);
 					}
-					if (!(mTarget == null)) {
-						mTarget.removePotionEffect(PotionEffectType.GLOWING);
-						mTarget = null;
-					}
+
+					resetTarget();
+
 					if (mGolem != null) {
 						mGolem.remove();
 						mGolem = null;
@@ -172,12 +172,19 @@ public class Metalmancy extends DepthsAbility {
 		}
 	}
 
+	private void resetTarget() {
+		if (mTarget != null) {
+			mTarget.removePotionEffect(PotionEffectType.GLOWING);
+			mTarget = null;
+		}
+	}
+
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("Swap hands while holding a weapon to summon an invulnerable steel construct. The Construct attacks the nearest mob within " + DETECTION_RANGE + " blocks. The Construct prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. The Construct deals ")
 			.append(Component.text(StringUtils.to2DP(DAMAGE[rarity - 1]), color))
 			.append(Component.text(" projectile damage and taunts non-boss enemies it hits. The Construct disappears after "))
 			.append(Component.text(DURATION[rarity - 1] / 20, color))
-			.append(Component.text(" seconds. Cooldown: " + COOLDOWN / 20 + "s."));
+			.append(Component.text(" seconds. Triggering while on cooldown will clear the specified target. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

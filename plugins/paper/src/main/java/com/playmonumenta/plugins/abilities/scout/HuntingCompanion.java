@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -96,7 +97,7 @@ public class HuntingCompanion extends Ability {
 					"The fox deals damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your mainhand's projectile damage, amplified by both melee and projectile damage from gear. " +
 					"Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. " +
 					"When a mob that was damaged by the fox dies, you heal " + (int) (HEALING_PERCENT * 100) + "% of your max health. " +
-					"The fox disappears after " + DURATION / 20 + " seconds. " +
+					"The fox disappears after " + DURATION / 20 + " seconds. Triggering while on cooldown will clear the specified target. " +
 					"If used while in water, an axolotl is spawned instead, and if used while in lava, a strider is spawned instead. Cooldown: " + COOLDOWN / 20 + "s.",
 				"Damage is increased to " + (int) (100 * DAMAGE_FRACTION_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.",
 				"Also summon an invulnerable eagle (parrot). " +
@@ -134,8 +135,11 @@ public class HuntingCompanion extends Ability {
 
 	public void cast() {
 		if (isOnCooldown()) {
+			clearTargetGlowing();
+			mSummons.entrySet().forEach(entry -> entry.setValue(null));
 			return;
 		}
+
 		putOnCooldown();
 
 		clearSummons();
@@ -273,16 +277,16 @@ public class HuntingCompanion extends Ability {
 
 	private void clearSummons() {
 		mSummons.keySet().forEach(Entity::remove);
-		for (LivingEntity target : mSummons.values()) {
-			if (target != null) {
-				target.removePotionEffect(PotionEffectType.GLOWING);
-			}
-		}
+		clearTargetGlowing();
 		mSummons.clear();
 		if (mRunnable != null) {
 			mRunnable.cancel();
 			mRunnable = null;
 		}
+	}
+
+	private void clearTargetGlowing() {
+		mSummons.values().stream().filter(Objects::nonNull).forEach(target -> target.removePotionEffect(PotionEffectType.GLOWING));
 	}
 
 	// Relies on mobs from the LoS. These mobs must have the tags UNPUSHABLE, boss_ccimmune, boss_canceldamage, and summon_ignore and must be invulnerable
@@ -389,6 +393,13 @@ public class HuntingCompanion extends Ability {
 	}
 
 	private @Nullable Mob findNearestNonTargetingSummon(LivingEntity target) {
+		// If a summon is already targeting this mob, choose that summon
+		for (Mob summon : mSummons.keySet()) {
+			if (summon.getTarget() == target) {
+				return summon;
+			}
+		}
+
 		Location targetLoc = target.getLocation();
 		List<LivingEntity> summons = new ArrayList<>(mSummons.keySet());
 
@@ -410,6 +421,7 @@ public class HuntingCompanion extends Ability {
 
 		nearbyMobs.removeIf(DamageUtils::isImmuneToDamage);
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
+		mSummons.keySet().stream().map(Mob::getTarget).filter(Objects::nonNull).forEach(nearbyMobs::remove);
 
 		List<LivingEntity> unfilteredNearbyMobs = new ArrayList<>(nearbyMobs);
 
@@ -418,13 +430,6 @@ public class HuntingCompanion extends Ability {
 			nearbyMobs.removeIf(mob -> EntityUtils.isFlyingMob(EntityUtils.getEntityStackBase(mob)));
 		} else if (summon instanceof Axolotl || summon instanceof Dolphin) {
 			nearbyMobs.removeIf(mob -> !EntityUtils.isInWater(mob));
-		}
-
-		for (Mob otherSummon : mSummons.keySet()) {
-			LivingEntity otherTarget = otherSummon.getTarget();
-			if (otherTarget != null) {
-				nearbyMobs.remove(otherTarget);
-			}
 		}
 
 		// if there are no other mobs to target, we can double up
