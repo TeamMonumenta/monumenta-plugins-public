@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -14,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -32,8 +32,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancements extends PotionAbility {
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.6;
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 1;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.8;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
 	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
@@ -62,29 +62,23 @@ public class EsotericEnhancements extends PotionAbility {
 			.descriptions(
 				"When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. " +
 					"The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, " +
-					"dealing 60% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.",
-				"Damage is increased to 100% of your potion damage.")
+					"dealing 100% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.",
+				"Damage is increased to 180% of your potion damage.")
 			.cooldown(ABERRATION_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(new ItemStack(Material.CREEPER_HEAD, 1));
 
-	private @Nullable AlchemistPotions mAlchemistPotions;
 	private final double mDamageMultiplier;
-
 	private final HashMap<LivingEntity, Integer> mAppliedMobs;
 	private final EsotericEnhancementsCS mCosmetic;
 
 	public EsotericEnhancements(Plugin plugin, Player player) {
-		super(plugin, player, INFO, 0, 0);
+		super(plugin, player, INFO);
 
 		mAppliedMobs = new HashMap<>();
 
 		mDamageMultiplier = isLevelOne() ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS(), EsotericEnhancementsCS.SKIN_LIST);
-
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
 	}
 
 	@Override
@@ -100,7 +94,7 @@ public class EsotericEnhancements extends PotionAbility {
 			if (mAppliedMobs.containsKey(mob)) {
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				for (int i = 0; i < num; i++) {
-					summonAberration(mob.getLocation());
+					summonAberration(mob.getLocation(), playerItemStats);
 					mCosmetic.esotericSummonEffect(mob.getWorld(), mPlayer, mob.getLocation());
 				}
 				putOnCooldown();
@@ -108,7 +102,7 @@ public class EsotericEnhancements extends PotionAbility {
 		}
 	}
 
-	private void summonAberration(Location loc) {
+	private void summonAberration(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			Creeper aberration = (Creeper) LibraryOfSoulsIntegration.summon(loc, mCosmetic.getLos());
 			if (aberration == null) {
@@ -124,7 +118,8 @@ public class EsotericEnhancements extends PotionAbility {
 			}
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, ABERRATION_DAMAGE_RADIUS);
-			alchemicalAberrationBoss.spawn(mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions == null ? 0 : mAlchemistPotions.getDamage() * mDamageMultiplier), radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamageMultiplier * playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.POTION_DAMAGE.getItemStat()));
+			alchemicalAberrationBoss.spawn(mPlayer, damage, radius, CharmManager.getDuration(mPlayer, CHARM_DURATION, ABERRATION_BLEED_DURATION), ABERRATION_BLEED_AMOUNT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED), playerItemStats);
 
 			aberration.setMaxFuseTicks(CharmManager.getDuration(mPlayer, CHARM_FUSE, aberration.getMaxFuseTicks()));
 			aberration.setExplosionRadius((int) radius);

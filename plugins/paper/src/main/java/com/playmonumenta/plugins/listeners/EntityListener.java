@@ -621,6 +621,15 @@ public class EntityListener implements Listener {
 						return;
 					}
 				}
+
+				// Remove thrown potions after 10 seconds.
+				// This is so they don't get stuck in water bubble columns forever.
+				ThrownPotion finalPotion = potion;
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					if (finalPotion != null) {
+						finalPotion.remove();
+					}
+				}, 10 * 20);
 			}
 		}
 	}
@@ -998,6 +1007,12 @@ public class EntityListener implements Listener {
 				}
 			}
 			fallingBlock.remove();
+			event.setCancelled(true);
+			return;
+		}
+
+		// Cancel Falling Blocks with SpellGrenade tag
+		if (event.getEntity() instanceof FallingBlock fallingBlock && fallingBlock.getScoreboardTags().contains("DisableBlockPlacement")) {
 			event.setCancelled(true);
 			return;
 		}

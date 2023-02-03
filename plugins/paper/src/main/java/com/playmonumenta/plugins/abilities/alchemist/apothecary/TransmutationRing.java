@@ -72,7 +72,7 @@ public class TransmutationRing extends PotionAbility {
 	private final TransmRingCS mCosmetic;
 
 	public TransmutationRing(Plugin plugin, Player player) {
-		super(plugin, player, INFO, 0, 0);
+		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TRANSMUTATION_RING_RADIUS);
 
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {

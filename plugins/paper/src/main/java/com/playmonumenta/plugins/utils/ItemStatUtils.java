@@ -18,6 +18,8 @@ import com.playmonumenta.plugins.itemstats.attributes.AttackDamageAdd;
 import com.playmonumenta.plugins.itemstats.attributes.AttackDamageMultiply;
 import com.playmonumenta.plugins.itemstats.attributes.MagicDamageAdd;
 import com.playmonumenta.plugins.itemstats.attributes.MagicDamageMultiply;
+import com.playmonumenta.plugins.itemstats.attributes.PotionDamage;
+import com.playmonumenta.plugins.itemstats.attributes.PotionRadius;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileDamageAdd;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileDamageMultiply;
 import com.playmonumenta.plugins.itemstats.attributes.ProjectileSpeed;
@@ -149,6 +151,7 @@ public class ItemStatUtils {
 		III("3", Component.text("Tier III", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
 		IV("4", Component.text("Tier IV", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
 		V("5", Component.text("Tier V", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
+		COMMON("common", Component.text("Common", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
 		UNCOMMON("uncommon", Component.text("Uncommon", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
 		RARE("rare", Component.text("Rare", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
 		ARTIFACT("artifact", Component.text("Artifact", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
@@ -802,7 +805,9 @@ public class ItemStatUtils {
 		MAGIC_DAMAGE_MULTIPLY(new MagicDamageMultiply(), true, false),
 		SPEED(Attribute.GENERIC_MOVEMENT_SPEED, "Speed", false, false),
 		KNOCKBACK_RESISTANCE(Attribute.GENERIC_KNOCKBACK_RESISTANCE, "Knockback Resistance", false, false),
-		THORNS(new ThornsDamage(), true, true);
+		THORNS(new ThornsDamage(), true, true),
+		POTION_DAMAGE(new PotionDamage(), true, false),
+		POTION_RADIUS(new PotionRadius(), true, false);
 
 		static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(AttributeType.values())
 			                                                           .collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
@@ -812,7 +817,9 @@ public class ItemStatUtils {
 			ATTACK_SPEED,
 			PROJECTILE_DAMAGE_ADD,
 			PROJECTILE_SPEED,
-			THROW_RATE
+			THROW_RATE,
+			POTION_DAMAGE,
+			POTION_RADIUS
 		);
 
 		public static final ImmutableList<AttributeType> PROJECTILE_ATTRIBUTE_TYPES = ImmutableList.of(
@@ -886,6 +893,8 @@ public class ItemStatUtils {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 				} else if (PROJECTILE_DAMAGE_ADD.getName().equals(name)) {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name.replace(" Add", "")), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
+				} else if (attribute == POTION_DAMAGE || attribute == POTION_RADIUS) {
+					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 				}
 			} else if (slot == Slot.MAINHAND && attribute == PROJECTILE_SPEED) {
 				// Hack for mainhands using projectile speed multiply instead of add
@@ -1896,9 +1905,7 @@ public class ItemStatUtils {
 		ItemMeta meta = item.getItemMeta();
 		if (meta.hasDisplayName()) {
 			String name = MessagingUtils.plainText(Objects.requireNonNull(meta.displayName()));
-			if (name.contains("Alchemist's Bag")) {
-				return Region.VALLEY;
-			} else if (name.contains("Experiencinator")) {
+			if (name.contains("Experiencinator")) {
 				return Region.VALLEY;
 			} else if (name.contains("Crystallizer")) {
 				return Region.ISLES;

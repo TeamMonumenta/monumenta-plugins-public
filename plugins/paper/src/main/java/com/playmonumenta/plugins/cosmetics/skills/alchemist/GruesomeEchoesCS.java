@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
+import java.util.AbstractMap;
+import java.util.Arrays;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -69,7 +72,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public void particlesOnSplash(Player mPlayer, Location loc, boolean isGruesome) {
+	public void particlesOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius) {
 		loc = loc.clone().add(0, 0.1, 0);
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
@@ -78,6 +81,16 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL, loc, 15, 0, 0, 0, 0.075)
 			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+
+		Vector colorValues = isGruesome ? new Vector(ECHO_COLOR.getRed(), ECHO_COLOR.getGreen(), ECHO_COLOR.getBlue()).normalize() :
+			new Vector(TWISTED_COLOR.getRed(), TWISTED_COLOR.getGreen(), TWISTED_COLOR.getBlue()).normalize();
+		ParticleUtils.explodingRingEffect(Plugin.getInstance(), loc, radius, 1, 3,
+			Arrays.asList(
+				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(1.0, (Location location) -> {
+					new PartialParticle(Particle.SPELL_MOB_AMBIENT, location, 1, colorValues.getX(), colorValues.getY(), colorValues.getZ(), 1).directionalMode(true).spawnAsPlayerActive(mPlayer);
+				})
+			)
+		);
 	}
 
 	@Override

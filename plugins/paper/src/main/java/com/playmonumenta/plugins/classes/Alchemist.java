@@ -42,12 +42,9 @@ public class Alchemist extends PlayerClass {
 		mClassColor = TextColor.fromHexString("#5FAA19");
 		mDisplayItem = new ItemStack(Material.POTION, 1);
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
-		mClassPassiveDescription = ("You gain 1 potion every %s seconds, up to a maximum of %s. Each skill point" +
-			                            " increases your potion magic damage by %s. Each spec point increases potion damage by %s." +
-			                           " Each enhancement point increases your potion damage by %s")
-			                           .formatted(StringUtils.ticksToSeconds(AlchemistPotions.POTIONS_TIMER_BASE), AlchemistPotions.MAX_CHARGES,
-				                           AlchemistPotions.DAMAGE_PER_SKILL_POINT, AlchemistPotions.DAMAGE_PER_SPEC_POINT,
-				                           AlchemistPotions.DAMAGE_PER_ENHANCEMENT);
+		mClassPassiveDescription = ("Allows using Alchemical Utensils. " +
+			"You gain 1 potion every %s seconds, up to a maximum of %s.")
+		   .formatted(StringUtils.ticksToSeconds(AlchemistPotions.POTIONS_TIMER_BASE), AlchemistPotions.MAX_CHARGES);
 		mClassPassiveName = "Alchemist Potions";
 
 		mSpecOne.mAbilities.add(Taboo.INFO);

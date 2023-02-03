@@ -114,6 +114,7 @@ public class InfusionUtils {
 
 		if (region == Region.VALLEY || region == Region.ISLES) {
 			switch (ItemStatUtils.getTier(item)) {
+				case COMMON:
 				case UNCOMMON:
 				case UNIQUE:
 				case EVENT:
@@ -246,7 +247,7 @@ public class InfusionUtils {
 	private static int getCostMultiplierWithCheck(ItemStack item) throws WrapperCommandSyntaxException {
 		int mult = getCostMultiplier(item);
 		if (mult < 0) {
-			throw CommandAPI.failWithString("Invalid item tier. Only Uncommon and higher tiered items are able to be infused!");
+			throw CommandAPI.failWithString("Invalid item tier. Only Common and higher tiered items are able to be infused!");
 		}
 		return mult;
 	}
@@ -260,6 +261,7 @@ public class InfusionUtils {
 		}
 
 		switch (ItemStatUtils.getTier(item)) {
+			case COMMON:
 			case UNCOMMON:
 			case UNIQUE:
 			case EVENT:
@@ -400,6 +402,7 @@ public class InfusionUtils {
 		}
 
 		switch (ItemStatUtils.getTier(item)) {
+			case COMMON:
 			case UNCOMMON:
 			case UNIQUE:
 			case EVENT:

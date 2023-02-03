@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
+import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Panacea extends Ability {
 
-	private static final double PANACEA_DAMAGE_FRACTION = 0.6;
+	private static final double PANACEA_DAMAGE_FRACTION = 1.2;
 	private static final int PANACEA_1_SHIELD = 2;
 	private static final int PANACEA_2_SHIELD = 4;
 	private static final int PANACEA_MAX_SHIELD = 16;
@@ -70,13 +71,15 @@ public class Panacea extends Ability {
 			.scoreboardId("Panacea")
 			.shorthandName("Pn")
 			.descriptions(
-				"Shift left click with a projectile weapon to shoot a mixture that deals 60% of your potion damage and applies 100% Slow for 1.5s to every enemy touched " +
-					"and adds 2 absorption health to other players, lasting 24 seconds, maximum 16. " +
-					"After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to damage enemies and shield allies a second time. Cooldown: 20s.",
+				"Sneak Drop with an Alchemist Bag to shoot a mixture that deals 120% of your potion damage " +
+					"which applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health " +
+					"to other players, lasting 24 seconds, maximum 16." +
+					"After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to " +
+					"damage enemies and shield allies a second time. Cooldown: 20s.",
 				"Absorption health added is increased to 4, and Slow duration is increased to 2s.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Panacea::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Panacea::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
+				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(new ItemStack(Material.PURPLE_CONCRETE_POWDER, 1));
 
 	private final double mShield;

@@ -5,10 +5,7 @@ import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
-import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
-import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.*;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTargetNPCBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTurretBoss;
@@ -318,6 +315,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(MetalmancyBoss.identityTag, MetalmancyBoss::new);
 		mStatelessBosses.put(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::new);
 		mStatelessBosses.put(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::new);
+		mStatelessBosses.put(AbilityMarkerEntityBoss.identityTag, AbilityMarkerEntityBoss::new);
 		mStatelessBosses.put(ThrowSummonBoss.identityTag, ThrowSummonBoss::new);
 		mStatelessBosses.put(PotionThrowBoss.identityTag, PotionThrowBoss::new);
 		mStatelessBosses.put(TwistedMiniBoss.identityTag, TwistedMiniBoss::new);
@@ -577,6 +575,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(MetalmancyBoss.identityTag, MetalmancyBoss::deserialize);
 		mBossDeserializers.put(RestlessSoulsBoss.identityTag, RestlessSoulsBoss::deserialize);
 		mBossDeserializers.put(AlchemicalAberrationBoss.identityTag, AlchemicalAberrationBoss::deserialize);
+		mBossDeserializers.put(AbilityMarkerEntityBoss.identityTag, AbilityMarkerEntityBoss::deserialize);
 		mBossDeserializers.put(ThrowSummonBoss.identityTag, ThrowSummonBoss::deserialize);
 		mBossDeserializers.put(HostileBoss.identityTag, HostileBoss::deserialize);
 		mBossDeserializers.put(FriendlyBoss.identityTag, FriendlyBoss::deserialize);

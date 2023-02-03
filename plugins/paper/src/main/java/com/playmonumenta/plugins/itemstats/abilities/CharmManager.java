@@ -518,7 +518,6 @@ public class CharmManager {
 			AlchemistPotions.CHARM_DAMAGE,
 			AlchemistPotions.CHARM_RADIUS,
 			AlchemistPotions.CHARM_CHARGES,
-			AlchemicalArtillery.CHARM_MULTIPLIER,
 			AlchemicalArtillery.CHARM_EXPLOSION_MULTIPLIER,
 			AlchemicalArtillery.CHARM_RADIUS,
 			AlchemicalArtillery.CHARM_KNOCKBACK,

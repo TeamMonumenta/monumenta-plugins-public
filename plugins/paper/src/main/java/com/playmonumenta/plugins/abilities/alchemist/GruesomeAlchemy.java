@@ -41,26 +41,20 @@ public class GruesomeAlchemy extends PotionAbility {
 			.descriptions(
 				"Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. " +
 					"These potions deal 80% of the magic damage of your Brutal potions and do not afflict damage over time. " +
-					"Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. " +
-					"If Alchemical Artillery is active, left clicking while holding a bow, crossbow, or trident will also swap modes.",
+					"Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. ",
 				"The Slow and Vulnerability are increased to 20%.",
 				"Your Gruesome potions now additionally paralyze (25% chance for 100% slowness for a second once a second) mobs for 8s.")
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.addTrigger(new AbilityTriggerInfo<>("toggleWithAA", "toggle with AA", GruesomeAlchemy::toggleAA, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
 
 	private final double mSlownessAmount;
 	private final double mVulnerabilityAmount;
-
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private @Nullable AlchemicalArtillery mAlchemicalArtillery;
-
 	private final GruesomeAlchemyCS mCosmetic;
 
 	public GruesomeAlchemy(Plugin plugin, Player player) {
-		super(plugin, player, INFO, 0, 0);
+		super(plugin, player, INFO);
 		//This is just for the Alchemical Artillery integration
 		mSlownessAmount = (isLevelOne() ? GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER : GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 		mVulnerabilityAmount = (isLevelOne() ? GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER : GRUESOME_ALCHEMY_2_VULNERABILITY_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULNERABILITY);
@@ -68,7 +62,6 @@ public class GruesomeAlchemy extends PotionAbility {
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mAlchemicalArtillery = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
 		});
 	}
 
@@ -87,16 +80,6 @@ public class GruesomeAlchemy extends PotionAbility {
 
 	public void toggle() {
 		if (mAlchemistPotions != null) {
-			mCosmetic.effectsOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
-			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
-		}
-	}
-
-	//Alchemical Artillery integration
-	public void toggleAA() {
-		if (mAlchemicalArtillery != null
-			    && mAlchemistPotions != null
-			    && mAlchemicalArtillery.isActive()) {
 			mCosmetic.effectsOnSwap(mPlayer, mAlchemistPotions.isGruesomeMode());
 			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
 		}

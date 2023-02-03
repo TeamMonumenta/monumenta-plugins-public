@@ -22,6 +22,16 @@ public class CustomDamageOverTime extends Effect {
 	protected final @Nullable Player mPlayer;
 	protected final @Nullable ClassAbility mSpell;
 	private int mTicks;
+	private final DamageType mDamageType;
+
+	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, DamageType damageType) {
+		super(duration, effectID);
+		mDamage = damage;
+		mPeriod = period;
+		mPlayer = player;
+		mSpell = spell;
+		mDamageType = damageType;
+	}
 
 	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell) {
 		super(duration, effectID);
@@ -29,6 +39,7 @@ public class CustomDamageOverTime extends Effect {
 		mPeriod = period;
 		mPlayer = player;
 		mSpell = spell;
+		mDamageType = DamageType.AILMENT;
 	}
 
 	//Magnitude is equal to the level of wither that it is equivalent to, at low levels of wither
@@ -49,7 +60,7 @@ public class CustomDamageOverTime extends Effect {
 			mTicks += 5; //Activates 4 times a second
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
-				DamageUtils.damage(mPlayer, le, DamageType.AILMENT, mDamage, mSpell, true, false);
+				DamageUtils.damage(mPlayer, le, mDamageType, mDamage, mSpell, true, false);
 				new PartialParticle(Particle.SQUID_INK, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
 			}
 		}

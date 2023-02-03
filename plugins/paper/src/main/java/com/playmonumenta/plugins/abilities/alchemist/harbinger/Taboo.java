@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -70,26 +69,14 @@ public class Taboo extends Ability {
 						}
 						return isTabooUpgradedAndActive(player);
 					})))
-			.addTrigger(new AbilityTriggerInfo<>("healWithAA", "heal with AA", Taboo::healWithAA, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
-				.lookDirections(AbilityTrigger.LookDirection.DOWN),
-				new AbilityTriggerInfo.TriggerRestriction("holding a projectile weapon and Taboo is active",
-					player -> {
-						if (!ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand())) {
-							return false;
-						}
-						return isTabooUpgradedAndActive(player);
-					})))
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.addTrigger(new AbilityTriggerInfo<>("toggleWithAA", "toggle with AA", Taboo::toggleWithAA, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.HONEY_BOTTLE, 1));
 
 	private final double mMagicDamageIncrease;
 	private final int mRechargeRateDecrease;
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
-	private @Nullable AlchemicalArtillery mAlchemicalArtillery;
 
 	private boolean mActive;
 
@@ -103,7 +90,6 @@ public class Taboo extends Ability {
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-			mAlchemicalArtillery = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
 		});
 	}
 
@@ -124,12 +110,6 @@ public class Taboo extends Ability {
 		}
 	}
 
-	public void toggleWithAA() {
-		if (isAAActive()) {
-			toggle();
-		}
-	}
-
 	public void heal() {
 		if (!isOnCooldown()
 			    && mAlchemistPotions != null
@@ -139,16 +119,6 @@ public class Taboo extends Ability {
 			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 1, 1.2f);
 			new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
 		}
-	}
-
-	public void healWithAA() {
-		if (isAAActive()) {
-			heal();
-		}
-	}
-
-	private boolean isAAActive() {
-		return mAlchemicalArtillery != null && mAlchemicalArtillery.isActive();
 	}
 
 	@Override

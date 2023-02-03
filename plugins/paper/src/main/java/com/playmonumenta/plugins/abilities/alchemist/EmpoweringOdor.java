@@ -45,7 +45,7 @@ public class EmpoweringOdor extends PotionAbility {
 	private final double mDamageAmplifier;
 
 	public EmpoweringOdor(Plugin plugin, Player player) {
-		super(plugin, player, INFO, 0, 0);
+		super(plugin, player, INFO);
 		mDamageAmplifier = (isLevelOne() ? EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER : EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 	}
 

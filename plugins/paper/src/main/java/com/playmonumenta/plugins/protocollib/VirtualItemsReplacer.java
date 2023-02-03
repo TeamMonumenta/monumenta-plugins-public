@@ -8,6 +8,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.commands.VirtualFirmament;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.ItemCooldown;
@@ -22,6 +23,7 @@ import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -34,7 +36,9 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
@@ -177,6 +181,31 @@ public class VirtualItemsReplacer extends PacketAdapter {
 					markVirtual(itemStack);
 				}
 				return;
+			}
+
+			// Update the count on Alchemical Utensils
+			if (ItemUtils.isAlchemistItem(itemStack)) {
+				if (PlayerUtils.isAlchemist(player)) {
+					AlchemistPotions potionsAbility = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+
+					if (potionsAbility == null) {
+						return;
+					}
+
+					int count = potionsAbility.getCharges();
+					new NBTItem(itemStack, true).setInteger("CHARGES", count);
+
+					ItemUtils.modifyMeta(itemStack, meta -> {
+						Component bagNameComponent = meta.displayName();
+						String bagName = PlainTextComponentSerializer.plainText().serialize(bagNameComponent);
+						List<Component> bagComponentChildren = bagNameComponent.children();
+						Map<TextDecoration, TextDecoration.State> bagDecorations = (bagComponentChildren.size() > 0) ? bagComponentChildren.get(0).decorations() : bagNameComponent.decorations();
+						TextColor bagColor = (bagComponentChildren.size() > 0) ? bagComponentChildren.get(0).color() : bagNameComponent.color();
+						String newName = String.format("%s (%s)", (bagName.charAt(bagName.length() - 1) == ')') ? bagName.substring(0, bagName.length() - 4).trim() : bagName, count);
+						meta.displayName(Component.text(newName, bagColor).decorations(bagDecorations));
+					});
+					markVirtual(itemStack);
+				}
 			}
 		}
 

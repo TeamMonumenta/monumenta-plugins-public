@@ -16,13 +16,9 @@ public abstract class PotionAbility extends Ability {
 	public static final AbilityTriggerInfo.TriggerRestriction HOLDING_ALCHEMIST_BAG_RESTRICTION =
 		new AbilityTriggerInfo.TriggerRestriction("holding an Alchemist's Bag", player -> ItemUtils.isAlchemistItem(player.getInventory().getItemInMainHand()));
 
-	private double mDamage;
-
 	public PotionAbility(Plugin plugin, Player player,
-	                     AbilityInfo<? extends PotionAbility> info, double damage1, double damage2) {
+	                     AbilityInfo<? extends PotionAbility> info) {
 		super(plugin, player, info);
-
-		mDamage = isLevelOne() ? damage1 : damage2;
 	}
 
 	public void apply(LivingEntity mob, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
@@ -35,9 +31,5 @@ public abstract class PotionAbility extends Ability {
 
 	public void createAura(Location loc, ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 
-	}
-
-	public double getDamage() {
-		return mDamage;
 	}
 }

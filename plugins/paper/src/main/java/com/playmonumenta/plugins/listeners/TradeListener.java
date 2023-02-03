@@ -307,6 +307,11 @@ public class TradeListener implements Listener {
 		NBTItem nbt1 = new NBTItem(i1);
 		NBTItem nbt2 = new NBTItem(i2);
 
+		// alchemist bags trades
+		if (ItemUtils.isAlchemistItem(i1) && ItemUtils.isAlchemistItem(i2)) {
+			return true;
+		}
+
 		// trades with ignored stat checks
 		for (Set<String> enabledtrade : SKIP_STAT_CHECK_TRADES) {
 			if (enabledtrade.contains(ItemUtils.getPlainNameIfExists(i1)) && enabledtrade.contains(ItemUtils.getPlainNameIfExists(i2))) {
