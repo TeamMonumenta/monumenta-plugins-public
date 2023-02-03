@@ -64,7 +64,7 @@ public class Brutalize extends DepthsAbility {
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("When you critically strike you deal ")
-			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]), color))
+			.append(Component.text(StringUtils.multiplierToPercentage(DAMAGE[rarity - 1]) + "%", color))
 			.append(Component.text(" of the damage to all enemies in a " + RADIUS + " block radius and knock other enemies away from the target."));
 	}
 

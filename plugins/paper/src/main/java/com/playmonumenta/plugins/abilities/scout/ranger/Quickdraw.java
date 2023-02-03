@@ -50,7 +50,7 @@ public class Quickdraw extends Ability {
 			.descriptions(
 				String.format("Left-clicking with a projectile weapon instantly fires that projectile, fully charged. " +
 					              "This skill can only apply Recoil once before touching the ground. Cooldown: %ds.", QUICKDRAW_1_COOLDOWN / 20),
-				String.format("Cooldown: %ds.", QUICKDRAW_2_COOLDOWN / 20))
+				String.format("Arrows shot with this skill are given +1 piercing. Cooldown: %ds.", QUICKDRAW_2_COOLDOWN / 20))
 			.cooldown(QUICKDRAW_1_COOLDOWN, QUICKDRAW_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Quickdraw::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
@@ -120,7 +120,7 @@ public class Quickdraw extends Ability {
 
 		proj.setShooter(mPlayer);
 		if (proj instanceof AbstractArrow arrow) {
-			arrow.setPierceLevel((int) CharmManager.getLevel(mPlayer, CHARM_PIERCING));
+			arrow.setPierceLevel((isLevelTwo() ? 1 : 0) + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING));
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 		}

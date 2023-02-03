@@ -51,7 +51,7 @@ public class AdvancingShadows extends Ability {
 	private static final double DAMAGE_BONUS_2 = 0.4;
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 	private static final int ENHANCEMENT_KILL_REQUIREMENT_TIME = 20;
-	private static final int ENHANCEMENT_CHAIN_DURATION = 20 * 3;
+	private static final int ENHANCEMENT_CHAIN_DURATION = 20 * 4;
 
 	private static final float[] PITCHES = {1.6f, 1.8f, 1.6f, 1.8f, 2f};
 
