@@ -54,8 +54,8 @@ public class SpellShuraDagger extends Spell {
 			// Initiate Aesthetic
 			(World world, Location loc, int ticks) -> {
 				PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-				world.playSound(mBoss.getLocation(), Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
-				world.playSound(mBoss.getLocation(), Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
+				world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
 
 				if (ticks % 4 == 0) {
 					new PartialParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
