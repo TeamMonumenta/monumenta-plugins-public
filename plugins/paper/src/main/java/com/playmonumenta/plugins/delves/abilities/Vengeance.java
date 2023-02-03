@@ -55,7 +55,7 @@ public class Vengeance {
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!DelvesUtils.isDelveMob(mob) && !EntityUtils.isElite(mob) && !EntityUtils.isBoss(mob) && FastUtils.RANDOM.nextDouble() < PERCENT_CHANCE[level - 1] / 100.0) {
 			mob.addScoreboardTag(AvengerBoss.identityTag);
-			mob.addScoreboardTag(AvengerBoss.identityTag + "[maxstacks=4]");
+			mob.addScoreboardTag(AvengerBoss.identityTag + "[maxstacks=12,damagepercentincrement=0.075,speedpercentincrement=0]");
 			mob.addScoreboardTag(ToughBoss.identityTag);
 		}
 	}
