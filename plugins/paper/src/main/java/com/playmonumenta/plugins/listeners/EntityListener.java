@@ -992,18 +992,26 @@ public class EntityListener implements Listener {
 			return;
 		}
 
+		// Cancel Falling Blocks with SpellGrenade tag
+		if (event.getEntity() instanceof FallingBlock fallingBlock && fallingBlock.getScoreboardTags().contains("DisableBlockPlacement")) {
+			event.setCancelled(true);
+			return;
+		}
+
 		// Prevent falling blocks forming into real blocks inside adventure mode areas if they come from outside
 		// Note that this event is also called when the block starts to fall, thus a missing metadata on the block is assumed to be that start event and thus allowed
 		if (ZoneUtils.hasZoneProperty(event.getBlock().getLocation(), ZoneProperty.ADVENTURE_MODE)
 			    && event.getEntity() instanceof FallingBlock fallingBlock
 			    && !MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)) {
-			Material material = fallingBlock.getBlockData().getMaterial();
-			if (!material.isAir()) { // this can apparently happen
-				try {
-					fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(material));
-				} catch (IllegalArgumentException e) {
-					// The error with dropping air still exists - log it to see what the issue is
-					MMLog.warning("IllegalArgumentException on dropping an item of type " + material, e);
+			if (fallingBlock.getDropItem()) {
+				Material material = fallingBlock.getBlockData().getMaterial();
+				if (!material.isAir()) { // this can apparently happen
+					try {
+						fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(material));
+					} catch (IllegalArgumentException e) {
+						// The error with dropping air still exists - log it to see what the issue is
+						MMLog.warning("IllegalArgumentException on dropping an item of type " + material, e);
+					}
 				}
 			}
 			fallingBlock.remove();
@@ -1011,11 +1019,6 @@ public class EntityListener implements Listener {
 			return;
 		}
 
-		// Cancel Falling Blocks with SpellGrenade tag
-		if (event.getEntity() instanceof FallingBlock fallingBlock && fallingBlock.getScoreboardTags().contains("DisableBlockPlacement")) {
-			event.setCancelled(true);
-			return;
-		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
