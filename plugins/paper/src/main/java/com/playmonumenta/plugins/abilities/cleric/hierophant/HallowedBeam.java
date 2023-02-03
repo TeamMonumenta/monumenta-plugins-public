@@ -75,7 +75,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.descriptions(
 				"Left-click with a projectile weapon while looking directly at a player or mob to shoot a beam of light. " +
 					"If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. " +
-					"If aimed at an Undead, it instantly deals projectile damage equal to the used weapon's projectile damage to the target, and stuns them for one second. " +
+					"If aimed at an Undead, it instantly deals magic damage equal to the your projectile damage to the target, and stuns them for one second. " +
 					"If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. " +
 					"Pressing Swap while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), " +
 					"'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). " +
@@ -184,12 +184,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 				mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
 				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);
 				int stunDuration;
-				if (Crusade.enemyTriggersAbilities(targetedEntity)) {
+				if (Crusade.enemyTriggersAbilities(targetedEntity, mCrusade)) {
 					double damage = ItemStatUtils.getAttributeAmount(inMainHand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
 					damage += Sniper.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.SNIPER));
 					damage += PointBlank.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.POINT_BLANK));
+					damage *= mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
 					damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
-					DamageUtils.damage(mPlayer, targetedEntity, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true, true);
+					DamageUtils.damage(mPlayer, targetedEntity, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 
 					if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT) > 0) {
 						EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, player);

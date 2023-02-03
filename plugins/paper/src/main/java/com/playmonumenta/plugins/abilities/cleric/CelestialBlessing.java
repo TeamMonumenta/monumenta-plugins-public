@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -16,14 +17,17 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class CelestialBlessing extends Ability {
@@ -66,7 +70,7 @@ public class CelestialBlessing extends Ability {
 			.shorthandName("CB")
 			.descriptions(
 				("When you left-click while sneaking, you and all other players in a %s block radius gain +%s%% melee and " +
-					"projectile damage and +%s%% speed for %ss. Cooldown: %ss.")
+					"projectile damage and +%s%% speed for %ss. Dealing damage affected by this effect triggers Crusade to mark the enemy as undead, if applicable. Cooldown: %ss.")
 					.formatted((long) CELESTIAL_RADIUS,
 						StringUtils.multiplierToPercentage(CELESTIAL_1_EXTRA_DAMAGE),
 						StringUtils.multiplierToPercentage(CELESTIAL_EXTRA_SPEED),
@@ -83,11 +87,17 @@ public class CelestialBlessing extends Ability {
 
 	private final int mDuration;
 	private final double mExtraDamage;
+	private final EnumSet<DamageType> mAffectedDamageTypes;
+
+	private @Nullable Crusade mCrusade;
 
 	public CelestialBlessing(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(player, CHARM_DURATION, CELESTIAL_DURATION);
 		mExtraDamage = CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + (isLevelOne() ? CELESTIAL_1_EXTRA_DAMAGE : CELESTIAL_2_EXTRA_DAMAGE);
+		mAffectedDamageTypes = isEnhanced() ? AFFECTED_DAMAGE_TYPES_ENHANCE : AFFECTED_DAMAGE_TYPES;
+
+		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	public void cast() {
@@ -104,7 +114,7 @@ public class CelestialBlessing extends Ability {
 
 		// Give these players the metadata tag that boosts their damage
 		for (Player p : affectedPlayers) {
-			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, isEnhanced() ? AFFECTED_DAMAGE_TYPES_ENHANCE : AFFECTED_DAMAGE_TYPES));
+			mPlugin.mEffectManager.addEffect(p, DAMAGE_EFFECT_NAME, new PercentDamageDealt(mDuration, mExtraDamage, mAffectedDamageTypes));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingExtraSpeed", new PercentSpeed(mDuration, CELESTIAL_EXTRA_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
 			mPlugin.mEffectManager.addEffect(p, "CelestialBlessingParticles", new Aesthetics(mDuration,
 				(entity, fourHertz, twoHertz, oneHertz) -> {
@@ -131,6 +141,14 @@ public class CelestialBlessing extends Ability {
 		}
 
 		putOnCooldown();
+	}
+
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (mAffectedDamageTypes.contains(event.getType()) && mPlugin.mEffectManager.hasEffect(mPlayer, DAMAGE_EFFECT_NAME)) {
+			Crusade.addCrusadeTag(enemy, mCrusade);
+		}
+		return false;
 	}
 
 }

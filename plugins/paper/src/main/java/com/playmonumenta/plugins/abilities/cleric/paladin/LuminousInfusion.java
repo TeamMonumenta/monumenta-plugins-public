@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class LuminousInfusion extends Ability {
-	public static final int DAMAGE_1 = 10;
-	public static final int DAMAGE_UNDEAD_1 = 20;
+	public static final int DAMAGE_1 = 12;
+	public static final int DAMAGE_UNDEAD_1 = 25;
 	public static final double DAMAGE_MULTIPLIER_2 = 0.15;
 
 	private final boolean mDoMultiplierAndFire;
@@ -58,7 +58,7 @@ public class LuminousInfusion extends Ability {
 			.descriptions(
 				"While sneaking, pressing the swap key charges your hands with holy light. " +
 					"The next time you damage an undead enemy, your attack is infused with explosive power, " +
-					"dealing 20 magic damage to it and all enemies in a 4 block radius around it, or 10 against non-undead, " +
+					"dealing 25 magic damage to it and all undead enemies in a 4 block radius around it, or 12 against non-undead, " +
 					"and knocking other enemies away from it. Cooldown: 12s.",
 				"Your melee attacks now passively deal 15% magic damage to undead enemies, " +
 					"and Divine Justice now passively deals 15% more total damage. " +
@@ -121,7 +121,7 @@ public class LuminousInfusion extends Ability {
 			return false;
 		}
 
-		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy);
+		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy, mCrusade);
 
 		// Do explosion first, then bypass iframes for passive
 		if (mActive && enemyTriggersAbilities) {
@@ -159,7 +159,7 @@ public class LuminousInfusion extends Ability {
 			double volume = 0.6 / Math.sqrt(affected.size());
 			mCosmetic.infusionSpreadEffect(world, mPlayer, damagee, e, (float) volume);
 
-			if (Crusade.enemyTriggersAbilities(e)) {
+			if (Crusade.enemyTriggersAbilities(e, mCrusade)) {
 				/*
 				 * Annoying thing to fix eventually: there's some stuff with how the AbilityManager
 				 * currently works (to infinite loop safe against certain abilities like Brute Force)

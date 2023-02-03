@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public class HandOfLight extends Ability {
@@ -41,8 +43,8 @@ public class HandOfLight extends Ability {
 	private static final double PERCENT_2 = 0.2;
 	private static final int DAMAGE_PER_1 = 2;
 	private static final int DAMAGE_PER_2 = 3;
-	private static final int DAMAGE_MAX_1 = 8;
-	private static final int DAMAGE_MAX_2 = 9;
+	private static final int DAMAGE_MAX_1 = 10;
+	private static final int DAMAGE_MAX_2 = 12;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
 	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
@@ -84,6 +86,8 @@ public class HandOfLight extends Ability {
 
 	private final HandOfLightCS mCosmetic;
 
+	private @Nullable Crusade mCrusade;
+
 	public HandOfLight(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
@@ -93,6 +97,8 @@ public class HandOfLight extends Ability {
 		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
+
+		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	public void cast() {
@@ -114,7 +120,7 @@ public class HandOfLight extends Ability {
 
 		boolean doCooldown = false;
 		List<LivingEntity> undeadMobs = new ArrayList<>(nearbyMobs);
-		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob));
+		undeadMobs.removeIf(mob -> !Crusade.enemyTriggersAbilities(mob, mCrusade));
 		if (isEnhanced()) {
 			undeadMobs.forEach(mob -> EntityUtils.applyStun(mPlugin, ENHANCEMENT_UNDEAD_STUN_DURATION, mob));
 			if (!undeadMobs.isEmpty()) {

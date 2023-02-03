@@ -46,8 +46,8 @@ public class DivineJustice extends Ability {
 	public static final String NAME = "Divine Justice";
 	public static final ClassAbility ABILITY = ClassAbility.DIVINE_JUSTICE;
 
-	public static final int DAMAGE = 4;
-	public static final double DAMAGE_MULTIPLIER = 0.15;
+	public static final int DAMAGE = 5;
+	public static final double DAMAGE_MULTIPLIER = 0.2;
 	public static final double HEALING_MULTIPLIER_OWN = 0.1;
 	public static final double HEALING_MULTIPLIER_OTHER = 0.05;
 	public static final int RADIUS = 12;
@@ -112,16 +112,20 @@ public class DivineJustice extends Ability {
 
 	private double mPriorAmount = 0;
 
+	private @Nullable Crusade mCrusade;
+
 	public DivineJustice(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDoHealingAndMultiplier = isLevelTwo();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DivineJusticeCS(), DivineJusticeCS.SKIN_LIST);
+
+		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy)) {
+		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
@@ -165,7 +169,7 @@ public class DivineJustice extends Ability {
 
 	@Override
 	public void entityDeathEvent(EntityDeathEvent entityDeathEvent, boolean dropsLoot) {
-		if (mDoHealingAndMultiplier && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity())) {
+		if (mDoHealingAndMultiplier && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)) {
 			PlayerUtils.healPlayer(
 				mPlugin,
 				mPlayer,
@@ -188,7 +192,7 @@ public class DivineJustice extends Ability {
 		}
 
 		if (isEnhanced()
-			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity())
+			    && Crusade.enemyTriggersAbilities(entityDeathEvent.getEntity(), mCrusade)
 			    && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_ASH_CHANCE) {
 			spawnAsh(entityDeathEvent.getEntity().getLocation());
 		}
@@ -202,8 +206,7 @@ public class DivineJustice extends Ability {
 		if (existingEffect != null && existingEffect.getMagnitude() > 0) {
 			mPriorAmount = existingEffect.getMagnitude();
 		} else if (existingEffect == null && mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE > 0) {
-			mPlugin.mEffectManager.addEffect(mPlayer, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
-				new PercentDamageDealt(ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION, mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy)));
+			addEnhancementEffect(mPlayer, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION, mPriorAmount - ENHANCEMENT_ASH_BONUS_DAMAGE);
 			mPriorAmount -= ENHANCEMENT_ASH_BONUS_DAMAGE;
 		}
 	}
@@ -282,8 +285,12 @@ public class DivineJustice extends Ability {
 		int duration = fromBoneShard ? ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION : Math.max(existingEffectDuration, ENHANCEMENT_ASH_BONUS_DAMAGE_DURATION);
 		double bonusDamage = fromBoneShard ? ENHANCEMENT_BONUS_DAMAGE_MAX : Math.min(existingEffectAmount + ENHANCEMENT_ASH_BONUS_DAMAGE, ENHANCEMENT_BONUS_DAMAGE_MAX);
 
+		addEnhancementEffect(player, duration, bonusDamage);
+	}
+
+	private void addEnhancementEffect(Player player, int duration, double bonusDamage) {
 		mPlugin.mEffectManager.addEffect(player, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME,
-			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy)));
+			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
 	}
 
 	@Override

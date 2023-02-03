@@ -29,8 +29,8 @@ import org.jetbrains.annotations.Nullable;
 public class EnchantedPrayer extends Ability {
 
 	private static final int ENCHANTED_PRAYER_COOLDOWN = 20 * 15;
-	private static final int ENCHANTED_PRAYER_1_DAMAGE = 9;
-	private static final int ENCHANTED_PRAYER_2_DAMAGE = 15;
+	private static final int ENCHANTED_PRAYER_1_DAMAGE = 12;
+	private static final int ENCHANTED_PRAYER_2_DAMAGE = 20;
 	private static final double ENCHANTED_PRAYER_1_HEAL = 0.1;
 	private static final double ENCHANTED_PRAYER_2_HEAL = 0.2;
 	private static final int ENCHANTED_PRAYER_RANGE = 15;
@@ -58,8 +58,8 @@ public class EnchantedPrayer extends Ability {
 			.shorthandName("EP")
 			.descriptions(
 				"Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. " +
-					"Their next melee or projectile attack deals an additional 9 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
-				"Damage is increased to 15. Healing is increased to 20% of max health.")
+					"Their next melee or projectile attack deals an additional 12 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
+				"Damage is increased to 20. Healing is increased to 20% of max health.")
 			.cooldown(ENCHANTED_PRAYER_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EnchantedPrayer::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
 			.displayItem(new ItemStack(Material.CHORUS_FRUIT, 1));

@@ -38,10 +38,10 @@ public class HolyJavelin extends Ability {
 
 	private static final double HITBOX_LENGTH = 0.75;
 	private static final int RANGE = 12;
-	private static final int UNDEAD_DAMAGE_1 = 18;
-	private static final int UNDEAD_DAMAGE_2 = 32;
-	private static final int DAMAGE_1 = 9;
-	private static final int DAMAGE_2 = 12;
+	private static final int UNDEAD_DAMAGE_1 = 22;
+	private static final int UNDEAD_DAMAGE_2 = 36;
+	private static final int DAMAGE_1 = 11;
+	private static final int DAMAGE_2 = 22;
 	private static final int FIRE_DURATION = 5 * 20;
 	private static final int COOLDOWN = 10 * 20;
 
@@ -59,9 +59,9 @@ public class HolyJavelin extends Ability {
 			.shorthandName("HJ")
 			.descriptions(
 				"While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. " +
-					"It deals 18 magic damage to all enemies in a 0.75-block cube around it along its path, or 9 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.",
+					"It deals 22 magic damage to all undead enemies in a 0.75-block cube around it along its path, and 11 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.",
 				"Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. " +
-					"Damage is increased from 18 to 32, and from 9 to 18 against non-undead.")
+					"Damage is increased to 36 against undead, and to 22 against non-undead.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HolyJavelin::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).sprinting(true)
@@ -69,6 +69,7 @@ public class HolyJavelin extends Ability {
 			.displayItem(new ItemStack(Material.TRIDENT, 1))
 			.priorityAmount(1001); // shortly after divine justice and luminous infusion
 
+	private @Nullable Crusade mCrusade;
 	private @Nullable DivineJustice mDivineJustice;
 	private @Nullable LuminousInfusion mLuminousInfusion;
 
@@ -78,6 +79,7 @@ public class HolyJavelin extends Ability {
 		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			mDivineJustice = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DivineJustice.class);
 			mLuminousInfusion = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, LuminousInfusion.class);
 		});
@@ -135,7 +137,7 @@ public class HolyJavelin extends Ability {
 			while (iterator.hasNext()) {
 				LivingEntity enemy = iterator.next();
 				if (enemy.getBoundingBox().overlaps(box)) {
-					double damage = Crusade.enemyTriggersAbilities(enemy) ? mUndeadDamage : mDamage;
+					double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
 					if (enemy != triggeringEnemy) {
 						// Triggering enemy would've already received the melee damage from Luminous
 						// Infusion

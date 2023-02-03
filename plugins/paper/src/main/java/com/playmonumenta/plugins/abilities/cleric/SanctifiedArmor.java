@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Optional;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -59,17 +60,21 @@ public class SanctifiedArmor extends Ability {
 
 	private final SanctifiedArmorCS mCosmetic;
 
+	private @Nullable Crusade mCrusade;
+
 	public SanctifiedArmor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentDamageReturned = isLevelOne() ? PERCENT_DAMAGE_RETURNED_1 : PERCENT_DAMAGE_RETURNED_2;
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctifiedArmorCS(), SanctifiedArmorCS.SKIN_LIST);
+
+		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (source != null
 			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE)
-			    && Crusade.enemyTriggersAbilities(source)
+			    && Crusade.enemyTriggersAbilities(source, mCrusade)
 			    && !EntityUtils.isBoss(source)) {
 			Location loc = source.getLocation();
 			World world = mPlayer.getWorld();
