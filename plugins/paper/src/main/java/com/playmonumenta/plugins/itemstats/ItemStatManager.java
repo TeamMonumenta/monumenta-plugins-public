@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -229,6 +230,9 @@ public class ItemStatManager implements Listener {
 				items.put(Slot.FEET, feet);
 
 				for (Slot slot : Slot.values()) {
+					if (slot == Slot.PROJECTILE) {
+						continue;
+					}
 					ItemStack item = items.get(slot);
 					if (item == null || item.getType() == Material.AIR) {
 						continue;
@@ -638,8 +642,9 @@ public class ItemStatManager implements Listener {
 	}
 
 	public void onLaunchProjectile(Plugin plugin, Player player, ProjectileLaunchEvent event, Projectile projectile) {
-		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+		PlayerItemStats stats = DamageListener.getProjectileItemStats(projectile);
+		if (stats != null) {
+			for (Entry<ItemStat, Double> entry : stats.getItemStats()) {
 				entry.getKey().onProjectileLaunch(plugin, player, entry.getValue(), event, projectile);
 			}
 		}

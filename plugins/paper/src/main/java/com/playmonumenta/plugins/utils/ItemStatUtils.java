@@ -549,6 +549,10 @@ public class ItemStatUtils {
 			                                                                  .filter(type -> type.mIsSpawnable)
 			                                                                  .collect(Collectors.toUnmodifiableSet());
 
+		public static final Set<EnchantmentType> PROJECTILE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
+			                                                                   .filter(type -> type.getItemStat() instanceof com.playmonumenta.plugins.itemstats.Enchantment ench && ench.getSlots().contains(Slot.PROJECTILE))
+			                                                                   .collect(Collectors.toUnmodifiableSet());
+
 		static final String KEY = "Enchantments";
 
 		final @Nullable Enchantment mEnchantment;
@@ -811,6 +815,11 @@ public class ItemStatUtils {
 			THROW_RATE
 		);
 
+		public static final ImmutableList<AttributeType> PROJECTILE_ATTRIBUTE_TYPES = ImmutableList.of(
+			PROJECTILE_DAMAGE_MULTIPLY,
+			PROJECTILE_SPEED
+		);
+
 		static final String KEY = "Attributes";
 
 		final @Nullable Attribute mAttribute;
@@ -941,26 +950,27 @@ public class ItemStatUtils {
 	}
 
 	public enum Slot {
-		MAINHAND(EquipmentSlot.HAND, "mainhand", Component.text("When in Main Hand:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
-		OFFHAND(EquipmentSlot.OFF_HAND, "offhand", Component.text("When in Off Hand:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
-		HEAD(EquipmentSlot.HEAD, "head", Component.text("When on Head:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
-		CHEST(EquipmentSlot.CHEST, "chest", Component.text("When on Chest:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
-		LEGS(EquipmentSlot.LEGS, "legs", Component.text("When on Legs:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)),
-		FEET(EquipmentSlot.FEET, "feet", Component.text("When on Feet:", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		MAINHAND(EquipmentSlot.HAND, "mainhand", "When in Main Hand:"),
+		OFFHAND(EquipmentSlot.OFF_HAND, "offhand", "When in Off Hand:"),
+		HEAD(EquipmentSlot.HEAD, "head", "When on Head:"),
+		CHEST(EquipmentSlot.CHEST, "chest", "When on Chest:"),
+		LEGS(EquipmentSlot.LEGS, "legs", "When on Legs:"),
+		FEET(EquipmentSlot.FEET, "feet", "When on Feet:"),
+		PROJECTILE(null, "projectile", "When Shot:");
 
 		static final String KEY = "Slot";
 
-		final EquipmentSlot mEquipmentSlot;
+		final @Nullable EquipmentSlot mEquipmentSlot;
 		final String mName;
 		final Component mDisplay;
 
-		Slot(EquipmentSlot equipmentSlot, String name, Component display) {
+		Slot(@Nullable EquipmentSlot equipmentSlot, String name, String display) {
 			mEquipmentSlot = equipmentSlot;
 			mName = name;
-			mDisplay = display;
+			mDisplay = Component.text(display, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 		}
 
-		public EquipmentSlot getEquipmentSlot() {
+		public @Nullable EquipmentSlot getEquipmentSlot() {
 			return mEquipmentSlot;
 		}
 
@@ -1833,9 +1843,10 @@ public class ItemStatUtils {
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 
-		if (type.getAttribute() != null) {
+		EquipmentSlot equipmentSlot = slot.getEquipmentSlot();
+		if (type.getAttribute() != null && equipmentSlot != null) {
 			ItemMeta meta = item.getItemMeta();
-			meta.addAttributeModifier(type.getAttribute(), new AttributeModifier(UUID.randomUUID(), "Modifier", amount, operation.getAttributeOperation(), slot.getEquipmentSlot()));
+			meta.addAttributeModifier(type.getAttribute(), new AttributeModifier(UUID.randomUUID(), "Modifier", amount, operation.getAttributeOperation(), equipmentSlot));
 			item.setItemMeta(meta);
 		}
 	}
@@ -1856,12 +1867,10 @@ public class ItemStatUtils {
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 
-		if (type.getAttribute() != null) {
+		EquipmentSlot equipmentSlot = slot.getEquipmentSlot();
+		if (type.getAttribute() != null && equipmentSlot != null) {
 			ItemMeta meta = item.getItemMeta();
-			Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(slot.getEquipmentSlot()).get(type.getAttribute());
-			if (modifiers == null) {
-				return;
-			}
+			Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(equipmentSlot).get(type.getAttribute());
 
 			for (AttributeModifier modifier : modifiers) {
 				if (modifier.getOperation() == operation.getAttributeOperation()) {
@@ -2423,7 +2432,7 @@ public class ItemStatUtils {
 		meta.addItemFlags(ItemFlag.HIDE_DYE);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		String name = item.getType().name();
-		if (name.contains("POTION") || name.contains("PATTERN") || name.contains("SHIELD")) {
+		if (name.contains("POTION") || name.contains("PATTERN") || name.contains("SHIELD") || ItemUtils.isArrow(item)) {
 			meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		}
 
@@ -2470,6 +2479,6 @@ public class ItemStatUtils {
 
 	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)
 	public static boolean isNotExclusivelyRanged(@Nullable ItemStack item) {
-		return item != null && (getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) == 0);
+		return item != null && !ItemUtils.isArrow(item) && (getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) == 0);
 	}
 }

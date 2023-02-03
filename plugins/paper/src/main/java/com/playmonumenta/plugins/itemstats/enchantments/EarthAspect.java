@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,6 +37,11 @@ public class EarthAspect implements Enchantment {
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.EARTH_ASPECT;
+	}
+
+	@Override
+	public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.PROJECTILE);
 	}
 
 	@Override

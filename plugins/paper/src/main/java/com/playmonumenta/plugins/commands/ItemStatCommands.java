@@ -619,7 +619,7 @@ public class ItemStatCommands {
 		arguments.add(new StringArgument("attribute").replaceSuggestions(ArgumentSuggestions.strings(info -> attributes)));
 		arguments.add(new DoubleArgument("amount"));
 		arguments.add(new MultiLiteralArgument(ItemStatUtils.Operation.ADD.getName(), ItemStatUtils.Operation.MULTIPLY.getName()));
-		arguments.add(new MultiLiteralArgument(ItemStatUtils.Slot.MAINHAND.getName(), ItemStatUtils.Slot.OFFHAND.getName(), ItemStatUtils.Slot.HEAD.getName(), ItemStatUtils.Slot.CHEST.getName(), ItemStatUtils.Slot.LEGS.getName(), ItemStatUtils.Slot.FEET.getName()));
+		arguments.add(new MultiLiteralArgument(ItemStatUtils.Slot.MAINHAND.getName(), ItemStatUtils.Slot.OFFHAND.getName(), ItemStatUtils.Slot.HEAD.getName(), ItemStatUtils.Slot.CHEST.getName(), ItemStatUtils.Slot.LEGS.getName(), ItemStatUtils.Slot.FEET.getName(), ItemStatUtils.Slot.PROJECTILE.getName()));
 
 		new CommandAPICommand("editattr").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			if (player.getGameMode() != GameMode.CREATIVE) {

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Player;
@@ -20,6 +21,11 @@ public class Piercing implements Enchantment {
 	@Override
 	public ItemStatUtils.EnchantmentType getEnchantmentType() {
 		return ItemStatUtils.EnchantmentType.PIERCING;
+	}
+
+	@Override
+	public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.PROJECTILE);
 	}
 
 	@Override

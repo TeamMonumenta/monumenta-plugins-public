@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
@@ -72,6 +73,7 @@ import org.bukkit.event.entity.EntityEnterBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -84,6 +86,7 @@ import org.bukkit.event.entity.VillagerCareerChangeEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -96,6 +99,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class EntityListener implements Listener {
@@ -1125,6 +1129,43 @@ public class EntityListener implements Listener {
 				frame.getWorld().dropItemNaturally(frame.getLocation(), frame.getItem());
 			}
 			frame.remove();
+		}
+	}
+
+	private static final WeakHashMap<UUID, ItemStack> ARROW_ITEM_MAP = new WeakHashMap<>();
+
+	public static @Nullable ItemStack getArrowItem(UUID uuid) {
+		return ARROW_ITEM_MAP.get(uuid);
+	}
+
+	public static void setArrowItem(AbstractArrow arrow, ItemStack item) {
+		ARROW_ITEM_MAP.put(arrow.getUniqueId(), item);
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityShootBowEvent(EntityShootBowEvent event) {
+		if (event.getEntity() instanceof Player
+			    && event.getProjectile() instanceof AbstractArrow arrow
+			    && !(arrow instanceof Trident)
+			    && arrow.getPickupStatus() == Arrow.PickupStatus.ALLOWED
+			    && ARROW_ITEM_MAP.get(arrow.getUniqueId()) == null) {
+			ItemStack item = ItemUtils.clone(event.getConsumable());
+			if (item != null) {
+				item.setAmount(1);
+				ARROW_ITEM_MAP.put(arrow.getUniqueId(), item);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerPickupArrowEvent(PlayerPickupArrowEvent event) {
+		Item itemEntity = event.getItem();
+		if (itemEntity.isValid()) {
+			UUID uuid = event.getArrow().getUniqueId();
+			ItemStack itemStack = ARROW_ITEM_MAP.remove(uuid);
+			if (itemStack != null) {
+				itemEntity.setItemStack(itemStack);
+			}
 		}
 	}
 

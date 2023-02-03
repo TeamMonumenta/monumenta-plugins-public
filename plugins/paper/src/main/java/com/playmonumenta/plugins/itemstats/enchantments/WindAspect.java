@@ -7,10 +7,12 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -33,6 +35,11 @@ public class WindAspect implements Enchantment {
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.WIND_ASPECT;
+	}
+
+	@Override
+	public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.PROJECTILE);
 	}
 
 	@Override

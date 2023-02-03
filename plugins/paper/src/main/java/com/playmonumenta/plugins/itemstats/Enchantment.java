@@ -14,7 +14,7 @@ public interface Enchantment extends ItemStat {
 	EnchantmentType getEnchantmentType();
 
 	/**
-	 * Slots that the Enchantment applies in. Defaults to all slots.
+	 * Slots that the Enchantment applies in. Defaults to all slots other than Projectile.
 	 *
 	 * @return an EnumSet of the Slots the Enchantment applies in
 	 */

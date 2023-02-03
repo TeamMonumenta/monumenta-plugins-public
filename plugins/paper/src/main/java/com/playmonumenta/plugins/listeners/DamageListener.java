@@ -5,23 +5,31 @@ import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTCompoundList;
+import de.tr7zw.nbtapi.NBTItem;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
@@ -31,6 +39,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +47,7 @@ public class DamageListener implements Listener {
 
 	private final Plugin mPlugin;
 
-	private static final WeakHashMap<Projectile, PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
+	private static final WeakHashMap<UUID, PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 
 	public DamageListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -171,7 +180,7 @@ public class DamageListener implements Listener {
 			if (source instanceof Player player) {
 				// Check if projectile
 				if (damager instanceof Projectile proj) {
-					PlayerItemStats playerItemStats = mPlayerItemStatsMap.get(proj);
+					PlayerItemStats playerItemStats = mPlayerItemStatsMap.get(proj.getUniqueId());
 					if (playerItemStats != null) {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, playerItemStats, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
@@ -233,18 +242,47 @@ public class DamageListener implements Listener {
 	}
 
 	public static @Nullable PlayerItemStats getProjectileItemStats(Projectile proj) {
-		return mPlayerItemStatsMap.get(proj);
+		return mPlayerItemStatsMap.get(proj.getUniqueId());
 	}
 
 	public static void addProjectileItemStats(Projectile proj, Player player) {
-		mPlayerItemStatsMap.put(proj, Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player));
-	}
+		Plugin plugin = Plugin.getInstance();
+		PlayerItemStats stats = plugin.mItemStatManager.getPlayerItemStatsCopy(player);
+		PlayerItemStats.ItemStatsMap map = stats.getItemStats();
+		UUID uuid = proj.getUniqueId();
+		if (proj instanceof AbstractArrow && !(proj instanceof Trident)) {
+			ItemStack item = EntityListener.getArrowItem(uuid);
+			if (item != null) {
+				NBTItem nbtItem = new NBTItem(item);
 
-	public static void addProjectileItemStats(Projectile proj, PlayerItemStats playerItemStats) {
-		mPlayerItemStatsMap.put(proj, playerItemStats);
+				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbtItem);
+
+				for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.PROJECTILE_ENCHANTMENTS) {
+					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
+					if (level > 0) {
+						map.add(Objects.requireNonNull(ench.getItemStat()), level);
+					}
+				}
+
+				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbtItem);
+
+				for (ItemStatUtils.AttributeType attr : ItemStatUtils.AttributeType.PROJECTILE_ATTRIBUTE_TYPES) {
+					double value = ItemStatUtils.getAttributeAmount(attributes, attr, ItemStatUtils.Operation.MULTIPLY, ItemStatUtils.Slot.PROJECTILE);
+					if (value != 0) {
+						ItemStat stat = Objects.requireNonNull(attr.getItemStat());
+						if (map.get(stat) == stat.getDefaultValue()) {
+							value += stat.getDefaultValue();
+						}
+						map.add(Objects.requireNonNull(attr.getItemStat()), value);
+					}
+				}
+			}
+		}
+
+		mPlayerItemStatsMap.put(uuid, stats);
 	}
 
 	public static PlayerItemStats removeProjectileItemStats(Projectile proj) {
-		return mPlayerItemStatsMap.remove(proj);
+		return mPlayerItemStatsMap.remove(proj.getUniqueId());
 	}
 }

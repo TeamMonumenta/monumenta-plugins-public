@@ -35,7 +35,7 @@ public class Sniper implements Enchantment {
 
 	@Override
 	public EnumSet<Slot> getSlots() {
-		return EnumSet.of(Slot.MAINHAND);
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
 	}
 
 	@Override

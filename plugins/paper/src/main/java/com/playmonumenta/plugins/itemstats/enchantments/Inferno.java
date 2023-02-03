@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.InfernoDamage;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,6 +24,11 @@ public class Inferno implements Enchantment {
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.INFERNO;
+	}
+
+	@Override
+	public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND, ItemStatUtils.Slot.HEAD, ItemStatUtils.Slot.CHEST, ItemStatUtils.Slot.LEGS, ItemStatUtils.Slot.FEET, ItemStatUtils.Slot.PROJECTILE);
 	}
 
 	//Called in EntityUtils.applyFire()

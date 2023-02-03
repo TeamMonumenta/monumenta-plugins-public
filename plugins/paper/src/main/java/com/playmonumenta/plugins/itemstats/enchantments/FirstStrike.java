@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -17,7 +18,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class FirstStrike implements Enchantment {
 
@@ -28,7 +28,7 @@ public class FirstStrike implements Enchantment {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(244, 141, 123), 0.75f);
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "First Strike";
 	}
 
@@ -40,6 +40,11 @@ public class FirstStrike implements Enchantment {
 	@Override
 	public EnchantmentType getEnchantmentType() {
 		return EnchantmentType.FIRST_STRIKE;
+	}
+
+	@Override
+	public EnumSet<ItemStatUtils.Slot> getSlots() {
+		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND, ItemStatUtils.Slot.HEAD, ItemStatUtils.Slot.CHEST, ItemStatUtils.Slot.LEGS, ItemStatUtils.Slot.FEET, ItemStatUtils.Slot.PROJECTILE);
 	}
 
 	@Override

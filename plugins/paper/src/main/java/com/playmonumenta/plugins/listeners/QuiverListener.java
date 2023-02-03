@@ -258,6 +258,8 @@ public class QuiverListener implements Listener {
 					}
 				}
 
+				EntityListener.setArrowItem(newArrow, projectileItem);
+
 				// We need to call a new ProjectileLaunchEvent as we changed the projectile entity (which causes the event to no longer get fired automatically)
 				// Delay to MONITOR to see if we actually shoot the projectile, and also allow the crossbow listener to add fire aspect and similar to the arrow
 				mCallProjectileLaunchEvent = true;
