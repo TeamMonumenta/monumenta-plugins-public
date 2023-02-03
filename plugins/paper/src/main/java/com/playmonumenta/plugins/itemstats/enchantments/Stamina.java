@@ -24,7 +24,7 @@ public class Stamina implements Enchantment {
 	private static final String STAMINA_EFFECT = "StaminaDamage";
 	private static final double DAMAGE_BONUS = 0.025;
 	private static final double DAMAGE_CAP = 0.1;
-	private static final int DURATION = 6 * 20;
+	private static final int DURATION = 5 * 20;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(241, 190, 84), 0.75f);
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
 		DamageEvent.DamageType.MELEE,
@@ -60,7 +60,16 @@ public class Stamina implements Enchantment {
 		double currStamina = 0;
 		if (s != null) {
 			currStamina = s.last().getMagnitude();
+			// Reset the duration of the previous stacks so that
+			// they don't decay in the background, and instead
+			// reappear once the greater magnitude stack effect runs out.
+			int durationMultiplier = (int) Math.min(DAMAGE_CAP / DAMAGE_BONUS, s.size() + 1);
+			for (Effect effect : s) {
+				effect.setDuration(durationMultiplier * DURATION);
+				durationMultiplier--;
+			}
 		}
+
 		double damage = Math.min(currStamina + (DAMAGE_BONUS * level), DAMAGE_CAP * level);
 		plugin.mEffectManager.addEffect(player, STAMINA_EFFECT, new PercentDamageDealt(DURATION, damage, AFFECTED_DAMAGE_TYPES));
 
