@@ -329,7 +329,7 @@ public class ItemStatCommands {
 							player.sendMessage(Component.text("WARNING: Unknown effect '" + parsedInfo.mEffect + "'. The charm won't work without plugin changes!", NamedTextColor.YELLOW));
 						}
 
-						String hexColor = CharmManager.getCharmEffectColor(lore.charAt(0) == '+', lore);
+						String hexColor = CharmManager.getCharmEffectColor(parsedInfo.mValue >= 0, parsedInfo.mEffect);
 
 						Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
 						ItemStatUtils.addCharmEffect(item, index, text);
@@ -409,16 +409,9 @@ public class ItemStatCommands {
 						}
 
 						ItemStatUtils.removeCharmEffect(item, index);
-						if (lore.charAt(0) == '+') {
-							Component text = Component.text(lore, TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false);
-							ItemStatUtils.addCharmEffect(item, index, text);
-						} else if (lore.charAt(0) == '-') {
-							Component text = Component.text(lore, TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false);
-							ItemStatUtils.addCharmEffect(item, index, text);
-						} else {
-							Component text = Component.text(lore, TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false);
-							ItemStatUtils.addCharmEffect(item, index, text);
-						}
+						String hexColor = CharmManager.getCharmEffectColor(parsedInfo.mValue >= 0, parsedInfo.mEffect);
+						Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
+						ItemStatUtils.addCharmEffect(item, index, text);
 
 						ItemStatUtils.generateItemStats(item);
 					}))

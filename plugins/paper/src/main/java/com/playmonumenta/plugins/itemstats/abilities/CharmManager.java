@@ -1228,23 +1228,7 @@ public class CharmManager {
 	}
 
 	public static String getCharmEffectColor(boolean isPositive, String charmEffectName) {
-		String outColor = "#4AC2E5";
-		if (isPositive) {
-			for (String s : INSTANCE.mFlippedColorEffectSubstrings) {
-				if (charmEffectName.endsWith(s)) {
-					outColor = "#D02E28";
-					return outColor;
-				}
-			}
-		} else {
-			for (String s : INSTANCE.mFlippedColorEffectSubstrings) {
-				if (charmEffectName.endsWith(s)) {
-					return outColor;
-				}
-			}
-			outColor = "#D02E28";
-		}
-		return outColor;
+		return isPositive != INSTANCE.mFlippedColorEffectSubstrings.contains(charmEffectName) ? "#4AC2E5" : "#D02E28";
 	}
 
 	public static class CharmParsedInfo {
