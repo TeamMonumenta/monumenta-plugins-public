@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -50,9 +51,10 @@ public class MapOverride extends BaseOverride {
 			Material.BLACK_WALL_BANNER
 		);
 
-	private boolean canUseMap(Player player, ItemStack mapItem) {
+	private boolean canUseMap(Player player, ItemStack mapItem, @Nullable ItemFrame itemFrame) {
 		GameMode playerMode = player.getGameMode();
-		if (playerMode.equals(GameMode.ADVENTURE) || playerMode.equals(GameMode.SPECTATOR)) {
+		if ((playerMode.equals(GameMode.ADVENTURE) || playerMode.equals(GameMode.SPECTATOR))
+			    && !(ItemUtils.isQuestItem(mapItem) && itemFrame != null && itemFrame.getScoreboardTags().contains("Removable"))) {
 			player.sendMessage(ChatColor.RED + "You can not place maps in town item frames");
 			return false;
 		} else if (playerMode.equals(GameMode.CREATIVE)) {
@@ -70,7 +72,7 @@ public class MapOverride extends BaseOverride {
 	@Override
 	public boolean rightClickItemInteraction(Plugin plugin, Player player, Action action, ItemStack item, @Nullable Block block) {
 		if (block != null && BANNERS.contains(block.getType())) {
-			return canUseMap(player, item);
+			return canUseMap(player, item, null);
 		}
 
 		return true;
@@ -78,8 +80,8 @@ public class MapOverride extends BaseOverride {
 
 	@Override
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack itemInHand) {
-		if (clickedEntity instanceof ItemFrame) {
-			return canUseMap(player, itemInHand);
+		if (clickedEntity instanceof ItemFrame itemFrame) {
+			return canUseMap(player, itemInHand, itemFrame);
 		}
 
 		return true;
