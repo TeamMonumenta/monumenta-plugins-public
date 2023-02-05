@@ -114,9 +114,8 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 			public void run() {
 				ParticleUtils.drawCurve(mCenter, 0, mUnits - 1, mPlayer.getLocation().getDirection(),
 					t -> dF * (t + mUnits * (mTick - 0.3 * radius)),
-					t -> dR * (t + mUnits * (mTick - 0.3 * radius)),
-					t -> dU * (t + mUnits * (mTick - 0.3 * radius)),
-					(l, t) -> {
+						t -> dU * (t + mUnits * (mTick - 0.3 * radius)), t -> dR * (t + mUnits * (mTick - 0.3 * radius)),
+						(l, t) -> {
 						new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0, color1).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.REDSTONE, l, 4, 0.25, 0.25, 0.25, 0, color2).spawnAsPlayerActive(mPlayer);
 					});

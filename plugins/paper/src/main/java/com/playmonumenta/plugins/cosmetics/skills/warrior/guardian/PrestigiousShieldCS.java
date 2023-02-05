@@ -86,21 +86,18 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 		Vector mFront = loc.getDirection().clone().setY(0).normalize().multiply(radius);
 		ParticleUtils.drawCurve(mCenter, -units1, units1, mFront,
 			t -> 0.125,
-			t -> 0.625 * t / units1,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.625 * t / units1,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, -units2, units2, mFront,
 			t -> -0.8,
-			t -> 0.75 * t / units1,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.75 * t / units1,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, -units2, units2, mFront,
 			t -> 0.8 * t / units2,
-			t -> 0,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 
 	}

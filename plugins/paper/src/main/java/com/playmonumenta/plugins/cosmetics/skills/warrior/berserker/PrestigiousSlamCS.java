@@ -113,51 +113,43 @@ public class PrestigiousSlamCS extends MeteorSlamCS implements PrestigeCS {
 		int units = (int) Math.ceil(radius * 1.8);
 		ParticleUtils.drawCurve(mCenter, 0, units * 6, mFront,
 			t -> FastUtils.cos(3.1416 * t / (units * 6)),
-			t -> 0.025 + FastUtils.sin(3.1416 * t / (units * 6)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.02, 0, 0.02, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.025 + FastUtils.sin(3.1416 * t / (units * 6)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.02, 0, 0.02, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 3, mFront,
 			t -> 0.5 + 0.5 * FastUtils.cos(3.1416 * t / (units * 3)),
-			t -> 0.025 - 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.025 - 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 3, mFront,
 			t -> -0.5 + 0.5 * FastUtils.cos(3.1416 * t / (units * 3)),
-			t -> 0.025 + 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.025 + 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 2, mFront,
 			t -> -0.5 + 0.167 * FastUtils.cos(3.1416 * 2 * t / (units * 2)),
-			t -> 0.167 * FastUtils.sin(3.1416 * 2 * t / (units * 2)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.167 * FastUtils.sin(3.1416 * 2 * t / (units * 2)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 6, mFront,
 			t -> FastUtils.cos(3.1416 * t / (units * 6)),
-			t -> -0.025 - FastUtils.sin(3.1416 * t / (units * 6)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.02, 0, 0.02, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> -0.025 - FastUtils.sin(3.1416 * t / (units * 6)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.02, 0, 0.02, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 3, mFront,
 			t -> 0.5 + 0.5 * FastUtils.cos(3.1416 * t / (units * 3)),
-			t -> -0.025 - 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> -0.025 - 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 3, mFront,
 			t -> -0.5 + 0.5 * FastUtils.cos(3.1416 * t / (units * 3)),
-			t -> -0.025 + 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> -0.025 + 0.5 * FastUtils.sin(3.1416 * t / (units * 3)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units * 2, mFront,
 			t -> 0.5 + 0.167 * FastUtils.cos(3.1416 * 2 * t / (units * 2)),
-			t -> 0.167 * FastUtils.sin(3.1416 * 2 * t / (units * 2)),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.167 * FastUtils.sin(3.1416 * 2 * t / (units * 2)),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 	}
 }

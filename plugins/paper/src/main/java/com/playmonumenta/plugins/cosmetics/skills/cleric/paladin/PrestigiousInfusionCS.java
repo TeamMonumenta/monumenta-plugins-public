@@ -150,24 +150,21 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 		Vector mFront = mPlayer.getLocation().getDirection().clone().setY(0).normalize();
 		ParticleUtils.drawCurve(mCenter, 1, 31, mFront,
 			t -> 0,
-			t -> 0,
-			t -> 0.26 * t,
-			(l, t) -> {
+				t -> 0.26 * t, t -> 0,
+				(l, t) -> {
 				if (t <= 6) {
 					int units = (int) Math.ceil(t * 0.18 * 3.2);
 					ParticleUtils.drawCurve(l, -units, units, mFront,
 						u -> 0,
-						u -> 0.17 * t * u / units,
-						u -> 0,
-						(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
+							u -> 0, u -> 0.17 * t * u / units,
+							(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
 					);
 				} else if (t <= 20) {
 					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
 					ParticleUtils.drawCurve(l, -6, 6, mFront,
 						u -> 0,
-						u -> 0.17 * u,
-						u -> 0,
-						(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
+							u -> 0, u -> 0.17 * u,
+							(l2, u) -> new PartialParticle(Particle.REDSTONE, l2, 1, 0.15, 0.15, 0.15, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
 					);
 				} else {
 					new PartialParticle(Particle.REDSTONE, l, 4, 0.15, 0.15, 0.15, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
@@ -176,9 +173,8 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 		);
 		ParticleUtils.drawCurve(mCenter, -9, 9, mFront,
 			t -> 0,
-			t -> 0.21 * t,
-			t -> 5.2,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.15, 0.15, 0.15, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 5.2, t -> 0.21 * t,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.15, 0.15, 0.15, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 	}
 

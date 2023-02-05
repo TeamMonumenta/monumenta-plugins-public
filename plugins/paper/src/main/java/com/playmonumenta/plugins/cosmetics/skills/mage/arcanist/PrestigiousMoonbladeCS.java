@@ -106,15 +106,13 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 		int uShort = (int) Math.ceil(1.6 * range);
 		ParticleUtils.drawCurve(mCenter, 0, uShort, mFront,
 			t -> 0.55 * t / uShort * FastUtils.cos(mShortAngle - (mSwings - 1) * mDShortAngle),
-			t -> 0.55 * t / uShort * FastUtils.sin(mShortAngle - (mSwings - 1) * mDShortAngle),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.12, 0.12, 0.12, 0, GOLD_COLOR1).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.55 * t / uShort * FastUtils.sin(mShortAngle - (mSwings - 1) * mDShortAngle),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.12, 0.12, 0.12, 0, GOLD_COLOR1).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, uLong, mFront,
 			t -> 0.95 * t / uLong * FastUtils.cos(mLongAngle - (mSwings - 1) * mDLongAngle),
-			t -> 0.95 * t / uLong * FastUtils.sin(mLongAngle - (mSwings - 1) * mDLongAngle),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.05, 0.05, 0.05, 0, GOLD_COLOR2).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.95 * t / uLong * FastUtils.sin(mLongAngle - (mSwings - 1) * mDLongAngle),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.05, 0.05, 0.05, 0, GOLD_COLOR2).spawnAsPlayerActive(mPlayer)
 		);
 
 		new BukkitRunnable() {

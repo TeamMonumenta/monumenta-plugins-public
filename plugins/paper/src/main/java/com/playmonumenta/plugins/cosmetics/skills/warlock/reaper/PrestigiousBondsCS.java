@@ -99,51 +99,43 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 				final int units = (int) Math.ceil(DENSITY * maxRadius * mFrame / FRAMES);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> WIDTH,
-					t -> WIDTH * t / MAX_UNITS,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> WIDTH * t / MAX_UNITS,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> -WIDTH,
-					t -> WIDTH * t / MAX_UNITS,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> WIDTH * t / MAX_UNITS,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> WIDTH * t / MAX_UNITS,
-					t -> WIDTH,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> WIDTH,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> WIDTH * t / MAX_UNITS,
-					t -> -WIDTH,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> -WIDTH,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> 0.5 + 0.5 * t / MAX_UNITS,
-					t -> 0.5 - 0.5 * t / MAX_UNITS,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> 0.5 - 0.5 * t / MAX_UNITS,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> -0.5 - 0.5 * t / MAX_UNITS,
-					t -> 0.5 - 0.5 * t / MAX_UNITS,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> 0.5 - 0.5 * t / MAX_UNITS,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> -0.5 - 0.5 * t / MAX_UNITS,
-					t -> -0.5 + 0.5 * t / MAX_UNITS,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> -0.5 + 0.5 * t / MAX_UNITS,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(mCenter, -units, units, mFront,
 					t -> 0.5 + 0.5 * t / MAX_UNITS,
-					t -> -0.5 + 0.5 * t / MAX_UNITS,
-					t -> 0,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> 0, t -> -0.5 + 0.5 * t / MAX_UNITS,
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 
 			}
@@ -166,9 +158,8 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 		Vector mFront = mLoc.toVector().subtract(eLoc.toVector());
 		ParticleUtils.drawCurve(eLoc.clone().add(0, 0.75, 0), 1, 36, mFront,
 			t -> 0.5 + 0.5 * FastUtils.sinDeg(t * 10),
-			t -> 0.125 * FastUtils.cosDeg(t * 10),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.125 * FastUtils.cosDeg(t * 10),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 	}
 }

@@ -85,9 +85,8 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 		int units = (int) Math.ceil(distance * 2.4);
 		ParticleUtils.drawCurve(bLoc, 1, units, dir,
 			t -> 0,
-			t -> radius * FastUtils.cos(3.1416 * 2 * t / units),
-			t -> radius * FastUtils.sin(3.1416 * 2 * t / units),
-			(loc, t) -> {
+				t -> radius * FastUtils.sin(3.1416 * 2 * t / units), t -> radius * FastUtils.cos(3.1416 * 2 * t / units),
+				(loc, t) -> {
 				if (t % 2 == 0) {
 					new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
 				} else {

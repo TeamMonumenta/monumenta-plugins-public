@@ -25,6 +25,7 @@ public class EliteFinishers {
 			.put(DragonsBreathFinisher.NAME, new DragonsBreathFinisher())
 			.put(ExcaliburFinisher.NAME, new ExcaliburFinisher())
 			.put(SwordRainFinisher.NAME, new SwordRainFinisher())
+			.put(ImplosionFinisher.NAME, new ImplosionFinisher())
 			.build();
 
 	// Delegate based on elite finisher name

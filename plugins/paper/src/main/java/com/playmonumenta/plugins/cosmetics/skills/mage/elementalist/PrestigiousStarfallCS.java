@@ -93,27 +93,23 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 		final double thresh = 0.65;
 		ParticleUtils.drawCurve(mCenter, 0, units1, mFront,
 			t -> FastUtils.cosDeg(140.0 * t / units1),
-			t -> t < thresh * units1 ? 0 : FastUtils.sinDeg(40.0 * (t - thresh * units1) / ((1 - thresh) * units1)) * (1.0 * t * t / units1 / units1),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> t < thresh * units1 ? 0 : FastUtils.sinDeg(40.0 * (t - thresh * units1) / ((1 - thresh) * units1)) * (1.0 * t * t / units1 / units1),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units1, mFront,
 			t -> FastUtils.cosDeg(140.0 * t / units1),
-			t -> t < thresh * units1 ? 0 : -FastUtils.sinDeg(40.0 * (t - thresh * units1) / ((1 - thresh) * units1)) * (1.0 * t * t / units1 / units1),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> t < thresh * units1 ? 0 : -FastUtils.sinDeg(40.0 * (t - thresh * units1) / ((1 - thresh) * units1)) * (1.0 * t * t / units1 / units1),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units2, mFront,
 			t -> 0.6 * t / units2,
-			t -> 0.6 - 0.25 * t / units2,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.6 - 0.25 * t / units2,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, units2, mFront,
 			t -> 0.6 * t / units2,
-			t -> -(0.6 - 0.25 * t / units2),
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> -(0.6 - 0.25 * t / units2),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 	}
 

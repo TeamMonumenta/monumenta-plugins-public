@@ -131,15 +131,13 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 				final double theta = i * 3.1416 * 0.25 + j * 3.1416 * 0.667;
 				ParticleUtils.drawCurve(loc, 0, 0, dir.clone().multiply(0.6),
 					t -> 0,
-					t -> FastUtils.cos(theta),
-					t -> FastUtils.sin(theta),
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.1, 0.1, 0.1, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> FastUtils.sin(theta), t -> FastUtils.cos(theta),
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.1, 0.1, 0.1, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 				ParticleUtils.drawCurve(loc, 0, 0, dir.clone().multiply(0.6),
 					t -> 0,
-					t -> FastUtils.cos(theta),
-					t -> FastUtils.sin(theta),
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+						t -> FastUtils.sin(theta), t -> FastUtils.cos(theta),
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 				);
 			}
 			if (loc.distance(e.getEyeLocation()) < 1.25) {

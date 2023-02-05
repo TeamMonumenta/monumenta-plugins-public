@@ -82,15 +82,13 @@ public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeC
 		);
 		ParticleUtils.drawCurve(eLoc, -9, 9, mFront,
 			t -> 0,
-			t -> 0.21 * t,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, WARN_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0.21 * t,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, WARN_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 		ParticleUtils.drawCurve(eLoc, -9, 9, mFront,
 			t -> 0,
-			t -> 0,
-			t -> 0.21 * t,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, WARN_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0.21 * t, t -> 0,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, WARN_COLOR).spawnAsPlayerActive(mPlayer)
 		);
 	}
 

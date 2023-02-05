@@ -92,45 +92,38 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 
 		ParticleUtils.drawCurve(mCenter, -para1, para1, mFront,
 			t -> FastUtils.sin(t * 3.1416 / para1 / 2),
-			t -> para3 * t / para1 - para2,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> para3 * t / para1 - para2,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 左撇
 		ParticleUtils.drawCurve(mCenter, -para1, para1, mFront,
 			t -> FastUtils.sin(t * 3.1416 / para1 / 2),
-			t -> -para3 * t / para1 + para2,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> -para3 * t / para1 + para2,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 右钩
 		ParticleUtils.drawCurve(mCenter, -para4, para4, mFront,
 			t -> 1 + para12 * FastUtils.cos(t * 3.1416 / para4 / 2),
-			t -> (para2 - para3) * t / para4,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> (para2 - para3) * t / para4,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 上折
 		ParticleUtils.drawCurve(mCenter, -para5, para5, mFront,
 			t -> para6 + 0.8 * para12 * FastUtils.cos(t * 3.1416 / para5 / 2),
-			t -> para2 * para6 * t / para5,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> para2 * para6 * t / para5,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 上横
 		ParticleUtils.drawCurve(mCenter, -para7, para7, mFront,
 			t -> para8 - 0.6 * para12 * FastUtils.cos(t * 3.1416 / para7 / 2),
-			t -> para2 * para8 * t / para7,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> para2 * para8 * t / para7,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 下横
 		ParticleUtils.drawCurve(mCenter, -para7, para5, mFront,
 			t -> (para6 - para8) * (t + para7) / (para5 + para7) + para8,
-			t -> 0,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> 0,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 中竖
 		ParticleUtils.drawCurve(mCenter.clone().add(mFront.clone().multiply(0.5 * (para6 + para8))), 1, para9, mFront,
 			t -> FastUtils.cos(2 * 3.1416 * t / para9) * para10,
-			t -> FastUtils.sin(2 * 3.1416 * t / para9) * para11,
-			t -> 0,
-			(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				t -> 0, t -> FastUtils.sin(2 * 3.1416 * t / para9) * para11,
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
 		); // 中口
 	}
 

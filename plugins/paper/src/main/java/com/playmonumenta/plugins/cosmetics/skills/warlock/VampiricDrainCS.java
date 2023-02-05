@@ -161,25 +161,22 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 
 		ParticleUtils.drawCurve(loc1, 0, (int) Math.ceil(distance * 3), mFront.clone().normalize(),
 			t -> t * 0.34,
-			t -> FastUtils.cos(t * 3.1416 / 5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
-			t -> FastUtils.sin(t * 3.1416 / 5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
-			(loc, t) -> {
+				t -> FastUtils.sin(t * 3.1416 / 5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3, t -> FastUtils.cos(t * 3.1416 / 5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
+				(loc, t) -> {
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
 			}
 		);
 		ParticleUtils.drawCurve(loc1, 0, (int) Math.ceil(distance * 3), mFront.clone().normalize(),
 			t -> t * 0.34,
-			t -> FastUtils.cos(t * 3.1416 / 5 - 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
-			t -> FastUtils.sin(t * 3.1416 / 5 - 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
-			(loc, t) -> {
+				t -> FastUtils.sin(t * 3.1416 / 5 - 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3, t -> FastUtils.cos(t * 3.1416 / 5 - 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
+				(loc, t) -> {
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
 			}
 		);
 		ParticleUtils.drawCurve(loc1, 0, (int) Math.ceil(distance * 3), mFront.clone().normalize(),
 			t -> t * 0.34,
-			t -> FastUtils.cos(t * 3.1416 / 5 + 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
-			t -> FastUtils.sin(t * 3.1416 / 5 + 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
-			(loc, t) -> {
+				t -> FastUtils.sin(t * 3.1416 / 5 + 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3, t -> FastUtils.cos(t * 3.1416 / 5 + 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
+				(loc, t) -> {
 				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
 			}
 		);
