@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 public class VoodooBondsReaper extends Effect {
 	public static final String effectID = "VoodooBondsReaper";
 
-	private static final double PERCENT_1 = 0.33;
-	private static final double PERCENT_2 = 0.67;
+	public static final double PERCENT_1 = 0.33;
+	public static final double PERCENT_2 = 0.67;
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 	private static final String MESSAGE = "You feel a pull on your soul...";
 

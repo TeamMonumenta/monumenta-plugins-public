@@ -24,18 +24,18 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 	private static final String SEND_EFFECT_NAME = "VoodooBondsDamageTaken";
 
-	private final Player mPlayer;
+	private final Player mReaper;
 	private final Plugin mPlugin;
 
 	int mRotation = 0;
-	private int mTransferDuration;
+	private final int mTransferDuration;
 	private boolean mTriggerTickParticle = false;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
-	public VoodooBondsOtherPlayer(int duration, int transferDuration, Player player, Plugin plugin) {
+	public VoodooBondsOtherPlayer(int duration, int transferDuration, Player reaper, Plugin plugin) {
 		super(duration, effectID);
-		mPlayer = player;
+		mReaper = reaper;
 		mPlugin = plugin;
 		mTransferDuration = transferDuration;
 	}
@@ -47,7 +47,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 		}
 
 		int duration = mTransferDuration;
-		double damage = event.getFinalDamage(true);
+		double damage = Math.min(event.getFinalDamage(true), entity.getHealth());
 		double maxHealth = EntityUtils.getMaxHealth(entity);
 		double percentDamage = damage / maxHealth;
 
@@ -58,7 +58,7 @@ public class VoodooBondsOtherPlayer extends Effect {
 			} else {
 				event.setDamage(0);
 				if (event.getDamager() instanceof LivingEntity le) {
-					MovementUtils.knockAway(mPlayer.getLocation(), le, 0.3f, 0.15f, true);
+					MovementUtils.knockAway(mReaper.getLocation(), le, 0.3f, 0.15f, true);
 				}
 				event.setCancelled(true);
 			}
@@ -73,13 +73,13 @@ public class VoodooBondsOtherPlayer extends Effect {
 
 		mTriggerTickParticle = true;
 		// Add this effect immediately afterwards to avoid causing a ConcurrentModificationException
-		Bukkit.getScheduler().runTask(mPlugin, () ->
-			mPlugin.mEffectManager.addEffect(mPlayer, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mPlayer, damage, percentDamage, mPlugin)));
+		Bukkit.getScheduler().runTask(mPlugin,
+			() -> mPlugin.mEffectManager.addEffect(mReaper, SEND_EFFECT_NAME, new VoodooBondsReaper(duration, mReaper, damage, percentDamage, mPlugin)));
 
 		Location loc = entity.getLocation();
 		World world = loc.getWorld();
-		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 65, 1, 0.5, 1, 0.001).spawnAsPlayerActive(mReaper);
+		new PartialParticle(Particle.REDSTONE, loc, 65, 1, 0.5, 1, 0, COLOR).spawnAsPlayerActive(mReaper);
 		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 2f, 0.75f);
 	}
 

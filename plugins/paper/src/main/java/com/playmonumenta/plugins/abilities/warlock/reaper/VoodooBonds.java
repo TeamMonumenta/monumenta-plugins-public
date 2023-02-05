@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.VoodooBondsCS;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.VoodooBondsOtherPlayer;
+import com.playmonumenta.plugins.effects.VoodooBondsReaper;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,7 +35,7 @@ public class VoodooBonds extends Ability {
 	private static final int COOLDOWN_2 = 12 * 20;
 	private static final int ACTIVE_RADIUS = 8;
 	private static final int PASSIVE_RADIUS = 3;
-	private static final double DAMAGE = 0.15;
+	private static final double CLEAVE_DAMAGE = 0.15;
 	private static final int DURATION_1 = 20 * 5;
 	private static final int DURATION_2 = 20 * 7;
 	public static final String EFFECT_NAME = "VoodooBondsEffect";
@@ -50,14 +52,19 @@ public class VoodooBonds extends Ability {
 			.scoreboardId("VoodooBonds")
 			.shorthandName("VB")
 			.descriptions(
-				"Melee strikes to a mob apply 15% of the damage to all mobs of the same type within 3 blocks. " +
-					"Additionally, right-click while sneaking and looking down to cast a protective spell on all players within an 8 block radius. " +
-					"The next hit every player (including the Reaper) takes has all damage ignored (or 50% if attack is from a Boss), " +
-					"but that damage will transfer to the Reaper in 5s unless it is passed on again. " +
-					"Passing that damage requires a melee strike, in which 33% of the initial damage blocked is added to the damage of the strike (Bosses are immune to this bonus). " +
-					"The damage directed to the Reaper is calculated by the percentage of health the initial hit would have taken from that player, " +
-					"and can never kill you, only leave you at 1 HP. Cooldown: 22s.",
-				"The duration before damage transfer increases to 7s, the on-hit damage when passing a hit increases to 66% of the blocked damage, and the cooldown is reduced to 12s.")
+				("Melee strikes to a mob apply %s%% of the damage to all mobs of the same type within %s blocks. " +
+					 "Additionally, right-click while sneaking and looking down to cast a protective spell on all players within an %s block radius. " +
+					 "The next hit every player (including the Reaper) takes has all damage ignored (or 50%% if attack is from a Boss), " +
+					 "but that damage will transfer to the Reaper in %ss unless it is passed on again. " +
+					 "Passing that damage requires a melee strike, in which %s%% of the initial damage blocked is added to the damage of the strike (Bosses are immune to this bonus). " +
+					 "The damage directed to the Reaper is calculated by the percentage of health the initial hit would have taken from that player, " +
+					 "and can never kill you, only leave you at 1 HP. Cooldown: %ss.")
+					.formatted(
+						StringUtils.multiplierToPercentage(CLEAVE_DAMAGE), PASSIVE_RADIUS, ACTIVE_RADIUS,
+						StringUtils.ticksToSeconds(DURATION_1), StringUtils.multiplierToPercentage(VoodooBondsReaper.PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN_1)
+					),
+				"The duration before damage transfer increases to %ss, the on-hit damage when passing a hit increases to %s%% of the blocked damage, and the cooldown is reduced to %ss."
+					.formatted(StringUtils.ticksToSeconds(DURATION_2), StringUtils.multiplierToPercentage(VoodooBondsReaper.PERCENT_2), StringUtils.ticksToSeconds(COOLDOWN_2)))
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", VoodooBonds::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
@@ -110,7 +117,7 @@ public class VoodooBonds extends Ability {
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(eLoc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, PASSIVE_RADIUS), mPlayer)) {
 				if (mob.getType().equals(type) && mob != enemy) {
 					Location mLoc = mob.getLocation();
-					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damage * DAMAGE, mInfo.getLinkedSpell(), true);
+					DamageUtils.damage(mPlayer, mob, DamageType.OTHER, damage * CLEAVE_DAMAGE, mInfo.getLinkedSpell(), true);
 					mCosmetic.bondsSpreadParticle(mPlayer, mLoc, eLoc);
 				}
 			}
