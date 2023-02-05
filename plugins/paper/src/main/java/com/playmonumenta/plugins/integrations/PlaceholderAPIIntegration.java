@@ -159,7 +159,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		// %monumenta_class%
 		if (identifier.equalsIgnoreCase("class")) {
-			return AbilityUtils.getClass(player);
+			String cls = AbilityUtils.getClass(player);
+			if (ServerProperties.getClassSpecializationsEnabled()) {
+				String spec = AbilityUtils.getSpec(player);
+				if (!spec.equals("No Spec")) {
+					cls = cls + " (" + spec + ")";
+				}
+			}
+			return cls;
 		}
 
 		// %monumenta_level%
