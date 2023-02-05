@@ -15,6 +15,7 @@ import dev.jorel.commandapi.executors.CommandExecutor;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -99,6 +100,10 @@ public class GraveCommand {
 				.withPermission("monumenta.command.grave.delete")
 				.withArguments(new LiteralArgument("cancel"))
 				.executesPlayer((PlayerCommandExecutor) (player, args) -> delete(player, null)))
+			.withSubcommand(new CommandAPICommand("deleteall")
+				.withPermission("monumenta.command.grave.deleteall")
+				.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+				.executes((CommandExecutor) (sender, args) -> deleteAll((Player) args[0])))
 			.register();
 	}
 
@@ -373,6 +378,14 @@ public class GraveCommand {
 				.append(Component.text("[CANCEL]", NamedTextColor.WHITE)
 					.hoverEvent(HoverEvent.showText(Component.text("Cancel deletion of the grave", NamedTextColor.WHITE)))
 					.clickEvent(ClickEvent.runCommand("/grave delete cancel"))));
+		}
+	}
+
+	private static void deleteAll(Player player) {
+		GraveManager manager = GraveManager.getInstance(player);
+		if (manager != null) {
+			List<Grave> graves = new ArrayList<>(manager.getGraves());
+			graves.forEach(Grave::delete);
 		}
 	}
 }
