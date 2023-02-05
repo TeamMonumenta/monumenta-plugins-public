@@ -83,28 +83,31 @@ public class GraveListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerInteractEntity(PlayerInteractEntityEvent event) {
-		if (GraveManager.isGrave(event.getRightClicked())
-			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
+		if (GraveManager.isGrave(event.getRightClicked())) {
 			event.setCancelled(true);
-			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
+				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
-		if (GraveManager.isGrave(event.getRightClicked())
-			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
+		if (GraveManager.isGrave(event.getRightClicked())) {
 			event.setCancelled(true);
-			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
+				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	public void playerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-		if (GraveManager.isGrave(event.getRightClicked())
-			    && MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
+		if (GraveManager.isGrave(event.getRightClicked())) {
 			event.setCancelled(true);
-			GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			if (MetadataUtils.checkOnceThisTick(mPlugin, event.getPlayer(), INTERACT_METAKEY)) {
+				GraveManager.onInteract(event.getPlayer(), event.getRightClicked());
+			}
 		}
 	}
 
