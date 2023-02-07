@@ -13,13 +13,22 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -54,6 +63,8 @@ public class UnstableAmalgam extends Ability {
 	private static final double UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE = 0.4;
 	private static final String DISABLE_SOURCE = "UnstableAmalgamDisable";
 
+	public static final String ROCKET_JUMP_OBJECTIVE = "RocketJumper";
+
 	public static final String CHARM_COOLDOWN = "Unstable Amalgam Cooldown";
 	public static final String CHARM_DAMAGE = "Unstable Amalgam Damage";
 	public static final String CHARM_RANGE = "Unstable Amalgam Cast Range";
@@ -84,6 +95,8 @@ public class UnstableAmalgam extends Ability {
 			.cooldown(UNSTABLE_AMALGAM_1_COOLDOWN, UNSTABLE_AMALGAM_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", UnstableAmalgam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("toggleRocketJump", "toggle rocket jump", "Toggles knockback from the Amalgam on or off, just like using the /rocketjump command.",
+				UnstableAmalgam::toggleRocketJump, new AbilityTrigger(AbilityTrigger.Key.DROP).enabled(false).lookDirections(AbilityTrigger.LookDirection.DOWN).sneaking(true), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(new ItemStack(Material.GUNPOWDER, 1));
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
@@ -232,10 +245,10 @@ public class UnstableAmalgam extends Ability {
 		if (!ZoneUtils.hasZoneProperty(loc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			for (Player player : hitbox.getHitPlayers(true)) {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(0) == 100) {
+					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, ROCKET_JUMP_OBJECTIVE).orElse(0) == 100) {
 						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
 						disable(player);
-					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, "RocketJumper").orElse(1) > 0) {
+					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, ROCKET_JUMP_OBJECTIVE).orElse(1) > 0) {
 						// by default any Alch can use Rocket Jump with their UA
 						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
 						disable(player);
@@ -288,7 +301,7 @@ public class UnstableAmalgam extends Ability {
 	public void setEnhancementThrownPotion(ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 		mEnhancementPotionPlayerStat.put(potion, playerItemStats);
 		if (mAlchemistPotions != null) {
-			mAlchemistPotions.setPotionAlchemistPotionAesthetic(potion);
+			mAlchemistPotions.setPotionAlchemistPotionAesthetic(potion, mAlchemistPotions.isGruesomeMode());
 		}
 	}
 
@@ -320,4 +333,15 @@ public class UnstableAmalgam extends Ability {
 			mAlchemistPotions.applyEffects(entity, false, mPlayerItemStats);
 		}
 	}
+
+	private void toggleRocketJump() {
+		if (ScoreboardUtils.getScoreboardValue(mPlayer, ROCKET_JUMP_OBJECTIVE).orElse(0) == 0) {
+			ScoreboardUtils.setScoreboardValue(mPlayer, ROCKET_JUMP_OBJECTIVE, 1);
+			mPlayer.sendActionBar(Component.text("Rocket jump enabled"));
+		} else {
+			ScoreboardUtils.setScoreboardValue(mPlayer, ROCKET_JUMP_OBJECTIVE, 0);
+			mPlayer.sendActionBar(Component.text("Rocket jump disabled"));
+		}
+	}
+
 }

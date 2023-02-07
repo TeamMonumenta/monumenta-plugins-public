@@ -60,16 +60,19 @@ public class AbilityTriggersGui extends Gui {
 				AbilityInfo<?> info = ability.getInfo();
 				for (AbilityTriggerInfo<?> trigger : ability.getCustomTriggers()) {
 					List<Component> lore = new ArrayList<>();
+					if (trigger.getDescription() != null) {
+						lore.add(Component.text(trigger.getDescription(), NamedTextColor.GRAY));
+					}
 					lore.add(trigger.getTrigger().equals(info.getTrigger(trigger.getId()).getTrigger()) ?
-						Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
-						Component.text("Custom Trigger:", NamedTextColor.AQUA));
-					lore.addAll(trigger.getDescription());
+						         Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
+						         Component.text("Custom Trigger:", NamedTextColor.AQUA));
+					lore.addAll(trigger.getTriggerDescription());
 					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem().getType(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
 						lore, true);
 
 					setItem(2 + (i / 7), 1 + (i % 7), item)
-							.onLeftClick(() -> {
+						.onLeftClick(() -> {
 								mSelectedAbility = info;
 								mSelectedTrigger = trigger;
 								mNewTrigger = new AbilityTrigger(trigger.getTrigger());

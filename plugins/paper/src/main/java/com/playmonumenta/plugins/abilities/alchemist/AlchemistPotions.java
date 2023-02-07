@@ -85,7 +85,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	private final List<PotionAbility> mPotionAbilities = new ArrayList<>();
 	private double mRadius = 0;
-	private int mTimer = 0;
+	private double mTimer = 0;
 	private int mSlot;
 	private final int mMaxCharges;
 	private int mCharges;
@@ -182,7 +182,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
 			mPlayer.setMetadata(METADATA_KEY, new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));
 			if (decrementCharge()) {
-				setPotionToAlchemistPotion(potion);
+				setPotionToAlchemistPotion(potion, mGruesomeMode);
 			} else {
 				potion.remove();
 			}
@@ -191,22 +191,29 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return true;
 	}
 
+	public void throwPotion(boolean gruesome) {
+		if (decrementCharge()) {
+			ThrownPotion thrownPotion = mPlayer.launchProjectile(ThrownPotion.class);
+			setPotionToAlchemistPotion(thrownPotion, gruesome);
+		}
+	}
+
 	/**
 	 * This function will set the given ThrownPotion potion to an Alchemist Potion, with also the damage and if it's gruesome or brutal mode
 	 */
-	public void setPotionToAlchemistPotion(ThrownPotion potion) {
+	public void setPotionToAlchemistPotion(ThrownPotion potion, boolean gruesome) {
 		mPlayerItemStatsMap.put(potion, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
-		if (mGruesomeMode) {
+		if (gruesome) {
 			potion.setMetadata("GruesomeAlchemistPotion", new FixedMetadataValue(mPlugin, 0));
 		}
 
-		setPotionAlchemistPotionAesthetic(potion);
+		setPotionAlchemistPotionAesthetic(potion, gruesome);
 	}
 
 	/**
 	 * This function will set the given ThrownPotion potion to an Alchemist Potion, ONLY to an aesthetic level
 	 */
-	public void setPotionAlchemistPotionAesthetic(ThrownPotion potion) {
+	public void setPotionAlchemistPotionAesthetic(ThrownPotion potion, boolean gruesome) {
 		if (BRUTAL_POTION == null || GRUESOME_POTION == null) {
 			ItemStack basePotion = InventoryUtils.getItemFromLootTable(mPlayer, NamespacedKeyUtils.fromString("epic:r1/items/alchemists_potion"));
 			if (basePotion == null) {
@@ -219,13 +226,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 
 		ItemStack item;
-		if (mGruesomeMode) {
+		if (gruesome) {
 			item = GRUESOME_POTION.clone();
 		} else {
 			item = BRUTAL_POTION.clone();
 		}
 		item.editMeta(m -> {
-			((PotionMeta) m).setColor(mCosmetic.splashColor(mGruesomeMode));
+			((PotionMeta) m).setColor(mCosmetic.splashColor(gruesome));
 		});
 		potion.setItem(item);
 	}
@@ -390,36 +397,35 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (twoHertz) {
-			ItemStack item = mPlayer.getInventory().getItem(mSlot);
+		ItemStack item = mPlayer.getInventory().getItem(mSlot);
 
-			if (mOnCooldown) {
-				mTimer += 10;
-				if (mTimer >= mChargeTime || (ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) && mTimer >= POTIONS_TIMER_TOWN)) {
-					mTimer = 0;
-					incrementCharge();
-					mOnCooldown = false;
-				}
+		if (mOnCooldown) {
+			mTimer += 5;
+			int chargeTime = ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.RESIST_5) ? Math.min(POTIONS_TIMER_TOWN, mChargeTime) : mChargeTime;
+			if (mTimer >= chargeTime) {
+				mTimer -= chargeTime;
+				incrementCharge();
+				mOnCooldown = false;
 			}
+		}
 
-			if (mCharges < mMaxCharges) {
-				mOnCooldown = true;
+		if (mCharges < mMaxCharges) {
+			mOnCooldown = true;
+		}
+
+		if (mCharges > mMaxCharges) {
+			mCharges = mMaxCharges;
+			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
+			// Update item
+
+			if (item != null) {
+				updateAlchemistItem(item, mCharges);
 			}
+			ClientModHandler.updateAbility(mPlayer, this);
+		}
 
-			if (mCharges > mMaxCharges) {
-				mCharges = mMaxCharges;
-				ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
-				// Update item
-
-				if (item != null) {
-					updateAlchemistItem(item, mCharges);
-				}
-				ClientModHandler.updateAbility(mPlayer, this);
-			}
-
-			if (item != null && item.getAmount() > 1 && ItemUtils.isAlchemistItem(item)) {
-				item.setAmount(1);
-			}
+		if (item != null && item.getAmount() > 1 && ItemUtils.isAlchemistItem(item)) {
+			item.setAmount(1);
 		}
 	}
 
@@ -447,6 +453,15 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	public void reduceChargeTime(int ticks) {
 		mChargeTime -= ticks;
+	}
+
+	/**
+	 * Modifies the time until the next potion is ready, in ticks. Add positive values to make it ready faster, and negative to make it slower.
+	 */
+	public void modifyCurrentPotionTimer(double ticks) {
+		if (mOnCooldown) {
+			mTimer += ticks;
+		}
 	}
 
 	public double getDamage() {

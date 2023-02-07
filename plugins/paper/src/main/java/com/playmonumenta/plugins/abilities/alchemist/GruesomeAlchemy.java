@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeAlchemyCS;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -44,8 +45,10 @@ public class GruesomeAlchemy extends PotionAbility {
 					"Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. ",
 				"The Slow and Vulnerability are increased to 20%.",
 				"Your Gruesome potions now additionally paralyze (25% chance for 100% slowness for a second once a second) mobs for 8s.")
-			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP),
-				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", "Toggles between throwing gruesome or brutal potions.",
+				GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("throwOpposite", "throw opposite potion", "Throws a potion of the opposite type, e.g. a gruesome potion if brutal potions are selected.",
+				GruesomeAlchemy::throwOpposite, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
 
 	private final double mSlownessAmount;
@@ -84,4 +87,11 @@ public class GruesomeAlchemy extends PotionAbility {
 			mAlchemistPotions.swapMode(mCosmetic.getSwapBrewPitch());
 		}
 	}
+
+	private void throwOpposite() {
+		if (mAlchemistPotions != null && MetadataUtils.checkOnceInRecentTicks(mPlugin, mPlayer, "GruesomeAlchemy_throwOpposite", 3)) {
+			mAlchemistPotions.throwPotion(!mAlchemistPotions.isGruesomeMode());
+		}
+	}
+
 }

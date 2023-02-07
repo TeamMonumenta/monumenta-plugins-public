@@ -223,6 +223,38 @@ public abstract class Hitbox {
 		}
 	}
 
+	public static class EmptyHitbox extends Hitbox {
+
+		private final BoundingBox mBoundingBox;
+		private final World mWorld;
+
+		public EmptyHitbox(BoundingBox boundingBox, World world) {
+			mBoundingBox = boundingBox;
+			mWorld = world;
+		}
+
+		@Override
+		public boolean contains(Vector vector) {
+			return false;
+		}
+
+		@Override
+		public boolean intersects(BoundingBox bbox) {
+			return false;
+		}
+
+		@Override
+		public BoundingBox getBoundingBox() {
+			return mBoundingBox;
+		}
+
+		@Override
+		public World getWorld() {
+			return mWorld;
+		}
+	}
+
+
 	/**
 	 * Creates an approximate cone-shaped hitbox, using a spherical base.
 	 *
@@ -262,6 +294,47 @@ public abstract class Hitbox {
 				        && test.getY() <= baseCenterVector.getY() + height
 				        && test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) <= radiusSquared
 				        && Math.abs(MathUtils.normalizeAngle(Math.atan2(test.getZ() - baseCenterVector.getZ(), test.getX() - baseCenterVector.getX()) - baseYaw, 0)) <= halfAngleRad
+		);
+	}
+
+	/**
+	 * Creates an approximate cylinder hitbox, where the cylinder may be rotated in any direction.
+	 * Optionally includes rounded end caps, i.e. adds a half-sphere to both ends of the cylinder.
+	 *
+	 * @param start       One end of the cylinder
+	 * @param end         The other end of the cylinder
+	 * @param radius      radius of the cylinder
+	 * @param roundedEnds Whether to add half-spheres to the ends of the cylinder
+	 */
+	public static ApproximateFreeformHitbox approximateCylinder(Location start, Location end, double radius, boolean roundedEnds) {
+
+		Vector startVector = start.toVector();
+		Vector line = end.toVector().subtract(startVector);
+		double length = line.length();
+		if (length < 0.00001) {
+			return new ApproximateFreeformHitbox(start.getWorld(), BoundingBox.of(start, end), test -> false);
+		}
+		Vector direction = line.multiply(1 / length);
+
+		return new ApproximateFreeformHitbox(start.getWorld(),
+			BoundingBox.of(start, end).expand(radius),
+			test -> {
+				Vector fromStart = test.clone().subtract(startVector);
+				double position = direction.dot(fromStart);
+				if (!roundedEnds && (position < 0 || position > length)) {
+					return false;
+				}
+				double distance = direction.getCrossProduct(fromStart).length();
+				if (roundedEnds) {
+					if (0 <= position && position <= length) {
+						return distance <= radius;
+					} else {
+						double d = Math.min(position, length - position); // distance after either end, negative
+						return distance * distance + d * d <= radius * radius;
+					}
+				}
+				return distance <= radius;
+			}
 		);
 	}
 

@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -13,7 +15,9 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -43,6 +47,8 @@ public class EscapeDeath extends Ability {
 	private static final double ENHANCEMENT_HEAL_PERCENT = 0.05;
 	private static final String ESCAPE_DEATH_ENHANCEMENT_REGEN = "EscapeDeathEnhancementRegenEffect";
 
+	private static final String DISABLE_JUMP_BOOST_TAG = "EscapeDeathNoJumpBoost";
+
 	public static final String CHARM_ABSORPTION = "Escape Death Absorption Health";
 	public static final String CHARM_JUMP = "Escape Death Jump Boost Amplifier";
 	public static final String CHARM_SPEED = "Escape Death Speed Amplifier";
@@ -69,11 +75,21 @@ public class EscapeDeath extends Ability {
 					(int) (ENHANCEMENT_HEAL_PERCENT * 100),
 					ENHANCEMENT_DURATION / 20))
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("toggleJumpBoost", "toggle jump boost", EscapeDeath::toggleJumpBoost,
+				new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP).enabled(false), AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
 			.displayItem(new ItemStack(Material.DRAGON_BREATH, 1))
 			.priorityAmount(10000);
 
 	public EscapeDeath(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+	}
+
+	private void toggleJumpBoost() {
+		if (ScoreboardUtils.toggleTag(mPlayer, DISABLE_JUMP_BOOST_TAG)) {
+			mPlayer.sendActionBar(Component.text("Escape Death's Jump Boost has been disabled"));
+		} else {
+			mPlayer.sendActionBar(Component.text("Escape Death's Jump Boost has been enabled"));
+		}
 	}
 
 	@Override
@@ -111,8 +127,10 @@ public class EscapeDeath extends Ability {
 				if (isLevelTwo()) {
 					AbsorptionUtils.addAbsorption(mPlayer, absorptionHealth, absorptionHealth, BUFF_DURATION);
 					mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(BUFF_DURATION, SPEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), PERCENT_SPEED_EFFECT_NAME));
-					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
-						new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP), true, true));
+					if (!mPlayer.getScoreboardTags().contains(DISABLE_JUMP_BOOST_TAG)) {
+						mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
+							new PotionEffect(PotionEffectType.JUMP, BUFF_DURATION, JUMP_BOOST_AMPLIFIER + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP), true, true));
+					}
 				}
 
 				if (isEnhanced()) {

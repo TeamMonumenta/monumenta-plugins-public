@@ -38,6 +38,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 	private final String mId;
 
 	private final String mDisplayName;
+	private final @Nullable String mDescription;
 
 	private final Consumer<T> mAction;
 
@@ -64,12 +65,17 @@ public class AbilityTriggerInfo<T extends Ability> {
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, AbilityTrigger trigger) {
-		this(id, displayName, action, trigger, null);
+		this(id, displayName, null, action, trigger, null);
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
+		this(id, displayName, null, action, trigger, restriction);
+	}
+
+	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
 		mId = id;
 		mDisplayName = displayName;
+		mDescription = description;
 		mAction = action;
 		mTrigger = trigger;
 		mRestriction = restriction;
@@ -77,6 +83,10 @@ public class AbilityTriggerInfo<T extends Ability> {
 
 	public String getDisplayName() {
 		return mDisplayName;
+	}
+
+	public @Nullable String getDescription() {
+		return mDescription;
 	}
 
 	public Consumer<T> getAction() {
@@ -115,14 +125,14 @@ public class AbilityTriggerInfo<T extends Ability> {
 
 	public AbilityTriggerInfo<T> withCustomTrigger(AbilityInfo<?> ability, Player player) {
 		AbilityTrigger customTrigger = Plugin.getInstance().mAbilityManager.getCustomTrigger(player, ability, mId);
-		return new AbilityTriggerInfo<>(mId, mDisplayName, mAction, customTrigger != null ? customTrigger : mTrigger, mRestriction);
+		return new AbilityTriggerInfo<>(mId, mDisplayName, mDescription, mAction, customTrigger != null ? customTrigger : mTrigger, mRestriction);
 	}
 
-	public List<Component> getDescription() {
+	public List<Component> getTriggerDescription() {
 		List<Component> desc = mTrigger.getDescription();
 		if (mRestriction != null && mTrigger.isEnabled()) {
 			desc.add(Component.text("- unchangeable: ", NamedTextColor.RED)
-				.append(Component.text(mRestriction.getDisplay(), NamedTextColor.WHITE)));
+				         .append(Component.text(mRestriction.getDisplay(), NamedTextColor.WHITE)));
 		}
 		return desc;
 	}

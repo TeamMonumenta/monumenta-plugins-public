@@ -1,12 +1,13 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class RocketJump {
-	private static final String SCB_NAME = "RocketJumper";
 
 	public static void register() {
 
@@ -14,12 +15,12 @@ public class RocketJump {
 			.withPermission("monumenta.rocketjump")
 			.withAliases("rj")
 			.executesPlayer((player, args) -> {
-				if (ScoreboardUtils.getScoreboardValue(player, SCB_NAME).orElse(0) == 0) {
-					ScoreboardUtils.setScoreboardValue(player, SCB_NAME, 1);
-					player.sendMessage(ChatColor.GOLD + "Rocket jump: " + ChatColor.AQUA + "Enable yours");
+				if (ScoreboardUtils.getScoreboardValue(player, UnstableAmalgam.ROCKET_JUMP_OBJECTIVE).orElse(0) == 0) {
+					ScoreboardUtils.setScoreboardValue(player, UnstableAmalgam.ROCKET_JUMP_OBJECTIVE, 1);
+					player.sendMessage(Component.text("Rocket jump: ", NamedTextColor.GOLD).append(Component.text("Enable yours", NamedTextColor.AQUA)));
 				} else {
-					ScoreboardUtils.setScoreboardValue(player, SCB_NAME, 0);
-					player.sendMessage(ChatColor.GOLD + "Rocket jump: " + ChatColor.RED + "Disabled");
+					ScoreboardUtils.setScoreboardValue(player, UnstableAmalgam.ROCKET_JUMP_OBJECTIVE, 0);
+					player.sendMessage(Component.text("Rocket jump: ", NamedTextColor.GOLD).append(Component.text("Disabled", NamedTextColor.AQUA)));
 				}
 			})
 			.register();
@@ -29,8 +30,8 @@ public class RocketJump {
 			.withAliases("rj")
 			.withArguments(new LiteralArgument("none"))
 			.executesPlayer((player, args) -> {
-				ScoreboardUtils.setScoreboardValue(player, SCB_NAME, 0);
-				player.sendMessage(ChatColor.GOLD + "Rocket jump: " + ChatColor.RED + "Disabled");
+				ScoreboardUtils.setScoreboardValue(player, UnstableAmalgam.ROCKET_JUMP_OBJECTIVE, 0);
+				player.sendMessage(Component.text("Rocket jump: ", NamedTextColor.GOLD).append(Component.text("Disabled", NamedTextColor.AQUA)));
 			})
 			.register();
 
@@ -39,8 +40,8 @@ public class RocketJump {
 			.withAliases("rj")
 			.withArguments(new LiteralArgument("self"))
 			.executesPlayer((player, args) -> {
-				ScoreboardUtils.setScoreboardValue(player, SCB_NAME, 1);
-				player.sendMessage(ChatColor.GOLD + "Rocket jump: " + ChatColor.AQUA + "Enable yours");
+				ScoreboardUtils.setScoreboardValue(player, UnstableAmalgam.ROCKET_JUMP_OBJECTIVE, 1);
+				player.sendMessage(Component.text("Rocket jump: ", NamedTextColor.GOLD).append(Component.text("Enable yours", NamedTextColor.AQUA)));
 			})
 			.register();
 
@@ -49,8 +50,8 @@ public class RocketJump {
 			.withAliases("rj")
 			.withArguments(new LiteralArgument("all"))
 			.executesPlayer((player, args) -> {
-				ScoreboardUtils.setScoreboardValue(player, SCB_NAME, 100);
-				player.sendMessage(ChatColor.GOLD + "Rocket jump: " + ChatColor.GREEN + "Enable all");
+				ScoreboardUtils.setScoreboardValue(player, UnstableAmalgam.ROCKET_JUMP_OBJECTIVE, 100);
+				player.sendMessage(Component.text("Rocket jump: ", NamedTextColor.GOLD).append(Component.text("Enable all", NamedTextColor.AQUA)));
 			})
 			.register();
 

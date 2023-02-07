@@ -116,7 +116,7 @@ public class AbilityTrigger {
 	}
 
 	private static final AtomicInteger mNextMetadataId = new AtomicInteger();
-	private final int mMetedataId = mNextMetadataId.getAndIncrement();
+	private final int mMetadataId = mNextMetadataId.getAndIncrement();
 
 	private Key mKey;
 
@@ -156,6 +156,11 @@ public class AbilityTrigger {
 
 	public AbilityTrigger key(Key key) {
 		mKey = key;
+		return this;
+	}
+
+	public AbilityTrigger enabled(boolean enabled) {
+		mEnabled = enabled;
 		return this;
 	}
 
@@ -329,7 +334,7 @@ public class AbilityTrigger {
 			return false;
 		}
 		if (mDoubleClick) {
-			String metadataKey = "DoubleClickCheck_" + mMetedataId;
+			String metadataKey = "DoubleClickCheck_" + mMetadataId;
 			int currentTick = Bukkit.getServer().getCurrentTick();
 			int lastClick = MetadataUtils.getMetadata(player, metadataKey, 0);
 			if (currentTick - lastClick <= 5) {

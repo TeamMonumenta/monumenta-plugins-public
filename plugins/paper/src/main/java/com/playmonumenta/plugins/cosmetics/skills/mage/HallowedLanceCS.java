@@ -49,13 +49,13 @@ public class HallowedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations, double radius) {
-		new PPLine(Particle.END_ROD, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(HALLOWED_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
+	public void lanceParticle(Player player, Location startLoc, Location endLoc) {
+		new PPLine(Particle.END_ROD, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(HALLOWED_LANCE_COLOR).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void lanceSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.75f);
+	public void lanceSound(World world, Player player) {
+		world.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.75f);
 	}
 }

@@ -71,6 +71,7 @@ public class Rogue extends PlayerClass {
 			AdvancingShadows.INFO, // after blade dance
 			DaggerThrow.INFO, // after cloak & dagger
 			Smokescreen.INFO,
+			EscapeDeath.INFO,
 
 			BodkinBlitz.INFO // after smoke screen
 		);

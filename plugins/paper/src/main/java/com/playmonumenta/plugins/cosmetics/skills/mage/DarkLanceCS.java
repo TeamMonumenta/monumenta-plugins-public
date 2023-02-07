@@ -44,20 +44,19 @@ public class DarkLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {
-		new PartialParticle(Particle.SOUL_FIRE_FLAME, bLoc, 40, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
+	public void lanceHitBlock(Player player, Location bLoc, World world) {
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, bLoc, 40, 0, 0, 0, 0.1).spawnAsPlayerActive(player);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
-
 	}
 
 	@Override
-	public void lanceParticle(Player mPlayer, Location loc, Location endLoc, int iterations, double radius) {
-		new PPLine(Particle.DRAGON_BREATH, loc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, loc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(DARK_LANCE_COLOR).spawnAsPlayerActive(mPlayer);
+	public void lanceParticle(Player player, Location startLoc, Location endLoc) {
+		new PPLine(Particle.DRAGON_BREATH, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0.1).extra(0.03).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.35).data(DARK_LANCE_COLOR).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void lanceSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.25f, 1.25f);
+	public void lanceSound(World world, Player player) {
+		world.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.25f, 1.25f);
 	}
 }
