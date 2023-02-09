@@ -17,6 +17,8 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.IStringTooltip;
+import dev.jorel.commandapi.StringTooltip;
 import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.Tooltip;
 import dev.jorel.commandapi.arguments.Argument;
@@ -32,6 +34,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -144,7 +147,7 @@ public class BossTagCommand {
 
 		arguments.clear();
 		arguments.add(new MultiLiteralArgument("remove"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionBossTagBasedonBoSAndParams)));
+		arguments.add(new GreedyStringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.stringsWithTooltipsCollection(BossTagCommand::suggestionBossTagBasedonBoSAndParams)));
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.bosstag.remove")
 			.withArguments(arguments)
@@ -818,13 +821,13 @@ public class BossTagCommand {
 
 	}
 
-	private static Tooltip<String>[] suggestionBossTagBasedonBoSAndParams(SuggestionInfo info) {
+	private static Collection<IStringTooltip> suggestionBossTagBasedonBoSAndParams(SuggestionInfo info) {
 		try {
-			BookOfSouls bos = getBos((Player)info.sender());
+			BookOfSouls bos = getBos((Player) info.sender());
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
 			if (nbtTagsList != null) {
-				List<Tooltip<String>> bossTags = new ArrayList<>();
+				List<IStringTooltip> bossTags = new ArrayList<>();
 				List<String> bossTagList = new ArrayList<>();
 				Map<String, Map<String, String>> paramsMap = new LinkedHashMap<>();
 
@@ -834,7 +837,7 @@ public class BossTagCommand {
 					if (BossManager.mBossParameters.get(tagString) != null) {
 						bossTagList.add(tagString);
 						paramsMap.put(tagString, new LinkedHashMap<>());
-						bossTags.add(Tooltip.ofString(tagString, null));
+						bossTags.add(StringTooltip.ofMessage(tagString, null));
 						//TODO- write a better Tooltip
 					}
 				}
@@ -849,14 +852,14 @@ public class BossTagCommand {
 					}
 				}
 				//TODO-finish this part.
-				return bossTags.toArray(Tooltip.arrayOf());
+				return Collections.unmodifiableList(bossTags);
 			}
 
 		} catch (Exception e) {
 			info.sender().sendMessage(Component.text(e.getMessage(), NamedTextColor.RED));
 		}
 
-		return Tooltip.arrayOf();
+		return Collections.emptyList();
 	}
 
 	private static void squashBossTags(Player player) throws WrapperCommandSyntaxException {
