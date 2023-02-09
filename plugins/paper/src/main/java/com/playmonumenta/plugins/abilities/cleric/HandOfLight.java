@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -33,18 +34,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class HandOfLight extends Ability {
 
 	public static final int RANGE = 12;
+	public static final int NEARBY_SPHERE_RANGE = 2;
 	private static final double HEALING_ANGLE = 70; // (half) angle of the healing cone
 	private static final double HEALING_DOT_ANGLE = Math.cos(Math.toRadians(HEALING_ANGLE));
 	private static final int HEALING_1_COOLDOWN = 14 * 20;
 	private static final int HEALING_2_COOLDOWN = 10 * 20;
-	private static final int FLAT_1 = 2;
-	private static final int FLAT_2 = 4;
+	private static final int FLAT_1 = 4;
+	private static final int FLAT_2 = 8;
 	private static final double PERCENT_1 = 0.1;
 	private static final double PERCENT_2 = 0.2;
 	private static final int DAMAGE_PER_1 = 2;
 	private static final int DAMAGE_PER_2 = 3;
 	private static final int DAMAGE_MAX_1 = 10;
 	private static final int DAMAGE_MAX_2 = 12;
+	private static final int REGEN_LEVEL = 1;
+	private static final int REGEN_DURATION = 4 * 20;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED = 0.025;
 	private static final double ENHANCEMENT_COOLDOWN_REDUCTION_MAX = 0.5;
 	private static final int ENHANCEMENT_UNDEAD_STUN_DURATION = 10;
@@ -60,12 +64,25 @@ public class HandOfLight extends Ability {
 			.scoreboardId("Healing")
 			.shorthandName("HoL")
 			.descriptions(
-				"Right click while holding a weapon or tool to heal all other players in a 12 block cone in front of you or within 2 blocks of you " +
-					"for 2 hearts + 10% of their max health and gives them regen 2 for 4 seconds. " +
-					"Additionally, damage all mobs in the area with magic damage equal to 2 times the number of undead mobs in the range, up to 8 damage. " +
-					"If holding a shield, the trigger is changed to sneak + right click. Cooldown: 14s.",
-				"The healing is improved to 4 hearts + 20% of their max health. Damage increases to 3 damage per undead mob, up to 9. Cooldown: 10s.",
-
+				String.format("Right click while holding a weapon or tool to heal all other players in a %s block cone in front of you or within %s blocks of you " +
+					"for %s hearts + %s%% of their max health and gives them regen %s for %s seconds. " +
+					"Additionally, damage all mobs in the area with magic damage equal to %s times the number of undead mobs in the range, up to %s damage. " +
+					"If holding a shield, the trigger is changed to sneak + right click. Cooldown: %ss.",
+					RANGE,
+					NEARBY_SPHERE_RANGE,
+					FLAT_1 / 2,
+					StringUtils.multiplierToPercentage(PERCENT_1),
+					REGEN_LEVEL + 1,
+					StringUtils.ticksToSeconds(REGEN_DURATION),
+					DAMAGE_PER_1,
+					DAMAGE_MAX_1,
+					StringUtils.ticksToSeconds(HEALING_1_COOLDOWN)),
+				String.format("The healing is improved to %s hearts + %s%% of their max health. Damage is increased to %s damage per undead mob, up to %s. Cooldown: %ss.",
+					FLAT_2 / 2,
+					StringUtils.multiplierToPercentage(PERCENT_2),
+					DAMAGE_PER_2,
+					DAMAGE_MAX_2,
+					StringUtils.ticksToSeconds(HEALING_2_COOLDOWN)),
 				String.format("The cone is changed to a sphere of equal range, centered on the Cleric." +
 					              " The cooldown is reduced by %s%% for each 4 health healed, capped at %s%% cooldown." +
 					              " All Undead caught in the radius are stunned for %ss.",
@@ -111,7 +128,7 @@ public class HandOfLight extends Ability {
 		Hitbox hitbox;
 		if (!isEnhanced()) {
 			hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mRange, Math.toRadians(HEALING_ANGLE))
-				         .union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 2));
+				         .union(new Hitbox.SphereHitbox(mPlayer.getLocation(), NEARBY_SPHERE_RANGE));
 		} else {
 			hitbox = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), mRange);
 		}
@@ -156,7 +173,7 @@ public class HandOfLight extends Ability {
 				healthHealed += p.getHealth() - healthBeforeHeal;
 
 				Location loc = p.getLocation();
-				mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, 20 * 4, 1, true, true));
+				mPlugin.mPotionManager.addPotion(p, PotionManager.PotionID.ABILITY_OTHER, new PotionEffect(PotionEffectType.REGENERATION, REGEN_DURATION, REGEN_LEVEL, true, true));
 				mCosmetic.lightHealEffect(mPlayer, loc, p);
 			}
 

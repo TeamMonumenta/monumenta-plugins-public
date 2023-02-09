@@ -49,7 +49,7 @@ public class BruteForce extends Ability {
 			.scoreboardId("BruteForce")
 			.shorthandName("BF")
 			.descriptions(
-				"Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radus around it, " +
+				"Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radius around it, " +
 					"and knocks all non-boss enemies away from you.",
 				"Damage is increased to 10 percent of the attack's damage plus 2.",
 				"Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.")
