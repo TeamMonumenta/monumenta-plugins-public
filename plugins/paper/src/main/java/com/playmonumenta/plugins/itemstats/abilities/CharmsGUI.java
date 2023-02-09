@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -64,20 +63,7 @@ public class CharmsGUI extends CustomInventory {
 					if (CharmManager.getInstance().addCharm(mTargetPlayer, item)) {
 						setCharms();
 						mTargetPlayer.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.5f, 1f);
-						//Remove one charm from the player inventory, not all ones with this name!
-						ItemStack[] items = mTargetPlayer.getInventory().getContents();
-						for (ItemStack itemStack : items) {
-							if (itemStack != null) {
-								if (itemStack.hasItemMeta() && Objects.equals(itemStack.getItemMeta().displayName(), item.getItemMeta().displayName())) {
-									if (itemStack.getAmount() > 1) {
-										itemStack.setAmount(itemStack.getAmount() - 1);
-									} else {
-										itemStack.setAmount(0);
-									}
-									return;
-								}
-							}
-						}
+						item.subtract();
 					} else {
 						mTargetPlayer.playSound(loc, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.5f, 1f);
 					}
