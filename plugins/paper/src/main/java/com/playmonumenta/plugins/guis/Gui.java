@@ -6,6 +6,7 @@ import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -24,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
  * Extend this class and define all items in the overridden {@link #setup()} method, then just {@link #open()} it to show it to a player.
  */
 public abstract class Gui {
+
+	private static final WeakHashMap<Player, Gui> LAST_OPENED_INVENTORY = new WeakHashMap<>();
 
 	protected final Plugin mPlugin;
 	public final Player mPlayer;
@@ -85,6 +88,7 @@ public abstract class Gui {
 	 */
 	public void open() {
 		update();
+		LAST_OPENED_INVENTORY.put(mPlayer, this);
 		mCustomInventory.openInventory(mPlayer, mPlugin);
 	}
 
@@ -190,6 +194,10 @@ public abstract class Gui {
 
 	}
 
+	protected void onOutsideInventoryClick(InventoryClickEvent event) {
+
+	}
+
 	protected void onInventoryDrag(InventoryDragEvent event) {
 
 	}
@@ -228,6 +236,8 @@ public abstract class Gui {
 				}
 			} else if (event.getClickedInventory() != null) {
 				onPlayerInventoryClick(event);
+			} else {
+				onOutsideInventoryClick(event);
 			}
 		}
 
@@ -248,6 +258,14 @@ public abstract class Gui {
 		public void discard() {
 			mDiscarded = true;
 		}
+	}
+
+	public static @Nullable Gui getOpenGui(Player player) {
+		Gui lastOpenedGui = LAST_OPENED_INVENTORY.get(player);
+		if (lastOpenedGui != null && lastOpenedGui.mCustomInventory.getInventory().equals(player.getOpenInventory().getTopInventory())) {
+			return lastOpenedGui;
+		}
+		return null;
 	}
 
 }

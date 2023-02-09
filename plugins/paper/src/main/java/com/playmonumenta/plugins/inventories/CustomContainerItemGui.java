@@ -17,14 +17,16 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-class CustomContainerItemGui extends Gui {
+public class CustomContainerItemGui extends Gui {
 	private final ItemStack mContainer;
 	private final CustomContainerItemManager.CustomContainerItemConfiguration mConfig;
 	private int mPage;
@@ -34,6 +36,10 @@ class CustomContainerItemGui extends Gui {
 		this.mContainer = container;
 		this.mConfig = config;
 		setFiller(Material.BLACK_STAINED_GLASS_PANE);
+	}
+
+	public ItemStack getContainer() {
+		return mContainer;
 	}
 
 	@Override
@@ -145,6 +151,14 @@ class CustomContainerItemGui extends Gui {
 								.reopenIfFail(true)
 								.open(mPlayer);
 						}
+						case DROP, CONTROL_DROP -> {
+							int dropAmount = event.getClick() == ClickType.CONTROL_DROP ? 64 : 1;
+							movedItem.setAmount(dropAmount);
+							CustomContainerItemManager.removeFromContainer(mPlayer, mContainer, movedItem);
+							Item itemEntity = mPlayer.getWorld().dropItem(mPlayer.getEyeLocation(), movedItem);
+							itemEntity.setVelocity(mPlayer.getLocation().getDirection());
+							update();
+						}
 						default -> {
 							// Are you happy now, PMD?
 						}
@@ -242,6 +256,21 @@ class CustomContainerItemGui extends Gui {
 		CustomContainerItemManager.reorderInContainer(mPlayer, mContainer, clone, position);
 		ItemStatUtils.generateItemStats(mContainer);
 		update();
+	}
+
+	@Override
+	protected void onOutsideInventoryClick(InventoryClickEvent event) {
+		// allow dropping items as normal
+		switch (event.getClick()) {
+			case LEFT, RIGHT, CREATIVE, DROP, CONTROL_DROP, WINDOW_BORDER_LEFT, WINDOW_BORDER_RIGHT -> {
+				if (event.getSlotType() == InventoryType.SlotType.OUTSIDE) {
+					event.setCancelled(false);
+				}
+			}
+			default -> {
+				// keep cancelled
+			}
+		}
 	}
 
 	@Override

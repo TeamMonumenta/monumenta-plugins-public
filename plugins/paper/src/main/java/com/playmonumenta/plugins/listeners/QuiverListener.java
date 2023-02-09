@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.inventories.CustomContainerItemGui;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -385,9 +386,16 @@ public class QuiverListener implements Listener {
 			if (!config.canPutIntoContainer(itemStack)) {
 				continue;
 			}
+
 			ItemStack transformedItemStack = getTransformedArrowStack(quiver, itemStack);
 			CustomContainerItemManager.addToContainer(player, quiver, config, transformedItemStack, true, true);
 			itemStack.setAmount(transformedItemStack.getAmount());
+
+			if (Gui.getOpenGui(player) instanceof CustomContainerItemGui gui && NmsUtils.getVersionAdapter().isSameItem(gui.getContainer(), quiver)) {
+				// Update quiver GUI if it is open
+				gui.update();
+			}
+
 			if (transformedItemStack.getAmount() == 0) {
 				return;
 			}
