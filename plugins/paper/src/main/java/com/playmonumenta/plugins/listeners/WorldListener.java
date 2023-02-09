@@ -344,6 +344,9 @@ public class WorldListener implements Listener {
 
 	public boolean shouldCancelPiston(Block piston, BlockFace direction, Block affectedBlock) {
 		int pistonTestValue = pistonZonePropertyTest(piston.getLocation());
+		if (pistonTestValue < 0) {
+			return true;
+		}
 
 		Location oldLoc = affectedBlock.getLocation();
 		if (pistonTestValue != pistonZonePropertyTest(oldLoc)) {
@@ -351,13 +354,17 @@ public class WorldListener implements Listener {
 		}
 
 		Location newLoc = new Location(oldLoc.getWorld(),
-		                               oldLoc.getX() + direction.getModX(),
-		                               oldLoc.getY() + direction.getModY(),
-		                               oldLoc.getZ() + direction.getModZ());
+			oldLoc.getX() + direction.getModX(),
+			oldLoc.getY() + direction.getModY(),
+			oldLoc.getZ() + direction.getModZ());
 		return pistonTestValue != pistonZonePropertyTest(newLoc);
 	}
 
+	// Return bit flags that must all be equal for affected locations. Return -1 to disallow in any case.
 	private int pistonZonePropertyTest(Location loc) {
+		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.OVERWORLD_BLOCK_RESET)) {
+			return -1;
+		}
 		int testValue = 0;
 		if (ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
 			testValue |= 1;
