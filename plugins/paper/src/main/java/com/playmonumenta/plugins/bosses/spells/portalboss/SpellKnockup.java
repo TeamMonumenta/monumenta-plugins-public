@@ -22,11 +22,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellKnockup extends Spell {
-	private int mCooldown = 0;
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
+	private final int mCooldown;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
 
-	private int mRadius = 3;
+	private final int mRadius = 3;
 
 	public SpellKnockup(LivingEntity boss, Plugin plugin, int cooldown) {
 		mBoss = boss;
@@ -45,7 +45,7 @@ public class SpellKnockup extends Spell {
 			locs.add(p.getLocation());
 		}
 
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 
 			@Override
@@ -109,7 +109,9 @@ public class SpellKnockup extends Spell {
 
 				mTicks += 2;
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 
