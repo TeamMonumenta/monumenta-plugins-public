@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -21,17 +22,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class SpellLightningStorm extends Spell {
 	private int mTicks = 0;
-	private LivingEntity mBoss;
-	private double mRange;
+	private final LivingEntity mBoss;
+	private final Kaul mKaul;
 	private static final String LIGHTNING_STORM_TAG = "KaulLightningStormTag";
 	private @Nullable Location mCenter;
-	private List<Player> mWarnedPlayers = new ArrayList<Player>();
+	private final List<Player> mWarnedPlayers = new ArrayList<>();
 	private static final Particle.DustOptions YELLOW_1_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 20), 1.0f);
 	private static final Particle.DustOptions YELLOW_2_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 120), 1.0f);
 
-	public SpellLightningStorm(LivingEntity boss, double range) {
+	public SpellLightningStorm(LivingEntity boss, Kaul kaul) {
 		mBoss = boss;
-		mRange = range;
+		mKaul = kaul;
 		for (Entity e : boss.getWorld().getEntities()) {
 			if (e.getScoreboardTags().contains(LIGHTNING_STORM_TAG) && e instanceof LivingEntity) {
 				mCenter = e.getLocation();
@@ -53,8 +54,7 @@ public class SpellLightningStorm extends Spell {
 			mTicks = 10;
 
 			double arenaSurfaceY = mCenter.getY(); // This should be 8.0 based on the armour stand placement
-			//TODO Fix spherical check missing players (bug #8731)
-			for (Player player : PlayerUtils.playersInRange(mCenter, mRange, true)) {
+			for (Player player : mKaul.getArenaParticipants()) {
 				double playerY = player.getLocation().getY();
 
 				// If standing on heightened ground or going up a climbable to cheese,
