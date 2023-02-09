@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +77,7 @@ public class StarfallBoss extends BossAbilityGroup {
 
 							@Override
 							public void run() {
-								if (mBoss.isDead() || !mBoss.isValid()) {
+								if (EntityUtils.shouldCancelSpells(mBoss)) {
 									cancel();
 									return;
 								}
@@ -87,7 +88,7 @@ public class StarfallBoss extends BossAbilityGroup {
 
 										@Override
 										public void run() {
-											if (mBoss.isDead() || !mBoss.isValid()) {
+											if (EntityUtils.shouldCancelSpells(mBoss)) {
 												cancel();
 												return;
 											}

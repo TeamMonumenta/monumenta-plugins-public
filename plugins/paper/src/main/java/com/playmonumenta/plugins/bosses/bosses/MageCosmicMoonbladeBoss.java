@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -116,7 +117,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 									mBoss.setGlowing(false);
 								}
 
-								if (!mBoss.isValid() || mBoss.isDead()) {
+								if (EntityUtils.shouldCancelSpells(mBoss)) {
 									cancel();
 									return;
 								}
@@ -150,7 +151,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 											}
 											mInit = true;
 										}
-										if (!mBoss.isValid() || mBoss.isDead()) {
+										if (EntityUtils.shouldCancelSpells(mBoss)) {
 											cancel();
 											return;
 										}

@@ -1195,6 +1195,10 @@ public class EntityUtils {
 		}
 	}
 
+	public static boolean shouldCancelSpells(@Nullable LivingEntity entity) {
+		return entity == null || !entity.isValid() || entity.isDead() || isSilenced(entity) || isStunned(entity);
+	}
+
 	public static void summonEntityAt(Location loc, EntityType type, String nbt) {
 		try {
 			getSummonEntityAt(loc, type, nbt);
