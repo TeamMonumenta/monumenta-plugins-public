@@ -14,6 +14,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Gate;
@@ -85,7 +86,8 @@ public class SpellBlockBreak extends Spell {
 					Block block = testloc.getBlock();
 					Material material = block.getType();
 
-					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || block.getBlockData() instanceof TrapDoor || block.getBlockData() instanceof Fence || block.getBlockData() instanceof Gate || block.getBlockData() instanceof Wall || block.getBlockData() instanceof Rail) {
+					BlockData blockData = block.getBlockData();
+					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || blockData instanceof TrapDoor || blockData instanceof Fence || blockData instanceof Gate || blockData instanceof Wall || blockData instanceof Rail) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						List<Block> list = new ArrayList<>(1);
 						list.add(block);
@@ -101,7 +103,7 @@ public class SpellBlockBreak extends Spell {
 						}
 					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
 						           !BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material) &&
-						           (material.isSolid() || ItemUtils.carpet.contains(material) || ItemUtils.candles.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD)) &&
+						           (material.isSolid() || ItemUtils.carpet.contains(material) || ItemUtils.CANDLES.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD) || ItemUtils.FLOWER_POTS.contains(material)) &&
 						           (!(block.getState() instanceof Lootable)
 							            || (!((Lootable) block.getState()).hasLootTable()
 								                && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {

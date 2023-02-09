@@ -328,7 +328,7 @@ public class ItemUtils {
 		Material.GLOWSTONE
 	);
 
-	public static final Set<Material> strippables = EnumSet.of(
+	public static final Set<Material> STRIPPABLES = EnumSet.of(
 		Material.BIRCH_LOG,
 		Material.SPRUCE_LOG,
 		Material.JUNGLE_LOG,
@@ -347,7 +347,7 @@ public class ItemUtils {
 		Material.WARPED_HYPHAE
 	);
 
-	public static final Set<Material> signs = EnumSet.of(
+	public static final Set<Material> SIGNS = EnumSet.of(
 		Material.ACACIA_SIGN,
 		Material.ACACIA_WALL_SIGN,
 		Material.BIRCH_SIGN,
@@ -366,7 +366,7 @@ public class ItemUtils {
 		Material.WARPED_WALL_SIGN
 	);
 
-	public static final Set<Material> candles = EnumSet.of(
+	public static final Set<Material> CANDLES = EnumSet.of(
 		Material.CANDLE,
 		Material.WHITE_CANDLE,
 		Material.LIGHT_GRAY_CANDLE,
@@ -384,6 +384,18 @@ public class ItemUtils {
 		Material.PURPLE_CANDLE,
 		Material.MAGENTA_CANDLE,
 		Material.PINK_CANDLE
+	);
+
+	public static final Set<Material> FLOWER_POTS = EnumSet.of(
+		Material.FLOWER_POT,
+		Material.POTTED_OAK_SAPLING, Material.POTTED_SPRUCE_SAPLING, Material.POTTED_BIRCH_SAPLING, Material.POTTED_JUNGLE_SAPLING,
+		Material.POTTED_ACACIA_SAPLING, Material.POTTED_DARK_OAK_SAPLING, Material.POTTED_FERN, Material.POTTED_DANDELION,
+		Material.POTTED_POPPY, Material.POTTED_BLUE_ORCHID, Material.POTTED_ALLIUM, Material.POTTED_AZURE_BLUET,
+		Material.POTTED_RED_TULIP, Material.POTTED_ORANGE_TULIP, Material.POTTED_WHITE_TULIP, Material.POTTED_PINK_TULIP,
+		Material.POTTED_OXEYE_DAISY, Material.POTTED_CORNFLOWER, Material.POTTED_LILY_OF_THE_VALLEY, Material.POTTED_WITHER_ROSE,
+		Material.POTTED_RED_MUSHROOM, Material.POTTED_BROWN_MUSHROOM, Material.POTTED_DEAD_BUSH, Material.POTTED_CACTUS,
+		Material.POTTED_BAMBOO, Material.POTTED_CRIMSON_FUNGUS, Material.POTTED_WARPED_FUNGUS, Material.POTTED_CRIMSON_ROOTS,
+		Material.POTTED_WARPED_ROOTS, Material.POTTED_AZALEA_BUSH, Material.POTTED_FLOWERING_AZALEA_BUSH
 	);
 
 	// list of blocks that are supposedly used as limits to player movements
@@ -659,11 +671,11 @@ public class ItemUtils {
 	}
 
 	public static boolean isStrippable(@Nullable Material mat) {
-		return mat != null && strippables.contains(mat);
+		return mat != null && STRIPPABLES.contains(mat);
 	}
 
 	public static boolean isSign(@Nullable Material mat) {
-		return mat != null && signs.contains(mat);
+		return mat != null && SIGNS.contains(mat);
 	}
 
 	public static boolean isWool(@Nullable Material mat) {
