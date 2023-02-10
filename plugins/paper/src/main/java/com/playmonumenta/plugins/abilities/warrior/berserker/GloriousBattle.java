@@ -43,8 +43,6 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private static final int DAMAGE_1 = 20;
 	private static final int DAMAGE_2 = 25;
 	private static final double RADIUS = 3;
-	private static final double BLEED_PERCENT = 0.2;
-	private static final int BLEED_TIME = 4 * 20;
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 	private static final double DAMAGE_PER = 0.05;
@@ -61,8 +59,6 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	public static final String CHARM_CHARGES = "Glorious Battle Charges";
 	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
 	public static final String CHARM_RADIUS = "Glorious Battle Radius";
-	public static final String CHARM_BLEED_AMPLIFIER = "Glorious Battle Bleed Amplifier";
-	public static final String CHARM_BLEED_DURATION = "Glorious Battle Bleed Duration";
 	public static final String CHARM_VELOCITY = "Glorious Battle Velocity";
 	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
 	public static final String CHARM_DAMAGE_MODIFIER = "Glorious Battle Damage Modifier";
@@ -75,9 +71,9 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.descriptions(
 				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
 					 "Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. " +
-					 "When you land, deal %s damage to the nearest mob within %s blocks and apply %s%% bleed for %s seconds. " +
+					 "When you land, deal %s damage to the nearest mob within %s blocks. " +
 					 "Additionally, knock back all mobs within %s blocks.")
-					.formatted(DAMAGE_1, RADIUS, StringUtils.multiplierToPercentage(BLEED_PERCENT), StringUtils.ticksToSeconds(BLEED_TIME), RADIUS),
+					.formatted(DAMAGE_1, RADIUS, RADIUS),
 				"Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
 					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
@@ -144,7 +140,6 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 						return;
 					}
 
-					EntityUtils.applyBleed(mPlugin, CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_TIME), BLEED_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED_AMPLIFIER), nearest);
 					DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mDamage), ClassAbility.GLORIOUS_BATTLE, true);
 					mCosmetic.gloryOnDamage(world, mPlayer, nearest);
 

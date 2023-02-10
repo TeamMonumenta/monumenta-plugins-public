@@ -30,6 +30,7 @@ public class SwiftCuts extends Ability {
 	private static final double PERCENT_AOE_DAMAGE_1 = 0.1;
 	private static final double PERCENT_AOE_DAMAGE_2 = 0.2;
 	private static final double ENHANCEMENT_DAMAGE_PERCENT = 0.35;
+	private static final int ENHANCEMENT_CDR = 20;
 
 	public static final String CHARM_DAMAGE = "Swift Cuts Damage";
 	public static final String CHARM_SWEEP_DAMAGE = "Swift Cuts Sweep Damage";
@@ -42,7 +43,7 @@ public class SwiftCuts extends Ability {
 			.descriptions(
 				String.format("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +%d%% damage and deals %d%% of the damage to all other mobs in a %s block radius.", (int) (CONSECUTIVE_PERCENT_DAMAGE_1 * 100), (int) (PERCENT_AOE_DAMAGE_1 * 100), SWEEP_RADIUS),
 				String.format("Bonus damage increased to +%d%%, sweep damage increased to %d%%.", (int) (CONSECUTIVE_PERCENT_DAMAGE_2 * 100), (int) (PERCENT_AOE_DAMAGE_2 * 100)),
-				"Every third fully charged melee attack in a row against the same mob deals " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% more damage.")
+				"Every third fully charged melee attack in a row against the same mob deals " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% more damage and reduces the cooldowns of your skills by " + (ENHANCEMENT_CDR / 20) + "s.")
 			.displayItem(new ItemStack(Material.STONE_SWORD, 1));
 
 	private final double mConsecutivePercentDamage;
@@ -93,6 +94,7 @@ public class SwiftCuts extends Ability {
 
 					if (mEnhancementHits == 3) {
 						event.setDamage(event.getDamage() * (1 + ENHANCEMENT_DAMAGE_PERCENT));
+						mPlugin.mTimers.updateCooldowns(mPlayer, ENHANCEMENT_CDR);
 						mEnhancementHits = 0;
 					}
 				}

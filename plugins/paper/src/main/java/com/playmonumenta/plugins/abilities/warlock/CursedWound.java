@@ -49,8 +49,8 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_DURATION = 6 * 20;
 	private static final int CURSED_WOUND_RADIUS = 3;
 	private static final double CURSED_WOUND_DAMAGE = 0.05;
-	private static final double CURSED_WOUND_1_CAP = 0.15;
-	private static final double CURSED_WOUND_2_CAP = 0.3;
+	private static final int CURSED_WOUND_1_CAP = 3;
+	private static final int CURSED_WOUND_2_CAP = 6;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 	private static final double DAMAGE_PER_EFFECT_RATIO = 0.03;
 
@@ -59,7 +59,7 @@ public class CursedWound extends Ability {
 
 	public static final String CHARM_DAMAGE = "Cursed Wound Damage Modifier";
 	public static final String CHARM_RADIUS = "Cursed Wound Radius";
-	public static final String CHARM_CAP = "Cursed Wound Damage Cap";
+	public static final String CHARM_CAP = "Cursed Wound Ability Cap";
 	public static final String CHARM_DOT = "Cursed Wound DoT";
 
 	public static final AbilityInfo<CursedWound> INFO =
@@ -69,20 +69,20 @@ public class CursedWound extends Ability {
 			.shorthandName("CW")
 			.descriptions(
 				"Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
-					"Your melee attacks passively deal 3% more damage per ability on cooldown, capped at +15% damage.",
-				"Damage cap is increased from 15% to 30%.",
+					"Your melee attacks passively deal 5% more damage per ability on cooldown, capped at 3 abilites.",
+				"Damage cap is increased from 3 to 6 abilities.",
 				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
 					"as well as 3% of your melee attack's damage as magic damage per effect.")
 			.displayItem(new ItemStack(Material.GOLDEN_SWORD, 1));
 
-	private final double mCursedWoundCap;
+	private final int mCursedWoundCap;
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;
 	private @Nullable HashMap<String, Effect> mStoredCustomEffects;
 
 	public CursedWound(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCursedWoundCap = CharmManager.getLevelPercentDecimal(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
+		mCursedWoundCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne() ? CURSED_WOUND_1_CAP : CURSED_WOUND_2_CAP);
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class CursedWound extends Ability {
 					}
 				}
 
-				event.setDamage(event.getDamage() * (1 + Math.min(cooldowns * (CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE) + CURSED_WOUND_DAMAGE), mCursedWoundCap)));
+				event.setDamage(event.getDamage() * (1 + (Math.min(cooldowns, mCursedWoundCap + (int) CharmManager.getLevel(mPlayer, CHARM_DAMAGE)) * CURSED_WOUND_DAMAGE)));
 			}
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {

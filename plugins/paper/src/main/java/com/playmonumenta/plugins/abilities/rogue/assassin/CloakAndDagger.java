@@ -36,7 +36,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	private static final double CLOAK_2_DAMAGE_MULTIPLIER = 3;
 	private static final int CLOAK_1_MAX_STACKS = 8;
 	private static final int CLOAK_2_MAX_STACKS = 12;
-	private static final int CLOAK_MIN_STACKS = 5;
+	private static final int CLOAK_MIN_STACKS = 4;
 	private static final int CLOAK_STACKS_ON_ELITE_KILL = 5;
 	private static final int STEALTH_DURATION = (int) (2.5 * 20);
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 300;

@@ -42,7 +42,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private static final int ACTIVE_MIN_STACKS = 10;
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
 	private static final int RAMPAGE_2_STACK_LIMIT = 20;
-	private static final double RAMPAGE_DAMAGE_RESISTANCE_PER_STACK = 0.01;
+	private static final double RAMPAGE_DAMAGE_RESISTANCE_PER_STACK = 0.0075;
 	private static final double RAMPAGE_RADIUS = 4;
 	private static final double HEAL_PERCENT = 0.025;
 	private static final double RAMPAGE_STACK_PERCENTAGE = 1.5;

@@ -30,8 +30,8 @@ import org.bukkit.inventory.ItemStack;
  */
 public class CoupDeGrace extends Ability {
 
-	private static final double COUP_1_NORMAL_THRESHOLD = 0.1;
-	private static final double COUP_2_NORMAL_THRESHOLD = 0.15;
+	private static final double COUP_1_NORMAL_THRESHOLD = 0.15;
+	private static final double COUP_2_NORMAL_THRESHOLD = 0.2;
 	private static final double COUP_1_ELITE_THRESHOLD = 0.2;
 	private static final double COUP_2_ELITE_THRESHOLD = 0.3;
 

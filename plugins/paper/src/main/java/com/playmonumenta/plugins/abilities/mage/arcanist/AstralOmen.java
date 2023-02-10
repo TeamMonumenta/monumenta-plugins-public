@@ -45,9 +45,9 @@ public class AstralOmen extends Ability {
 	public static final String BONUS_DAMAGE_SOURCE = "AstralOmenBonusDamage";
 	public static final String DAMAGED_THIS_TICK_METAKEY = "AstralOmenDamagedThisTick";
 
-	public static final int DAMAGE = 8;
+	public static final int DAMAGE = 7;
 	public static final int RADIUS = 3;
-	public static final double BONUS_MULTIPLIER = 0.2;
+	public static final double BONUS_MULTIPLIER = 0.15;
 	public static final int STACK_TICKS = 10 * Constants.TICKS_PER_SECOND;
 	public static final int BONUS_TICKS = 8 * Constants.TICKS_PER_SECOND;
 	public static final float PULL_SPEED = 0.25f;
