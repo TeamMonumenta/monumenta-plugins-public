@@ -44,8 +44,8 @@ public class PercentDamageDealt extends Effect {
 	}
 
 	// Only call this in PercentDamageDealtSingle
-	protected PercentDamageDealt(int duration, double amount, String effectIdentifier) {
-		this(duration, amount, null, 0, null, effectIdentifier);
+	protected PercentDamageDealt(int duration, double amount, @Nullable EnumSet<DamageEvent.DamageType> affectedDamageTypes, String effectIdentifier) {
+		this(duration, amount, affectedDamageTypes, 0, null, effectIdentifier);
 	}
 
 	// This needs to trigger before any flat damage

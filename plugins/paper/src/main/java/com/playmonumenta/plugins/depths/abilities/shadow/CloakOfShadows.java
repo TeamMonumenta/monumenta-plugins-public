@@ -9,11 +9,13 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.EnumSet;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -84,7 +86,7 @@ public class CloakOfShadows extends DepthsAbility {
 		putOnCooldown();
 		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1]);
 
-		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, DAMAGE[mRarity - 1]));
+		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageEvent.DamageType.MELEE)));
 
 		new BukkitRunnable() {
 
