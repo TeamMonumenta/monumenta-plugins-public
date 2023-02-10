@@ -20,7 +20,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 public class EarthAspect implements Enchantment {
 
@@ -30,7 +29,7 @@ public class EarthAspect implements Enchantment {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(120, 148, 82), 0.75f);
 
 	@Override
-	public @NotNull String getName() {
+	public String getName() {
 		return "Earth Aspect";
 	}
 
@@ -48,6 +47,9 @@ public class EarthAspect implements Enchantment {
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
 		DamageEvent.DamageType type = event.getType();
 		if ((type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE) {
+			if (type == DamageEvent.DamageType.PROJECTILE || event.getAbility() == ClassAbility.EXPLOSIVE) {
+				level /= 2;
+			}
 			apply(plugin, player, level);
 		}
 	}
