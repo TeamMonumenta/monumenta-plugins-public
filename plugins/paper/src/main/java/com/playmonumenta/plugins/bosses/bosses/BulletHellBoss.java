@@ -98,7 +98,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
-						BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.PROJECTILE, p.DAMAGE, prevLoc);
+						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE / 100.0);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
 				}
