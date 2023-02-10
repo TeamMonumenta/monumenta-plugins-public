@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -40,11 +41,21 @@ public class GruesomeAlchemy extends PotionAbility {
 			.scoreboardId("GruesomeAlchemy")
 			.shorthandName("GA")
 			.descriptions(
-				"Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. " +
-					"These potions deal 80% of the magic damage of your Brutal potions and do not afflict damage over time. " +
-					"Instead, they apply 10% Slow, 10% Vulnerability, and 10% Weaken for 8 seconds. ",
-				"The Slow and Vulnerability are increased to 20%.",
-				"Your Gruesome potions now additionally paralyze (25% chance for 100% slowness for a second once a second) mobs for 8s.")
+				("Swap hands while holding an Alchemist's Bag to switch to Gruesome potions. " +
+				"These potions deal %s%% of the magic damage of your Brutal potions and do not afflict damage over time. " +
+				"Instead, they apply %s%% Slow, %s%% Vulnerability, and %s%% Weaken for %ss.")
+					.formatted(
+							StringUtils.multiplierToPercentage(GRUESOME_POTION_DAMAGE_MULTIPLIER),
+							StringUtils.multiplierToPercentage(GRUESOME_ALCHEMY_1_SLOWNESS_AMPLIFIER),
+							StringUtils.multiplierToPercentage(GRUESOME_ALCHEMY_1_VULNERABILITY_AMPLIFIER),
+							StringUtils.multiplierToPercentage(GRUESOME_ALCHEMY_WEAKEN_AMPLIFIER),
+							StringUtils.ticksToSeconds(GRUESOME_ALCHEMY_DURATION)
+					),
+				"The Slow and Vulnerability are increased to %s%%."
+					.formatted(StringUtils.multiplierToPercentage(GRUESOME_ALCHEMY_2_SLOWNESS_AMPLIFIER)),
+				"Your Gruesome potions now additionally paralyze (25%% chance for 100%% slowness for a second once a second) mobs for %ss."
+					.formatted(StringUtils.ticksToSeconds(GRUESOME_ALCHEMY_DURATION))
+			)
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", "Toggles between throwing gruesome or brutal potions.",
 				GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("throwOpposite", "throw opposite potion", "Throws a potion of the opposite type, e.g. a gruesome potion if brutal potions are selected.",

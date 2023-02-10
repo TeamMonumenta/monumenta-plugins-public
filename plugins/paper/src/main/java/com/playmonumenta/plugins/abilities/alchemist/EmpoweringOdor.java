@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -37,9 +38,18 @@ public class EmpoweringOdor extends PotionAbility {
 			.scoreboardId("EmpoweringOdor")
 			.shorthandName("EO")
 			.descriptions(
-				"Other players hit by your Alchemist's Potions are given 10% speed and 10% damage from all sources for 8 seconds.",
-				"Your potion recharge rate is decreased by 0.5s.",
-				"The first hit a player would deal to an enemy after they gain this bonus is increased by 10%, refreshing on each application.")
+				"Other players hit by your Alchemist's Potions are given %s%% speed and %s%% damage from all sources for %ss."
+					.formatted(
+							StringUtils.multiplierToPercentage(EMPOWERING_ODOR_SPEED_AMPLIFIER),
+							StringUtils.multiplierToPercentage(EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER),
+							StringUtils.ticksToSeconds(EMPOWERING_ODOR_DURATION)
+					),
+				"Your potion recharge delay is decreased by %ss."
+					.formatted(StringUtils.ticksToSeconds(POTION_RECHARGE_TIME_REDUCTION_2)),
+				("The first hit a player would deal to an enemy after they gain this bonus is increased by %s%%, " +
+				"refreshing on each application.")
+					.formatted(StringUtils.multiplierToPercentage(EMPOWERING_ODOR_ENHANCEMENT_DAMAGE_AMPLIFIER))
+			)
 			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
 
 	private final double mDamageAmplifier;

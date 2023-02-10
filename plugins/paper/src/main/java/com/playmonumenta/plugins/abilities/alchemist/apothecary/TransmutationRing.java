@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -56,10 +57,24 @@ public class TransmutationRing extends PotionAbility {
 			.scoreboardId("Transmutation")
 			.shorthandName("TR")
 			.descriptions(
-				"Sneak while throwing an Alchemist's Potion to create a Transmutation Ring at the potion's landing location that lasts for 10 seconds. " +
-					"The ring has a radius of 5 blocks. Other players within this ring deal 10% extra damage on all attacks. " +
-					"Mobs that die within this ring increase the damage bonus by 1% per mob, up to 30% total extra damage. Cooldown: 25s.",
-				"Mobs that die within this ring also increase the duration of the ring by 0.35 seconds per mob, up to 5 extra seconds. Cooldown: 20s.")
+				("Sneak while throwing an Alchemist's Potion to create a Transmutation Ring at the potion's landing location that lasts for %ss. " +
+				"The ring has a radius of %s blocks. Other players within this ring deal %s%% extra damage on all attacks. " +
+				"Mobs that die within this ring increase the damage bonus by %s%% per mob, up to %s%% extra damage. Cooldown: %ss.")
+					.formatted(
+							StringUtils.ticksToSeconds(TRANSMUTATION_RING_DURATION),
+							StringUtils.to2DP(TRANSMUTATION_RING_RADIUS),
+							StringUtils.multiplierToPercentage(DAMAGE_AMPLIFIER),
+							StringUtils.multiplierToPercentage(DAMAGE_PER_DEATH_AMPLIFIER),
+							StringUtils.multiplierToPercentage(MAX_KILLS * DAMAGE_PER_DEATH_AMPLIFIER),
+							StringUtils.ticksToSeconds(TRANSMUTATION_RING_1_COOLDOWN)
+					),
+				"Mobs that die within this ring also increase its duration by %ss per mob, up to %s extra seconds. Cooldown: %ss."
+					.formatted(
+							StringUtils.ticksToSeconds(DURATION_INCREASE),
+							StringUtils.ticksToSeconds(MAX_DURATION_INCREASE),
+							StringUtils.ticksToSeconds(TRANSMUTATION_RING_2_COOLDOWN)
+					)
+			)
 			.cooldown(TRANSMUTATION_RING_1_COOLDOWN, TRANSMUTATION_RING_2_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(new ItemStack(Material.GOLD_NUGGET, 1));
 

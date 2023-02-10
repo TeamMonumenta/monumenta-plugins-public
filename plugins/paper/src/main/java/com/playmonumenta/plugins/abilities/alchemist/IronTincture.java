@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -59,14 +60,26 @@ public class IronTincture extends Ability {
 			.scoreboardId("IronTincture")
 			.shorthandName("IT")
 			.descriptions(
-				"Crouch and right-click to throw a tincture. If you walk over the tincture, gain 6 absorption health for 50 seconds, up to 8 absorption health. " +
-					"If an ally walks over it, or is hit by it, you both gain the effect. If it isn't grabbed before it disappears it will quickly come off cooldown. " +
-					"When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, you gain 1 Alchemist's Potion. Cooldown: 50s.",
-				"Effect and effect cap increased to 10 absorption health.",
-				"The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants 5% damage resistance when absorption is present for the duration of the absorption.")
+				("Crouch and right-click to throw a tincture. If you walk over the tincture, gain %s absorption health " +
+				"for %ss, up to %s absorption health. If an ally walks over it, or is hit by it, you both gain the effect. " +
+				"If it isn't grabbed before it disappears, it will quickly come off cooldown. " +
+				"When another player grabs the tincture, you gain 2 Alchemist's Potions. When you grab the tincture, " +
+				"you gain 1 Alchemist's Potion. Cooldown: %ss.")
+					.formatted(
+							IRON_TINCTURE_1_ABSORPTION,
+							StringUtils.ticksToSeconds(IRON_TINCTURE_ABSORPTION_DURATION),
+							IRON_TINCTURE_1_ABSORPTION,
+							StringUtils.ticksToSeconds(IRON_TINCTURE_USE_COOLDOWN)
+					),
+				"Effect and effect cap increased to %s absorption health."
+					.formatted(IRON_TINCTURE_2_ABSORPTION),
+				("The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants %s%% " +
+				"damage resistance when absorption is present, for the duration of the absorption.")
+					.formatted(StringUtils.multiplierToPercentage(IRON_TINCTURE_ENHANCEMENT_RESISTANCE))
+			)
 			.cooldown(IRON_TINCTURE_USE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IronTincture::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
-				                                                                         .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+					.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(new ItemStack(Material.SPLASH_POTION, 1));
 
 	private @Nullable AlchemistPotions mAlchemistPotions;

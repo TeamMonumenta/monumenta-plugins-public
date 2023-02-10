@@ -81,17 +81,29 @@ public class UnstableAmalgam extends Ability {
 			.shorthandName("UA")
 			.descriptions(
 				("Shift left click while holding an Alchemist's Bag to consume a potion to place an Amalgam with 1 health at the location you are looking, up to %s blocks away. " +
-					 "Shift left click again to detonate it, dealing your Alchemist Potion's damage + %s magic damage to mobs in a %s block radius and applying potion effects from all abilities. " +
-					 "The Amalgam also explodes when killed, or %s seconds after being placed. " +
-					 "Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: %ss.")
-					.formatted(UNSTABLE_AMALGAM_CAST_RANGE, UNSTABLE_AMALGAM_1_DAMAGE, UNSTABLE_AMALGAM_RADIUS,
-						StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_DURATION), StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_1_COOLDOWN)),
+				 "Shift left click again to detonate it, dealing your Alchemist Potion's damage + %s magic damage to mobs in a %s block radius and applying potion effects from all abilities. " +
+				 "The Amalgam also explodes when killed, or %s seconds after being placed. " +
+				 "Mobs and players in the radius are knocked away from the Amalgam. For each mob damaged, gain an Alchemist's Potion. Cooldown: %ss.")
+					.formatted(
+							UNSTABLE_AMALGAM_CAST_RANGE,
+							UNSTABLE_AMALGAM_1_DAMAGE,
+							UNSTABLE_AMALGAM_RADIUS,
+							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_DURATION),
+							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_1_COOLDOWN)
+					),
 				"The damage is increased to %s and the cooldown is reduced to %ss."
-					.formatted(UNSTABLE_AMALGAM_2_DAMAGE, StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_2_COOLDOWN)),
+					.formatted(
+							UNSTABLE_AMALGAM_2_DAMAGE,
+							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_2_COOLDOWN)
+					),
 				("Enemies hit by the Amalgam's explosion become unstable for %s seconds. " +
-					 "When an unstable mob is killed, a potion that deals %s%% of your potion damage is dropped at its location. " +
-					 "These potions apply both Brutal and Gruesome effects.")
-					.formatted(StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION), StringUtils.multiplierToPercentage(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)))
+				 "When an unstable mob is killed, a potion that deals %s%% of your potion damage is dropped at its location. " +
+				 "These potions apply both Brutal and Gruesome effects.")
+					.formatted(
+							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION),
+							StringUtils.multiplierToPercentage(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)
+					)
+			)
 			.cooldown(UNSTABLE_AMALGAM_1_COOLDOWN, UNSTABLE_AMALGAM_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", UnstableAmalgam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))

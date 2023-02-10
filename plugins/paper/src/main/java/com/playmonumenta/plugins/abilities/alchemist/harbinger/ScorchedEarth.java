@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,9 +62,22 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			.scoreboardId("ScorchedEarth")
 			.shorthandName("SE")
 			.descriptions(
-				"Sneak while throwing an Alchemist's Potion to deploy a 5 block radius zone that lasts 15 seconds where the potion lands. " +
-					"Mobs in this zone are dealt 25% of your potion's damage and set on fire for 4s whenever taking damage of types other than ailment or fire. Cooldown: 30s.",
-				"Cooldown reduced to 25s, and two charges of this ability can be stored at once.")
+				("Sneak while throwing an Alchemist's Potion to deploy a %s block radius zone that lasts %ss where the potion lands. " +
+				"Mobs in this zone are dealt %s%% of your potion's damage and set on fire for %ss whenever taking damage " +
+				"of types other than ailment or fire. Cooldown: %ss.")
+					.formatted(
+							StringUtils.to2DP(SCORCHED_EARTH_RADIUS),
+							StringUtils.ticksToSeconds(SCORCHED_EARTH_DURATION),
+							StringUtils.multiplierToPercentage(SCORCHED_EARTH_DAMAGE_FRACTION),
+							StringUtils.ticksToSeconds(SCORCHED_EARTH_FIRE_DURATION),
+							StringUtils.ticksToSeconds(SCORCHED_EARTH_1_COOLDOWN)
+					),
+				"Cooldown reduced to %ss, and %s charges of this ability can be stored at once."
+					.formatted(
+							StringUtils.ticksToSeconds(SCORCHED_EARTH_2_COOLDOWN),
+							SCORCHED_EARTH_2_CHARGES
+					)
+			)
 			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(new ItemStack(Material.BROWN_DYE, 1));
 

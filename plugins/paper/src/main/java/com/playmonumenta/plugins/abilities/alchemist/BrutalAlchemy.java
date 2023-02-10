@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -35,12 +36,21 @@ public class BrutalAlchemy extends PotionAbility {
 			.scoreboardId("BrutalAlchemy")
 			.shorthandName("BA")
 			.descriptions(
-				"Your Brutal Alchemist's Potions now apply a Damage Over Time effect which does " + (int) (BRUTAL_ALCHEMY_1_DOT_MULTIPLIER * 100) +
-				"% base damage as magic damage every second, over 8 seconds.",
-				"The Damage Over Time effect now does " + (int) (BRUTAL_ALCHEMY_2_DOT_MULTIPLIER * 100) +
-				"% base damage as magic damage.",
-				"Your Brutal Alchemist's Potions now apply a second Damage Over Time effect which does " + (int) (BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER * 100) +
-				"% base damage as magic damage every 2 seconds, over 8 seconds."
+				("Your Brutal Alchemist's Potions now apply a Damage Over Time effect which does %s%% base damage " +
+				"as magic damage every second, over %ss.")
+					.formatted(
+							StringUtils.multiplierToPercentage(BRUTAL_ALCHEMY_1_DOT_MULTIPLIER),
+							StringUtils.ticksToSeconds(BRUTAL_ALCHEMY_DURATION)
+					),
+				"The Damage Over Time effect now does %s%% base damage as magic damage."
+					.formatted(StringUtils.multiplierToPercentage(BRUTAL_ALCHEMY_2_DOT_MULTIPLIER)),
+				("Your Brutal Alchemist's Potions now apply a second Damage Over Time effect which does %s%% base damage " +
+				"as magic damage every %s seconds, over %s seconds.")
+					.formatted(
+							StringUtils.multiplierToPercentage(BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER),
+							StringUtils.ticksToSeconds(BRUTAL_ALCHEMY_PERIOD * 2),
+							StringUtils.ticksToSeconds(BRUTAL_ALCHEMY_DURATION)
+					)
 			)
 			.displayItem(new ItemStack(Material.REDSTONE, 1));
 

@@ -68,9 +68,27 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 			.scoreboardId("EnergizingElixir")
 			.shorthandName("EE")
 			.descriptions(
-				"Left click while holding an Alchemist's Bag to consume a potion to apply 10% Speed and Jump Boost 2 to yourself for 6s. Cooldown: 2s.",
-				"Speed is increased to 20%; additionally, gain a 10% damage buff from all sources for the same duration.",
-				"Recasting this ability while the buff is still active refreshes the duration and increases the damage bonus and speed by 3%, up to 4 stacks. Stacks decay every 6 seconds.")
+				("Left click while holding an Alchemist's Bag to consume a potion to apply %s%% Speed and Jump Boost %s " +
+				"to yourself for %ss. Cooldown: %ss.")
+					.formatted(
+						StringUtils.multiplierToPercentage(SPEED_AMPLIFIER_1),
+						JUMP_LEVEL + 1,
+						StringUtils.ticksToSeconds(DURATION),
+						StringUtils.ticksToSeconds(COOLDOWN)
+					),
+				"Speed is increased to %s%%; additionally, gain a %s%% damage buff from all sources for the same duration."
+					.formatted(
+						StringUtils.multiplierToPercentage(SPEED_AMPLIFIER_2),
+						StringUtils.multiplierToPercentage(DAMAGE_AMPLIFIER_2)
+					),
+				("Recasting this ability while the buff is still active refreshes the duration and increases " +
+				"the damage bonus and speed by %s%%, up to %s stacks. Stacks decay every %ss.")
+					.formatted(
+						StringUtils.multiplierToPercentage(ENHANCED_BONUS),
+						ENHANCED_MAX_STACK,
+						StringUtils.ticksToSeconds(DURATION)
+					)
+			)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast",
 				EnergizingElixir::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))

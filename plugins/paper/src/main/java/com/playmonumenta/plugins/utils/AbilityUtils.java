@@ -525,7 +525,10 @@ public class AbilityUtils {
 		ClassAbility.QUAKE,
 		ClassAbility.EXPLOSIVE,
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
-		ClassAbility.PREDATOR_STRIKE
+		ClassAbility.PREDATOR_STRIKE,
+		ClassAbility.ALCHEMIST_POTION,
+		ClassAbility.ALCHEMICAL_ARTILLERY,
+		ClassAbility.UNSTABLE_AMALGAM
 	);
 
 	public static boolean isAspectTriggeringEvent(DamageEvent event, Player player) {

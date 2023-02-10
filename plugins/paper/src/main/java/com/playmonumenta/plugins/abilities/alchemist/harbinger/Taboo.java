@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -52,13 +53,25 @@ public class Taboo extends Ability {
 			.scoreboardId("Taboo")
 			.shorthandName("Tb")
 			.descriptions(
-					"Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. " +
-							"Drinking the potion causes you to recharge potions 0.5s faster, deal +15% magic damage, and gain 50% knockback resistance. " +
-							"However, you lose 5% of your health per second, which bypasses resistances and absorption, but cannot kill you. " +
-							"Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. " +
-							"Taboo can also be toggled by sneaking and swapping hands while holding a bow, crossbow, or trident while Alchemical Artillery is active.",
-					"Extra magic damage increased to 25%. Additionally, while the effect is active, swap hands while looking down, sneaking, and holding an Alchemist's Bag " +
-							"to consume 2 potions and heal 20% of your health. This healing has a 5s cooldown.")
+				("Swap hands while sneaking and holding an Alchemist's Bag to drink a potion. " +
+				"Drinking the potion causes you to recharge potions %ss faster, deal +%s%% magic damage, and gain %s%% knockback resistance. " +
+				"However, you lose %s%% of your health per second, which bypasses resistances and absorption, but cannot kill you. " +
+				"Swapping hands while sneaking and holding an Alchemist's Bag disables the effect. ")
+					.formatted(
+							StringUtils.ticksToSeconds(CHARGE_TIME_REDUCTION),
+							StringUtils.multiplierToPercentage(MAGIC_DAMAGE_INCREASE_1),
+							StringUtils.multiplierToPercentage(PERCENT_KNOCKBACK_RESIST),
+							StringUtils.multiplierToPercentage(PERCENT_HEALTH_DAMAGE)
+					),
+				("Extra magic damage increased to %s%%. Additionally, while the effect is active, swap hands while " +
+				"looking down, sneaking, and holding an Alchemist's Bag to consume 2 potions and heal %s%% of your health. " +
+				"This healing has a %ss cooldown.")
+					.formatted(
+							StringUtils.multiplierToPercentage(MAGIC_DAMAGE_INCREASE_2),
+							StringUtils.multiplierToPercentage(PERCENT_HEALTH_HEALING),
+							StringUtils.ticksToSeconds(COOLDOWN)
+					)
+			)
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("heal", "heal", Taboo::heal, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
 				                                                                  .lookDirections(AbilityTrigger.LookDirection.DOWN),

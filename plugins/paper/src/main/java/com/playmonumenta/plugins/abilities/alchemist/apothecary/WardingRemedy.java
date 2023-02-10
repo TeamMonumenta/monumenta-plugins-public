@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.WardingRemedyCS;
@@ -15,6 +14,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -50,11 +50,28 @@ public class WardingRemedy extends Ability {
 			.scoreboardId("WardingRemedy")
 			.shorthandName("WR")
 			.descriptions(
-				"Swap hands while sneaking and holding an Alchemist's Bag to give players (including yourself) within a 6 block radius 1 absorption health every 0.5 seconds for 4 seconds, lasting 30 seconds, up to 6 absorption health. Cooldown: 30s.",
-				"You and allies in a 12 block radius passively gain 10% increased healing while having absorption health, and cooldown decreased to 25s.")
+				("Swap hands while sneaking to give players (including yourself) " +
+				"within a %s block radius %s absorption health every %ss for %ss, lasting %ss, " +
+				"up to %s absorption health. Cooldown: %ss.")
+					.formatted(
+							StringUtils.to2DP(WARDING_REMEDY_ACTIVE_RADIUS),
+							WARDING_REMEDY_ABSORPTION,
+							StringUtils.ticksToSeconds(WARDING_REMEDY_PULSE_DELAY),
+							StringUtils.ticksToSeconds(WARDING_REMEDY_PULSES * WARDING_REMEDY_PULSE_DELAY),
+							StringUtils.ticksToSeconds(WARDING_REMEDY_ABSORPTION_DURATION),
+							WARDING_REMEDY_MAX_ABSORPTION,
+							StringUtils.ticksToSeconds(WARDING_REMEDY_1_COOLDOWN)
+					),
+				("You and allies in a %s block radius passively gain %s%% increased healing while having " +
+				"absorption health, and cooldown decreased to %ss.")
+					.formatted(
+							StringUtils.to2DP(WARDING_REMEDY_RANGE),
+							StringUtils.multiplierToPercentage(WARDING_REMEDY_HEAL_MULTIPLIER),
+							StringUtils.ticksToSeconds(WARDING_REMEDY_2_COOLDOWN)
+					)
+			)
 			.cooldown(WARDING_REMEDY_1_COOLDOWN, WARDING_REMEDY_2_COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardingRemedy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardingRemedy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
 			.displayItem(new ItemStack(Material.GOLDEN_CARROT, 1));
 
 	private final WardingRemedyCS mCosmetic;

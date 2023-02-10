@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +33,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class EsotericEnhancements extends PotionAbility {
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 1;
-	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.8;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
+	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.35;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
 	private static final int ABERRATION_SUMMON_DURATION = 30;
 	private static final double ABERRATION_BLEED_AMOUNT = 0.2;
@@ -60,10 +61,22 @@ public class EsotericEnhancements extends PotionAbility {
 			.scoreboardId("Esoteric")
 			.shorthandName("Es")
 			.descriptions(
-				"When afflicting a mob with a Brutal potion within 1.5s of afflicting that mob with a Gruesome potion, summon an Alchemical Aberration. " +
-					"The Aberration targets the mob with the highest health within 8 blocks and explodes on that mob, " +
-					"dealing 100% of your potion damage and applying 20% Bleed for 4s to all mobs in a 3 block radius. Cooldown: 5s.",
-				"Damage is increased to 180% of your potion damage.")
+				("When afflicting a mob with a Brutal potion within %ss of afflicting that mob with a Gruesome potion, " +
+				"summon an Alchemical Aberration. The Aberration targets the mob with the highest health within %s blocks " +
+				"and explodes on that mob, dealing %s%% of your potion damage and applying %s%% Bleed for %ss to all mobs " +
+				"in a %s block radius. Cooldown: %ss.")
+					.formatted(
+							StringUtils.ticksToSeconds(ABERRATION_SUMMON_DURATION),
+							StringUtils.to2DP(ABERRATION_TARGET_RADIUS),
+							StringUtils.multiplierToPercentage(ABERRATION_POTION_DAMAGE_MULTIPLIER_1),
+							StringUtils.multiplierToPercentage(ABERRATION_BLEED_AMOUNT),
+							StringUtils.ticksToSeconds(ABERRATION_BLEED_DURATION),
+							StringUtils.to2DP(ABERRATION_DAMAGE_RADIUS),
+							StringUtils.ticksToSeconds(ABERRATION_COOLDOWN)
+					),
+				"Damage is increased to %s%% of your potion damage."
+					.formatted(StringUtils.multiplierToPercentage(ABERRATION_POTION_DAMAGE_MULTIPLIER_2))
+			)
 			.cooldown(ABERRATION_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(new ItemStack(Material.CREEPER_HEAD, 1));
 

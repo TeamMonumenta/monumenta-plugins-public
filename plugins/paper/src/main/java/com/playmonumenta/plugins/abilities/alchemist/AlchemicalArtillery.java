@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +28,8 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
@@ -37,7 +39,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class AlchemicalArtillery extends PotionAbility {
-	private static final int COOLDOWN = 20 * 3;
+	private static final int COOLDOWN = 20 * 6;
 
 	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 1.5;
 	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 2.5;
@@ -56,15 +58,24 @@ public class AlchemicalArtillery extends PotionAbility {
 			.scoreboardId("Alchemical")
 			.shorthandName("AA")
 			.descriptions(
-			"Pressing the Drop Key while holding an Alchemist Bag and not sneaking launches a heavy bomb that " +
-					"explodes on contact with the ground or lava, or after 6 seconds, dealing " + (int) (ARTILLERY_1_DAMAGE_MULTIPLIER * 100) +
-					"% of your potion's damage, in an area that is " + (int) (ARTILLERY_RANGE_MULTIPLIER * 100) +
-					"% of your potion's radius. The initial speed of the bomb scales with your projectile speed. " +
-					"This costs you " + ARTILLERY_POTION_COST + " potions.",
-			"The damage of the bomb is increased to " + (int) (ARTILLERY_2_DAMAGE_MULTIPLIER * 100) + "%",
-				"" + ENHANCEMENT_EXPLOSION_DELAY / 20 + " second after the bomb lands, a secondary explosion deals " +
-					(int) (ENHANCEMENT_EXPLOSION_DAMAGE_MULTIPLIER * 100) + "% of the bomb's damage and applies the " +
-					"effects of your currently selected potion type."
+				("Pressing the Drop Key while holding an Alchemist Bag and not sneaking launches a heavy bomb that " +
+				"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s%% of your " +
+				"potion's damage, in an area that is %s%% of your potion's radius. The initial speed of the bomb " +
+				"scales with your projectile speed. This costs you %s potions. %ss cooldown.")
+					.formatted(
+							StringUtils.multiplierToPercentage(ARTILLERY_1_DAMAGE_MULTIPLIER),
+							StringUtils.multiplierToPercentage(ARTILLERY_RANGE_MULTIPLIER),
+							ARTILLERY_POTION_COST,
+							StringUtils.ticksToSeconds(COOLDOWN)
+					),
+				"The damage of the bomb is increased to %s%%"
+					.formatted(StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
+				("%ss after the bomb lands, a secondary explosion deals %s%% of the bomb's damage and applies " +
+				"the effects of your currently selected potion type.")
+					.formatted(
+							StringUtils.ticksToSeconds(ENHANCEMENT_EXPLOSION_DELAY),
+							StringUtils.multiplierToPercentage(ENHANCEMENT_EXPLOSION_DAMAGE_MULTIPLIER)
+					)
 			)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AlchemicalArtillery::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
@@ -111,17 +122,22 @@ public class AlchemicalArtillery extends PotionAbility {
 				vel.setY(0.2);
 			}
 
-			FallingBlock physicsBlock = loc.getWorld().spawnFallingBlock(loc, Bukkit.createBlockData(Material.BARRIER));
-			physicsBlock.setVelocity(vel);
-			physicsBlock.addPassenger(grenade);
-			physicsBlock.addScoreboardTag("DisableBlockPlacement");
-			physicsBlock.setDropItem(false);
+			// Mount the grenade on a dropped item to use its physics instead
+			Item physicsItem = (Item) loc.getWorld().spawnEntity(loc, EntityType.DROPPED_ITEM);
+			ItemStack itemStack = new ItemStack(Material.GUNPOWDER);
+			itemStack.setAmount(1);
+			physicsItem.setItemStack(itemStack);
+			physicsItem.setCanPlayerPickup(false);
+			physicsItem.setCanMobPickup(false);
+			physicsItem.setVelocity(vel);
+			physicsItem.addPassenger(grenade);
+			physicsItem.setInvulnerable(true);
 
 			new BukkitRunnable() {
 				int mTicks = 0;
 				ItemStatManager.PlayerItemStats mPlayerItemStats = playerItemStats;
 				private MagmaCube mGrenade = grenade;
-				private FallingBlock mPhysicsBlock = physicsBlock;
+				private Item mPhysicsItem = physicsItem;
 				@Override
 				public void run() {
 					if (mGrenade == null) {
@@ -131,20 +147,21 @@ public class AlchemicalArtillery extends PotionAbility {
 
 					if (!mPlayer.isOnline()) {
 						mGrenade.remove();
-						mPhysicsBlock.remove();
+						mPhysicsItem.remove();
 						this.cancel();
 						return;
 					}
 
 					// Explosion conditions
 					// - If the grenade somehow died
-					// - If the physics block hit the ground
+					// - If the physics item hit the ground
 					// - If the grenade hit lava
+					// - If the grenade has collided with any enemy
 					// - If 6 seconds have passed (probably stuck in webs)
-					if (mGrenade.isDead() || mPhysicsBlock.isOnGround() || mTicks > 120 || mGrenade.isInLava()) {
-						explode(mGrenade.getLocation().subtract(0, 0.5, 0), mPlayerItemStats);
+					if (mGrenade.isDead() || mPhysicsItem.isOnGround() || mTicks > 120 || mGrenade.isInLava() || hasCollidedWithEnemy(mGrenade)) {
+						explode(mGrenade.getLocation().subtract(0, 0.1, 0), mPlayerItemStats);
 						mGrenade.remove();
-						mPhysicsBlock.remove();
+						mPhysicsItem.remove();
 						this.cancel();
 						return;
 					}
@@ -158,6 +175,14 @@ public class AlchemicalArtillery extends PotionAbility {
 				}
 			}.runTaskTimer(mPlugin, 0, 1);
 		}
+	}
+
+	private boolean hasCollidedWithEnemy(MagmaCube grenade) {
+		Hitbox hitbox = new Hitbox.AABBHitbox(grenade.getWorld(), grenade.getBoundingBox());
+		if (hitbox.getHitMobs().size() > 0) {
+			return true;
+		}
+		return false;
 	}
 
 	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {

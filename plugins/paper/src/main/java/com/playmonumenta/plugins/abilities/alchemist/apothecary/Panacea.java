@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -18,6 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Panacea extends Ability {
 
-	private static final double PANACEA_DAMAGE_FRACTION = 1.2;
+	private static final double PANACEA_DAMAGE_FRACTION = 1;
 	private static final int PANACEA_1_SHIELD = 2;
 	private static final int PANACEA_2_SHIELD = 4;
 	private static final int PANACEA_MAX_SHIELD = 16;
@@ -54,6 +56,11 @@ public class Panacea extends Ability {
 	private static final Particle.DustOptions APOTHECARY_LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.0f);
 	private static final int COOLDOWN = 20 * 20;
+	private static final double PANACEA_LEVEL_1_DOT_MULTIPLIER = 0.20;
+	private static final double PANACEA_LEVEL_2_DOT_MULTIPLIER = 0.35;
+	private static final String PANACEA_DOT_EFFECT_NAME = "PanaceaDamageOverTimeEffect";
+	private static final int PANACEA_DOT_PERIOD = 10;
+	private static final int PANACEA_DOT_DURATION = 20 * 9;
 
 	public static final String CHARM_DAMAGE = "Panacea Damage";
 	public static final String CHARM_ABSORPTION = "Panacea Absorption Health";
@@ -71,12 +78,31 @@ public class Panacea extends Ability {
 			.scoreboardId("Panacea")
 			.shorthandName("Pn")
 			.descriptions(
-				"Sneak Drop with an Alchemist Bag to shoot a mixture that deals 120% of your potion damage " +
-					"which applies 100% Slow for 1.5s to every enemy touched and adds 2 absorption health " +
-					"to other players, lasting 24 seconds, maximum 16." +
-					"After hitting a block or traveling 10 blocks, the mixture traces and returns to you, able to " +
-					"damage enemies and shield allies a second time. Cooldown: 20s.",
-				"Absorption health added is increased to 4, and Slow duration is increased to 2s.")
+				("Sneak Drop with an Alchemist Bag to shoot a mixture that deals %s%% of your potion damage, " +
+				"applies 100%% Slow for %ss, applies a %s%% base magic Damage Over Time effect every %ss for %ss, " +
+				"and adds %s absorption health to other players per enemy touched (maximum %s absorption), lasting %ss. " +
+				"After hitting a block or traveling %s blocks, the mixture traces and returns to you, able to " +
+				"damage enemies and shield allies a second time. Cooldown: %ss.")
+					.formatted(
+							StringUtils.multiplierToPercentage(PANACEA_DAMAGE_FRACTION),
+							StringUtils.ticksToSeconds(PANACEA_1_SLOW_TICKS),
+							StringUtils.multiplierToPercentage(PANACEA_LEVEL_1_DOT_MULTIPLIER),
+							StringUtils.ticksToSeconds(PANACEA_DOT_PERIOD),
+							StringUtils.ticksToSeconds(PANACEA_DOT_DURATION),
+							PANACEA_1_SHIELD,
+							PANACEA_MAX_SHIELD,
+							StringUtils.ticksToSeconds(PANACEA_ABSORPTION_DURATION),
+							StringUtils.to2DP(PANACEA_MAX_DURATION * PANACEA_MOVE_SPEED),
+							StringUtils.ticksToSeconds(COOLDOWN)
+					),
+				("Absorption health added is increased to %s, Slow duration is increased to %ss, " +
+				"Damage Over Time is increased to %s%% base magic damage.")
+					.formatted(
+							PANACEA_2_SHIELD,
+							StringUtils.ticksToSeconds(PANACEA_2_SLOW_TICKS),
+							StringUtils.multiplierToPercentage(PANACEA_LEVEL_2_DOT_MULTIPLIER)
+					)
+			)
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Panacea::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
@@ -119,7 +145,7 @@ public class Panacea extends Ability {
 
 		if (mAlchemistPotions != null) {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION);
-
+			double dotDamage = mAlchemistPotions.getDamage() * (isLevelOne() ? PANACEA_LEVEL_1_DOT_MULTIPLIER : PANACEA_LEVEL_2_DOT_MULTIPLIER);
 			cancelOnDeath(new BukkitRunnable() {
 				final Location mLoc = mPlayer.getEyeLocation();
 				final BoundingBox mBox = BoundingBox.of(mLoc, radius, radius, radius);
@@ -143,6 +169,7 @@ public class Panacea extends Ability {
 						LivingEntity mob = mobIter.next();
 						if (mBox.overlaps(mob.getBoundingBox())) {
 							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
+							mPlugin.mEffectManager.addEffect(mob, PANACEA_DOT_EFFECT_NAME, new CustomDamageOverTime(PANACEA_DOT_DURATION, dotDamage, PANACEA_DOT_PERIOD, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC));
 
 							if (!EntityUtils.isBoss(mob)) {
 								EntityUtils.applySlow(mPlugin, mSlowTicks, 1, mob);

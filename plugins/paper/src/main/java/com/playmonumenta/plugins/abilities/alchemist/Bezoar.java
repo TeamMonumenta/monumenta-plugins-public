@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -74,13 +75,34 @@ public class Bezoar extends Ability {
 			.scoreboardId("Bezoar")
 			.shorthandName("BZ")
 			.descriptions(
-				"Every 5th mob killed within 16 blocks of the Alchemist spawns a Bezoar that lingers for 10s. " +
-					"Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, " +
-					"and will grant both the player who picks it up and the Alchemist a custom healing effect that regenerates 5% of max health " +
-					"every second for 2 seconds and reduces the duration of all current potion debuffs by 10s.",
-				"The Bezoar now additionally grants +15% damage from all sources for 8s.",
-				"When a Bezoar would spawn, 10% of the time it will summon a Philosopher's Stone instead. " +
-					"When the Philosopher's Stone is picked up, the player and the Alchemist gain 4 absorption hearts for 8s and the Alchemist gains 3 potions.")
+				("Every %sth mob killed within %s blocks of the Alchemist spawns a Bezoar that lingers for %ss. " +
+				"Picking up a Bezoar will grant the Alchemist an additional Alchemist Potion, " +
+				"and will grant both the player who picks it up and the Alchemist a custom healing effect that " +
+				"regenerates %s%% of max health every second for %ss and reduces the duration of all current " +
+				"potion debuffs by %ss.")
+					.formatted(
+							FREQUENCY,
+							StringUtils.to2DP(RADIUS),
+							StringUtils.ticksToSeconds(LINGER_TIME),
+							StringUtils.multiplierToPercentage(HEAL_PERCENT),
+							StringUtils.ticksToSeconds(HEAL_DURATION),
+							StringUtils.ticksToSeconds(DEBUFF_REDUCTION)
+					),
+				"The Bezoar now additionally grants +%s%% damage from all sources for %ss."
+					.formatted(
+							StringUtils.multiplierToPercentage(DAMAGE_PERCENT),
+							StringUtils.ticksToSeconds(DAMAGE_DURATION)
+					),
+				("When a Bezoar would spawn, %s%% of the time it will summon a Philosopher's Stone instead. " +
+				"When the Philosopher's Stone is picked up, the player and the Alchemist gain %s absorption hearts for " +
+				"%ss and the Alchemist gains %s potions.")
+					.formatted(
+							StringUtils.multiplierToPercentage(PHILOSOPHER_STONE_SPAWN_RATE),
+							PHILOSOPHER_STONE_ABSORPTION_HEALTH / 2,
+							StringUtils.ticksToSeconds(PHILOSOPHER_STONE_ABSORPTION_DURATION),
+							PHILOSOPHER_STONE_POTIONS
+					)
+			)
 			.displayItem(new ItemStack(Material.LIME_CONCRETE, 1));
 
 	private int mKills = 0;
