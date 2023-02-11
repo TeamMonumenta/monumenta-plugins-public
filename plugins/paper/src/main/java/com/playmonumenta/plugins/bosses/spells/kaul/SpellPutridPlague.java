@@ -164,7 +164,7 @@ public class SpellPutridPlague extends Spell {
 						team.color(NamedTextColor.WHITE);
 						Location base = point.getLocation();
 						base.setY(0);
-						List<Player> safe = new Hitbox.UprightCylinderHitbox(base, Kaul.ARENA_MAX_Y, 4).getHitPlayers(true);
+						List<Player> safe = new Hitbox.UprightCylinderHitbox(base, Kaul.ARENA_MAX_Y, 8).getHitPlayers(true);
 						Collection<Player> ps = mKaul.getArenaParticipants();
 						for (Player player : ps) {
 							if (!safe.contains(player)) {

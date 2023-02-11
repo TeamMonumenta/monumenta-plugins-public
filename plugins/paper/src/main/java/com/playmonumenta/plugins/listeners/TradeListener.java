@@ -51,7 +51,8 @@ public class TradeListener implements Listener {
 	// Ignore stat checks for trades between items in these sets
 	private static final ImmutableSet<ImmutableSet<String>> SKIP_STAT_CHECK_TRADES = ImmutableSet.of(
 		ImmutableSet.of("King's Warden", "Queen's Warden", "Kaul's Warden"),
-		ImmutableSet.of("Frost Giant's Greatsword", "Frost Giant's Crusher", "Frost Giant's Staff", "Frost Giant's Crescent"));
+		ImmutableSet.of("Frost Giant's Greatsword", "Frost Giant's Crusher", "Frost Giant's Staff", "Frost Giant's Crescent"),
+		ImmutableSet.of("True North", "Truer North", "Truest North"));
 
 	// Infusions whose cost depends on item tier and/or region. These can only be moved in re-skin trades.
 	private static final ItemStatUtils.InfusionType[] VARYING_COST_INFUSIONS = {
