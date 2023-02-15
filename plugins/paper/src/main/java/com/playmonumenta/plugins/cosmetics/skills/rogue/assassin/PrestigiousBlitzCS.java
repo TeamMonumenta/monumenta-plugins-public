@@ -32,7 +32,8 @@ public class PrestigiousBlitzCS extends BodkinBlitzCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"BODKIN_DESC"
+			"Only the best can hide in the",
+			"light as well as the shadows."
 		);
 	}
 

@@ -39,7 +39,8 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"MOONBLADE_DESC"
+			"Amber planes cleave",
+			"through your foes."
 		);
 	}
 

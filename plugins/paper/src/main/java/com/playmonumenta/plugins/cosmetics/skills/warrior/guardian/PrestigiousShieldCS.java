@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 
-	public static final String NAME = "Prestigious Shield";
+	public static final String NAME = "Prestigious Wall";
 
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(192, 168, 32), 1.5f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.25f);
@@ -30,7 +30,8 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"SHIELD_DESC"
+			"A radiant crescent glows",
+			"upon the hero's shield."
 		);
 	}
 

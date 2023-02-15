@@ -33,7 +33,8 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"RONDE_DESC"
+			"A flurry of blows follows",
+			"the master's blade."
 		);
 	}
 

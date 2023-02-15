@@ -36,7 +36,8 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"REMEDY_DESC"
+			"Golden light escapes the",
+			"flask, soothing the weary."
 		);
 	}
 

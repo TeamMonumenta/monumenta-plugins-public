@@ -33,7 +33,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"BEAM_DESC"
+			"Golden winds follow",
+			"the beam's arc."
 		);
 	}
 

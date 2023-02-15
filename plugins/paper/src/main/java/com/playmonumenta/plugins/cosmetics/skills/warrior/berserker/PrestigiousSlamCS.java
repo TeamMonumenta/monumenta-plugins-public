@@ -31,7 +31,8 @@ public class PrestigiousSlamCS extends MeteorSlamCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"SLAM_DESC"
+			"Only the best can balance",
+			"both power and grace."
 		);
 	}
 

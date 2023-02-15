@@ -44,7 +44,8 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"INFUSION_DESC"
+			"A radiant blade echoes",
+			"the perfect strike."
 		);
 	}
 

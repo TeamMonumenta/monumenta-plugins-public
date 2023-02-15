@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements PrestigeCS {
 
-	public static final String NAME = "Prestigious Esoteric";
+	public static final String NAME = "Prestigious Enhancements";
 
 	private static final String ABERRATION_LOS = "PrestigiousAberration";
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 224, 48), 1.0f);
@@ -34,7 +34,8 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"ESOTERIC_DESC"
+			"The perfect permutation",
+			"forms a divine geometry."
 		);
 	}
 

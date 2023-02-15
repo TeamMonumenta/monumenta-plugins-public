@@ -32,8 +32,8 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"\"Nobody survived under catastrophe\"",
-			"Now, we are the catastrophe."
+			"The weight of fate is oft",
+			"heavier than any stone."
 		);
 	}
 

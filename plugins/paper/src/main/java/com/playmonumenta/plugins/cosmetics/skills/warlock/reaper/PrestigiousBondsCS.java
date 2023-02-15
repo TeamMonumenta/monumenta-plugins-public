@@ -33,7 +33,8 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"BONDS_DESC"
+			"Chains of radiance weave",
+			"a beautiful prison."
 		);
 	}
 

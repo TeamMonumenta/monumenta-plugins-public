@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeCS {
 
-	public static final String NAME = "Prestigious Pinning Shot";
+	public static final String NAME = "Prestigious Shot";
 
 	private static final Particle.DustOptions GOLD_COLOR = new Particle.DustOptions(Color.fromRGB(255, 224, 48), 1.1f);
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);
@@ -31,7 +31,8 @@ public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeC
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"PIN_DESC"
+			"A halo of light marks",
+			"those soon to depart."
 		);
 	}
 

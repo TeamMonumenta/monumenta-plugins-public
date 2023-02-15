@@ -33,7 +33,8 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"SHADES_DESC"
+			"Golden church bells haunt",
+			"the hero's requiem."
 		);
 	}
 

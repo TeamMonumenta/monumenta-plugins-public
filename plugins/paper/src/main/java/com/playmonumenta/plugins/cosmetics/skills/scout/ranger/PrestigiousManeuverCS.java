@@ -31,7 +31,8 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	@Override
 	public @Nullable Cosmetic getCosmetic() {
 		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"MANEUVER_DESC"
+			"Runes of light form an",
+			"afterimage from your speed."
 		);
 	}
 
