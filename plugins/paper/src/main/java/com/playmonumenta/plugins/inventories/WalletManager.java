@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
@@ -44,18 +45,24 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 public class WalletManager implements Listener {
@@ -157,6 +164,19 @@ public class WalletManager implements Listener {
 				"epic:r2/dungeons/rushdown/dis_energy", 100, loc)
 		).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
 	}
+
+	private record WalletSettings(ItemStatUtils.Region mMaxRegion, boolean allCurrencies) {
+	}
+
+	private static final WalletSettings MAX_SETTINGS = new WalletSettings(ItemStatUtils.Region.RING, true);
+	private static final ImmutableMap<ItemUtils.ItemIdentifier, WalletSettings> WALLET_SETTINGS = ImmutableMap.of(
+		new ItemUtils.ItemIdentifier(Material.GLASS_BOTTLE, "Experience Flask"), new WalletSettings(ItemStatUtils.Region.VALLEY, false),
+		new ItemUtils.ItemIdentifier(Material.CAULDRON, "Experience Bucket"), new WalletSettings(ItemStatUtils.Region.VALLEY, true),
+		new ItemUtils.ItemIdentifier(Material.AMETHYST_CLUSTER, "Crystal Cluster"), new WalletSettings(ItemStatUtils.Region.ISLES, false),
+		new ItemUtils.ItemIdentifier(Material.AMETHYST_BLOCK, "Crystal Collector"), new WalletSettings(ItemStatUtils.Region.ISLES, true),
+		new ItemUtils.ItemIdentifier(Material.PORKCHOP, "Piggy Bank"), new WalletSettings(ItemStatUtils.Region.RING, false),
+		new ItemUtils.ItemIdentifier(Material.FLOWER_POT, "Bag of Hoarding"), MAX_SETTINGS
+	);
 
 	private static final Map<UUID, Wallet> mWallets = new HashMap<>();
 
@@ -368,11 +388,15 @@ public class WalletManager implements Listener {
 
 	private static class WalletGui extends Gui {
 		private final Wallet mWallet;
+		private final WalletSettings mSettings;
+		private final String mPlainName;
 		private int mPage;
 
-		public WalletGui(Player player, Wallet wallet, Component displayName) {
+		public WalletGui(Player player, Wallet wallet, WalletSettings settings, Component displayName) {
 			super(player, 6 * 9, displayName);
-			this.mWallet = wallet;
+			mWallet = wallet;
+			mSettings = settings;
+			mPlainName = MessagingUtils.plainText(displayName);
 			setFiller(Material.BLACK_STAINED_GLASS_PANE);
 		}
 
@@ -607,7 +631,7 @@ public class WalletManager implements Listener {
 			{
 				ItemStack infoIcon = new ItemStack(Material.DARK_OAK_SIGN);
 				ItemMeta itemMeta = infoIcon.getItemMeta();
-				itemMeta.displayName(Component.text("Bag of Hoarding Info", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+				itemMeta.displayName(Component.text(mPlainName + " Info", NamedTextColor.GOLD).decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 				itemMeta.lore(List.of(
 					Component.text("Left click here to toggle displaying item counts.", NamedTextColor.WHITE)
 						.decoration(TextDecoration.ITALIC, false),
@@ -617,7 +641,7 @@ public class WalletManager implements Listener {
 						.decoration(TextDecoration.ITALIC, false),
 					Component.text("Shift click to store all of the same type.", NamedTextColor.GRAY)
 						.decoration(TextDecoration.ITALIC, false),
-					Component.text("Click on items in the Bag of Hoarding to retrieve them:", NamedTextColor.GRAY)
+					Component.text("Click on items in the " + mPlainName + " to retrieve them:", NamedTextColor.GRAY)
 						.decoration(TextDecoration.ITALIC, false),
 					Component.text(" - ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 						.append(Component.text("Left Click", NamedTextColor.WHITE))
@@ -678,10 +702,10 @@ public class WalletManager implements Listener {
 			}
 			ItemStack currentItem = event.getCurrentItem();
 			if (event.getClick() == ClickType.LEFT
-				    && canPutIntoWallet(currentItem)) {
+				    && canPutIntoWallet(currentItem, mSettings)) {
 				mWallet.add(mPlayer, currentItem);
 				update();
-			} else if (event.getClick() == ClickType.SHIFT_LEFT && canPutIntoWallet(currentItem)) {
+			} else if (event.getClick() == ClickType.SHIFT_LEFT && canPutIntoWallet(currentItem, mSettings)) {
 				ItemStack combinedItems = ItemUtils.clone(currentItem);
 				currentItem.setAmount(0);
 				for (ItemStack item : mPlayer.getInventory().getStorageContents()) {
@@ -692,7 +716,7 @@ public class WalletManager implements Listener {
 				}
 				mWallet.add(mPlayer, combinedItems);
 				update();
-			} else if ((event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) && canPutIntoWallet(currentItem)) {
+			} else if ((event.getClick() == ClickType.RIGHT || event.getClick() == ClickType.SHIFT_RIGHT) && canPutIntoWallet(currentItem, mSettings)) {
 				ItemStack oneItem = ItemUtils.clone(currentItem);
 				currentItem.setAmount(currentItem.getAmount() - 1);
 				oneItem.setAmount(1);
@@ -704,7 +728,8 @@ public class WalletManager implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		if (isWallet(event.getCurrentItem())
+		WalletSettings settings = getSettings(event.getCurrentItem());
+		if (settings != null
 			    && event.getCurrentItem().getAmount() == 1
 			    && event.getWhoClicked() instanceof Player player
 			    && player.hasPermission("monumenta.usewallet")) {
@@ -721,7 +746,7 @@ public class WalletManager implements Listener {
 						return;
 					}
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					new WalletGui(player, wallet, walletItem.getItemMeta().displayName()).open();
+					new WalletGui(player, wallet, settings, walletItem.getItemMeta().displayName()).open();
 				} else if (event.getClick() == ClickType.SWAP_OFFHAND) {
 					// quick-fill wallet
 					event.setCancelled(true);
@@ -733,7 +758,7 @@ public class WalletManager implements Listener {
 					PlayerInventory inventory = player.getInventory();
 					for (int i = 0; i < inventory.getSize(); i++) {
 						ItemStack item = inventory.getItem(i);
-						if (canPutIntoWallet(item)) {
+						if (canPutIntoWallet(item, settings)) {
 							deposited += item.getAmount();
 							depositedItems.merge(ItemUtils.getPlainName(item), item.getAmount(), Integer::sum);
 							wallet.add(player, item);
@@ -741,7 +766,7 @@ public class WalletManager implements Listener {
 					}
 					if (deposited > 0) {
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						player.sendMessage(Component.text(deposited + " item" + (deposited == 1 ? "" : "s") + " deposited into your Bag of Hoarding", NamedTextColor.GOLD)
+						player.sendMessage(Component.text(deposited + " item" + (deposited == 1 ? "" : "s") + " deposited into your " + ItemUtils.getPlainName(walletItem), NamedTextColor.GOLD)
 							                   .hoverEvent(HoverEvent.showText(Component.text(
 								                   depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
 									                   .collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
@@ -754,13 +779,13 @@ public class WalletManager implements Listener {
 						return;
 					}
 					ItemStack cursor = event.getCursor();
-					if (canPutIntoWallet(cursor)) {
+					if (canPutIntoWallet(cursor, settings)) {
 						wallet.add(player, cursor);
 						event.getView().setCursor(cursor);
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						player.sendMessage(Component.text("Item deposited into your Bag of Hoarding", NamedTextColor.GOLD));
+						player.sendMessage(Component.text("Item deposited into your " + ItemUtils.getPlainName(walletItem), NamedTextColor.GOLD));
 					} else {
-						player.sendMessage(Component.text("Only plain currency can be put into the Bag of Hoarding", NamedTextColor.RED));
+						player.sendMessage(Component.text("This item cannot be put into the " + ItemUtils.getPlainName(walletItem), NamedTextColor.RED));
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					}
 				}
@@ -768,23 +793,48 @@ public class WalletManager implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
+		if (isWallet(event.getItem())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerInteractEvent(PlayerInteractEvent event) {
+		if (isWallet(event.getItem())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
+		if (!(event.getRightClicked() instanceof ItemFrame)
+			    && !(event.getRightClicked() instanceof ArmorStand)
+			    && isWallet(event.getPlayer().getEquipment().getItem(event.getHand()))) {
+			event.setCancelled(true);
+		}
+	}
+
 	private static boolean checkNotSoulbound(Player player, ItemStack item) {
 		if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
 			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
-			player.sendMessage(Component.text("This Bag of Hoarding does not belong to you!", NamedTextColor.RED));
+			player.sendMessage(Component.text("This " + ItemUtils.getPlainName(item) + " does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return true;
 		}
 		return false;
 	}
 
-	public static boolean canPutIntoWallet(ItemStack item) {
+	public static boolean canPutIntoWallet(ItemStack item, WalletSettings settings) {
 		return item != null
-			&& item.getAmount() > 0
-			&& (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY
-				|| ItemStatUtils.getTier(item) == ItemStatUtils.Tier.EVENT_CURRENCY
-				|| InventoryUtils.testForItemWithLore(item, "Can be put into a Bag of Hoarding."))
-			&& ItemStatUtils.getPlayerModified(new NBTItem(item)) == null;
+			       && item.getAmount() > 0
+			       && (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY
+				           || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.EVENT_CURRENCY
+				           || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."))
+			       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+			       && ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) <= 0
+			       && (settings.allCurrencies || ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) < 0 || MAIN_CURRENCIES.stream().anyMatch(c -> c.isSimilar(item)));
 	}
 
 	private static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
@@ -796,10 +846,13 @@ public class WalletManager implements Listener {
 		return null;
 	}
 
+	@Contract("null -> null")
+	private static @Nullable WalletManager.WalletSettings getSettings(@Nullable ItemStack item) {
+		return item == null ? null : WALLET_SETTINGS.get(ItemUtils.getIdentifier(item));
+	}
+
 	public static boolean isWallet(@Nullable ItemStack itemStack) {
-		return itemStack != null
-			       && itemStack.getType() == Material.FLOWER_POT
-			       && "Bag of Hoarding".equals(ItemUtils.getPlainNameIfExists(itemStack));
+		return getSettings(itemStack) != null;
 	}
 
 	public static void registerCommand() {
@@ -809,7 +862,7 @@ public class WalletManager implements Listener {
 			.executes((sender, args) -> {
 				Player viewer = CommandUtils.getPlayerFromSender(sender);
 				Player viewee = (Player) args[0];
-				new WalletGui(viewer, mWallets.computeIfAbsent(viewee.getUniqueId(), Wallet::new),
+				new WalletGui(viewer, mWallets.computeIfAbsent(viewee.getUniqueId(), Wallet::new), MAX_SETTINGS,
 					Component.text("Wallet of ", NamedTextColor.GOLD).append(viewee.displayName())).open();
 			})
 			.register();
