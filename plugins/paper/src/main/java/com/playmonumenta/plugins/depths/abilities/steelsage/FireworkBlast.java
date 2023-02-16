@@ -127,7 +127,7 @@ public class FireworkBlast extends DepthsAbility {
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
-		return Component.text("Right click while sneaking and holding a weapon to shoot a firework that deals")
+		return Component.text("Right click while sneaking and holding a weapon to shoot a firework that deals ")
 			.append(Component.text(DAMAGE[rarity - 1], color))
 			.append(Component.text(" projectile damage to enemies within " + RADIUS + " blocks of its explosion. The damage is increased by " + StringUtils.multiplierToPercentage(DAMAGE_INCREASE_PER_BLOCK) + "% for every block the firework travels, up to "))
 			.append(Component.text(DAMAGE_CAP[rarity - 1], color))

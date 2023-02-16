@@ -42,7 +42,7 @@ public class Warlock extends PlayerClass {
 		mQuestReq = "Quest13";
 		mQuestReqMin = 1;
 		mClassDescription = "Warlocks use scythes in combination with dark magic to bring suffering and death to their enemies.";
-		mClassPassiveDescription = "Killing an enemy while holding a scythe grants 6 seconds of Resistance 1.";
+		mClassPassiveDescription = "Killing an enemy while holding a scythe grants 10% damage reduction for 6 seconds.";
 		mClassPassiveName = "Culling";
 
 		mSpecOne.mAbilities.add(DarkPact.INFO);
