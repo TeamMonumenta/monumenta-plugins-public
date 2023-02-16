@@ -109,12 +109,6 @@ public final class TrackingManager {
 
 	public void update(int ticks) {
 		try {
-			mPlayers.update(ticks);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
 			mCreepers.update(ticks);
 		} catch (Exception e) {
 			e.printStackTrace();

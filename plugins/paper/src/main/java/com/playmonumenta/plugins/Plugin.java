@@ -457,6 +457,12 @@ public class Plugin extends JavaPlugin {
 				}
 
 				// Every tick - 20 times a second
+				try {
+					mTrackingManager.mPlayers.update(1);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 				// Update cooldowns
 				try {
 					mProjectileEffectTimers.update();

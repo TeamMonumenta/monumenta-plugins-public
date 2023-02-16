@@ -1072,6 +1072,11 @@ public class PlayerListener implements Listener {
 
 		Player player = event.getPlayer();
 		mPlugin.mAbilityManager.playerTeleportEvent(player, event);
+
+		// If the teleport wasn't cancelled by anything, update their gamemode and other location-based info
+		if (!event.isCancelled()) {
+			mPlugin.mTrackingManager.mPlayers.updateLocation(player, event.getTo(), 0);
+		}
 	}
 
 	private static boolean collidesWithUnbreakableBlock(World world, BoundingBox boundingBox) {

@@ -23,11 +23,11 @@ public class Constants {
 	public static final int ONE_HOUR = TICKS_PER_MINUTE * 60;
 	public static final int THREE_HOURS = TICKS_PER_MINUTE * 180;
 
-	public static final PotionEffect CAPITAL_SPEED_EFFECT = new PotionEffect(PotionEffectType.SPEED, 2 * TICKS_PER_SECOND, 1, true, false);
-	public static final PotionEffect CITY_SATURATION_EFFECT = new PotionEffect(PotionEffectType.SATURATION, 2 * TICKS_PER_SECOND, 1, true, false);
-	public static final PotionEffect CITY_RESISTANCE_EFFECT = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2 * TICKS_PER_SECOND, 4, true, false);
-	public static final PotionEffect CITY_JUMP_MASK_EFFECT = new PotionEffect(PotionEffectType.JUMP, 2 * TICKS_PER_SECOND, 1000, true, false);
-	public static final PotionEffect CITY_SPEED_MASK_EFFECT = new PotionEffect(PotionEffectType.SPEED, 2 * TICKS_PER_SECOND, 1000, true, false);
+	public static final PotionEffect CAPITAL_SPEED_EFFECT = new PotionEffect(PotionEffectType.SPEED, 2 * TICKS_PER_SECOND - 1, 1, true, false);
+	public static final PotionEffect CITY_SATURATION_EFFECT = new PotionEffect(PotionEffectType.SATURATION, 2 * TICKS_PER_SECOND - 1, 1, true, false);
+	public static final PotionEffect CITY_RESISTANCE_EFFECT = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2 * TICKS_PER_SECOND - 1, 4, true, false);
+	public static final PotionEffect CITY_JUMP_MASK_EFFECT = new PotionEffect(PotionEffectType.JUMP, 2 * TICKS_PER_SECOND - 1, 1000, true, false);
+	public static final PotionEffect CITY_SPEED_MASK_EFFECT = new PotionEffect(PotionEffectType.SPEED, 2 * TICKS_PER_SECOND - 1, 1000, true, false);
 
 	//  USED FOR DEBUGGING PURPOSES WHEN COMPILING A JAR FOR OTHERS. (sadly it'll still contain the code in the jar, however it won't run)
 	public static final boolean CLASSES_ENABLED = true;
