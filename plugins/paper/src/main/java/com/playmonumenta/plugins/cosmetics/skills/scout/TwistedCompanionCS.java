@@ -170,6 +170,11 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 
 			@Override
 			public void run() {
+				if (!mL.getWorld().equals(target.getWorld())) {
+					cancel();
+					return;
+				}
+
 				mT++;
 
 				Location to = LocationUtils.getHalfHeightLocation(target);

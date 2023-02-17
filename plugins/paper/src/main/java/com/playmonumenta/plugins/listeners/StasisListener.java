@@ -183,7 +183,7 @@ public class StasisListener implements Listener {
 
 	private void endRespawnStasis(Player player, boolean ignoreTimeCheck) {
 		RespawnStasis respawnStasis = Plugin.getInstance().mEffectManager.getActiveEffect(player, RespawnStasis.class);
-		if (respawnStasis != null && (ignoreTimeCheck || respawnStasis.getDuration() < RespawnStasis.DURATION - 20)) {
+		if (respawnStasis != null && (ignoreTimeCheck || respawnStasis.getDuration() < RespawnStasis.DURATION - RespawnStasis.MINIMUM_DURATION)) {
 			respawnStasis.setDuration(0);
 		}
 	}

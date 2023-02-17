@@ -27,7 +27,11 @@ public class RespawnStasis extends Stasis {
 
 	public static final int DURATION = 20 * 60;
 
+	public static final int MINIMUM_DURATION = 10;
+
 	int mShatter;
+
+	private boolean mRemoveActionbar = false;
 
 	public RespawnStasis() {
 		super(DURATION, effectID);
@@ -44,7 +48,7 @@ public class RespawnStasis extends Stasis {
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, getDuration(), 0, false, false, false));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, getDuration(), 0, false, false, false));
 
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> showMessages(player));
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> showMessages(player, false));
 
 			// The following lines are from base Stasis with sound, glowing, and action bar message removed; and also potion effects' icons and particles removed
 			player.addScoreboardTag(Constants.Tags.STASIS);
@@ -61,8 +65,7 @@ public class RespawnStasis extends Stasis {
 			player.removePotionEffect(PotionEffectType.INVISIBILITY);
 			player.removePotionEffect(PotionEffectType.SLOW);
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			player.clearTitle();
-			player.sendActionBar(Component.empty());
+			showMessages(player, true);
 		}
 		super.entityLoseEffect(entity);
 	}
@@ -77,21 +80,28 @@ public class RespawnStasis extends Stasis {
 			.delta(0.3, 0.5, 0.3)
 			.spawnAsEntityActive(entity);
 		if (oneHertz && entity instanceof Player player) {
-			showMessages(player);
+			showMessages(player, false);
 		}
 	}
 
-	private void showMessages(Player player) {
-		Component subtitle;
-		if (mShatter == 1) {
-			subtitle = Component.text("Your gear is shattered!", NamedTextColor.RED);
-		} else if (mShatter > 1) {
-			subtitle = Component.text("Your gear is ", NamedTextColor.RED).append(Component.text("heavily shattered!", NamedTextColor.RED).decorate(TextDecoration.BOLD));
-		} else {
-			subtitle = Component.text("Nothing shattered.", NamedTextColor.GRAY);
+	private void showMessages(Player player, boolean fadeOut) {
+		if (!fadeOut || mRemoveActionbar) {
+			Component subtitle;
+			if (mShatter == 1) {
+				subtitle = Component.text("Your gear is shattered!", NamedTextColor.RED);
+			} else if (mShatter > 1) {
+				subtitle = Component.text("Your gear is ", NamedTextColor.RED).append(Component.text("heavily shattered!", NamedTextColor.RED).decorate(TextDecoration.BOLD));
+			} else {
+				subtitle = Component.text("Nothing shattered.", NamedTextColor.GRAY);
+			}
+			MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED), subtitle, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(fadeOut ? 0 : 2000), Duration.ofMillis(1000)));
 		}
-		MessagingUtils.sendTitle(player, Component.text("You Died", NamedTextColor.RED), subtitle, Title.Times.times(Duration.ofMillis(0), Duration.ofMillis(5000), Duration.ofMillis(500)));
-
+		if (fadeOut) {
+			if (mRemoveActionbar) {
+				player.sendActionBar(Component.empty());
+			}
+			return;
+		}
 		if (mShatter > 0 && getDuration() >= DURATION - 20 * 10) {
 			// For the first 10 seconds, show hint on how to repair gear if shattered
 			if (mShatter == 1) {
@@ -100,21 +110,25 @@ public class RespawnStasis extends Stasis {
 					                     .append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
 					                     .append(Component.text("collecting your grave", NamedTextColor.AQUA))
 					                     .append(Component.text("!", NamedTextColor.GOLD)));
+				mRemoveActionbar = false;
 			} else {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
 					                     .append(Component.text("massively more damage", NamedTextColor.RED).decorate(TextDecoration.BOLD))
 					                     .append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
 					                     .append(Component.text("using anvils on it", NamedTextColor.AQUA))
 					                     .append(Component.text("!", NamedTextColor.GOLD)));
+				mRemoveActionbar = false;
 			}
 		} else if (getDuration() >= DURATION / 2) {
-			// After 10 seconds, tell the player that they can click to respawn (or after one second immediately if not showing the shatter message)
-			if (getDuration() <= DURATION - 20) {
+			// After 10 seconds, tell the player that they can click to respawn (or after the minimal duration if not showing the shatter message)
+			if (getDuration() <= DURATION - MINIMUM_DURATION) {
 				player.sendActionBar(Component.text("(click any time to respawn)", NamedTextColor.WHITE));
+				mRemoveActionbar = true;
 			}
 		} else {
 			// After half the duration is over, inform the player that they will be force-respawned soon
 			player.sendActionBar(Component.text("You will be forcibly respawned in " + (getDuration() / 20) + " seconds!", NamedTextColor.WHITE));
+			mRemoveActionbar = true;
 		}
 	}
 

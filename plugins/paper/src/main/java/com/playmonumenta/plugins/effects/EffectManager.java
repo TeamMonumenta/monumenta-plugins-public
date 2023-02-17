@@ -430,7 +430,7 @@ public final class EffectManager implements Listener {
 									} catch (Exception ex) {
 										Plugin.getInstance().getLogger().severe("Error in effect manager tick: " + ex.getMessage());
 										ex.printStackTrace();
-										/* If ticking throws an exception (i.e. NPE) remove it */
+										/* If ticking throws an exception (e.g. NPE) remove it */
 										tickResult = false;
 									}
 									if (tickResult) {
