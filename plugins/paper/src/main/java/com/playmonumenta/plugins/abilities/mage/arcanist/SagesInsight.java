@@ -130,7 +130,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 
 				mStacks = 0;
 				for (ClassAbility s : mResets) {
-					if (ability == ClassAbility.MANA_LANCE) {
+					if (s == ClassAbility.MANA_LANCE) {
 						// Special Treatment for Mana Lance because of charged abilities.
 						Objects.requireNonNull(mPlugin.mAbilityManager.getPlayerAbility(mPlayer, ManaLance.class)).incrementCharge();
 					} else {
