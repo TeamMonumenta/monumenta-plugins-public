@@ -32,7 +32,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 
-
 public class HolyJavelin extends Ability {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
 

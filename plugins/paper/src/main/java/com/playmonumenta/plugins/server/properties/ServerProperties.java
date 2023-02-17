@@ -3,9 +3,11 @@ package com.playmonumenta.plugins.server.properties;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,12 +87,40 @@ public class ServerProperties {
 		return INSTANCE.mKeepLowTierInventory;
 	}
 
-	public static boolean getClassSpecializationsEnabled() {
-		return INSTANCE.mClassSpecializationsEnabled;
+	public static boolean getClassSpecializationsEnabled(@Nullable Player player) {
+		if (player == null) {
+			return INSTANCE.mClassSpecializationsEnabled;
+		}
+		if (INSTANCE.mClassSpecializationsEnabled) {
+			return true;
+		}
+		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(getShardName());
+		if (mapping == null) {
+			return false;
+		}
+		String typeName = mapping.getTypeName();
+		if (typeName == null) {
+			return false;
+		}
+		return ScoreboardUtils.getScoreboardValue(player.getName(), typeName).orElse(0) == 1;
 	}
 
-	public static boolean getAbilityEnhancementsEnabled() {
-		return INSTANCE.mAbilityEnhancementsEnabled;
+	public static boolean getAbilityEnhancementsEnabled(@Nullable Player player) {
+		if (player == null) {
+			return INSTANCE.mAbilityEnhancementsEnabled;
+		}
+		if (INSTANCE.mAbilityEnhancementsEnabled) {
+			return true;
+		}
+		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(getShardName());
+		if (mapping == null) {
+			return false;
+		}
+		String typeName = mapping.getTypeName();
+		if (typeName == null) {
+			return false;
+		}
+		return ScoreboardUtils.getScoreboardValue(player.getName(), typeName).orElse(0) == 1;
 	}
 
 	public static boolean getAuditMessagesEnabled() {
@@ -336,8 +367,7 @@ public class ServerProperties {
 		}
 	}
 
-	public static ItemStatUtils.Region getRegion() {
-		return ServerProperties.getAbilityEnhancementsEnabled() ? ItemStatUtils.Region.RING : ServerProperties.getClassSpecializationsEnabled() ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+	public static ItemStatUtils.Region getRegion(Player player) {
+		return ServerProperties.getAbilityEnhancementsEnabled(player) ? ItemStatUtils.Region.RING : ServerProperties.getClassSpecializationsEnabled(player) ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
 	}
-
 }

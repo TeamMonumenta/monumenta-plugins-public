@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -72,14 +73,16 @@ public class SkillSummary extends GenericCommand {
 					player.sendMessage(abilityHover);
 				}
 			}
-			for (AbilityInfo<?> disabledAbility : plugin.mAbilityManager.getDisabledAbilities()) {
-				if (disabledAbility.testCanUse(player)
-					    && disabledAbility.getScoreboard() != null) {
-					int score = ScoreboardUtils.getScoreboardValue(player, disabledAbility.getScoreboard()).orElse(0);
-					if (score > 0) {
-						Component abilityHover = disabledAbility.getLevelHover(score, useShorthand, false);
-						if (abilityHover != null) {
-							player.sendMessage(abilityHover.color(NamedTextColor.GRAY).append(Component.text(" (disabled in this region)", NamedTextColor.GRAY)));
+			if (!ServerProperties.getClassSpecializationsEnabled(player)) {
+				for (AbilityInfo<?> disabledAbility : plugin.mAbilityManager.getDisabledSpecAbilities()) {
+					if (disabledAbility.testCanUse(player)
+						    && disabledAbility.getScoreboard() != null) {
+						int score = ScoreboardUtils.getScoreboardValue(player, disabledAbility.getScoreboard()).orElse(0);
+						if (score > 0) {
+							Component abilityHover = disabledAbility.getLevelHover(player, score, useShorthand, false);
+							if (abilityHover != null) {
+								player.sendMessage(abilityHover.color(NamedTextColor.GRAY).append(Component.text(" (disabled in this region)", NamedTextColor.GRAY)));
+							}
 						}
 					}
 				}

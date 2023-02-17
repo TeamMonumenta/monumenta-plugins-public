@@ -164,7 +164,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				}
 			}
 
-			if (ServerProperties.getClassSpecializationsEnabled()) {
+			if (ServerProperties.getClassSpecializationsEnabled(mPlayer)) {
 				for (Ability specAbility : specAbilities) {
 					if (specAbility instanceof PotionAbility potionAbility) {
 						mPotionAbilities.add(potionAbility);

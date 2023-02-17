@@ -16,13 +16,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class Chivalrous {
 
-	private static final double[] SPAWN_CHANCE = {
-			0.10,
-			0.20,
-			0.30,
-			0.40,
-			0.50
-	};
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.10;
 
 	// 50% bee - 25% slime - 25% magmacube
 	private static final String[] MOUNTS = {
@@ -55,19 +49,11 @@ public class Chivalrous {
 
 	public static final String DESCRIPTION = "Enemies become Knights of slime, bees, dolphins, fish, and striders.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Enemies have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance to be Chivalrous, gaining 10% damage."
-			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance to be Chivalrous, gaining 10% damage."
-			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance to be Chivalrous, gaining 10% damage."
-			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance to be Chivalrous, gaining 10% damage."
-			}, {
-				"Enemies have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance to be Chivalrous, gaining 10% damage."
-			}
-	};
+	public static String[] rankDescription(int level) {
+			return new String[]{
+				"Enemies have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance to be Chivalrous."
+			};
+	}
 
 
 	private static final EnumSet<EntityType> CHIVALROUS_IMMUNE = EnumSet.of(
@@ -80,7 +66,7 @@ public class Chivalrous {
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (!mob.isInsideVehicle() && !CHIVALROUS_IMMUNE.contains(mob.getType()) && !EntityUtils.isBoss(mob) && !DelvesUtils.isDelveMob(mob)
-				&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE[level - 1]) {
+				&& FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
 			boolean isInWater = LocationUtils.isLocationInWater(mob.getLocation());
 			boolean isInLava = mob.getLocation().getBlock().getType() == Material.LAVA;
 			String [] possibleMounts = MOUNTS;
@@ -98,7 +84,6 @@ public class Chivalrous {
 					creeper.setExplosionRadius((creeper.getExplosionRadius() + 1) / 2);
 				}
 			}
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(mob, "ChivalrousDamageEffect", new PercentDamageDealt(999999999, .1));
 		}
 	}
 

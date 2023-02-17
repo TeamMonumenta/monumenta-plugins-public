@@ -27,12 +27,13 @@ public class Haunted {
 
 	public static final String DESCRIPTION = "Your regrets haunt you.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			"A looming figure haunts you relentlessly,",
 			"only moving when you do."
-		}
-	};
+		};
+	}
+
 	public static final double MAX_SPEED = 0.5;
 	public static final double DAMAGE = 0.3; //percentage
 	public static final double RANGE = 50;

@@ -3,18 +3,26 @@ package com.playmonumenta.plugins.delves;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.FloatArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.arguments.ScoreHolderArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 
 public class DelvesCommands {
@@ -243,16 +251,86 @@ public class DelvesCommands {
 			.withPermission(perms)
 			.withArguments(
 				new MultiLiteralArgument("validate"),
-				new EntitySelectorArgument.OnePlayer("player"), dungeonArg
+				new EntitySelectorArgument.OnePlayer("player"),
+				dungeonArg
 			).executes((commandSender, args) -> {
 				Player player = (Player) args[1];
 				String dungeon = (String) args[2];
-				if (dungeon.equals("ring")) {
-					if (DelvesManager.validateDelvePreset(player, dungeon)) {
-						return 1;
-					}
+				return DelvesManager.validateDelvePreset(player, dungeon) ? 1 : 0;
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new LiteralArgument("set"),
+				new LiteralArgument("preset"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				dungeonArg,
+				new GreedyStringArgument("preset").replaceSuggestions(ArgumentSuggestions.strings(Arrays.stream(DelvePreset.values()).map(p -> p.mName).toArray(String[]::new)))
+			).executes((commandSender, args) -> {
+				Player player = (Player) args[0];
+				String dungeon = (String) args[1];
+				DelvePreset preset = DelvePreset.getDelvePreset((String) args[2]);
+				if (preset == null) {
+					throw CommandAPI.failWithString("Unknown preset '" + args[2] + "'");
 				}
-				return 0;
+				DelvesManager.savePlayerData(player, dungeon, preset.mModifiers, preset.mId);
+				if (commandSender != null && !(commandSender instanceof ProxiedCommandSender)) {
+					commandSender.sendMessage(Component.text("Applied preset '" + preset.mName + "' to " + player.getName() + " for shard " + dungeon, NamedTextColor.GOLD));
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("spawnercheck"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				new FloatArgument("percentage", 0, 100)
+			).executes((commandSender, args) -> {
+				Player player = (Player) args[1];
+				float percentage = (Float) args[2];
+				int broken = DelvesManager.getSpawnersBroken(player.getWorld());
+				int total = DelvesManager.getSpawnersTotal(player.getWorld());
+				if (broken < 0 || total < 0) {
+					return 0;
+				} else if (broken >= (percentage / 100.0) * total) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("setbrokenspawners"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				new IntegerArgument("broken", 0)
+			).executes((commandSender, args) -> {
+				Player player = (Player) args[1];
+				int broken = (int) args[2];
+				DelvesManager.setSpawnersBroken(player.getWorld(), broken);
+				commandSender.sendMessage(Component.text("Set broken spawner count to " + broken, NamedTextColor.GOLD));
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
+				new MultiLiteralArgument("debugchallenge"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				dungeonArg
+			).executes((commandSender, args) -> {
+				Player player = (Player) args[1];
+				String dungeon = (String) args[2];
+				int broken = DelvesManager.getSpawnersBroken(player.getWorld());
+				int total = DelvesManager.getSpawnersTotal(player.getWorld());
+				boolean isChallenge = DelvesManager.validateDelvePreset(player, dungeon);
+				if (!isChallenge) {
+					commandSender.sendMessage(Component.text("Instance is not a challenge delve", NamedTextColor.RED));
+					return;
+				}
+				commandSender.sendMessage(Component.text("Instance is a challenge delve", NamedTextColor.GREEN));
+				commandSender.sendMessage(Component.text(String.format("Spawners broken: %d / %d (%d %%)", broken, total, 100 * broken / total), NamedTextColor.GOLD));
 			}).register();
 	}
 

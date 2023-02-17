@@ -11,8 +11,10 @@ import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.delves.abilities.Transcendent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class StatMultiplierBoss extends BossAbilityGroup {
 	public static final String identityTag = "StatMultiplierBoss";
@@ -30,7 +32,8 @@ public class StatMultiplierBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		mDamageRegionStatMult = (ServerProperties.getClassSpecializationsEnabled() ? StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R2 : StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R1);
+		Player nearestPlayer = EntityUtils.getNearestPlayer(boss.getLocation(), 64);
+		mDamageRegionStatMult = (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R2 : StatMultiplier.DELVE_MOB_STAT_MULTIPLIER_R1);
 		mDamageStatMult = p.DAMAGE_STAT_MULT;
 		mDamageMultiplier = p.DAMAGE_MULT;
 

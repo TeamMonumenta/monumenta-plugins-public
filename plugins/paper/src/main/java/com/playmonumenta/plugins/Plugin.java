@@ -245,6 +245,9 @@ public class Plugin extends JavaPlugin {
 		UpdateStrikeChests.register();
 		RenameItemCommand.register();
 		ForceCastSpell.register();
+		DungeonAccessCommand.register();
+		SpawnerCountCommand.register();
+		PersistentDataCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);

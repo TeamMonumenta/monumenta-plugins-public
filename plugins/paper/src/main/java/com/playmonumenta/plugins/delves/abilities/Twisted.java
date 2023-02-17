@@ -45,19 +45,34 @@ public class Twisted {
 
 	public static final String DESCRIPTION = "Something, everything is wrong...";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				ChatColor.MAGIC + "M" + ChatColor.RESET + "or" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "i non mo" + ChatColor.MAGIC + "rd" + ChatColor.RESET + "ent",
-			}, {
-				ChatColor.MAGIC + "Mors" + ChatColor.RESET + " non a" + ChatColor.MAGIC + "ccip" + ChatColor.RESET + "it excusatio" + ChatColor.MAGIC + "nes"
-			}, {
-				"Quid" + ChatColor.MAGIC + "quid in" + ChatColor.RESET + " altum " + ChatColor.MAGIC + "for" + ChatColor.RESET + "tuna " + ChatColor.MAGIC + "tulit" + ChatColor.RESET + ", ruitura " + ChatColor.MAGIC + "levat."
-			}, {
-				ChatColor.MAGIC + "Nec" + ChatColor.RESET + " vita " + ChatColor.MAGIC + "nec" + ChatColor.RESET + " fortuna " + ChatColor.MAGIC + "hominibus " + ChatColor.RESET + " perpes " + ChatColor.MAGIC + "est"
-			}, {
-				"For" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "na " + ChatColor.MAGIC + "fav" + ChatColor.RESET + "et fo" + ChatColor.MAGIC + "rtib" + ChatColor.RESET + "u" + ChatColor.MAGIC + "s"
-			}
-	};
+	public static final String[] rankDescription(int level) {
+		switch (level) {
+			case 1:
+				return new String[]{
+					ChatColor.MAGIC + "M" + ChatColor.RESET + "or" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "i non mo" + ChatColor.MAGIC + "rd" + ChatColor.RESET + "ent",
+				};
+			case 2:
+				return new String[]{
+					ChatColor.MAGIC + "Mors" + ChatColor.RESET + " non a" + ChatColor.MAGIC + "ccip" + ChatColor.RESET + "it excusatio" + ChatColor.MAGIC + "nes"
+				};
+			case 3:
+				return new String[]{
+					"Quid" + ChatColor.MAGIC + "quid in" + ChatColor.RESET + " altum " + ChatColor.MAGIC + "for" + ChatColor.RESET + "tuna " + ChatColor.MAGIC + "tulit" + ChatColor.RESET + ", ruitura " + ChatColor.MAGIC + "levat."
+				};
+			case 4:
+				return new String[]{
+					ChatColor.MAGIC + "Nec" + ChatColor.RESET + " vita " + ChatColor.MAGIC + "nec" + ChatColor.RESET + " fortuna " + ChatColor.MAGIC + "hominibus " + ChatColor.RESET + " perpes " + ChatColor.MAGIC + "est"
+				};
+			case 5:
+				return new String[]{
+					"For" + ChatColor.MAGIC + "tu" + ChatColor.RESET + "na " + ChatColor.MAGIC + "fav" + ChatColor.RESET + "et fo" + ChatColor.MAGIC + "rtib" + ChatColor.RESET + "u" + ChatColor.MAGIC + "s"
+				};
+			default:
+				return new String[]{
+					ChatColor.MAGIC + "Lorem ipsum dolor sit amet"
+				};
+		}
+	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (DelvesUtils.isValidTwistedMob(mob)) {

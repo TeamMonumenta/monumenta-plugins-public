@@ -8,11 +8,11 @@ public class Chronology {
 
 	public static final String DESCRIPTION = "Spawners spawn faster.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			"All spawners spawn twice as fast."
-		}
-	};
+		};
+	}
 
 	public static void applyModifiers(CreatureSpawner spawner, int level) {
 		if (level == 0) {

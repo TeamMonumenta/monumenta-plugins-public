@@ -392,7 +392,7 @@ public class AbilityUtils {
 
 	public static int getEffectiveTotalSkillPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
-		if (ServerProperties.getAbilityEnhancementsEnabled()
+		if (ServerProperties.getAbilityEnhancementsEnabled(player)
 			    && ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0) {
 			return MAX_SKILL_POINTS;
 		}
@@ -401,7 +401,7 @@ public class AbilityUtils {
 
 	public static int getEffectiveTotalSpecPoints(Player player) {
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
-		if (ServerProperties.getAbilityEnhancementsEnabled()
+		if (ServerProperties.getAbilityEnhancementsEnabled(player)
 			    && ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0) {
 			return MAX_SPEC_POINTS;
 		}

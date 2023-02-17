@@ -145,7 +145,6 @@ public class Quickdraw extends Ability {
 		return !eventLaunch.isCancelled() || proj instanceof Trident;
 	}
 
-
 	public boolean isQuickDraw(Projectile projectile) {
 		return projectile == mProjectile;
 	}

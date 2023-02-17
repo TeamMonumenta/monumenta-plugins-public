@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class KillTriggeredAbilityTracker {
 
@@ -21,8 +22,8 @@ public class KillTriggeredAbilityTracker {
 		mDamageDealtToBossesPerKill = damage;
 	}
 
-	public KillTriggeredAbilityTracker(KillTriggeredAbility linkedAbility, int r1damage, int r2damage, int r3damage) {
-		this(linkedAbility, ServerProperties.getAbilityEnhancementsEnabled() ? r3damage : (ServerProperties.getClassSpecializationsEnabled() ? r2damage : r1damage));
+	public KillTriggeredAbilityTracker(Player player, KillTriggeredAbility linkedAbility, int r1damage, int r2damage, int r3damage) {
+		this(linkedAbility, ServerProperties.getAbilityEnhancementsEnabled(player) ? r3damage : (ServerProperties.getClassSpecializationsEnabled(player) ? r2damage : r1damage));
 	}
 
 	public void updateDamageDealtToBosses(DamageEvent event) {

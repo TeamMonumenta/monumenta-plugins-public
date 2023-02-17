@@ -14,13 +14,13 @@ public class Assassins {
 
 	public static final String DESCRIPTION = "Enemies become stealthy assassins.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			"Mobs deal 40% extra damage when not in the player",
 			"field of view, and have a 30% chance to become",
 			"\"stealthed,\" gaining new abilities."
-		}
-	};
+		};
+	}
 
 	static {
 		ABILITY_POOL = new ArrayList<>();

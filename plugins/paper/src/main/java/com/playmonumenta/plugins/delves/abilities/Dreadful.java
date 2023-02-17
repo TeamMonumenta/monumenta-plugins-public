@@ -7,39 +7,21 @@ import org.bukkit.entity.LivingEntity;
 
 public class Dreadful {
 
-	private static final double[] SPAWN_CHANCE = {
-			0.2,
-			0.4,
-			0.6,
-			0.8,
-			1.0
-	};
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.2;
 
 	public static final String DESCRIPTION = "Dying elites transform into new enemies.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Dying Elites have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance",
+	public static String[] rankDescription(int level) {
+			return new String[]{
+				"Dying Elites have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
 				"to spawn Dreadnaughts."
-			}, {
-				"Dying Elites have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance",
-				"to spawn Dreadnaughts."
-			}, {
-				"Dying Elites have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
-				"to spawn Dreadnaughts."
-			}, {
-				"Dying Elites have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance",
-				"to spawn Dreadnaughts."
-			}, {
-				"Dying Elites have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance",
-				"to spawn Dreadnaughts."
-			}
-	};
+			};
+	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob)) {
 			mob.addScoreboardTag(DreadfulSummonBoss.identityTag);
-			mob.addScoreboardTag(DreadfulSummonBoss.identityTag + "[spawnchance=" + SPAWN_CHANCE[level - 1] + "]");
+			mob.addScoreboardTag(DreadfulSummonBoss.identityTag + "[spawnchance=" + SPAWN_CHANCE_PER_LEVEL * level + "]");
 		}
 	}
 

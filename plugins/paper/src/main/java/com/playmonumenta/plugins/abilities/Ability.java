@@ -335,11 +335,11 @@ public abstract class Ability {
 	}
 
 	public boolean isEnhanced() {
-		return getAbilityScore() > 2 && ServerProperties.getAbilityEnhancementsEnabled();
+		return getAbilityScore() > 2 && ServerProperties.getAbilityEnhancementsEnabled(mPlayer);
 	}
 
 	public @Nullable Component getLevelHover(boolean useShorthand) {
-		return mInfo.getLevelHover(getAbilityScore(), useShorthand, true);
+		return mInfo.getLevelHover(mPlayer, getAbilityScore(), useShorthand, true);
 	}
 
 	@Override

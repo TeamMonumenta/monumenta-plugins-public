@@ -6,22 +6,16 @@ import com.playmonumenta.plugins.bosses.bosses.ProjectileBoss;
 import com.playmonumenta.plugins.bosses.bosses.RejuvenationBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Arcanic {
 
-	private static final double[] ABILITY_CHANCE = {
-		0.06,
-		0.12,
-		0.18,
-		0.24,
-		0.3,
-		0.36,
-		0.42,
-		};
+	private static final double ABILITY_CHANCE_PER_LEVEL = 0.06;
 
 	private static final List<List<String>> ABILITY_POOL_R1;
 	private static final List<List<String>> ABILITY_POOL_R2;
@@ -101,28 +95,15 @@ public class Arcanic {
 
 	public static final String DESCRIPTION = "Enemies gain magical abilities.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Enemies have a " + Math.round(ABILITY_CHANCE[0] * 100) + "% chance to be Arcanic."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[1] * 100) + "% chance to be Arcanic."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[2] * 100) + "% chance to be Arcanic."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Arcanic."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Arcanic."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[5] * 100) + "% chance to be Arcanic."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[6] * 100) + "% chance to be Arcanic."
-			}
-	};
+	public static String[] rankDescription(int level) {
+		return new String[]{"Enemies have a " + Math.round(100 * ABILITY_CHANCE_PER_LEVEL * level) + "% chance to be Arcanic."};
+	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
+		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL && !DelvesUtils.isDelveMob(mob)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
-			List<List<String>> abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
+			List<List<String>> abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
 			abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));
 			List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
 			for (String abilityTag : ability) {
@@ -130,5 +111,4 @@ public class Arcanic {
 			}
 		}
 	}
-
 }

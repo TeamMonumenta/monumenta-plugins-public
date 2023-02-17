@@ -140,7 +140,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		}
 		UUID entityUuid = entity.getUniqueId();
 		// Don't let players go through the portal if it's not theirs, unless they're in r3
-		if (entity instanceof Player && !entityUuid.equals(mPlayer.getUniqueId()) && !ServerProperties.getAbilityEnhancementsEnabled()) {
+		if (entity instanceof Player && !entityUuid.equals(mPlayer.getUniqueId()) && !ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
 			return;
 		}
 		if (mCooldowns.containsKey(entityUuid)) {
@@ -154,14 +154,14 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		}
 		switch (to.mFacing) {
 		case UP:
-			if (ServerProperties.getAbilityEnhancementsEnabled()) {
+			if (ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
 				mCooldowns.put(entityUuid, 25);
 				break;
 			}
 			mCooldowns.put(entityUuid, 8);
 			break;
 		case DOWN:
-			if (ServerProperties.getAbilityEnhancementsEnabled()) {
+			if (ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
 				mCooldowns.put(entityUuid, 25);
 				break;
 			}

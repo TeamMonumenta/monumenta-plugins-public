@@ -4,7 +4,9 @@ import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.structures.StructuresPlugin;
 import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class StatMultiplier {
 
@@ -86,6 +89,24 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Forsaken Manor", KEEP);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Arx Spirensis", KEEP);
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Submerged Citadel", KEEP);
+
+		// Exalted
+		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("magentaexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("lightblueexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("yellowexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("willowsexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("reverieexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("limeexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("pinkexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("grayexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("lightgrayexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("cyanexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("purpleexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("tealexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("forumexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("shiftingcityexalted", 1.0);
 	}
 
 	public static double getStatCompensation(String dungeon) {
@@ -105,6 +126,21 @@ public class StatMultiplier {
 				}
 			}
 			//no match -> return default value from shard mapping
+		} else {
+			Player player = EntityUtils.getNearestPlayer(loc, 64);
+			if (player != null) {
+				DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(shardType);
+				if (mapping != null) {
+					String typeName = mapping.getTypeName();
+					boolean exaltedDungeon = false;
+					if (typeName != null) {
+						exaltedDungeon = ScoreboardUtils.getScoreboardValue(player, typeName).orElse(0) == 1;
+					}
+					if (exaltedDungeon) {
+						shardType += "exalted";
+					}
+				}
+			}
 		}
 
 		return STAT_COMPENSATION_MAPPINGS.getOrDefault(shardType, 1.0);
@@ -147,9 +183,11 @@ public class StatMultiplier {
 		double statCompensation = getStatCompensation(ServerProperties.getShardName(), mob.getLocation());
 
 		//stat
+		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
 		double healthMulti = DelvesUtils.isDelveMob(mob) ?
-			                    getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? DELVE_MOB_STAT_MULTIPLIER_R3 : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
-			                    getHealthMultiplier(level) * statCompensation;
+			getHealthMultiplier(level) * (ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? DELVE_MOB_STAT_MULTIPLIER_R3 : DELVE_MOB_STAT_MULTIPLIER_R2) : DELVE_MOB_STAT_MULTIPLIER_R1) :
+			getHealthMultiplier(level) * statCompensation;
+
 
 		EntityUtils.scaleMaxHealth(mob, healthMulti - 1, HEALTH_MODIFIER_NAME);
 

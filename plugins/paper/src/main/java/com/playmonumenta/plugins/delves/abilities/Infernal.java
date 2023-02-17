@@ -9,11 +9,13 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class Infernal {
 
@@ -22,35 +24,11 @@ public class Infernal {
 			DamageType.FALL
 	);
 
-	private static final double[] ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER = {
-			1.1,
-			1.2,
-			1.3,
-			1.4,
-			1.5,
-			1.6,
-			1.7
-	};
+	private static final double ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL = 0.1;
 
-	private static final double[] BURNING_DAMAGE_TAKEN_MULTIPLIER = {
-			1.2,
-			1.4,
-			1.6,
-			1.8,
-			2,
-			2.2,
-			2.4
-	};
+	private static final double BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL = 0.2;
 
-	private static final double[] ABILITY_CHANCE = {
-		0.06,
-		0.12,
-		0.18,
-		0.24,
-		0.3,
-		0.36,
-		0.42
-	};
+	private static final double ABILITY_CHANCE_PER_LEVEL = 0.06;
 
 	private static final List<List<String>> ABILITY_POOL_R1;
 	private static final List<List<String>> ABILITY_POOL_R2;
@@ -135,37 +113,13 @@ public class Infernal {
 
 	public static final String DESCRIPTION = "Enemies gain fiery abilities.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Enemies have a " + Math.round(ABILITY_CHANCE[0] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[0] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[0] - 1) * 100) + "% Environmental Damage."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[1] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[1] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[1] - 1) * 100) + "% Environmental Damage."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[2] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[2] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[2] - 1) * 100) + "% Environmental Damage."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[3] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[3] - 1) * 100) + "% Environmental Damage."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[4] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[4] - 1) * 100) + "% Environmental Damage."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[5] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[5] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[5] - 1) * 100) + "% Environmental Damage."
-			}, {
-				"Enemies have a " + Math.round(ABILITY_CHANCE[6] * 100) + "% chance to be Infernal.",
-				"Players take +" + Math.round((BURNING_DAMAGE_TAKEN_MULTIPLIER[6] - 1) * 100) + "% Burning Damage",
-				"and +" + Math.round((ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[6] - 1) * 100) + "% Environmental Damage."
-			}
-	};
+	public static String[] rankDescription(int level) {
+			return new String[]{
+				"Enemies have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to be Infernal.",
+				"Players take +" + Math.round(BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Burning Damage",
+				"and +" + Math.round(ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level * 100) + "% Environmental Damage."
+			};
+	}
 
 	public static void applyDamageModifiers(DamageEvent event, int level) {
 		if (level == 0) {
@@ -173,16 +127,16 @@ public class Infernal {
 		}
 
 		if (event.getType() == DamageType.FIRE) {
-			event.setDamage(event.getDamage() * BURNING_DAMAGE_TAKEN_MULTIPLIER[level - 1]);
+			event.setDamage(event.getDamage() * (1 + BURNING_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level));
 		} else if (ENVIRONMENTAL_DAMAGE_CAUSES.contains(event.getType())) {
-			event.setDamage(event.getDamage() * ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER[level - 1]);
+			event.setDamage(event.getDamage() * (1 + ENVIRONMENTAL_DAMAGE_TAKEN_MULTIPLIER_PER_LEVEL * level));
 		}
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1] && !DelvesUtils.isDelveMob(mob)) {
-			// This runs prior to BossManager parsing, so we can just add tags directly
-			List<List<String>> abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL && !DelvesUtils.isDelveMob(mob)) {
+			Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
+			List<List<String>> abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
 			abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));
 			List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
 			for (String abilityTag : ability) {
@@ -190,5 +144,4 @@ public class Infernal {
 			}
 		}
 	}
-
 }

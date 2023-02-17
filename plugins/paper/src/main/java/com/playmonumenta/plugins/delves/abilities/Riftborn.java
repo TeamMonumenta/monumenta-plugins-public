@@ -21,14 +21,14 @@ public class Riftborn {
 
 	public static final String DESCRIPTION = "Spawners have a chance of generating portals.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			"There is a 7.5% chance to spawn",
 			"a void gate near a spawner, which",
 			"summons rift enemies and protects",
 			"the spawner from destruction."
-		}
-	};
+		};
+	}
 
 	public static void spawnGate(Block block) {
 		List<Location> validSpawnLocs = new ArrayList<>();

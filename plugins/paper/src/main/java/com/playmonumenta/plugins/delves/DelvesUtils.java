@@ -47,7 +47,7 @@ public class DelvesUtils {
 
 	public static final int MAX_DEPTH_POINTS;
 	public static final int MINIMUM_DEPTH_POINTS = 5;
-	private static final EnumMap<DelvesModifier, Integer> MODIFIER_RANK_CAPS = new EnumMap<>(DelvesModifier.class);
+	public static final EnumMap<DelvesModifier, Integer> MODIFIER_RANK_CAPS = new EnumMap<>(DelvesModifier.class);
 
 	static {
 		MODIFIER_RANK_CAPS.put(DelvesModifier.ARCANIC, 5);
@@ -118,13 +118,17 @@ public class DelvesUtils {
 		if (rank > MODIFIER_RANK_CAPS.getOrDefault(mod, 0)) {
 			return null;
 		}
-		ItemStack stack = new ItemStack(level >= rank ? Material.ORANGE_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE);
+		rank = Math.min(rank, MODIFIER_RANK_CAPS.get(mod));
+		if (level > MODIFIER_RANK_CAPS.get(mod)) {
+			rank = level;
+		}
+		ItemStack stack = new ItemStack(level >= rank ? Material.ORANGE_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE, rank > MODIFIER_RANK_CAPS.get(mod) ? Math.min(rank, 64) : 1);
 		ItemMeta meta = stack.getItemMeta();
 
 		meta.displayName(Component.text("Rank " + rank, (level >= rank ? NamedTextColor.GOLD : NamedTextColor.RED)).decoration(TextDecoration.ITALIC, false));
 
 		List<Component> lore = new ArrayList<>();
-		for (String loreString : mod.getRankDescriptions()[rank - 1]) {
+		for (String loreString : mod.getRankDescriptions().apply(rank)) {
 			lore.add(Component.text(loreString, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 
@@ -163,17 +167,17 @@ public class DelvesUtils {
 		return points;
 	}
 
-	public static void copyDelvePoint(@Nullable CommandSender sender, @NotNull Player copyTarget, @NotNull Player target, @NotNull String dungeonName) {
-		Map<String, DelvesManager.DungeonDelveInfo> copyMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(copyTarget.getUniqueId(), key -> new HashMap<>());
-		Map<String, DelvesManager.DungeonDelveInfo> targetMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(target.getUniqueId(), key -> new HashMap<>());
+	public static void copyDelvePoint(@Nullable CommandSender sender, @NotNull Player sourcePlayer, @NotNull Player targetPlayer, @NotNull String dungeonName) {
+		Map<String, DelvesManager.DungeonDelveInfo> sourceMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(sourcePlayer.getUniqueId(), key -> new HashMap<>());
+		Map<String, DelvesManager.DungeonDelveInfo> targetMap = DelvesManager.PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(targetPlayer.getUniqueId(), key -> new HashMap<>());
 
-		targetMap.put(dungeonName, copyMap.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo()).cloneDelveInfo());
+		targetMap.put(dungeonName, sourceMap.computeIfAbsent(dungeonName, key -> new DelvesManager.DungeonDelveInfo()).cloneDelveInfo());
 
 		if (sender != null && !(sender instanceof ProxiedCommandSender)) {
-			sender.sendMessage(Component.text("Copied delve info " + copyTarget.getName() + " -> " + target.getName() + " for shard " + dungeonName, NamedTextColor.GOLD));
+			sender.sendMessage(Component.text("Copied delve info " + sourcePlayer.getName() + " -> " + targetPlayer.getName() + " for shard " + dungeonName, NamedTextColor.GOLD));
 		}
 
-		updateDelveScoreBoard(target);
+		updateDelveScoreBoard(targetPlayer);
 	}
 
 	public static int setDelvePoint(@Nullable CommandSender sender, @NotNull Player target, @NotNull String dungeonName, @Nullable DelvesModifier modifier, int level) {

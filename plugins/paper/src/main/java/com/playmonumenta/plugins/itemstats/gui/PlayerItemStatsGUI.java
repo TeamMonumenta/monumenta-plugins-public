@@ -176,9 +176,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		if (otherPlayer != null) {
 			setEquipmentFromPlayer(true, otherPlayer);
 		}
-		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion()), mRightStats.getMaximumRegion(false, ServerProperties.getRegion()))
+		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion(player)), mRightStats.getMaximumRegion(false, ServerProperties.getRegion(player)))
 			                              .max(Comparator.naturalOrder())
-			                              .orElse(ServerProperties.getRegion());
+			                              .orElse(ServerProperties.getRegion(player));
 		mLeftStats.mPlayerItemStats.setRegion(region);
 		mRightStats.mPlayerItemStats.setRegion(region);
 		generateInventory();

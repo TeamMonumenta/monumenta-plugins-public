@@ -117,7 +117,7 @@ public class DelveCustomInventory extends CustomInventory {
 	private int mPage = 0;
 	private int mTotalPoint = 0;
 	private int mIgnoreOldEntropyPoint;
-	@Nullable private DelvePreset mPreset;
+	@Nullable private final DelvePreset mPreset;
 
 	private final Map<DelvesModifier, Integer> mPointSelected = new HashMap<>();
 
@@ -179,16 +179,18 @@ public class DelveCustomInventory extends CustomInventory {
 			if (mod != null) {
 				mInventory.setItem(DELVE_MOD_ITEM_SLOTS[i], mod.getIcon());
 				int level = mPointSelected.getOrDefault(mod, 0);
-
 				for (int j = 0; j < 5; j++) {
 					ItemStack stack = DelvesUtils.getRankItem(mod, j + 1, level);
 					if (stack != null) {
 						int slot = (DELVE_MOD_ITEM_SLOTS[i] - (9 * (j + 1)));
-						if (j == 4 && DelvesModifier.rotatingDelveModifiers().contains(mod)) {
-							stack = ROTATING_DELVE_MODIFIER_INFO;
-						}
 						mInventory.setItem(slot, stack);
+						if (level > DelvesUtils.MODIFIER_RANK_CAPS.get(mod)) {
+							break;
+						}
 					}
+				}
+				if (DelvesModifier.rotatingDelveModifiers().contains(mod)) {
+					mInventory.setItem(DELVE_MOD_ITEM_SLOTS[i] - (9 * 5), ROTATING_DELVE_MODIFIER_INFO);
 				}
 			}
 		}
@@ -204,7 +206,7 @@ public class DelveCustomInventory extends CustomInventory {
 					mInventory.setItem(PRESET_SLOT, presetItem);
 				}
 			}
-		} else if (mPreset != null) {
+		} else if (mPreset != null && !mPreset.isDungeonChallengePreset()) {
 			mInventory.setItem(PAGE_LEFT_SLOT, BOUNTY_SELECTION_ITEM);
 		}
 
@@ -422,7 +424,7 @@ public class DelveCustomInventory extends CustomInventory {
 				playerWhoClicked.playSound(playerWhoClicked.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 1f, 0.5f);
 				mPointSelected.forEach((mod, value) -> mPointSelected.put(mod, 0));
 				mIgnoreOldEntropyPoint = 0;
-			} else if (mPreset != null) {
+			} else if (mPreset != null && !mPreset.isDungeonChallengePreset()) {
 				this.close();
 				try {
 					new BountyGui(playerWhoClicked, 3, 0).open();
@@ -469,7 +471,11 @@ public class DelveCustomInventory extends CustomInventory {
 					}
 				}
 
-				DelvesManager.savePlayerData(mOwner, mDungeonName, mPointSelected);
+				int presetId = 0;
+				if (mPreset != null && DelvePreset.validatePresetModifiers(mPointSelected, mPreset, true)) {
+					presetId = mPreset.mId;
+				}
+				DelvesManager.savePlayerData(mOwner, mDungeonName, mPointSelected, presetId);
 				mInventory.clear();
 				playerWhoClicked.closeInventory();
 				if (!ServerProperties.getShardName().equals(mDungeonName)) {

@@ -42,8 +42,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-
-
 public class HallowedBeam extends MultipleChargeAbility {
 
 	private static final int HALLOWED_1_MAX_CHARGES = 2;

@@ -47,8 +47,8 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		if (event != null && !EntityUtils.isElite(mBoss) && !EntityUtils.isBoss(mBoss) && !DelvesUtils.isDelveMob(mBoss) && EntityUtils.isHostileMob(mBoss)) {
-			double chance = FastUtils.RANDOM.nextDouble();
-			if (chance < mParam.SPAWN_CHANCE) {
+			int numSpawns = FastUtils.roundRandomly(mParam.SPAWN_CHANCE);
+			for (int i = 0; i < numSpawns; i++) {
 				Location loc = mBoss.getLocation();
 				boolean isWaterLoc = BlockUtils.containsWater(loc.getBlock());
 				if (isWaterLoc) {

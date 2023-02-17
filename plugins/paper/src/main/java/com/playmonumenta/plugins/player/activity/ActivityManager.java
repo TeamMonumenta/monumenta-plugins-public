@@ -45,13 +45,13 @@ public class ActivityManager {
 		UUID playerId = player.getUniqueId();
 		double updatedDamage = mDamageDealt.getOrDefault(playerId, 0.0) + damage;
 		mDamageDealt.put(playerId, updatedDamage);
-		if (ServerProperties.getAbilityEnhancementsEnabled()) {
+		if (ServerProperties.getAbilityEnhancementsEnabled(player)) {
 			if (updatedDamage > THRESHOLD_R3) {
 				mDamageDealt.put(playerId, updatedDamage - THRESHOLD_R3);
 				addActivity(player);
 			}
 		} else
-		if (ServerProperties.getClassSpecializationsEnabled()) {
+		if (ServerProperties.getClassSpecializationsEnabled(player)) {
 			if (updatedDamage > THRESHOLD_R2) {
 				mDamageDealt.put(playerId, updatedDamage - THRESHOLD_R2);
 				addActivity(player);
@@ -67,14 +67,14 @@ public class ActivityManager {
 		double updatedHealing = mHealingDealt.getOrDefault(playerId, 0.0) + healing;
 		double damageDealt = mDamageDealt.getOrDefault(playerId, 0.0);
 		mHealingDealt.put(playerId, updatedHealing);
-		if (ServerProperties.getAbilityEnhancementsEnabled()) {
+		if (ServerProperties.getAbilityEnhancementsEnabled(player)) {
 			if (updatedHealing > THRESHOLD_R3 / 4 && damageDealt > 1) {
 				mHealingDealt.put(playerId, updatedHealing - THRESHOLD_R3 / 4);
 				mDamageDealt.put(playerId, 0.0);
 				addActivity(player);
 			}
 		} else
-		if (ServerProperties.getClassSpecializationsEnabled()) {
+		if (ServerProperties.getClassSpecializationsEnabled(player)) {
 			if (updatedHealing > THRESHOLD_R2 / 4 && damageDealt > 1) {
 				mHealingDealt.put(playerId, updatedHealing - THRESHOLD_R2 / 4);
 				mDamageDealt.put(playerId, 0.0);

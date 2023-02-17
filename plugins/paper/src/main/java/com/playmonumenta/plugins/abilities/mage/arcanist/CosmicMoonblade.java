@@ -81,7 +81,6 @@ public class CosmicMoonblade extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CosmicMoonbladeCS(), CosmicMoonbladeCS.SKIN_LIST);
 	}
 
-
 	public void cast() {
 		if (isOnCooldown()) {
 			return;

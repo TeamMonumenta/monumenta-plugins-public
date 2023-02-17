@@ -89,7 +89,7 @@ public class AmplifyingHex extends Ability {
 		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
 		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
-		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled() ? R3_CAP : ServerProperties.getClassSpecializationsEnabled() ? R2_CAP : R1_CAP;
+		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(player) ? R2_CAP : R1_CAP;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AmplifyingHexCS(), AmplifyingHexCS.SKIN_LIST);
 

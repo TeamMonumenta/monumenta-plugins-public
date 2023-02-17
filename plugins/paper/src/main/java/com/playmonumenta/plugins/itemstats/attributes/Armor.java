@@ -37,7 +37,7 @@ public class Armor implements Attribute {
 			boolean adaptability = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0;
 			double damageMultiplier = getDamageMultiplier(value, getSecondaryEnchantsMod(event, plugin, player),
 				plugin.mItemStatManager.getAttributeAmount(player, AttributeType.AGILITY), Agility.getSecondaryEnchantsMod(event, plugin, player),
-				getSecondaryEnchantCap(), adaptability, 0, event.getType().isEnvironmental());
+				getSecondaryEnchantCap(player), adaptability, 0, event.getType().isEnvironmental());
 			event.setDamage(event.getDamage() * damageMultiplier);
 		}
 	}
@@ -78,8 +78,8 @@ public class Armor implements Attribute {
 	 * Gets the maximum armor/agility points that may be increased by secondary enchants for the current region.
 	 * Any additional points will still provide defense, but won't be affected by secondary enchants.
 	 */
-	public static double getSecondaryEnchantCap() {
-		return getSecondaryEnchantCap(ServerProperties.getClassSpecializationsEnabled());
+	public static double getSecondaryEnchantCap(Player player) {
+		return getSecondaryEnchantCap(ServerProperties.getClassSpecializationsEnabled(player));
 	}
 
 	public static double getSecondaryEnchantCap(boolean region2) {

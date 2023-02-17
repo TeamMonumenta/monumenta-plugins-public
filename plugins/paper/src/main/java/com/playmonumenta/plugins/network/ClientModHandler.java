@@ -64,7 +64,7 @@ public class ClientModHandler {
 	 * Does nothing if the player does not have a compatible client mod installed, or if the ability makes no sense to send to clients (see {@link #shouldHandleAbility(Ability)}).
 	 */
 	public static void updateAbility(Player player, Ability ability) {
-		if (INSTANCE == null || !playerHasClientMod(player) || !shouldHandleAbility(ability)) {
+		if (INSTANCE == null || !playerHasClientMod(player) || !shouldHandleAbility(player, ability)) {
 			return;
 		}
 		ClassAbility classAbility = ability.getInfo().getLinkedSpell();
@@ -91,7 +91,7 @@ public class ClientModHandler {
 
 		ClassUpdatePacket.ClientModAbilityInfo[] abilities =
 			INSTANCE.mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilitiesIgnoringSilence().stream()
-				.filter(ClientModHandler::shouldHandleAbility)
+				.filter(ability -> ClientModHandler.shouldHandleAbility(player, ability))
 				.map(ability -> {
 					ClassAbility classAbility = ability.getInfo().getLinkedSpell();
 					int remainingCooldown = classAbility == null ? 0 : INSTANCE.mPlugin.mTimers.getCooldown(player.getUniqueId(), classAbility);
@@ -142,9 +142,9 @@ public class ClientModHandler {
 	/**
 	 * @return Whether we're sending data for the given ability to clients
 	 */
-	private static boolean shouldHandleAbility(Ability ability) {
+	private static boolean shouldHandleAbility(Player player, Ability ability) {
 		return ability != null
-			       && (ability.getInfo().getBaseCooldown(ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
+			       && (ability.getInfo().getBaseCooldown(player, ability.getAbilityScore()) > 0 || ability instanceof AbilityWithChargesOrStacks
 				           || ability instanceof AlchemicalArtillery || ability instanceof Swiftness || ability instanceof OneWithTheWind); // these are passives with modes
 	}
 

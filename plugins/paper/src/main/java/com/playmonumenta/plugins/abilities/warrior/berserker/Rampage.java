@@ -85,7 +85,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
 	public Rampage(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamagePerStack = ((isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD)) * (ServerProperties.getAbilityEnhancementsEnabled() ? R3_DAMAGE_PER_STACK_MULTIPLIER : 1);
+		mDamagePerStack = ((isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD)) * (ServerProperties.getAbilityEnhancementsEnabled(mPlayer) ? R3_DAMAGE_PER_STACK_MULTIPLIER : 1);
 		mStackLimit = (isLevelOne() ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 	}
 

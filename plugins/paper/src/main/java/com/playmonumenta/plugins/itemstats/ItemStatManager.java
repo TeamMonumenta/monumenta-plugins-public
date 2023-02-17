@@ -161,8 +161,8 @@ public class ItemStatManager implements Listener {
 			mRegion = region;
 		}
 
-		public PlayerItemStats() {
-			mRegion = ServerProperties.getRegion();
+		public PlayerItemStats(Player player) {
+			mRegion = ServerProperties.getRegion(player);
 		}
 
 		public PlayerItemStats(PlayerItemStats playerItemStats) {
@@ -211,6 +211,7 @@ public class ItemStatManager implements Listener {
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll) {
 			mMainhand = mainhand;
+			mRegion = ServerProperties.getRegion(player);
 
 			ItemStatsMap newArmorAddStats;
 			ItemStatsMap newMainhandAddStats = new ItemStatsMap();
@@ -436,7 +437,7 @@ public class ItemStatManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void playerJoinEvent(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		PlayerItemStats playerItemStats = new PlayerItemStats();
+		PlayerItemStats playerItemStats = new PlayerItemStats(player);
 		mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
 		playerItemStats.updateStats(player, true, false);
 		updateStatsDelayed(player);
@@ -530,7 +531,7 @@ public class ItemStatManager implements Listener {
 	public PlayerItemStats getPlayerItemStats(Player player) {
 		PlayerItemStats playerItemStats = mPlayerItemStatsMappings.get(player.getUniqueId());
 		if (playerItemStats == null) {
-			playerItemStats = new PlayerItemStats();
+			playerItemStats = new PlayerItemStats(player);
 			mPlayerItemStatsMappings.put(player.getUniqueId(), playerItemStats);
 			playerItemStats.updateStats(player, true, false);
 		}

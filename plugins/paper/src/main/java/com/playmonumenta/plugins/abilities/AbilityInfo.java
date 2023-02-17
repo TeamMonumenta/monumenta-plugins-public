@@ -189,18 +189,18 @@ public class AbilityInfo<T extends Ability> {
 
 	// other methods
 
-	public int getBaseCooldown(int score) {
+	public int getBaseCooldown(Player player, int score) {
 		if (mCooldowns == null) {
 			return 0;
 		}
-		if (!ServerProperties.getAbilityEnhancementsEnabled() && score > 2) {
+		if (!ServerProperties.getAbilityEnhancementsEnabled(player) && score > 2) {
 			score -= 2;
 		}
 		return mCooldowns.get(Math.min(score - 1, mCooldowns.size() - 1));
 	}
 
 	public int getModifiedCooldown(Player player, int score) {
-		int baseCooldown = getBaseCooldown(score);
+		int baseCooldown = getBaseCooldown(player, score);
 		if (mCharmCooldown != null) {
 			return CharmManager.getCooldown(player, mCharmCooldown, baseCooldown);
 		}
@@ -264,7 +264,7 @@ public class AbilityInfo<T extends Ability> {
 		return mDescriptions.get(level - 1);
 	}
 
-	public Component getFormattedDescription(int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
+	public Component getFormattedDescription(@Nullable Player player, int skillLevel, boolean enabled) throws IndexOutOfBoundsException {
 		Component description = getDescription(skillLevel);
 
 		String displayName = mDisplayName;
@@ -278,8 +278,8 @@ public class AbilityInfo<T extends Ability> {
 		if (skillLevel <= 2) {
 			skillHeader = "[" + displayName.toUpperCase() + " Level " + skillLevel + "] : ";
 		} else {
-			coloured &= ServerProperties.getAbilityEnhancementsEnabled();
-			skillHeader = "[" + displayName.toUpperCase() + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled() ? "(disabled in this region) " : "") + ": ";
+			coloured &= ServerProperties.getAbilityEnhancementsEnabled(player);
+			skillHeader = "[" + displayName.toUpperCase() + " Enhancement] " + (enabled && !ServerProperties.getAbilityEnhancementsEnabled(player) ? "(disabled in this region) " : "") + ": ";
 		}
 
 		return Component.text("")
@@ -287,18 +287,18 @@ public class AbilityInfo<T extends Ability> {
 			       .append(description.color(coloured ? NamedTextColor.YELLOW : NamedTextColor.GRAY));
 	}
 
-	public Component getFormattedDescriptions(int level, boolean isEnhanced, boolean enabled) {
+	public Component getFormattedDescriptions(@Nullable Player player, int level, boolean isEnhanced, boolean enabled) {
 		if (mDescriptions.isEmpty()) {
 			return Component.text("No descriptions found for " + mDisplayName + "!", NamedTextColor.RED);
 		}
 
 		Component component = Component.text("");
-		component = component.append(getFormattedDescription(1, enabled));
+		component = component.append(getFormattedDescription(player, 1, enabled));
 		if (level > 1) {
-			component = component.append(Component.newline()).append(getFormattedDescription(2, enabled));
+			component = component.append(Component.newline()).append(getFormattedDescription(player, 2, enabled));
 		}
 		if (isEnhanced) {
-			component = component.append(Component.newline()).append(getFormattedDescription(3, enabled));
+			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled));
 		}
 		return component;
 	}
@@ -306,7 +306,7 @@ public class AbilityInfo<T extends Ability> {
 	/*
 	 * Returns null if a hover message could not be created
 	 */
-	public @Nullable Component getLevelHover(int skillLevel, boolean useShorthand, boolean enabled) {
+	public @Nullable Component getLevelHover(@Nullable Player player, int skillLevel, boolean useShorthand, boolean enabled) {
 		int level = skillLevel;
 		boolean isEnhanced = false;
 		if (skillLevel > 2) {
@@ -330,11 +330,11 @@ public class AbilityInfo<T extends Ability> {
 			hoverableString += "*";
 		}
 		return Component.text(hoverableString, NamedTextColor.YELLOW)
-			       .hoverEvent(getFormattedDescriptions(level, isEnhanced, enabled));
+			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled));
 	}
 
 	public void sendDescriptions(CommandSender sender) {
-		sender.sendMessage(getFormattedDescriptions(2, false, true));
+		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true));
 	}
 
 	public JsonObject toJson() {

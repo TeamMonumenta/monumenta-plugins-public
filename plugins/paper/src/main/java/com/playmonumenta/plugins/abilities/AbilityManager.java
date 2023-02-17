@@ -200,8 +200,9 @@ public class AbilityManager {
 	private static @MonotonicNonNull AbilityManager mManager = null;
 
 	private final Plugin mPlugin;
+
 	private final List<AbilityInfo<?>> mReferenceAbilities;
-	private final List<AbilityInfo<?>> mDisabledAbilities;
+	private final List<AbilityInfo<?>> mDisabledSpecAbilities;
 	private final Map<UUID, AbilityCollection> mAbilities = new HashMap<>();
 
 	//Only used for MultipleChargeAbilities
@@ -219,7 +220,7 @@ public class AbilityManager {
 		mManager = this;
 
 		mReferenceAbilities = new ArrayList<>();
-		mDisabledAbilities = new ArrayList<>();
+		mDisabledSpecAbilities = new ArrayList<>();
 
 		mReferenceAbilities.addAll(Arrays.asList(
 			// ALL (CLUCKING POTIONS)
@@ -415,10 +416,10 @@ public class AbilityManager {
 			//Normal class and spec abilities
 			mReferenceAbilities.addAll(classAbilities);
 
-			if (ServerProperties.getClassSpecializationsEnabled()) {
+			if (ServerProperties.getClassSpecializationsEnabled(null)) {
 				mReferenceAbilities.addAll(specAbilities);
 			} else {
-				mDisabledAbilities.addAll(specAbilities);
+				mDisabledSpecAbilities.addAll(specAbilities);
 			}
 		}
 
@@ -540,6 +541,15 @@ public class AbilityManager {
 			}
 		}
 
+		if (ServerProperties.getClassSpecializationsEnabled(player)) {
+			for (AbilityInfo<?> ability : mDisabledSpecAbilities) {
+				if (ability.testCanUse(player)) {
+					Ability newAbility = ability.newInstance(mPlugin, player);
+					abilities.add(newAbility);
+				}
+			}
+		}
+
 		AbilityCollection collection = new AbilityCollection(abilities);
 		mAbilities.put(player.getUniqueId(), collection);
 
@@ -579,10 +589,10 @@ public class AbilityManager {
 		return mReferenceAbilities;
 	}
 
-	// This is for things that care about currently disabled abilities. (ex. Specs in R1)
+	// This is for things that care about currently disabled spec abilities.
 	/* Do not modify the returned data! */
-	public List<AbilityInfo<?>> getDisabledAbilities() {
-		return mDisabledAbilities;
+	public List<AbilityInfo<?>> getDisabledSpecAbilities() {
+		return mDisabledSpecAbilities;
 	}
 
 	/* Convenience method */

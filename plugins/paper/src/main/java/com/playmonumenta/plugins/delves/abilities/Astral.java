@@ -37,11 +37,11 @@ public class Astral {
 	);
 
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			POSSIBLE_DESCRIPTIONS.get(FastUtils.RANDOM.nextInt(POSSIBLE_DESCRIPTIONS.size()))
-		}
-	};
+		};
+	}
 
 
 	static {

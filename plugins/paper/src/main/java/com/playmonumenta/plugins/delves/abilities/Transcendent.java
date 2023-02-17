@@ -14,19 +14,13 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Evoker;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 public class Transcendent {
 
-	private static final double[] ABILITY_CHANCE = {
-		0.1,
-		0.2,
-		0.3,
-		0.4,
-		0.5,
-		0.6
-	};
+	private static final double ABILITY_CHANCE_PER_LEVEL = 0.1;
 
 	private static final List<List<String>> ABILITY_POOL_MELEE_R1;
 	private static final List<List<String>> ABILITY_POOL_MELEE_R2;
@@ -100,34 +94,26 @@ public class Transcendent {
 
 	public static final String DESCRIPTION = "Elites become greatly empowered.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Elites have a " + Math.round(ABILITY_CHANCE[0] * 100) + "% chance to be Transcendent."
-			}, {
-				"Elites have a " + Math.round(ABILITY_CHANCE[1] * 100) + "% chance to be Transcendent."
-			}, {
-				"Elites have a " + Math.round(ABILITY_CHANCE[2] * 100) + "% chance to be Transcendent."
-			}, {
-				"Elites have a " + Math.round(ABILITY_CHANCE[3] * 100) + "% chance to be Transcendent."
-			}, {
-				"Elites have a " + Math.round(ABILITY_CHANCE[4] * 100) + "% chance to be Transcendent."
-			}, {
-				"Elites have a " + Math.round(ABILITY_CHANCE[5] * 100) + "% chance to be Transcendent."
-			}
-	};
+	public static String[] rankDescription(int level) {
+			return new String[]{
+				"Elites have a " + Math.round(ABILITY_CHANCE_PER_LEVEL * level * 100) + "% chance to be Transcendent."
+			};
+	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE[level - 1]) {
+		if (EntityUtils.isElite(mob) && !DelvesUtils.isDelveMob(mob) && FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level) {
 			EntityEquipment equipment = mob.getEquipment();
 			ItemStack mainhand = equipment == null ? null : equipment.getItemInMainHand();
 			Material material = mainhand == null ? null : mainhand.getType();
 			List<List<String>> abilityPool;
+			Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
 			if (material == Material.BOW || material == Material.CROSSBOW || material == Material.TRIDENT
-				    || mob instanceof Evoker) {
-				abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
+				|| mob instanceof Evoker) {
+				abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
 			} else {
-				abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled() ? (ServerProperties.getAbilityEnhancementsEnabled() ? ABILITY_POOL_MELEE_R3 : ABILITY_POOL_MELEE_R2) : ABILITY_POOL_MELEE_R1);
+				abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? ABILITY_POOL_MELEE_R3 : ABILITY_POOL_MELEE_R2) : ABILITY_POOL_MELEE_R1);
 			}
+
 			abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));
 			List<String> ability = abilityPool.get(FastUtils.RANDOM.nextInt(abilityPool.size()));
 			for (String abilityTag : ability) {

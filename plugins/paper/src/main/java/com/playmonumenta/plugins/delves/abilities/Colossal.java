@@ -11,15 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Colossal {
 
-	private static final double[] SPAWN_CHANCE = {
-			0.05,
-			0.1,
-			0.15,
-			0.2,
-			0.25,
-			0.3,
-			0.35
-	};
+	private static final double SPAWN_CHANCE_PER_LEVEL = 0.05;
 
 	private static final String[] COLOSSI = {
 		"ColossusofTerror",
@@ -31,34 +23,16 @@ public class Colossal {
 
 	public static final String DESCRIPTION = "Broken spawners unleash enemies.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-			{
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[0] * 100) + "% chance",
+	public static String[] rankDescription(int level) {
+			return new String[]{
+				"Broken Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
 				"to spawn Colossi."
-			}, {
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[1] * 100) + "% chance",
-				"to spawn Colossi."
-			}, {
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[2] * 100) + "% chance",
-				"to spawn Colossi."
-			}, {
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[3] * 100) + "% chance",
-				"to spawn Colossi."
-			}, {
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[4] * 100) + "% chance",
-				"to spawn Colossi."
-			}, {
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[5] * 100) + "% chance",
-				"to spawn Colossi."
-			}, {
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE[6] * 100) + "% chance",
-				"to spawn Colossi."
-			}
-	};
+			};
+	}
 
 	public static void applyModifiers(Location loc, int level) {
 		double percent = FastUtils.RANDOM.nextDouble();
-		if (level == 0 || percent > SPAWN_CHANCE[level - 1]) {
+		if (level == 0 || percent > SPAWN_CHANCE_PER_LEVEL * level) {
 			return;
 		}
 

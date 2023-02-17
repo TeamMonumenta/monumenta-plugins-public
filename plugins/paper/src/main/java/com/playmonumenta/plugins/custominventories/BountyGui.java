@@ -252,7 +252,7 @@ public class BountyGui extends Gui {
 		for (Player target : nearbyPlayers) {
 			if (preset != null) {
 				ScoreboardUtils.setScoreboardValue(target, DelvePreset.PRESET_SCOREBOARD, preset.mId);
-				DelvesManager.savePlayerData(target, "ring", preset.mModifiers);
+				DelvesManager.savePlayerData(target, "ring", preset.mModifiers, preset.mId);
 			}
 			ScoreboardUtils.setScoreboardValue(target, BOUNTY_SCOREBOARDS.get(mRegion - 1), bounty.mID);
 			ScoreboardUtils.setScoreboardValue(target, LORE_SCOREBOARDS.get(mRegion - 1), 1);

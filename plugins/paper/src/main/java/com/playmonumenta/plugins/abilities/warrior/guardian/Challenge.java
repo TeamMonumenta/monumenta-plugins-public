@@ -109,5 +109,4 @@ public class Challenge extends Ability {
 			putOnCooldown();
 		}
 	}
-
 }

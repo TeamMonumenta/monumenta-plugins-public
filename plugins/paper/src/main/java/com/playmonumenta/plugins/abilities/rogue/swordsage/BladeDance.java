@@ -165,5 +165,4 @@ public class BladeDance extends Ability {
 
 		putOnCooldown();
 	}
-
 }

@@ -9,11 +9,11 @@ public class Fragile {
 
 	public static final String DESCRIPTION = "Deaths cause extra shatter.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			"Upon death, players get +1 extra level of shatter."
-		}
-	};
+		};
+	}
 
 	public static void applyModifiers(Player player, int level) {
 		if (level == 0) {

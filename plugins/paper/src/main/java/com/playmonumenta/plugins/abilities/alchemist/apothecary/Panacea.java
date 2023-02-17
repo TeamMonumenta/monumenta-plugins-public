@@ -246,5 +246,4 @@ public class Panacea extends Ability {
 			}.runTaskTimer(mPlugin, 0, 1));
 		}
 	}
-
 }

@@ -79,7 +79,6 @@ public class VoodooBonds extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new VoodooBondsCS(), VoodooBondsCS.SKIN_LIST);
 	}
 
-
 	public void cast() {
 		if (isOnCooldown()) {
 			return;

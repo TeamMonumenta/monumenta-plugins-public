@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.delves;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
 import com.playmonumenta.plugins.delves.abilities.Chronology;
@@ -21,40 +24,39 @@ import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -65,12 +67,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.util.Vector;
 
 
 public class DelvesManager implements Listener {
@@ -80,48 +80,46 @@ public class DelvesManager implements Listener {
 
 	/**
 	 * This structure contains All the delves mods picked by online players (in this shard)
-	 *
+	 * <p>
 	 * it's structured in this way:
 	 * <PlayerID, <DungeonID, <ModifierID, points>>>
 	 */
 	public static final Map<UUID, Map<String, DungeonDelveInfo>> PLAYER_DELVE_DUNGEON_MOD_MAP = new HashMap<>();
 	public static final String PHANTOM_NAME = "LoomingConsequence";
-	static final String SPAWNER_BREAKS_SCORE_NAME = "SpawnerBreaks";
-	static final String SPAWNER_TOTAL_SCORE_NAME = "SpawnersTotal";
-	static final int CHUNK_SCAN_RADIUS = 32;
-	public static final Set<String> DUNGEONS = new HashSet<>();
+	public static final NamespacedKey SPAWNER_BREAKS_DATA_KEY = NamespacedKeyUtils.fromString("monumenta:spawners_broken");
+	public static final NamespacedKey SPAWNER_COUNT_DATA_KEY = NamespacedKeyUtils.fromString("monumenta:spawners_total");
 
 	//List of all the shard where we can use delves
-	static {
-		DUNGEONS.add("white");
-		DUNGEONS.add("orange");
-		DUNGEONS.add("magenta");
-		DUNGEONS.add("lightblue");
-		DUNGEONS.add("yellow");
-		DUNGEONS.add("willows");
-		DUNGEONS.add("reverie");
-		DUNGEONS.add("lime");
-		DUNGEONS.add("pink");
-		DUNGEONS.add("gray");
-		DUNGEONS.add("lightgray");
-		DUNGEONS.add("cyan");
-		DUNGEONS.add("purple");
-		DUNGEONS.add("teal");
-		DUNGEONS.add("forum");
-		DUNGEONS.add("shiftingcity");
-		DUNGEONS.add("dev1");
-		DUNGEONS.add("dev2");
-		DUNGEONS.add("dev3");
-		DUNGEONS.add("mobs");
-		DUNGEONS.add("depths");
-		DUNGEONS.add("corridors");
-		DUNGEONS.add("ring");
-		DUNGEONS.add("ruin");
-		DUNGEONS.add("portal");
-		DUNGEONS.add("blue");
-		DUNGEONS.add("brown");
-		DUNGEONS.add("futurama");
-	}
+	public static final ImmutableSet<String> DUNGEONS = ImmutableSet.of(
+		"white",
+		"orange",
+		"magenta",
+		"lightblue",
+		"yellow",
+		"willows",
+		"reverie",
+		"lime",
+		"pink",
+		"gray",
+		"lightgray",
+		"cyan",
+		"purple",
+		"teal",
+		"forum",
+		"shiftingcity",
+		"dev1",
+		"dev2",
+		"dev3",
+		"mobs",
+		"depths",
+		"corridors",
+		"ring",
+		"ruin",
+		"portal",
+		"blue",
+		"brown",
+		"futurama"
+	);
 
 	private static final String HAS_DELVE_MODIFIER_TAG = "DelveModifiersApplied";
 	public static final String AVOID_MODIFIERS = "boss_delveimmune";
@@ -189,24 +187,35 @@ public class DelvesManager implements Listener {
 
 				DungeonDelveInfo info = new DungeonDelveInfo();
 
-				JsonArray delveModArr = dungeonObj.getAsJsonArray("delveMods");
-				if (delveModArr == null) {
-					continue;
+				JsonElement presetId = dungeonObj.get("presetId");
+				if (presetId != null) {
+					info.mPresetId = presetId.getAsInt();
 				}
-				for (int delveIterator = 0; delveIterator < delveModArr.size(); delveIterator++) {
-					JsonObject delveObj = delveModArr.get(delveIterator).getAsJsonObject();
-					DelvesModifier delveMod = DelvesModifier.fromName(delveObj.getAsJsonPrimitive("delveModName").getAsString());
-					if (delveMod == null) {
+
+				DelvePreset preset = DelvePreset.getDelvePreset(info.mPresetId);
+				if (preset != null) {
+					// if a preset is saved, ignore the saved modifiers and update to the preset instead
+					info.mModifierPoint.putAll(preset.mModifiers);
+					info.recalculateTotalPoint();
+				} else {
+					JsonArray delveModArr = dungeonObj.getAsJsonArray("delveMods");
+					if (delveModArr == null) {
 						continue;
 					}
+					for (int delveIterator = 0; delveIterator < delveModArr.size(); delveIterator++) {
+						JsonObject delveObj = delveModArr.get(delveIterator).getAsJsonObject();
+						DelvesModifier delveMod = DelvesModifier.fromName(delveObj.getAsJsonPrimitive("delveModName").getAsString());
+						if (delveMod == null) {
+							continue;
+						}
 
-					int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
+						int lvl = delveObj.getAsJsonPrimitive("delveModLvl").getAsInt();
 
-					if (lvl > 0) {
-						info.put(delveMod, lvl);
+						if (lvl > 0) {
+							info.put(delveMod, lvl);
+						}
+
 					}
-
-
 				}
 
 				PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>()).putIfAbsent(name, info);
@@ -219,21 +228,30 @@ public class DelvesManager implements Listener {
 		}
 	}
 
-	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods) {
+	public static void savePlayerData(Player player, String dungeon, Map<DelvesModifier, Integer> mods, int presetId) {
 		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.computeIfAbsent(player.getUniqueId(), key -> new HashMap<>());
 		DungeonDelveInfo ddinfo = playerDungeonInfo.computeIfAbsent(dungeon, key -> new DungeonDelveInfo());
 		ddinfo.mModifierPoint.clear();
 		for (DelvesModifier mod : mods.keySet()) {
 			ddinfo.mModifierPoint.put(mod, mods.get(mod));
 		}
+		ddinfo.mPresetId = presetId;
 		ddinfo.recalculateTotalPoint();
 	}
 
 	public static boolean validateDelvePreset(Player player, String dungeon) {
-		int preset = ScoreboardUtils.getScoreboardValue(player, DelvePreset.PRESET_SCOREBOARD).orElse(0);
-		DelvePreset delvePreset = DelvePreset.getDelvePreset(preset);
+		DelvePreset delvePreset;
+		if (dungeon.equals("ring")) {
+			int presetId = ScoreboardUtils.getScoreboardValue(player, DelvePreset.PRESET_SCOREBOARD).orElse(0);
+			if (presetId == 0) {
+				return true;
+			}
+			delvePreset = DelvePreset.getDelvePreset(presetId);
+		} else {
+			delvePreset = DelvePreset.getDelvePreset(dungeon);
+		}
 		if (delvePreset == null) {
-			return true;
+			return false;
 		}
 
 		Map<String, DungeonDelveInfo> playerDungeonInfo = PLAYER_DELVE_DUNGEON_MOD_MAP.get(player.getUniqueId());
@@ -242,7 +260,7 @@ public class DelvesManager implements Listener {
 		}
 
 		DungeonDelveInfo ddinfo = playerDungeonInfo.getOrDefault(dungeon, new DungeonDelveInfo());
-		return DelvePreset.validatePresetModifiers(ddinfo, delvePreset);
+		return DelvePreset.validatePresetModifiers(ddinfo, delvePreset, false);
 	}
 
 	protected static JsonObject convertPlayerData(Player player) {
@@ -267,11 +285,24 @@ public class DelvesManager implements Listener {
 				dungeonMod.addProperty("delveModLvl", modLevelEntry.getValue());
 				delveModArr.add(dungeonMod);
 			}
+			dungeonObj.addProperty("presetId", playerDungeonInfo.getValue().mPresetId);
 			dungeons.add(dungeonObj);
 
 		}
 
 		return obj;
+	}
+
+	public static int getSpawnersBroken(World world) {
+		return world.getPersistentDataContainer().getOrDefault(SPAWNER_BREAKS_DATA_KEY, PersistentDataType.INTEGER, -1);
+	}
+
+	public static void setSpawnersBroken(World world, int count) {
+		world.getPersistentDataContainer().set(SPAWNER_BREAKS_DATA_KEY, PersistentDataType.INTEGER, count);
+	}
+
+	public static int getSpawnersTotal(World world) {
+		return world.getPersistentDataContainer().getOrDefault(SPAWNER_COUNT_DATA_KEY, PersistentDataType.INTEGER, -1);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -440,89 +471,61 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreakEventLate(BlockBreakEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())
-			    || event.getBlock().getType() != Material.SPAWNER) {
+			|| !Plugin.IS_PLAY_SERVER) {
 			return;
 		}
 
-		Location loc = event.getBlock().getLocation();
+		spawnerBreakEventHandler(event.getBlock());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onBlockExplodeEventLate(BlockExplodeEvent event) {
+		if (!DUNGEONS.contains(ServerProperties.getShardName())
+			|| !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+
+		for (Block block : event.blockList()) {
+			spawnerBreakEventHandler(block);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEntityExplodeEventLate(EntityExplodeEvent event) {
+		if (!DUNGEONS.contains(ServerProperties.getShardName())
+			|| !Plugin.IS_PLAY_SERVER) {
+			return;
+		}
+
+		for (Block block : event.blockList()) {
+			spawnerBreakEventHandler(block);
+		}
+	}
+
+	public void spawnerBreakEventHandler(Block block) {
+		if (block.getType() != Material.SPAWNER) {
+			return;
+		}
+		Location loc = block.getLocation();
 		Colossal.applyModifiers(loc, DelvesUtils.getModifierLevel(loc, DelvesModifier.COLOSSAL));
 
-		//region Spawner Breaks Handling
-		if (false) { // this is causing massive lag and is not currently used
-			ScoreboardManager manager = Bukkit.getScoreboardManager();
-			final Scoreboard board = manager.getNewScoreboard();
-			if (board.getObjective(SPAWNER_TOTAL_SCORE_NAME) != null) {
-				board.registerNewObjective(SPAWNER_TOTAL_SCORE_NAME, "dummy");
-			}
-			if (board.getObjective(SPAWNER_BREAKS_SCORE_NAME) != null) {
-				board.registerNewObjective(SPAWNER_BREAKS_SCORE_NAME, "dummy");
-			}
+		World world = loc.getWorld();
 
-			Location armorStandLoc = event.getPlayer().getWorld().getSpawnLocation(); // get the spawn location
-			ArmorStand armorStand = null;
-			for (Entity entity : armorStandLoc.getNearbyEntities(2, 2, 2)) { // get the entities at the spawn location
-				if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName() != null && entity.getCustomName().equals("SpawnerBreaksArmorStand")) { //if it's our marker armorstand
-					armorStand = (ArmorStand) entity;
-				}
-			}
-			if (armorStand == null) { // create new armor stand
-				armorStand = (ArmorStand) event.getPlayer().getWorld().spawnEntity(armorStandLoc, EntityType.ARMOR_STAND);
-				armorStand.setVisible(false);
-				armorStand.setGravity(false);
-				armorStand.setMarker(true);
-				armorStand.setCustomName("SpawnerBreaksArmorStand");
-			}
-			// add one to breaks
-			int breaks = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME).orElse(0) + 1;
-			ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_BREAKS_SCORE_NAME, breaks);
-			// if we haven't initialized spawners
-			int numSpawnersTotal = ScoreboardUtils.getScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME).orElse(-2);
-			if (numSpawnersTotal < -1) {
-				// Haven't been initialized yet - load all the chunks and count the spawners
-
-				// Set the score to -1 to start so that this doesn't get called more than once before it finishes
-				ScoreboardUtils.setScoreboardValue(armorStand, SPAWNER_TOTAL_SCORE_NAME, -1);
-
-				// Get starting coords (divide by 16, basically)
-				int spawnChunkX = armorStandLoc.getBlockX() >> 4;
-				int spawnChunkZ = armorStandLoc.getBlockZ() >> 4;
-
-				World world = armorStandLoc.getWorld();
-				AtomicInteger numSpawners = new AtomicInteger(0);
-				AtomicInteger numChunksToLoad = new AtomicInteger(64 * 64);
-
-				ArmorStand finalArmorStand = armorStand;
-				// Load each chunk async, when they load the callback will be called
-				for (int cx = spawnChunkX - CHUNK_SCAN_RADIUS; cx <= spawnChunkX + CHUNK_SCAN_RADIUS; cx++) {
-					for (int cz = spawnChunkZ - CHUNK_SCAN_RADIUS; cz <= spawnChunkZ + CHUNK_SCAN_RADIUS; cz++) {
-						world.getChunkAtAsync(cx, cz, false /* don't create new chunks */, (Consumer<Chunk>) (chunk) -> {
-							if (chunk != null && chunk.isLoaded()) {
-								// This gets called once per chunk
-								for (BlockState tile : chunk.getTileEntities()) {
-									if (tile.getType().equals(Material.SPAWNER)) {
-										// Found another spawner
-										if (tile.getLocation().subtract(new Vector(0, 1, 0)).getBlock().getType().equals(Material.BEDROCK)) {
-											continue;
-										}
-										numSpawners.incrementAndGet();
-									}
-								}
-
-							}
-							// Decrement the number of chunks left until we get to 0
-							int numLeft = numChunksToLoad.decrementAndGet();
-							if (numLeft == 0) {
-								// This is the last chunk - so we can now store the value to the armor stand
-								// Need to run this on the main thread, since this function is labeled async
-
-								ScoreboardUtils.setScoreboardValue(finalArmorStand, SPAWNER_TOTAL_SCORE_NAME, numSpawners.intValue());
-							}
-						});
-					}
-				}
-			}
+		// Shifting generates spawners randomly. Modifying the shifting plugin would be a lot of effort, so just count spawners on play for this case.
+		boolean shiftingcity = ServerProperties.getShardName().equals("shiftingcity");
+		int spawnersTotal = getSpawnersTotal(world);
+		if (spawnersTotal == -1 && shiftingcity) {
+			// Mark spawner counting as in progress
+			world.getPersistentDataContainer().set(DelvesManager.SPAWNER_COUNT_DATA_KEY, PersistentDataType.INTEGER, -2);
+			// Start the counter - it will eventually update the total spawner count
+			SpawnerCountCommand.count(null, world, 8, true);
 		}
-		//endregion
+
+		// add one to spawner breaks
+		if (spawnersTotal > 0 || shiftingcity) {
+			int spawnersBroken = getSpawnersBroken(world);
+			world.getPersistentDataContainer().set(SPAWNER_BREAKS_DATA_KEY, PersistentDataType.INTEGER, spawnersBroken < 0 ? 1 : spawnersBroken + 1);
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -574,10 +577,14 @@ public class DelvesManager implements Listener {
 
 		public int mTotalPoint = 0;
 
-		@Override public String toString() {
+		public int mPresetId = 0;
+
+		@Override
+		public String toString() {
 			return "DungeonDelveInfo{" +
-					   "TotalPoint=" + mTotalPoint +
+				       "TotalPoint=" + mTotalPoint +
 				       ",ModifierPoint=" + mModifierPoint +
+				       ",PresetId=" + mPresetId +
 				       '}';
 		}
 
@@ -585,6 +592,7 @@ public class DelvesManager implements Listener {
 			DungeonDelveInfo info = new DungeonDelveInfo();
 			info.mModifierPoint.putAll(this.mModifierPoint);
 			info.mTotalPoint = this.mTotalPoint;
+			info.mPresetId = this.mPresetId;
 			return info;
 		}
 

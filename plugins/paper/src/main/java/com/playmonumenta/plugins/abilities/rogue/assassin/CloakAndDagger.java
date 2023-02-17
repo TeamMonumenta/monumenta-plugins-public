@@ -81,7 +81,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		super(plugin, player, INFO);
 		mDamageMultiplier = (isLevelOne() ? CLOAK_1_DAMAGE_MULTIPLIER : CLOAK_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE);
 		mMaxStacks = (isLevelOne() ? CLOAK_1_MAX_STACKS : CLOAK_2_MAX_STACKS) + (int) CharmManager.getLevel(player, CHARM_STACKS);
-		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
+		mTracker = new KillTriggeredAbilityTracker(player, this, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 	}
 
 	public void cast() {
@@ -127,8 +127,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		if (mActive
-			    && !AbilityUtils.isStealthed(mPlayer)) {
+		if (mActive && !AbilityUtils.isStealthed(mPlayer)) {
 			mActive = false;
 		}
 	}

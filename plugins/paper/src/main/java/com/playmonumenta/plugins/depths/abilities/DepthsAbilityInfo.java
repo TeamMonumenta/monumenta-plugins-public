@@ -117,7 +117,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	@Override
-	public int getBaseCooldown(int score) {
+	public int getBaseCooldown(Player player, int score) {
 		if (mCooldowns == null) {
 			return 0;
 		}

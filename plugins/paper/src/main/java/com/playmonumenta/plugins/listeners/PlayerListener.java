@@ -1547,12 +1547,12 @@ public class PlayerListener implements Listener {
 		}
 
 		// For Fire / Fall damage in R2 and R3, take more damage.
-		if (event.getEntity() instanceof Player
+		if (event.getEntity() instanceof Player player
 			&& SCALABLE_REGION_DAMAGE_CAUSES.contains(event.getCause())) {
-			if (ServerProperties.getAbilityEnhancementsEnabled()) {
+			if (ServerProperties.getAbilityEnhancementsEnabled(player)) {
 				// R3, Take +40% more damage
 				event.setDamage(event.getDamage() * 1.4);
-			} else if (ServerProperties.getClassSpecializationsEnabled()) {
+			} else if (ServerProperties.getClassSpecializationsEnabled(player)) {
 				// R2, Take +20% more damage
 				event.setDamage(event.getDamage() * 1.2);
 			}

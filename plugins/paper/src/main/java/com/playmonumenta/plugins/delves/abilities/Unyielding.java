@@ -9,15 +9,15 @@ public class Unyielding {
 
 	public static final String DESCRIPTION = "Elites find renewed strength at half health.";
 
-	public static final String[][] RANK_DESCRIPTIONS = {
-		{
+	public static String[] rankDescription(int level) {
+		return new String[]{
 			"Elite enemies heal 120% maximum health over 3 seconds",
 			"upon falling to 50% health and shed negative effects.",
 			"The attack that triggers this cannot bring the elite",
 			"to under 50% health. The healing can be cancelled through",
 			"hard crowd control (knock away, pull, stun, silence, freeze)."
-		}
-	};
+		};
+	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		if (level == 0) {

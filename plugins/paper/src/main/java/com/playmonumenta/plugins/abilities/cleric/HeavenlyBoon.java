@@ -93,7 +93,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	public HeavenlyBoon(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mTracker = new KillTriggeredAbilityTracker(this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
+		mTracker = new KillTriggeredAbilityTracker(player, this, BOSS_DAMAGE_THRESHOLD_R1, BOSS_DAMAGE_THRESHOLD_R2, BOSS_DAMAGE_THRESHOLD_R3);
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
 		mDurationChange = CharmManager.getExtraDuration(player, CHARM_DURATION);

@@ -34,7 +34,7 @@ public class Agility implements Attribute {
 			boolean adaptability = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADAPTABILITY) > 0;
 			double damageMultiplier = Armor.getDamageMultiplier(0, Armor.getSecondaryEnchantsMod(event, plugin, player),
 				value, getSecondaryEnchantsMod(event, plugin, player),
-				Armor.getSecondaryEnchantCap(), adaptability, 0, event.getType().isEnvironmental());
+				Armor.getSecondaryEnchantCap(player), adaptability, 0, event.getType().isEnvironmental());
 			event.setDamage(event.getDamage() * damageMultiplier);
 		}
 	}
