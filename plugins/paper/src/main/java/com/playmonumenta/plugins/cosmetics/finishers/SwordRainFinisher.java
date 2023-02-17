@@ -398,8 +398,8 @@ public class SwordRainFinisher implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
-		for (int i = 0; i < 3; i++) {
-			int offset = 5 * (3 - i);
+		for (int i = 0; i < 5; i++) {
+			int offset = 3 * (5 - i);
 			new BukkitRunnable() {
 				int mTicks = 0;
 				ArmorStand mSwordStand = createSword(loc);
@@ -407,16 +407,16 @@ public class SwordRainFinisher implements EliteFinisher {
 				@Override
 				public void run() {
 					if (mTicks == 0) {
-						loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.25f, Constants.NotePitches.F11);
+						loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.25f, Constants.NotePitches.calculatePitch(FastUtils.RANDOM.nextInt(24)));
 					}
-					if (mSwordStand.getLocation().clone().add(0, 0.4, 0).getBlock().isEmpty()) {
-						if (mSwordStand.getLocation().clone().add(0, -mFallSpeed + 0.3, 0).getBlock().isEmpty()) {
+					if (mSwordStand.getLocation().getY() > killedMob.getLocation().getY() || mSwordStand.getLocation().clone().add(0, 0.4, 0).getBlock().isEmpty()) {
+						if (mSwordStand.getLocation().getY() > killedMob.getLocation().getY() || mSwordStand.getLocation().clone().add(0, -mFallSpeed + 0.3, 0).getBlock().isEmpty()) {
 							mSwordStand.teleport(mSwordStand.getLocation().clone().add(0, -mFallSpeed, 0));
 						} else {
 							mSwordStand.teleport(mSwordStand.getLocation().clone().add(0, -mFallSpeed / 2, 0));
 						}
 					}
-					if (mTicks >= 30 + offset) {
+					if (mTicks >= 50 + offset) {
 						mSwordStand.remove();
 						this.cancel();
 					}
