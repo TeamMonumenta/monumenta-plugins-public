@@ -247,8 +247,7 @@ public class ItemStatManager implements Listener {
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-					ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
-					double regionScaling = getRegionScaling(player, region, mRegion, 1, 0.5, 0.25);
+					double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.5, 0.25);
 					boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
 
 					for (ItemStat stat : ITEM_STATS) {
@@ -265,7 +264,7 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 							}
 							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getRegionScaling(player, region, mRegion, 0, 1, 2)));
+								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getEffectiveRegionScaling(player, item, mRegion, 0, 1, 2)));
 							}
 						} else if (stat instanceof Infusion infusion) {
 							double multiplier = infusion.getInfusionType().isRegionScaled() ? (shattered ? 0 : regionScaling) : 1.0;
@@ -284,8 +283,7 @@ public class ItemStatManager implements Listener {
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-				ItemStatUtils.Region region = ItemStatUtils.getRegion(mainhand);
-				double regionScaling = getRegionScaling(player, region, mRegion, 1, 0.5, 0.25);
+				double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.5, 0.25);
 
 				for (ItemStat stat : ITEM_STATS) {
 					if (stat instanceof Attribute attribute) {
@@ -307,7 +305,7 @@ public class ItemStatManager implements Listener {
 							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
 						}
 						if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
-							newMainhandAddStats.add(stat, getRegionScaling(player, region, mRegion, 0, 1, 2));
+							newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
 						}
 					} else if (stat instanceof Infusion infusion) {
 						double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
@@ -831,6 +829,14 @@ public class ItemStatManager implements Listener {
 			return serverRegion == ItemStatUtils.Region.VALLEY ? oneRegionScaling : baseScaling;
 		}
 		return baseScaling;
+	}
+
+	public static double getEffectiveRegionScaling(Player player, ItemStack item, ItemStatUtils.Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+		ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
+		if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WORLDLY_PROTECTION) > 0) {
+			region = ItemStatUtils.Region.VALLEY;
+		}
+		return getRegionScaling(player, region, serverRegion, baseScaling, oneRegionScaling, twoRegionScaling);
 	}
 
 }
