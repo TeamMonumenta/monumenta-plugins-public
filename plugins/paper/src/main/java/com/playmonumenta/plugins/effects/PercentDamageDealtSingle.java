@@ -48,6 +48,14 @@ public class PercentDamageDealtSingle extends PercentDamageDealt {
 	}
 
 	@Override
+	public @Nullable String getSpecificDisplay() {
+		if (mHasDoneDamage) {
+			return null;
+		}
+		return super.getSpecificDisplay();
+	}
+
+	@Override
 	public JsonObject serialize() {
 		JsonObject object = new JsonObject();
 		object.addProperty("effectID", mEffectID);
