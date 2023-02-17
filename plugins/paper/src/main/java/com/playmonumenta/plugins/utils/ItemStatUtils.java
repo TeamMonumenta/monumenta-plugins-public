@@ -348,6 +348,7 @@ public class ItemStatUtils {
 		PROMENADE("promenade", "Mecha-Pelias' Mecha-Promenade", TextColor.fromHexString("#B87333")),
 		AMBER("amber", "item name color", TextColor.fromHexString("#FFBF00")),
 		GOLD("gold", "item name color", TextColor.fromHexString("#FFD700")),
+		TRUENORTH("truenorth", "True North", TextColor.fromHexString("#FFD700")),
 		DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
 		INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
 		MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8"));
