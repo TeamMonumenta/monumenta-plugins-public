@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -44,7 +43,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final NamespacedKey GEODE_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/depths/loot/voidstained_geode");
 	private static final NamespacedKey STRAND_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/twisted_strand");
 	private static final NamespacedKey CANVAS_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r3/gallery/items/torn_canvas");
-	private static final NamespacedKey PRESTIGE_LOOTTABLE = NamespacedKeyUtils.fromString("epic:r2/delves/items/reverial_roots");
+	private static final String CHALLENGE_POINTS_SCOREBOARD = "ChallengePoints";
 
 	//Theme constants
 	//Depths
@@ -326,14 +325,13 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 							}
 
 							// Check costs
-							ItemStack mStar = InventoryUtils.getItemFromLootTable(player, PRESTIGE_LOOTTABLE);
+							int score = ScoreboardUtils.getScoreboardValue(player, CHALLENGE_POINTS_SCOREBOARD).orElse(0);
 							int priceNum = PRESTIGE_CS.get(entry).getPrice();
-							int removed = InventoryUtils.removeSoulboundItemFromInventory(player.getInventory(), ItemUtils.getPlainName(mStar), priceNum, player);
-							if (removed == 0) {
+							if (score < priceNum) {
 								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
-								player.sendMessage(Component.text("You don't have enough items to buy this cosmetic skill!", NamedTextColor.RED));
-							} else if (removed == priceNum) {
-								// Successfully removed items
+								player.sendMessage(Component.text("You don't have enough Challenge Points to buy this cosmetic skill!", NamedTextColor.RED));
+							} else {
+								ScoreboardUtils.setScoreboardValue(player, CHALLENGE_POINTS_SCOREBOARD, score - priceNum);
 								if (CosmeticsManager.getInstance().addCosmetic(player, CosmeticType.COSMETIC_SKILL, skin)) {
 									player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 									player.sendMessage(Component.text("You successfully bought " + skin + "! Go to Cosmetic Manager to equip it!", NamedTextColor.GREEN));
@@ -344,10 +342,6 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 									player.sendMessage(Component.text("EX[" + skin + "]2: An exception occurred when buying cosmetic skill. Contact a moder or dev with this message to report if you believe this is a bug.", NamedTextColor.DARK_RED));
 									close();
 								}
-							} else {
-								// Shouldn't be here! But leave it as a handler to avoid typo in code.
-								player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
-								player.sendMessage(Component.text("EX[" + skin + "]3: An exception occurred when consuming Soulbound tokens. Contact a moder if you lose items.", NamedTextColor.DARK_RED));
 							}
 						} else {
 							// Already bought
@@ -493,50 +487,28 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 				mInventory.setItem(INTRO_LOC, introItem);
 
 				// Depth theme entry
-				if (ScoreboardUtils.getScoreboardValue(player, DEPTHS_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
-					ItemStack depthItem = createPageIcon(Material.BLACKSTONE, "Darkest Depths", DEPTH_COLOR, DEPTH_INTRO);
-					mInventory.setItem(DEPTH_ENTRY_LOC, depthItem);
-				} else {
-					ItemStack depthItem = createPageIcon(LOCKED, "Da" + ChatColor.MAGIC + "rkest Dep" + ChatColor.RESET + "ths", DEPTH_COLOR,
-						List.of("Complete " + ChatColor.MAGIC + "Darke" + ChatColor.RESET + "st D" + ChatColor.MAGIC + "epth" + ChatColor.RESET + "s",
-							"to unlock this theme!"));
-					mInventory.setItem(DEPTH_ENTRY_LOC, depthItem);
-				}
+				setPageIcon(DEPTH_ENTRY_LOC, Material.BLACKSTONE, "Darkest Depths", "Da" + ChatColor.MAGIC + "rkest Dep" + ChatColor.RESET + "ths", DEPTH_COLOR, DEPTH_INTRO,
+					List.of("Complete " + ChatColor.MAGIC + "Darke" + ChatColor.RESET + "st D" + ChatColor.MAGIC + "epth" + ChatColor.RESET + "s",
+						"to unlock this theme!"),
+					DEPTHS_SCB, player);
 
 				// Delve theme entry
-				if (ScoreboardUtils.getScoreboardValue(player, R1MONUMENT_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
-					ItemStack delveItem = createPageIcon(Material.NETHERITE_BLOCK, "Dungeon Delves", DELVE_COLOR, DELVE_INTRO);
-					mInventory.setItem(DELVE_ENTRY_LOC, delveItem);
-				} else {
-					ItemStack delveItem = createPageIcon(LOCKED, ChatColor.MAGIC + "Dungeon D" + ChatColor.RESET + "elves", DELVE_COLOR,
-						List.of("Complete Monument of King's Valley",
-							"to unlock this theme!"));
-					mInventory.setItem(DELVE_ENTRY_LOC, delveItem);
-				}
+				setPageIcon(DELVE_ENTRY_LOC, Material.NETHERITE_BLOCK, "Dungeon Delves", ChatColor.MAGIC + "Dungeon D" + ChatColor.RESET + "elves", DELVE_COLOR, DELVE_INTRO,
+					List.of("Complete Monument of King's Valley",
+						"to unlock this theme!"),
+					R1MONUMENT_SCB, player);
 
 				// Prestige theme entry
-				final boolean prestige_enable = false; //TODO: Remove this awful restriction when launching prestige hall
-				if (prestige_enable) {
-					if (ScoreboardUtils.getScoreboardValue(player, PRESTIGE_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) { //Testing!
-						ItemStack prestigeItem = createPageIcon(Material.GOLD_BLOCK, "Prestige Hall", PRESTIGE_COLOR, PRESTIGE_INTRO);
-						mInventory.setItem(PRESTIGE_ENTRY_LOC, prestigeItem);
-					} else {
-						ItemStack prestigeItem = createPageIcon(LOCKED, "???", PRESTIGE_COLOR,
-							List.of("Coming Soon!")); //TODO: pre hall condition
-						mInventory.setItem(PRESTIGE_ENTRY_LOC, prestigeItem);
-					}
-				}
+				setPageIcon(PRESTIGE_ENTRY_LOC, Material.GOLD_BLOCK, "Challenge Delves", ChatColor.MAGIC + "Chall" + ChatColor.RESET + "enge Delves", PRESTIGE_COLOR, PRESTIGE_INTRO,
+					List.of("Complete Monument of King's Valley",
+						"to unlock this theme!"),
+					R1MONUMENT_SCB, player);
 
 				// Gallery theme entry
-				if (ScoreboardUtils.getScoreboardValue(player, GALLERY_SCB).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
-					ItemStack galleryItem = createPageIcon(Material.WAXED_OXIDIZED_COPPER, "Gallery of Fear", GALLERY_COLOR, GALLERY_INTRO);
-					mInventory.setItem(GALLERY_ENTRY_LOC, galleryItem);
-				} else {
-					ItemStack galleryItem = createPageIcon(LOCKED, ChatColor.MAGIC + "MzkCaerulaArbor" + ChatColor.RESET, GALLERY_COLOR,
-						List.of("Reveal the secret b" + ChatColor.MAGIC + "eneth the ocean" + ChatColor.RESET + "s",
-							"to unlock this theme!"));
-					mInventory.setItem(GALLERY_ENTRY_LOC, galleryItem);
-				}
+				setPageIcon(GALLERY_ENTRY_LOC, Material.WAXED_OXIDIZED_COPPER, "Gallery of Fear", ChatColor.MAGIC + "MzkCaerulaArbor" + ChatColor.RESET, GALLERY_COLOR, GALLERY_INTRO,
+					List.of("Reveal the secret b" + ChatColor.MAGIC + "eneth the ocean" + ChatColor.RESET + "s",
+						"to unlock this theme!"),
+					GALLERY_SCB, player);
 
 				// Back item
 				setBackItem("Back to Cosmetic Manager");
@@ -637,7 +609,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			for (int i = (mPageNumber - 1) * ENTRY_PER_PAGE; i < PRESTIGE_CS.size(); ) {
 				String skin = PRESTIGE_THEME.get(i);
 				int priceNum = PRESTIGE_CS.get(i).getPrice();
-				List<String> price = List.of(priceNum + " Reverial Roots");
+				List<String> price = List.of(priceNum + " Challenge Points");
 				ItemStack item = createSkillIcon(skin, PRESTIGE_COLOR, player, price);
 				mInventory.setItem(currentSlot, item);
 				if (slotToEntryNum(++currentSlot) < 0) {
@@ -721,6 +693,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		meta.displayName(Component.text(itemName, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		item.setItemMeta(meta);
 		mInventory.setItem(BACK_LOC, item);
+	}
+
+	private void setPageIcon(int location, Material unlockedIcon, String unlockedName, String lockedName, TextColor color, List<String> unlockedLore, List<String> lockedLore, String scoreboard, Player player) {
+		ItemStack item;
+		if (ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) > 0 || player.getGameMode() == GameMode.CREATIVE) {
+			item = createPageIcon(unlockedIcon, unlockedName, color, unlockedLore);
+		} else {
+			item = createPageIcon(LOCKED, lockedName, color, lockedLore);
+		}
+		mInventory.setItem(location, item);
 	}
 
 	private ItemStack createPageIcon(Material icon, String name, TextColor color, List<String> desc) {
