@@ -163,8 +163,10 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 	private void toggleRecast() {
 		// Toggling off is always possible. Toggling on casts the ability once, so requires being off cooldown and having enough potions to use it.
 		if (mPlayer.getScoreboardTags().remove(TOGGLE_TAG)) {
+			mPlayer.sendActionBar(Component.text("Energizing Elixir automatic recast has been disabled"));
 			ClientModHandler.updateAbility(mPlayer, this);
 		} else if (!isOnCooldown() && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(mPrice)) {
+			mPlayer.sendActionBar(Component.text("Energizing Elixir automatic recast has been enabled"));
 			mPlayer.getScoreboardTags().add(TOGGLE_TAG);
 			activate(true);
 			putOnCooldown();

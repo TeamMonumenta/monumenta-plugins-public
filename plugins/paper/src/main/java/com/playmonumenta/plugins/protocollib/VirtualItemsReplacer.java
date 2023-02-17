@@ -36,9 +36,8 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
@@ -47,6 +46,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 
 public class VirtualItemsReplacer extends PacketAdapter {
 
@@ -114,8 +114,11 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		}
 
 		if (isPlayerInventory) {
+			boolean isArmorOrOffhandSlot = (5 <= slot && slot <= 8) || slot == 45;
+			boolean isHotbarOrOffhandSlot = 36 <= slot && slot < 46;
+
 			// Virtual Firmament
-			if (36 <= slot && slot < 46 // hotbar or offhand
+			if (isHotbarOrOffhandSlot
 				    && ItemUtils.isShulkerBox(itemStack.getType())
 				    && VirtualFirmament.isEnabled(player)) {
 				String plainName = ItemUtils.getPlainNameIfExists(itemStack);
@@ -152,7 +155,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			}
 
 			// Vanity
-			if ((5 <= slot && slot <= 8) || slot == 45) { // armor or offhand
+			if (isArmorOrOffhandSlot) {
 				VanityManager.VanityData vanityData = mPlugin.mVanityManager.getData(player);
 				if (vanityData != null && vanityData.mSelfVanityEnabled) {
 					EquipmentSlot equipmentSlot = switch (slot) {
@@ -183,29 +186,32 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				return;
 			}
 
-			// Update the count on Alchemical Utensils
-			if (ItemUtils.isAlchemistItem(itemStack)) {
-				if (PlayerUtils.isAlchemist(player)) {
-					AlchemistPotions potionsAbility = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
+			// Alchemical Utensils
+			if (isHotbarOrOffhandSlot && ItemUtils.isAlchemistItem(itemStack) && PlayerUtils.isAlchemist(player)) {
+				AlchemistPotions potionsAbility = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 
-					if (potionsAbility == null) {
-						return;
-					}
-
-					int count = potionsAbility.getCharges();
-					new NBTItem(itemStack, true).setInteger("CHARGES", count);
-
-					ItemUtils.modifyMeta(itemStack, meta -> {
-						Component bagNameComponent = meta.displayName();
-						String bagName = PlainTextComponentSerializer.plainText().serialize(bagNameComponent);
-						List<Component> bagComponentChildren = bagNameComponent.children();
-						Map<TextDecoration, TextDecoration.State> bagDecorations = (bagComponentChildren.size() > 0) ? bagComponentChildren.get(0).decorations() : bagNameComponent.decorations();
-						TextColor bagColor = (bagComponentChildren.size() > 0) ? bagComponentChildren.get(0).color() : bagNameComponent.color();
-						String newName = String.format("%s (%s)", (bagName.charAt(bagName.length() - 1) == ')') ? bagName.substring(0, bagName.length() - 4).trim() : bagName, count);
-						meta.displayName(Component.text(newName, bagColor).decorations(bagDecorations));
-					});
-					markVirtual(itemStack);
+				if (potionsAbility == null) {
+					return;
 				}
+
+				int count = potionsAbility.getCharges();
+				new NBTItem(itemStack, true).setInteger("CHARGES", count);
+				itemStack.setAmount(Math.max(1, count));
+
+				ItemUtils.modifyMeta(itemStack, meta -> {
+					if (meta instanceof PotionMeta potionMeta) {
+						double ratio = ((double) count) / potionsAbility.getMaxCharges();
+						int color = (int) (ratio * 255);
+						if (potionsAbility.isGruesomeMode()) {
+							potionMeta.setColor(Color.fromRGB(color, 0, 0));
+						} else {
+							potionMeta.setColor(Color.fromRGB(0, color, 0));
+						}
+					}
+					meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
+				});
+				markVirtual(itemStack);
+				return;
 			}
 		}
 

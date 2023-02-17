@@ -43,9 +43,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
@@ -56,7 +54,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
@@ -322,40 +319,39 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public boolean decrementCharge() {
-		if (mCharges > 0) {
-			mCharges--;
-			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
-			PlayerInventory inventory = mPlayer.getInventory();
+		if (mCharges <= 0) {
+			return false;
+		}
 
-			PlayerUtils.callAbilityCastEvent(mPlayer, ClassAbility.ALCHEMIST_POTION);
-
-			if (ItemUtils.isAlchemistItem(inventory.getItemInMainHand())) {
-				updateAlchemistItem(inventory.getItemInMainHand(), mCharges);
-				mSlot = inventory.getHeldItemSlot();
-			} else if (ItemUtils.isAlchemistItem(inventory.getItem(mSlot))) {
-				updateAlchemistItem(inventory.getItem(mSlot), mCharges);
-			} else {
-				boolean found = false;
-				for (int i = 0; i < 9; i++) {
-					if (ItemUtils.isAlchemistItem(inventory.getItem(i))) {
-						mSlot = i;
-						updateAlchemistItem(inventory.getItem(i), mCharges);
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					// Cannot find alch bag
-					return false;
+		// Check if the player has an alchemical utensil on the hotbar
+		PlayerInventory inventory = mPlayer.getInventory();
+		if (ItemUtils.isAlchemistItem(inventory.getItemInMainHand())) {
+			mSlot = inventory.getHeldItemSlot();
+		} else if (!ItemUtils.isAlchemistItem(inventory.getItem(mSlot))) {
+			boolean found = false;
+			for (int i = 0; i < 9; i++) {
+				if (ItemUtils.isAlchemistItem(inventory.getItem(i))) {
+					mSlot = i;
+					found = true;
+					break;
 				}
 			}
-
-
-			ClientModHandler.updateAbility(mPlayer, this);
-
-			return true;
+			if (!found) {
+				// Cannot find alch bag
+				return false;
+			}
 		}
-		return false;
+
+		mCharges--;
+		ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
+
+		PlayerUtils.callAbilityCastEvent(mPlayer, ClassAbility.ALCHEMIST_POTION);
+
+		updateAlchemistItem();
+
+		ClientModHandler.updateAbility(mPlayer, this);
+
+		return true;
 	}
 
 	public boolean decrementCharges(int charges) {
@@ -375,11 +371,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		if (mCharges < mMaxCharges) {
 			mCharges++;
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
-			// Update item
-			ItemStack item = mPlayer.getInventory().getItem(mSlot);
-			if (item != null) {
-				updateAlchemistItem(item, mCharges);
-			}
+			updateAlchemistItem();
 			ClientModHandler.updateAbility(mPlayer, this);
 			return true;
 		}
@@ -396,7 +388,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		ItemStack item = mPlayer.getInventory().getItem(mSlot);
 
 		if (mOnCooldown) {
 			mTimer += 5;
@@ -417,12 +408,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 			ScoreboardUtils.setScoreboardValue(mPlayer, POTION_SCOREBOARD, mCharges);
 			// Update item
 
-			if (item != null) {
-				updateAlchemistItem(item, mCharges);
-			}
+			updateAlchemistItem();
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
+		// Old code to prevent Sacred Provisions from duplicating alch pots.
+		// That bug has since been fixed, but this is left just in case something similar happens again.
+		ItemStack item = mPlayer.getInventory().getItem(mSlot);
 		if (item != null && item.getAmount() > 1 && ItemUtils.isAlchemistItem(item)) {
 			item.setAmount(1);
 		}
@@ -434,7 +426,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 		MessagingUtils.sendActionBarMessage(mPlayer, "Alchemist's Potions swapped to " + mode + " mode");
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, brewPitch);
-		updateAlchemistItem(mPlayer.getInventory().getItem(mSlot), mCharges);
+		updateAlchemistItem();
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -501,33 +493,9 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return mRadius;
 	}
 
-	private boolean updateAlchemistItem(@Nullable ItemStack item, int count) {
-		if (item == null) {
-			return false;
-		}
-
-		ItemMeta meta = item.getItemMeta();
-
-		if (item.getType() == Material.SPLASH_POTION && meta instanceof PotionMeta potionMeta) {
-			double ratio = ((double) count) / mMaxCharges;
-			int color = (int) (ratio * 255);
-			if (mGruesomeMode) {
-				potionMeta.setColor(Color.fromRGB(color, 0, 0));
-			} else {
-				potionMeta.setColor(Color.fromRGB(0, color, 0));
-			}
-			item.setItemMeta(potionMeta);
-		}
-
-		// The count display on the item name is now handled via virtual item.
-		// Just need to update the player's inventory.
-		// The name of the bag will stay the same (base without any charge information)
-		if (meta.hasDisplayName() && ItemUtils.isAlchemistItem(item)) {
-			mPlayer.updateInventory();
-			return true;
-		}
-
-		return false;
+	private void updateAlchemistItem() {
+		// Display is handled virtually, just need to update the player's inventory to show changes
+		mPlayer.updateInventory();
 	}
 
 	@Override
