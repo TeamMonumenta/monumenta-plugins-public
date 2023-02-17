@@ -251,11 +251,11 @@ public class DelveCustomInventory extends CustomInventory {
 
 		List<Component> lore = new ArrayList<>();
 
-		lore.add(Component.text(String.format("%d Depth Points Assigned", depthPoints), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text(String.format("%d Delve Points Assigned", depthPoints), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 
 		lore.add(Component.text(""));
 
-		lore.add(Component.text("Stat Multipliers from Depth Points:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("Stat Multipliers from Delve Points:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 		double damageMultiplier = StatMultiplier.getDamageMultiplier(depthPoints);
 		double healthMultiplier = StatMultiplier.getHealthMultiplier(depthPoints);
 		double speedMultiplier = StatMultiplier.getSpeedMultiplier(depthPoints);
