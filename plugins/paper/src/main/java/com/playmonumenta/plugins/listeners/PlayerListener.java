@@ -629,7 +629,7 @@ public class PlayerListener implements Listener {
 			    && ItemStatUtils.isCharm(item)
 			    && item.getAmount() == 1
 			    && ItemUtils.isNullOrAir(event.getCursor())) {
-			new CharmsGUI(player).openInventory(player, mPlugin);
+			new CharmsGUI(player).open();
 		}
 
 

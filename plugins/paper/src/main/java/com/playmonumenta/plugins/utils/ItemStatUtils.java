@@ -1199,7 +1199,7 @@ public class ItemStatUtils {
 		return nextNumeralValue.getValue() + toRomanNumerals(value - nextNumeralValue.getKey());
 	}
 
-	private static Optional<NBTCompound> getCompound(@Nullable NBTCompound compound, String... path) {
+	public static Optional<NBTCompound> getCompound(@Nullable NBTCompound compound, String... path) {
 		if (compound == null) {
 			return Optional.empty();
 		}
@@ -1212,14 +1212,14 @@ public class ItemStatUtils {
 		return Optional.of(compound);
 	}
 
-	private static Optional<NBTCompound> getCompound(@Nullable ItemStack item, String... path) {
+	public static Optional<NBTCompound> getCompound(@Nullable ItemStack item, String... path) {
 		if (item == null || item.getType() == Material.AIR) {
 			return Optional.empty();
 		}
 		return getCompound(new NBTItem(item), path);
 	}
 
-	private static <T extends Enum<T>> @Nullable T getEnum(NBTCompound compound, String key, Class<T> enumClass) {
+	public static <T extends Enum<T>> @Nullable T getEnum(NBTCompound compound, String key, Class<T> enumClass) {
 		String value = compound.getString(key);
 		if (value == null) {
 			return null;

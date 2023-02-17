@@ -137,22 +137,33 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				new CharmsGUI(player).openInventory(player, plugin);
+				new CharmsGUI(player).open();
 			}).register();
 
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
 
 		new CommandAPICommand("charm")
-		.withPermission(guiPerms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[0];
-			Player viewer = player;
-			if (sender instanceof Player s) {
-				viewer = s;
-			}
-			new CharmsGUI(viewer, player).openInventory(viewer, plugin);
-		}).register();
+			.withPermission(guiPerms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				Player viewer = player;
+				if (sender instanceof Player s) {
+					viewer = s;
+				}
+				new CharmsGUI(viewer, player).open();
+			}).register();
+
+		// charm edit GUI command - only for moderators
+
+		new CommandAPICommand("charm")
+			.withPermission(perms)
+			.withArguments(new LiteralArgument("gui-edit"),
+				new EntitySelectorArgument.OnePlayer("player"))
+			.executesPlayer((sender, args) -> {
+				Player player = (Player) args[0];
+				new CharmsGUI(sender, player, true).open();
+			}).register();
 
 		//These are identical, maybe just a bit easier to use
 
@@ -163,7 +174,7 @@ public class CharmsCommand extends GenericCommand {
 			.withPermission(guiPerms)
 			.withArguments(arguments)
 			.executesPlayer((player, args) -> {
-				new CharmsGUI(player).openInventory(player, plugin);
+				new CharmsGUI(player).open();
 			}).register();
 
 		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
@@ -174,7 +185,7 @@ public class CharmsCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executesPlayer((sender, args) -> {
 				Player player = (Player) args[0];
-				new CharmsGUI(sender, player).openInventory(sender, plugin);
+				new CharmsGUI(sender, player).open();
 			}).register();
 
 		// CHARM SEARCH COMMAND
