@@ -159,7 +159,7 @@ public class MasterworkUtils {
 
 		TRUENORTH_ONE("truenorth_1", "epic:r3/items/currency/godtree_carving", 4, HYPER_ARCHOS_RING, 1),
 		TRUENORTH_TWO("truenorth_2", PULSATING_DIAMOND, 2, HYPER_ARCHOS_RING, 3),
-		TRUENORTH_THREE("truenorth_3", "epic:r3/items/shrine/curse_of_the_dark_soul", 1, HYPER_ARCHOS_RING, 4),
+		TRUENORTH_THREE("truenorth_3", "epic:r3/shrine/curse_of_the_dark_soul", 1, HYPER_ARCHOS_RING, 4),
 		TRUENORTH_FOUR("truenorth_4", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		TRUENORTH_FIVE("truenorth_5", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		TRUENORTH_SIX("truenorth_6", INVALID_ITEM, 1, INVALID_ITEM, 1),
