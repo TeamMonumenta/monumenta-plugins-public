@@ -46,7 +46,7 @@ public class DungeonUtils {
 
 		// Architect's Ring
 		BLUE("blue", "D12Access", "D12Finished", "D12StartDate", 17, null, DelvePreset.BLUE),
-		BROWN("brown", "D13Access", "D13Finished", "D13StartDate", 18, null, null), // TODO: Add brown preset
+		BROWN("brown", "D13Access", "D13Finished", "D13StartDate", 18, null, DelvePreset.BROWN),
 
 		SKT("skt", "DSKTAccess", "DSKTChests", "DSKTStartDate", -1, null, null),
 		RUIN("ruin", "DMASAccess", "DMASFinished", null, -1, null, null),
