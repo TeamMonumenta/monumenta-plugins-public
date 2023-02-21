@@ -126,7 +126,7 @@ public class HauntingShades extends Ability {
 		stand.setSilent(true);
 		stand.setBasePlate(false);
 		stand.setMarker(true);
-		stand.setVisible(true);
+		stand.setVisible(false);
 		stand.setCustomNameVisible(false);
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHADES_DURATION);
