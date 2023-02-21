@@ -136,7 +136,7 @@ public class CursedWound extends Ability {
 					}
 				}
 
-				event.setDamage(event.getDamage() * (1 + (Math.min(cooldowns, mCursedWoundCap + (int) CharmManager.getLevel(mPlayer, CHARM_DAMAGE)) * CURSED_WOUND_DAMAGE)));
+				event.setDamage(event.getDamage() * (1 + (Math.min(cooldowns, mCursedWoundCap) * (CURSED_WOUND_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)))));
 			}
 
 			if (PlayerUtils.isFallingAttack(mPlayer)) {
