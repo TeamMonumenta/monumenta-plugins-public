@@ -294,12 +294,12 @@ public enum DelvePreset {
 		entry(DelvesModifier.RIFTBORN, 1)
 	)),
 	BROWN(68, "brown", 100, Material.BROWN_WOOL, Map.ofEntries(
+		entry(DelvesModifier.COLOSSAL, 15),
+		entry(DelvesModifier.HAUNTED, 1),
 		entry(DelvesModifier.CARAPACE, 15),
-		entry(DelvesModifier.COLOSSAL, 5),
-		entry(DelvesModifier.CHRONOLOGY, 1),
-		entry(DelvesModifier.PERNICIOUS, 10),
-		entry(DelvesModifier.BLOODTHIRSTY, 10),
-		entry(DelvesModifier.INFERNAL, 5)
+		entry(DelvesModifier.SPECTRAL, 5),
+		entry(DelvesModifier.TWISTED, 5),
+		entry(DelvesModifier.DREADFUL, 5)
 	));
 
 	public static final String PRESET_SCOREBOARD = "Daily3DelvePreset";
