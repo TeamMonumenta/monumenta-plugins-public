@@ -249,11 +249,20 @@ public class DungeonAccessCommand extends GenericCommand {
 
 		String shardName = mapping.getShardName();
 		if (shardName != null) {
+			int numShards = switch (shardName) {
+				case "blue" -> 4;
+				case "brown" -> 3;
+				case "skt" -> 3;
+				case "gallery" -> 2;
+				default -> 1;
+			};
 			for (Player player : players) {
+				int shardNum = 1 + (ScoreboardUtils.getScoreboardValue(player, mapping.getAccessName()).orElse(0) % numShards);
+				String fullShard = shardName + (shardNum == 1 ? "" : "-" + shardNum);
 				try {
-					MonumentaRedisSyncAPI.sendPlayer(player, shardName, returnLocation, returnYaw, returnPitch);
+					MonumentaRedisSyncAPI.sendPlayer(player, fullShard, returnLocation, returnYaw, returnPitch);
 				} catch (Exception e) {
-					MMLog.warning("Error while sending player " + player.getName() + " to " + shardName, e);
+					MMLog.warning("Error while sending player " + player.getName() + " to " + fullShard, e);
 				}
 			}
 		} else {
