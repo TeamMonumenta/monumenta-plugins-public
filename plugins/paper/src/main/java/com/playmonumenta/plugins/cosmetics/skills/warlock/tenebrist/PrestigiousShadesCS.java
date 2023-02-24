@@ -77,7 +77,7 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 	public void shadesStartSound(World world, Player mPlayer) {
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.PLAYERS, 0.9f, 0.8f);
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_AMBIENT, SoundCategory.PLAYERS, 1.25f, 0.6f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 3.5f, 0.75f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.75f);
 	}
 
 	@Override
@@ -128,8 +128,8 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 		}
 
 		if (mT % 20 == 0) {
-			world.playSound(bLoc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 5f, 0.5f);
-			world.playSound(bLoc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 7.5f, 0.6f);
+			world.playSound(bLoc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.5f);
+			world.playSound(bLoc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 0.6f);
 		}
 	}
 
@@ -156,6 +156,6 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 		}
 
 		world.playSound(bLoc, Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, .5f, 0.65f);
-		world.playSound(bLoc, Sound.BLOCK_CONDUIT_DEACTIVATE, SoundCategory.PLAYERS, 4.8f, 0.6f);
+		world.playSound(bLoc, Sound.BLOCK_CONDUIT_DEACTIVATE, SoundCategory.PLAYERS, 2.0f, 0.6f);
 	}
 }
