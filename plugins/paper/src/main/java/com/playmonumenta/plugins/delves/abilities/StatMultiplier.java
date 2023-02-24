@@ -91,8 +91,8 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS_RING_POI.put("Submerged Citadel", KEEP);
 
 		// Exalted
-		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.0);
-		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.0);
+		STAT_COMPENSATION_MAPPINGS.put("whiteexalted", 1.1);
+		STAT_COMPENSATION_MAPPINGS.put("orangeexalted", 1.1);
 		STAT_COMPENSATION_MAPPINGS.put("magentaexalted", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("lightblueexalted", 1.0);
 		STAT_COMPENSATION_MAPPINGS.put("yellowexalted", 1.0);
@@ -109,8 +109,8 @@ public class StatMultiplier {
 		STAT_COMPENSATION_MAPPINGS.put("shiftingcityexalted", 1.0);
 	}
 
-	public static double getStatCompensation(String dungeon) {
-		return STAT_COMPENSATION_MAPPINGS.getOrDefault(dungeon, 1.0);
+	public static double getStatCompensation(String dungeon, boolean exalted) {
+		return STAT_COMPENSATION_MAPPINGS.getOrDefault(dungeon + (exalted ? "exalted" : ""), 1.0);
 	}
 
 	public static double getStatCompensation(String shard, Location loc) {

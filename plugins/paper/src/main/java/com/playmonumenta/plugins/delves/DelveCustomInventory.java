@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.custominventories.BountyGui;
 import com.playmonumenta.plugins.delves.abilities.Entropy;
 import com.playmonumenta.plugins.delves.abilities.StatMultiplier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -275,7 +276,9 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
-		double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeonName);
+		DungeonUtils.DungeonCommandMapping mapping = DungeonUtils.DungeonCommandMapping.getByShard(mDungeonName);
+		boolean exalted = mapping != null && mapping.getTypeName() != null && ScoreboardUtils.getScoreboardValue(mOwner, mapping.getTypeName()).orElse(0) == 1;
+		double dungeonMultiplier = StatMultiplier.getStatCompensation(mDungeonName, exalted);
 		lore.add(Component.text("Stat Multipliers from Base Dungeon:", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 		lore.add(Component.text(String.format("- Damage Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		lore.add(Component.text(String.format("- Health Multiplier: x%.3f", dungeonMultiplier), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
@@ -324,10 +327,15 @@ public class DelveCustomInventory extends CustomInventory {
 
 		lore.add(Component.text(""));
 
+		if (mapping != null && mapping.getDelvePreset() != null && mapping.getDelvePreset().isDungeonChallengePreset() && DelvePreset.validatePresetModifiers(mPointSelected, mapping.getDelvePreset(), false)) {
+			lore.add(Component.text("- Challenge Mode Active", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+		} else {
+			lore.add(Component.text("- Challenge Mode not Active", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+		}
 		if (depthPoints >= DelvesUtils.MAX_DEPTH_POINTS) {
 			lore.add(Component.text("- All Delves Modifiers Advancement Granted upon Completion", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		} else {
-			lore.add(Component.text("- All Delves Modifiers Advancement Granted upon Completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("- All Delves Modifiers Advancement not Granted upon Completion", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 
 		meta.lore(lore);
