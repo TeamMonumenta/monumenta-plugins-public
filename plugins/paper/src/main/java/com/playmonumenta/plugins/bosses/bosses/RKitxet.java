@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.bosses.spells.SpellShieldStun;
 import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgony;
 import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellEndlessAgonyDamage;
@@ -22,6 +21,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,6 +62,7 @@ public class RKitxet extends BossAbilityGroup {
 	public static final int RKITXET_HEALTH = 1400;
 	public static final int SWAP_TARGET_SECONDS = 15;
 
+	private static final String MUSIC_TITLE = "epic:muisc.kaul";
 	private static final int MUSIC_DURATION = 3 * 60 + 39; //seconds
 	private static final String GOLEM_TAG = "Golem";
 	private static final int COOLDOWN_TICKS_1 = 10 * 20;
@@ -148,8 +149,6 @@ public class RKitxet extends BossAbilityGroup {
 		//The SpellShardShield class stores the information about the shield and handles adding/removing the shield
 		mShieldSpell = new SpellShardShield(mBoss);
 
-		SpellMusic music = new SpellMusic(mBoss, "epic:music.kaul", MUSIC_DURATION * 20, 2.0f, 0, detectionRange, detectionRange, false, 0, true);
-
 		//Only change between phase 1 and 2 is the cooldowns of the spells
 		SpellManager phase1Actives = new SpellManager(Arrays.asList(
 			new SpellEndlessAgony(mPlugin, this, mSpawnLoc, detectionRange, COOLDOWN_TICKS_1),
@@ -169,16 +168,14 @@ public class RKitxet extends BossAbilityGroup {
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
 			new SpellShieldStun(10 * 20),
-			new SpellEndlessAgonyDamage(mBoss, this),
-			music
+			new SpellEndlessAgonyDamage(mBoss, this)
 		);
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellKaulsFury(mPlugin, mBoss, this, 7 * 20, 3 * 20, 10, 7 * 20),
 			mShieldSpell,
 			new SpellBlockBreak(mBoss),
 			new SpellShieldStun(10 * 20),
-			new SpellEndlessAgonyDamage(mBoss, this),
-			music
+			new SpellEndlessAgonyDamage(mBoss, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -248,6 +245,8 @@ public class RKitxet extends BossAbilityGroup {
 					mBoss.setInvulnerable(false);
 					mBoss.setAI(true);
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+
+					SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendTitle(player, Component.text("R'Kitxet", NamedTextColor.DARK_GREEN, TextDecoration.BOLD), Component.text("Forsaken Elder", NamedTextColor.GREEN, TextDecoration.BOLD));

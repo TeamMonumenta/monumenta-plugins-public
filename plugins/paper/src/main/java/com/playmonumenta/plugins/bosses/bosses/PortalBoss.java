@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellKnockup;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalBullet;
 import com.playmonumenta.plugins.bosses.spells.portalboss.SpellPortalPassiveLava;
@@ -20,6 +19,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -89,8 +89,6 @@ public final class PortalBoss extends BossAbilityGroup {
 
 		mCooldownTicks = 8 * 20;
 
-		SpellMusic music = new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 2.0f, 6 * 20, detectionRange, detectionRange, false, 0, true);
-
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 			new SpellKnockup(mBoss, plugin, mCooldownTicks - 30),
@@ -99,8 +97,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
 		List<Spell> phase1Passives = Arrays.asList(
-			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this),
-			music
+			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
 		);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
@@ -111,8 +108,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
 		List<Spell> phase2Passives = Arrays.asList(
-			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this),
-			music
+			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
@@ -123,8 +119,7 @@ public final class PortalBoss extends BossAbilityGroup {
 			new SpellRisingCircles(plugin, mBoss, mSpawnLoc, mCooldownTicks)
 		));
 		List<Spell> phase3Passives = Arrays.asList(
-			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this),
-			music
+			new SpellPortalPassiveLava(mBoss, mSpawnLoc, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -283,6 +278,8 @@ public final class PortalBoss extends BossAbilityGroup {
 
 		//Clear portals
 		players.forEach(PortalManager::clearAllPortals);
+
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 		new BukkitRunnable() {
 			int mTicks = 0;

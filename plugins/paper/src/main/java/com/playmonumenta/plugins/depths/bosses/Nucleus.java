@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
-import com.playmonumenta.plugins.bosses.spells.SpellMusic;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.depths.DepthsParty;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -22,6 +21,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -168,8 +168,6 @@ public final class Nucleus extends BossAbilityGroup {
 			}
 		}
 
-		SpellMusic music = new SpellMusic(mBoss, MUSIC_TITLE, MUSIC_DURATION * 20, 2.0f, 0, detectionRange, detectionRange, false, 0, true);
-
 		//Spell setup
 		SpellManager phase1Spells = new SpellManager(Arrays.asList(
 				new SpellSurroundingDeath(plugin, mBoss, mSpawnLoc, surroundingDeathCooldown, this),
@@ -178,8 +176,7 @@ public final class Nucleus extends BossAbilityGroup {
 		List<Spell> phase1Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this),
-			music
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase2Spells = new SpellManager(Arrays.asList(
@@ -190,8 +187,7 @@ public final class Nucleus extends BossAbilityGroup {
 		List<Spell> phase2Passives = Arrays.asList(
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this),
-			music
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this)
 		);
 
 		SpellManager phase3Spells = new SpellManager(Arrays.asList(
@@ -203,8 +199,7 @@ public final class Nucleus extends BossAbilityGroup {
 			new SpellBlockBreak(mBoss, 2, 3, 2),
 			new SpellVolcanicDeepmise(mBoss, mSpawnLoc),
 			new SpellPassiveEyes(mBoss, this, spawnLoc),
-			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this),
-			music
+			new SpellPassiveSummons(plugin, mBoss, 30.0, 15, mSpawnLoc.getY(), mSpawnLoc, party == null ? 1 : ((party.getFloor() - 1) / 3) + 1, this)
 		);
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
@@ -354,6 +349,9 @@ public final class Nucleus extends BossAbilityGroup {
 		mBoss.setHealth(modifiedHealth);
 
 		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
+
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 		new BukkitRunnable() {
 
