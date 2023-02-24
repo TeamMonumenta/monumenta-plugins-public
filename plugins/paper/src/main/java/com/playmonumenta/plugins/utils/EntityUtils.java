@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
+import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
@@ -331,13 +332,15 @@ public class EntityUtils {
 	}
 
 	public static boolean isElite(Entity entity) {
-		Set<String> tags = entity.getScoreboardTags();
-		return tags.contains("Elite");
+		return ScoreboardUtils.checkTag(entity, "Elite");
 	}
 
 	public static boolean isBoss(Entity entity) {
-		Set<String> tags = entity.getScoreboardTags();
-		return tags.contains("Boss");
+		return ScoreboardUtils.checkTag(entity, "Boss");
+	}
+
+	public static boolean isTrainingDummy(Entity entity) {
+		return ScoreboardUtils.checkTag(entity, TrainingDummyBoss.identityTag);
 	}
 
 	public static boolean isHostileMob(@Nullable Entity entity) {
