@@ -254,6 +254,7 @@ public class GraveListener implements Listener {
 	public void playerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		PlayerInventory inv = player.getInventory();
+		boolean gravesEnabled = gravesEnabled(player);
 
 		if (player.getHealth() > 0) {
 			return;
@@ -275,7 +276,7 @@ public class GraveListener implements Listener {
 			 * Keep inventory (but not levels), and equipped items get one level of Shatter.
 			 */
 
-			event.setKeepInventory(true);
+			event.setKeepInventory(gravesEnabled);
 			event.setKeepLevel(false);
 			event.getDrops().clear();
 
@@ -318,7 +319,7 @@ public class GraveListener implements Listener {
 				Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
 			}
 
-			if (gravesEnabled(player)) {
+			if (gravesEnabled) {
 				// Generate a new grave if necessary
 				GraveManager.onDeath(player, equipment);
 			}
