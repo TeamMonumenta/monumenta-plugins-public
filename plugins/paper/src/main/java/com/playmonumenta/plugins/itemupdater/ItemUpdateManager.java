@@ -254,11 +254,12 @@ public class ItemUpdateManager implements Listener {
 					if (playerModified != null) {
 						NBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 						if (arrowNBTs != null) {
+							List<String> arrowPath = new ArrayList<>(path);
+							arrowPath.add("in quiver");
 							List<NBTContainer> arrows = new ArrayList<>(arrowNBTs.size());
 							for (NBTListCompound arrowNBT : arrowNBTs) {
 								ItemStack arrow = NBTItem.convertNBTtoItem(arrowNBT);
-								ItemStatUtils.markClean(arrow);
-								ItemStatUtils.generateItemStats(arrow);
+								updateNested(arrowPath, arrow);
 								arrows.add(NBTItem.convertItemtoNBT(arrow));
 							}
 							arrowNBTs.clear();
