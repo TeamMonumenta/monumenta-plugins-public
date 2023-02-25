@@ -12,7 +12,9 @@ import com.playmonumenta.scriptedquests.utils.QuestUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -63,6 +65,8 @@ public class ServerProperties {
 	private boolean mLootingLimiterIgnoreBreakingChests = false;
 	private boolean mDepthsEnabled = false;
 	private boolean mTrickyCreepersEnabled = true;
+
+	private final Map<String, Integer> mShardCounts = new HashMap<>();
 
 	public ServerProperties() {
 	}
@@ -199,6 +203,10 @@ public class ServerProperties {
 		return INSTANCE.mMasterworkRefundEnabled;
 	}
 
+	public static int getShardCount(String shard) {
+		return INSTANCE.mShardCounts.getOrDefault(shard, 1);
+	}
+
 	public static void load(Plugin plugin, @Nullable CommandSender sender) {
 		INSTANCE.loadInternal(plugin, sender);
 	}
@@ -248,6 +256,14 @@ public class ServerProperties {
 
 			mDepthsEnabled = getPropertyValueBool(object, "depthsEnabled", mDepthsEnabled);
 			mTrickyCreepersEnabled = getPropertyValueBool(object, "trickyCreepersEnabled", mTrickyCreepersEnabled);
+
+			JsonElement shardCounts = object.get("shardCounts");
+			if (shardCounts != null) {
+				mShardCounts.clear();
+				for (Map.Entry<String, JsonElement> shardCount : shardCounts.getAsJsonObject().entrySet()) {
+					mShardCounts.put(shardCount.getKey(), shardCount.getValue().getAsJsonPrimitive().getAsInt());
+				}
+			}
 
 			return null;
 		});
@@ -300,6 +316,8 @@ public class ServerProperties {
 		out.add("depthsEnabled = " + mDepthsEnabled + " (NB: changing this requires a restart)");
 
 		out.add("trickyCreepersEnabled = " + mTrickyCreepersEnabled);
+
+		out.add("shardCounts = " + mShardCounts);
 
 		return out;
 	}

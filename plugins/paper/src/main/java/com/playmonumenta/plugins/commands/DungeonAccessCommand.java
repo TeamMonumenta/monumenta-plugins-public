@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -249,13 +250,7 @@ public class DungeonAccessCommand extends GenericCommand {
 
 		String shardName = mapping.getShardName();
 		if (shardName != null) {
-			int numShards = switch (shardName) {
-				case "blue" -> 4;
-				case "brown" -> 3;
-				case "skt" -> 3;
-				case "gallery" -> 2;
-				default -> 1;
-			};
+			int numShards = ServerProperties.getShardCount(shardName);
 			for (Player player : players) {
 				int shardNum = 1 + (ScoreboardUtils.getScoreboardValue(player, mapping.getAccessName()).orElse(0) % numShards);
 				String fullShard = shardName + (shardNum == 1 ? "" : "-" + shardNum);
