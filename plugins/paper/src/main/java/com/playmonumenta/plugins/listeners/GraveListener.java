@@ -254,31 +254,38 @@ public class GraveListener implements Listener {
 	public void playerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		PlayerInventory inv = player.getInventory();
-		boolean gravesEnabled = gravesEnabled(player);
 
 		if (player.getHealth() > 0) {
 			return;
 		}
 
+		// Deaths in safe zones are safe deaths (can e.g. be achieved with Black Swan Song)
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
+			event.setKeepInventory(true);
+			event.getDrops().clear();
+			event.setKeepLevel(true);
+			event.setDroppedExp(0);
+		}
+
 		if (event.getKeepInventory()) {
-			//Remove Curse of Vanishing 2 Items even if Keep Inventory is on
+			// Remove Curse of Vanishing 2 Items even if Keep Inventory is on
 			for (int slot = 0; slot <= 40; slot++) {
 				ItemStack item = inv.getItem(slot);
 				if (ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) >= 2) {
 					inv.setItem(slot, null);
 				}
 			}
-		}
-
-		if (!event.getKeepInventory()) {
-			/* Monumenta-custom keep inventory
+		} else if (gravesEnabled(player)) {
+			/*
+			 * Monumenta-custom keep inventory
 			 *
 			 * Keep inventory (but not levels), and equipped items get one level of Shatter.
+			 * A grave is spawned that allows removing one level of shatter when clicked.
 			 */
 
-			event.setKeepInventory(gravesEnabled);
-			event.setKeepLevel(false);
+			event.setKeepInventory(true);
 			event.getDrops().clear();
+			event.setKeepLevel(false);
 
 			// Handle curse of vanishing
 			ItemStack[] items = inv.getContents();
@@ -319,11 +326,20 @@ public class GraveListener implements Listener {
 				Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
 			}
 
-			if (gravesEnabled) {
-				// Generate a new grave if necessary
-				GraveManager.onDeath(player, equipment);
-			}
+			// Generate a new grave if necessary
+			GraveManager.onDeath(player, equipment);
 
+		} else { // Not safe death, and graves are disabled: use vanilla behaviour of dropping items on death
+			// Handle curse of vanishing
+			event.getDrops().removeIf(item -> ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) >= 2);
+			for (ItemStack item : inv.getContents()) {
+				if (item != null
+					    && item.containsEnchantment(Enchantment.VANISHING_CURSE)
+					    && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) == 1) {
+					Shattered.shatter(item, Shattered.CURSE_OF_VANISHING_SHATTER);
+					event.getDrops().add(item);
+				}
+			}
 		}
 	}
 
