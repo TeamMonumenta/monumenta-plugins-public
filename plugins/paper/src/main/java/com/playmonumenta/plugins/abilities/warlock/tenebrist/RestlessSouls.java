@@ -26,8 +26,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
@@ -51,7 +49,7 @@ public class RestlessSouls extends Ability {
 	private static final int TICK_INTERVAL = 1;
 	private static final int DETECTION_RANGE = 24;
 	private static final int RANGE = 8;
-	private static final double MOVESPEED = 2.5; //block(s) per second on 0.2 mob speed
+	private static final double MOVESPEED = 5; // block(s) per second
 
 	public static final String CHARM_DAMAGE = "Restless Souls Damage";
 	public static final String CHARM_RADIUS = "Restless Souls Radius";
@@ -184,16 +182,6 @@ public class RestlessSouls extends Ability {
 					Location vexLoc = mBoss.getLocation();
 					if (mTarget != null && !mTarget.isDead()) {
 						mBoss.setCharging(true);
-						//choose vehicle mob for speed (bee mount mobs do not have speed, but bees do)
-						//sometimes rider have speed, choose fastest
-						double speed = 0;
-						Entity vehicle = mTarget;
-						while (vehicle != null) {
-							if (vehicle instanceof LivingEntity livingEntity) {
-								speed = Math.max(speed, EntityUtils.getAttributeBaseOrDefault(livingEntity, Attribute.GENERIC_MOVEMENT_SPEED, 0));
-							}
-							vehicle = vehicle.getVehicle();
-						}
 						Vector direction = LocationUtils.getDirectionTo(mTarget.getLocation(), vexLoc);
 						//0.2x distance for vertical movement for flying mobs
 						double yDiff = (mTarget.getLocation().getY() - mBoss.getLocation().getY()) * 0.2;
@@ -201,9 +189,8 @@ public class RestlessSouls extends Ability {
 							direction.setY(yDiff);
 						}
 						vexLoc.setDirection(direction);
-						//do not set scaling speed if mob is slower than baseline for shulkers
-						double scale = Math.max(speed / 0.2, 1);
-						vexLoc.add(direction.multiply(MOVESPEED * TICK_INTERVAL / 20 * scale));
+						// set speed
+						vexLoc.add(direction.multiply(MOVESPEED * TICK_INTERVAL / 20));
 						// attack
 						if (mBoss.getBoundingBox().overlaps(mTarget.getBoundingBox())) {
 							mBoss.attack(mTarget);
