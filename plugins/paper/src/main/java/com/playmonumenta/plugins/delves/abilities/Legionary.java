@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.entity.LivingEntity;
 
@@ -18,11 +19,15 @@ public class Legionary {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob)) {
+		if (DelvesUtils.isDelveMob(mob) || EntityUtils.isBoss(mob)) {
+			return;
+		}
+
+		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
 			DelvesUtils.duplicateLibraryOfSoulsMob(mob);
 		}
 		//Chance for a third if chance > 100
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level - 1 && !DelvesUtils.isDelveMob(mob)) {
+		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level - 1) {
 			DelvesUtils.duplicateLibraryOfSoulsMob(mob);
 		}
 	}
