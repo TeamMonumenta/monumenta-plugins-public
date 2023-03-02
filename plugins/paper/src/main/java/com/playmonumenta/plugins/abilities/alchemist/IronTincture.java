@@ -11,11 +11,12 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,6 +48,8 @@ public class IronTincture extends Ability {
 	private static final double IRON_TINCTURE_VELOCITY = 0.7;
 
 	private static final double IRON_TINCTURE_ENHANCEMENT_RESISTANCE = 0.05;
+	private static final int IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS = 3;
+	private static final int IRON_TINCTURE_ENHANCEMENT_STUN_DURATION = 30;
 
 	public static final String CHARM_COOLDOWN = "Iron Tincture Cooldown";
 	public static final String CHARM_ABSORPTION = "Iron Tincture Absorption Health";
@@ -73,9 +76,13 @@ public class IronTincture extends Ability {
 					),
 				"Effect and effect cap increased to %s absorption health."
 					.formatted(IRON_TINCTURE_2_ABSORPTION),
-				("The tincture now additionally cleanses all potion debuffs, extinguishes fire, and grants %s%% " +
-				"damage resistance when absorption is present, for the duration of the absorption.")
-					.formatted(StringUtils.multiplierToPercentage(IRON_TINCTURE_ENHANCEMENT_RESISTANCE))
+				("The tincture now grants %s%% damage resistance when absorption is present, for the duration of the absorption. " +
+				"Additionally, mobs within a %s block radius of the player who picks it up will be stunned for %ss.")
+					.formatted(
+						StringUtils.multiplierToPercentage(IRON_TINCTURE_ENHANCEMENT_RESISTANCE),
+						IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS,
+						StringUtils.ticksToSeconds(IRON_TINCTURE_ENHANCEMENT_STUN_DURATION)
+					)
 			)
 			.cooldown(IRON_TINCTURE_USE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IronTincture::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
@@ -178,10 +185,14 @@ public class IronTincture extends Ability {
 		AbsorptionUtils.addAbsorption(player, mAbsorption, mAbsorption, duration);
 
 		if (isEnhanced()) {
-			PotionUtils.clearNegatives(mPlugin, player);
-			if (player.getFireTicks() > 1) {
-				player.setFireTicks(1);
-			}
+			Hitbox hitbox = new Hitbox.SphereHitbox(player.getLocation(), IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS);
+			hitbox.getHitMobs().forEach(
+				mob -> {
+					if (!EntityUtils.isBoss(mob)) {
+						EntityUtils.applyStun(mPlugin, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION, mob);
+					}
+				}
+			);
 
 			double resistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {

@@ -12,12 +12,12 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -45,8 +45,7 @@ public class AlchemicalArtillery extends PotionAbility {
 	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 2.5;
 	private static final double ARTILLERY_RANGE_MULTIPLIER = 1.5;
 	private static final int ARTILLERY_POTION_COST = 2;
-	private static final int ENHANCEMENT_EXPLOSION_DELAY = 20;
-	private static final double ENHANCEMENT_EXPLOSION_DAMAGE_MULTIPLIER = 0.1;
+	private static final double ENHANCEMENT_REFUND_CHANCE = 0.5;
 	public static final String CHARM_DELAY = "Alchemical Artillery Delay";
 	public static final String CHARM_RADIUS = "Alchemical Artillery Radius";
 	public static final String CHARM_KNOCKBACK = "Alchemical Artillery Knockback";
@@ -60,8 +59,8 @@ public class AlchemicalArtillery extends PotionAbility {
 			.descriptions(
 				("Pressing the Drop Key while holding an Alchemist Bag and not sneaking launches a heavy bomb that " +
 				"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s%% of your " +
-				"potion's damage, in an area that is %s%% of your potion's radius. The initial speed of the bomb " +
-				"scales with your projectile speed. This costs you %s potions. %ss cooldown.")
+				"potion's damage and applying your selected potion's effects, in an area that is %s%% of your potion's radius. " +
+				"The initial speed of the bomb scales with your projectile speed. This costs you %s potions. %ss cooldown.")
 					.formatted(
 							StringUtils.multiplierToPercentage(ARTILLERY_1_DAMAGE_MULTIPLIER),
 							StringUtils.multiplierToPercentage(ARTILLERY_RANGE_MULTIPLIER),
@@ -70,12 +69,7 @@ public class AlchemicalArtillery extends PotionAbility {
 					),
 				"The damage of the bomb is increased to %s%%"
 					.formatted(StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
-				("%ss after the bomb lands, a secondary explosion deals %s%% of the bomb's damage and applies " +
-				"the effects of your currently selected potion type.")
-					.formatted(
-							StringUtils.ticksToSeconds(ENHANCEMENT_EXPLOSION_DELAY),
-							StringUtils.multiplierToPercentage(ENHANCEMENT_EXPLOSION_DAMAGE_MULTIPLIER)
-					)
+				"After launching the bomb, you have a 50% chance to be refunded 1 potion."
 			)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AlchemicalArtillery::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
@@ -101,6 +95,12 @@ public class AlchemicalArtillery extends PotionAbility {
 			putOnCooldown();
 			Location loc = mPlayer.getEyeLocation();
 			spawnGrenade(loc);
+			// If enhanced, chance to refund a potion when cast.
+			if (isEnhanced() && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_REFUND_CHANCE) {
+				mAlchemistPotions.incrementCharge();
+				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
+				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
+			}
 		}
 	}
 
@@ -135,16 +135,11 @@ public class AlchemicalArtillery extends PotionAbility {
 
 			new BukkitRunnable() {
 				int mTicks = 0;
-				ItemStatManager.PlayerItemStats mPlayerItemStats = playerItemStats;
-				private MagmaCube mGrenade = grenade;
-				private Item mPhysicsItem = physicsItem;
+				final ItemStatManager.PlayerItemStats mPlayerItemStats = playerItemStats;
+				private final MagmaCube mGrenade = grenade;
+				private final Item mPhysicsItem = physicsItem;
 				@Override
 				public void run() {
-					if (mGrenade == null) {
-						this.cancel();
-						return;
-					}
-
 					if (!mPlayer.isOnline()) {
 						mGrenade.remove();
 						mPhysicsItem.remove();
@@ -158,7 +153,7 @@ public class AlchemicalArtillery extends PotionAbility {
 					// - If the grenade hit lava
 					// - If the grenade has collided with any enemy
 					// - If 6 seconds have passed (probably stuck in webs)
-					if (mGrenade.isDead() || mPhysicsItem.isOnGround() || mTicks > 120 || mGrenade.isInLava() || hasCollidedWithEnemy(mGrenade)) {
+					if (!mGrenade.isValid() || mPhysicsItem.isOnGround() || mTicks > 120 || mGrenade.isInLava() || hasCollidedWithEnemy(mGrenade)) {
 						explode(mGrenade.getLocation().subtract(0, 0.1, 0), mPlayerItemStats);
 						mGrenade.remove();
 						mPhysicsItem.remove();
@@ -179,10 +174,7 @@ public class AlchemicalArtillery extends PotionAbility {
 
 	private boolean hasCollidedWithEnemy(MagmaCube grenade) {
 		Hitbox hitbox = new Hitbox.AABBHitbox(grenade.getWorld(), grenade.getBoundingBox());
-		if (hitbox.getHitMobs().size() > 0) {
-			return true;
-		}
-		return false;
+		return hitbox.getHitMobs().size() > 0;
 	}
 
 	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {
@@ -202,48 +194,17 @@ public class AlchemicalArtillery extends PotionAbility {
 
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, true, false);
+			applyEffects(mob, playerItemStats);
 
 			if (!EntityUtils.isBoss(mob)) {
 				MovementUtils.knockAwayRealistic(loc, mob, 1f, 0.5f, true);
 			}
 		}
-
-		if (isEnhanced()) {
-			new BukkitRunnable() {
-				Location mLoc = loc;
-				double mRadius = radius;
-				double mDamage = finalDamage;
-				private @Nullable ItemStatManager.PlayerItemStats mCastPlayerItemStats = playerItemStats;
-
-				@Override
-				public void run() {
-					Hitbox hitbox = new Hitbox.SphereHitbox(mLoc, mRadius);
-					List<LivingEntity> mobs = hitbox.getHitMobs();
-					World world = mLoc.getWorld();
-
-					if (mobs.size() == 0) {
-						world.playSound(mLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1.75f);
-						new PartialParticle(Particle.EXPLOSION_LARGE, mLoc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-						return;
-					}
-
-					for (LivingEntity mob : mobs) {
-						DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), mCastPlayerItemStats), mDamage * 0.1, true, true, false);
-						applyEffects(mob, playerItemStats);
-						new PartialParticle(Particle.BLOCK_CRACK, mob.getLocation(), 25, 0, 0, 0, 1, world.getBlockData(mob.getLocation().clone().subtract(0, 1, 0))).spawnAsPlayerActive(mPlayer);
-
-						Location mobLoc = mob.getLocation();
-						new PartialParticle(Particle.EXPLOSION_LARGE, mobLoc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
-						world.playSound(mobLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1.75f);
-					}
-				}
-			}.runTaskLater(mPlugin, 20);
-		}
 	}
 
 	private void explosionEffect(Location loc, double radius) {
 		ParticleUtils.explodingRingEffect(mPlugin, loc, radius, 1, 10,
-			Arrays.asList(
+			List.of(
 				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> {
 					new PartialParticle(Particle.FLAME, location, 1, 0, 0, 0, 0.0025).spawnAsPlayerActive(mPlayer);
 				})

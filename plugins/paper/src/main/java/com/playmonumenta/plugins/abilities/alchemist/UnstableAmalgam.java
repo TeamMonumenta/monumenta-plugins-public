@@ -58,7 +58,8 @@ public class UnstableAmalgam extends Ability {
 	private static final int UNSTABLE_AMALGAM_CAST_RANGE = 7;
 	private static final int UNSTABLE_AMALGAM_DURATION = 3 * 20;
 	private static final int UNSTABLE_AMALGAM_RADIUS = 4;
-	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED = 2.5f;
+	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL = 2.5f;
+	private static final float UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL = 1.0f;
 	private static final int UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION = 20 * 8;
 	private static final double UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE = 0.4;
 	private static final String DISABLE_SOURCE = "UnstableAmalgamDisable";
@@ -96,7 +97,7 @@ public class UnstableAmalgam extends Ability {
 							UNSTABLE_AMALGAM_2_DAMAGE,
 							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_2_COOLDOWN)
 					),
-				("Enemies hit by the Amalgam's explosion become unstable for %s seconds. " +
+				("Enemies hit by the Amalgam's explosion become unstable for %s seconds, and they are knocked straight up. " +
 				 "When an unstable mob is killed, a potion that deals %s%% of your potion damage is dropped at its location. " +
 				 "These potions apply both Brutal and Gruesome effects.")
 					.formatted(
@@ -227,8 +228,9 @@ public class UnstableAmalgam extends Ability {
 		}
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, UNSTABLE_AMALGAM_RADIUS);
-		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED);
-		float playerVertical = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, 2);
+		float horizontalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL);
+		float verticalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL);
+		float playerVertical = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL * 2);
 
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
 		List<LivingEntity> mobs = hitbox.getHitMobs(mAmalgam);
@@ -241,7 +243,11 @@ public class UnstableAmalgam extends Ability {
 			applyEffects(mob);
 
 			if (!EntityUtils.isBoss(mob)) {
-				MovementUtils.knockAwayRealistic(loc, mob, knockback, 2f, true);
+				if (isEnhanced()) {
+					mob.setVelocity(new Vector(0, verticalKnockback, 0));
+				} else {
+					MovementUtils.knockAwayRealistic(loc, mob, horizontalKnockback, verticalKnockback, true);
+				}
 			}
 			mAlchemistPotions.incrementCharge();
 		}
@@ -258,11 +264,11 @@ public class UnstableAmalgam extends Ability {
 			for (Player player : hitbox.getHitPlayers(true)) {
 				if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.NO_MOBILITY_ABILITIES)) {
 					if (!player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, ROCKET_JUMP_OBJECTIVE).orElse(0) == 100) {
-						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
+						MovementUtils.knockAwayRealistic(loc, player, horizontalKnockback, playerVertical, false);
 						disable(player);
 					} else if (player.equals(mPlayer) && ScoreboardUtils.getScoreboardValue(player, ROCKET_JUMP_OBJECTIVE).orElse(1) > 0) {
 						// by default any Alch can use Rocket Jump with their UA
-						MovementUtils.knockAwayRealistic(loc, player, knockback, playerVertical, false);
+						MovementUtils.knockAwayRealistic(loc, player, horizontalKnockback, playerVertical, false);
 						disable(player);
 					}
 				}
