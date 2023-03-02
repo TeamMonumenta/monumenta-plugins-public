@@ -54,7 +54,7 @@ public class DelveCustomInventory extends CustomInventory {
 		meta = STARTING_ITEM_NOT_ENOUGH_POINTS.getItemMeta();
 		meta.displayName(Component.text("Start delve!", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 		List<Component> lore = new ArrayList<>();
-		lore.add(Component.text("- Requires " + DelvesUtils.MINIMUM_DEPTH_POINTS + " Depth Points to begin", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("- Requires " + DelvesUtils.MINIMUM_DEPTH_POINTS + " Delve Points to begin", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore);
 		STARTING_ITEM_NOT_ENOUGH_POINTS.setItemMeta(meta);
 
