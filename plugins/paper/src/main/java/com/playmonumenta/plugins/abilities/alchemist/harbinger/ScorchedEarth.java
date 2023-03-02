@@ -8,15 +8,18 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.ScorchedEarthDamage;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -81,10 +84,13 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(new ItemStack(Material.BROWN_DYE, 1));
 
+	private final List<Instance> mActiveInstances = new ArrayList<>();
+
+	private record Instance(Location mLocation, int mEndTick, PlayerItemStats mStats) {
+	}
+
 	private final int mDuration;
 	private final double mRadius;
-
-	private final Map<Location, Integer> mCenters;
 	private int mLastCastTicks = 0;
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
@@ -94,7 +100,6 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mCharges = getTrackedCharges();
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SCORCHED_EARTH_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SCORCHED_EARTH_RADIUS);
-		mCenters = new HashMap<>();
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
@@ -103,38 +108,38 @@ public class ScorchedEarth extends MultipleChargeAbility {
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (mAlchemistPotions == null) {
-			mCenters.clear();
+			mActiveInstances.clear();
 			return;
 		}
 		manageChargeCooldowns();
-		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * SCORCHED_EARTH_DAMAGE_FRACTION);
-		for (Iterator<Map.Entry<Location, Integer>> iterator = mCenters.entrySet().iterator(); iterator.hasNext(); ) {
-			Map.Entry<Location, Integer> center = iterator.next();
-			Location loc = center.getKey();
-			int timeRemaining = center.getValue();
-			if (timeRemaining <= 0) {
+		int currentTick = Bukkit.getCurrentTick();
+		for (Iterator<Instance> iterator = mActiveInstances.iterator(); iterator.hasNext(); ) {
+			Instance instance = iterator.next();
+			if (instance.mEndTick <= currentTick) {
 				iterator.remove();
 			} else {
-				center.setValue(timeRemaining - 5);
-
+				Location loc = instance.mLocation;
 				World world = loc.getWorld();
-				new PartialParticle(Particle.SMOKE_LARGE, loc, 3, 2.1, 0.3, 2.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.FLAME, loc, 3, 2, 0.1, 2, 0.1f).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.REDSTONE, loc, 5, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.REDSTONE, loc, 5, 2.1, 0.3, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.LAVA, loc, 1, 2.1, 0.1, 2.1, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				double delta = (mRadius - 1) / 2;
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 3, delta, 0.3, delta, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FLAME, loc, 3, delta, 0.1, delta, 0.1f).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 5, delta, 0.3, delta, new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 5, delta, 0.3, delta, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.LAVA, loc, 1, delta, 0.1, delta, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.FLAME, loc, mRadius).ringMode(true).count(5).spawnAsPlayerActive(mPlayer);
 
+				int timeRemaining = instance.mEndTick - currentTick;
 				new PartialParticle(Particle.REDSTONE, loc.clone().add(5 * FastUtils.sin((timeRemaining % 40 / 20.0 - 1) * Math.PI), 0, 5 * FastUtils.cos((timeRemaining % 40 / 20.0 - 1) * Math.PI)), 1, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.25f)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
 
 				if (timeRemaining % 120 == 60 && timeRemaining < mDuration) {
 					world.playSound(loc, Sound.BLOCK_FIRE_AMBIENT, SoundCategory.PLAYERS, 1f, 0.5f);
 				}
 
-				PlayerItemStats stats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 				int fireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, SCORCHED_EARTH_FIRE_DURATION);
+				double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage(instance.mStats) * SCORCHED_EARTH_DAMAGE_FRACTION);
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 				for (LivingEntity mob : hitbox.getHitMobs()) {
-					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, stats, fireDuration));
+					mPlugin.mEffectManager.addEffect(mob, SCORCHED_EARTH_EFFECT_NAME, new ScorchedEarthDamage(10, damage, mPlayer, instance.mStats, fireDuration));
 				}
 			}
 		}
@@ -153,27 +158,30 @@ public class ScorchedEarth extends MultipleChargeAbility {
 				return true;
 			}
 			mLastCastTicks = ticks;
-			potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
+			potion.setMetadata(SCORCHED_EARTH_POTION_METAKEY, new FixedMetadataValue(mPlugin, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer)));
 		}
 		return true;
 	}
 
 	@Override
 	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (potion.hasMetadata(SCORCHED_EARTH_POTION_METAKEY)) {
+		Optional<PlayerItemStats> stats = MetadataUtils.getMetadata(potion, SCORCHED_EARTH_POTION_METAKEY);
+		if (stats.isPresent() && mAlchemistPotions != null) {
 			Location loc = potion.getLocation();
 			World world = mPlayer.getWorld();
-			new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 2.1, 0.5, 2.1, 0.1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SMOKE_LARGE, loc, 15, 2.1, 0.5, 2.1, 0).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, loc, 20, 2.1, 0.5, 2.1, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f)).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.FLAME, loc, 30, 2.1, 0.5, 2.1, 0.1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.LAVA, loc, 25, 1.5, 0.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
+			double delta = (mRadius - 1) / 2;
+			new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, delta, 0.5, delta, 0.1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.SMOKE_LARGE, loc, 15, delta, 0.5, delta, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, loc, 20, delta, 0.5, delta, new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 2.0f)).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.FLAME, loc, 30, delta, 0.5, delta, 0.1).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.LAVA, loc, 25, delta, 0.5, delta, 0).spawnAsPlayerActive(mPlayer);
+			new PPCircle(Particle.FLAME, loc, mRadius).ringMode(true).count(20).spawnAsPlayerActive(mPlayer);
 
 			world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 0.5f);
 			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 0.5f);
 			world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.5f);
 
-			mCenters.put(loc, mDuration);
+			mActiveInstances.add(new Instance(loc, Bukkit.getCurrentTick() + mDuration, stats.get()));
 		}
 
 		return true;
