@@ -45,6 +45,7 @@ public class Scrapshot extends DepthsAbility {
 		new DepthsAbilityInfo<>(Scrapshot.class, ABILITY_NAME, Scrapshot::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_LEFT_CLICK)
 			.linkedSpell(ClassAbility.SCRAPSHOT)
 			.cooldown(COOLDOWN)
+			.actionBarColor(TextColor.color(130, 130, 130))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Scrapshot::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.NETHERITE_SCRAP))

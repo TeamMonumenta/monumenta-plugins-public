@@ -117,6 +117,12 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	@Override
+	public DepthsAbilityInfo<T> actionBarColor(TextColor color) {
+		super.actionBarColor(color);
+		return this;
+	}
+
+	@Override
 	public int getBaseCooldown(Player player, int score) {
 		if (mCooldowns == null) {
 			return 0;

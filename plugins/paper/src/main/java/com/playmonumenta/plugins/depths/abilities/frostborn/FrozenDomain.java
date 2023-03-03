@@ -50,7 +50,7 @@ public class FrozenDomain extends DepthsAbility {
 			new PartialParticle(Particle.SNOW_SHOVEL, mPlayer.getLocation(), 8, 0, 0, 0, 0.65).spawnAsPlayerPassive(mPlayer);
 		}
 		if (oneSecond) {
-			if (mPlayer.isOnGround() && isOnIce(mPlayer)) {
+			if (PlayerUtils.isOnGround(mPlayer) && isOnIce(mPlayer)) {
 				mWasOnIce = true;
 				mSecondWhenIce = mSeconds;
 				handleSpeed();
@@ -106,10 +106,8 @@ public class FrozenDomain extends DepthsAbility {
 
 	public boolean isOnIce(LivingEntity entity) {
 		Location loc = entity.getLocation();
-		if (DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) && DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation())) {
-			return true;
-		}
-		return false;
+		return DepthsUtils.isIce(loc.getBlock().getRelative(BlockFace.DOWN).getType()) &&
+			DepthsUtils.iceActive.containsKey(loc.getBlock().getRelative(BlockFace.DOWN).getLocation());
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {

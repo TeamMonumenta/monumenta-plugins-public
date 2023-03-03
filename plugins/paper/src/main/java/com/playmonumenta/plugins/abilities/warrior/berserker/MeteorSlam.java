@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
@@ -142,7 +143,7 @@ public final class MeteorSlam extends Ability {
 					return;
 				}
 
-				if (!player.isOnGround()) {
+				if (!PlayerUtils.isOnGround(player)) {
 					updateFallFrom(); // Vanilla fall distance would be 0 if on ground
 				} else {
 					// Currently on ground

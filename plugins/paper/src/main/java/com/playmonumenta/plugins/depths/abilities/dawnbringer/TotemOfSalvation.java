@@ -57,6 +57,7 @@ public class TotemOfSalvation extends DepthsAbility {
 		new DepthsAbilityInfo<>(TotemOfSalvation.class, ABILITY_NAME, TotemOfSalvation::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.TOTEM_OF_SALVATION)
 			.cooldown(COOLDOWN)
+			.actionBarColor(TextColor.color(254, 212, 38))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemOfSalvation::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.TOTEM_OF_UNDYING))
 			.descriptions(TotemOfSalvation::getDescription);

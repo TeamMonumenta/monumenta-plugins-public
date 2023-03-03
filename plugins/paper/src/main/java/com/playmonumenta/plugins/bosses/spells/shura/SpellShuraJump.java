@@ -29,12 +29,12 @@ import org.bukkit.util.Vector;
 
 public class SpellShuraJump extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
 	private boolean mTrigger = true;
-	private double mVelocityMultiplier = 0.7;
-	private int mCooldown = 8 * 20;
+	private final double mVelocityMultiplier = 0.7;
+	private final int mCooldown = 8 * 20;
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f);
 
 	public SpellShuraJump(Plugin plugin, LivingEntity boss, double range) {
@@ -48,11 +48,11 @@ public class SpellShuraJump extends Spell {
 
 		BukkitRunnable a = new BukkitRunnable() {
 			int mT = 0;
-			List<Player> mTargeted = new ArrayList<Player>();
+			final List<Player> mTargeted = new ArrayList<>();
 
 			@Override
 			public void run() {
-				//List is farthest players in the beginning, and nearest players at the end
+				//List is the farthest players in the beginning, and nearest players at the end
 				List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
 				players.removeAll(mTargeted);
 				if (mTrigger && players.size() > 0) {
@@ -102,8 +102,8 @@ public class SpellShuraJump extends Spell {
 		final Vector finalVelocity = velocity;
 
 		BukkitRunnable leap = new BukkitRunnable() {
-			Location mLeapLocation = moveTo;
-			Vector mDirection = finalVelocity;
+			final Location mLeapLocation = moveTo;
+			final Vector mDirection = finalVelocity;
 			boolean mLeaping = false;
 			boolean mHasBeenOneTick = false;
 
@@ -162,7 +162,7 @@ public class SpellShuraJump extends Spell {
 
 	private void land(Vector v, World world) {
 		ParticleUtils.explodingRingEffect(mPlugin, mBoss.getLocation(), 4, 1, 4,
-			Arrays.asList(
+			List.of(
 				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> {
 					new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(mBoss);
 				})
@@ -171,7 +171,7 @@ public class SpellShuraJump extends Spell {
 		Location tloc = mBoss.getLocation().setDirection(v);
 		BukkitRunnable runB = new BukkitRunnable() {
 			int mT = 0;
-			PartialParticle mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1, RED);
+			final PartialParticle mPRed = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0.1, RED);
 
 			@Override
 			public void run() {

@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Iterator;
 import java.util.List;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -77,6 +78,7 @@ public class Panacea extends Ability {
 			.linkedSpell(ClassAbility.PANACEA)
 			.scoreboardId("Panacea")
 			.shorthandName("Pn")
+			.actionBarColor(TextColor.color(255, 255, 100))
 			.descriptions(
 				("Sneak Drop with an Alchemist Bag to shoot a mixture that deals %s%% of your potion damage, " +
 				"applies 100%% Slow for %ss, applies a %s%% base magic Damage Over Time effect every %ss for %ss, " +

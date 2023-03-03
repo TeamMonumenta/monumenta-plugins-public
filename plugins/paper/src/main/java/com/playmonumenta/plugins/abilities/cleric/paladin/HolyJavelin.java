@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Iterator;
 import java.util.List;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -56,6 +57,7 @@ public class HolyJavelin extends Ability {
 			.linkedSpell(ClassAbility.HOLY_JAVELIN)
 			.scoreboardId("HolyJavelin")
 			.shorthandName("HJ")
+			.actionBarColor(TextColor.color(255, 255, 50))
 			.descriptions(
 				"While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. " +
 					"It deals 22 magic damage to all undead enemies in a 0.75-block cube around it along its path, and 11 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.",

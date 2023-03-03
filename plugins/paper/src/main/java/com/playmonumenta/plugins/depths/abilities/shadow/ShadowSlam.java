@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -67,7 +68,7 @@ public final class ShadowSlam extends DepthsAbility {
 					return;
 				}
 
-				if (!player.isOnGround()) {
+				if (!PlayerUtils.isOnGround(player)) {
 					updateFallFrom(); // Vanilla fall distance would be 0 if on ground
 				} else {
 					// Currently on ground

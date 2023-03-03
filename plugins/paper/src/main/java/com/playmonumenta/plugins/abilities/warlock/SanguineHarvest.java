@@ -18,9 +18,9 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -69,6 +69,7 @@ public class SanguineHarvest extends Ability {
 			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
 			.scoreboardId("SanguineHarvest")
 			.shorthandName("SH")
+			.actionBarColor(TextColor.color(179, 0, 0))
 			.descriptions(
 				("Enemies you damage with an ability are afflicted with Bleed I for %s seconds. " +
 					 "Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
@@ -91,7 +92,7 @@ public class SanguineHarvest extends Ability {
 	private final double mBleedLevel;
 	private final double mHealPercent;
 
-	private ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
+	private final ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
 	public SanguineHarvest(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -173,9 +174,7 @@ public class SanguineHarvest extends Ability {
 				return;
 			}
 
-			Iterator<LivingEntity> iter = nearbyMobs.iterator();
-			while (iter.hasNext()) {
-				LivingEntity mob = iter.next();
+			for (LivingEntity mob : nearbyMobs) {
 				if (mob.getBoundingBox().overlaps(box)) {
 					if (EntityUtils.isHostileMob(mob)) {
 						explode(bLoc);

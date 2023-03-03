@@ -3,13 +3,11 @@ package com.playmonumenta.plugins.abilities;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Objects;
 import org.bukkit.entity.Player;
 
 public abstract class MultipleChargeAbility extends Ability implements AbilityWithChargesOrStacks {
-
 	protected int mMaxCharges;
 
 	protected int mCharges = 0;
@@ -28,7 +26,7 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 			mCharges--;
 			PlayerUtils.callAbilityCastEvent(mPlayer, mLinkedSpell);
 			if (mMaxCharges > 1) {
-				MessagingUtils.sendActionBarMessage(mPlayer, mLinkedSpell.getName() + " Charges: " + mCharges);
+				showChargesMessage();
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
 			AbilityManager.getManager().trackCharges(mPlayer, mLinkedSpell, mCharges);
@@ -43,9 +41,9 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		if (mCharges < mMaxCharges) {
 			mCharges++;
 			if (mMaxCharges > 1) {
-				MessagingUtils.sendActionBarMessage(mPlayer, mLinkedSpell.getName() + " Charges: " + mCharges);
+				showChargesMessage();
 			} else {
-				MessagingUtils.sendActionBarMessage(mPlayer, mLinkedSpell.getName() + " is now off cooldown!");
+				showOffCooldownMessage();
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
 			AbilityManager.getManager().trackCharges(mPlayer, mLinkedSpell, mCharges);
@@ -71,9 +69,9 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 		if (mCharges < mMaxCharges && mWasOnCooldown && !onCooldown) {
 			mCharges++;
 			if (mMaxCharges > 1) {
-				MessagingUtils.sendActionBarMessage(mPlayer, mLinkedSpell.getName() + " Charges: " + mCharges);
+				showChargesMessage();
 			} else {
-				MessagingUtils.sendActionBarMessage(mPlayer, mLinkedSpell.getName() + " is now off cooldown!");
+				showOffCooldownMessage();
 			}
 			needsClientModUpdate = true;
 			AbilityManager.getManager().trackCharges(mPlayer, mLinkedSpell, mCharges);
@@ -103,6 +101,11 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	@Override
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		manageChargeCooldowns();
+	}
+
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.STACKS;
 	}
 
 	@Override

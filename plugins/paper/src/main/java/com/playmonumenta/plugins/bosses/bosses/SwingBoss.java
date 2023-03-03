@@ -46,10 +46,10 @@ public class SwingBoss extends BossAbilityGroup {
 		@BossParam(help = "Sound played every few ticks")
 		public Sound SOUND = Sound.ENTITY_PLAYER_ATTACK_SWEEP;
 
-		@BossParam(help = "Particle summon arround the boss in the air ")
+		@BossParam(help = "Particle summon around the boss in the air ")
 		public ParticlesList PARTICLE_CHARGE = ParticlesList.fromString("[(SWEEP_ATTACK,1)]");
 
-		@BossParam(help = "Particle summon arround the boss on the terrain")
+		@BossParam(help = "Particle summon around the boss on the terrain")
 		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT,1)]");
 
 		@BossParam(help = "Sound played when the ability explode")
@@ -98,7 +98,7 @@ public class SwingBoss extends BossAbilityGroup {
 					for (Player player : PlayerUtils.playersInRange(boss.getLocation(), p.RADIUS, true)) {
 						double playerY = player.getLocation().getY();
 						//if the player is on ground increase the size of the swing to avoid slab cheating
-						if ((playerY + player.getHeight() < bossY) || (player.isOnGround() ? bossY + 0.7 < playerY : bossY + 0.1 < playerY)) {
+						if ((playerY + player.getHeight() < bossY) || (PlayerUtils.isOnGround(player) ? bossY + 0.7 < playerY : bossY + 0.1 < playerY)) {
 							continue;
 						}
 

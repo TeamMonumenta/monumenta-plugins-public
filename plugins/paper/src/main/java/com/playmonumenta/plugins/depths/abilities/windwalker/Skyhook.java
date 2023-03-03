@@ -102,13 +102,13 @@ public class Skyhook extends DepthsAbility {
 			mPlayer.teleport(loc);
 
 			//Refund cooldowns
-			for (Ability abil : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
-				AbilityInfo<?> info = abil.getInfo();
+			for (Ability ability : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
+				AbilityInfo<?> info = ability.getInfo();
 				ClassAbility spell = info.getLinkedSpell();
 				if (spell == null || spell == mInfo.getLinkedSpell()) {
 					continue;
 				}
-				int totalCD = abil.getModifiedCooldown();
+				int totalCD = ability.getModifiedCooldown();
 				int reducedCD = (int) (totalCD * (loc.distance(playerStartLoc) / 100.0));
 				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
 			}

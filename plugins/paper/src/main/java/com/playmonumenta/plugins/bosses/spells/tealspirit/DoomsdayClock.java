@@ -59,7 +59,7 @@ public class DoomsdayClock extends Spell {
 
 			@Override
 			public void run() {
-				if (!mBoss.isValid() || mBoss == null || mBoss.isDead()) {
+				if (!mBoss.isValid() || mBoss.isDead()) {
 					mIsActive = false;
 				}
 
@@ -101,7 +101,7 @@ public class DoomsdayClock extends Spell {
 						}
 						/*
 						for (BoundingBox box : redBoxes) {
-							if (box.overlaps(player.getBoundingBox()) && player.isOnGround()) {
+							if (box.overlaps(player.getBoundingBox()) && PlayerUtils.isOnGround(player)) {
 								DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, RED_DAMAGE, null, false, false, "Doomsday Clock");
 							}
 						}

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -64,6 +65,7 @@ public class ScorchedEarth extends MultipleChargeAbility {
 			.linkedSpell(ClassAbility.SCORCHED_EARTH)
 			.scoreboardId("ScorchedEarth")
 			.shorthandName("SE")
+			.actionBarColor(TextColor.color(230, 134, 0))
 			.descriptions(
 				("Sneak while throwing an Alchemist's Potion to deploy a %s block radius zone that lasts %ss where the potion lands. " +
 				"Mobs in this zone are dealt %s%% of your potion's damage and set on fire for %ss whenever taking damage " +
@@ -100,9 +102,8 @@ public class ScorchedEarth extends MultipleChargeAbility {
 		mCharges = getTrackedCharges();
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SCORCHED_EARTH_DURATION);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, SCORCHED_EARTH_RADIUS);
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(mPlugin, () ->
+			mAlchemistPotions = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	@Override

@@ -4,7 +4,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Davey;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
@@ -28,9 +29,9 @@ public class SpellDaveyAnticheese extends Spell {
 		//Anticheese
 		if (mTicks % 20 == 0) {
 			for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), Davey.detectionRange, true)) {
-				if ((p.getLocation().getY() > mStartLoc.getY() + 3 && p.isOnGround()) || p.getLocation().distance(mStartLoc) > 40) {
+				if ((p.getLocation().getY() > mStartLoc.getY() + 3 && PlayerUtils.isOnGround(p)) || p.getLocation().distance(mStartLoc) > 40) {
 					BossUtils.bossDamagePercent(mBoss, p, .1);
-					p.sendMessage(ChatColor.RED + "That hurt! Looks like the arena is pulling you down..");
+					p.sendMessage(Component.text("That hurt! Looks like the arena is pulling you down..", NamedTextColor.RED));
 				}
 			}
 

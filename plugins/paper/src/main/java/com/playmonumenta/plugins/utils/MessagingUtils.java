@@ -8,6 +8,7 @@ import java.time.Duration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -34,7 +35,7 @@ public class MessagingUtils {
 		sendActionBarMessage(player, message, NamedTextColor.YELLOW);
 	}
 
-	public static void sendActionBarMessage(Player player, String message, NamedTextColor color) {
+	public static void sendActionBarMessage(Player player, String message, TextColor color) {
 		message = translatePlayerName(player, message);
 		TextComponent formattedMessage = LEGACY_SERIALIZER.deserialize(message)
 			.color(color);

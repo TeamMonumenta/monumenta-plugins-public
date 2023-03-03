@@ -20,9 +20,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
@@ -125,7 +125,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			public void run() {
 				mT++;
 				mCosmetic.gloryTick(mPlayer, mT);
-				if (mPlayer.isOnGround()) {
+				if (PlayerUtils.isOnGround(mPlayer)) {
 					mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
 					double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 					Location location = mPlayer.getLocation();
@@ -166,9 +166,9 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			if (mStacks < mStackLimit) {
 				mStacks++;
 				if (mStackLimit > 1) {
-					MessagingUtils.sendActionBarMessage(mPlayer, "Glorious Battle Stacks: " + mStacks);
+					showChargesMessage();
 				} else {
-					MessagingUtils.sendActionBarMessage(mPlayer, "Glorious Battle is ready!");
+					sendActionBarMessage("Glorious Battle is ready!");
 				}
 			}
 			if (mStacks != previousStacks) {

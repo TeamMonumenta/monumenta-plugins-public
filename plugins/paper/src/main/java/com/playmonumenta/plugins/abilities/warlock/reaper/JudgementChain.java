@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -97,6 +98,7 @@ public class JudgementChain extends Ability {
 			.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
 			.scoreboardId("JudgementChain")
 			.shorthandName("JC")
+			.actionBarColor(TextColor.color(115, 115, 115))
 			.descriptions(
 				"Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. " +
 					"For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. " +

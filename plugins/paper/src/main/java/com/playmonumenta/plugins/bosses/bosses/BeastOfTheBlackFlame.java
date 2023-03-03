@@ -59,9 +59,8 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	public double mCastSpeed = 1;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new BeastOfTheBlackFlame(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new BeastOfTheBlackFlame(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -95,7 +94,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 			new SpellShieldStun(6 * 20)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(90, mBoss -> {
 			forceCastSpell(BlackflameGolemNecromancy.class);
@@ -129,7 +128,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 					if ((mSpawnLoc.distance(p.getLocation()) > 22
 						     || mSpawnLoc.getY() - p.getLocation().getY() >= 3
-						     || (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
+						     || (mSpawnLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
 						    && p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
@@ -159,7 +158,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 		new BukkitRunnable() {
 			int mCount = 1;
 			int mTicks = 0;
-			double mYInc = 3 / 40.0;
+			final double mYInc = 3 / 40.0;
 
 			@Override
 			public void run() {

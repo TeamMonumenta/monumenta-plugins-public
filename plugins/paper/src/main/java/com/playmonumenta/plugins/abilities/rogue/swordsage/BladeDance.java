@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,6 +55,7 @@ public class BladeDance extends Ability {
 			.linkedSpell(ClassAbility.BLADE_DANCE)
 			.scoreboardId("BladeDance")
 			.shorthandName("BD")
+			.actionBarColor(TextColor.color(150, 0, 0))
 			.descriptions(
 				String.format("When holding two swords, press the drop key to enter a defensive stance, " +
 					              "parrying all attacks and becoming invulnerable for 0.75 seconds. " +

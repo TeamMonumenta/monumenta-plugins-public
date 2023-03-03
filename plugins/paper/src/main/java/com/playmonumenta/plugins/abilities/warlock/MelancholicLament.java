@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,6 +60,7 @@ public class MelancholicLament extends Ability {
 			.linkedSpell(ClassAbility.MELANCHOLIC_LAMENT)
 			.scoreboardId("Melancholic")
 			.shorthandName("MLa")
+			.actionBarColor(TextColor.color(235, 235, 224))
 			.descriptions(
 				("Press the swap key while sneaking and holding a scythe to recite a haunting song, " +
 					 "causing all mobs within %s blocks to target the user and afflicting them with %s%% Weaken for %s seconds. Cooldown: %ss.")

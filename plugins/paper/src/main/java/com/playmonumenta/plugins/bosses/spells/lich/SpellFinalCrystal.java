@@ -34,24 +34,24 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellFinalCrystal extends Spell {
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private double mT = 20 * 1;
-	private int mSoloCooldown = 20 * 20;
+	private final int mSoloCooldown = 20 * 20;
 	private double mCooldown;
-	private double mMaxFactor = 2.0;
-	private Location mCenter;
-	private double mRange;
-	private LivingEntity mBoss;
-	private List<Location> mCrystalLoc;
-	private Collection<EnderCrystal> mCrystal = new ArrayList<EnderCrystal>();
+	private final double mMaxFactor = 2.0;
+	private final Location mCenter;
+	private final double mRange;
+	private final LivingEntity mBoss;
+	private final List<Location> mCrystalLoc;
+	private final Collection<EnderCrystal> mCrystal = new ArrayList<>();
 	private static boolean mTriggered = false;
 	private boolean mRecast = false;
-	private String mShieldCrystal = "DeathCrystal";
+	private final String mShieldCrystal = "DeathCrystal";
 	private boolean mTrigger = false;
 	private boolean mBombActive = false;
-	private List<Player> mPlayers = new ArrayList<Player>();
-	private PartialParticle mSoul;
-	private PartialParticle mExpH;
+	private List<Player> mPlayers = new ArrayList<>();
+	private final PartialParticle mSoul;
+	private final PartialParticle mExpH;
 
 	public SpellFinalCrystal(Plugin plugin, LivingEntity boss, Location loc, double range, List<Location> crystalLoc) {
 		mPlugin = plugin;
@@ -98,7 +98,7 @@ public class SpellFinalCrystal extends Spell {
 		}
 
 		//recast function
-		if (mCrystal.size() <= 0) {
+		if (mCrystal.isEmpty()) {
 			mRecast = true;
 			List<Player> players = Lich.playersInRange(mCenter, mRange, true);
 			double count = Math.min(8, Math.max(2, Math.sqrt(players.size())));
@@ -112,7 +112,7 @@ public class SpellFinalCrystal extends Spell {
 		//time limit 6s to break all active crystals
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT;
-			int mCount = mCrystal.size();
+			final int mCount = mCrystal.size();
 
 			@Override
 			public void run() {
@@ -216,7 +216,7 @@ public class SpellFinalCrystal extends Spell {
 
 							BukkitRunnable runC = new BukkitRunnable() {
 								int mTicks = 0;
-								Location mLoc = loc.clone().add(0, 0.2, 0);
+								final Location mLoc = loc.clone().add(0, 0.2, 0);
 
 								@Override
 								public void run() {

@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -80,7 +79,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 
 				if (mStacks < mMaxStacks) {
 					mStacks++;
-					MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
+					showChargesMessage();
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
@@ -97,7 +96,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 			if (mTicksToStackDecay <= 0) {
 				mTicksToStackDecay = mDecayTime;
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
+				showChargesMessage();
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
@@ -116,7 +115,7 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		Sharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, Sharpshooter.class);
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS + (int) CharmManager.getLevel(player, CHARM_STACKS), ss.mStacks + stacks);
-			MessagingUtils.sendActionBarMessage(player, "Sharpshooter Stacks: " + ss.mStacks);
+			ss.showChargesMessage();
 			ClientModHandler.updateAbility(player, ss);
 		}
 	}

@@ -33,7 +33,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,7 +61,7 @@ public class RKitxet extends BossAbilityGroup {
 	public static final int RKITXET_HEALTH = 1400;
 	public static final int SWAP_TARGET_SECONDS = 15;
 
-	private static final String MUSIC_TITLE = "epic:muisc.kaul";
+	private static final String MUSIC_TITLE = "epic:music.kaul";
 	private static final int MUSIC_DURATION = 3 * 60 + 39; //seconds
 	private static final String GOLEM_TAG = "Golem";
 	private static final int COOLDOWN_TICKS_1 = 10 * 20;
@@ -81,9 +80,8 @@ public class RKitxet extends BossAbilityGroup {
 	private boolean mSameSpellUsedTwice;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new RKitxet(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new RKitxet(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -129,7 +127,7 @@ public class RKitxet extends BossAbilityGroup {
 				}
 
 				for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-					if (player.getLocation().distance(mSpawnLoc) > 30 || (player.getLocation().getY() > mSpawnLoc.getY() + 4 && player.isOnGround())) {
+					if (player.getLocation().distance(mSpawnLoc) > 30 || (player.getLocation().getY() > mSpawnLoc.getY() + 4 && PlayerUtils.isOnGround(player))) {
 						//Give 10 seconds at the beginning of the fight before actually damaging
 						if (mBoss.getTicksLived() >= 200) {
 							PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 30 * 20, 2));
@@ -297,7 +295,7 @@ public class RKitxet extends BossAbilityGroup {
 					return;
 				}
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-					player.sendMessage(ChatColor.GREEN + message);
+					player.sendMessage(Component.text(message, NamedTextColor.GREEN));
 				}
 				mCount++;
 			}
@@ -312,7 +310,7 @@ public class RKitxet extends BossAbilityGroup {
 				arrow.removeCustomEffect(PotionEffectType.SLOW);
 			}
 			if (event.getSource() instanceof Player player) {
-				player.sendMessage(ChatColor.AQUA + "The Elder's shield absorbs your attack.");
+				player.sendMessage(Component.text("The Elder's shield absorbs your attack.", NamedTextColor.AQUA));
 				player.playSound(mBoss.getLocation(), Sound.ITEM_SHIELD_BLOCK, SoundCategory.HOSTILE, 1, 1);
 			}
 		}

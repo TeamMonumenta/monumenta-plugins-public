@@ -20,8 +20,8 @@ import org.bukkit.util.Vector;
 
 public class SpellEruption extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 
 	public SpellEruption(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
@@ -67,7 +67,7 @@ public class SpellEruption extends Spell {
 									@Override
 									public void run() {
 										new PartialParticle(Particle.SMOKE_LARGE, player.getLocation(), 1, 0, 0, 0, 0.05).spawnAsEntityActive(mBoss);
-										if (player.isOnGround() || player.isDead() || !player.isValid() || !player.isOnline()) {
+										if (PlayerUtils.isOnGround(player) || player.isDead() || !player.isValid() || !player.isOnline()) {
 											this.cancel();
 											new BukkitRunnable() {
 

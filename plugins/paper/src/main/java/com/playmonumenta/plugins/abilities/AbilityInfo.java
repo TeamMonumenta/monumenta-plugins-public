@@ -20,7 +20,9 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.util.HSVLike;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +43,8 @@ public class AbilityInfo<T extends Ability> {
 	private @Nullable String mShorthandName;
 	// List of descriptions to aid ability selection
 	private List<TextComponent> mDescriptions = new ArrayList<>();
+	// Color used by action bar messages
+	private TextColor mActionBarColor;
 
 	// If the ability does not require a scoreboardID and just a classId, leave this as null.
 	private @Nullable String mScoreboardId = null;
@@ -67,6 +71,15 @@ public class AbilityInfo<T extends Ability> {
 		mAbilityClass = abilityClass;
 		mDisplayName = displayName;
 		mConstructor = constructor;
+		if (displayName == null) {
+			mActionBarColor = NamedTextColor.YELLOW;
+		} else {
+			int hash = displayName.hashCode();
+			float hue = (hash & 0xff) / 255.0f;
+			float saturation = 0.7f + 0.3f * (hash >> 8 & 0xff) / 255.0f;
+			float value = 0.7f + 0.3f * (hash >> 16 & 0xff) / 255.0f;
+			mActionBarColor = TextColor.color(HSVLike.hsvLike(hue, saturation, value));
+		}
 	}
 
 	// builder methods
@@ -144,6 +157,11 @@ public class AbilityInfo<T extends Ability> {
 			throw new IllegalStateException("Missing linked spell for ability with trigger");
 		}
 		mTriggers.add(trigger);
+		return this;
+	}
+
+	public AbilityInfo<T> actionBarColor(TextColor color) {
+		mActionBarColor = color;
 		return this;
 	}
 
@@ -333,6 +351,10 @@ public class AbilityInfo<T extends Ability> {
 			       .hoverEvent(getFormattedDescriptions(player, level, isEnhanced, enabled));
 	}
 
+	public TextColor getActionBarColor() {
+		return mActionBarColor;
+	}
+
 	public void sendDescriptions(CommandSender sender) {
 		sender.sendMessage(getFormattedDescriptions(sender instanceof Player player ? player : null, 2, false, true));
 	}
@@ -372,6 +394,7 @@ public class AbilityInfo<T extends Ability> {
 			}
 			info.add("cooldowns", cooldowns);
 		}
+		info.addProperty("actionBarColor", mActionBarColor.asHexString());
 		return info;
 	}
 

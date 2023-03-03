@@ -32,13 +32,13 @@ import org.bukkit.util.Vector;
 
 public class SpellReaperOfLife extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
-	private Location mCenter;
-	private Set<UUID> mSummoned = new HashSet<UUID>();
-	private Set<Player> mWarnedPlayers = new HashSet<Player>();
-	private int mCooldownTicks;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
+	private final Location mCenter;
+	private final Set<UUID> mSummoned = new HashSet<>();
+	private final Set<Player> mWarnedPlayers = new HashSet<>();
+	private final int mCooldownTicks;
 
 	public SpellReaperOfLife(Plugin plugin, LivingEntity entity, Location center, double range, int cooldown) {
 		mPlugin = plugin;
@@ -72,9 +72,9 @@ public class SpellReaperOfLife extends Spell {
 
 			Location pLoc = mCenter;
 			Location tLoc = fallingBlock.getLocation();
-			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply(pLoc.distance(tLoc) / 25).setY(0.7f);
-			fallingBlock.setVelocity(vect);
+			Vector vector = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
+			vector.normalize().multiply(pLoc.distance(tLoc) / 25).setY(0.7f);
+			fallingBlock.setVelocity(vector);
 
 			world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 3, 1.5f);
 			new PartialParticle(Particle.FLAME, fallingBlock.getLocation().add(0, fallingBlock.getHeight() / 2, 0), 3, 0.25, .25, .25, 0.025).spawnAsEntityActive(mBoss);
@@ -92,7 +92,7 @@ public class SpellReaperOfLife extends Spell {
 
 
 			new BukkitRunnable() {
-				double mN = 0;
+				double mTempPlayerScalingHP = 0;
 				double mPlayerScalingHP = 0;
 
 				@Override
@@ -108,9 +108,9 @@ public class SpellReaperOfLife extends Spell {
 
 						int playerCount = players.size();
 						for (int i = 1; i <= playerCount; i++) {
-							mN = mN + (150 / (Math.log(i + 1) / Math.log(2)));
+							mTempPlayerScalingHP = mTempPlayerScalingHP + (150 / (Math.log(i + 1) / Math.log(2)));
 						}
-						mPlayerScalingHP = mN;
+						mPlayerScalingHP = mTempPlayerScalingHP;
 						if (mPlayerScalingHP > 1000) {
 							mPlayerScalingHP = 1000;
 						}
@@ -131,10 +131,10 @@ public class SpellReaperOfLife extends Spell {
 		}
 	}
 
-	public void bomb(LivingEntity z, double mPSHP) {
-		z.setAI(false);
-		EntityUtils.setAttributeBase(z, Attribute.GENERIC_MAX_HEALTH, mPSHP);
-		z.setHealth(mPSHP);
+	public void bomb(LivingEntity nuke, double playerScalingHP) {
+		nuke.setAI(false);
+		EntityUtils.setAttributeBase(nuke, Attribute.GENERIC_MAX_HEALTH, playerScalingHP);
+		nuke.setHealth(playerScalingHP);
 		new BukkitRunnable() {
 			int mInc = 0;
 
@@ -142,33 +142,33 @@ public class SpellReaperOfLife extends Spell {
 			public void run() {
 				World world = mBoss.getWorld();
 				mInc++;
-				z.setNoDamageTicks(0);
-				if (z.isDead() || !z.isValid()) {
+				nuke.setNoDamageTicks(0);
+				if (nuke.isDead() || !nuke.isValid()) {
 					mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 					this.cancel();
 					return;
 
 				}
 				if (mBoss.isDead() || !mBoss.isValid()) {
-					if (!z.isDead()) {
-						z.setHealth(0);
+					if (!nuke.isDead()) {
+						nuke.setHealth(0);
 					}
 					this.cancel();
 					return;
 				}
 				if (mInc % 10 == 0) {
 					world.playSound(mCenter, Sound.ENTITY_CREEPER_HURT, SoundCategory.HOSTILE, 3, 1f);
-					new PartialParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.LAVA, nuke.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
 				}
 				if (mInc % 20 == 0) {
-					new PartialParticle(Particle.LAVA, z.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.LAVA, nuke.getLocation(), 30, 0.3, 0.3, 0.3, 1).spawnAsEntityActive(mBoss);
 				}
 				if (mInc >= 20 * 7) {
-					z.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 1));
+					nuke.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 1));
 				}
 				if (mInc >= 20 * 10) {
 					mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-					z.setHealth(0);
+					nuke.setHealth(0);
 					world.playSound(mCenter, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 1f);
 					world.playSound(mCenter, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1f);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, mCenter, 250, 21, 0.3, 21, 0.1).spawnAsEntityActive(mBoss);

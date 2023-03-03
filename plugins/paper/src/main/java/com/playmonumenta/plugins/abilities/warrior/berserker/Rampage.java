@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -110,7 +109,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, mStacks * 0.4f, 2);
 
 			mStacks = 0;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Rage: " + mStacks);
+			showChargesMessage();
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
@@ -123,7 +122,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			if (mTimeToStackDecay >= RAMPAGE_STACK_DECAY_TIME) {
 				mTimeToStackDecay = 0;
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlayer, "Rage: " + mStacks);
+				showChargesMessage();
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
@@ -148,7 +147,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		if (newStacks > 0) {
 			int previousStacks = mStacks;
 			mStacks = Math.min(mStackLimit, mStacks + newStacks);
-			MessagingUtils.sendActionBarMessage(mPlayer, "Rage: " + mStacks);
+			showChargesMessage();
 			if (mStacks != previousStacks) {
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
@@ -161,6 +160,11 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			return;
 		}
 		event.setDamage(event.getDamage() * getDamageResistanceRatio());
+	}
+
+	@Override
+	public void showChargesMessage() {
+		sendActionBarMessage("Rage: " + mStacks);
 	}
 
 	private double getDamageResistanceRatio() {

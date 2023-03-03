@@ -23,13 +23,13 @@ import org.bukkit.util.Vector;
 public class SpellFloor extends Spell {
 
 	private int mTimer = 0;
-	private int mDuration;
+	private final int mDuration;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private Location mCurrentLoc;
 
-	private List<LivingEntity> mDamaged = new ArrayList<>();
+	private final List<LivingEntity> mDamaged = new ArrayList<>();
 
 
 	public SpellFloor(Plugin plugin, LivingEntity boss, int duration, Location currentLoc) {
@@ -56,7 +56,7 @@ public class SpellFloor extends Spell {
 				Location loc = p.getLocation();
 				double height = loc.getY();
 
-				if (height - mCurrentLoc.getY() > 7 && p.isOnGround()) {
+				if (height - mCurrentLoc.getY() > 7 && PlayerUtils.isOnGround(p)) {
 					BossUtils.bossDamagePercent(mBoss, p, 0.7, "Mechanical Void");
 					Vector dir = mCurrentLoc.toVector().clone().subtract(p.getLocation().toVector());
 					dir.normalize();

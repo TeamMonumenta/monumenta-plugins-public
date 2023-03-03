@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -62,6 +63,7 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 			.linkedSpell(ClassAbility.THURIBLE_PROCESSION)
 			.scoreboardId("Thurible")
 			.shorthandName("TP")
+			.actionBarColor(TextColor.color(255, 195, 0))
 			.descriptions(
 				"The Hierophant passively builds up buffs, which are applied to all players in a 30 block radius. " +
 					"Buffs end and the buildup resets upon taking damage that causes you to drop below 60% of your max health, unless the full set of buffs have been obtained. " +

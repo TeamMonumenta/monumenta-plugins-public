@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -143,7 +142,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
-		MessagingUtils.sendActionBarMessage(mPlayer, "Cloak stacks: " + mCloak);
+		showChargesMessage();
 	}
 
 	@Override

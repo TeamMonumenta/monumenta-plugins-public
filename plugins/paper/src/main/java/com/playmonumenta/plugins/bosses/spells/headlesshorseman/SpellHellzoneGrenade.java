@@ -38,12 +38,12 @@ Falling Block Projectile
 public class SpellHellzoneGrenade extends Spell {
 	private static final int RADIUS = 3;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mRange;
-	private Location mCenter;
-	private int mCooldownTicks;
-	private int mCount;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mRange;
+	private final Location mCenter;
+	private final int mCooldownTicks;
+	private final int mCount;
 
 	public SpellHellzoneGrenade(Plugin plugin, LivingEntity entity, Location center, double range, int cooldown, int count) {
 		mPlugin = plugin;
@@ -97,15 +97,15 @@ public class SpellHellzoneGrenade extends Spell {
 
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
-			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
-			fallingBlock.setVelocity(vect);
+			Vector vector = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
+			vector.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
+			fallingBlock.setVelocity(vector);
 
 			PartialParticle flameTrail = new PartialParticle(Particle.FLAME, fallingBlock.getLocation(), 3, 0.25, .25, .25, 0.025);
 			PartialParticle smokeTrail = new PartialParticle(Particle.SMOKE_NORMAL, fallingBlock.getLocation(), 2, 0.25, .25, .25, 0.025);
 
 			new BukkitRunnable() {
-				World mWorld = mBoss.getWorld();
+				final World mWorld = mBoss.getWorld();
 
 				@Override
 				public void run() {

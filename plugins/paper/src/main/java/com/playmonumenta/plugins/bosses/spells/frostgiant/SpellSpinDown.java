@@ -32,9 +32,9 @@ import org.bukkit.util.Vector;
 
 public class SpellSpinDown extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mStartLoc;
 
 	private boolean mCooldown = false;
 	private boolean mDeleteIce = false;
@@ -128,7 +128,7 @@ public class SpellSpinDown extends Spell {
 									for (int r = 0; r <= 2; r++) {
 										for (int x = -r; x < r; x++) {
 											for (int z = -r; z < r; z++) {
-												//Have to clone location becuase of use in HashMap
+												//Have to clone location because of use in HashMap
 												Block b = bLoc.clone().add(x, -1, z).getBlock();
 												Location l = b.getLocation();
 

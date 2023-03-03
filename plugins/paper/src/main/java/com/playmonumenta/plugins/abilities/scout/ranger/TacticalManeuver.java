@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Bukkit;
@@ -97,7 +98,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			cancelOnDeath(new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (mPlayer.isOnGround() || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
+					if (PlayerUtils.isOnGround(mPlayer) || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
 						this.cancel();
 						return;
 					}

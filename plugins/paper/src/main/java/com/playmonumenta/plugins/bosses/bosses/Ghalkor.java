@@ -62,9 +62,8 @@ public final class Ghalkor extends BossAbilityGroup {
 	public double mCastSpeed = 1;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Ghalkor(plugin, boss, spawnLoc, endLoc);
-		});
+		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
+			new Ghalkor(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -87,11 +86,11 @@ public final class Ghalkor extends BossAbilityGroup {
 		));
 
 
-		List<Spell> passiveNormalSpells = Arrays.asList(
+		List<Spell> passiveNormalSpells = List.of(
 			new SpellBlockBreak(boss, 2, 3, 2)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 
 		events.put(50, mBoss -> {
 			//Cast faster
@@ -168,7 +167,7 @@ public final class Ghalkor extends BossAbilityGroup {
 				for (Player p : PlayerUtils.playersInRange(mMiddleLoc, detectionRange, true)) {
 					if ((mMiddleLoc.distance(p.getLocation()) > 22
 						     || mMiddleLoc.getY() - p.getLocation().getY() >= 3
-						     || (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && p.isOnGround()))
+						     || (mMiddleLoc.getY() - p.getLocation().getY() <= -2 && PlayerUtils.isOnGround(p)))
 						    && p.getGameMode() != GameMode.CREATIVE) {
 						Vector vel = p.getVelocity();
 						BossUtils.bossDamagePercent(mBoss, p, 0.1);
@@ -240,7 +239,7 @@ public final class Ghalkor extends BossAbilityGroup {
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Ghalkor]\",\"color\":\"gold\"},{\"text\":\" With mine Laastasem...  My lifeblood fuels the ritual... Come forth o Beast!\",\"color\":\"dark_gray\"}]");
 
 			Entity beast = LibraryOfSoulsIntegration.summon(mSpawnLoc.add(-2, -3, 0), BeastOfTheBlackFlame.losName);
-			if (beast != null && beast instanceof LivingEntity leBeast) {
+			if (beast instanceof LivingEntity leBeast) {
 				try {
 					BossManager.createBoss(null, leBeast, BeastOfTheBlackFlame.identityTag, mEndLoc);
 				} catch (Exception e) {

@@ -292,7 +292,7 @@ public class PlayerUtils {
 	 * They cannot be on the ground or climbing.
 	 */
 	public static boolean isFreeFalling(Player player) {
-		if (!player.isOnGround() && player.getLocation().isChunkLoaded()) {
+		if (!isOnGround(player) && player.getLocation().isChunkLoaded()) {
 			Material playerFeetMaterial = player.getLocation().getBlock().getType();
 			// Accounts for vines, ladders, nether vines, scaffolding etc
 			return !MaterialSetTag.CLIMBABLE.isTagged(playerFeetMaterial);
@@ -373,7 +373,7 @@ public class PlayerUtils {
 		//     List<EntityLiving> list = this.world.a(EntityLiving.class, entity.getBoundingBox().grow(1.0D, 0.25D, 1.0D));
 		return (
 			isNonFallingAttack(player, enemy)
-				&& player.isOnGround()
+				&& isOnGround(player)
 		);
 	}
 
@@ -490,7 +490,13 @@ public class PlayerUtils {
 	public static double getJumpHeight(Player player) {
 		PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP);
 		double jumpLevel = (jump == null ? -1 : jump.getAmplifier());
-		double jumpHeight = (jumpLevel < 0 ? 1.2523 : 0.0308354 * jumpLevel * jumpLevel + 0.744631 * jumpLevel + 1.836131); // Quadratic function taken from mc wiki - thanks mojank!
-		return jumpHeight;
+		return jumpLevel < 0 ? 1.2523 : 0.0308354 * jumpLevel * jumpLevel + 0.744631 * jumpLevel + 1.836131; // Quadratic function taken from mc wiki - thanks mojank!
+	}
+
+	/**
+	 * Just to quarantine the deprecation warnings tbh
+	 */
+	public static boolean isOnGround(Player player) {
+		return player.isOnGround();
 	}
 }

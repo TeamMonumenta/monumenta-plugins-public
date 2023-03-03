@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.AbstractMap;
 import java.util.List;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -56,6 +57,7 @@ public class AlchemicalArtillery extends PotionAbility {
 			.linkedSpell(ClassAbility.ALCHEMICAL_ARTILLERY)
 			.scoreboardId("Alchemical")
 			.shorthandName("AA")
+			.actionBarColor(TextColor.color(255, 0, 0))
 			.descriptions(
 				("Pressing the Drop Key while holding an Alchemist Bag and not sneaking launches a heavy bomb that " +
 				"explodes on contact with the ground, lava, or a hostile, or after 6 seconds, dealing %s%% of your " +
@@ -80,9 +82,8 @@ public class AlchemicalArtillery extends PotionAbility {
 
 	public AlchemicalArtillery(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
+		Bukkit.getScheduler().runTask(plugin, () ->
+			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	public void cast() {
@@ -205,9 +206,8 @@ public class AlchemicalArtillery extends PotionAbility {
 	private void explosionEffect(Location loc, double radius) {
 		ParticleUtils.explodingRingEffect(mPlugin, loc, radius, 1, 10,
 			List.of(
-				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) -> {
-					new PartialParticle(Particle.FLAME, location, 1, 0, 0, 0, 0.0025).spawnAsPlayerActive(mPlayer);
-				})
+				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) ->
+					new PartialParticle(Particle.FLAME, location, 1, 0, 0, 0, 0.0025).spawnAsPlayerActive(mPlayer))
 			)
 		);
 		ParticleUtils.drawRing(loc, 45, new Vector(0, 1, 0), radius,

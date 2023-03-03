@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -31,9 +32,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 				boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1.5f, 0f);
 			},
 			// Warning particles
-			(Location loc) -> {
-				new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
-			},
+			(Location loc) -> new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss),
 			// Charge attack sound/particles at boss location
 			(LivingEntity player) -> {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15).spawnAsEntityActive(boss);
@@ -91,7 +90,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 								public void run() {
 									mTicks++;
 
-									if (mTicks >= 20 || player.isOnGround()) {
+									if (mTicks >= 20 || PlayerUtils.isOnGround(player)) {
 										this.cancel();
 										player.setFallDistance(0);
 										player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
@@ -105,9 +104,7 @@ public class SpellAGoshDamnAirCombo extends SpellBaseCharge {
 				}
 			},
 			// Attack particles
-			(Location loc) -> {
-				new PartialParticle(Particle.SMOKE_NORMAL, loc, 7, 0.5, 0.5, 0.5, 0.125).spawnAsEntityActive(boss);
-			},
+			(Location loc) -> new PartialParticle(Particle.SMOKE_NORMAL, loc, 7, 0.5, 0.5, 0.5, 0.125).spawnAsEntityActive(boss),
 			// Ending particles on boss
 			() -> {
 				new PartialParticle(Particle.EXPLOSION_NORMAL, boss.getLocation(), 50, 0.45, 0.45, 0.45, 0.15).spawnAsEntityActive(boss);

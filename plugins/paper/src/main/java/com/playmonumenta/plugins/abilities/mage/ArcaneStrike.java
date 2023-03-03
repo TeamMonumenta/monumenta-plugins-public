@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -56,6 +57,7 @@ public class ArcaneStrike extends Ability {
 			.linkedSpell(ClassAbility.ARCANE_STRIKE)
 			.scoreboardId("ArcaneStrike")
 			.shorthandName("AS")
+			.actionBarColor(TextColor.color(220, 147, 249))
 			.descriptions(
 				String.format("When you attack an enemy with a wand, you unleash an arcane explosion dealing %s arcane magic damage to all mobs in a %s block radius around the target. " +
 					              "Enemies that are on fire or slowed take %s extra damage. Arcane Strike can not trigger Spellshock's static. Cooldown: %ss.",

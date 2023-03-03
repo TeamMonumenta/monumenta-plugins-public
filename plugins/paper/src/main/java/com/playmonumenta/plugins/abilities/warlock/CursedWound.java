@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,9 +68,10 @@ public class CursedWound extends Ability {
 			.linkedSpell(ClassAbility.CURSED_WOUND)
 			.scoreboardId("CursedWound")
 			.shorthandName("CW")
+			.actionBarColor(TextColor.color(217, 217, 217))
 			.descriptions(
 				"Attacking an enemy with a critical scythe attack passively afflicts it and all enemies in a 3 block radius around it with 1 damage every second for 6s. " +
-					"Your melee attacks passively deal 5% more damage per ability on cooldown, capped at 3 abilites.",
+					"Your melee attacks passively deal 5% more damage per ability on cooldown, capped at 3 abilities.",
 				"Damage cap is increased from 3 to 6 abilities.",
 				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +

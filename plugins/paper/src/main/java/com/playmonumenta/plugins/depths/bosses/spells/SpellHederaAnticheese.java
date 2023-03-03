@@ -4,7 +4,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Hedera;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,9 +27,9 @@ public class SpellHederaAnticheese extends Spell {
 		//Anticheese
 		if (mTicks % 20 == 0) {
 			for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), Hedera.detectionRange, true)) {
-				if ((p.getLocation().getY() > mStartLoc.getY() + 11 && p.isOnGround()) || p.getLocation().distance(mStartLoc) > 35) {
+				if ((p.getLocation().getY() > mStartLoc.getY() + 11 && PlayerUtils.isOnGround(p)) || p.getLocation().distance(mStartLoc) > 35) {
 					BossUtils.bossDamagePercent(mBoss, p, .1);
-					p.sendMessage(ChatColor.RED + "That hurt! Looks like the arena is pulling you down..");
+					p.sendMessage(Component.text("That hurt! Looks like the arena is pulling you down..", NamedTextColor.RED));
 				}
 			}
 		}

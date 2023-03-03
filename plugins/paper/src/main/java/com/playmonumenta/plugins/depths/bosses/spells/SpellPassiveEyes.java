@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -48,9 +47,9 @@ public class SpellPassiveEyes extends Spell {
 		//Anticheese
 		if (mTicks % 20 == 0) {
 			for (Player p : PlayerUtils.playersInRange(mBoss.getLocation(), Nucleus.detectionRange, true)) {
-				if ((p.getLocation().getY() > mStartLoc.getY() + 3 && p.isOnGround()) || p.getLocation().distance(mStartLoc) > 28) {
+				if ((p.getLocation().getY() > mStartLoc.getY() + 3 && PlayerUtils.isOnGround(p)) || p.getLocation().distance(mStartLoc) > 28) {
 					BossUtils.bossDamagePercent(mBoss, p, .1);
-					p.sendMessage(ChatColor.RED + "That hurt! Looks like the arena is pulling you down..");
+					p.sendMessage(Component.text("That hurt! Looks like the arena is pulling you down..", NamedTextColor.RED));
 				}
 			}
 		}

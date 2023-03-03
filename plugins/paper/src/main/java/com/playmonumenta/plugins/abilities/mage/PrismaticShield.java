@@ -136,7 +136,7 @@ public class PrismaticShield extends Ability {
 				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION));
 				World world = mPlayer.getWorld();
 				mCosmetic.prismaEffect(world, mPlayer, RADIUS);
-				MessagingUtils.sendActionBarMessage(mPlayer, "Prismatic Shield has been activated");
+				sendActionBarMessage("Prismatic Shield has been activated");
 
 				if (dealDamageLater) {
 					mPlayer.setHealth(1);

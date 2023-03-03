@@ -21,7 +21,6 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -231,7 +230,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		} else {
 			mMode = Mode.DEFAULT;
 		}
-		MessagingUtils.sendActionBarMessage(mPlayer, ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + mMode.mLabel);
+		sendActionBarMessage(ClassAbility.HALLOWED_BEAM.getName() + " Mode: " + mMode.mLabel);
 		ScoreboardUtils.setScoreboardValue(mPlayer, MODE_SCOREBOARD, mMode.ordinal());
 		ClientModHandler.updateAbility(mPlayer, this);
 	}

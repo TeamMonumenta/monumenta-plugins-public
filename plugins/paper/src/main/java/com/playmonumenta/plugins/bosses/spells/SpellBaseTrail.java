@@ -63,7 +63,7 @@ public class SpellBaseTrail extends Spell {
 	private final HitAction mHitAction;
 	private final ExpireAction mExpireAction;
 
-	private final Map<Location, TrailNode> mTrailNodes = new HashMap<Location, TrailNode>();
+	private final Map<Location, TrailNode> mTrailNodes = new HashMap<>();
 
 	private int mTicks = 0;
 

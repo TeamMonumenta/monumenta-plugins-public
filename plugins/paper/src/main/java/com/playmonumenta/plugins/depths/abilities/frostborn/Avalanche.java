@@ -45,6 +45,7 @@ public class Avalanche extends DepthsAbility {
 		new DepthsAbilityInfo<>(Avalanche.class, ABILITY_NAME, Avalanche::new, DepthsTree.FROSTBORN, DepthsTrigger.SWAP)
 			.linkedSpell(ClassAbility.AVALANCHE)
 			.cooldown(COOLDOWN_TICKS)
+			.actionBarColor(TextColor.color(91, 187, 255))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Avalanche::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SNOW_BLOCK))
 			.descriptions(Avalanche::getDescription);

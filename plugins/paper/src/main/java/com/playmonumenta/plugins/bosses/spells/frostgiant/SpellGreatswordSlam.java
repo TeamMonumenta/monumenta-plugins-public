@@ -38,15 +38,15 @@ import org.bukkit.util.Vector;
 
 public class SpellGreatswordSlam extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mDeg;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mDeg;
 	//Number of sec. the cracked ice lasts
-	private int mDuration;
+	private final int mDuration;
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
 	private static final Particle.DustOptions GRAY_COLOR = new Particle.DustOptions(Color.fromRGB(156, 156, 156), 1.0f);
 
-	private Location mStartLoc;
+	private final Location mStartLoc;
 
 	//Starts deleting ice immediately when this is true
 	private boolean mDeleteIce = false;
@@ -117,7 +117,7 @@ public class SpellGreatswordSlam extends Spell {
 
 		BukkitRunnable runnable2 = new BukkitRunnable() {
 			int mT = 0;
-			List<Player> mHitPlayers = new ArrayList<>();
+			final List<Player> mHitPlayers = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -146,10 +146,10 @@ public class SpellGreatswordSlam extends Spell {
 									this.cancel();
 								}
 
-								//In the current radius, makes a cone of frostsed ice and various other particles
+								//In the current radius, makes a cone of frosted ice and various other particles
 								//If player is in trajectory (in bounding box), damage them and knock back
 								Vector vec;
-								List<BoundingBox> boxes = new ArrayList<BoundingBox>();
+								List<BoundingBox> boxes = new ArrayList<>();
 								for (double degree = 90 - mDeg / 2; degree <= 90 + mDeg / 2; degree += 5) {
 
 									double radian1 = Math.toRadians(degree);
@@ -257,7 +257,7 @@ public class SpellGreatswordSlam extends Spell {
 				if (mT >= 20 * mDuration || mBoss.isDead() || !mBoss.isValid() || mDeleteIce) {
 					new BukkitRunnable() {
 						int mTicks = 0;
-						Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
+						final Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
 
 						@Override
 						public void run() {

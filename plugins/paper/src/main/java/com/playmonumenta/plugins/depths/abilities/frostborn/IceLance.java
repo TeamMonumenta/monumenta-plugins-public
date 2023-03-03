@@ -51,6 +51,7 @@ public class IceLance extends DepthsAbility {
 		new DepthsAbilityInfo<>(IceLance.class, ABILITY_NAME, IceLance::new, DepthsTree.FROSTBORN, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.ICE_LANCE)
 			.cooldown(COOLDOWN)
+			.actionBarColor(TextColor.color(194, 224, 249))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceLance::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.SNOWBALL))

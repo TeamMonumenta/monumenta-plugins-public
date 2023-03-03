@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -57,7 +56,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 				if (mStacks < MAX_STACKS) {
 					mStacks++;
-					MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
+					showChargesMessage();
 					ClientModHandler.updateAbility(mPlayer, this);
 				}
 			}
@@ -73,7 +72,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 			if (mTicksToStackDecay <= 0) {
 				mTicksToStackDecay = mDecayTimerLength;
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlayer, "Sharpshooter Stacks: " + mStacks);
+				showChargesMessage();
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
@@ -83,7 +82,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		DepthsSharpshooter ss = AbilityManager.getManager().getPlayerAbility(player, DepthsSharpshooter.class);
 		if (ss != null) {
 			ss.mStacks = Math.min(MAX_STACKS, ss.mStacks + stacks);
-			MessagingUtils.sendActionBarMessage(player, "Sharpshooter Stacks: " + ss.mStacks);
+			ss.showChargesMessage();
 			ClientModHandler.updateAbility(ss.mPlayer, ss);
 		}
 	}

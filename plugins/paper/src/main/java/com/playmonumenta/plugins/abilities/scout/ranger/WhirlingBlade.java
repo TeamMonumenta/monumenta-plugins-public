@@ -81,7 +81,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 	public void cast() {
 		int ticks = Bukkit.getServer().getCurrentTick();
-		// Prevent double casting on accident. Also, strange bug, this seems to trigger twice when right clicking, but not the
+		// Prevent double casting on accident. Also, strange bug, this seems to trigger twice when right-clicking, but not the
 		// case for stuff like Bodkin Blitz. This check also fixes that bug.
 		if (ticks - mLastCastTicks <= 5 || !consumeCharge()) {
 			return;

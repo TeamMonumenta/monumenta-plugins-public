@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -48,7 +49,7 @@ public class RiptideDisable extends ZeroArgumentEffect {
 					}
 					if (!player.isRiptiding()
 						    && (player.isInWater()
-							        || player.isOnGround()
+							        || PlayerUtils.isOnGround(player)
 							        || NmsUtils.getVersionAdapter().hasCollision(player.getWorld(), player.getBoundingBox().shift(0, -0.1, 0)))) {
 						setDuration(0);
 						cancel();

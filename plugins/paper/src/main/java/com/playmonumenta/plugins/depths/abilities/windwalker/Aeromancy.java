@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -38,7 +39,7 @@ public class Aeromancy extends DepthsAbility {
 
 	private double damageMultiplier(Entity damagee) {
 		double multiplier = 1;
-		if (!mPlayer.isOnGround()) {
+		if (!PlayerUtils.isOnGround(mPlayer)) {
 			multiplier *= PLAYER_DAMAGE[mRarity - 1];
 		}
 		if (!damagee.isOnGround()) {

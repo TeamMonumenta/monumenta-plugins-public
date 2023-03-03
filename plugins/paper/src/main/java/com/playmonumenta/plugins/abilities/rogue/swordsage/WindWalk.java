@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -147,7 +148,7 @@ public class WindWalk extends MultipleChargeAbility {
 				}
 
 				Material block = mPlayer.getLocation().getBlock().getType();
-				if (!mTickOne && (mPlayer.isOnGround() || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
+				if (!mTickOne && (PlayerUtils.isOnGround(mPlayer) || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
 					this.cancel();
 					return;
 				}

@@ -16,7 +16,6 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -118,7 +117,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 
-		MessagingUtils.sendActionBarMessage(mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+		showChargesMessage();
 
 		return true;
 	}
@@ -143,7 +142,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 			mActiveRunnable = null;
 
 			mRondeStacks--;
-			MessagingUtils.sendActionBarMessage(mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+			showChargesMessage();
 			ClientModHandler.updateAbility(mPlayer, this);
 			if (mRondeStacks > 0) {
 				mActiveRunnable = new BukkitRunnable() {
@@ -152,7 +151,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 					public void run() {
 						mActiveRunnable = null;
 						mRondeStacks = 0;
-						MessagingUtils.sendActionBarMessage(mPlayer, "Deadly Ronde stacks: " + mRondeStacks);
+						showChargesMessage();
 						ClientModHandler.updateAbility(mPlayer, DeadlyRonde.this);
 					}
 

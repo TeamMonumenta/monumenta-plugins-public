@@ -148,7 +148,7 @@ public final class Lich extends BossAbilityGroup {
 	private static final double SCALING_X = 0.7;
 	private static final double SCALING_Y = 0.575;
 
-	private double mPhylactHealth;
+	private final double mPhylactHealth;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
@@ -427,7 +427,7 @@ public final class Lich extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mT;
 				int mDio = 0;
-				Location mCenter = mStart.getLocation();
+				final Location mCenter = mStart.getLocation();
 
 				@Override
 				public void run() {
@@ -577,7 +577,7 @@ public final class Lich extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mT = 0;
 				int mDio = 0;
-				Location mCenter = mStart.getLocation();
+				final Location mCenter = mStart.getLocation();
 
 				@Override
 				public void run() {
@@ -637,7 +637,7 @@ public final class Lich extends BossAbilityGroup {
 						}
 						// change terracotta to red nether bricks
 						new BukkitRunnable() {
-							Location mLoc = mStart.getLocation().subtract(0, 1, 0);
+							final Location mLoc = mStart.getLocation().subtract(0, 1, 0);
 							int mT = 0;
 
 							@Override
@@ -880,10 +880,10 @@ public final class Lich extends BossAbilityGroup {
 		}
 	}
 
-	private void knockback(World world, int r) {
+	private void knockback(World world, int radius) {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2.0f, 1.0f);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 2.0f, 0f);
-		for (Player player : playersInRange(mBoss.getLocation(), r, true)) {
+		for (Player player : playersInRange(mBoss.getLocation(), radius, true)) {
 			MovementUtils.knockAway(mBoss.getLocation(), player, 0.55f, false);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 1));
 		}
@@ -1336,8 +1336,8 @@ public final class Lich extends BossAbilityGroup {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 		// particles to look like kaul die
 		new BukkitRunnable() {
-			Location mLoc = mStart.getLocation().subtract(0, 0.5, 0);
-			double mRotation = 0;
+			final Location mLoc = mStart.getLocation().subtract(0, 0.5, 0);
+			final double mRotation = 0;
 			double mRadius = 0;
 			int mT = 0;
 
@@ -1525,8 +1525,8 @@ public final class Lich extends BossAbilityGroup {
 			new BukkitRunnable() {
 				int mT = 0;
 				boolean mTrigger = false;
-				Location mStart = p.getLocation().add(0, 1, 0);
-				Vector mVec = LocationUtils.getVectorTo(mBoss.getLocation().add(0, 1, 0), mStart).multiply(1.0 / (20.0 * 4.0d));
+				final Location mStart = p.getLocation().add(0, 1, 0);
+				final Vector mVec = LocationUtils.getVectorTo(mBoss.getLocation().add(0, 1, 0), mStart).multiply(1.0 / (20.0 * 4.0d));
 
 				@Override
 				public void run() {
@@ -1785,7 +1785,7 @@ public final class Lich extends BossAbilityGroup {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 						p.sendMessage(ChatColor.AQUA + "The crystals moved into the big tower. Destroy them before it's too late!");
 					}
-				} else if (mCrystal.size() == 0 && !SpellFinalCrystal.getTriggered()) {
+				} else if (mCrystal.size() == 0) {
 					this.cancel();
 					mCounter++;
 					// find higher tower location index
@@ -1922,8 +1922,8 @@ public final class Lich extends BossAbilityGroup {
 							LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "LichMainhand");
 							LibraryOfSoulsIntegration.summon(mBoss.getLocation(), "LichOffhand");
 							// get all armor stand
-							Collection<ArmorStand> armorStands = new ArrayList<>();
-							armorStands.addAll(mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, 1));
+							Collection<ArmorStand> armorStands =
+								new ArrayList<>(mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, 1));
 							for (LivingEntity e : armorStands) {
 								double x = FastUtils.randomDoubleInRange(-1.2, 1.2);
 								double z = FastUtils.randomDoubleInRange(-1.2, 1.2);

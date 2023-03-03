@@ -84,7 +84,7 @@ public final class RestoringDraft extends DepthsAbility {
 			return;
 		}
 
-		if (!player.isOnGround()) {
+		if (!PlayerUtils.isOnGround(player)) {
 			updateFallFrom(); // Vanilla fall distance would be 0 if on ground
 		} else {
 			// Currently on ground

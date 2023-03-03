@@ -35,7 +35,7 @@ public class TealAntiCheat extends Spell {
 			for (Player player : PlayerUtils.playersInRange(mSpawnLoc, RANGE, true)) {
 				Location loc = player.getLocation();
 				double height = loc.getY() - mSpawnLoc.getY();
-				if (LocationUtils.xzDistance(mSpawnLoc, loc) > RADIUS || (height > HEIGHT_UP && player.isOnGround()) || height < -HEIGHT_DOWN) {
+				if (LocationUtils.xzDistance(mSpawnLoc, loc) > RADIUS || (height > HEIGHT_UP && PlayerUtils.isOnGround(player)) || height < -HEIGHT_DOWN) {
 					BossUtils.bossDamagePercent(mBoss, player, 0.85);
 					player.sendMessage(ChatColor.RED + "You are too far from the fight!");
 				}

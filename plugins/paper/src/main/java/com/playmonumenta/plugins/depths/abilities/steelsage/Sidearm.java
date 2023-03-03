@@ -43,6 +43,7 @@ public class Sidearm extends DepthsAbility {
 		new DepthsAbilityInfo<>(Sidearm.class, ABILITY_NAME, Sidearm::new, DepthsTree.STEELSAGE, DepthsTrigger.RIGHT_CLICK)
 			.linkedSpell(ClassAbility.SIDEARM)
 			.cooldown(COOLDOWN)
+			.actionBarColor(TextColor.color(130, 130, 130))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Sidearm::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
 			.displayItem(new ItemStack(Material.CROSSBOW))

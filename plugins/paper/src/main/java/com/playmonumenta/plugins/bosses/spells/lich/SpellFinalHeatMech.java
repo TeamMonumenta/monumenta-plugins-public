@@ -26,20 +26,20 @@ import org.bukkit.util.Vector;
 
 public class SpellFinalHeatMech extends Spell {
 
-	private Plugin mPlugin;
+	private final Plugin mPlugin;
 	private double mT = 20 * 7;
-	private int mSoloCooldown = 20 * 29;
+	private final int mSoloCooldown = 20 * 29;
 	private double mCooldown;
-	private double mMaxFactor = 1.7;
-	private Location mCenter;
-	private double mRange;
-	private LivingEntity mBoss;
+	private final double mMaxFactor = 1.7;
+	private final Location mCenter;
+	private final double mRange;
+	private final LivingEntity mBoss;
 	private boolean mTrigger = false;
 	private boolean mDamage;
-	private List<Player> mPlayers = new ArrayList<Player>();
-	private PartialParticle mFlame;
-	private PartialParticle mDmg;
-	private PartialParticle mExpL;
+	private List<Player> mPlayers = new ArrayList<>();
+	private final PartialParticle mFlame;
+	private final PartialParticle mDmg;
+	private final PartialParticle mExpL;
 
 	public SpellFinalHeatMech(Plugin plugin, LivingEntity boss, Location loc, double range) {
 		mPlugin = plugin;
@@ -100,14 +100,13 @@ public class SpellFinalHeatMech extends Spell {
 	private void toss() {
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_GHAST_SHOOT, SoundCategory.HOSTILE, 4, 1);
-		List<Vector> vecs = new ArrayList<Vector>();
-		vecs.add(new Vector(0.22, 1.0, 0.22));
-		vecs.add(new Vector(0.27, 0.95, 0.55));
-		vecs.add(new Vector(0.55, 0.95, 0.27));
+		List<Vector> vectors = new ArrayList<>();
+		vectors.add(new Vector(0.22, 1.0, 0.22));
+		vectors.add(new Vector(0.27, 0.95, 0.55));
+		vectors.add(new Vector(0.55, 0.95, 0.27));
 
 		for (int i = 0; i < 4; i++) {
-			List<Vector> vec = new ArrayList<Vector>();
-			vec.addAll(vecs);
+			List<Vector> vec = new ArrayList<>(vectors);
 
 			//rotate vectors
 			for (int j = 0; j < vec.size(); j++) {

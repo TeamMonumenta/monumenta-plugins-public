@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MetadataUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -324,7 +325,7 @@ public class AbilityTrigger {
 		if (mSprinting != BinaryOption.EITHER && player.isSprinting() != (mSprinting == BinaryOption.TRUE)) {
 			return false;
 		}
-		if (mOnGround != BinaryOption.EITHER && player.isOnGround() == (mOnGround == BinaryOption.FALSE)) {
+		if (mOnGround != BinaryOption.EITHER && PlayerUtils.isOnGround(player) == (mOnGround == BinaryOption.FALSE)) {
 			return false;
 		}
 		LookDirection lookDirection = player.getLocation().getPitch() < -LOOK_DIRECTION_CUTOFF_ANGLE ? LookDirection.UP

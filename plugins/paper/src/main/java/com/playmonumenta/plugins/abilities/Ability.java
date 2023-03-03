@@ -372,4 +372,22 @@ public abstract class Ability {
 		return null;
 	}
 
+	public void showOffCooldownMessage() {
+		sendActionBarMessage(mInfo.getDisplayName() + " is now off cooldown!");
+	}
+
+	/**
+	 * Show the player the number of charges available
+	 */
+	public void showChargesMessage() {
+		if (this instanceof AbilityWithChargesOrStacks abilityWithChargesOrStacks) {
+			sendActionBarMessage(mInfo.getDisplayName()
+				+ " " + abilityWithChargesOrStacks.getChargeType()
+				+ ": " + abilityWithChargesOrStacks.getCharges());
+		}
+	}
+
+	public void sendActionBarMessage(String message) {
+		mPlayer.sendActionBar(Component.text(message, mInfo.getActionBarColor()));
+	}
 }

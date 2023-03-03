@@ -24,9 +24,9 @@ import org.bukkit.util.Vector;
 public class SpellFallingIcicle extends Spell {
 	private static final int RESPAWN_DURATION = 20 * 3;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private BoundingBox mBox;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final BoundingBox mBox;
 	private boolean mCurrentlyRespawning = false;
 
 
@@ -68,7 +68,7 @@ public class SpellFallingIcicle extends Spell {
 				for (int x = -5; x <= 5; x++) {
 					for (int z = -5; z <= 5; z++) {
 						for (int y = 20; y >= -5; y--) {
-							//Can't make location values more optimized - each ones needs to be a separate Location object
+							//Can't make location values more optimized - each one needs to be a separate Location object
 							Location l = loc.clone().add(x, y, z);
 							if (l.getBlock().getType() == Material.ICE) {
 

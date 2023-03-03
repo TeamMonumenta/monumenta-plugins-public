@@ -12,11 +12,11 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,6 +53,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 		new AbilityInfo<>(SagesInsight.class, "Sage's Insight", SagesInsight::new)
 			.scoreboardId("SagesInsight")
 			.shorthandName("SgI")
+			.actionBarColor(TextColor.color(222, 219, 36))
 			.descriptions(
 				String.format("If an active spell hits an enemy, you gain an Arcane Insight. Insights stack up to %s, " +
 						"but decay every %ss of not gaining one. Once %s Insights are revealed, %s " +
@@ -91,7 +92,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			if (mTicksToStackDecay <= 0) {
 				mTicksToStackDecay = CharmManager.getDuration(mPlayer, CHARM_DECAY, DECAY_TIMER);
 				mStacks--;
-				MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
+				showChargesMessage();
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
@@ -141,7 +142,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			} else {
 				new PartialParticle(Particle.REDSTONE, locD, 15, 0.4, 0.4, 0.4, COLOR).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 15, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
-				MessagingUtils.sendActionBarMessage(mPlayer, "Sage's Insight Stacks: " + mStacks);
+				showChargesMessage();
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
@@ -158,6 +159,11 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 			mResets.remove(0);
 		}
 		return true;
+	}
+
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.STACKS;
 	}
 
 	@Override

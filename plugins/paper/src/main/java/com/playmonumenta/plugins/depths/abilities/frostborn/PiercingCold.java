@@ -49,6 +49,7 @@ public class PiercingCold extends DepthsAbility {
 		new DepthsAbilityInfo<>(PiercingCold.class, ABILITY_NAME, PiercingCold::new, DepthsTree.FROSTBORN, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.PIERCING_COLD)
 			.cooldown(COOLDOWN)
+			.actionBarColor(TextColor.color(80, 32, 140))
 			.displayItem(new ItemStack(Material.PRISMARINE_SHARD))
 			.descriptions(PiercingCold::getDescription);
 

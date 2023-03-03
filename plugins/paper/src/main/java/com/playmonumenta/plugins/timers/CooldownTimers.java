@@ -1,9 +1,10 @@
 package com.playmonumenta.plugins.timers;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
+import com.playmonumenta.plugins.abilities.AbilityCollection;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class CooldownTimers {
 	}
 
 	public void registerCooldown(Player player, ClassAbility spell, Integer cooldownTime) {
-		HashMap<ClassAbility, Integer> cd = new HashMap<ClassAbility, Integer>();
+		HashMap<ClassAbility, Integer> cd = new HashMap<>();
 		cd.put(spell, cooldownTime);
 		mTimers.put(player.getUniqueId(), cd);
 	}
@@ -58,7 +59,7 @@ public class CooldownTimers {
 			playerCooldowns.put(spell, cooldownTime);
 		} else {
 			// Else add a new player entry with its info.
-			HashMap<ClassAbility, Integer> cooldownHash = new HashMap<ClassAbility, Integer>();
+			HashMap<ClassAbility, Integer> cooldownHash = new HashMap<>();
 
 			cooldownHash.put(spell, cooldownTime);
 			mTimers.put(playerID, cooldownHash);
@@ -93,9 +94,7 @@ public class CooldownTimers {
 					int time = cooldown.getValue() - ticks;
 					if (time <= 0) {
 						ClassAbility spell = cooldown.getKey();
-						if (mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(spell) != null) {
-							MessagingUtils.sendActionBarMessage(player, spell.getName() + " is now off cooldown!");
-						}
+						showOffCooldownMessage(player, spell);
 
 						abilityIter.remove();
 
@@ -131,9 +130,7 @@ public class CooldownTimers {
 				int cd = entry.getValue();
 				cd -= ticks;
 				if (cd <= 0) {
-					if (mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(spell) != null) {
-						MessagingUtils.sendActionBarMessage(player, spell.getName() + " is now off cooldown!");
-					}
+					showOffCooldownMessage(player, spell);
 					it.remove();
 				} else {
 					cds.put(spell, cd);
@@ -154,9 +151,7 @@ public class CooldownTimers {
 			int cd = cds.get(spell);
 			cd -= ticks;
 			if (cd <= 0) {
-				if (mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(spell) != null) {
-					MessagingUtils.sendActionBarMessage(player, spell.getName() + " is now off cooldown!");
-				}
+				showOffCooldownMessage(player, spell);
 				cds.remove(spell);
 			} else {
 				cds.put(spell, cd);
@@ -181,9 +176,7 @@ public class CooldownTimers {
 					int cd = entry.getValue();
 					cd -= ticks;
 					if (cd <= 0) {
-						if (mPlugin.mAbilityManager.getPlayerAbilities(player).getAbilityIgnoringSilence(currSpell) != null) {
-							MessagingUtils.sendActionBarMessage(player, currSpell.getName() + " is now off cooldown!");
-						}
+						showOffCooldownMessage(player, currSpell);
 						it.remove();
 					} else {
 						cds.put(currSpell, cd);
@@ -228,4 +221,13 @@ public class CooldownTimers {
 		}
 	}
 
+	public void showOffCooldownMessage(Player player, ClassAbility spell) {
+		AbilityCollection abilityCollection = mPlugin.mAbilityManager.getPlayerAbilities(player);
+		if (abilityCollection.getAbilityIgnoringSilence(spell) != null) {
+			Ability ability = abilityCollection.getAbility(spell);
+			if (ability != null) {
+				ability.showOffCooldownMessage();
+			}
+		}
+	}
 }
