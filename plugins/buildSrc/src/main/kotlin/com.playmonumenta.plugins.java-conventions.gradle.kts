@@ -73,10 +73,6 @@ repositories {
     }
 
     maven {
-        url = uri("https://repo.bstats.org/content/repositories/releases")
-    }
-
-    maven {
         url = uri("https://repo.codemc.org/repository/nms")
     }
 
