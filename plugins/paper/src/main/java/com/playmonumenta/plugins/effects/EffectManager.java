@@ -399,6 +399,14 @@ public final class EffectManager implements Listener {
 							}
 						}
 
+						// Remove effects from players who are no longer logged in here - those effects will be re-added when they return
+						if (entity instanceof Player player) {
+							if (!player.isOnline()) {
+								entityIter.remove();
+								continue;
+							}
+						}
+
 						for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
 							Iterator<NavigableSet<Effect>> priorityEffectsIter = priorityEffects.values().iterator();
 							while (priorityEffectsIter.hasNext()) {
