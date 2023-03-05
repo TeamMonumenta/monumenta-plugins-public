@@ -5,8 +5,10 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.WeakHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class Gui {
 
-	private static final WeakHashMap<Player, Gui> LAST_OPENED_INVENTORY = new WeakHashMap<>();
+	private static final Map<UUID, Gui> LAST_OPENED_INVENTORY = new HashMap<>();
 
 	protected final Plugin mPlugin;
 	public final Player mPlayer;
@@ -88,7 +90,7 @@ public abstract class Gui {
 	 */
 	public void open() {
 		update();
-		LAST_OPENED_INVENTORY.put(mPlayer, this);
+		LAST_OPENED_INVENTORY.put(mPlayer.getUniqueId(), this);
 		mCustomInventory.openInventory(mPlayer, mPlugin);
 	}
 
@@ -261,11 +263,15 @@ public abstract class Gui {
 	}
 
 	public static @Nullable Gui getOpenGui(Player player) {
-		Gui lastOpenedGui = LAST_OPENED_INVENTORY.get(player);
+		Gui lastOpenedGui = LAST_OPENED_INVENTORY.get(player.getUniqueId());
 		if (lastOpenedGui != null && lastOpenedGui.mCustomInventory.getInventory().equals(player.getOpenInventory().getTopInventory())) {
 			return lastOpenedGui;
 		}
 		return null;
+	}
+
+	public static void playerQuit(Player player) {
+		LAST_OPENED_INVENTORY.remove(player.getUniqueId());
 	}
 
 }
