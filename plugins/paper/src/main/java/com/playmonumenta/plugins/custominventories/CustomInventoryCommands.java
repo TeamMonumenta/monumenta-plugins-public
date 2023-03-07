@@ -28,7 +28,7 @@ public class CustomInventoryCommands {
 			.withPermission("monumenta.command.openexamplecustominvgui")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
 			.executes((sender, args) -> {
-				Player player = (Player)args[0];
+				Player player = (Player) args[0];
 				new ExampleCustomInventory(player).openInventory(player, plugin);
 			})
 			.register();
@@ -256,6 +256,21 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				emote(player);
+			})
+			.register();
+
+		new CommandAPICommand("opentrinketgui")
+			.withPermission("monumenta.command.opentrinketgui")
+			.executesPlayer((player, args) -> {
+				new KnickKnackSackGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("opentrinketgui")
+			.withPermission("monumenta.command.opentrinketgui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new KnickKnackSackGui(player).open();
 			})
 			.register();
 	}
