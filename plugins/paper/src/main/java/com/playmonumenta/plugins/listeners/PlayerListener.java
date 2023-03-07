@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.commands.ToggleSwap;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
+import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
@@ -237,6 +238,8 @@ public class PlayerListener implements Listener {
 		mPlugin.mAbilityManager.playerQuitEvent(player, event);
 
 		mPlugin.mTrackingManager.removeEntity(player);
+
+		Gui.playerQuit(player);
 
 		Team playersTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(PLAYERS_TEAM_NAME);
 		if (playersTeam != null) {
