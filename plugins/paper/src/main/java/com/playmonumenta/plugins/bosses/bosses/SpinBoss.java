@@ -30,8 +30,7 @@ public final class SpinBoss extends BossAbilityGroup {
 
 		List<Spell> passiveSpells = Arrays.asList(new SpellRunAction(() -> {
 			Location loc = boss.getLocation();
-			loc.setYaw((loc.getYaw() + p.SPIN_RATE));
-			boss.teleport(loc);
+			boss.setRotation(loc.getYaw() + p.SPIN_RATE, loc.getPitch());
 		}));
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, -1, null, 100, 1);
