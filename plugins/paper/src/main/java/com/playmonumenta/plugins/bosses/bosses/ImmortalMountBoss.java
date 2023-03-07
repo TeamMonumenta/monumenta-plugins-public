@@ -97,17 +97,19 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 
 	@Override
 	public void customEffectAppliedToBoss(CustomEffectApplyEvent event) {
-		if (mPassenger != null && COPIED_EFFECTS.contains(event.getEffect().getClass())) {
+		if (mTransferDamage && mPassenger != null && COPIED_EFFECTS.contains(event.getEffect().getClass())) {
 			event.setEntity(mPassenger);
 		}
 	}
 
 	@Override
 	public void bossIgnited(int ticks) {
-		if (mPassenger != null) {
-			EntityUtils.setFireTicksIfLower(ticks, mPassenger);
+		if (mTransferDamage) {
+			if (mPassenger != null) {
+				EntityUtils.setFireTicksIfLower(ticks, mPassenger);
+			}
+			mBoss.setFireTicks(0);
 		}
-		mBoss.setFireTicks(0);
 	}
 
 }

@@ -658,6 +658,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(GenericTargetBoss.identityTag, new GenericTargetBoss.Parameters());
 		mBossParameters.put(LimitedLifespanBoss.identityTag, new LimitedLifespanBoss.Parameters());
 		mBossParameters.put(ImmortalMountBoss.identityTag, new ImmortalMountBoss.Parameters());
+		mBossParameters.put(ImmortalPassengerBoss.identityTag, new ImmortalPassengerBoss.Parameters());
 		mBossParameters.put(BrownMagnetSwapBoss.identityTag, new BrownMagnetSwapBoss.Parameters());
 		mBossParameters.put(BrownPositiveBoss.identityTag, new BrownPositiveBoss.Parameters());
 		mBossParameters.put(BrownNegativeBoss.identityTag, new BrownNegativeBoss.Parameters());
