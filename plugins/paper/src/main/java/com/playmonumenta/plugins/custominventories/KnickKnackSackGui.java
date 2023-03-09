@@ -14,6 +14,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -43,7 +45,7 @@ public class KnickKnackSackGui extends Gui {
 
 		// Charm trinket, r3 access
 		ItemStack charm = makeTrinketItemStack("epic:r3/charms/charms_trinket");
-		int charmSlot = 11;
+		int charmSlot = 16;
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, "R3Access").orElse(0) != 0) {
 			overrideLore(charm,
 				"Click to open the Charms Menu."
@@ -57,16 +59,31 @@ public class KnickKnackSackGui extends Gui {
 			setItem(charmSlot, charm);
 		}
 
-		// Depths trinket, depths access, may want to consider making it inaccessible outside of depths
-		int depthsSlot = 12;
-		GuiItem tDepths = makeTrinketGuiItem(
-			"epic:items/functions/depths_trinket"
-		).onRightClick(() -> {
-			runConsoleCommand("opendepthsgui summary @S");
-		}).onLeftClick(() -> {
-			runConsoleCommand("depths party @S");
-		});
-		setItem(depthsSlot, tDepths);
+		// Depths trinket, unlocked with lobby access, may want to consider making it inaccessible outside of depths
+		int depthsSlot = 15;
+		ItemStack depths = makeTrinketItemStack("epic:items/functions/depths_trinket");
+		NamespacedKey findDepthsLobby = NamespacedKey.fromString("monumenta:dungeons/depths/find");
+		boolean playerFoundDepths = false;
+		if (findDepthsLobby != null) {
+			Advancement foundDepthsLobby = Bukkit.getAdvancement(findDepthsLobby);
+			if (foundDepthsLobby != null) {
+				playerFoundDepths = mPlayer.getAdvancementProgress(foundDepthsLobby).isDone();
+			}
+		}
+		if (playerFoundDepths) {
+			GuiItem tDepths = new GuiItem(depths)
+			.onRightClick(() -> {
+				runConsoleCommand("opendepthsgui summary @S");
+			}).onLeftClick(() -> {
+				runConsoleCommand("depths party @S");
+			});
+			setItem(depthsSlot, tDepths);
+		} else {
+			depths.setType(Material.BARRIER);
+			overrideLore(depths, NamedTextColor.YELLOW,
+				"Find the Darkest Depths lobby to unlock!");
+			setItem(depthsSlot, depths);
+		}
 
 		// Bestiary, quest completion
 		ItemStack bestiary = makeTrinketItemStack("epic:r1/quests/53_reward");
@@ -88,7 +105,7 @@ public class KnickKnackSackGui extends Gui {
 		}
 
 		// Pass Trinket, always unlocked
-		int passSlot = 14;
+		int passSlot = 11;
 		GuiItem tPass = makeTrinketGuiItem(
 			"epic:pass/seasonal_pass_trinket",
 			"Click to show active pass and",
@@ -97,26 +114,29 @@ public class KnickKnackSackGui extends Gui {
 		setItem(passSlot, tPass);
 
 		// Cosmetics Trinket, always unlocked
-		int cosmeticsSlot = 15;
-		GuiItem tCosmetics = makeTrinketGuiItem(
-			"epic:pass/personal_cosmetic_interface",
-			"Click to show and equip your",
-			"unlocked cosmetics."
-		).onClick((evt) -> runConsoleCommand("cosmetics gui @S"));
-		setItem(cosmeticsSlot, tCosmetics);
+		// Personal Cosmetics trinket is gonna be added in a later patch
+		//int cosmeticsSlot = 15;
+		//GuiItem tCosmetics = makeTrinketGuiItem(
+			//"epic:pass/personal_cosmetic_interface",
+			//"Click to show and equip your",
+			//"unlocked cosmetics."
+		//).onClick((evt) -> runConsoleCommand("cosmetics gui @S"));
+		//setItem(cosmeticsSlot, tCosmetics);
 
 		// Parrot bell, always unlocked
-		int parrotSlot = 16;
-		GuiItem tParrot = makeTrinketGuiItem(
-			"epic:r2/items/randommistportjunk/portable_parrot_bell",
-			"Click to open the parrot menu."
-		).onClick((evt) -> runConsoleCommand("openparrotgui @S"));
-		setItem(parrotSlot, tParrot);
+		// Parrot bell is also gonna be added in a later patch
+		//int parrotSlot = 16;
+		//GuiItem tParrot = makeTrinketGuiItem(
+			//"epic:r2/items/randommistportjunk/portable_parrot_bell",
+			//"Click to open the parrot menu."
+		//).onClick((evt) -> runConsoleCommand("openparrotgui @S"));
+		//setItem(parrotSlot, tParrot);
 
 		// Tlaxan Record Player OR Soulsinger, quest completion OR purchase of epic
 		int recordScore = ScoreboardUtils.getScoreboardValue(mPlayer, "Quest47").orElse(0);
 		ItemStack record = makeTrinketItemStack("epic:r1/items/misc/tlaxan_record_player");
-		int recordSlot = 19;
+		//int recordSlot = 19;
+		int recordSlot = 14;
 		if (recordScore > 2) {
 			overrideLore(record,
 				"Click to open the menu",
@@ -144,7 +164,8 @@ public class KnickKnackSackGui extends Gui {
 
 		// Delves Trinket, requires r3 access
 		ItemStack delve = makeTrinketItemStack("epic:r3/delves/items/delves_trinket");
-		int delveSlot = 20;
+		//int delveSlot = 20;
+		int delveSlot = 19;
 		if (ScoreboardUtils.getScoreboardValue(mPlayer, "R3Access").orElse(0) != 0) {
 			overrideLore(delve,
 				"Click to view Architect's Ring",
@@ -171,7 +192,8 @@ public class KnickKnackSackGui extends Gui {
 		}
 
 		// Emotes Trinket, always unlocked
-		int emoteSlot = 21;
+		//int emoteSlot = 21;
+		int emoteSlot = 12;
 		GuiItem tEmote = makeTrinketGuiItem(
 			"epic:r1/items/misc/emotes_trinket",
 			"Left click to open the Emotes Menu.",
