@@ -45,8 +45,8 @@ public class Astral {
 
 
 	static {
-		MOB_POOL = Arrays.asList("PillarAlpha", "PillarBeta", "PillarGamma", "PillarDelta", "PillarEpsilon", "PillarNu");
-		SPECIAL_MOB_POOL = Arrays.asList("PillarMutatedAlpha", "PillarMutatedBeta", "PillarMutatedGamma", "PillarMutatedDelta", "PillarMutatedEpsilon", "PillarMutatedNu");
+		MOB_POOL = Arrays.asList("PillarAlpha", "PillarBeta", "PillarGamma", "PillarDelta", "PillarEpsilon", "PillarNu", "PillarEta", "PillarXi", "PillarLambda");
+		SPECIAL_MOB_POOL = Arrays.asList("PillarMutatedAlpha", "PillarMutatedBeta", "PillarMutatedGamma", "PillarMutatedDelta", "PillarMutatedEpsilon", "PillarMutatedNu", "PillarMutatedEta", "PillarMutatedXi", "PillarMutatedLambda");
 	}
 
 	private static void summonAstral(Block block) {

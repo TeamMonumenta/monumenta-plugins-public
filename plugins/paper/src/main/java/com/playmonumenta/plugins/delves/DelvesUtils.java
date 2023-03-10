@@ -114,6 +114,19 @@ public class DelvesUtils {
 		return nWeekRotation.get((int) (DateUtils.getWeeklyVersion() % nWeekRotation.size()));
 	}
 
+	public static List<DelvesModifier> getWeeklyRotatingModifier(int nextWeek) {
+		List<List<DelvesModifier>> nWeekRotation = new ArrayList<>();
+		List<DelvesModifier> rotatingMods = DelvesModifier.rotatingDelveModifiers();
+		for (int i = 0; i < rotatingMods.size() - 1; i++) {
+			for (int j = i + 1; j < rotatingMods.size(); j++) {
+				nWeekRotation.add(Arrays.asList(rotatingMods.get(i), rotatingMods.get(j)));
+			}
+		}
+		long week = DateUtils.getWeeklyVersion() + nextWeek;
+		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(week / nWeekRotation.size()));
+		return nWeekRotation.get((int) (week % nWeekRotation.size()));
+	}
+
 	public static @Nullable ItemStack getRankItem(DelvesModifier mod, int rank, int level) {
 		if (rank > MODIFIER_RANK_CAPS.getOrDefault(mod, 0)) {
 			return null;

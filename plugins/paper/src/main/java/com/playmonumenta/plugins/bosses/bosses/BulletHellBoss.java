@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBullet;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import org.bukkit.Location;
@@ -98,9 +99,9 @@ public class BulletHellBoss extends BossAbilityGroup {
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
-						BossUtils.bossDamagePercent(mBoss, player, p.DAMAGE / 100.0);
+						DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, null), p.DAMAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, true);
 					}
-					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 15, 0, 0, 0, 0.175).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 5, 0, 0, 0, 0.175).spawnAsEnemy();
 				}
 			))), Collections.emptyList(), p.DETECTION, null, 0);
 

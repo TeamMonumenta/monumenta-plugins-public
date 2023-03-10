@@ -316,6 +316,17 @@ public class DelvesCommands {
 		new CommandAPICommand(COMMAND)
 			.withPermission(perms)
 			.withArguments(
+				new MultiLiteralArgument("nextrotation"),
+				new IntegerArgument("week", 0)
+			).executes((commandSender, args) -> {
+				for (DelvesModifier mod : DelvesUtils.getWeeklyRotatingModifier((int)args[1])) {
+					commandSender.sendMessage(Component.text(mod.name(), NamedTextColor.RED));
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(perms)
+			.withArguments(
 				new MultiLiteralArgument("debugchallenge"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				dungeonArg

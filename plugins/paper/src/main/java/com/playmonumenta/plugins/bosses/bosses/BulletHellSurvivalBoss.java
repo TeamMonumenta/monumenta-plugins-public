@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 public class BulletHellSurvivalBoss extends BossAbilityGroup {
@@ -120,6 +121,18 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 				world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.2f, 1.5f);
 			}
 		}
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		if (event.getPlayer().getLocation().distanceSquared(mBoss.getLocation()) <= 13 * 13) {
+			mBoss.setHealth(Math.min(mBoss.getHealth() + 40 * EntityUtils.getMaxHealth(mBoss), EntityUtils.getMaxHealth(mBoss)));
+		}
+	}
+
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
 	}
 
 }
