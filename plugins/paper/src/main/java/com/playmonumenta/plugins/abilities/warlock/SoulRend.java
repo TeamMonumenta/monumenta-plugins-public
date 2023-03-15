@@ -135,6 +135,9 @@ public class SoulRend extends Ability {
 
 	//Handles capping the absorption
 	private void absorptionPlayer(Player player, double absorption, LivingEntity enemy) {
+		if (absorption <= 0) {
+			return;
+		}
 		absorption = Math.min(ABSORPTION_CAP, absorption);
 		AbsorptionUtils.addAbsorption(player, absorption, absorption, ABSORPTION_DURATION);
 		mCosmetic.rendAbsorptionEffect(mPlayer, player, enemy);
