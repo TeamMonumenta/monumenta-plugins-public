@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -58,7 +59,7 @@ public class Skyhook extends DepthsAbility {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow && damager.hasMetadata(SKYHOOK_ARROW_METADATA)) {
+		if (event.getType() == DamageType.PROJECTILE && damager != null && damager.hasMetadata(SKYHOOK_ARROW_METADATA)) {
 			hook(damager);
 			damager.removeMetadata(SKYHOOK_ARROW_METADATA, mPlugin);
 		}
@@ -74,32 +75,27 @@ public class Skyhook extends DepthsAbility {
 		}
 	}
 
-	private void hook(Entity arrow) {
-		Location loc = arrow.getLocation();
+	private void hook(Entity projectile) {
+		Location loc = projectile.getLocation();
 		Location playerStartLoc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
 
-		if (loc.clone().add(0, 0.5, 0).getBlock().isSolid()) {
-			loc = loc.subtract(0, 1, 0);
-		}
-
-		//Check if the location is in an inescapable place for the player
-		if (!(loc.getBlock().getType() == Material.BEDROCK) && !(loc.getBlock().getRelative(BlockFace.UP).getType() == Material.BEDROCK)) {
+		if (LocationUtils.blinkCollisionCheck(mPlayer, loc.toVector())) {
+			loc = mPlayer.getLocation();
 			Location pLoc = loc.clone().add(0, 0.5, 0);
-			Vector dir = mPlayer.getLocation().toVector().subtract(loc.toVector()).normalize();
-			for (int i = 0; i <= mPlayer.getLocation().distance(loc); i++) {
+			Vector dir = playerStartLoc.toVector().subtract(loc.toVector()).normalize();
+			double distanceTraveled = playerStartLoc.distance(loc);
+			for (int i = 0; i <= distanceTraveled; i++) {
 				pLoc.add(dir);
 
 				new PartialParticle(Particle.SWEEP_ATTACK, pLoc, 5, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.CLOUD, pLoc, 10, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
 			}
 
-			world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 1.5f);
-			new PartialParticle(Particle.SMOKE_LARGE, mPlayer.getLocation(), 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
+			world.playSound(playerStartLoc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 1.5f);
+			new PartialParticle(Particle.SMOKE_LARGE, playerStartLoc, 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.CLOUD, loc, 10, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SWEEP_ATTACK, loc, 5, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
-			loc.setDirection(mPlayer.getEyeLocation().getDirection());
-			mPlayer.teleport(loc);
 
 			//Refund cooldowns
 			for (Ability ability : AbilityManager.getManager().getPlayerAbilities(mPlayer).getAbilities()) {
@@ -109,13 +105,13 @@ public class Skyhook extends DepthsAbility {
 					continue;
 				}
 				int totalCD = ability.getModifiedCooldown();
-				int reducedCD = (int) (totalCD * (loc.distance(playerStartLoc) / 100.0));
+				int reducedCD = (int) (totalCD * distanceTraveled / 100.0);
 				mPlugin.mTimers.updateCooldown(mPlayer, spell, reducedCD);
 			}
 		}
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 1.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1, 1.5f);
 
-		arrow.remove();
+		projectile.remove();
 	}
 
 	@Override

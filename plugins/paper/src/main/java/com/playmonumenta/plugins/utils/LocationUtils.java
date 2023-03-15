@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.adapters.VersionAdapter;
 import com.playmonumenta.structures.StructuresPlugin;
 import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
@@ -472,6 +473,44 @@ public class LocationUtils {
 		}
 	}
 
+	/**
+	 * Teleport from blinkee's original location to destination, moving backwards slightly until there is no collision.
+	 * The teleport will not occur if it would send the blinkee backwards. Collision checks for the space between
+	 * the blinkee and the target location are not performed as long as there is space at the destination.
+	 * <p>
+	 * returns true on successful teleport
+	 */
+	public static boolean blinkCollisionCheck(Entity blinkee, Vector target) {
+		World world = blinkee.getWorld();
+		Location from = blinkee.getLocation();
+		Location dest = new Location(world, target.getX(), target.getY(), target.getZ(), from.getYaw(), from.getPitch());
+		Vector requestedPositionDelta = target.clone().subtract(from.toVector());
+		double travelledDistance = target.distance(from.toVector());
+
+		if (travelledDistance == 0.0) {
+			// Teleport in place; nothing to do
+			return false;
+		}
+
+		double reverseDeltaDistance = 1.0/16.0;
+		Vector reverseDeltaPosition = requestedPositionDelta.clone().normalize().multiply(-reverseDeltaDistance);
+
+		VersionAdapter versionAdapter = NmsUtils.getVersionAdapter();
+		BoundingBox bb = blinkee.getBoundingBox().clone().shift(requestedPositionDelta);
+		while (versionAdapter.hasCollision(world, bb)) {
+			// Back up until no collision is found, or teleport is in place/backwards
+			travelledDistance -= reverseDeltaDistance;
+			if (travelledDistance <= 0.0) {
+				return false;
+			}
+			dest.add(reverseDeltaPosition);
+			bb.shift(reverseDeltaPosition);
+		}
+
+		blinkee.teleport(dest);
+		return true;
+	}
+
 	// Adds part or all of y height above feet location, based on multiplier. Player height 1.8, player sneaking height 1.5
 	public static Location getHeightLocation(Entity entity, double heightMultiplier) {
 		return entity.getLocation().add(0, entity.getHeight() * heightMultiplier, 0);
@@ -524,7 +563,7 @@ public class LocationUtils {
 	}
 
 	public static List<Chunk> getSurroundingChunks(Block block, int radius) {
-		ArrayList<Chunk> chunkList = new ArrayList<Chunk>();
+		ArrayList<Chunk> chunkList = new ArrayList<>();
 		Location location = block.getLocation();
 		// 16 block offset guarantees we get an adjacent chunk
 		for (int x = -radius; x <= radius; x += 16) {
