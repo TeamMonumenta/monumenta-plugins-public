@@ -135,4 +135,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 		return mMaxStacks;
 	}
 
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.STACKS;
+	}
+
 }

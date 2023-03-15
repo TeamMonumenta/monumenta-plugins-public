@@ -104,11 +104,6 @@ public abstract class MultipleChargeAbility extends Ability implements AbilityWi
 	}
 
 	@Override
-	public ChargeType getChargeType() {
-		return ChargeType.STACKS;
-	}
-
-	@Override
 	public int getCharges() {
 		return mCharges;
 	}

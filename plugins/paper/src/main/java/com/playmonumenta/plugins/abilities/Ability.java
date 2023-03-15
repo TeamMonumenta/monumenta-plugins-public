@@ -373,7 +373,7 @@ public abstract class Ability {
 	}
 
 	public void showOffCooldownMessage() {
-		sendActionBarMessage(mInfo.getDisplayName() + " is now off cooldown!");
+		sendActionBarMessage(getLinkedSpellName() + " is now off cooldown!");
 	}
 
 	/**
@@ -381,7 +381,7 @@ public abstract class Ability {
 	 */
 	public void showChargesMessage() {
 		if (this instanceof AbilityWithChargesOrStacks abilityWithChargesOrStacks) {
-			sendActionBarMessage(mInfo.getDisplayName()
+			sendActionBarMessage(getLinkedSpellName()
 				+ " " + abilityWithChargesOrStacks.getChargeType()
 				+ ": " + abilityWithChargesOrStacks.getCharges());
 		}
@@ -389,5 +389,13 @@ public abstract class Ability {
 
 	public void sendActionBarMessage(String message) {
 		mPlayer.sendActionBar(Component.text(message, mInfo.getActionBarColor()));
+	}
+
+	public @Nullable String getLinkedSpellName() {
+		ClassAbility ca = mInfo.getLinkedSpell();
+		if (ca == null) {
+			return mInfo.getDisplayName();
+		}
+		return ca.getName();
 	}
 }

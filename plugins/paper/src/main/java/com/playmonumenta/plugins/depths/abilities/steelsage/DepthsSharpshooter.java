@@ -106,5 +106,10 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 		return MAX_STACKS;
 	}
 
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.STACKS;
+	}
+
 }
 
