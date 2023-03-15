@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -64,7 +65,7 @@ public class GalleryCommands {
 				if (game != null) {
 					game.printPlayerInfo(target);
 				} else {
-					target.sendMessage(ChatColor.GRAY + "the game should start in a bit");
+					target.sendMessage(Component.text("The game has not started yet!", NamedTextColor.GRAY));
 				}
 				return 1;
 			}).register();
