@@ -94,7 +94,7 @@ public class Challenge extends Ability {
 
 			for (LivingEntity mob : mobs) {
 				if (mob instanceof Mob) {
-					EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+					EntityUtils.applyTaunt(mob, mPlayer);
 				}
 			}
 

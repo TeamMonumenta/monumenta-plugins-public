@@ -102,7 +102,7 @@ public class MelancholicLament extends Ability {
 		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
 		for (LivingEntity mob : hitbox.getHitMobs()) {
 			EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);
-			EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+			EntityUtils.applyTaunt(mob, mPlayer);
 		}
 
 		if (isEnhanced()) {

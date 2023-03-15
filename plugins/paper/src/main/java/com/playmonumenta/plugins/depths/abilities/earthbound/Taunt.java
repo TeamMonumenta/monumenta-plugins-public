@@ -64,7 +64,7 @@ public class Taunt extends DepthsAbility {
 			// add rarity% absorption for each affected mob, up to 6
 			AbsorptionUtils.addAbsorption(mPlayer, Math.min(mobs.size(), MAX_ABSORB) * ABSORPTION[mRarity - 1], MAX_ABSORB * ABSORPTION[mRarity - 1], ABSORPTION_DURATION);
 			for (LivingEntity le : mobs) {
-				EntityUtils.applyTaunt(mPlugin, le, mPlayer);
+				EntityUtils.applyTaunt(le, mPlayer);
 				new PartialParticle(Particle.BLOCK_DUST, le.getLocation(), 50, 0.1, 0.1, 0.1, 0.1, Material.DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.FIREWORKS_SPARK, le.getLocation(), 30, 0.1, 0.1, 0.1, 0.2).spawnAsPlayerActive(mPlayer);
 			}

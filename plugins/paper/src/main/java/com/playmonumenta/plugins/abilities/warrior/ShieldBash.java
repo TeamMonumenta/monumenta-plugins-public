@@ -26,6 +26,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -132,7 +133,21 @@ public class ShieldBash extends Ability {
 			EntityUtils.applyStun(mPlugin, duration, le);
 		}
 		if (le instanceof Mob mob) {
-			EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+			new BukkitRunnable() {
+				int mT = 0;
+
+				@Override
+				public void run() {
+					if (mob.isDead() || !mob.isValid() || mT > duration * 2) {
+						this.cancel();
+					} else if (!EntityUtils.isStunned(mob)) {
+						EntityUtils.applyTaunt(mob, mPlayer, false);
+						this.cancel();
+					}
+
+					mT++;
+				}
+			}.runTaskTimer(mPlugin, 0, 1);
 		}
 	}
 

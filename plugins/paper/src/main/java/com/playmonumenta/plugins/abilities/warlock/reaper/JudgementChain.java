@@ -206,7 +206,7 @@ public class JudgementChain extends Ability {
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
 			world.playSound(loc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.75f, 1.0f);
 			mPlugin.mEffectManager.addEffect(mTarget, EFFECT_NAME, new JudgementChainMobEffect(DURATION, mPlayer, EFFECT_NAME));
-			EntityUtils.applyTaunt(mPlugin, mTarget, mPlayer);
+			EntityUtils.applyTaunt(mTarget, mPlayer);
 
 			cancelOnDeath(new BukkitRunnable() {
 				final int mRunnableDuration = DURATION;

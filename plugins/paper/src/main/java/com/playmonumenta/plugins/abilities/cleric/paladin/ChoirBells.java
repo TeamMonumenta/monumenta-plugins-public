@@ -89,7 +89,7 @@ public class ChoirBells extends Ability {
 
 			if (Crusade.enemyTriggersAbilities(mob, mCrusade)) {
 				// Infusion
-				EntityUtils.applyTaunt(mPlugin, mob, mPlayer);
+				EntityUtils.applyTaunt(mob, mPlayer);
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE), mInfo.getLinkedSpell(), true, true);
 				EntityUtils.applyVulnerability(mPlugin, DURATION, mVulnerabilityEffect, mob);
 				EntityUtils.applyWeaken(mPlugin, DURATION, mWeakenEffect, mob);

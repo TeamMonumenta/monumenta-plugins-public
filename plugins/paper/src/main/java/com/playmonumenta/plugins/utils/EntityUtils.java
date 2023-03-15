@@ -207,17 +207,10 @@ public class EntityUtils {
 					cooling.setValue(cooling.getValue() - 1);
 
 					if (cooling.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
-						AttributeInstance ai = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-						if (ai != null) {
-							for (AttributeModifier mod : ai.getModifiers()) {
-								if (mod != null && mod.getName().equals(COOLING_ATTR_NAME)) {
-									ai.removeModifier(mod);
-								}
-							}
-						}
+						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, COOLING_ATTR_NAME);
 
-						if (mob instanceof Mob) {
-							((Mob) mob).setTarget(getNearestPlayer(mob.getLocation(), mob.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).getValue()));
+						if (mob instanceof Mob m) {
+							m.setTarget(getNearestPlayer(mob.getLocation(), getAttributeOrDefault(mob, Attribute.GENERIC_FOLLOW_RANGE, 0)));
 						}
 
 						coolingIter.remove();
@@ -239,14 +232,7 @@ public class EntityUtils {
 					new PartialParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STUN_COLOR).spawnAsEnemyBuff();
 
 					if (stunned.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
-						AttributeInstance ai = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-						if (ai != null) {
-							for (AttributeModifier mod : ai.getModifiers()) {
-								if (mod != null && mod.getName().equals(STUN_ATTR_NAME)) {
-									ai.removeModifier(mod);
-								}
-							}
-						}
+						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, STUN_ATTR_NAME);
 						stunnedIter.remove();
 					}
 				}
@@ -1038,7 +1024,11 @@ public class EntityUtils {
 		setFireTicksIfLower(fireTicks, target);
 	}
 
-	public static void applyTaunt(Plugin plugin, LivingEntity tauntedEntity, Player targetedPlayer) {
+	public static void applyTaunt(LivingEntity tauntedEntity, Player targetedPlayer) {
+		applyTaunt(tauntedEntity, targetedPlayer, true);
+	}
+
+	public static void applyTaunt(LivingEntity tauntedEntity, Player targetedPlayer, boolean particles) {
 		if (!tauntedEntity.getScoreboardTags().contains(IGNORE_TAUNT_TAG)) {
 			//TODO - when all the mobs in game use only generic target remove these lines
 			PlayerTargetBoss playerTargetBoss = BossManager.getInstance().getBoss(tauntedEntity, PlayerTargetBoss.class);
@@ -1056,7 +1046,9 @@ public class EntityUtils {
 			Mob tauntedMob = (Mob) tauntedEntity;
 			tauntedMob.setTarget(targetedPlayer);
 
-			new PartialParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR).spawnAsPlayerActive(targetedPlayer);
+			if (particles) {
+				new PartialParticle(Particle.REDSTONE, tauntedEntity.getEyeLocation().add(0, 0.5, 0), 12, 0.4, 0.5, 0.4, TAUNT_COLOR).spawnAsPlayerActive(targetedPlayer);
+			}
 
 			// Damage the taunted enemy to keep focus on the player who casted the taunt.
 			// Damage bypasses iframes & doesn't affect velocity
@@ -1081,16 +1073,14 @@ public class EntityUtils {
 			startTracker(plugin);
 		}
 
-		if (mob instanceof Mob) {
-			((Mob) mob).setTarget(null);
+		if (mob instanceof Mob m) {
+			m.setTarget(null);
 		}
 
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = COOLING_MOBS.get(mob);
 		if (t == null) {
-			AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-			AttributeModifier mod = new AttributeModifier(COOLING_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER);
-			speed.addModifier(mod);
+			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(COOLING_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER));
 		}
 		if (t == null || t < ticks) {
 			COOLING_MOBS.put(mob, ticks);
@@ -1126,11 +1116,9 @@ public class EntityUtils {
 		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
 		Integer t = STUNNED_MOBS.get(mob);
 		if (t == null) {
-			AttributeInstance speed = mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-			AttributeModifier mod = new AttributeModifier(STUN_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER);
-			speed.addModifier(mod);
-			if (mob instanceof Mob) {
-				NmsUtils.getVersionAdapter().cancelStrafe((Mob) mob);
+			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(STUN_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER));
+			if (mob instanceof Mob m) {
+				NmsUtils.getVersionAdapter().cancelStrafe(m);
 			}
 		}
 		if (t == null || t < ticks) {
