@@ -111,7 +111,7 @@ public class Quickdraw extends Ability {
 		}
 		mProjectile = proj;
 
-		if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
+		if (!mPlayer.isSneaking() && ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
 			if (EntityUtils.isRecoilDisable(mPlugin, mPlayer, 1)) {
 				proj.addScoreboardTag("NoRecoil");
 			}
