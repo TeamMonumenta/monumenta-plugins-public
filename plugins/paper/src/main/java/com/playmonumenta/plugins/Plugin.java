@@ -46,6 +46,7 @@ import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.player.PlayerSaturationTracker;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
@@ -325,6 +326,8 @@ public class Plugin extends JavaPlugin {
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
+
+		PlayerSaturationTracker.startTracking(this);
 
 		DailyReset.startTimer(this);
 
