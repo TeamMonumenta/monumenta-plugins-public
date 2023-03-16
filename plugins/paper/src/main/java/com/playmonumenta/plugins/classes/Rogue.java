@@ -40,7 +40,8 @@ public class Rogue extends PlayerClass {
 		mClassName = "Rogue";
 		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
-		mClassPassiveDescription = String.format("While holding two swords, deal %s%% more damage to elite enemies, and %s%% more to bosses.", StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_ELITE_MODIFIER - 1), StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_BOSS_MODIFIER - 1));
+		mClassPassiveDescription = String.format("While holding two swords, deal %s%% more melee damage to elite enemies, and %s%% more to bosses.",
+			StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_ELITE_MODIFIER - 1), StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_BOSS_MODIFIER - 1));
 		mClassPassiveName = "Dethroner";
 
 		mSpecOne.mAbilities.add(BladeDance.INFO);
