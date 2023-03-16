@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.List;
 import java.util.Objects;
@@ -35,15 +36,13 @@ public class Haunted {
 	}
 
 	public static final double MAX_SPEED = 0.5;
-	public static final double DAMAGE = 0.3; //percentage
+	public static final double DAMAGE = 0.4; //percentage
 	public static final double RANGE = 50;
 	public static final double VERTICAL_SPEED_DEBUFF = 3;
 
 	private static void followPlayer(Player p, ArmorStand armorStand) {
 		new BukkitRunnable() {
 			Location mPLoc = p.getLocation();
-			final Location mSLoc = armorStand.getLocation();
-
 			double mRadian = 0;
 			double mSpeed = MAX_SPEED;
 
@@ -68,12 +67,13 @@ public class Haunted {
 					return;
 				}
 
+				Location sLoc = armorStand.getLocation();
 				double distance = armorStand.getLocation().distance(p.getLocation());
 
 				if (distance > RANGE) {
 					armorStand.remove();
 					this.cancel();
-					summonBeast(p, p.getLocation().add(0, 10, 0));
+					summonBeast(p, p.getLocation().add(p.getLocation().getDirection().multiply(-10)));
 					return;
 				} else if (distance > RANGE / 2) {
 					mSpeed = MAX_SPEED * 2;
@@ -81,11 +81,15 @@ public class Haunted {
 					mSpeed = MAX_SPEED;
 				}
 
+				if (EntityUtils.isInWater(p)) {
+					mSpeed *= .8;
+				}
+
 				// Change the direction of the stand and its head
-				Vector direction = LocationUtils.getDirectionTo(p.getLocation(), mSLoc);
-				mSLoc.setDirection(direction);
-				armorStand.setHeadPose(new EulerAngle(Math.toRadians(mSLoc.getPitch()), 0, 0));
-				armorStand.teleport(mSLoc.clone().add(0, FastMath.sin(mRadian) * 0.35, 0));
+				Vector direction = LocationUtils.getDirectionTo(p.getLocation(), sLoc);
+				sLoc.setDirection(direction);
+				armorStand.setHeadPose(new EulerAngle(Math.toRadians(sLoc.getPitch()), 0, 0));
+				armorStand.teleport(sLoc.clone().add(0, (FastMath.sin(mRadian) * 0.35)/10, 0));
 				mRadian += Math.PI / 20D; // Finishes a sin bob in (20 * 2) ticks
 
 				// Hit detection
@@ -118,7 +122,7 @@ public class Haunted {
 					.minimumMultiplier(false).spawnAsEntityActive(armorStand);
 
 				//Sounds
-				distance = mSLoc.distance(p.getLocation());
+				distance = sLoc.distance(p.getLocation());
 				if (distance <= 16 && mRangeCD <= 0) {
 					p.playSound(armorStand.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, SoundCategory.HOSTILE, 1.75f, 0f);
 					mRangeCD = 70;
@@ -133,7 +137,7 @@ public class Haunted {
 					pMovedTick = 1;
 				}
 
-				mSLoc.add(direction.multiply(mSpeed*pMovedTick).divide(new Vector(1, VERTICAL_SPEED_DEBUFF, 1)));
+				armorStand.teleport(sLoc.add(direction.multiply(mSpeed*pMovedTick).divide(new Vector(1, VERTICAL_SPEED_DEBUFF, 1))));
 				mPLoc = p.getLocation();
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0L, 1L);
@@ -151,12 +155,23 @@ public class Haunted {
 		followPlayer(p, armorStand);
 	}
 
+	public static void moveBackwards(Player player, int multiplier) {
+		String phantomName = DelvesManager.PHANTOM_NAME;
+		for (Entity nearbyEntity : player.getLocation().getNearbyEntities(20, 20, 20)) {
+			if (nearbyEntity instanceof ArmorStand && nearbyEntity.getScoreboardTags().contains(phantomName + player.getUniqueId())) {
+				Vector direction = nearbyEntity.getLocation().getDirection();
+				direction.multiply(-multiplier);
+				nearbyEntity.teleport(nearbyEntity.getLocation().add(direction));
+			}
+		}
+	}
+
 	public static void applyModifiers(Player p) {
 		String phantomName = DelvesManager.PHANTOM_NAME;
 		if (p.getGameMode() == GameMode.SPECTATOR || p.getGameMode() == GameMode.CREATIVE) {
 			return;
 		}
-		Location loc = p.getLocation().add(new Vector(0, 10, 0));
+		Location loc = p.getLocation().add(p.getLocation().getDirection().multiply(-10));
 		ArmorStand armorStand = null;
 		List<Entity> nearbyEntities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 100, 100, 100);
 		for (Entity nearbyEntity : nearbyEntities) {

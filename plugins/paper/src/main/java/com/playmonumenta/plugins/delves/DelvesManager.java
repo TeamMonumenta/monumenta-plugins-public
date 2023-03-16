@@ -57,6 +57,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -387,6 +388,22 @@ public class DelvesManager implements Listener {
 		if (getRank(player, DelvesModifier.HAUNTED) > 0 && !player.isDead()) {
 			Haunted.applyModifiers(player);
 		}
+	}
+
+	@EventHandler(ignoreCancelled = false)
+	public void entityDeathEvent(EntityDeathEvent event) {
+		if (event.getEntity().getKiller() == null || !(getRank(event.getEntity().getKiller(), DelvesModifier.HAUNTED) > 0)) {
+			return;
+		}
+
+		int multiplier = 1;
+		if (EntityUtils.isElite(event.getEntity())) {
+			multiplier = 4;
+		} else if (EntityUtils.isBoss(event.getEntity())) {
+			multiplier = 10;
+		}
+
+		Haunted.moveBackwards(event.getEntity().getKiller(), multiplier);
 	}
 
 	@EventHandler(ignoreCancelled = true)
