@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ import org.bukkit.util.Vector;
 
 public class ShieldWall extends Ability {
 
-	private static final int SHIELD_WALL_1_DURATION = 8 * 30;
+	private static final int SHIELD_WALL_1_DURATION = 8 * 20;
 	private static final int SHIELD_WALL_2_DURATION = 10 * 20;
 	private static final int SHIELD_WALL_DAMAGE = 3;
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
@@ -44,6 +45,7 @@ public class ShieldWall extends Ability {
 	private static final int SHIELD_WALL_ANGLE = 180;
 	private static final float SHIELD_WALL_2_KNOCKBACK = 0.3f;
 	private static final double SHIELD_WALL_RADIUS = 4.0;
+	private static final int SHIELD_WALL_HEIGHT = 5;
 
 	public static final String CHARM_DURATION = "Shield Wall Duration";
 	public static final String CHARM_DAMAGE = "Shield Wall Damage";
@@ -57,9 +59,20 @@ public class ShieldWall extends Ability {
 			.scoreboardId("ShieldWall")
 			.shorthandName("SW")
 			.descriptions(
-				"Press the swap key while holding a shield in either hand to create a 180 degree arc of particles 5 blocks high and 4 blocks wide in front of the user. " +
-					"This blocks all enemy projectiles (Ghast fireballs explode on the wall) and deals 3 melee damage to enemies that pass through the wall. The shield lasts 8 seconds. Cooldown: 30s.",
-				"The shield lasts 10 seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: 20s.")
+				String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles %s blocks high and %s blocks wide in front of the user. " +
+					"This blocks all enemy projectiles such as arrows or fireballs and deals %s melee damage to enemies that pass through the wall. The shield lasts %s seconds. Cooldown: %ss.",
+					SHIELD_WALL_ANGLE,
+					SHIELD_WALL_HEIGHT,
+					(int) SHIELD_WALL_RADIUS,
+					SHIELD_WALL_DAMAGE,
+					StringUtils.ticksToSeconds(SHIELD_WALL_1_DURATION),
+					StringUtils.ticksToSeconds(SHIELD_WALL_1_COOLDOWN)
+				),
+				String.format("The shield lasts %s seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: %ss.",
+					StringUtils.ticksToSeconds(SHIELD_WALL_2_DURATION),
+					StringUtils.ticksToSeconds(SHIELD_WALL_2_COOLDOWN)
+				)
+			)
 			.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ShieldWall::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
 				new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
@@ -91,7 +104,6 @@ public class ShieldWall extends Ability {
 
 		new BukkitRunnable() {
 			int mT = 0;
-			final int mHeight = 5;
 			final Location mLoc = mPlayer.getLocation();
 			final List<BoundingBox> mBoxes = new ArrayList<>();
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
@@ -102,7 +114,7 @@ public class ShieldWall extends Ability {
 			public void run() {
 				mT++;
 				Vector vec;
-				for (int y = 0; y < mHeight; y++) {
+				for (int y = 0; y < SHIELD_WALL_HEIGHT; y++) {
 					for (double degree = 0; degree < angle; degree += 10) {
 						double radian1 = Math.toRadians(degree - 0.5 * angle);
 						vec = new Vector(-FastUtils.sin(radian1) * SHIELD_WALL_RADIUS, y, FastUtils.cos(radian1) * SHIELD_WALL_RADIUS);
@@ -110,7 +122,7 @@ public class ShieldWall extends Ability {
 
 						Location l = mLoc.clone().add(vec);
 						if (mT % 4 == 0) {
-							mCosmetic.shieldWallDot(mPlayer, l, degree, angle, y, mHeight);
+							mCosmetic.shieldWallDot(mPlayer, l, degree, angle, y, SHIELD_WALL_HEIGHT);
 						}
 						if (!mHitboxes) {
 							mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
