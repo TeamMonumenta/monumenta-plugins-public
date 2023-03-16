@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.delves.mobabilities;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
@@ -48,10 +50,18 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 			for (int i = 0; i < numSpawns; i++) {
 				Location loc = mBoss.getLocation();
 				boolean isWaterLoc = BlockUtils.containsWater(loc.getBlock());
+				Entity entity;
 				if (isWaterLoc) {
-					LibraryOfSoulsIntegration.summon(loc, DREADNAUGHT_WATER);
+					entity = LibraryOfSoulsIntegration.summon(loc, DREADNAUGHT_WATER);
 				} else {
-					LibraryOfSoulsIntegration.summon(loc, DREADNAUGHTS[FastUtils.RANDOM.nextInt(DREADNAUGHTS.length)]);
+					entity = LibraryOfSoulsIntegration.summon(loc, DREADNAUGHTS[FastUtils.RANDOM.nextInt(DREADNAUGHTS.length)]);
+				}
+
+				// Safety net in case the Dreadnaught doesn't get summoned for some reason
+				if (entity != null && mBoss.hasMetadata(Constants.SPAWNER_COUNT_METAKEY)) {
+					/* Include the original mob's metadata for spawner counting on the Dreadnaught. This should prevent
+					   drop farming from Dreadnaughts when a death event is detected in the mob listener. */
+					entity.setMetadata(Constants.SPAWNER_COUNT_METAKEY, mBoss.getMetadata(Constants.SPAWNER_COUNT_METAKEY).get(0));
 				}
 
 				loc.add(0, 1, 0);
