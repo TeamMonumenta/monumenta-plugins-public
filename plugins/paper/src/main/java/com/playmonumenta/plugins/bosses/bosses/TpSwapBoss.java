@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,6 +17,7 @@ public class TpSwapBoss extends BossAbilityGroup {
 		public int DURATION = 50;
 		public int DETECTION = 20;
 		public int COOLDOWN = 12 * 20;
+		public ParticlesList PARTICLE = ParticlesList.fromString("[(PORTAL,10,1,1,1,0.03)]");
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -28,7 +30,7 @@ public class TpSwapBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpSwapPlaces(plugin, boss, p.COOLDOWN, p.RANGE, p.DURATION)));
+			new SpellTpSwapPlaces(plugin, boss, p.COOLDOWN, p.RANGE, p.DURATION, p.PARTICLE)));
 
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
