@@ -498,7 +498,10 @@ public class InventoryUtils {
 		// getStorageContents excludes armor, offhand slots
 		for (ItemStack itemInInventory : inventory.getStorageContents()) {
 			if (itemInInventory == null || itemInInventory.getType() == Material.AIR) {
-				return true;
+				remainingCount -= item.getMaxStackSize();
+				if (remainingCount <= 0) {
+					return true;
+				}
 			} else if (item.isSimilar(itemInInventory)) {
 				remainingCount -= Math.max(0, item.getMaxStackSize() - itemInInventory.getAmount());
 				if (remainingCount <= 0) {

@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -384,7 +385,7 @@ public class LoadoutManager implements Listener {
 			YellowTesseractOverride.setCooldown(player, 0);
 			yellowCooldown = 0;
 		}
-		if (full && loadout.mIncludeClass) {
+		if (full && loadout.mIncludeClass && !ServerProperties.getDepthsEnabled()) {
 			Loadout testLoadout = new Loadout(-1, "test");
 			testLoadout.setClassFromPlayer(player);
 			if (testLoadout.mClass.mClassId != loadout.mClass.mClassId

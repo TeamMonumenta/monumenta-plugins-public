@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -140,7 +141,7 @@ public class UnstableAmalgam extends Ability {
 		}
 
 		// explode existing amalgam
-		if (mAmalgam != null) {
+		if (MetadataUtils.checkOnceInRecentTicks(mPlugin, mPlayer, "UnstableAmalgamCast", 2) && mAmalgam != null) {
 			explode(mAmalgam.getLocation());
 			mAmalgam.remove();
 			mAmalgam = null;

@@ -87,7 +87,8 @@ public class SpellBlockBreak extends Spell {
 					Material material = block.getType();
 
 					BlockData blockData = block.getBlockData();
-					if (material.equals(Material.COBWEB) || material.equals(Material.HONEY_BLOCK) || blockData instanceof TrapDoor || blockData instanceof Fence || blockData instanceof Gate || blockData instanceof Wall || blockData instanceof Rail) {
+					if (material == Material.COBWEB || material == Material.HONEY_BLOCK || material == Material.POWDER_SNOW
+						    || blockData instanceof TrapDoor || blockData instanceof Fence || blockData instanceof Gate || blockData instanceof Wall || blockData instanceof Rail) {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						List<Block> list = new ArrayList<>(1);
 						list.add(block);

@@ -101,8 +101,8 @@ public class Sundrops extends DepthsAbility {
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("Whenever a player in your party breaks a spawner, there is a ")
-			.append(Component.text(DROP_CHANCE[rarity - 1], color))
-			.append(Component.text(" chance of spawning a sundrop. Picking up a sundrop gives " + StringUtils.multiplierToPercentage(PERCENT_SPEED) + "% speed and " + StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%."));
+			       .append(Component.text(DROP_CHANCE[rarity - 1], color))
+			       .append(Component.text("% chance of spawning a sundrop. Picking up a sundrop gives " + StringUtils.multiplierToPercentage(PERCENT_SPEED) + "% speed and " + StringUtils.multiplierToPercentage(-PERCENT_DAMAGE_RECEIVED) + "% resistance for " + DURATION / 20 + " seconds. Spawn chance stacks with other players in your party who have the skill, up to 100%."));
 	}
 
 }

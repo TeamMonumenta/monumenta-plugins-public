@@ -180,8 +180,10 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 		}
 		double bonus = mStacks * (ENHANCED_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS));
 		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(duration, mSpeedAmp + bonus, PERCENT_SPEED_EFFECT_NAME));
-		mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, duration, mJumpBoostAmplifier,
-			true, false, !mPlayer.getScoreboardTags().contains(TOGGLE_TAG)));
+		if (!mPlayer.getScoreboardTags().contains(DISABLE_JUMP_BOOST_TAG)) {
+			mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.JUMP, duration, mJumpBoostAmplifier,
+				true, false, !mPlayer.getScoreboardTags().contains(TOGGLE_TAG)));
+		}
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(duration, DAMAGE_AMPLIFIER_2 + bonus + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE)));
 		}
