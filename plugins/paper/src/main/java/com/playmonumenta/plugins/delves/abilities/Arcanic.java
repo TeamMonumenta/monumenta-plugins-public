@@ -101,7 +101,7 @@ public class Arcanic {
 
 	public static void applyModifiers(LivingEntity mob, int level) {
 		Player nearestPlayer = EntityUtils.getNearestPlayer(mob.getLocation(), 64);
-		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL && !DelvesUtils.isDelveMob(mob)) {
+		if (FastUtils.RANDOM.nextDouble() < ABILITY_CHANCE_PER_LEVEL * level && !DelvesUtils.isDelveMob(mob)) {
 			// This runs prior to BossManager parsing, so we can just add tags directly
 			List<List<String>> abilityPool = new ArrayList<>(ServerProperties.getClassSpecializationsEnabled(nearestPlayer) ? (ServerProperties.getAbilityEnhancementsEnabled(nearestPlayer) ? ABILITY_POOL_R3 : ABILITY_POOL_R2) : ABILITY_POOL_R1);
 			abilityPool.removeIf(ability -> mob.getScoreboardTags().contains(ability.get(0)));

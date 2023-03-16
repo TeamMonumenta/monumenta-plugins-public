@@ -23,11 +23,7 @@ public class Legionary {
 			return;
 		}
 
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level) {
-			DelvesUtils.duplicateLibraryOfSoulsMob(mob);
-		}
-		//Chance for a third if chance > 100
-		if (FastUtils.RANDOM.nextDouble() < SPAWN_CHANCE_PER_LEVEL * level - 1) {
+		for (int i = FastUtils.roundRandomly(SPAWN_CHANCE_PER_LEVEL * level); i > 0; i--) {
 			DelvesUtils.duplicateLibraryOfSoulsMob(mob);
 		}
 	}

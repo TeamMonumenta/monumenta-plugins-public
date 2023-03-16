@@ -31,8 +31,7 @@ public class Colossal {
 	}
 
 	public static void applyModifiers(Location loc, int level) {
-		double percent = FastUtils.RANDOM.nextDouble();
-		if (level == 0 || percent > SPAWN_CHANCE_PER_LEVEL * level) {
+		if (level == 0 || FastUtils.RANDOM.nextDouble() > SPAWN_CHANCE_PER_LEVEL * level) {
 			return;
 		}
 
