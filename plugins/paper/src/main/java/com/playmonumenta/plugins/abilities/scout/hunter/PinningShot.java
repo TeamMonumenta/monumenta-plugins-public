@@ -71,7 +71,7 @@ public class PinningShot extends Ability {
 				EntityUtils.setSlowTicks(mPlugin, enemy, 1);
 				EntityUtils.setWeakenTicks(mPlugin, enemy, 1);
 				if (!EntityUtils.isBoss(enemy)) {
-					DamageUtils.damage(mPlayer, enemy, DamageType.OTHER, EntityUtils.getMaxHealth(enemy) * mDamageMultiplier, mInfo.getLinkedSpell(), true, false);
+					DamageUtils.damage(mPlayer, enemy, DamageType.TRUE, EntityUtils.getMaxHealth(enemy) * mDamageMultiplier, mInfo.getLinkedSpell(), true, false);
 				}
 			}
 		} else {

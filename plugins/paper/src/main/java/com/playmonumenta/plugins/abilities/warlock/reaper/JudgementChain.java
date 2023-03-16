@@ -142,7 +142,7 @@ public class JudgementChain extends Ability {
 	}
 
 	public void passDamage(DamageEvent event) {
-		if (mChainActive && mTarget != null && event.getAbility() != ClassAbility.COUP_DE_GRACE) {
+		if (mChainActive && mTarget != null && event.getType() != DamageType.TRUE) {
 			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
 			e.remove(mTarget);
 			e.removeIf(entity -> mPlugin.mEffectManager.hasEffect(entity, EFFECT_NAME));
@@ -150,7 +150,8 @@ public class JudgementChain extends Ability {
 			LivingEntity selectedEnemy = EntityUtils.getNearestMob(mTarget.getLocation(), e);
 			double damage = event.getDamage();
 
-			if (selectedEnemy != null) {
+			if (selectedEnemy != null && damage > 0) {
+				event.setDamage(0);
 				if (event.getAbility() != null && event.getSource() instanceof Player p) {
 					mDamageInTick.computeIfAbsent(p, key -> new HashMap<>()).computeIfAbsent(event.getAbility(), key -> new ArrayList<>()).add(event);
 					if (!mRunDamageNextTick) {
