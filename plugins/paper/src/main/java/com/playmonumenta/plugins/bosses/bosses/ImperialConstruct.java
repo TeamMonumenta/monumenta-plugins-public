@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +41,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.EntityType;
@@ -62,26 +62,24 @@ public class ImperialConstruct extends BossAbilityGroup {
 	private static final String PHASE_TWO_TAG = "Construct_PhaseTwo";
 	private static final String PHASE_THREE_TAG = "Construct_PhaseThree";
 	private LivingEntity mStart;
-	private int mHealth = 22500;
+	private final int mHealth;
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
 	//Changes based on the current phase
 	private Location mCurrentLoc;
-	//private int mPhase = 1;
 	private Location mPhase2Loc;
 	private Location mPhase3Loc;
 	public @Nullable SpellLingeringParadox mParadox;
 	public @Nullable SpellLingeringParadox mParadox2;
 	public @Nullable SpellLingeringParadox mParadox3;
-	private SpellCrash mCrash;
-	private SpellRush mRush;
-	private SpellRush mRush2;
-	private SpellRecover mRecover;
-	private MinionSpawn mSpawner;
-	private SpellFloor mFloor;
-	private SpellSlice mSlice;
-	private String mEncounterType;
+	private final SpellCrash mCrash;
+	private final SpellRush mRush;
+	private final SpellRush mRush2;
+	private final SpellRecover mRecover;
+	private final MinionSpawn mSpawner;
+	private final SpellFloor mFloor;
+	private final SpellSlice mSlice;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
@@ -92,7 +90,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 	public String serialize() {
 		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
 	}
-
 
 	public ImperialConstruct(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss);
@@ -114,6 +111,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 			}
 		}
 
+		String mEncounterType = "Normal";
 		for (Player p : PlayerUtils.playersInRange(mSpawnLoc, 75, true)) {
 			if (p.getScoreboardTags().contains("SKTQuest")) {
 				mEncounterType = "Story";
@@ -126,6 +124,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 				break;
 			}
 		}
+
 		mCurrentLoc = mStart.getLocation();
 
 		switch (mEncounterType) {
@@ -144,7 +143,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 				SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
-					// Active Spell List
 					mRush,
 					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 110),
 					new SilverBolts(boss, plugin),
@@ -152,7 +150,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				));
 
 				SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
-					// Active Spell List
 					mRush2,
 					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 110),
 					new SilverBolts(boss, plugin),
@@ -165,7 +162,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				));
 
 				List<Spell> passiveSpells = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -174,7 +170,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -184,7 +179,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -194,7 +188,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -206,16 +199,13 @@ public class ImperialConstruct extends BossAbilityGroup {
 				Map<Integer, BossHealthAction> events = new HashMap<>();
 				events.put(100, (mob) -> {
 					mCurrentLoc = mStart.getLocation();
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE")));
+					getDialogueAction1().run(mob);
 				});
 
-				events.put(90, (mob) -> new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1).run());
+				events.put(90, getSteelboreAction(plugin, true, false));
 
 				events.put(80, (mob) -> {
-					new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1).run();
+					getSteelboreAction(plugin, true, false).run(mob);
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
 					}
@@ -228,17 +218,12 @@ public class ImperialConstruct extends BossAbilityGroup {
 				});
 
 				events.put(70, (mob) -> {
-					new SpellSteelboreSpread(plugin, boss, 11, mSpawnLoc, 40, 1).run();
+					getSteelboreAction(plugin, true, false).run(mob);
 					mSlice.run();
 				});
 
 				events.put(66, (mob) -> {
-					mCurrentLoc = mPhase2Loc;
-					mRush.setLocation(mPhase2Loc);
-					mRecover.setLocation(mPhase2Loc);
-					mSpawner.setLocation(mPhase2Loc);
-					mFloor.setLocation(mPhase2Loc);
-					mSlice.setLocation(mPhase2Loc);
+					setSpellLocations(mPhase2Loc);
 					mCrash.run();
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
@@ -248,32 +233,24 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(60, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1).run();
+					getSteelboreAction(plugin, true, false).run(mob);
 				});
 
 				events.put(50, (mob) -> {
 					if (mParadox2 != null) {
 						mParadox2.run();
 					}
-					new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1).run();
+					getSteelboreAction(plugin, true, false).run(mob);
 				});
 
-				events.put(40, (mob) -> new SpellSteelboreSpread(plugin, boss, 11, mPhase2Loc, 40, 1).run());
+				events.put(40, getSteelboreAction(plugin, true, false));
 
 				events.put(33, (mob) -> {
-					mCurrentLoc = mPhase3Loc;
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS")));
+					setSpellLocations(mPhase3Loc);
+					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
-					mRush.setLocation(mPhase3Loc);
-					mRecover.setLocation(mPhase3Loc);
-					mSpawner.setLocation(mPhase3Loc);
-					mFloor.setLocation(mPhase3Loc);
-					mSlice.setLocation(mPhase3Loc);
 					mCrash.run();
-					PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "customeffect @s clear paradox");
+					PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(this::clearParadox);
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
 					}
@@ -283,18 +260,13 @@ public class ImperialConstruct extends BossAbilityGroup {
 				events.put(30, (mob) -> {
 					mSlice.setRingMode(true);
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1).run();
+					getSteelboreAction(plugin, true, true).run(mob);
 					changePhase(finalStandActiveSpells, passiveSpellsPhase3, null);
 				});
 
 				events.put(25, (mob) -> {
-					for (Player p : PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true)) {
-						Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
-					}
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE")));
+					PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true).forEach(this::clearParadox);
+					getDialogueAction3().run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
 					}
@@ -302,7 +274,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(20, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1).run();
+					getSteelboreAction(plugin, true, true).run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
 					}
@@ -311,7 +283,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(10, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 6, mPhase3Loc, 40, 1).run();
+					getSteelboreAction(plugin, true, true).run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
 					}
@@ -322,10 +294,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 					if (mParadox3 != null) {
 						mParadox3.run();
 					}
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED")));
+					getDialogueAction4().run(mob);
 				});
 				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
@@ -345,7 +314,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 				SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
-					// Active Spell List
 					mRush,
 					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
 					new SilverBolts(boss, plugin),
@@ -353,7 +321,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				));
 
 				SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
-					// Active Spell List
 					mRush2,
 					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
 					new SilverBolts(boss, plugin),
@@ -366,7 +333,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				));
 
 				List<Spell> passiveSpells = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -375,7 +341,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -385,7 +350,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -395,7 +359,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -407,16 +370,13 @@ public class ImperialConstruct extends BossAbilityGroup {
 				Map<Integer, BossHealthAction> events = new HashMap<>();
 				events.put(100, (mob) -> {
 					mCurrentLoc = mStart.getLocation();
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE")));
+					getDialogueAction1().run(mob);
 				});
 
-				events.put(90, (mob) -> new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6).run());
+				events.put(90, getSteelboreAction(plugin, false, false));
 
 				events.put(80, (mob) -> {
-					new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6).run();
+					getSteelboreAction(plugin, false, false).run(mob);
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
 					}
@@ -430,16 +390,11 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(70, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 7, mSpawnLoc, 40, 0.6).run();
+					getSteelboreAction(plugin, false, false).run(mob);
 				});
 
 				events.put(66, (mob) -> {
-					mCurrentLoc = mPhase2Loc;
-					mRush.setLocation(mPhase2Loc);
-					mRecover.setLocation(mPhase2Loc);
-					mSpawner.setLocation(mPhase2Loc);
-					mFloor.setLocation(mPhase2Loc);
-					mSlice.setLocation(mPhase2Loc);
+					setSpellLocations(mPhase2Loc);
 					mCrash.run();
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
@@ -449,7 +404,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(60, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run();
+					getSteelboreAction(plugin, false, false).run(mob);
 				});
 
 				events.put(50, (mob) -> new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run());
@@ -457,19 +412,11 @@ public class ImperialConstruct extends BossAbilityGroup {
 				events.put(40, (mob) -> new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run());
 
 				events.put(33, (mob) -> {
-					mCurrentLoc = mPhase3Loc;
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS")));
+					setSpellLocations(mPhase2Loc);
+					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
-					mRush.setLocation(mPhase3Loc);
-					mRecover.setLocation(mPhase3Loc);
-					mSpawner.setLocation(mPhase3Loc);
-					mFloor.setLocation(mPhase3Loc);
-					mSlice.setLocation(mPhase3Loc);
 					mCrash.run();
-					PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "customeffect @s clear paradox");
+					PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(this::clearParadox);
 					if (mParadox != null) {
 						mParadox.spawnExchanger(mCurrentLoc);
 					}
@@ -479,18 +426,13 @@ public class ImperialConstruct extends BossAbilityGroup {
 				events.put(30, (mob) -> {
 					mSlice.setRingMode(true);
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6).run();
+					getSteelboreAction(plugin, false, true).run(mob);
 					changePhase(finalStandActiveSpells, passiveSpellsPhase3, null);
 				});
 
 				events.put(25, (mob) -> {
-					for (Player p : PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true)) {
-						Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
-					}
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE")));
+					PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true).forEach(this::clearParadox);
+					getDialogueAction3().run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
 					}
@@ -498,7 +440,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(20, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6).run();
+					getSteelboreAction(plugin, false, true).run(mob);
 					if (mParadox3 != null) {
 						mParadox3.run();
 					}
@@ -507,14 +449,12 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 				events.put(10, (mob) -> {
 					mSlice.run();
-					new SpellSteelboreSpread(plugin, boss, 3, mPhase3Loc, 40, 0.6).run();
+					getSteelboreAction(plugin, false, true).run(mob);
 					changePhase(finalStandActiveSpells, passiveSpellsPhase3Part3, null);
 				});
 
-				events.put(5, (mob) -> PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.WHITE)
-						.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-						.append(Component.text("TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED"))));
+				events.put(5, getDialogueAction4());
+
 				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
 
@@ -531,7 +471,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				mSlice = new SpellSlice(boss, plugin, mCurrentLoc);
 
 				SpellManager activeSpellsPhase1 = new SpellManager(Arrays.asList(
-					// Active Spell List
 					mRush,
 					new SpellStonemason(boss, plugin, mSpawnLoc, 30, 70),
 					new SilverBolts(boss, plugin),
@@ -539,7 +478,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				));
 
 				SpellManager activeSpellsPhase2 = new SpellManager(Arrays.asList(
-					// Active Spell List
 					mRush2,
 					new SpellStonemason(boss, plugin, mPhase2Loc, 30, 70),
 					new SilverBolts(boss, plugin),
@@ -552,7 +490,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				));
 
 				List<Spell> passiveSpells = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -561,7 +498,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -571,7 +507,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3Part2 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -581,7 +516,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 				);
 
 				List<Spell> passiveSpellsPhase3Part3 = Arrays.asList(
-					// passiveSpells
 					new SpellBlockBreak(boss, 2, 2, 2),
 					mFloor,
 					mRecover,
@@ -593,21 +527,13 @@ public class ImperialConstruct extends BossAbilityGroup {
 				Map<Integer, BossHealthAction> events = new HashMap<>();
 				events.put(100, (mob) -> {
 					mCurrentLoc = mStart.getLocation();
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE")));
+					getDialogueAction1().run(mob);
 				});
 
 				events.put(70, (mob) -> mSlice.run());
 
 				events.put(66, (mob) -> {
-					mCurrentLoc = mPhase2Loc;
-					mRush.setLocation(mPhase2Loc);
-					mRecover.setLocation(mPhase2Loc);
-					mSpawner.setLocation(mPhase2Loc);
-					mFloor.setLocation(mPhase2Loc);
-					mSlice.setLocation(mPhase2Loc);
+					setSpellLocations(mPhase2Loc);
 					mCrash.run();
 					changePhase(activeSpellsPhase2, passiveSpells, null);
 				});
@@ -615,19 +541,11 @@ public class ImperialConstruct extends BossAbilityGroup {
 				events.put(60, (mob) -> mSlice.run());
 
 				events.put(33, (mob) -> {
-					mCurrentLoc = mPhase3Loc;
-					PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-						.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS")));
+					setSpellLocations(mPhase3Loc);
+					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
-					mRush.setLocation(mPhase3Loc);
-					mRecover.setLocation(mPhase3Loc);
-					mSpawner.setLocation(mPhase3Loc);
-					mFloor.setLocation(mPhase3Loc);
-					mSlice.setLocation(mPhase3Loc);
 					mCrash.run();
-					PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "customeffect @s clear paradox");
+					PlayerUtils.playersInRange(spawnLoc, detectionRange, true).forEach(this::clearParadox);
 					changePhase(finalStandActiveSpells, passiveSpells, null);
 				});
 
@@ -638,12 +556,8 @@ public class ImperialConstruct extends BossAbilityGroup {
 				});
 
 				events.put(25, (mob) -> {
-					for (Player p : PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true)) {
-						Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
-						p.sendMessage(Component.text("", NamedTextColor.WHITE)
-							.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-							.append(Component.text("TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE")));
-					}
+					PlayerUtils.playersInRange(boss.getLocation(), detectionRange, true).forEach(this::clearParadox);
+					getDialogueAction3().run(mob);
 				});
 
 				events.put(20, (mob) -> {
@@ -656,15 +570,57 @@ public class ImperialConstruct extends BossAbilityGroup {
 					changePhase(finalStandActiveSpells, passiveSpellsPhase3Part3, null);
 				});
 
-				events.put(5, (mob) -> PlayerUtils.nearbyPlayersAudience(spawnLoc, detectionRange)
-					.sendMessage(Component.text("", NamedTextColor.WHITE)
-						.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-						.append(Component.text("TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED"))));
+				events.put(5, getDialogueAction4());
 
 				BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 				super.constructBoss(activeSpellsPhase1, passiveSpells, detectionRange, bossBar);
 			}
 		}
+	}
+
+	private void clearParadox(Player p) {
+		Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
+	}
+
+	private BossBarManager.BossHealthAction getSteelboreAction(Plugin plugin, boolean savage, boolean phase3) {
+		double damage = savage ? 1 : 0.6;
+		int radius = savage ? (phase3 ? 11 : 6) : (phase3 ? 7 : 3);
+		return boss -> new SpellSteelboreSpread(plugin, boss, radius, mCurrentLoc, 40, damage).run();
+	}
+
+	private Component getMessageComponent(String text) {
+		return Component.text("", NamedTextColor.WHITE)
+			.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
+			.append(Component.text(text));
+	}
+
+	private BossBarManager.BossHealthAction getDialogueAction(String text) {
+		return mBoss -> PlayerUtils.nearbyPlayersAudience(mSpawnLoc, detectionRange).sendMessage(getMessageComponent(text));
+	}
+
+	private BossBarManager.BossHealthAction getDialogueAction1() {
+		return getDialogueAction("UNAUTHORIZED ENTITY DETECTED: IMPLEMENTING REMOVAL PROCEDURE");
+	}
+
+	private BossBarManager.BossHealthAction getDialogueAction2() {
+		return getDialogueAction("INTERNAL DAMAGE CRITICAL: REALIGNING CURRENT DIRECTIVE: DESTROY INTRUDERS");
+	}
+
+	private BossBarManager.BossHealthAction getDialogueAction3() {
+		return getDialogueAction("TEMPORAL ANOMALY DETECTED: INTRUDERS BEWARE");
+	}
+
+	private BossBarManager.BossHealthAction getDialogueAction4() {
+		return getDialogueAction("TOMB DEFENSES COMPROMISED: FORGE DEFENSES ACTIVATED");
+	}
+
+	private void setSpellLocations(Location loc) {
+		mCurrentLoc = loc;
+		mRush.setLocation(loc);
+		mRecover.setLocation(loc);
+		mSpawner.setLocation(loc);
+		mFloor.setLocation(loc);
+		mSlice.setLocation(loc);
 	}
 
 	@Override
@@ -679,8 +635,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, mHealth);
-		mBoss.setHealth(mHealth);
+		EntityUtils.setMaxHealthAndHealth(mBoss, mHealth);
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Silver Construct", ChatColor.RED + "Forgotten Defender");
@@ -694,9 +649,8 @@ public class ImperialConstruct extends BossAbilityGroup {
 		if (event == null) {
 			return;
 		}
-		for (Player p : PlayerUtils.playersInRange(event.getEntity().getLocation(), detectionRange, true)) {
-			Plugin.getInstance().mEffectManager.clearEffects(p, "Paradox");
-		}
+		List<Player> players = PlayerUtils.playersInRange(event.getEntity().getLocation(), detectionRange, true);
+		players.forEach(this::clearParadox);
 		World world = mBoss.getWorld();
 		if (event.getEntity().getKiller() != null) {
 			new BukkitRunnable() {
@@ -708,13 +662,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 						mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.HOSTILE, 10, 0);
 						this.cancel();
 						mBoss.remove();
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-
-								mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-							}
-						}.runTaskLater(mPlugin, 20 * 3);
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK), 20 * 3);
 					}
 
 					if (mTicks % 10 == 0) {
@@ -725,14 +673,11 @@ public class ImperialConstruct extends BossAbilityGroup {
 					mTicks += 2;
 				}
 			}.runTaskTimer(mPlugin, 0, 2);
-			for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+			for (Player player : players) {
 				player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
-				player.sendMessage(Component.text("", NamedTextColor.WHITE)
-					.append(Component.text("[Silver Construct] ", NamedTextColor.GOLD))
-					.append(Component.text("PRIME DIRECTIVE FAILED: TOMB HAS BEEN BREACHED. ENABLING FORGE DEFENCES.")));
+				player.sendMessage(getMessageComponent("PRIME DIRECTIVE FAILED: TOMB HAS BEEN BREACHED. ENABLING FORGE DEFENCES."));
 			}
 		}
-
 
 		mSpawner.removeMobs();
 		if (mParadox != null) {
