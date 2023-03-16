@@ -848,7 +848,7 @@ public class WalletManager implements Listener {
 
 	@Contract("null -> null")
 	private static @Nullable WalletManager.WalletSettings getSettings(@Nullable ItemStack item) {
-		return item == null ? null : WALLET_SETTINGS.get(ItemUtils.getIdentifier(item));
+		return item == null ? null : WALLET_SETTINGS.get(ItemUtils.getIdentifier(item, false));
 	}
 
 	public static boolean isWallet(@Nullable ItemStack itemStack) {

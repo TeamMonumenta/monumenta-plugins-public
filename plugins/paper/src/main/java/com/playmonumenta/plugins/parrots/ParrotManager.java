@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
@@ -36,56 +37,49 @@ public class ParrotManager implements Listener {
 
 	public enum ParrotVariant {
 		//minecraft default
-		RED("Scarlet Macaw", 1, Parrot.Variant.RED),
-		BLUE("Hyacinth Macaw", 2, Parrot.Variant.BLUE),
-		CYAN("Blue-Yellow Macaw", 3, Parrot.Variant.CYAN),
-		GREEN("Green Parakeet", 4, Parrot.Variant.GREEN),
-		GRAY("Gray Cockatiel", 5, Parrot.Variant.GRAY),
+		RED("Scarlet Macaw", 1, Parrot.Variant.RED, Material.RED_WOOL),
+		BLUE("Hyacinth Macaw", 2, Parrot.Variant.BLUE, Material.BLUE_WOOL),
+		CYAN("Blue-Yellow Macaw", 3, Parrot.Variant.CYAN, Material.LIGHT_BLUE_WOOL),
+		GREEN("Green Parakeet", 4, Parrot.Variant.GREEN, Material.GREEN_WOOL),
+		GRAY("Gray Cockatiel", 5, Parrot.Variant.GRAY, Material.LIGHT_GRAY_WOOL),
 
 		//added with texture
-		PATREON("Patreon Parakeet", 6, Parrot.Variant.RED) {
+		PATREON("Patreon Parakeet", 6, Parrot.Variant.RED, Material.ORANGE_WOOL) {
 			@Override
 			public boolean hasUnlocked(Player player) {
 				return ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.PATREON_DOLLARS).orElse(0) > Constants.PATREON_TIER_1;
 			}
 		},
-		PULSATING_GOLD("Golden Conure", 7, Parrot.Variant.CYAN),
-		PULSATING_EMERALD("Emerald Conure", 8, Parrot.Variant.GREEN),
-		PIRATE("Scoundrel Macaw", 9, Parrot.Variant.BLUE),
-		KAUL("Blackroot Kakapo", 10, Parrot.Variant.GREEN),
-		ELDRASK("Permafrost Kea", 11, Parrot.Variant.CYAN),
-		RAINBOW("Rainbow Parrot", 12, Parrot.Variant.CYAN),
-		SNOWY("Snowy Cockatoo", 13, Parrot.Variant.GRAY),
-		DEPTHS("Otherworldly Myiopsitta", 14, Parrot.Variant.RED),
-		DEPTHS_UPGRADE("Otherworldly Myiopsitta (u)", 15, Parrot.Variant.BLUE),
-		BEE("Bee Conure", 16, Parrot.Variant.CYAN),
-		RADIANT("Radiant Conure", 17, Parrot.Variant.CYAN),
-		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE),
-		BLITZ("Plushy Parrot", 19, Parrot.Variant.RED),
-		CORRIDORS("Crimson Lace", 20, Parrot.Variant.RED),
-		TWISTED("Twisted Torrap", 21, Parrot.Variant.BLUE);
+		PULSATING_GOLD("Golden Conure", 7, Parrot.Variant.CYAN, Material.YELLOW_CONCRETE),
+		PULSATING_EMERALD("Emerald Conure", 8, Parrot.Variant.GREEN, Material.GREEN_CONCRETE),
+		PIRATE("Scoundrel Macaw", 9, Parrot.Variant.BLUE, Material.PURPLE_WOOL),
+		KAUL("Blackroot Kakapo", 10, Parrot.Variant.GREEN, Material.JUNGLE_LEAVES),
+		ELDRASK("Permafrost Kea", 11, Parrot.Variant.CYAN, Material.BLUE_ICE),
+		RAINBOW("Rainbow Parrot", 12, Parrot.Variant.CYAN, Material.YELLOW_GLAZED_TERRACOTTA),
+		SNOWY("Snowy Cockatoo", 13, Parrot.Variant.GRAY, Material.SNOW_BLOCK),
+		DEPTHS("Otherworldly Myiopsitta", 14, Parrot.Variant.RED, Material.RED_GLAZED_TERRACOTTA),
+		DEPTHS_UPGRADE("Otherworldly Myiopsitta (u)", 15, Parrot.Variant.BLUE, Material.CRYING_OBSIDIAN),
+		BEE("Bee Conure", 16, Parrot.Variant.CYAN, Material.HONEYCOMB_BLOCK),
+		RADIANT("Radiant Conure", 17, Parrot.Variant.CYAN, Material.GLOWSTONE),
+		HEKAWT("Veil Electus", 18, Parrot.Variant.BLUE, Material.MAGMA_BLOCK),
+		BLITZ("Plushy Parrot", 19, Parrot.Variant.RED, Material.RED_WOOL),
+		CORRIDORS("Crimson Lace", 20, Parrot.Variant.RED, Material.NETHER_WART_BLOCK),
+		TWISTED("Twisted Torrap", 21, Parrot.Variant.BLUE, Material.BEDROCK);
 
+		private final String mName;
+		private final int mNumber;
+		private final Parrot.Variant mVariant;
+		private final Material mDisplayitem;
 
-		private String mName;
-		private int mNumber;
-		private Parrot.Variant mVariant;
-
-		ParrotVariant(String name, int num, Parrot.Variant variant) {
+		ParrotVariant(String name, int num, Parrot.Variant variant, Material displayitem) {
 			this.mName = name;
 			this.mNumber = num;
 			this.mVariant = variant;
-		}
-
-		public void setNumber(int num) {
-			this.mNumber = num;
+			mDisplayitem = displayitem;
 		}
 
 		public int getNumber() {
 			return this.mNumber;
-		}
-
-		public void setName(String name) {
-			this.mName = name;
 		}
 
 		public String getName() {
@@ -96,8 +90,8 @@ public class ParrotManager implements Listener {
 			return this.mVariant;
 		}
 
-		public void setVariant(Parrot.Variant variant) {
-			this.mVariant = variant;
+		public Material getDisplayitem() {
+			return mDisplayitem;
 		}
 
 		public static @Nullable ParrotVariant getVariantByNumber(int number) {

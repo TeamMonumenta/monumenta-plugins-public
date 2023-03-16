@@ -63,8 +63,8 @@ public class VanityManager implements Listener {
 		public boolean mLockboxSwapEnabled = true;
 		public boolean mGuiVanityEnabled = true;
 
-		public void equip(EquipmentSlot slot, @Nullable ItemStack item) {
-			if (item == null || item.getType() == Material.AIR) {
+		public void equip(EquipmentSlot slot, @Nullable ItemStack item, @Nullable Player verifyForPlayer) {
+			if (item == null || item.getType() == Material.AIR || (verifyForPlayer != null && !isValidVanityItem(verifyForPlayer, item, slot))) {
 				mEquipped.remove(slot);
 			} else {
 				item = cleanCopyForDisplay(item);
@@ -73,10 +73,10 @@ public class VanityManager implements Listener {
 			}
 		}
 
-		public void setEquipped(Map<EquipmentSlot, ItemStack> vanity) {
+		public void setEquipped(Map<EquipmentSlot, ItemStack> vanity, @Nullable Player verifyForPlayer) {
 			mEquipped.clear();
 			for (Map.Entry<EquipmentSlot, ItemStack> entry : vanity.entrySet()) {
-				equip(entry.getKey(), entry.getValue());
+				equip(entry.getKey(), entry.getValue(), verifyForPlayer);
 			}
 		}
 
@@ -133,7 +133,7 @@ public class VanityManager implements Listener {
 					ItemStatUtils.generateItemStats(item);
 					ItemStatUtils.markClean(item);
 				}
-				vanityData.equip(slot, item);
+				vanityData.equip(slot, item, null);
 			}
 		}
 		vanityData.mSelfVanityEnabled = data.getAsJsonPrimitive("selfVanityEnabled").getAsBoolean();
@@ -318,7 +318,7 @@ public class VanityManager implements Listener {
 	}
 
 	/**
-	 * Applies vanity to the given item, Modifies the passed-in item stack!
+	 * Applies vanity to the given item. Modifies the passed-in item stack!
 	 *
 	 * @param itemStack     Real item stack to apply vanity to (will be modified!)
 	 * @param vanityData    Vanity data for the player
@@ -327,6 +327,10 @@ public class VanityManager implements Listener {
 	 */
 	public static void applyVanity(ItemStack itemStack, VanityData vanityData, EquipmentSlot equipmentSlot, boolean self) {
 		ItemStack vanityItem = vanityData.getEquipped(equipmentSlot);
+		applyVanity(itemStack, vanityItem, equipmentSlot, self);
+	}
+
+	public static void applyVanity(ItemStack itemStack, @Nullable ItemStack vanityItem, EquipmentSlot equipmentSlot, boolean self) {
 		if (vanityItem != null && vanityItem.getType() != Material.AIR) {
 			if (self
 				    && equipmentSlot == EquipmentSlot.OFF_HAND

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.AbilitySilence;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
@@ -78,14 +77,14 @@ public class ShulkerEquipmentListener implements Listener {
 		.build();
 
 	private static final ImmutableMap<Integer, Integer> CHARM_SLOTS = ImmutableMap.<Integer, Integer>builder()
-		.put(0, 18)
-		.put(1, 19)
-		.put(2, 20)
-		.put(3, 21)
-		.put(4, 22)
-		.put(5, 23)
-		.put(6, 24)
-		.build();
+		                                                                  .put(0, 18)
+		                                                                  .put(1, 19)
+		                                                                  .put(2, 20)
+		                                                                  .put(3, 21)
+		                                                                  .put(4, 22)
+		                                                                  .put(5, 23)
+		                                                                  .put(6, 24)
+		                                                                  .build();
 
 
 	private final Plugin mPlugin;
@@ -93,6 +92,29 @@ public class ShulkerEquipmentListener implements Listener {
 
 	public ShulkerEquipmentListener(Plugin plugin) {
 		mPlugin = plugin;
+	}
+
+	public static boolean checkAllowedToSwapEquipment(Player player) {
+
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
+			player.sendMessage(ChatColor.RED + "You can't use this here");
+			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+			return false;
+		}
+
+		if (player.getLocation().getY() < player.getWorld().getMinHeight()) {
+			player.sendMessage(ChatColor.RED + "You can't use this in the void");
+			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+			return false;
+		}
+
+		if (EntityUtils.touchesLava(player)) {
+			player.sendMessage(ChatColor.RED + "You can't use this in lava");
+			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+			return false;
+		}
+
+		return true;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -121,21 +143,7 @@ public class ShulkerEquipmentListener implements Listener {
 			return;
 		}
 
-		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
-			player.sendMessage(ChatColor.RED + "You can't use this here");
-			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
-			return;
-		}
-
-		if (player.getLocation().getY() < player.getWorld().getMinHeight()) {
-			player.sendMessage(ChatColor.RED + "You can't use this in the void");
-			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
-			return;
-		}
-
-		if (EntityUtils.touchesLava(player)) {
-			player.sendMessage(ChatColor.RED + "You can't use this in lava");
-			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
+		if (!checkAllowedToSwapEquipment(player)) {
 			return;
 		}
 
@@ -146,7 +154,8 @@ public class ShulkerEquipmentListener implements Listener {
 			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta && sMeta.getBlockState() instanceof ShulkerBox sbox && sbox.isLocked()) {
 				String lock = sbox.getLock();
 				if (lock.equals(LOCK_STRING)) {
-					if (checkCooldownAndSetIfApplicable(player, event, "Lockbox")) {
+					if (!checkCooldownAndSetIfApplicable(player, "Lockbox")) {
+						event.setCancelled(true);
 						return;
 					}
 
@@ -160,13 +169,11 @@ public class ShulkerEquipmentListener implements Listener {
 
 					player.updateInventory();
 					event.setCancelled(true);
-					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
-					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, true);
-					}
+					mPlugin.mItemStatManager.updateStats(player);
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				} else if (lock.equals(CHARM_STRING)) {
-					if (checkCooldownAndSetIfApplicable(player, event, "C.H.A.R.M. 2000")) {
+					if (!checkCooldownAndSetIfApplicable(player, "C.H.A.R.M. 2000")) {
+						event.setCancelled(true);
 						return;
 					}
 
@@ -178,7 +185,8 @@ public class ShulkerEquipmentListener implements Listener {
 					CharmManager.getInstance().updateCharms(player);
 					event.setCancelled(true);
 				} else if (lock.equals(PORTAL_EPIC_STRING)) {
-					if (checkCooldownAndSetIfApplicable(player, event, "Omnilockbox")) {
+					if (!checkCooldownAndSetIfApplicable(player, "Omnilockbox")) {
+						event.setCancelled(true);
 						return;
 					}
 
@@ -216,10 +224,7 @@ public class ShulkerEquipmentListener implements Listener {
 					CharmManager.getInstance().updateCharms(player);
 					event.setCancelled(true);
 
-					Map<UUID, ItemStatManager.PlayerItemStats> itemStatsMap = mPlugin.mItemStatManager.getPlayerItemStatsMappings();
-					if (itemStatsMap.containsKey(player.getUniqueId())) {
-						itemStatsMap.get(player.getUniqueId()).updateStats(player, true, true);
-					}
+					mPlugin.mItemStatManager.updateStats(player);
 					InventoryUtils.scheduleDelayedEquipmentCheck(mPlugin, player, null);
 				}
 			}
@@ -270,11 +275,19 @@ public class ShulkerEquipmentListener implements Listener {
 		return SWAP_SLOTS.get(playerInventorySlot);
 	}
 
+	/**
+	 * Checks if an item can be put into a loadout lockbox. Non-shulker items aare always allowed.
+	 * For Shulkers, only Firmament, Worldshaper's Loom, and Potion Injector (and skins/upgrades of each) are allowed.
+	 */
+	public static boolean canSwapItem(@Nullable ItemStack item) {
+		return item == null || !ItemUtils.isShulkerBox(item.getType()) || FirmamentOverride.isFirmamentItem(item) || WorldshaperOverride.isWorldshaperItem(item) || isPotionInjectorItem(item);
+	}
+
 	private void swapEquipment(Player player, PlayerInventory pInv, ShulkerBox sbox) {
 		/* Prevent swapping/nesting shulkers */
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
-			if (item != null && ItemUtils.isShulkerBox(item.getType()) && !FirmamentOverride.isFirmamentItem(item) && !WorldshaperOverride.isWorldshaperItem(item) && !isPotionInjectorItem(item)) {
+			if (!canSwapItem(item)) {
 				player.sendMessage(ChatColor.RED + "You can not store shulker boxes");
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
 				return;
@@ -339,7 +352,7 @@ public class ShulkerEquipmentListener implements Listener {
 			} else {
 				vanityItems.setItemStack(slotKey, oldVanity);
 			}
-			vanityData.equip(slot, newVanity);
+			vanityData.equip(slot, newVanity, null);
 		}
 	}
 
@@ -399,7 +412,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 	private void swapSkills(Player player, ItemStack item) {
 		ItemMeta itemMeta = YellowTesseractOverride.generateAbilityLore(player, item);
-		YellowTesseractOverride.loadAbilityFromLore(player, item);
+		YellowTesseractOverride.loadClassFromLore(player, item);
 
 		// Set new lore
 		item.setItemMeta(itemMeta);
@@ -408,26 +421,34 @@ public class ShulkerEquipmentListener implements Listener {
 		ItemUtils.setPlainTag(item);
 	}
 
-	// Returns true if event is the cooldown was previously active, i.e. items should not be swapped
-	private boolean checkCooldownAndSetIfApplicable(Player player, InventoryClickEvent event, String name) {
+	public boolean checkCooldown(Player player, String name) {
 		if (checkLockboxSwapCooldown(player)) {
 			player.sendMessage(Component.text(name + " is on cooldown!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			event.setCancelled(true);
-			return true;
+			return false;
 		}
+		return true;
+	}
 
+	public void startCooldownIfApplicable(Player player, String name) {
 		Location loc = player.getLocation();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, 24)) {
 			if (EntityUtils.isBoss(mob) && !EntityUtils.isTrainingDummy(mob)) {
 				// should be last message
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> player.sendMessage(Component.text("Because you are close to a boss, the " + name + " has been put on a 15s cooldown!", NamedTextColor.RED)));
 				setLockboxSwapCooldown(player);
-				break;
+				return;
 			}
 		}
+	}
 
-		return false;
+	// Returns true if event is the cooldown was previously active, i.e. items should not be swapped
+	public boolean checkCooldownAndSetIfApplicable(Player player, String name) {
+		if (!checkCooldown(player, name)) {
+			return false;
+		}
+		startCooldownIfApplicable(player, name);
+		return true;
 	}
 
 	//Set cooldown after swapping in RADIUS 24 blocks of boss

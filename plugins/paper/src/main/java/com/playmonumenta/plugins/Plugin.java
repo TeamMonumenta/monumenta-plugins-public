@@ -41,6 +41,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.*;
+import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
@@ -135,6 +136,8 @@ public class Plugin extends JavaPlugin {
 	public CosmeticsManager mCosmeticsManager;
 	public SeasonalEventManager mSeasonalEventManager;
 	public VanityManager mVanityManager;
+	public LoadoutManager mLoadoutManager;
+	public ShulkerEquipmentListener mShulkerEquipmentListener;
 	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
@@ -249,6 +252,7 @@ public class Plugin extends JavaPlugin {
 		DungeonAccessCommand.register();
 		SpawnerCountCommand.register();
 		PersistentDataCommand.register();
+		LoadoutManagerCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -323,6 +327,8 @@ public class Plugin extends JavaPlugin {
 		mSeasonalEventManager = new SeasonalEventManager();
 		mActivityManager = new ActivityManager(this);
 		mVanityManager = new VanityManager();
+		mLoadoutManager = new LoadoutManager();
+		mShulkerEquipmentListener = new ShulkerEquipmentListener(this);
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -369,7 +375,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new VehicleListener(this), this);
 		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
-		manager.registerEvents(new ShulkerEquipmentListener(this), this);
+		manager.registerEvents(mShulkerEquipmentListener, this);
 		manager.registerEvents(new PortableEnderListener(), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(new ZoneListener(), this);
@@ -403,6 +409,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new QuiverListener(), this);
 		manager.registerEvents(new ToggleTrail(), this);
 		manager.registerEvents(mVanityManager, this);
+		manager.registerEvents(mLoadoutManager, this);
 		manager.registerEvents(POIManager.getInstance(), this);
 		manager.registerEvents(new BrokenEquipmentListener(), this);
 		manager.registerEvents(PortalManager.getInstance(), this);

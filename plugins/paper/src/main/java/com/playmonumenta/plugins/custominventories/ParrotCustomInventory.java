@@ -340,42 +340,42 @@ public final class ParrotCustomInventory extends CustomInventory {
 		//==================================================================================================
 
 		//GREEN
-		createParrotItems(playerLoad, ParrotVariant.GREEN, ParrotGUIPage.R1, 10, Material.GREEN_WOOL, "ParrotBought4",
+		createParrotItems(playerLoad, ParrotVariant.GREEN, ParrotGUIPage.R1, 10, "ParrotBought4",
 			ImmutableMap.of(hxp, 48));
 
 		//GRAY
-		createParrotItems(playerLoad, ParrotVariant.GRAY, ParrotGUIPage.R1, 11, Material.LIGHT_GRAY_WOOL, "ParrotBought5",
+		createParrotItems(playerLoad, ParrotVariant.GRAY, ParrotGUIPage.R1, 11, "ParrotBought5",
 			ImmutableMap.of(hxp, 48));
 
 		//GOLD
-		createParrotItems(playerLoad, ParrotVariant.PULSATING_GOLD, ParrotGUIPage.R1, 12, Material.YELLOW_CONCRETE, "ParrotBought7",
+		createParrotItems(playerLoad, ParrotVariant.PULSATING_GOLD, ParrotGUIPage.R1, 12, "ParrotBought7",
 			ImmutableMap.of(pulsatingGold, 64));
 
 		//BEE Parrot!
-		createParrotItems(playerLoad, ParrotVariant.BEE, ParrotGUIPage.R1, 13, Material.HONEYCOMB_BLOCK, "ParrotBought16",
+		createParrotItems(playerLoad, ParrotVariant.BEE, ParrotGUIPage.R1, 13, "ParrotBought16",
 			ImmutableMap.of(hxp, 80));
 
 		//Radiant
-		createParrotItems(playerLoad, ParrotVariant.RADIANT, ParrotGUIPage.R1, 14, Material.GLOWSTONE, "ParrotBought17",
+		createParrotItems(playerLoad, ParrotVariant.RADIANT, ParrotGUIPage.R1, 14, "ParrotBought17",
 			List.of("Defeat Arena of Terth to learn more about this parrot"),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Arena").orElse(0) != 0,
 			ImmutableMap.of(hxp, 48));
 
 		//Kaul!
-		createParrotItems(playerLoad, ParrotVariant.KAUL, ParrotGUIPage.R1, 15, Material.JUNGLE_LEAVES, "ParrotBought10",
+		createParrotItems(playerLoad, ParrotVariant.KAUL, ParrotGUIPage.R1, 15, "ParrotBought10",
 			List.of("Requires 50 Kaul wins to buy", "You still need " + (50 - ScoreboardUtils.getScoreboardValue(playerLoad, "KaulWins").orElse(0)) + " wins"),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "KaulWins").orElse(0) >= 50,
 			ImmutableMap.of(shardOfTheMantle, 80));
 
 		//Plunderer's Blitz
-		createParrotItems(playerLoad, ParrotVariant.BLITZ, ParrotGUIPage.R1, 16, Material.RED_WOOL, "ParrotBought19",
+		createParrotItems(playerLoad, ParrotVariant.BLITZ, ParrotGUIPage.R1, 16, "ParrotBought19",
 			List.of("Requires having beaten the 50th round in Plunderer's Blitz",
 				"You have reached round " + (ScoreboardUtils.getScoreboardValue(playerLoad, "Blitz").orElse(1) - 1)),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "Blitz").orElse(0) > 50,
 			ImmutableMap.of(blitzDoubloon, 128));
 
 		int corridorsScore = ScoreboardUtils.getScoreboardValue(playerLoad, "RogEndless").orElse(0);
-		createParrotItems(playerLoad, ParrotVariant.CORRIDORS, ParrotGUIPage.R1, 19, Material.NETHER_WART_BLOCK, "ParrotBought20",
+		createParrotItems(playerLoad, ParrotVariant.CORRIDORS, ParrotGUIPage.R1, 19, "ParrotBought20",
 			List.of("Requires clearing floor 12 from Ephemeral Corridors", "You have cleared floor " + corridorsScore),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(playerLoad, "RogEndless").orElse(0) > 12,
 			ImmutableMap.of(persistentParchment, 24));
@@ -389,44 +389,44 @@ public final class ParrotCustomInventory extends CustomInventory {
 		//==================================================================================================
 
 		//RED PARROT
-		createParrotItems(playerLoad, ParrotVariant.RED, ParrotGUIPage.R2, 10, Material.RED_WOOL, "ParrotBought1",
+		createParrotItems(playerLoad, ParrotVariant.RED, ParrotGUIPage.R2, 10, "ParrotBought1",
 			ImmutableMap.of(hcs, 48));
 
 		//BLUE PARROT
-		createParrotItems(playerLoad, ParrotVariant.BLUE, ParrotGUIPage.R2, 11, Material.BLUE_WOOL, "ParrotBought2",
+		createParrotItems(playerLoad, ParrotVariant.BLUE, ParrotGUIPage.R2, 11, "ParrotBought2",
 			ImmutableMap.of(hcs, 48));
 
 		//BLUE-YELLOW
-		createParrotItems(playerLoad, ParrotVariant.CYAN, ParrotGUIPage.R2, 12, Material.LIGHT_BLUE_WOOL, "ParrotBought3",
+		createParrotItems(playerLoad, ParrotVariant.CYAN, ParrotGUIPage.R2, 12, "ParrotBought3",
 			ImmutableMap.of(hcs, 48));
 
 		//EMERALD
-		createParrotItems(playerLoad, ParrotVariant.PULSATING_EMERALD, ParrotGUIPage.R2, 13, Material.GREEN_CONCRETE, "ParrotBought8",
+		createParrotItems(playerLoad, ParrotVariant.PULSATING_EMERALD, ParrotGUIPage.R2, 13, "ParrotBought8",
 			ImmutableMap.of(pulsatingEmerald, 64));
 
 		//PIRATE
-		createParrotItems(playerLoad, ParrotVariant.PIRATE, ParrotGUIPage.R2, 14, Material.PURPLE_WOOL, "ParrotBought9",
+		createParrotItems(playerLoad, ParrotVariant.PIRATE, ParrotGUIPage.R2, 14, "ParrotBought9",
 			ImmutableMap.of(hcs, 80));
 
 		//Snowy
-		createParrotItems(playerLoad, ParrotVariant.SNOWY, ParrotGUIPage.R2, 15, Material.SNOW_BLOCK, "ParrotBought13",
+		createParrotItems(playerLoad, ParrotVariant.SNOWY, ParrotGUIPage.R2, 15, "ParrotBought13",
 			ImmutableMap.of(hcs, 80));
 
 		//Eldrask
-		createParrotItems(playerLoad, ParrotVariant.ELDRASK, ParrotGUIPage.R2, 16, Material.BLUE_ICE, "ParrotBought11",
+		createParrotItems(playerLoad, ParrotVariant.ELDRASK, ParrotGUIPage.R2, 16, "ParrotBought11",
 			List.of("Requires 50 Eldrask wins to buy", "You still need " + (50 - ScoreboardUtils.getScoreboardValue(playerLoad, "FGWins").orElse(0)) + " wins"),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "FGWins").orElse(0) >= 50,
 			ImmutableMap.of(titanicKnowledge, 80));
 
 		//Hekawt - Lich
-		createParrotItems(playerLoad, ParrotVariant.HEKAWT, ParrotGUIPage.R2, 19, Material.MAGMA_BLOCK, "ParrotBought18",
+		createParrotItems(playerLoad, ParrotVariant.HEKAWT, ParrotGUIPage.R2, 19, "ParrotBought18",
 			List.of("Requires 50 Hekawt wins to buy", "You still need " + (50 - ScoreboardUtils.getScoreboardValue(playerLoad, "LichWins").orElse(0)) + " wins"),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "LichWins").orElse(0) >= 50,
 			ImmutableMap.of(ancestralEffigy, 80));
 
 		//Depths
 		int depthsScore = ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0);
-		createParrotItems(playerLoad, ParrotVariant.DEPTHS, ParrotGUIPage.R2, 20, Material.RED_GLAZED_TERRACOTTA, "ParrotBought14",
+		createParrotItems(playerLoad, ParrotVariant.DEPTHS, ParrotGUIPage.R2, 20, "ParrotBought14",
 			List.of("Requires clearing floor 9 from Darkest Depths", "You have cleared floor " + ((depthsScore - 1) / 10)),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(playerLoad, "DepthsEndless").orElse(0) >= 91,
 			ImmutableMap.of(voidstainedGeode, 64),
@@ -435,7 +435,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(playerLoad, "Depths").orElse(0) > 0);
 
 		//Depths Upgrade
-		createParrotItems(playerLoad, ParrotVariant.DEPTHS_UPGRADE, ParrotGUIPage.R2, 21, Material.CRYING_OBSIDIAN, "ParrotBought15",
+		createParrotItems(playerLoad, ParrotVariant.DEPTHS_UPGRADE, ParrotGUIPage.R2, 21, "ParrotBought15",
 			List.of("Requires clearing floor 12 from Darkest Depths", "You have cleared floor " + ((depthsScore - 1) / 10)),
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "DepthsEndless").orElse(0) >= 121,
 			ImmutableMap.of(voidstainedGeode, 96),
@@ -497,7 +497,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		} else {
 			rainbowCost.add("##Gray Cockatiel");
 		}
-		createParrotItems(playerLoad, ParrotVariant.RAINBOW, ParrotGUIPage.SPECIAL, 11, Material.YELLOW_GLAZED_TERRACOTTA,
+		createParrotItems(playerLoad, ParrotVariant.RAINBOW, ParrotGUIPage.SPECIAL, 11,
 			"ParrotBought12", rainbowCost,
 			(player, inv) -> ScoreboardUtils.getScoreboardValue(player, "ParrotBought1").orElse(0) > 0 &&
 				                 ScoreboardUtils.getScoreboardValue(player, "ParrotBought2").orElse(0) > 0 &&
@@ -524,11 +524,11 @@ public final class ParrotCustomInventory extends CustomInventory {
 		}
 
 		if (twistedUnlocked) {
-			createParrotItems(playerLoad, ParrotVariant.TWISTED, ParrotGUIPage.SPECIAL, 12, Material.BEDROCK, "ParrotBought21", ImmutableMap.of());
+			createParrotItems(playerLoad, ParrotVariant.TWISTED, ParrotGUIPage.SPECIAL, 12, "ParrotBought21", ImmutableMap.of());
 		} else {
 			ItemStack stack = buildItem(Material.BEDROCK, ChatColor.MAGIC + "Twisted?????", List.of());
 			ItemUtils.setPlainName(stack, ParrotVariant.TWISTED.getName());
-			GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 12, stack, null, null, null));
+			GUI_ITEMS.add(new ParrotGuiItem(ParrotGUIPage.SPECIAL.mNum, 12, stack, null, (player, inv) -> mSelectedAction == ParrotAction.NONE, null));
 		}
 
 		//==================================================================================================
@@ -538,23 +538,23 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 	}
 
-	private void createParrotItems(Player playerLoad, ParrotVariant variant, ParrotGUIPage page, int slot, Material itemMaterial, String scoreboard,
+	private void createParrotItems(Player playerLoad, ParrotVariant variant, ParrotGUIPage page, int slot, String scoreboard,
 	                               ImmutableMap<ItemStack, Integer> cost) {
-		createParrotItems(playerLoad, variant, page, slot, itemMaterial, scoreboard, null, null, cost, null, null);
+		createParrotItems(playerLoad, variant, page, slot, scoreboard, null, null, cost, null, null);
 	}
 
-	private void createParrotItems(Player playerLoad, ParrotVariant variant, ParrotGUIPage page, int slot, Material itemMaterial, String scoreboard,
+	private void createParrotItems(Player playerLoad, ParrotVariant variant, ParrotGUIPage page, int slot, String scoreboard,
 	                               List<String> requirementsLore, BiPredicate<Player, Inventory> requirements, ImmutableMap<ItemStack, Integer> cost) {
-		createParrotItems(playerLoad, variant, page, slot, itemMaterial, scoreboard, requirementsLore, requirements, cost, null, null);
+		createParrotItems(playerLoad, variant, page, slot, scoreboard, requirementsLore, requirements, cost, null, null);
 	}
 
-	private void createParrotItems(Player playerLoad, ParrotVariant variant, ParrotGUIPage page, int slot, Material itemMaterial, String scoreboard,
+	private void createParrotItems(Player playerLoad, ParrotVariant variant, ParrotGUIPage page, int slot, String scoreboard,
 	                               @Nullable List<String> requirementsLore, @Nullable BiPredicate<Player, Inventory> requirements, ImmutableMap<ItemStack, Integer> cost,
 	                               @Nullable List<String> hiddenUnlockLore, @Nullable BiPredicate<Player, Inventory> showUnlockRequirements) {
 
 		// "hidden" parrot (cannot be bought and unlock condition is hidden)
 		if (hiddenUnlockLore != null && showUnlockRequirements != null) {
-			ItemStack hiddenDisplayItem = buildItem(itemMaterial, variant.getName(), hiddenUnlockLore);
+			ItemStack hiddenDisplayItem = buildItem(variant.getDisplayitem(), variant.getName(), hiddenUnlockLore);
 			GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, hiddenDisplayItem,
 				(player, inv) -> mSelectedAction == ParrotAction.NONE
 					                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
@@ -563,7 +563,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 
 		// locked parrot (cannot be bought yet)
 		if (requirementsLore != null && requirements != null) {
-			ItemStack lockedDisplayItem = buildItem(itemMaterial, variant.getName(), requirementsLore);
+			ItemStack lockedDisplayItem = buildItem(variant.getDisplayitem(), variant.getName(), requirementsLore);
 			GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, lockedDisplayItem,
 				(player, inv) -> mSelectedAction == ParrotAction.NONE
 					                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
@@ -577,7 +577,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 		for (Map.Entry<ItemStack, Integer> entry : cost.entrySet()) {
 			costLore.add(entry.getValue() + " " + ItemUtils.getPlainName(entry.getKey()));
 		}
-		ItemStack buyDisplayItem = buildItem(itemMaterial, "Buy " + variant.getName(), costLore);
+		ItemStack buyDisplayItem = buildItem(variant.getDisplayitem(), "Buy " + variant.getName(), costLore);
 		GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, buyDisplayItem, cost,
 			(player, inv) -> mSelectedAction == ParrotAction.NONE
 				                 && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) == 0
@@ -589,7 +589,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 			}));
 
 		// unclickable bought parrot
-		ItemStack boughtDisplayItem = buildItem(itemMaterial, variant.getName(),
+		ItemStack boughtDisplayItem = buildItem(variant.getDisplayitem(), variant.getName(),
 			List.of("Owned", new Date((long) ScoreboardUtils.getScoreboardValue(playerLoad, scoreboard).orElse(0) * 1000).toString()));
 		GUI_ITEMS.add(new ParrotGuiItem(page.mNum, slot, boughtDisplayItem,
 			(player, inv) -> mSelectedAction == ParrotAction.NONE && ScoreboardUtils.getScoreboardValue(player, scoreboard).orElse(0) > 0));

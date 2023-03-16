@@ -467,7 +467,7 @@ public class InventoryUtils {
 		int[] remainingCount = items.stream().mapToInt(ItemStack::getAmount).toArray();
 		// first find existing stacks
 		for (ItemStack itemInInventory : inventory.getStorageContents()) {
-			if (itemInInventory == null) {
+			if (itemInInventory == null || itemInInventory.getType() == Material.AIR) {
 				continue;
 			}
 			for (int i = 0; i < remainingCount.length; i++) {
@@ -497,7 +497,7 @@ public class InventoryUtils {
 
 		// getStorageContents excludes armor, offhand slots
 		for (ItemStack itemInInventory : inventory.getStorageContents()) {
-			if (itemInInventory == null) {
+			if (itemInInventory == null || itemInInventory.getType() == Material.AIR) {
 				return true;
 			} else if (item.isSimilar(itemInInventory)) {
 				remainingCount -= Math.max(0, item.getMaxStackSize() - itemInInventory.getAmount());
@@ -514,7 +514,7 @@ public class InventoryUtils {
 
 		// getStorageContents excludes armor, offhand slots
 		for (ItemStack itemInInventory : inventory.getStorageContents()) {
-			if (itemInInventory == null) {
+			if (itemInInventory == null || itemInInventory.getType() == Material.AIR) {
 				count += item.getMaxStackSize();
 			} else if (item.isSimilar(itemInInventory)) {
 				count += Math.max(0, item.getMaxStackSize() - itemInInventory.getAmount());

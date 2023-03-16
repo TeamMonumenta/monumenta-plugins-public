@@ -166,6 +166,24 @@ public class LocationUtils {
 		return true;
 	}
 
+	public static boolean hasNearbyBlock(Location center, int radius, Material material) {
+		int cx = center.getBlockX();
+		int cy = center.getBlockY();
+		int cz = center.getBlockZ();
+		World world = center.getWorld();
+
+		for (int x = cx - radius; x <= cx + radius; x++) {
+			for (int z = cz - radius; z <= cz + radius; z++) {
+				for (int y = (cy - radius); y <= (cy + radius); y++) {
+					if (world.getType(x, y, z) == material) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	// Search a cuboid around a Location and return the first Location found with a block matching one of the given Materials
 	public static @Nullable Location getNearestBlock(Location center, int radius, Material... materials) {
 		int cx = center.getBlockX();

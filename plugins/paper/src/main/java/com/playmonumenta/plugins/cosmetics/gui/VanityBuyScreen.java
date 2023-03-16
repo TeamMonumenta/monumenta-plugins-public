@@ -97,7 +97,7 @@ class VanityBuyScreen extends Gui {
 		if (slot == EquipmentSlot.HAND) {
 			slot = EquipmentSlot.OFF_HAND;
 		}
-		mPlugin.mVanityManager.getData(mPlayer).equip(slot, mItem);
+		mPlugin.mVanityManager.getData(mPlayer).equip(slot, mItem, null);
 		close();
 	}
 

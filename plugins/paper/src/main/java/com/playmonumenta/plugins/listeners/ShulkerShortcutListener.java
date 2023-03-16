@@ -199,7 +199,12 @@ public class ShulkerShortcutListener implements Listener {
 			           && !ShulkerEquipmentListener.isAnyEquipmentBox(itemClicked)
 			           && !PortableEnderListener.isPortableEnder(itemClicked)) {
 			// Player clicked a non-equipment shulker box in an inventory.
-			if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
+			if (clickedInventory == topInventory && shulkerInventory != null && click == ClickType.RIGHT) {
+				// A shulker inside another shulker was right-clicked, cancel.
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(ChatColor.RED + "Cannot open nested shulkers");
+				event.setCancelled(true);
+			} else if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 				// A currently open shulker box was clicked, cancel.
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "That shulker is open");
@@ -209,7 +214,7 @@ public class ShulkerShortcutListener implements Listener {
 				if (player.hasPermission(PERMISSION)) {
 					if (click == ClickType.RIGHT && action == InventoryAction.SWAP_WITH_CURSOR &&
 						    itemHeld != null && !ItemUtils.isShulkerBox(itemHeld.getType()) &&
-							!CurseOfEphemerality.isEphemeral(itemHeld)) {
+						    !CurseOfEphemerality.isEphemeral(itemHeld)) {
 
 						// Player right-clicked shulker while holding an item on their cursor.
 						event.setCancelled(true);

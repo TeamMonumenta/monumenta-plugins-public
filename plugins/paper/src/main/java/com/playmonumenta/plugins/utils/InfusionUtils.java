@@ -59,6 +59,15 @@ public class InfusionUtils {
 			return null;
 		}
 
+		public static InfusionSelection getByType(InfusionType infusionType) {
+			for (InfusionSelection infusionSelection : values()) {
+				if (infusionSelection.mInfusionType == infusionType) {
+					return infusionSelection;
+				}
+			}
+			return REFUND;
+		}
+
 		public String getLabel() {
 			return mLabel;
 		}

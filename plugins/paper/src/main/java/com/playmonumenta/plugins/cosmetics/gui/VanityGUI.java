@@ -224,7 +224,7 @@ public class VanityGUI extends Gui {
 				confirm.setItemMeta(meta);
 				ItemUtils.setPlainTag(confirm);
 				setItem(5, 2, confirm).onLeftClick(() -> {
-					vanityData.setEquipped(mNewVanity);
+					vanityData.setEquipped(mNewVanity, null);
 					ProtocolLibrary.getProtocolManager().updateEntity(mPlayer, ProtocolLibrary.getProtocolManager().getEntityTrackers(mPlayer));
 					update();
 				});

@@ -839,22 +839,21 @@ public class CharmManager {
 		);
 	}
 
-	public boolean addCharm(Player p, ItemStack charm) {
+	public List<ItemStack> getCharms(Player player) {
+		return mPlayerCharms.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
+	}
 
-		if (p != null && mPlayerCharms.get(p.getUniqueId()) != null && validateCharm(p, charm)) {
+	public boolean addCharm(Player player, ItemStack charm) {
+		if (player == null) {
+			return false;
+		}
+
+		List<ItemStack> charms = getCharms(player);
+		if (validateCharm(player, charm)) {
 			ItemStack charmCopy = new ItemStack(charm);
-			mPlayerCharms.get(p.getUniqueId()).add(charmCopy);
+			charms.add(charmCopy);
 
-			updateCharms(p, mPlayerCharms.get(p.getUniqueId()));
-
-			return true;
-		} else if (p != null && validateCharm(p, charm)) {
-			List<ItemStack> playerCharms = new ArrayList<>();
-			ItemStack charmCopy = new ItemStack(charm);
-			playerCharms.add(charmCopy);
-			mPlayerCharms.put(p.getUniqueId(), playerCharms);
-
-			updateCharms(p, mPlayerCharms.get(p.getUniqueId()));
+			updateCharms(player, charms);
 
 			return true;
 		}

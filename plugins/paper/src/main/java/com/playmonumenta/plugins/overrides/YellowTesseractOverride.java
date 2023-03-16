@@ -186,7 +186,7 @@ public class YellowTesseractOverride extends BaseOverride {
 	}
 
 	private void changeSkills(Player player, ItemStack item) {
-		loadAbilityFromLore(player, item);
+		loadClassFromLore(player, item);
 
 		Location pLoc = player.getLocation();
 		pLoc.setY(pLoc.getY() + player.getEyeHeight() - 0.5);
@@ -288,30 +288,26 @@ public class YellowTesseractOverride extends BaseOverride {
 		return copyItem.getItemMeta();
 	}
 
-	// Load abilities for player from Item Lore. Returns a boolean false if player had too many skills.\
-	// And Tesseract needs to be reset.
-	public static boolean loadAbilityFromLore(Player player, ItemStack item) {
+	/**
+	 * Load abilities for player from item lore.
+	 */
+	public static void loadClassFromLore(Player player, ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		List<Component> lore = meta.lore();
 		if (lore == null) {
-			return true;
+			return;
 		}
 		Map<String, Integer> targetSkills = new HashMap<>();
 		int classVal = 0;
 		int specVal = 0;
-		int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player);
-		int totalSpec = AbilityUtils.getEffectiveTotalSpecPoints(player);
-		int totalEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
 
 		/* Get all the target skills */
 		for (Component comp : lore) {
 			String str = MessagingUtils.plainText(comp);
 			if (str.startsWith(CLASS_STR)) {
 				classVal = AbilityUtils.getClass(str.substring(CLASS_STR.length()));
-				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, classVal);
 			} else if (str.startsWith(SPEC_STR)) {
 				specVal = AbilityUtils.getSpec(str.substring(SPEC_STR.length()));
-				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, specVal);
 			} else if (str.startsWith(PREFIX)) {
 				boolean enhanced = false;
 				if (str.endsWith("*")) {
@@ -327,6 +323,21 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
+		boolean success = loadClass(player, classVal, specVal, targetSkills, true);
+		if (!success) {
+			player.sendMessage(Component.text(ItemUtils.getPlainName(item) + " has too many skills!", NamedTextColor.RED));
+			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+		}
+	}
+
+	/**
+	 * Sets the player's class and abilities to the gives scores. Returns false if player had too many skills and their class was reset as a result.
+	 */
+	public static boolean loadClass(Player player, int classId, int specId, Map<String, Integer> targetSkills, boolean useDisplayName) {
+
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, classId);
+		ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME, specId);
+
 		MonumentaClasses classes = new MonumentaClasses();
 		List<AbilityInfo<?>> allAbilities = classes.mClasses.stream()
 			                                    .flatMap(c -> Stream.concat(c.mAbilities.stream(), Stream.concat(c.mSpecOne.mAbilities.stream(), c.mSpecTwo.mAbilities.stream())))
@@ -338,25 +349,27 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
+		int totalLevel = AbilityUtils.getEffectiveTotalSkillPoints(player);
+		int totalSpec = AbilityUtils.getEffectiveTotalSpecPoints(player);
+		int totalEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0);
+
 		int totalSkillsAdded = 0;
 		int totalSpecAdded = 0;
 		int totalEnhancementsAdded = 0;
 		// We want to separate different points here because of fast track, since people with fast track can cheese the skill cap otherwise
 		// Check all abilities of the selected class + spec for matches
-		int finalClassVal = classVal;
 		List<AbilityInfo<?>> classAbilities = classes.mClasses.stream()
-			                                      .filter(c -> c.mClass == finalClassVal)
+			                                      .filter(c -> c.mClass == classId)
 			                                      .flatMap(x -> x.mAbilities.stream())
 			                                      .toList();
-		int finalSpecVal = specVal;
 		List<AbilityInfo<?>> specAbilities = classes.mClasses.stream()
-			                                     .filter(c -> c.mClass == finalClassVal)
+			                                     .filter(c -> c.mClass == classId)
 			                                     .flatMap(c -> Stream.of(c.mSpecOne, c.mSpecTwo))
-			                                     .filter(spec -> spec.mSpecialization == finalSpecVal)
+			                                     .filter(spec -> spec.mSpecialization == specId)
 			                                     .flatMap(spec -> spec.mAbilities.stream())
 			                                     .toList();
 		for (AbilityInfo<?> reference : classAbilities) {
-			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
+			@Nullable Integer level = targetSkills.get(useDisplayName ? reference.getDisplayName() : reference.getScoreboard());
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
 				if (scoreboard != null) {
@@ -371,7 +384,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 		for (AbilityInfo<?> reference : specAbilities) {
-			@Nullable Integer level = targetSkills.get(reference.getDisplayName());
+			@Nullable Integer level = targetSkills.get(useDisplayName ? reference.getDisplayName() : reference.getScoreboard());
 			if (level != null) {
 				String scoreboard = reference.getScoreboard();
 				if (scoreboard != null) {
@@ -383,9 +396,7 @@ public class YellowTesseractOverride extends BaseOverride {
 
 		// If the Tesseract had too many skills, reset the player and the item.
 		if (totalSkillsAdded > totalLevel || totalSpecAdded > totalSpec || totalEnhancementsAdded > totalEnhancement) {
-			player.sendMessage(Component.text(ItemUtils.getPlainName(item) + " has too many skills!", NamedTextColor.RED));
 			AbilityManager.getManager().resetPlayerAbilities(player);
-			player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
 			return false;
 		}
 

@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -1314,6 +1316,12 @@ public class ItemUtils {
 		return NmsUtils.getVersionAdapter().getDisplayName(item);
 	}
 
+	/**
+	 * Identifies a Monumenta item, ignoring Masterwork level.
+	 * Items are usually identified via type + plain name, but a few items can change base type
+	 * (e.g. dyeing shulker or due to Multitool) and are still considered the same item.
+	 * Whether this is taken into account or not depends on the value of the 'normalized' parameter various methods take.
+	 */
 	public static final class ItemIdentifier {
 		public final Material mType;
 		public final @Nullable String mName;
@@ -1340,22 +1348,41 @@ public class ItemUtils {
 			return Objects.hash(mType, mName);
 		}
 
-		public boolean isIdentifierFor(ItemStack item) {
-			Material otherType = item == null ? Material.AIR : item.getType();
-			if (mType != otherType) {
-				return false;
+		public boolean isIdentifierFor(ItemStack item, boolean normalized) {
+			if (normalized) {
+				ItemIdentifier otherId = getIdentifier(item, true);
+				return equals(otherId) || normalized(() -> ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)).equals(otherId);
+			} else {
+				return equals(getIdentifier(item, false));
 			}
-			String otherName = getPlainNameIfExists(item);
-			if (otherName != null && otherName.isEmpty()) {
-				otherName = null;
+		}
+
+		public ItemIdentifier normalized(BooleanSupplier isMultitool) {
+			if (isShulkerBox(mType)) {
+				return new ItemIdentifier(Material.SHULKER_BOX, mName);
 			}
-			return Objects.equals(mName, otherName);
+			if ((Materials.PICKAXES.contains(mType) || Materials.AXES.contains(mType) || Materials.SHOVELS.contains(mType)) && isMultitool.getAsBoolean()) {
+				Material axeType = Material.valueOf(mType.toString().split("_")[0] + "_AXE");
+				return new ItemIdentifier(axeType, mName);
+			}
+			return this;
+		}
+
+		public Component getDisplayName() {
+			if (mName != null) {
+				return Component.text(mName).decoration(TextDecoration.ITALIC, false);
+			}
+			return Component.translatable(mType.translationKey());
 		}
 	}
 
-	public static ItemIdentifier getIdentifier(@Nullable ItemStack item) {
+	public static ItemIdentifier getIdentifier(@Nullable ItemStack item, boolean normalized) {
 		if (item != null) {
-			return new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
+			ItemIdentifier id = new ItemIdentifier(item.getType(), getPlainNameIfExists(item));
+			if (normalized) {
+				return id.normalized(() -> ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL));
+			}
+			return id;
 		} else {
 			return new ItemIdentifier(null, null);
 		}

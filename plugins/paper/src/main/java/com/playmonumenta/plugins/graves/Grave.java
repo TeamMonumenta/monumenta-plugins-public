@@ -39,6 +39,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -418,34 +419,38 @@ public final class Grave {
 				if (mGhostGrave) {
 					// Remove one level of shattering from the player's items
 					int unshattered = 0;
+					boolean hasEnderChest = Arrays.stream(player.getInventory().getContents()).anyMatch(
+						item -> item != null && ItemUtils.isShulkerBox(item.getType()) && "Remnant of the Rose".equals(ItemUtils.getPlainNameIfExists(item)));
 					equipmentLoop:
 					for (ItemStack graveEquipment : mEquipment.values()) {
 						if (ItemStatUtils.getInfusionLevel(graveEquipment, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {
 							continue;
 						}
-						ItemUtils.ItemIdentifier identifier = ItemUtils.getIdentifier(graveEquipment);
-						ItemStack[] contents = player.getInventory().getContents();
-						for (int i = contents.length - 1; i >= 0; i--) { // loop from high to low to check equipment first
-							ItemStack playerItem = contents[i];
-							if (identifier.isIdentifierFor(playerItem)
-								    && Shattered.unshatterOneLevel(playerItem)) {
-								unshattered++;
-								continue equipmentLoop;
+						ItemUtils.ItemIdentifier identifier = ItemUtils.getIdentifier(graveEquipment, true);
+						for (Inventory inv : hasEnderChest ? new Inventory[] {player.getInventory(), player.getEnderChest()} : new Inventory[] {player.getInventory()}) {
+							ItemStack[] contents = inv.getContents();
+							for (int i = contents.length - 1; i >= 0; i--) { // loop from high to low to check equipment first
+								ItemStack playerItem = contents[i];
+								if (identifier.isIdentifierFor(playerItem, true)
+									    && Shattered.unshatterOneLevel(playerItem)) {
+									unshattered++;
+									continue equipmentLoop;
+								}
 							}
-						}
-						// if the item is not in the player's inventory, try Shulker boxes in the inventory (e.g. Loadout Lockboxes)
-						for (ItemStack item : contents) {
-							if (item != null
-								    && ItemUtils.isShulkerBox(item.getType())
-								    && item.getItemMeta() instanceof BlockStateMeta meta
-								    && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
-								for (ItemStack shulkerItem : shulkerBox.getInventory().getContents()) {
-									if (identifier.isIdentifierFor(shulkerItem)
-										    && Shattered.unshatterOneLevel(shulkerItem)) {
-										unshattered++;
-										meta.setBlockState(shulkerBox);
-										item.setItemMeta(meta);
-										continue equipmentLoop;
+							// if the item is not in the player's inventory, try Shulker boxes in the inventory (e.g. Loadout Lockboxes)
+							for (ItemStack item : contents) {
+								if (item != null
+									    && ItemUtils.isShulkerBox(item.getType())
+									    && item.getItemMeta() instanceof BlockStateMeta meta
+									    && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
+									for (ItemStack shulkerItem : shulkerBox.getInventory().getContents()) {
+										if (identifier.isIdentifierFor(shulkerItem, true)
+											    && Shattered.unshatterOneLevel(shulkerItem)) {
+											unshattered++;
+											meta.setBlockState(shulkerBox);
+											item.setItemMeta(meta);
+											continue equipmentLoop;
+										}
 									}
 								}
 							}

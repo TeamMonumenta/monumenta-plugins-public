@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.Nullable;
 
 public class MonumentaClasses {
 	public ArrayList<PlayerClass> mClasses = new ArrayList<>();
@@ -49,7 +50,12 @@ public class MonumentaClasses {
 		return new ArrayList<>(mClasses);
 	}
 
-	public PlayerClass getClassAtIndex(int index) {
-		return mClasses.get(index);
+	public @Nullable PlayerClass getClassById(int classId) {
+		for (PlayerClass clazz : mClasses) {
+			if (clazz.mClass == classId) {
+				return clazz;
+			}
+		}
+		return null;
 	}
 }

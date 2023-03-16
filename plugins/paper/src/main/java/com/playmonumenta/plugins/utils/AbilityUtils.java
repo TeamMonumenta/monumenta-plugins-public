@@ -55,7 +55,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class AbilityUtils {
 
-	private static final String ARROW_REFUNDED_METAKEY = "ArrowRefunded";
 	private static final String POTION_REFUNDED_METAKEY = "PotionRefunded";
 	public static final String TOTAL_LEVEL = "TotalLevel";
 	public static final String TOTAL_SPEC = "TotalSpec";
@@ -262,7 +261,11 @@ public class AbilityUtils {
 	}
 
 	public static String getClass(Player player) {
-		return switch (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0)) {
+		return getClass(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0));
+	}
+
+	public static String getClass(int classId) {
+		return switch (classId) {
 			case Mage.CLASS_ID -> "Mage";
 			case Warrior.CLASS_ID -> "Warrior";
 			case Cleric.CLASS_ID -> "Cleric";
@@ -288,8 +291,11 @@ public class AbilityUtils {
 	}
 
 	public static String getSpec(Player player) {
-		int classVal = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0);
-		return switch (classVal) {
+		return getSpec(ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0));
+	}
+
+	public static String getSpec(int specId) {
+		return switch (specId) {
 			case Mage.ARCANIST_SPEC_ID -> "Arcanist";
 			case Mage.ELEMENTALIST_SPEC_ID -> "Elementalist";
 			case Warrior.BERSERKER_SPEC_ID -> "Berserker";
