@@ -1503,4 +1503,35 @@ public class EntityUtils {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), fw::detonate, delay);
 	}
 
+	/**
+	 * Changes the size on a slime (or magma cube) or phantom without changing its current health, max health, damage, or armor
+	 */
+	public static void setSize(LivingEntity entity, int size) {
+		double maxHealthBase = EntityUtils.getAttributeBaseOrDefault(entity, Attribute.GENERIC_MAX_HEALTH, 0);
+		double atkDamage = EntityUtils.getAttributeBaseOrDefault(entity, Attribute.GENERIC_ATTACK_DAMAGE, 0);
+		double armor = EntityUtils.getAttributeBaseOrDefault(entity, Attribute.GENERIC_ARMOR, 0);
+		double currentHealth = entity.getHealth();
+		if (entity instanceof Slime slime) {
+			slime.setSize(size);
+		} else if (entity instanceof Phantom phantom) {
+			phantom.setSize(size);
+		}
+		EntityUtils.setAttributeBase(entity, Attribute.GENERIC_MAX_HEALTH, maxHealthBase);
+		EntityUtils.setAttributeBase(entity, Attribute.GENERIC_ATTACK_DAMAGE, atkDamage);
+		EntityUtils.setAttributeBase(entity, Attribute.GENERIC_ARMOR, armor);
+		entity.setHealth(currentHealth);
+	}
+
+	/**
+	 * Gets the size of a slime (or magma cube) or phantom. Returns 0 for other mobs.
+	 */
+	public static int getSize(LivingEntity entity) {
+		if (entity instanceof Slime slime) {
+			return slime.getSize();
+		} else if (entity instanceof Phantom phantom) {
+			return phantom.getSize();
+		}
+		return 0;
+	}
+
 }
