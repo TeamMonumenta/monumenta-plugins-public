@@ -407,9 +407,9 @@ public class ImperialConstruct extends BossAbilityGroup {
 					getSteelboreAction(plugin, false, false).run(mob);
 				});
 
-				events.put(50, (mob) -> new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run());
+				events.put(50, getSteelboreAction(plugin, false, false));
 
-				events.put(40, (mob) -> new SpellSteelboreSpread(plugin, boss, 7, mPhase2Loc, 40, 0.6).run());
+				events.put(40, getSteelboreAction(plugin, false, false));
 
 				events.put(33, (mob) -> {
 					setSpellLocations(mPhase2Loc);
@@ -584,7 +584,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 
 	private BossBarManager.BossHealthAction getSteelboreAction(Plugin plugin, boolean savage, boolean phase3) {
 		double damage = savage ? 1 : 0.6;
-		int radius = savage ? (phase3 ? 11 : 6) : (phase3 ? 7 : 3);
+		int radius = savage ? (phase3 ? 6 : 11) : (phase3 ? 3 : 7);
 		return boss -> new SpellSteelboreSpread(plugin, boss, radius, mCurrentLoc, 40, damage).run();
 	}
 
