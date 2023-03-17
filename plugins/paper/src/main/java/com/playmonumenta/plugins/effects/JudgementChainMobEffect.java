@@ -42,7 +42,7 @@ public class JudgementChainMobEffect extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Attributable) {
-			EntityUtils.addAttribute((Attributable) entity, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, -0.3, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.addAttribute((Attributable) entity, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, -0.25, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 
 		// Only change glowing color if:

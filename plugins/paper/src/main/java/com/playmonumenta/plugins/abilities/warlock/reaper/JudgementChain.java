@@ -142,7 +142,7 @@ public class JudgementChain extends Ability {
 	}
 
 	public void passDamage(DamageEvent event) {
-		if (mChainActive && mTarget != null && event.getType() != DamageType.TRUE) {
+		if (mChainActive && mTarget != null && event.getDamagee() == mTarget && event.getType() != DamageType.TRUE) {
 			List<LivingEntity> e = EntityUtils.getNearbyMobs(mTarget.getLocation(), 8, mTarget, true);
 			e.remove(mTarget);
 			e.removeIf(entity -> mPlugin.mEffectManager.hasEffect(entity, EFFECT_NAME));

@@ -412,7 +412,7 @@ public class ImperialConstruct extends BossAbilityGroup {
 				events.put(40, getSteelboreAction(plugin, false, false));
 
 				events.put(33, (mob) -> {
-					setSpellLocations(mPhase2Loc);
+					setSpellLocations(mPhase3Loc);
 					getDialogueAction2().run(mob);
 					mCrash.setLocation(mPhase2Loc);
 					mCrash.run();
