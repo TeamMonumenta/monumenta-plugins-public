@@ -13,6 +13,7 @@ import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1414,6 +1415,22 @@ public class ItemUtils {
 			clone1.setItemMeta(damageable1);
 		}
 		return clone1.equals(item2);
+	}
+
+	public static boolean isPortableEnder(@Nullable ItemStack item) {
+		if (item == null || !isShulkerBox(item.getType())) {
+			return false;
+		}
+		String name = getPlainNameIfExists(item);
+		return "Remnant of the Rose".equals(name) || "Bottomless Present".equals(name);
+	}
+
+	public static boolean hasPortableEnder(Player player) {
+		return Arrays.stream(player.getInventory().getContents()).anyMatch(ItemUtils::isPortableEnder);
+	}
+
+	public static boolean hasPortableEnderOrIsNearEnderChest(Player player) {
+		return hasPortableEnder(player) || LocationUtils.hasNearbyBlock(player.getLocation(), 5, Material.ENDER_CHEST);
 	}
 
 }

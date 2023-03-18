@@ -419,8 +419,7 @@ public final class Grave {
 				if (mGhostGrave) {
 					// Remove one level of shattering from the player's items
 					int unshattered = 0;
-					boolean hasEnderChest = Arrays.stream(player.getInventory().getContents()).anyMatch(
-						item -> item != null && ItemUtils.isShulkerBox(item.getType()) && "Remnant of the Rose".equals(ItemUtils.getPlainNameIfExists(item)));
+					boolean hasEnderChest = ItemUtils.hasPortableEnder(player);
 					equipmentLoop:
 					for (ItemStack graveEquipment : mEquipment.values()) {
 						if (ItemStatUtils.getInfusionLevel(graveEquipment, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {

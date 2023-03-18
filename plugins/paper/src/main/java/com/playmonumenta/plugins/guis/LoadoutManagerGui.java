@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.guis;
 
+import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
@@ -13,6 +14,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,7 +95,7 @@ public class LoadoutManagerGui extends Gui {
 					- 1 Loadout Lockbox
 					- 1 Tesseract of the Elements
 					- and 1 C.H.A.R.M. 2000
-					Note that only empty, unmodified items in your inventory are taken as payment."""))
+					Note that only empty, uninfused items in your inventory are taken as payment."""))
 				.onLeftClick(() -> {
 					if (mLoadoutData.mMaxLoadouts >= MAX_LOADOUTS) {
 						mPlayer.sendMessage(Component.text("You have already reached the maximum number of loadout slots!", NamedTextColor.RED));
@@ -104,10 +106,7 @@ public class LoadoutManagerGui extends Gui {
 						item -> item != null
 							        && ItemUtils.isShulkerBox(item.getType())
 							        && "Loadout Lockbox".equals(ItemUtils.getPlainNameIfExists(item))
-							        && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
-							        && item.getItemMeta() instanceof BlockStateMeta meta
-							        && meta.getBlockState() instanceof ShulkerBox shulkerBox
-							        && Arrays.stream(shulkerBox.getInventory().getContents()).allMatch(ItemUtils::isNullOrAir)
+							        && isUnmodifiedShulker(item)
 					).findFirst().orElse(null);
 					if (cost1 == null) {
 						mPlayer.sendMessage(Component.text("You need an empty, unmodified Loadout Lockbox to buy a loadout slot!", NamedTextColor.RED));
@@ -118,10 +117,7 @@ public class LoadoutManagerGui extends Gui {
 						item -> item != null
 							        && ItemUtils.isShulkerBox(item.getType())
 							        && "C.H.A.R.M. 2000".equals(ItemUtils.getPlainNameIfExists(item))
-							        && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
-							        && item.getItemMeta() instanceof BlockStateMeta meta
-							        && meta.getBlockState() instanceof ShulkerBox shulkerBox
-							        && Arrays.stream(shulkerBox.getInventory().getContents()).allMatch(ItemUtils::isNullOrAir)
+							        && isUnmodifiedShulker(item)
 					).findFirst().orElse(null);
 					if (cost2 == null) {
 						mPlayer.sendMessage(Component.text("You need an empty, unmodified C.H.A.R.M. 2000 to buy a loadout slot!", NamedTextColor.RED));
@@ -144,7 +140,7 @@ public class LoadoutManagerGui extends Gui {
 					cost3.subtract();
 					mLoadoutData.mMaxLoadouts++;
 					mPlayer.sendMessage(Component.text("Successfully bought a loadout slot! Your new loadout limit is ", NamedTextColor.AQUA)
-						                    .append(Component.text(mLoadoutData.mMaxLoadouts, NamedTextColor.YELLOW, TextDecoration.BOLD))
+						                    .append(Component.text(mLoadoutData.mMaxLoadouts, NamedTextColor.GOLD, TextDecoration.BOLD))
 						                    .append(Component.text(" (out of a possible maximum of " + MAX_LOADOUTS + ").", NamedTextColor.AQUA)));
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1, 2);
 					update();
@@ -564,6 +560,24 @@ public class LoadoutManagerGui extends Gui {
 			item.setItemMeta(skullMeta);
 		}
 		return item;
+	}
+
+	private static final ImmutableSet<String> ALLOWED_PLAYER_MODIFIED_KEYS = ImmutableSet.of(
+		ItemStatUtils.CUSTOM_SKIN_KEY, ItemStatUtils.PLAYER_CUSTOM_NAME_KEY, ItemStatUtils.VANITY_ITEMS_KEY);
+
+	private static boolean isUnmodifiedShulker(ItemStack item) {
+		// Must be empty
+		if (item.getItemMeta() instanceof BlockStateMeta meta
+			    && meta.getBlockState() instanceof ShulkerBox shulkerBox
+			    && !Arrays.stream(shulkerBox.getInventory().getContents()).allMatch(ItemUtils::isNullOrAir)) {
+			return false;
+		}
+		// Must not have any player modifications except for name, skin, or stored vanity
+		NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item));
+		if (playerModified == null) {
+			return true;
+		}
+		return ALLOWED_PLAYER_MODIFIED_KEYS.containsAll(playerModified.getKeys());
 	}
 
 }

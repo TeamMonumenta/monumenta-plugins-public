@@ -23,7 +23,6 @@ import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -136,9 +135,7 @@ public class LoadoutManager implements Listener {
 				}
 			};
 			findStorageShulkers.accept(player.getInventory());
-			boolean hasEnderChest = Arrays.stream(player.getInventory().getContents())
-				                        .anyMatch(item -> item != null && ItemUtils.isShulkerBox(item.getType()) && "Remnant of the Rose".equals(ItemUtils.getPlainNameIfExists(item)))
-				                        || LocationUtils.hasNearbyBlock(player.getLocation(), 5, Material.ENDER_CHEST);
+			boolean hasEnderChest = ItemUtils.hasPortableEnderOrIsNearEnderChest(player);
 			if (hasEnderChest) {
 				findStorageShulkers.accept(player.getEnderChest());
 				inventories.add(new ItemInventory(player.getEnderChest(), () -> {
@@ -182,37 +179,20 @@ public class LoadoutManager implements Listener {
 									}
 									player.getInventory().setItem(loadoutItem.mSlot, newItemClone);
 
-									if (playerItem != null
-										    && ItemUtils.isShulkerBox(playerItem.getType())
-										    && !inventory.mInventory.equals(player.getInventory())
-										    && !inventory.mInventory.equals(player.getEnderChest())) {
-										// Swapped-out item is a shulker box: allow only specific shulker-type items into equipment boxes
-										if (ShulkerEquipmentListener.canSwapItem(playerItem)) {
-											if (newItem.getAmount() == 0 && canPutMoreShulkersIntoEquipmentBox(inventory.mInventory)) {
-												// Allowed shulker item, and not too many in the storage box: swap as normal
-												inventory.mInventory.setItem(i, playerItem);
-											} else {
-												// Allowed shulker item, but current equipment box cannot take more shulkers: try to put into other boxes
-												for (ItemInventory inv : inventories) {
-													if (InventoryUtils.numEmptySlots(inv.mInventory) > 0 && canPutMoreShulkersIntoEquipmentBox(inv.mInventory)) {
-														inv.mInventory.addItem(playerItem);
-														return true;
-													}
-												}
-												InventoryUtils.giveItem(player, playerItem);
-											}
-										} else {
-											// Other shulker: only allow in ender chest or player inventory
-											if (hasEnderChest && InventoryUtils.numEmptySlots(player.getEnderChest()) > 0) {
-												player.getEnderChest().addItem(playerItem);
-											} else {
-												InventoryUtils.giveItem(player, playerItem);
-											}
-										}
-									} else {
-										if (newItem.getAmount() == 0) {
+									if (!ItemUtils.isNullOrAir(playerItem)) {
+										if (newItem.getAmount() == 0
+											    && (!ItemUtils.isShulkerBox(playerItem.getType())
+												        || inventory.mInventory.equals(player.getInventory())
+												        || inventory.mInventory.equals(player.getEnderChest())
+												        || (ShulkerEquipmentListener.canSwapItem(playerItem)
+													            && canPutMoreShulkersIntoEquipmentBox(inventory.mInventory)))) {
+											// Swap item if that is allowed: target slot is empty, and:
+											// - the item swapped is not a shulker box
+											// - or is swapping to inventory or ender chest
+											// - or is an allowed shulker box and the targeted equipment case is below the shulker box limit
 											inventory.mInventory.setItem(i, playerItem);
 										} else {
+											// Otherwise, put into any valid inventory
 											giveItem(player, inventories, playerItem);
 										}
 									}
@@ -456,12 +436,28 @@ public class LoadoutManager implements Listener {
 		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
-		for (ItemInventory inv : inventories) {
-			if (InventoryUtils.canFitInInventory(item, inv.mInventory)) {
-				inv.mInventory.addItem(item);
-				return;
+		if (ItemUtils.isShulkerBox(item.getType())) {
+			// shulker box: allow in player inventory and ender chest, and allow specific shulkers in equipment cases up to a limit
+			boolean canSwapItem = ShulkerEquipmentListener.canSwapItem(item);
+			for (ItemInventory inv : inventories) {
+				if (InventoryUtils.numEmptySlots(inv.mInventory) > 0
+					    && (inv.mInventory.equals(player.getEnderChest())
+						        || inv.mInventory.equals(player.getInventory())
+						        || (canSwapItem && canPutMoreShulkersIntoEquipmentBox(inv.mInventory)))) {
+					inv.mInventory.addItem(item);
+					return;
+				}
+			}
+		} else {
+			// normal item: just place where it fits
+			for (ItemInventory inv : inventories) {
+				if (InventoryUtils.canFitInInventory(item, inv.mInventory)) {
+					inv.mInventory.addItem(item);
+					return;
+				}
 			}
 		}
+		// no good place found: give to player
 		InventoryUtils.giveItem(player, item);
 	}
 
@@ -671,6 +667,10 @@ public class LoadoutManager implements Listener {
 					}
 				}
 			}
+		}
+
+		public @Nullable LoadoutItem getEquipmentInSlot(int slot) {
+			return mEquipment.stream().filter(i -> i.mSlot == slot).findFirst().orElse(null);
 		}
 
 		public JsonObject toJson() {

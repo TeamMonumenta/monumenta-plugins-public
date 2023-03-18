@@ -119,6 +119,7 @@ public class RenameItemCommand {
 		} else {
 			playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
 		}
+		ItemStatUtils.generateItemStats(itemStack);
 		player.updateInventory();
 		String baseName = ItemUtils.getPlainNameIfExists(itemStack);
 		if (!name.isEmpty()) {
