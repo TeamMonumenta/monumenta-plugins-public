@@ -212,5 +212,20 @@ public class DepthsCommand extends GenericCommand {
 			new DepthsDebugGUI(requestingPlayer, targetPlayer, plugin).openInventory(requestingPlayer, plugin);
 
 		}).register();
+
+		//CHECK ENDLESS COMMAND - mech command that returns 1 if endless, else 0
+		arguments.clear();
+		arguments.add(new LiteralArgument("check"));
+		arguments.add(new LiteralArgument("endless"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+
+		new CommandAPICommand("depths")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+
+				return DepthsManager.getInstance().getIsEndless(player) ? 1 : 0;
+			}).register();
 	}
 }

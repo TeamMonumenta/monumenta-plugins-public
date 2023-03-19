@@ -1024,6 +1024,15 @@ public class DepthsManager {
 		}
 	}
 
+	public boolean getIsEndless(Player p) {
+		DepthsParty party = getDepthsParty(p);
+		if (party != null) {
+			return party.mEndlessMode;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * This method is called by the command block at the end of each room.
 	 * If the room is clear, it opens the next room selection gui
