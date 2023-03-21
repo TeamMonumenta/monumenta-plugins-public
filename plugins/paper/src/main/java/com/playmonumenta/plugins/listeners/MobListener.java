@@ -252,6 +252,15 @@ public class MobListener implements Listener {
 		spawner.getBlock().removeMetadata(SPAWNER_TORCH_SKIP_COUNT_METADATA_KEY, mPlugin);
 		spawner.getBlock().setMetadata(SPAWNER_TORCH_LAST_CHECK_TIME_METADATA_KEY, new FixedMetadataValue(mPlugin, Bukkit.getServer().getCurrentTick()));
 		Bukkit.getScheduler().runTask(mPlugin, () -> spawner.getBlock().removeMetadata(SPAWNER_FIRST_SPAWN_ATTEMPT_METADATA_KEY, mPlugin));
+
+		// Delete the spawner if the spawned mob has the boss_spawner_delete tag
+		if (mob.getScoreboardTags().contains("boss_spawner_delete")) {
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+				if (spawner.getBlock().getType() == Material.SPAWNER) {
+					spawner.getBlock().setType(Material.AIR);
+				}
+			});
+		}
 	}
 
 	private void tagSpawnCountRecursively(Entity mob, int spawnCount) {
