@@ -133,6 +133,7 @@ public class EntityListener implements Listener {
 
 	public static final EnumSet<EntityType> PLOT_ANIMALS = EnumSet.of(
 		EntityType.AXOLOTL,
+		EntityType.BEE,
 		EntityType.CAT,
 		EntityType.CHICKEN,
 		EntityType.COW,

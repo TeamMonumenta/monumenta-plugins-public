@@ -1505,6 +1505,11 @@ public class PlayerListener implements Listener {
 			cancel = false;
 		}
 		event.setCancelled(cancel);
+
+		// Easter egg: Times Dyed for shulker boxes
+		if (!cancel && ItemUtils.isShulkerBox(resultMat) && event.getWhoClicked() instanceof Player player) {
+			StatTrackManager.getInstance().incrementStatImmediately(result, player, InfusionType.STAT_TRACK_DEATH, 1);
+		}
 	}
 
 	private static final Set<DamageCause> DISABLE_KNOCKBACK_DAMAGE_CAUSES = Set.of(

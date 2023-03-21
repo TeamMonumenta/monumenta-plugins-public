@@ -2205,7 +2205,12 @@ public class ItemStatUtils {
 					if (type == InfusionType.STAT_TRACK) {
 						statTrackLater.add(0, type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					} else if (type.mIsStatTrackOption) {
-						statTrackLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
+						if (type == InfusionType.STAT_TRACK_DEATH && ItemUtils.isShulkerBox(item.getType())) {
+							// Easter egg: Times Dyed for shulker boxes
+							statTrackLater.add(Component.text("Times Dyed: " + (infusion.getInteger(LEVEL_KEY) - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+						} else {
+							statTrackLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY)));
+						}
 					} else if (!type.getMessage().isEmpty()) {
 						infusionTagsLater.add(type.getDisplay(infusion.getInteger(LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(INFUSER_KEY)))));
 					} else {
