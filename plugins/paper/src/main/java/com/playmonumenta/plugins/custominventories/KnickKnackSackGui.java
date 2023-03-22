@@ -269,12 +269,17 @@ public class KnickKnackSackGui extends Gui {
 					mPlayer.sendMessage(Component.text("You can only use this item in Survival and Adventure mode.", NamedTextColor.RED));
 					return;
 				}
+				// Same mechanism as interactable: run this function, and player's temp score == 1 means contract is enabled
+				runConsoleCommand("execute as @S run function monumenta:mechanisms/check/crimson_contract_enabled");
+				if (ScoreboardUtils.getScoreboardValue(mPlayer, "temp").orElse(0) != 1) {
+					mPlayer.sendMessage(Component.text("The magic of this area prevents you from using your contract.", NamedTextColor.AQUA));
+					return;
+				}
+
 				switch (evt.getClick()) {
 					default -> {
 						// Swap experience
-						// TODO: Remove "magic block" check
-						runConsoleCommand("execute as @S in minecraft:overworld unless block -1464 0 -1456 gold_block run function monumenta:mechanisms/contract/swap");
-						runConsoleCommand("execute in minecraft:overworld if block -1464 0 -1456 gold_block as @S at @S run tellraw @S {\"text\":\"The magic of this area prevents you from using your contract.\",\"color\":\"aqua\"}");
+						runConsoleCommand("execute as @S in minecraft:overworld run function monumenta:mechanisms/contract/swap");
 					}
 					case SHIFT_LEFT -> {
 						// Check experience
