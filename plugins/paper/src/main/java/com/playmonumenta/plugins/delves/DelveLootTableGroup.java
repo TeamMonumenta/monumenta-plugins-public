@@ -139,6 +139,15 @@ public class DelveLootTableGroup {
 		// orange
 		new DelveLootTableGroup("r3/exalteds/orange/delves/delve_chest", "r3/exalteds/orange/delves/dmat_chest", "r3/exalteds/orange/delves/cmat_chest", "r3/exalteds/orange/chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/exalteds/orange/delves/lootroom_delve_chest", "r3/exalteds/orange/delves/lootroom_dmat_chest", "r3/exalteds/orange/delves/lootroom_cmat_chest", "r3/exalteds/orange/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		// magenta
+		new DelveLootTableGroup("r3/exalteds/magenta/delves/delve_chest", "r3/exalteds/magenta/delves/dmat_chest", "r3/exalteds/magenta/delves/cmat_chest", "r3/exalteds/magenta/chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/magenta/delves/lootroom_delve_chest", "r3/exalteds/magenta/delves/lootroom_dmat_chest", "r3/exalteds/magenta/delves/lootroom_cmat_chest", "r3/exalteds/magenta/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		// lightblue
+		new DelveLootTableGroup("r3/exalteds/lightblue/delves/delve_academy", "r3/exalteds/lightblue/delves/dmat_academy", "r3/exalteds/lightblue/delves/cmat_academy", "r3/exalteds/lightblue/chest_academy").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/lightblue/delves/delve_bastion", "r3/exalteds/lightblue/delves/dmat_bastion", "r3/exalteds/lightblue/delves/cmat_bastion", "r3/exalteds/lightblue/chest_bastion").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/lightblue/delves/lootroom_delve_chest", "r3/exalteds/lightblue/delves/lootroom_dmat_chest", "r3/exalteds/lightblue/delves/lootroom_cmat_chest", "r3/exalteds/lightblue/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 	}
 
 

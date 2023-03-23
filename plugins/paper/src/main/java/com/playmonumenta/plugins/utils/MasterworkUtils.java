@@ -65,6 +65,8 @@ public class MasterworkUtils {
 	// Exalted Dungeons
 	private static final String WHITE_MAT = "epic:r1/delves/white/auxiliary/delve_material";
 	private static final String ORANGE_MAT = "epic:r1/delves/orange/auxiliary/delve_material";
+	private static final String MAGENTA_MAT = "epic:r1/delves/magenta/auxiliary/delve_material";
+	private static final String LIGHTBLUE_MAT = "epic:r1/delves/lightblue/auxiliary/delve_material";
 
 	public enum MasterworkCost {
 		FOREST_ONE("forest_1", FOREST_FRAG, 1, HYPER_ARCHOS_RING, 1),
@@ -190,7 +192,6 @@ public class MasterworkUtils {
 		WHITE_SEVENB("white_7b", WHITE_MAT, 32, POTENCY_AUGMENT, 16),
 		WHITE_SEVENC("white_7c", WHITE_MAT, 32, ALACRITY_AUGMENT, 16),
 
-		// Exalted
 		ORANGE_ONE("orange_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		ORANGE_TWO("orange_2", ORANGE_MAT, 3, HYPER_ARCHOS_RING, 3),
 		ORANGE_THREE("orange_3", ORANGE_MAT, 6, HYPER_ARCHOS_RING, 4),
@@ -199,7 +200,27 @@ public class MasterworkUtils {
 		ORANGE_SIX("orange_6", ORANGE_MAT, 16, HYPER_ARCHOS_RING, 4),
 		ORANGE_SEVENA("orange_7a", ORANGE_MAT, 32, FORTITUDE_AUGMENT, 16),
 		ORANGE_SEVENB("orange_7b", ORANGE_MAT, 32, POTENCY_AUGMENT, 16),
-		ORANGE_SEVENC("orange_7c", ORANGE_MAT, 32, ALACRITY_AUGMENT, 16);
+		ORANGE_SEVENC("orange_7c", ORANGE_MAT, 32, ALACRITY_AUGMENT, 16),
+
+		MAGENTA_ONE("magenta_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		MAGENTA_TWO("magenta_2", MAGENTA_MAT, 3, HYPER_ARCHOS_RING, 3),
+		MAGENTA_THREE("magenta_3", MAGENTA_MAT, 6, HYPER_ARCHOS_RING, 4),
+		MAGENTA_FOUR("magenta_4", PULSATING_DIAMOND, 3, HYPER_ARCHOS_RING, 4),
+		MAGENTA_FIVE("magenta_5", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
+		MAGENTA_SIX("magenta_6", MAGENTA_MAT, 16, HYPER_ARCHOS_RING, 4),
+		MAGENTA_SEVENA("magenta_7a", MAGENTA_MAT, 32, FORTITUDE_AUGMENT, 16),
+		MAGENTA_SEVENB("magenta_7b", MAGENTA_MAT, 32, POTENCY_AUGMENT, 16),
+		MAGENTA_SEVENC("magenta_7c", MAGENTA_MAT, 32, ALACRITY_AUGMENT, 16),
+
+		LIGHTBLUE_ONE("lightblue_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		LIGHTBLUE_TWO("lightblue_2", LIGHTBLUE_MAT, 3, HYPER_ARCHOS_RING, 3),
+		LIGHTBLUE_THREE("lightblue_3", MAGENTA_MAT, 6, HYPER_ARCHOS_RING, 4),
+		LIGHTBLUE_FOUR("lightblue_4", PULSATING_DIAMOND, 3, HYPER_ARCHOS_RING, 4),
+		LIGHTBLUE_FIVE("lightblue_5", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
+		LIGHTBLUE_SIX("lightblue_6", LIGHTBLUE_MAT, 16, HYPER_ARCHOS_RING, 4),
+		LIGHTBLUE_SEVENA("lightblue_7a", LIGHTBLUE_MAT, 32, FORTITUDE_AUGMENT, 16),
+		LIGHTBLUE_SEVENB("lightblue_7b", LIGHTBLUE_MAT, 32, POTENCY_AUGMENT, 16),
+		LIGHTBLUE_SEVENC("lightblue_7c", LIGHTBLUE_MAT, 32, ALACRITY_AUGMENT, 16);
 
 		private final String mLabel;
 		private final String mPathA;
