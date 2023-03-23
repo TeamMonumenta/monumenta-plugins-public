@@ -45,6 +45,8 @@ public class ShatterBoss extends BossAbilityGroup {
 		public int DETECTION = 40;
 		@BossParam(help = "not written")
 		public double RADIUS = 10;
+		@BossParam(help = "The height of the attack's hitbox")
+		public double HEIGHT = 15;
 		@BossParam(help = "Number of Shatter Lines, out of a 360 degree angle.")
 		public int NUM_LINES = 4;
 		@BossParam(help = "Delay of first spell cast")
@@ -87,6 +89,7 @@ public class ShatterBoss extends BossAbilityGroup {
 				p.COOLDOWN,
 				p.DURATION,
 				p.NUM_LINES,
+				p.HEIGHT,
 				p.INDICATOR_MATERIAL,
 				() -> {
 					// Targets of spell launch

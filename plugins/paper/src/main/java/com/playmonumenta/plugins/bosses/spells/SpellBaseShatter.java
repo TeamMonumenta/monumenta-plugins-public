@@ -28,6 +28,7 @@ public class SpellBaseShatter extends Spell {
 	private int mCooldown;
 	private int mDelay;
 	private int mNumLines;
+	private final double mHeight;
 	private Spell.GetSpellTargets<LivingEntity> mSpellTargets;
 	private Material mIndicator;
 	private final HitAction mHitAction;
@@ -55,6 +56,35 @@ public class SpellBaseShatter extends Spell {
 		mCooldown = cooldown;
 		mDelay = delay;
 		mNumLines = numLines;
+		mHeight = 15;
+		mSpellTargets = spellTargets;
+		mIndicator = indicator;
+		mWarningAesthetics = warningAesthetics;
+		mLaunchAesthetics = launchAesthetics;
+		mHitAction = hitAction;
+	}
+
+	public SpellBaseShatter(
+			Plugin plugin,
+			LivingEntity boss,
+			double radius,
+			int cooldown,
+			int delay,
+			int numLines,
+			double height,
+			Material indicator,
+			GetSpellTargets<LivingEntity> spellTargets,
+			WarningAesthetics warningAesthetics,
+			LaunchAesthetics launchAesthetics,
+			HitAction hitAction
+	) {
+		mPlugin = plugin;
+		mBoss = boss;
+		mRadius = radius;
+		mCooldown = cooldown;
+		mDelay = delay;
+		mNumLines = numLines;
+		mHeight = height;
 		mSpellTargets = spellTargets;
 		mIndicator = indicator;
 		mWarningAesthetics = warningAesthetics;
@@ -157,7 +187,7 @@ public class SpellBaseShatter extends Spell {
 
 								Location l = loc.clone().add(vec);
 								//1.5 -> 15
-								BoundingBox box = BoundingBox.of(l, 0.65, 15, 0.65);
+								BoundingBox box = BoundingBox.of(l, 0.65, mHeight, 0.65);
 								boxes.add(box);
 							}
 						}

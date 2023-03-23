@@ -17,6 +17,8 @@ public class GenericBoss extends BossAbilityGroup {
 		public BarColor BAR_COLOR = BarColor.WHITE;
 
 		public BarStyle BAR_STYLE = BarStyle.SOLID;
+
+		public boolean BOSS_FOG = true;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -27,7 +29,7 @@ public class GenericBoss extends BossAbilityGroup {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		BossBarManager bossBar = new BossBarManager(plugin, boss, p.DETECTION, p.BAR_COLOR, p.BAR_STYLE, null);
+		BossBarManager bossBar = new BossBarManager(plugin, boss, p.DETECTION, p.BAR_COLOR, p.BAR_STYLE, null, p.BOSS_FOG);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), p.DETECTION, bossBar);
 	}

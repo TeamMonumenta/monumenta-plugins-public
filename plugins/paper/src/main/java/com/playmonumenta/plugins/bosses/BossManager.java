@@ -5,7 +5,11 @@ import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
-import com.playmonumenta.plugins.bosses.bosses.abilities.*;
+import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.DummyDecoyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.MetalmancyBoss;
+import com.playmonumenta.plugins.bosses.bosses.abilities.RestlessSoulsBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTargetNPCBoss;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeTurretBoss;
@@ -238,6 +242,9 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(KamikazeBoss.identityTag, KamikazeBoss::new);
 		mStatelessBosses.put(TinyBombTossBoss.identityTag, TinyBombTossBoss::new);
 		mStatelessBosses.put(AntiRangeBoss.identityTag, AntiRangeBoss::new);
+		mStatelessBosses.put(AntiMeleeBoss.identityTag, AntiMeleeBoss::new);
+		mStatelessBosses.put(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::new);
+		mStatelessBosses.put(DamageCapBoss.identityTag, DamageCapBoss::new);
 		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, AntiRangeChivalrousBoss::new);
 		mStatelessBosses.put(ImmortalMountBoss.identityTag, ImmortalMountBoss::new);
 		mStatelessBosses.put(SilenceOnHitBoss.identityTag, SilenceOnHitBoss::new);
@@ -295,7 +302,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(PhasesManagerBoss.identityTag, PhasesManagerBoss::new);
 		mStatelessBosses.put(SoundBoss.identityTag, SoundBoss::new);
 		mStatelessBosses.put(RedstoneBoss.identityTag, RedstoneBoss::new);
-
+		mStatelessBosses.put(SlashAttackBoss.identityTag, SlashAttackBoss::new);
+		mStatelessBosses.put(DashBoss.identityTag, DashBoss::new);
 
 		mStatelessBosses.put(LichMageBoss.identityTag, LichMageBoss::new);
 		mStatelessBosses.put(LichRogueBoss.identityTag, LichRogueBoss::new);
@@ -491,6 +499,9 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(KamikazeBoss.identityTag, KamikazeBoss::deserialize);
 		mBossDeserializers.put(TinyBombTossBoss.identityTag, TinyBombTossBoss::deserialize);
 		mBossDeserializers.put(AntiRangeBoss.identityTag, AntiRangeBoss::deserialize);
+		mBossDeserializers.put(AntiMeleeBoss.identityTag, AntiMeleeBoss::deserialize);
+		mBossDeserializers.put(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::deserialize);
+		mBossDeserializers.put(DamageCapBoss.identityTag, DamageCapBoss::deserialize);
 		mBossDeserializers.put(AntiRangeChivalrousBoss.identityTag, AntiRangeChivalrousBoss::deserialize);
 		mBossDeserializers.put(ImmortalMountBoss.identityTag, ImmortalMountBoss::deserialize);
 		mBossDeserializers.put(SilenceOnHitBoss.identityTag, SilenceOnHitBoss::deserialize);
@@ -555,6 +566,8 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(PhasesManagerBoss.identityTag, PhasesManagerBoss::deserialize);
 		mBossDeserializers.put(SoundBoss.identityTag, SoundBoss::deserialize);
 		mBossDeserializers.put(RedstoneBoss.identityTag, RedstoneBoss::deserialize);
+		mBossDeserializers.put(SlashAttackBoss.identityTag, SlashAttackBoss::deserialize);
+		mBossDeserializers.put(DashBoss.identityTag, DashBoss::deserialize);
 
 		mBossDeserializers.put(Lich.identityTag, Lich::deserialize);
 		mBossDeserializers.put(LichAlchBoss.identityTag, LichAlchBoss::deserialize);
@@ -604,6 +617,8 @@ public class BossManager implements Listener {
 		mBossParameters.put(BlockLockBoss.identityTag, new BlockLockBoss.Parameters());
 		mBossParameters.put(ChestLockBoss.identityTag, new ChestLockBoss.Parameters());
 		mBossParameters.put(AntiRangeBoss.identityTag, new AntiRangeBoss.Parameters());
+		mBossParameters.put(AntiMeleeBoss.identityTag, new AntiMeleeBoss.Parameters());
+		mBossParameters.put(DamageCapBoss.identityTag, new DamageCapBoss.Parameters());
 		mBossParameters.put(UnyieldingBoss.identityTag, new UnyieldingBoss.Parameters());
 		mBossParameters.put(ToughBoss.identityTag, new ToughBoss.Parameters());
 		mBossParameters.put(UnseenBoss.identityTag, new UnseenBoss.Parameters());
@@ -666,7 +681,8 @@ public class BossManager implements Listener {
 		mBossParameters.put(SoundBoss.identityTag, new SoundBoss.Parameters());
 		mBossParameters.put(TagScalingBoss.identityTag, new TagScalingBoss.Parameters());
 		mBossParameters.put(RedstoneBoss.identityTag, new RedstoneBoss.Parameters());
-
+		mBossParameters.put(SlashAttackBoss.identityTag, new SlashAttackBoss.Parameters());
+		mBossParameters.put(DashBoss.identityTag, new DashBoss.Parameters());
 	}
 
 	/********************************************************************************
