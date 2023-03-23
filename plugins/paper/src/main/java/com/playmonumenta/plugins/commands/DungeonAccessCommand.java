@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -272,6 +273,10 @@ public class DungeonAccessCommand extends GenericCommand {
 				}
 			}
 		}
+	}
+
+	public static void send(Player player, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation) {
+		send(List.of(player), mapping, returnLocation, returnLocation.getYaw(), returnLocation.getPitch());
 	}
 
 	/**

@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
+import com.playmonumenta.plugins.commands.DungeonAccessCommand;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DungeonUtils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -10,7 +12,9 @@ import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -33,49 +37,38 @@ public class OrinCustomInventory extends CustomInventory {
 		String mLore;
 		int mScoreRequired;
 		Material mType;
-		String mLeftClick;
-		String mRightClick;
+		@Nullable BiConsumer<OrinCustomInventory, Player> mLeftClick;
+		@Nullable BiConsumer<OrinCustomInventory, Player> mRightClick;
 		int mItemCount;
 
-		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left, String right) {
-			mPage = p;
-			mSlot = s;
-			mName = n;
-			mLore = l;
-			mType = t;
-			mScoreboard = sc;
-			mScoreRequired = sr;
-			mLeftClick = left;
-			mRightClick = right;
-			mItemCount = 1;
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left) {
+			this(page, slot, name, lore, type, scoreboard, scoreRequired, left, null, 1);
 		}
 
-		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left) {
-			mPage = p;
-			mSlot = s;
-			mName = n;
-			mLore = l;
-			mType = t;
-			mScoreboard = sc;
-			mScoreRequired = sr;
-			mLeftClick = left;
-			mRightClick = "";
-			mItemCount = 1;
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left, @Nullable String right) {
+			this(page, slot, name, lore, type, scoreboard, scoreRequired, left, right, 1);
 		}
 
-		public TeleportEntry(int p, int s, String n, String l, Material t, @Nullable String sc, int sr, String left, String right, int count) {
-			mPage = p;
-			mSlot = s;
-			mName = n;
-			mLore = l;
-			mType = t;
-			mScoreboard = sc;
-			mScoreRequired = sr;
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, @Nullable String scoreboard, int scoreRequired, @Nullable String left, @Nullable String right, int count) {
+			this(page, slot, name, lore, type, scoreboard, scoreRequired,
+				StringUtils.isBlank(left) ? null : (gui, player) -> gui.completeCommand(player, left),
+				StringUtils.isBlank(right) ? null : (gui, player) -> gui.completeCommand(player, right), count);
+		}
+
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, @Nullable String scoreboard, int scoreRequired, @Nullable BiConsumer<OrinCustomInventory, Player> left, @Nullable BiConsumer<OrinCustomInventory, Player> right, int count) {
+			mPage = page;
+			mSlot = slot;
+			mName = name;
+			mLore = lore;
+			mType = type;
+			mScoreboard = scoreboard;
+			mScoreRequired = scoreRequired;
 			mLeftClick = left;
 			mRightClick = right;
 			mItemCount = count;
 		}
 	}
+
 	/* Page Info
 	 * Page 0: Common for 1-9
 	 * Page 1: Region 1
@@ -171,31 +164,30 @@ public class OrinCustomInventory extends CustomInventory {
 
 		//21: Dungeon Instances
 		//Group: R1 Dungeons
-		ORIN_ITEMS.add(new TeleportEntry(21, 18, "Labs", "Click to teleport!", Material.GLASS_BOTTLE, "D0Access", 1, "execute as @S run function monumenta:lobbies/send_one/d0"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 19, "White", "Click to teleport!", Material.WHITE_WOOL, "D1Access", 1, "execute as @S run function monumenta:lobbies/send_one/d1"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 20, "Orange", "Click to teleport!", Material.ORANGE_WOOL, "D2Access", 1, "execute as @S run function monumenta:lobbies/send_one/d2"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 27, "Magenta", "Click to teleport!", Material.MAGENTA_WOOL, "D3Access", 1, "execute as @S run function monumenta:lobbies/send_one/d3"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 28, "Light Blue", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "D4Access", 1, "execute as @S run function monumenta:lobbies/send_one/d4"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 29, "Yellow", "Click to teleport!", Material.YELLOW_WOOL, "D5Access", 1, "execute as @S run function monumenta:lobbies/send_one/d5"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 36, "Willows", "Click to teleport!", Material.JUNGLE_LEAVES, "DB1Access", 1, "execute as @S run function monumenta:lobbies/send_one/db1"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 37, "Reverie", "Click to teleport!", Material.FIRE_CORAL, "DCAccess", 1, "execute as @S run function monumenta:lobbies/send_one/dc"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 38, "Sanctum", "Click to teleport!", Material.GRASS_BLOCK, "DS1Access", 1, "execute as @S run function monumenta:lobbies/send_one/ds1"));
+		ORIN_ITEMS.add(new TeleportEntry(21, 18, "Labs", "Click to teleport!", Material.GLASS_BOTTLE, "D0Access", 1, sendToDungeonAction(DungeonCommandMapping.LABS), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 19, "White", "Click to teleport!", Material.WHITE_WOOL, "D1Access", 1, sendToDungeonAction(DungeonCommandMapping.WHITE), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 20, "Orange", "Click to teleport!", Material.ORANGE_WOOL, "D2Access", 1, sendToDungeonAction(DungeonCommandMapping.ORANGE), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 27, "Magenta", "Click to teleport!", Material.MAGENTA_WOOL, "D3Access", 1, sendToDungeonAction(DungeonCommandMapping.MAGENTA), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 28, "Light Blue", "Click to teleport!", Material.LIGHT_BLUE_WOOL, "D4Access", 1, sendToDungeonAction(DungeonCommandMapping.LIGHTBLUE), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 29, "Yellow", "Click to teleport!", Material.YELLOW_WOOL, "D5Access", 1, sendToDungeonAction(DungeonCommandMapping.YELLOW), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 36, "Willows", "Click to teleport!", Material.JUNGLE_LEAVES, "DB1Access", 1, sendToDungeonAction(DungeonCommandMapping.WILLOWS), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 37, "Reverie", "Click to teleport!", Material.FIRE_CORAL, "DCAccess", 1, sendToDungeonAction(DungeonCommandMapping.REVERIE), null, 1));
 
 		//Group: R2 Dungeons
-		ORIN_ITEMS.add(new TeleportEntry(21, 21, "Lime", "Click to teleport!", Material.LIME_WOOL, "D6Access", 1, "execute as @S run function monumenta:lobbies/send_one/d6"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 22, "Pink", "Click to teleport!", Material.PINK_WOOL, "D7Access", 1, "execute as @S run function monumenta:lobbies/send_one/d7"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 23, "Gray", "Click to teleport!", Material.GRAY_WOOL, "D8Access", 1, "execute as @S run function monumenta:lobbies/send_one/d8"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 30, "Light Gray", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "D9Access", 1, "execute as @S run function monumenta:lobbies/send_one/d9"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 31, "Cyan", "Click to teleport!", Material.CYAN_WOOL, "D10Access", 1, "execute as @S run function monumenta:lobbies/send_one/d10"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 32, "Purple", "Click to teleport!", Material.PURPLE_WOOL, "D11Access", 1, "execute as @S run function monumenta:lobbies/send_one/d11"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 39, "Teal", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "DTLAccess", 1, "execute as @S run function monumenta:lobbies/send_one/dtl"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 40, "Shifting City", "Click to teleport!", Material.PRISMARINE_BRICKS, "DRL2Access", 1, "execute as @S run function monumenta:lobbies/send_one/drl2"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 41, "The Fallen Forum", "Click to teleport!", Material.BOOKSHELF, "DFFAccess", 1, "execute as @S run function monumenta:lobbies/send_one/dff", ""));
+		ORIN_ITEMS.add(new TeleportEntry(21, 21, "Lime", "Click to teleport!", Material.LIME_WOOL, "D6Access", 1, sendToDungeonAction(DungeonCommandMapping.LIME), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 22, "Pink", "Click to teleport!", Material.PINK_WOOL, "D7Access", 1, sendToDungeonAction(DungeonCommandMapping.PINK), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 23, "Gray", "Click to teleport!", Material.GRAY_WOOL, "D8Access", 1, sendToDungeonAction(DungeonCommandMapping.GRAY), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 30, "Light Gray", "Click to teleport!", Material.LIGHT_GRAY_WOOL, "D9Access", 1, sendToDungeonAction(DungeonCommandMapping.LIGHTGRAY), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 31, "Cyan", "Click to teleport!", Material.CYAN_WOOL, "D10Access", 1, sendToDungeonAction(DungeonCommandMapping.CYAN), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 32, "Purple", "Click to teleport!", Material.PURPLE_WOOL, "D11Access", 1, sendToDungeonAction(DungeonCommandMapping.PURPLE), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 39, "Teal", "Click to teleport!", Material.CYAN_CONCRETE_POWDER, "DTLAccess", 1, sendToDungeonAction(DungeonCommandMapping.TEAL), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 40, "Shifting City", "Click to teleport!", Material.PRISMARINE_BRICKS, "DRL2Access", 1, sendToDungeonAction(DungeonCommandMapping.SHIFTINGCITY), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 41, "The Fallen Forum", "Click to teleport!", Material.BOOKSHELF, "DFFAccess", 1, sendToDungeonAction(DungeonCommandMapping.FORUM), null, 1));
 
 		//Group: R3 Dungeons
-		ORIN_ITEMS.add(new TeleportEntry(21, 24, "Silver Knight's Tomb", "Click to teleport!", Material.DEEPSLATE, "DSKTAccess", 1, "execute as @S run function monumenta:lobbies/send_one/dskt"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 25, "Blue", "Click to teleport!", Material.BLUE_WOOL, "D12Access", 1, "execute as @S run function monumenta:lobbies/send_one/d12"));
-		ORIN_ITEMS.add(new TeleportEntry(21, 26, "Brown", "Click to teleport!", Material.BROWN_WOOL, "D13Access", 1, "execute as @S run function monumenta:lobbies/send_one/d13"));
+		ORIN_ITEMS.add(new TeleportEntry(21, 24, "Silver Knight's Tomb", "Click to teleport!", Material.DEEPSLATE, "DSKTAccess", 1, sendToDungeonAction(DungeonCommandMapping.SKT), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 25, "Blue", "Click to teleport!", Material.BLUE_WOOL, "D12Access", 1, sendToDungeonAction(DungeonCommandMapping.BLUE), null, 1));
+		ORIN_ITEMS.add(new TeleportEntry(21, 26, "Brown", "Click to teleport!", Material.BROWN_WOOL, "D13Access", 1, sendToDungeonAction(DungeonCommandMapping.BROWN), null, 1));
 	}
 
 	private int mCurrentPage;
@@ -247,16 +239,24 @@ public class OrinCustomInventory extends CustomInventory {
 			for (TeleportEntry item : ORIN_ITEMS) {
 				if (item.mSlot == chosenSlot && item.mPage == mCurrentPage) {
 					if (event.isLeftClick()) {
-						completeCommand(player, item.mLeftClick);
+						if (item.mLeftClick != null) {
+							item.mLeftClick.accept(this, player);
+						}
 					} else {
-						completeCommand(player, item.mRightClick);
+						if (item.mRightClick != null) {
+							item.mRightClick.accept(this, player);
+						}
 					}
 				}
 				if (item.mSlot == chosenSlot && item.mPage == commonPage) {
 					if (event.isLeftClick()) {
-						completeCommand(player, item.mLeftClick);
+						if (item.mLeftClick != null) {
+							item.mLeftClick.accept(this, player);
+						}
 					} else {
-						completeCommand(player, item.mRightClick);
+						if (item.mRightClick != null) {
+							item.mRightClick.accept(this, player);
+						}
 					}
 				}
 			}
@@ -264,9 +264,13 @@ public class OrinCustomInventory extends CustomInventory {
 				for (TeleportEntry item : INSTANCE_ITEMS) {
 					if (item.mSlot == chosenSlot && item.mPage == mCurrentPage) {
 						if (event.isLeftClick()) {
-							completeCommand(player, item.mLeftClick);
+							if (item.mLeftClick != null) {
+								item.mLeftClick.accept(this, player);
+							}
 						} else {
-							completeCommand(player, item.mRightClick);
+							if (item.mRightClick != null) {
+								item.mRightClick.accept(this, player);
+							}
 						}
 					}
 				}
@@ -274,7 +278,7 @@ public class OrinCustomInventory extends CustomInventory {
 		}
 	}
 
-	public Boolean isInternalCommand(String command) {
+	public boolean isInternalCommand(String command) {
 		return command.equals("exit") || command.startsWith("page") || command.startsWith("instancebot") || command.equals("back");
 	}
 
@@ -336,6 +340,10 @@ public class OrinCustomInventory extends CustomInventory {
 				player.closeInventory();
 			}
 		}
+	}
+
+	private static BiConsumer<OrinCustomInventory, Player> sendToDungeonAction(DungeonCommandMapping dungeon) {
+		return (gui, player) -> DungeonAccessCommand.send(player, dungeon, player.getLocation());
 	}
 
 	public ItemStack createCustomItem(TeleportEntry location) {
