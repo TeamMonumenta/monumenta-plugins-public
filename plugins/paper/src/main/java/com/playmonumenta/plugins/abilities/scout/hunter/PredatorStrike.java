@@ -117,8 +117,7 @@ public class PredatorStrike extends Ability {
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (!mActive
-			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
+		if (!mActive || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			return true;
 		}
 		mActive = false;
