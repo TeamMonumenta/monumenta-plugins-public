@@ -466,7 +466,7 @@ public class KnickKnackSackGui extends Gui {
 		CosmeticsManager cm = CosmeticsManager.INSTANCE;
 
 		return cm.playerHasCosmetic(mPlayer, CosmeticType.COSMETIC_SKILL, t.mAssociatedSkill)
-			&& mPlayer.getInventory().contains(makeTrinketItemStack(t.mPath))
+			&& mPlayer.getInventory().containsAtLeast(makeTrinketItemStack(t.mPath), 1)
 			&& ScoreboardUtils.getScoreboardValue(mPlayer, t.mUnlockObjective).orElse(0) == 1;
 	}
 
@@ -535,7 +535,7 @@ public class KnickKnackSackGui extends Gui {
 		// The item will only have an onClick if the player is eligible for a refund
 		return new GuiItem(i).onClick((evt) -> {
 			ItemStack trinket = makeTrinketItemStack(t.mPath);
-			if (mPlayer.getInventory().contains(trinket)) {
+			if (mPlayer.getInventory().containsAtLeast(trinket, 1)) {
 				if (mPlayer.getInventory().firstEmpty() < 0) {
 					// if player inventory is full
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
@@ -549,7 +549,7 @@ public class KnickKnackSackGui extends Gui {
 				ScoreboardUtils.setScoreboardValue(mPlayer, t.mUnlockObjective, 2);
 
 				// Remove the talisman from the player's inventory
-				mPlayer.getInventory().remove(trinket);
+				mPlayer.getInventory().removeItem(trinket);
 
 				mPlayer.sendMessage(Component.text("You have been given a refund of 64 Voidstained Geodes!", NamedTextColor.GREEN));
 				mPage = Page.DEPTHS_TALISMANS;
