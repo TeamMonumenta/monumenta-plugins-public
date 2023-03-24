@@ -636,67 +636,71 @@ public class ItemStatUtils {
 
 	public enum InfusionType {
 		// Infusions
-		ACUMEN(new Acumen(), "", true, false, false, true),
-		ANTIGRAV(new AntiGrav(), "", true, false, false, true),
-		ARDOR(new Ardor(), "", true, false, false, true),
-		AURA(new Aura(), "", true, false, false, true),
-		CARAPACE(new Carapace(), "", true, false, false, true),
-		CHOLER(new Choler(), "", true, false, false, true),
-		DECAPITATION(new Decapitation(), "", true, false, false, true),
-		EMPOWERED(new Empowered(), "", true, false, false, true),
-		ENERGIZE(new Energize(), "", true, false, false, true),
-		EPOCH(new Epoch(), "", true, false, false, true),
-		EXECUTION(new Execution(), "", true, false, false, true),
-		EXPEDITE(new Expedite(), "", true, false, false, true),
-		FUELED(new Fueled(), "", true, false, false, true),
-		FOCUS(new Focus(), "", true, false, false, true),
-		GALVANIC(new Galvanic(), "", true, false, false, true),
-		GRACE(new Grace(), "", true, false, false, true),
-		MITOSIS(new Mitosis(), "", true, false, false, true),
-		NATANT(new Natant(), "", true, false, false, true),
-		NUTRIMENT(new Nutriment(), "", true, false, false, true),
-		PENNATE(new Pennate(), "", true, false, false, true),
-		PERSPICACITY(new Perspicacity(), "", true, false, false, true),
-		QUENCH(new Quench(), "", true, false, false, true),
-		REFLECTION(new Reflection(), "", true, false, false, true),
-		REFRESH(new Refresh(), "", true, false, false, true),
-		SOOTHING(new Soothing(), "", true, false, false, true),
-		TENACITY(new Tenacity(), "", true, false, false, true),
-		UNDERSTANDING(new Understanding(), "", true, false, false, true),
-		UNYIELDING(new Unyielding(), "", true, false, false, true),
-		USURPER(new Usurper(), "", true, false, false, true),
-		VENGEFUL(new Vengeful(), "", true, false, false, true),
-		VIGOR(new Vigor(), "", true, false, false, true),
-		VITALITY(new Vitality(), "", true, false, false, true),
+		ACUMEN(new Acumen(), "", true, false, false, false, true),
+		ANTIGRAV(new AntiGrav(), "", true, false, false, false, true),
+		ARDOR(new Ardor(), "", true, false, false, false, true),
+		AURA(new Aura(), "", true, false, false, false, true),
+		CARAPACE(new Carapace(), "", true, false, false, false, true),
+		CHOLER(new Choler(), "", true, false, false, false, true),
+		DECAPITATION(new Decapitation(), "", false, true, false, false, true),
+		EMPOWERED(new Empowered(), "", true, false, false, false, true),
+		ENERGIZE(new Energize(), "", true, false, false, false, true),
+		EPOCH(new Epoch(), "", true, false, false, false, true),
+		EXECUTION(new Execution(), "", true, false, false, false, true),
+		EXPEDITE(new Expedite(), "", true, false, false, false, true),
+		FUELED(new Fueled(), "", true, false, false, false, true),
+		FOCUS(new Focus(), "", true, false, false, false, true),
+		GALVANIC(new Galvanic(), "", true, false, false, false, true),
+		GRACE(new Grace(), "", true, false, false, false, true),
+		MITOSIS(new Mitosis(), "", true, false, false, false, true),
+		NATANT(new Natant(), "", true, false, false, false, true),
+		NUTRIMENT(new Nutriment(), "", true, false, false, false, true),
+		PENNATE(new Pennate(), "", true, false, false, false, true),
+		PERSPICACITY(new Perspicacity(), "", true, false, false, false, true),
+		QUENCH(new Quench(), "", true, false, false, false, true),
+		REFLECTION(new Reflection(), "", true, false, false, false, true),
+		REFRESH(new Refresh(), "", true, false, false, false, true),
+		SOOTHING(new Soothing(), "", true, false, false, false, true),
+		TENACITY(new Tenacity(), "", true, false, false, false, true),
+		UNDERSTANDING(new Understanding(), "", true, false, false, false, true),
+		UNYIELDING(new Unyielding(), "", true, false, false, false, true),
+		USURPER(new Usurper(), "", true, false, false, false, true),
+		VENGEFUL(new Vengeful(), "", true, false, false, false, true),
+		VIGOR(new Vigor(), "", true, false, false, false, true),
+		VITALITY(new Vitality(), "", true, false, false, false, true),
 		// Other Added Tags
-		LOCKED(new Locked(), "", false, false, false, false),
-		BARKING(new Barking(), "", true, true, false, false),
-		DEBARKING(new Debarking(), "", false, false, false, false),
-		HOPE(new Hope(), "Hoped", false, true, false, false),
-		COLOSSAL(new Colossal(), "Reinforced", false, false, false, false),
-		PHYLACTERY(new Phylactery(), "Embalmed", false, false, false, false),
-		SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false),
-		FESTIVE(new Festive(), "Decorated", false, true, false, false),
-		GILDED(new Gilded(), "Gilded", false, true, false, false),
-		SHATTERED(new Shattered(), "", true, false, false, false),
+		LOCKED(new Locked(), "", false, false, false, false, false),
+		BARKING(new Barking(), "", true, false, true, false, false),
+		DEBARKING(new Debarking(), "", false, false, false, false, false),
+		RUSTWORTHY(new Rustworthy(), "", true, true, false, false, false),
+		UNRUSTWORTHY(new Unrustworthy(), "", false, false, false, false, false),
+		WAX_ON(new WaxOn(), "", false, false, false, false, false),
+		WAX_OFF(new WaxOff(), "", false, false, false, false, false),
+		HOPE(new Hope(), "Hoped", false, false, true, false, false),
+		COLOSSAL(new Colossal(), "Reinforced", false, false, false, false, false),
+		PHYLACTERY(new Phylactery(), "Embalmed", false, false, false, false, false),
+		SOULBOUND(new Soulbound(), "Soulbound", false, false, false, false, false),
+		FESTIVE(new Festive(), "Decorated", false, false, true, false, false),
+		GILDED(new Gilded(), "Gilded", false, false, true, false, false),
+		SHATTERED(new Shattered(), "", true, false, false, false, false),
 		// Stat tracking stuff
-		STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false),
-		STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, true, false),
-		STAT_TRACK_DAMAGE(new StatTrackDamage(), "", true, false, true, false),
-		STAT_TRACK_MELEE(new StatTrackMelee(), "", true, false, true, false),
-		STAT_TRACK_PROJECTILE(new StatTrackProjectile(), "", true, false, true, false),
-		STAT_TRACK_MAGIC(new StatTrackMagic(), "", true, false, true, false),
-		STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, true, false),
-		STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, true, false),
-		STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, true, false),
-		STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, true, false),
-		STAT_TRACK_RIPTIDE(new StatTrackRiptide(), "", true, false, true, false),
-		STAT_TRACK_BLOCKS_BROKEN(new StatTrackBlocksBroken(), "", true, false, true, false),
-		STAT_TRACK_SHIELD_BLOCKED(new StatTrackShielded(), "", true, false, true, false),
-		STAT_TRACK_DEATH(new StatTrackDeath(), "", true, false, true, false),
-		STAT_TRACK_REPAIR(new StatTrackRepair(), "", true, false, true, false),
-		STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, true, false),
-		STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, true, false);
+		STAT_TRACK(new StatTrack(), "Tracked", false, false, false, false, false),
+		STAT_TRACK_KILLS(new StatTrackKills(), "", true, false, false, true, false),
+		STAT_TRACK_DAMAGE(new StatTrackDamage(), "", true, false, false, true, false),
+		STAT_TRACK_MELEE(new StatTrackMelee(), "", true, false, false, true, false),
+		STAT_TRACK_PROJECTILE(new StatTrackProjectile(), "", true, false, false, true, false),
+		STAT_TRACK_MAGIC(new StatTrackMagic(), "", true, false, false, true, false),
+		STAT_TRACK_BOSS(new StatTrackBoss(), "", true, false, false, true, false),
+		STAT_TRACK_SPAWNER(new StatTrackSpawners(), "", true, false, false, true, false),
+		STAT_TRACK_CONSUMED(new StatTrackConsumed(), "", true, false, false, true, false),
+		STAT_TRACK_BLOCKS(new StatTrackBlocks(), "", true, false, false, true, false),
+		STAT_TRACK_RIPTIDE(new StatTrackRiptide(), "", true, false, false, true, false),
+		STAT_TRACK_BLOCKS_BROKEN(new StatTrackBlocksBroken(), "", true, false, false, true, false),
+		STAT_TRACK_SHIELD_BLOCKED(new StatTrackShielded(), "", true, false, false, true, false),
+		STAT_TRACK_DEATH(new StatTrackDeath(), "", true, false, false, true, false),
+		STAT_TRACK_REPAIR(new StatTrackRepair(), "", true, false, false, true, false),
+		STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, false, true, false),
+		STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false);
 
 		public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
 			                                                                 .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
@@ -722,14 +726,16 @@ public class ItemStatUtils {
 		final String mMessage;
 		final boolean mIsSpawnable;
 		final boolean mHasLevels;
+		final boolean mIsCurse;
 		final boolean mIsStatTrackOption;
 		final boolean mIsRegionScaled;
 
-		InfusionType(ItemStat itemStat, String message, boolean hasLevels, boolean isSpawnable, boolean isStatTrackOption, boolean isRegionScaled) {
+		InfusionType(ItemStat itemStat, String message, boolean hasLevels, boolean isCurse, boolean isSpawnable, boolean isStatTrackOption, boolean isRegionScaled) {
 			mItemStat = itemStat;
 			mName = itemStat.getName();
 			mIsSpawnable = isSpawnable;
 			mHasLevels = hasLevels;
+			mIsCurse = isCurse;
 			mMessage = message;
 			mIsStatTrackOption = isStatTrackOption;
 			mIsRegionScaled = isRegionScaled;
@@ -754,30 +760,30 @@ public class ItemStatUtils {
 		public Component getDisplay(int level, String infuser) {
 			if (!mHasLevels) {
 				if (mMessage.isEmpty()) {
-					return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+					return Component.text(mName, mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 				} else if (this == SOULBOUND) {
-					return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
+					return Component.text(mName, mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " to " + infuser + ")", NamedTextColor.DARK_GRAY));
 				} else {
-					return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
+					return Component.text(mName, mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
 				}
 			} else if (mIsStatTrackOption) {
 				return Component.text(mName + ": " + (level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else {
 				if (mMessage.isEmpty()) {
-					return Component.text(mName + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+					return Component.text(mName + " " + toRomanNumerals(level), mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 				} else {
-					return Component.text(mName + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
+					return Component.text(mName + " " + toRomanNumerals(level), mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
 				}
 			}
 		}
 
 		public Component getDisplay(int level) {
 			if (!mHasLevels) {
-				return Component.text(mName, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				return Component.text(mName, mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 			} else if (mIsStatTrackOption) {
 				return Component.text(mName + ": " + (level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else {
-				return Component.text(mName + " " + toRomanNumerals(level), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+				return Component.text(mName + " " + toRomanNumerals(level), mIsCurse ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 			}
 		}
 
@@ -898,7 +904,7 @@ public class ItemStatUtils {
 					return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 				}
 			} else if (slot == Slot.MAINHAND && attribute == PROJECTILE_SPEED) {
-				// Hack for mainhands using projectile speed multiply instead of add
+				// Hack for mainhand items using projectile speed multiply instead of add
 				return Component.text(String.format(" %s %s", NUMBER_FORMATTER.format(amount), name), NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false);
 			}
 
@@ -1871,9 +1877,8 @@ public class ItemStatUtils {
 			return;
 		}
 
-		attributes.removeIf((attribute) -> {
-			return attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName());
-		});
+		attributes.removeIf((attribute) ->
+			attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 
@@ -2158,7 +2163,7 @@ public class ItemStatUtils {
 		// Checks for PI + Totem of Transposing
 		if (ItemUtils.getPlainName(item).equals("Potion Injector") && ItemUtils.isShulkerBox(item.getType())) {
 			List<String> plainLore = ItemUtils.getPlainLore(item);
-			Component potionName = item.lore().get(1);
+			Component potionName = Objects.requireNonNull(item.lore()).get(1);
 			lore.add(Component.text(plainLore.get(0), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 			lore.add(potionName);
 		} else if (ItemUtils.getPlainName(item).equals("Totem of Transposing")) {
@@ -2243,26 +2248,12 @@ public class ItemStatUtils {
 					if (region == Region.RING) {
 						if (masterwork != null && masterwork != Masterwork.ERROR && masterwork != Masterwork.NONE) {
 							switch (Objects.requireNonNull(masterwork)) {
-								case ZERO:
-								case I:
-								case II:
-								case III:
-									tier = Tier.RARE;
-									break;
-								case IV:
-								case V:
-									tier = Tier.ARTIFACT;
-									break;
-								case VI:
-									tier = Tier.EPIC;
-									break;
-								case VIIA:
-								case VIIB:
-								case VIIC:
-									tier = Tier.LEGENDARY;
-									break;
-								default:
-									break;
+								case ZERO, I, II, III -> tier = Tier.RARE;
+								case IV, V -> tier = Tier.ARTIFACT;
+								case VI -> tier = Tier.EPIC;
+								case VIIA, VIIB, VIIC -> tier = Tier.LEGENDARY;
+								default -> {
+								}
 							}
 							monumenta.setString(Tier.KEY, tier.getName());
 						}
@@ -2275,10 +2266,7 @@ public class ItemStatUtils {
 				if (isCharm(item)) {
 					int charmPower = getCharmPower(item);
 					if (charmPower > 0) {
-						String starString = "";
-						for (int i = 0; i < charmPower; i++) {
-							starString += "★";
-						}
+						String starString = "★".repeat(charmPower);
 						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false))
 							         .append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClassComponent(monumenta.getStringList(CHARM_KEY))));
 					}
