@@ -91,9 +91,9 @@ public class SpellFrostGiantBlockBreak extends Spell {
 								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 							}
 						}
-					} else if (!mIgnoredMats.contains(material) && !mNoBreak.contains(material) &&
-						           (material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.carpet.contains(material)) &&
-						           (!(block.getState() instanceof Lootable) || !((Lootable) block.getState()).hasLootTable())) {
+					} else if (!mIgnoredMats.contains(material) && !mNoBreak.contains(material)
+						           && (material.isSolid() || material.equals(Material.COBWEB) || block.getBlockData() instanceof TrapDoor || ItemUtils.CARPETS.contains(material))
+						           && (!(block.getState() instanceof Lootable) || !((Lootable) block.getState()).hasLootTable())) {
 						badBlockList.add(block);
 					}
 				}

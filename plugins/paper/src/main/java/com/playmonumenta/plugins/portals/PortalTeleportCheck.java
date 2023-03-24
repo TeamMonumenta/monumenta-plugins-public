@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.portals;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -56,7 +59,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 
 	private final Map<UUID, Integer> mCooldowns = new HashMap<>();
 
-	private List<Map<UUID, Vector>> mPastPlayerLocs = new ArrayList<>();
+	private final List<Map<UUID, Vector>> mPastPlayerLocs = new ArrayList<>();
 
 	private final Player mPlayer;
 
@@ -73,8 +76,10 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		}
 		World w1 = p1.getWorld();
 		World w2 = p2.getWorld();
-		BoundingBox b1 = p1.getBoundingBox();
-		BoundingBox b2 = p2.getBoundingBox();
+
+		// slightly expanded bounding boxes to better catch entering from the sides
+		BoundingBox b1 = p1.getBoundingBox().expand(0.1);
+		BoundingBox b2 = p2.getBoundingBox().expand(0.1);
 
 		// Show bounding boxes for debugging
 		//ParticleUtils.tickBoundingBoxEdge(w1, b1, Color.fromRGB(127, 127, 255), 50);
@@ -146,29 +151,81 @@ public class PortalTeleportCheck extends BukkitRunnable {
 		if (mCooldowns.containsKey(entityUuid)) {
 			return;
 		}
-		// Ensure the player has a valid velocity to modify
-		if (entity instanceof Player) {
-			from.travel(entity, getRecentVelocity((Player) entity));
+		if (entity instanceof Player player) {
+			if (!portalEnterCheck(player, from)) {
+				return;
+			}
+			from.travel(entity, getRecentVelocity(player));
 		} else {
 			from.travel(entity);
 		}
 		switch (to.mFacing) {
-		case UP:
-			if (ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
-				mCooldowns.put(entityUuid, 25);
+			case UP:
+				if (ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
+					mCooldowns.put(entityUuid, 25);
+					break;
+				}
+				mCooldowns.put(entityUuid, 8);
 				break;
-			}
-			mCooldowns.put(entityUuid, 8);
-			break;
-		case DOWN:
-			if (ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
-				mCooldowns.put(entityUuid, 25);
+			case DOWN:
+				if (ServerProperties.getAbilityEnhancementsEnabled(mPlayer)) {
+					mCooldowns.put(entityUuid, 25);
+					break;
+				}
+				mCooldowns.put(entityUuid, 12);
 				break;
+			default:
+				mCooldowns.put(entityUuid, entity instanceof Player ? 10 : 25);
+		}
+	}
+
+	/**
+	 * Checks if the player should be teleported by the given portal.
+	 */
+	private boolean portalEnterCheck(Player player, Portal portal) {
+		// Check for intersection with the real bounding box first - we don't want to be able to enter portals from behind
+		if (!player.getBoundingBox().overlaps(portal.getBoundingBox())) {
+			return false;
+		}
+		// Ensure the player has a valid velocity to modify
+		Vector recentVelocity = getRecentVelocity(player);
+		if (portal.mFacing == BlockFace.DOWN) {
+			// Ceiling portals must be entered going upwards, not level or downwards
+			return recentVelocity.getY() > 0.01;
+		} else if (portal.mFacing == BlockFace.UP) {
+			// Floor portals must be entered going downwards or level to the ground, not upwards
+			return recentVelocity.getY() < 0.01;
+		} else {
+			// Wall portals must be entered by going in their direction
+			// To test this, check if the player would hit the portal if they kept going in the current direction
+			// Also test for movement speed to teleport later if moving more slowly (or equivalently, teleport earlier when fast)
+
+			Vector playerCenter = LocationUtils.getHalfHeightLocation(player).toVector();
+			Vector portalCenter = portal.getBoundingBox().getCenter().add(portal.mFacing.getDirection().multiply(-0.5));
+			double distanceToPortal = Math.abs(portalCenter.clone().subtract(playerCenter).dot(portal.mFacing.getDirection())) - player.getBoundingBox().getWidthX() / 2;
+
+			if (Math.abs(distanceToPortal) < 0.01) {
+				// Always teleport if touching the portal (e.g. moving while against the wall)
+				return true;
 			}
-			mCooldowns.put(entityUuid, 12);
-			break;
-		default:
-			mCooldowns.put(entityUuid, 25);
+			double speed = recentVelocity.length();
+			if (speed * 4 < distanceToPortal) {
+				// Moving too slowly towards the portal (or not moving at all) - don't teleport (yet), will probably teleport later unless the player stops moving or changes direction
+				return false;
+			}
+			Vector portalPlaneIntersection = VectorUtils.rayPlaneIntersection(playerCenter, recentVelocity.clone().normalize(), portalCenter, portal.mFacing.getDirection());
+			if (portalPlaneIntersection == null) {
+				// No intersection, i.e. moving away from or parallel to the portal (and we checked the special case of touching it already)
+				return false;
+			}
+			double dy = (portal.getBoundingBox().getHeight() + player.getBoundingBox().getHeight()) / 2;
+			double dxz = (portal.getBoundingBox().getWidthX() + player.getBoundingBox().getWidthX()) / 2;
+			Vector delta = portalCenter.clone().subtract(portalPlaneIntersection);
+			if (Math.abs(delta.getY()) > dy || Math.abs(delta.getX() + delta.getZ()) > dxz) { // (NB: either x or z is 0, so can add them)
+				// Player will miss the portal if they keep their current direction
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -189,23 +246,12 @@ public class PortalTeleportCheck extends BukkitRunnable {
 			locPrevious2 = mPastPlayerLocs.get(2).get(playerUuid);
 		}
 
-		@Nullable Vector velocity1 = null;
 		if (locNow != null && locPrevious1 != null) {
 			return locNow.clone().subtract(locPrevious1);
 		}
-		@Nullable Vector velocity2 = null;
 		if (locPrevious1 != null && locPrevious2 != null) {
 			return locPrevious1.clone().subtract(locPrevious2);
 		}
-
-		if (velocity1 == null) {
-			return player.getVelocity();
-		} else if (velocity2 == null) {
-			return velocity1;
-		} else if (velocity2.lengthSquared() > velocity1.lengthSquared()) {
-			return velocity1.normalize().multiply(velocity2.length());
-		} else {
-			return velocity1;
-		}
+		return player.getVelocity();
 	}
 }

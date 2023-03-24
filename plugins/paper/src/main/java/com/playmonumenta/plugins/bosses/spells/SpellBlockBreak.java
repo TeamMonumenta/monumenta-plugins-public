@@ -102,12 +102,12 @@ public class SpellBlockBreak extends Spell {
 								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 							}
 						}
-					} else if ((y > 0 || (mFootLevelBreak && y >= 0)) &&
-						           !BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material) &&
-						           (material.isSolid() || ItemUtils.carpet.contains(material) || ItemUtils.CANDLES.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD) || ItemUtils.FLOWER_POTS.contains(material)) &&
-						           (!(block.getState() instanceof Lootable)
-							            || (!((Lootable) block.getState()).hasLootTable()
-								                && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
+					} else if ((y > 0 || (mFootLevelBreak && y >= 0))
+						           && !BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material)
+						           && (material.isSolid() || ItemUtils.CARPETS.contains(material) || ItemUtils.CANDLES.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD) || ItemUtils.FLOWER_POTS.contains(material))
+						           && (!(block.getState() instanceof Lootable)
+							               || (!((Lootable) block.getState()).hasLootTable()
+								                   && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
 						badBlockList.add(block);
 					}
 				}

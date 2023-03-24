@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A powerful vector util class that allows you to rotate the design<br>
@@ -98,4 +99,46 @@ public class VectorUtils {
 			return dir;
 		}
 	}
+
+	/**
+	 * Calculates the intersection point of a line and a plane.
+	 * <p>
+	 * Returns null if the line and plane are parallel (i.e. they either don't intersect or the line is part of the plane).
+	 *
+	 * @param linePoint     A point on the line
+	 * @param lineDirection Direction of the line
+	 * @param planePoint    A point on the plane
+	 * @param planeNormal   Normal of the plane
+	 */
+	public static @Nullable Vector linePlaneIntersection(Vector linePoint, Vector lineDirection, Vector planePoint, Vector planeNormal) {
+		double cosAngle = lineDirection.dot(planeNormal);
+		if (cosAngle == 0) {
+			return null;
+		}
+		double intersectionDistance = planePoint.clone().subtract(linePoint).dot(planeNormal) / cosAngle;
+		return linePoint.clone().add(lineDirection.clone().multiply(intersectionDistance));
+	}
+
+	/**
+	 * Calculates the intersection point of a ray and a plane.
+	 * <p>
+	 * Returns null if the ray and plane don't intersect (i.e. if the ray is parallel to the plane or pointing away from it).
+	 *
+	 * @param rayStart     Start of the ray
+	 * @param rayDirection Direction of the ray
+	 * @param planePoint   A point on the plane
+	 * @param planeNormal  Normal of the plane
+	 */
+	public static @Nullable Vector rayPlaneIntersection(Vector rayStart, Vector rayDirection, Vector planePoint, Vector planeNormal) {
+		double cosAngle = rayDirection.dot(planeNormal);
+		if (cosAngle == 0) {
+			return null;
+		}
+		double intersectionDistance = planePoint.clone().subtract(rayStart).dot(planeNormal) / cosAngle;
+		if (intersectionDistance < 0) {
+			return null;
+		}
+		return rayStart.clone().add(rayDirection.clone().multiply(intersectionDistance));
+	}
+
 }

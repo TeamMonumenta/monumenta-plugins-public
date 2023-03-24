@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.portals;
 
+import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Location;
@@ -87,7 +88,7 @@ public class Portal {
 	}
 
 	public BoundingBox getBoundingBox() {
-		return BoundingBox.of(mLocation1, mLocation2).expand(0.1, 0.1, 0.1, 1.1, 1.1, 1.1);
+		return BoundingBox.of(mLocation1, mLocation2).expand(0, 0, 0, 1, 1, 1);
 	}
 
 	private Vector portalLeftDirection() {
@@ -99,26 +100,7 @@ public class Portal {
 	}
 
 	private static boolean willBeInBlock(Entity entity, Location location) {
-		World world = location.getWorld();
-		double entityHalfWidth = entity.getWidth() / 2.0;
-
-		int minX = (int) Math.floor(location.getX() - entityHalfWidth);
-		int minY = (int) Math.floor(location.getY());
-		int minZ = (int) Math.floor(location.getZ() - entityHalfWidth);
-		int maxX = (int) Math.floor(location.getX() + entityHalfWidth);
-		int maxY = (int) Math.floor(location.getY() + entity.getHeight());
-		int maxZ = (int) Math.floor(location.getZ() + entityHalfWidth);
-
-		for (int x = minX; x <= maxX; ++x) {
-			for (int y = minY; y <= maxY; ++y) {
-				for (int z = minZ; z <= maxZ; ++z) {
-					if (!world.getBlockAt(x, y, z).isPassable()) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+		return NmsUtils.getVersionAdapter().hasCollisionWithBlocks(location.getWorld(), entity.getBoundingBox().shift(entity.getLocation().multiply(-1)).shift(location), false);
 	}
 
 	private void fixInsideWall(Entity entity, Location location) {
@@ -134,20 +116,20 @@ public class Portal {
 			break;
 		case SOUTH:
 			// z+
-			location.setZ(Math.max(location.getZ(), location.getZ() + entityHalfWidth));
+			location.setZ(Math.max(location.getZ(), mLocation1.getZ() + entityHalfWidth));
 			break;
 		case NORTH:
 			// z-
-			location.setZ(Math.min(location.getZ(), location.getZ() + 1.0 - entityHalfWidth));
+			location.setZ(Math.min(location.getZ(), mLocation1.getZ() + 1.0 - entityHalfWidth));
 			break;
 		case EAST:
 			// x+
-			location.setX(Math.max(location.getX(), location.getX() + entityHalfWidth));
+			location.setX(Math.max(location.getX(), mLocation1.getX() + entityHalfWidth));
 			break;
 		case WEST:
 		default:
 			// x-
-			location.setX(Math.min(location.getX(), location.getX() + 1.0 - entityHalfWidth));
+			location.setX(Math.min(location.getX(), mLocation1.getX() + 1.0 - entityHalfWidth));
 			break;
 		}
 	}
@@ -247,6 +229,7 @@ public class Portal {
 			return;
 		}
 
+		double halfHeight = entity.getHeight() / 2;
 		Location location = entity.getLocation().clone();
 		Vector direction = location.getDirection();
 		if (mFacing == BlockFace.DOWN) {
@@ -257,7 +240,7 @@ public class Portal {
 			fireballDirection = fireball.getDirection();
 		}
 
-		location = mPair.fromInterPortalCoords(toInterPortalCoords(location));
+		location = mPair.fromInterPortalCoords(toInterPortalCoords(location.add(0, halfHeight, 0))).subtract(0, halfHeight, 0);
 		fixInsideWall(entity, location);
 		if (willBeInBlock(entity, location)) {
 			location = mPair.defaultTeleportLocation(entity);

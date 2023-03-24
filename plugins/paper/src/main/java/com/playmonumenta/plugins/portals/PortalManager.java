@@ -1,8 +1,10 @@
 package com.playmonumenta.plugins.portals;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
+import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,24 +57,44 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class PortalManager implements Listener {
-	public static final Set<Material> TRANSPARENT_BLOCKS_1 = Set.of(
-		Material.LIGHT_BLUE_STAINED_GLASS,
-		Material.PURPLE_STAINED_GLASS,
-		Material.AIR,
-		Material.WATER,
-		Material.LAVA,
-		Material.VINE,
-		Material.LIGHT
-	);
-	public static final Set<Material> TRANSPARENT_BLOCKS_2 = Set.of(
-		Material.ORANGE_STAINED_GLASS,
-		Material.PURPLE_STAINED_GLASS,
-		Material.AIR,
-		Material.WATER,
-		Material.LAVA,
-		Material.VINE,
-		Material.LIGHT
-	);
+
+	// Blocks where a portal can be placed within
+	private static final ImmutableSet<Material> ALLOWED_PORTAL_BLOCKS =
+		ImmutableSet.<Material>builder()
+			.addAll(ItemUtils.CARPETS)
+			.addAll(ItemUtils.BUTTONS)
+			.add(
+				Material.AIR,
+				Material.CAVE_AIR,
+				Material.LIGHT,
+				Material.VINE,
+				Material.CAVE_VINES,
+				Material.CAVE_VINES_PLANT,
+				Material.GLOW_BERRIES,
+				Material.GLOW_LICHEN
+			).build();
+
+	// Blocks that a portal beam can be shot through (for either portal)
+	private static final ImmutableSet<Material> TRANSPARENT_BLOCKS_COMMON =
+		ImmutableSet.<Material>builder()
+			.addAll(ALLOWED_PORTAL_BLOCKS)
+			.add(
+				Material.PURPLE_STAINED_GLASS,
+				Material.WATER,
+				Material.LAVA
+			).build();
+	// Same list as above, but with the portal-specific stained-glass blocks added (light blue/orange)
+	public static final ImmutableSet<Material> TRANSPARENT_BLOCKS_1 =
+		ImmutableSet.<Material>builder()
+			.addAll(TRANSPARENT_BLOCKS_COMMON)
+			.add(Material.LIGHT_BLUE_STAINED_GLASS)
+			.build();
+	public static final ImmutableSet<Material> TRANSPARENT_BLOCKS_2 =
+		ImmutableSet.<Material>builder()
+			.addAll(TRANSPARENT_BLOCKS_COMMON)
+			.add(Material.ORANGE_STAINED_GLASS)
+			.build();
+
 	public static final long LOG_SIZE_LIMIT = 1_000_000;
 	public static final String MAP_TAG = "PortalMap";
 
@@ -100,6 +122,19 @@ public class PortalManager implements Listener {
 	}
 
 	public static void spawnPortal(Player player, int portalNum, int gunId) {
+		boolean success = spawnPortalInternal(player, portalNum, gunId);
+
+		World world = player.getWorld();
+		if (success) {
+			for (int i = 0; i < 6; i++) {
+				world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 0.4f, 1f);
+			}
+		} else {
+			world.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 1, 2f);
+		}
+	}
+
+	private static boolean spawnPortalInternal(Player player, int portalNum, int gunId) {
 		portalLog("enter spawnPortal(" + player.getName() + ", " + portalNum + ", " + gunId + ");");
 
 		//Raycast player eye to block face
@@ -121,7 +156,7 @@ public class PortalManager implements Listener {
 
 		if (blockHit == null) {
 			portalLog("exit spawnPortal: X - no block hit");
-			return;
+			return false;
 		}
 		//Check invalid block
 		boolean failed = false;
@@ -141,15 +176,15 @@ public class PortalManager implements Listener {
 			} else {
 				world.spawnParticle(Particle.REDSTONE, bLoc, 3, .15, .15, .15, new Particle.DustOptions(Color.fromRGB(255, 69, 0), 1.0f));
 			}
-			world.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, .5f, 1f);
 			if (bLoc.getBlock().getType().isSolid()) {
 				break;
 			}
 		}
 		if (failed) {
 			portalLog("exit spawnPortal: X - hit block is not valid");
-			return;
+			return false;
 		}
+
 		//Calculate player primary direction
 		BlockFace playerFacing;
 		if (Math.abs(dir.getX()) >= Math.abs(dir.getZ())) {
@@ -197,10 +232,10 @@ public class PortalManager implements Listener {
 		//Check invalid block
 		if (adjacent.getType() != Material.SMOOTH_STONE) {
 			portalLog("exit spawnPortal: X - adjacent block is not valid");
-			return;
+			return false;
 		} else if (!adjacent.getType().isSolid()) {
 			portalLog("exit spawnPortal: X - adjacent block is not valid");
-			return;
+			return false;
 		}
 		//Get the open blocks to place the portal on
 		Block portalBlock1;
@@ -226,36 +261,34 @@ public class PortalManager implements Listener {
 			portalBlock2 = world.getBlockAt(adjacent.getLocation().clone().add(new Vector(0, 0, 1)));
 		} else {
 			portalLog("exit spawnPortal: X - unknown direction");
-			return;
+			return false;
 		}
 
-		if (portalBlock1.getType() != Material.AIR || portalBlock2.getType() != Material.AIR) {
-			portalLog("exit spawnPortal: X - a portal block is not air");
-			return;
+		if (!ALLOWED_PORTAL_BLOCKS.contains(portalBlock1.getType()) || !ALLOWED_PORTAL_BLOCKS.contains(portalBlock2.getType())) {
+			portalLog("exit spawnPortal: X - a portal block is not air (or another allowed block type)");
+			return false;
 		}
-		//Check if the desired spots are occupied by other portal
+		//Check if the desired spots are occupied by other portals
+		Portal portal1 = mPlayerPortal1.get(player);
+		Portal portal2 = mPlayerPortal2.get(player);
 		ArrayList<Location> occupiedLocations = new ArrayList<>();
-		if (mPlayerPortal1.values().size() > 0) {
-			for (Portal p : mPlayerPortal1.values()) {
-				if (p != null) {
-					occupiedLocations.add(p.mLocation1);
-					occupiedLocations.add(p.mLocation2);
-				}
+		for (Portal p : mPlayerPortal1.values()) {
+			if (p != null && !(portalNum == 1 && p == portal1)) {
+				occupiedLocations.add(p.mLocation1);
+				occupiedLocations.add(p.mLocation2);
 			}
 		}
-		if (mPlayerPortal2.values().size() > 0) {
-			for (Portal p : mPlayerPortal2.values()) {
-				if (p != null) {
-					occupiedLocations.add(p.mLocation1);
-					occupiedLocations.add(p.mLocation2);
-				}
+		for (Portal p : mPlayerPortal2.values()) {
+			if (p != null && !(portalNum == 2 && p == portal2)) {
+				occupiedLocations.add(p.mLocation1);
+				occupiedLocations.add(p.mLocation2);
 			}
 		}
 
 		//Check to see if there is already a portal at desired location
 		if (occupiedLocations.contains(portalBlock1.getLocation()) || occupiedLocations.contains(portalBlock2.getLocation())) {
 			portalLog("exit spawnPortal: X - a portal is already present");
-			return;
+			return false;
 		}
 
 		//Change rotation if needed for up and down blocks
@@ -285,8 +318,6 @@ public class PortalManager implements Listener {
 		}
 
 		//Destroy old portal
-		Portal portal1 = mPlayerPortal1.get(player);
-		Portal portal2 = mPlayerPortal2.get(player);
 
 		if (portal1 != null && portalNum == 1) {
 			clearPortal(player, 1);
@@ -302,11 +333,9 @@ public class PortalManager implements Listener {
 		Location location1 = portalBlock1.getLocation();
 		Location location2 = portalBlock2.getLocation();
 		ItemStack mapItem = new ItemStack(Material.FILLED_MAP, 1);
-		mapItem.editMeta(itemMeta -> {
-			if (itemMeta instanceof MapMeta mapMeta) {
-				// The Bukkit team can learn to deal with this. There's no other way to set an existing map ID.
-				mapMeta.setMapId(mapNum);
-			}
+		mapItem.editMeta(MapMeta.class, mapMeta -> {
+			// The Bukkit team can learn to deal with this. There's no other way to set an existing map ID.
+			mapMeta.setMapId(mapNum);
 		});
 		Entity map1 = world.spawn(location1, GlowItemFrame.class, itemFrame -> {
 			itemFrame.setFacingDirection(targetFace);
@@ -377,6 +406,8 @@ public class PortalManager implements Listener {
 		check.runTaskLater(Plugin.getInstance(), PORTAL_AFK_TIMER);
 		mPortalAFKChecks.put(player, check);
 		portalLog("exit spawnPortal: + spawned portal");
+
+		return true;
 	}
 
 	public static void clearAllPortals(Player player) {

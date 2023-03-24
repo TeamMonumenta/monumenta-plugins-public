@@ -222,7 +222,7 @@ public class ItemUtils {
 		Material.CRIMSON_FENCE_GATE
 	);
 
-	public static final Set<Material> carpet = EnumSet.of(
+	public static final Set<Material> CARPETS = EnumSet.of(
 		Material.WHITE_CARPET,
 		Material.ORANGE_CARPET,
 		Material.MAGENTA_CARPET,
@@ -238,7 +238,21 @@ public class ItemUtils {
 		Material.BROWN_CARPET,
 		Material.GREEN_CARPET,
 		Material.RED_CARPET,
-		Material.BLACK_CARPET
+		Material.BLACK_CARPET,
+		Material.MOSS_CARPET
+	);
+
+	public static final Set<Material> BUTTONS = EnumSet.of(
+		Material.ACACIA_BUTTON,
+		Material.CRIMSON_BUTTON,
+		Material.BIRCH_BUTTON,
+		Material.STONE_BUTTON,
+		Material.WARPED_BUTTON,
+		Material.DARK_OAK_BUTTON,
+		Material.JUNGLE_BUTTON,
+		Material.POLISHED_BLACKSTONE_BUTTON,
+		Material.OAK_BUTTON,
+		Material.SPRUCE_BUTTON
 	);
 
 	public static final Set<Material> shulkerBoxes = EnumSet.of(
