@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -11,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 
 public class DateVersionCommand {
 	private enum VersionField {
@@ -73,12 +75,17 @@ public class DateVersionCommand {
 							}))
 						.withSubcommand(new CommandAPICommand("DailyVersionScore")
 							.withArguments(new ObjectiveArgument("DailyVersionScore"))
-							.executesEntity((entity, args) -> {
-								String objective = (String) args[0];
-								int dailyVersion = ScoreboardUtils.getScoreboardValue(entity, objective).orElse(0);
-								LocalDateTime localDateTime = DateUtils.localDateTime(dailyVersion);
+							.executes((sender, args) -> {
+								CommandSender callee = CommandUtils.getCallee(sender);
+								if (callee instanceof Entity entity) {
+									String objective = (String) args[0];
+									int dailyVersion = ScoreboardUtils.getScoreboardValue(entity, objective).orElse(0);
+									LocalDateTime localDateTime = DateUtils.localDateTime(dailyVersion);
 
-								return getDateVersionResult(entity, localDateTime, versionField);
+									return getDateVersionResult(entity, localDateTime, versionField);
+								}
+
+								return 0;
 							}))
 						.withSubcommand(new CommandAPICommand("DailyVersionConst")
 							.withArguments(new IntegerArgument("DailyVersionConst"))
