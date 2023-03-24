@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -346,7 +347,7 @@ public class AbilityUtils {
 
 	public static int getDebuffCount(Plugin plugin, LivingEntity entity) {
 		int debuffCount = 0;
-		for (PotionEffectType effectType: DEBUFFS) {
+		for (PotionEffectType effectType : DEBUFFS) {
 			PotionEffect effect = entity.getPotionEffect(effectType);
 			if (effect != null) {
 				debuffCount++;
@@ -414,6 +415,11 @@ public class AbilityUtils {
 		return ScoreboardUtils.getScoreboardValue(player, TOTAL_SPEC).orElse(0);
 	}
 
+	public static boolean getEffectiveSpecs(Player player) {
+		// fast track: all specs in R3; and also in plots if having been to R3 at least once
+		return ServerProperties.getAbilityEnhancementsEnabled(player) && (ScoreboardUtils.getScoreboardValue(player, "R3Access").orElse(0) > 0);
+	}
+
 	public static void resetClass(Player player) {
 		if (ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_CLASS_NAME).orElse(0) == 0) {
 			player.sendMessage(Component.text("You do not have a class.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
@@ -477,6 +483,21 @@ public class AbilityUtils {
 					}
 				}
 			}
+			if (playerClass == mClass.mClass && mClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, mClass.mQuestReq).orElse(0) < mClass.mQuestReqMin && !getEffectiveSpecs(player))) {
+				player.sendMessage(Component.text("You have not unlocked this class yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+				AbilityManager.getManager().resetPlayerAbilities(player);
+				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+			} else if (playerSpec == mClass.mSpecOne.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(mClass.mSpecOne.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
+				player.sendMessage(Component.text("You have not unlocked this specialization yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+				AbilityManager.getManager().resetPlayerAbilities(player);
+				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+			} else if (playerSpec == mClass.mSpecTwo.mSpecialization && ScoreboardUtils.getScoreboardValue(player, Objects.requireNonNull(mClass.mSpecTwo.mSpecQuestScoreboard)).orElse(0) < 100 && !getEffectiveSpecs(player)) {
+				player.sendMessage(Component.text("You have not unlocked this specialization yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
+				AbilityManager.getManager().resetPlayerAbilities(player);
+				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
+			}
+
+
 		}
 
 		// Update remaining skill point scores (and reset class if more skills are assigned than total skill points are available)
@@ -524,6 +545,7 @@ public class AbilityUtils {
 			ScoreboardUtils.setScoreboardValue(player, REMAINING_SPEC, remainingSpecPoints);
 			ScoreboardUtils.setScoreboardValue(player, REMAINING_ENHANCE, remainingEnhancementPoints);
 		}
+
 	}
 
 	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(

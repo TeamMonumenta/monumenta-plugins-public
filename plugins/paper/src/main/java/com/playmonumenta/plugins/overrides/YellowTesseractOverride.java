@@ -193,7 +193,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		new PartialParticle(Particle.FIREWORKS_SPARK, pLoc, 10, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(player);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has swapped your class!", NamedTextColor.YELLOW));
-
+		AbilityUtils.updateAbilityScores(player);
 		if (!ZoneUtils.hasZoneProperty(player, ZoneProperty.RESIST_5)) {
 			setCooldown(player, 5);
 		}
@@ -226,11 +226,11 @@ public class YellowTesseractOverride extends BaseOverride {
 		for (int i = lore.size() - 1; i >= 0; --i) {
 			String line = lore.get(i);
 			if (line.startsWith(CLASS_STR)
-				|| line.startsWith(SPEC_STR)
-				|| line.startsWith(CLASS_LEVEL_STR)
-				|| line.startsWith(SPEC_LEVEL_STR)
-				|| line.startsWith(ENHANCE_STR)
-				|| line.startsWith(PREFIX)) {
+				    || line.startsWith(SPEC_STR)
+				    || line.startsWith(CLASS_LEVEL_STR)
+				    || line.startsWith(SPEC_LEVEL_STR)
+				    || line.startsWith(ENHANCE_STR)
+				    || line.startsWith(PREFIX)) {
 				ItemStatUtils.removeLore(item, i);
 			}
 		}
