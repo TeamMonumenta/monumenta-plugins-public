@@ -111,6 +111,11 @@ public class CourageEffect extends Effect {
 	}
 
 	@Override
+	public String getSpecificDisplay() {
+		return "Liquid Courage";
+	}
+
+	@Override
 	public String toString() {
 		String types = "any";
 		if (mAffectedDamageTypes != null) {

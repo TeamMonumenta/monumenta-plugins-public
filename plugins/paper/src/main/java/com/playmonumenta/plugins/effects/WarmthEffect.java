@@ -56,6 +56,11 @@ public class WarmthEffect extends Effect {
 	}
 
 	@Override
+	public String getSpecificDisplay() {
+		return "Intoxicating Warmth";
+	}
+
+	@Override
 	public String toString() {
 		return String.format("WarmthEffect duration:%d", this.getDuration());
 	}
