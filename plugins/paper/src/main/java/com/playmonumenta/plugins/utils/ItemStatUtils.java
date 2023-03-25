@@ -642,7 +642,7 @@ public class ItemStatUtils {
 		AURA(new Aura(), "", true, false, false, false, true),
 		CARAPACE(new Carapace(), "", true, false, false, false, true),
 		CHOLER(new Choler(), "", true, false, false, false, true),
-		DECAPITATION(new Decapitation(), "", false, true, false, false, true),
+		DECAPITATION(new Decapitation(), "", true, false, false, false, true),
 		EMPOWERED(new Empowered(), "", true, false, false, false, true),
 		ENERGIZE(new Energize(), "", true, false, false, false, true),
 		EPOCH(new Epoch(), "", true, false, false, false, true),
