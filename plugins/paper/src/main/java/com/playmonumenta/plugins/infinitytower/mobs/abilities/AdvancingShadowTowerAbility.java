@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +80,7 @@ public class AdvancingShadowTowerAbility extends TowerAbility {
 										new PartialParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);
 										new PartialParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mBoss);
 
-										mBoss.teleport(locTest);
+										EntityUtils.teleportStack(mBoss, locTest);
 										mHasTP = true;
 										if (mBoss instanceof Mob mob) {
 											GenericTowerMob towerMob = BossManager.getInstance().getBoss(mob, GenericTowerMob.class);

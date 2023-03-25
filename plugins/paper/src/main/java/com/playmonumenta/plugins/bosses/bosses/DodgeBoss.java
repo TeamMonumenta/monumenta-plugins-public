@@ -74,7 +74,7 @@ public class DodgeBoss extends BossAbilityGroup {
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 10, 0, 0, 0, 0.5).spawnAsEntityActive(mBoss);
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 
-					mBoss.teleport(loc);
+					EntityUtils.teleportStack(mBoss, loc);
 					break;
 				} else {
 					loc.add(0, 1, 0);

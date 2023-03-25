@@ -167,4 +167,8 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 		return item.displayName();
 	}
 
+	@Override
+	public void setEntityLocation(Entity entity, Vector target, float yaw, float pitch) {
+	}
+
 }

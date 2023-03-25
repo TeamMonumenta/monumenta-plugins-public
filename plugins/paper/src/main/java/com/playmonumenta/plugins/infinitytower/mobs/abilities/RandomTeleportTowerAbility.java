@@ -52,7 +52,7 @@ public class RandomTeleportTowerAbility extends TowerAbility {
 								if (mTimer <= 20) {
 									new PartialParticle(Particle.SOUL, mLoc, 30, 0.2, 1.5, 0.2, 0.05).spawnAsEntityActive(mBoss);
 								} else {
-									mBoss.teleport(mLoc);
+									EntityUtils.teleportStack(mBoss, mLoc);
 
 									for (LivingEntity target : mIsPlayerMob ? mGame.getFloorMobs() : mGame.getPlayerMobs()) {
 										if (target.getLocation().distance(mLoc) < 2) {

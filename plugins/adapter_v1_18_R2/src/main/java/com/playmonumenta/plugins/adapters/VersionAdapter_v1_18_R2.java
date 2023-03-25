@@ -550,4 +550,9 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		return PaperAdventure.asAdventure(CraftItemStack.asNMSCopy(item).getHoverName());
 	}
 
+	@Override
+	public void setEntityLocation(Entity entity, Vector target, float yaw, float pitch) {
+		((CraftEntity) entity).getHandle().moveTo(target.getX(), target.getY(), target.getZ(), yaw, pitch);
+	}
+
 }

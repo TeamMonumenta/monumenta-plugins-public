@@ -114,7 +114,7 @@ public class SpellTpBehindPlayer extends Spell {
 							new PartialParticle(Particle.SPELL_WITCH, loc, 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
 							new PartialParticle(Particle.SMOKE_LARGE, loc, 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
 
-							mLauncher.teleport(locTest);
+							EntityUtils.teleportStack(mLauncher, locTest);
 							if (mLauncher instanceof Mob mob && !AbilityUtils.isStealthed(target)) {
 								mob.setTarget(target);
 								// For some reason just setting the target doesn't seem to be enough, so try again a tick later

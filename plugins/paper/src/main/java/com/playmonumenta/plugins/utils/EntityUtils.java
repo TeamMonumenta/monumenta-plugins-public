@@ -258,21 +258,21 @@ public class EntityUtils {
 	}
 
 	// Affected by Smite
-	public static boolean isUndead(LivingEntity mob) {
+	public static boolean isUndead(Entity mob) {
 		return UNDEAD_MOBS.contains(mob.getType());
 	}
 
 	// Affected by Slayer
-	public static boolean isBeast(LivingEntity mob) {
+	public static boolean isBeast(Entity mob) {
 		return BEAST_MOBS.contains(mob.getType());
 	}
 
 	// Affected by Duelist
-	public static boolean isHumanlike(LivingEntity mob) {
+	public static boolean isHumanlike(Entity mob) {
 		return HUMANLIKE_MOBS.contains(mob.getType());
 	}
 
-	public static boolean isFlyingMob(LivingEntity mob) {
+	public static boolean isFlyingMob(Entity mob) {
 		return isFlyingMob(mob.getType());
 	}
 
@@ -290,7 +290,7 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static boolean isWaterMob(LivingEntity mob) {
+	public static boolean isWaterMob(Entity mob) {
 		return isWaterMob(mob.getType());
 	}
 
@@ -299,7 +299,7 @@ public class EntityUtils {
 	}
 
 	// Affected by Abyssal
-	public static boolean isInWater(LivingEntity mob) {
+	public static boolean isInWater(Entity mob) {
 		return LocationUtils.isLocationInWater(mob.getLocation()) || LocationUtils.isLocationInWater(mob.getLocation().subtract(0, 1, 0));
 	}
 
@@ -600,11 +600,16 @@ public class EntityUtils {
 		}
 	}
 
-	public static LivingEntity getEntityStackBase(LivingEntity entity) {
-		if (entity.getVehicle() instanceof LivingEntity vehicle) {
+	public static Entity getEntityStackBase(Entity entity) {
+		Entity vehicle = entity.getVehicle();
+		if (vehicle != null) {
 			return getEntityStackBase(vehicle);
 		}
 		return entity;
+	}
+
+	public static void teleportStack(Entity entity, Location loc) {
+		NmsUtils.getVersionAdapter().setEntityLocation(getEntityStackBase(entity), loc.toVector(), loc.getYaw(), loc.getPitch());
 	}
 
 	public static List<LivingEntity> getMobsInLine(Location loc, Vector direction, double range, double halfHitboxLength) {

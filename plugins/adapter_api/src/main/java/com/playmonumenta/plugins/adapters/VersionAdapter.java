@@ -173,4 +173,10 @@ public interface VersionAdapter {
 	 */
 	Component getDisplayName(ItemStack item);
 
+	/**
+	 * Teleports the entity, with its passengers, to the target location in the same world
+	 */
+
+	void setEntityLocation(Entity entity, Vector target, float yaw, float pitch);
+
 }

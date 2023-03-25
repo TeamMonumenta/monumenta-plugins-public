@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -63,11 +65,12 @@ public class SpellKnockAway extends Spell {
 
 	private void animation(Location loc) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+		World world = loc.getWorld();
 
 		Runnable animLoop = () -> {
-			Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-			mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-			centerLoc.getWorld().playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
+			Location centerLoc = loc.clone().add(0, 1, 0);
+			EntityUtils.teleportStack(mLauncher, loc);
+			world.playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
 			new PartialParticle(Particle.CRIT, centerLoc, 10, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
 			mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 3));
 		};
@@ -86,9 +89,9 @@ public class SpellKnockAway extends Spell {
 				new PartialParticle(Particle.CRIT, particleLoc, 1, 0.02, 1.5 * rad, 0.02, 0).spawnAsEntityActive(mLauncher);
 			}
 			if (mWidth == 0) {
-				particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, (float) mRadius / 7, 0.77F);
-				particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, (float) mRadius / 7, 0.5F);
-				particleLoc.getWorld().playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, (float) mRadius / 7, 0.65F);
+				world.playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, (float) mRadius / 7, 0.77F);
+				world.playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, (float) mRadius / 7, 0.5F);
+				world.playSound(particleLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, (float) mRadius / 7, 0.65F);
 			}
 			mWidth++;
 		};

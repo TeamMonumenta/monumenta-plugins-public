@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import java.util.Collections;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -54,12 +55,13 @@ public class DeathSummonBoss extends BossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		mParam.PARTICLES.spawn(mBoss, mBoss.getLocation().clone().add(0, 0.5, 0));
-		mParam.SOUNDS.play(mBoss.getLocation());
+		Location loc = mBoss.getLocation();
+		mParam.PARTICLES.spawn(mBoss, loc.clone().add(0, 0.5, 0));
+		mParam.SOUNDS.play(loc);
 		for (int i = 0; i < mParam.MOB_COUNT; i++) {
-			Entity entity = mParam.POOL.spawn(mBoss.getLocation());
+			Entity entity = mParam.POOL.spawn(loc);
 			if (entity instanceof LivingEntity livingEntity) {
-				livingEntity.teleport(mBoss.getLocation()); //to fix Yaw and Pitch location
+				livingEntity.setRotation(loc.getYaw(), loc.getPitch());
 				livingEntity.setAI(false);
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					livingEntity.setAI(true);

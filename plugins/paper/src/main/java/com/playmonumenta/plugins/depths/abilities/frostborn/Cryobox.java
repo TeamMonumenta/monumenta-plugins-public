@@ -86,12 +86,12 @@ public class Cryobox extends DepthsAbility {
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
-			if (EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG)) {
+			if (EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG) || mob.getVehicle() != null) {
 				continue;
 			}
 			Location mobLoc = mob.getLocation();
 			mobLoc.setY(center.getY() + 4);
-			mob.teleport(mobLoc);
+			EntityUtils.teleportStack(mob, mobLoc);
 		}
 
 		AbsorptionUtils.addAbsorption(mPlayer, ABSORPTION_HEALTH[mRarity - 1], ABSORPTION_HEALTH[mRarity - 1], DURATION);
