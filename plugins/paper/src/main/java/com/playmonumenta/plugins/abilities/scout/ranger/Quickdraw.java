@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -67,6 +68,11 @@ public class Quickdraw extends Ability {
 			return;
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
+		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
+		if (ItemStatUtils.hasEnchantment(inMainHand, ItemStatUtils.EnchantmentType.TWO_HANDED)
+			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, ItemStatUtils.EnchantmentType.WEIGHTLESS))) {
+			return;
+		}
 		World world = mPlayer.getWorld();
 
 		new PartialParticle(Particle.CRIT, mPlayer.getEyeLocation().add(mPlayer.getLocation().getDirection()), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
