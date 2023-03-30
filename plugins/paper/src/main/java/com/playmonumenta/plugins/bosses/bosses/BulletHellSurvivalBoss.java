@@ -93,13 +93,14 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 
 	private boolean playerIsCheesing(Player p) {
 		Location loc = p.getLocation().clone().add(0, -0.15, 0);
-		boolean cheesing = false;
 		for (int i = -1; i < 2; i += 2) {
 			for (int j = -1; j < 2; j += 2) {
-				cheesing = cheesing || cheeseBlocks.contains(loc.clone().add(i * PLAYER_BOUNDING_BOX_XZ / 2.0, 0, j * PLAYER_BOUNDING_BOX_XZ / 2.0).getBlock().getType());
+				if (cheeseBlocks.contains(loc.clone().add(i * PLAYER_BOUNDING_BOX_XZ / 2.0, 0, j * PLAYER_BOUNDING_BOX_XZ / 2.0).getBlock().getType())) {
+					return true;
+				}
 			}
 		}
-		return cheesing;
+		return false;
 	}
 
 	@Override

@@ -140,11 +140,15 @@ public class SpellBullet extends Spell {
 
 			@Override
 			public void run() {
-				int correctedTicks = mTicks - mDelay;
-				if (mCaster == null || mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
+				if (mCaster == null || mCaster.isDead()) {
 					this.cancel();
 					return;
 				}
+				if (EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
+					// Do not cancel as the spell is only ran once until players are out of range
+					return;
+				}
+				int correctedTicks = mTicks - mDelay;
 				if (mTicks < mDelay) {
 					mTickAction.run(mCaster, mTicks);
 				} else if (mTicks < mDuration + mDelay && mTicks % mEmissionSpeed == 0) {

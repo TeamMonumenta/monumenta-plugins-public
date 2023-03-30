@@ -99,7 +99,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
-						DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, null), p.DAMAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, true);
+						DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, null), p.DAMAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, false);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 5, 0, 0, 0, 0.175).spawnAsEnemy();
 				}
