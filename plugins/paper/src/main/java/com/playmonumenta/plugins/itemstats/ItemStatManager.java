@@ -190,7 +190,7 @@ public class ItemStatManager implements Listener {
 		public void updateStats(Player player, boolean updateAll, boolean checkHealth) {
 			double priorHealth = EntityUtils.getMaxHealth(player);
 			PlayerInventory inventory = player.getInventory();
-			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), player, updateAll);
+			updateStats(inventory.getItemInMainHand(), inventory.getItemInOffHand(), inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), player, updateAll, null);
 			// Tell the ItemStats that there has been an update
 			Plugin plugin = Plugin.getInstance();
 			for (ItemStat stat : ITEM_STATS) {
@@ -209,9 +209,9 @@ public class ItemStatManager implements Listener {
 
 		}
 
-		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll) {
+		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll, @Nullable ItemStatUtils.Region region) {
 			mMainhand = mainhand;
-			mRegion = ServerProperties.getRegion(player);
+			mRegion = region != null ? region : ServerProperties.getRegion(player);
 
 			ItemStatsMap newArmorAddStats;
 			ItemStatsMap newMainhandAddStats = new ItemStatsMap();
@@ -477,7 +477,7 @@ public class ItemStatManager implements Listener {
 		ItemStack oldItem = inv.getItem(event.getPreviousSlot());
 		ItemStack newItem = inv.getItem(event.getNewSlot());
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
-			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, player, false);
+			mPlayerItemStatsMappings.get(player.getUniqueId()).updateStats(newItem, null, null, null, null, null, player, false, null);
 			for (ItemStat stat : ITEM_STATS) {
 				stat.onEquipmentUpdate(mPlugin, player);
 			}
