@@ -1182,9 +1182,9 @@ public class PlayerListener implements Listener {
 			BlockState state = testblock.getState();
 
 			if (testblock.getType().equals(Material.COMMAND_BLOCK)
-			    && state instanceof CommandBlock) {
+			    && state instanceof CommandBlock commandBlock) {
 
-				String str = ((CommandBlock) state).getCommand();
+				String str = commandBlock.getCommand();
 
 				String[] split = str.split(" ");
 				if (split.length != 5) {
@@ -1253,6 +1253,9 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+
+		// If we have not returned yet, check if the interaction should be blocked
+		BlockInteractionsListener.playerEnteredNonTeleporterBed(event);
 	}
 
 	private static final String PLAYER_LEFT_BED_TICK_METAKEY = "PlayerLeftBedTick";

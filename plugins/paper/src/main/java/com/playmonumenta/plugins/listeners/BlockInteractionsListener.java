@@ -5,7 +5,9 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import java.util.EnumSet;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -14,7 +16,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockInteractionsListener implements Listener {
 	public static final String COMMAND = "blockinteractions";
@@ -23,22 +27,6 @@ public final class BlockInteractionsListener implements Listener {
 	private static final String DISABLE_TAG = "DisableBlockInteractions";
 
 	private static final EnumSet<Material> INTERACTABLES = EnumSet.of(
-		Material.WHITE_BED,
-		Material.ORANGE_BED,
-		Material.MAGENTA_BED,
-		Material.LIGHT_BLUE_BED,
-		Material.YELLOW_BED,
-		Material.LIME_BED,
-		Material.PINK_BED,
-		Material.GRAY_BED,
-		Material.LIGHT_GRAY_BED,
-		Material.CYAN_BED,
-		Material.PURPLE_BED,
-		Material.BLUE_BED,
-		Material.BROWN_BED,
-		Material.GREEN_BED,
-		Material.RED_BED,
-		Material.BLACK_BED,
 		Material.LOOM,
 		Material.CRAFTING_TABLE,
 		Material.STONECUTTER,
@@ -67,9 +55,9 @@ public final class BlockInteractionsListener implements Listener {
 
 	private void playerToggle(Player player) {
 		if (ScoreboardUtils.toggleTag(player, DISABLE_TAG)) {
-			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Interactions with blocks have been disabled.");
+			player.sendMessage(Component.text("Interactions with blocks have been disabled.", NamedTextColor.GOLD, TextDecoration.BOLD));
 		} else {
-			player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Interactions with blocks have been enabled.");
+			player.sendMessage(Component.text("Interactions with blocks have been enabled.", NamedTextColor.GOLD, TextDecoration.BOLD));
 		}
 	}
 
@@ -77,8 +65,19 @@ public final class BlockInteractionsListener implements Listener {
 	public void playerInteractEvent(PlayerInteractEvent event) {
 		Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
-		if (block != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && !player.isSneaking() && player.getGameMode() == GameMode.SURVIVAL && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG) && INTERACTABLES.contains(block.getType())) {
+		if (checkAction(block, player) && event.getAction() == Action.RIGHT_CLICK_BLOCK && INTERACTABLES.contains(block.getType())) {
 			event.setCancelled(true);
 		}
+	}
+
+	// Called in PlayerListener
+	public static void playerEnteredNonTeleporterBed(PlayerBedEnterEvent event) {
+		if (checkAction(event.getBed(), event.getPlayer())) {
+			event.setCancelled(true);
+		}
+	}
+
+	private static boolean checkAction(@Nullable Block block, Player player) {
+		return block != null && !player.isSneaking() && player.getGameMode() == GameMode.SURVIVAL && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG);
 	}
 }
