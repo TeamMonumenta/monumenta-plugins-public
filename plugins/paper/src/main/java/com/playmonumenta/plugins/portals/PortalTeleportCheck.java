@@ -175,7 +175,7 @@ public class PortalTeleportCheck extends BukkitRunnable {
 				mCooldowns.put(entityUuid, 12);
 				break;
 			default:
-				mCooldowns.put(entityUuid, entity instanceof Player ? 10 : 25);
+				mCooldowns.put(entityUuid, 25);
 		}
 	}
 
