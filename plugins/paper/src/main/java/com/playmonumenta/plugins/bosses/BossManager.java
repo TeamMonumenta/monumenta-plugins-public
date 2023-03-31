@@ -142,6 +142,7 @@ public class BossManager implements Listener {
 		mStatelessBosses = new HashMap<>();
 		mStatelessBosses.put(BulletHellSurvivalBoss.identityTag, BulletHellSurvivalBoss::new);
 		mStatelessBosses.put(BlockLockBoss.identityTag, BlockLockBoss::new);
+		mStatelessBosses.put(MessageBoss.identityTag, MessageBoss::new);
 		mStatelessBosses.put(ImmortalPassengerBoss.identityTag, ImmortalPassengerBoss::new);
 		mStatelessBosses.put(ChestLockBoss.identityTag, ChestLockBoss::new);
 		mStatelessBosses.put(UnyieldingBoss.identityTag, UnyieldingBoss::new);
@@ -380,6 +381,7 @@ public class BossManager implements Listener {
 		mBossDeserializers = new HashMap<String, BossDeserializer>();
 		mBossDeserializers.put(BulletHellSurvivalBoss.identityTag, BulletHellSurvivalBoss::deserialize);
 		mBossDeserializers.put(BlockLockBoss.identityTag, BlockLockBoss::deserialize);
+		mBossDeserializers.put(MessageBoss.identityTag, MessageBoss::deserialize);
 		mBossDeserializers.put(ImmortalPassengerBoss.identityTag, ImmortalPassengerBoss::deserialize);
 		mBossDeserializers.put(ChestLockBoss.identityTag, ChestLockBoss::deserialize);
 		mBossDeserializers.put(UnyieldingBoss.identityTag, UnyieldingBoss::deserialize);
@@ -615,6 +617,7 @@ public class BossManager implements Listener {
 		mBossParameters = new HashMap<>();
 		mBossParameters.put(BulletHellSurvivalBoss.identityTag, new BulletHellBoss.Parameters());
 		mBossParameters.put(BlockLockBoss.identityTag, new BlockLockBoss.Parameters());
+		mBossParameters.put(MessageBoss.identityTag, new MessageBoss.Parameters());
 		mBossParameters.put(ChestLockBoss.identityTag, new ChestLockBoss.Parameters());
 		mBossParameters.put(AntiRangeBoss.identityTag, new AntiRangeBoss.Parameters());
 		mBossParameters.put(AntiMeleeBoss.identityTag, new AntiMeleeBoss.Parameters());
@@ -1043,9 +1046,9 @@ public class BossManager implements Listener {
 			Entity snowman = Bukkit.getEntity(UUID.fromString(player.getMetadata(WinterSnowmanEventBoss.deathMetakey).get(0).asString()));
 			Component snowmanName = snowman != null ? snowman.customName() : null;
 			Component deathMessage = Component.text("")
-				.append(Component.selector(player.getName()))
-				.append(Component.text(" was snowballed by "))
-				.append(snowmanName != null ? snowmanName : Component.text("a snowman"));
+				                         .append(Component.selector(player.getName()))
+				                         .append(Component.text(" was snowballed by "))
+				                         .append(snowmanName != null ? snowmanName : Component.text("a snowman"));
 			event.deathMessage(deathMessage);
 			player.removeMetadata(WinterSnowmanEventBoss.deathMetakey, mPlugin);
 		}
@@ -1204,8 +1207,8 @@ public class BossManager implements Listener {
 			if (mStatefulBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-						"' but it requires positional arguments");
+						                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						                   "' but it requires positional arguments");
 					sender.sendMessage(ChatColor.GOLD + "Try again with some ending location coordinates");
 				}
 			} else {
@@ -1238,8 +1241,8 @@ public class BossManager implements Listener {
 			if (mStatelessBosses.get(requestedTag) != null) {
 				if (sender != null) {
 					sender.sendMessage(ChatColor.GOLD + "There is a boss with the tag '" +
-						ChatColor.GREEN + requestedTag + ChatColor.GOLD +
-						"' but it does not take positional arguments");
+						                   ChatColor.GREEN + requestedTag + ChatColor.GOLD +
+						                   "' but it does not take positional arguments");
 					sender.sendMessage(ChatColor.GOLD + "Try again without the coordinates");
 				}
 			} else {
