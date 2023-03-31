@@ -41,7 +41,6 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -375,21 +374,17 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
 		return getEntityAtCursor(player, range, targetPlayers, targetNonPlayers, checkLos, null);
 	}
 
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, @Nullable Predicate<Entity> ignoreIf) {
-		List<Entity> en = player.getNearbyEntities(range, range, range);
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, @Nullable Predicate<Entity> ignoreIf) {
 		ArrayList<LivingEntity> entities = new ArrayList<>();
-		for (Entity e : en) {
-			//  Make sure to only get living entities.
-			if (e instanceof LivingEntity) {
-				//  Make sure we should be targeting this entity.
-				if ((targetPlayers && (e instanceof Player ep) && ep.getGameMode() != GameMode.SPECTATOR) || (targetNonPlayers && !(e instanceof Player))) {
-					entities.add((LivingEntity) e);
-				}
-			}
+		if (targetNonPlayers) {
+			entities.addAll(getNearbyMobs(player.getLocation(), range));
+		}
+		if (targetPlayers) {
+			entities.addAll(PlayerUtils.otherPlayersInRange(player, range, true));
 		}
 
 		if (ignoreIf != null) {
@@ -403,7 +398,7 @@ public class EntityUtils {
 
 		BlockIterator bi;
 		try {
-			bi = new BlockIterator(player, range);
+			bi = new BlockIterator(player, (int) Math.ceil(range));
 		} catch (IllegalStateException e) {
 			return null;
 		}
