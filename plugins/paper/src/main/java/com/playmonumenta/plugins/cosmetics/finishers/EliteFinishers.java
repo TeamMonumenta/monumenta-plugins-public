@@ -26,6 +26,8 @@ public class EliteFinishers {
 			.put(ExcaliburFinisher.NAME, new ExcaliburFinisher())
 			.put(SwordRainFinisher.NAME, new SwordRainFinisher())
 			.put(ImplosionFinisher.NAME, new ImplosionFinisher())
+			.put(Promenade.NAME, new Promenade())
+			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
 			.put(PaintSplashFinisher.NAME, new PaintSplashFinisher())
 			.build();
 
