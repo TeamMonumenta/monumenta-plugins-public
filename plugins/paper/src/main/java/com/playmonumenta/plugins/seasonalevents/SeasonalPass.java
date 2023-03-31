@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -41,7 +43,7 @@ public class SeasonalPass {
 	public final LocalDateTime mPassStart;
 	public String mName;
 	public Material mDisplayItem;
-	public NamedTextColor mNameColor;
+	public TextColor mNameColor;
 	public int mNumberOfWeeks = 0;
 	public int mTotalMp = 0;
 	public final List<WeeklyMission> mMissions = new ArrayList<>();
@@ -74,7 +76,9 @@ public class SeasonalPass {
 				SeasonalRewardType type = SeasonalRewardType.getRewardTypeSelection(rewardTypeStr);
 				if (type == null) {
 					if (showWarnings) {
-						sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr + " " + mName + ": No such mission type " + rewardTypeStr, NamedTextColor.RED));
+						sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+							+ ": No such reward type " + rewardTypeStr, NamedTextColor.RED)
+							.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 					}
 					continue;
 				}
@@ -89,8 +93,19 @@ public class SeasonalPass {
 					String lootTable = toParse.get("loottable").getAsString();
 					if (lootTable != null && lootTable.length() > 0) {
 						LootContext context = new LootContext.Builder(Bukkit.getWorlds().get(0).getSpawnLocation()).build();
-						LootTable rewardTable = Bukkit.getLootTable(NamespacedKeyUtils.fromString(lootTable));
-						if (rewardTable != null) {
+						LootTable rewardTable;
+						try {
+							rewardTable = Bukkit.getLootTable(NamespacedKeyUtils.fromString(lootTable));
+						} catch (IllegalArgumentException ex) {
+							rewardTable = null;
+						}
+						if (rewardTable == null) {
+							if (showWarnings) {
+								sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+									+ ": No such loot table " + lootTable, NamedTextColor.RED)
+									.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+							}
+						} else {
 							Collection<ItemStack> loot = rewardTable.populateLoot(FastUtils.RANDOM, context);
 							if (loot.size() > 0) {
 								for (ItemStack item : loot) {
@@ -115,24 +130,56 @@ public class SeasonalPass {
 					reward.mAmount = toParse.get("amount").getAsInt();
 				}
 				if (toParse.get("displayitem") != null) {
-					reward.mDisplayItem = Material.getMaterial(toParse.get("displayitem").getAsString());
+					String displayItem = toParse.get("displayitem").getAsString();
+					reward.mDisplayItem = Material.getMaterial(displayItem);
+					if (reward.mDisplayItem == null) {
+						reward.mDisplayItem = Material.CHEST;
+						if (showWarnings) {
+							sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+								+ ": Invalid display item " + displayItem, NamedTextColor.RED)
+								.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+						}
+					}
 				} else {
 					reward.mDisplayItem = Material.CHEST;
+					if (showWarnings) {
+						sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+							+ ": Display item not set", NamedTextColor.RED)
+							.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+					}
 				}
 				if (toParse.get("namecolor") != null) {
-					reward.mNameColor = NamedTextColor.NAMES.value(toParse.get("namecolor").getAsString());
+					String nameColor = toParse.get("namecolor").getAsString();
+					reward.mNameColor = MessagingUtils.colorFromString(nameColor);
+					if (reward.mNameColor == null) {
+						reward.mNameColor = NamedTextColor.WHITE;
+						if (showWarnings) {
+							sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+								+ ": Invalid name color " + nameColor, NamedTextColor.RED)
+								.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+						}
+					}
 				} else {
 					reward.mNameColor = NamedTextColor.WHITE;
 				}
 				if (toParse.get("descriptioncolor") != null) {
-					reward.mDescriptionColor = NamedTextColor.NAMES.value(toParse.get("descriptioncolor").getAsString());
+					String descriptionColor = toParse.get("descriptioncolor").getAsString();
+					reward.mDescriptionColor = MessagingUtils.colorFromString(descriptionColor);
+					if (reward.mDescriptionColor == null) {
+						reward.mDescriptionColor = NamedTextColor.GRAY;
+						if (showWarnings) {
+							sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+								+ ": Invalid description color " + descriptionColor, NamedTextColor.RED)
+								.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+						}
+					}
 				} else {
 					reward.mDescriptionColor = NamedTextColor.GRAY;
 				}
 
 				mRewards.add(reward);
 			} catch (Exception e) {
-				e.printStackTrace();
+				MessagingUtils.sendStackTrace(sender, e);
 			}
 		}
 	}
@@ -145,7 +192,16 @@ public class SeasonalPass {
 		String startDateStr = data.get("start_date").getAsString();
 		mName = data.get("pass_name").getAsString();
 		mDisplayItem = Material.getMaterial(data.get("pass_displayitem").getAsString());
-		mNameColor = NamedTextColor.NAMES.value(data.get("pass_namecolor").getAsString());
+		String nameColorStr = data.get("pass_namecolor").getAsString();
+		TextColor nameColor = MessagingUtils.colorFromString(nameColorStr);
+		if (nameColor == null) {
+			nameColor = NamedTextColor.GOLD;
+			if (showWarnings) {
+				sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+					+ mName + ": No such name color " + nameColorStr, NamedTextColor.RED));
+			}
+		}
+		mNameColor = nameColor;
 		JsonArray missionParse = data.get("missions").getAsJsonArray();
 		for (JsonElement missionElement : missionParse) {
 			try {
@@ -157,7 +213,9 @@ public class SeasonalPass {
 				String missionTypeStr = toParse.get("type").getAsString();
 				mission.mType = WeeklyMissionType.getMissionTypeSelection(missionTypeStr);
 				if (mission.mType == null && showWarnings) {
-					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such mission type " + missionTypeStr, NamedTextColor.RED));
+					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+						+ mName + ": No such mission type " + missionTypeStr, NamedTextColor.RED)
+						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 				}
 				mission.mWeek = toParse.get("week").getAsInt();
 				mission.mMP = toParse.get("mp").getAsInt();
@@ -174,7 +232,9 @@ public class SeasonalPass {
 						MonumentaContent monumentaContent = MonumentaContent.getContentSelection(contentStr);
 						if (monumentaContent == null) {
 							if (showWarnings) {
-								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such content " + contentStr, NamedTextColor.RED));
+								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+									+ " " + mName + ": No such content " + contentStr, NamedTextColor.RED)
+									.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 							}
 							continue;
 						}
@@ -206,10 +266,15 @@ public class SeasonalPass {
 								if (modifier != null) {
 									modList.add(modifier);
 								} else if (showWarnings) {
-									sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName, NamedTextColor.RED));
+									sender.sendMessage(Component.text("[SeasonPass] loadMissions for "
+										+ startDateStr + " " + mName + ": No such modifier " + modName,
+										NamedTextColor.RED)
+										.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 								}
 							} else if (showWarnings) {
-								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + mod, NamedTextColor.RED));
+								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+									+ " " + mName + ": Modifier ID is not string " + mod, NamedTextColor.RED)
+									.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 							}
 						}
 						mission.mDelveModifiers = modList;
@@ -223,10 +288,14 @@ public class SeasonalPass {
 								modList.add(modifier);
 								mission.mDelveModifiers = modList;
 							} else if (showWarnings) {
-								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": No such modifier " + modName, NamedTextColor.RED));
+								sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+									+ " " + mName + ": No such modifier " + modName, NamedTextColor.RED)
+									.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 							}
 						} else if (showWarnings) {
-							sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " " + mName + ": Modifier ID is not string " + modPrimitive, NamedTextColor.RED));
+							sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+								+ " " + mName + ": Modifier ID is not string " + modPrimitive, NamedTextColor.RED)
+								.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 						}
 					}
 				}
@@ -236,7 +305,7 @@ public class SeasonalPass {
 				}
 				mMissions.add(mission);
 			} catch (Exception e) {
-				e.printStackTrace();
+				MessagingUtils.sendStackTrace(sender, e);
 			}
 		}
 		mNumberOfWeeks = numberOfWeeks;
@@ -256,7 +325,8 @@ public class SeasonalPass {
 		int newLevel = getLevelFromMP(newMP);
 		//Give any unclaimed rewards
 		for (int i = currentLevel + 1; i <= newLevel; i++) {
-			p.sendMessage(Component.text("You earned a new reward!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			p.sendMessage(Component.text("You earned a new reward!", NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 
 			EntityUtils.fireworkAnimation(p);
 			givePassReward(p, i);
@@ -264,7 +334,8 @@ public class SeasonalPass {
 
 		// Special case - finished all missions
 		if (newMP == mTotalMp && !CosmeticsManager.getInstance().playerHasCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME)) {
-			p.sendMessage(Component.text("You finished all the missions!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			p.sendMessage(Component.text("You finished all the missions!", NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			EntityUtils.fireworkAnimation(p);
 			CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME);
 		}
@@ -478,7 +549,10 @@ public class SeasonalPass {
 		ScoreboardUtils.setScoreboardValue(p.getName(), scoreboard, Math.min(mission.mAmount, score + amount));
 		if (score + amount >= mission.mAmount) {
 			//Play an animation and notify player
-			p.sendMessage(Component.text("You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+			p.sendMessage(Component.text(
+				"You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!",
+				NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			EntityUtils.fireworkAnimation(p);
 		}
 	}

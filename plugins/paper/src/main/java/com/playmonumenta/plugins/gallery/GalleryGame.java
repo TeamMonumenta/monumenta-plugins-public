@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.gallery.interactables.BaseInteractable;
 import com.playmonumenta.plugins.gallery.interactables.BasePricedInteractable;
 import com.playmonumenta.plugins.gallery.interactables.EffectInteractable;
 import com.playmonumenta.plugins.gallery.interactables.MysteryBoxInteractable;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -420,6 +421,7 @@ public class GalleryGame {
 			}
 
 			if (player.isOnline()) {
+				SeasonalEventListener.playerGalleryWave(player.getPlayer());
 				player.onRoundStart(this);
 			}
 			player.sendMessage("Starting round: " + mCurrentRound);

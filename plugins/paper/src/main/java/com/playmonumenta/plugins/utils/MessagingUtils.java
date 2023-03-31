@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +19,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class MessagingUtils {
 	public static final Gson GSON = new Gson();
@@ -61,7 +61,7 @@ public class MessagingUtils {
 		if (errorMessage != null) {
 			formattedMessage = LEGACY_SERIALIZER.deserialize(errorMessage);
 		} else {
-			formattedMessage = Component.text("An error occured without a set message. Hover for stack trace.");
+			formattedMessage = Component.text("An error occurred without a set message. Hover for stack trace.");
 		}
 		formattedMessage = formattedMessage.color(NamedTextColor.RED);
 
@@ -149,6 +149,14 @@ public class MessagingUtils {
 
 	public static void sendTitle(Player player, Component title, Component subtitle, Title.Times times) {
 		player.showTitle(Title.title(title, subtitle, times));
+	}
+
+	public static @Nullable TextColor colorFromString(String value) {
+		if (value.startsWith("#")) {
+			return TextColor.fromHexString(value);
+		} else {
+			return NamedTextColor.NAMES.value(value);
+		}
 	}
 
 	private static Duration ticks(int t) {

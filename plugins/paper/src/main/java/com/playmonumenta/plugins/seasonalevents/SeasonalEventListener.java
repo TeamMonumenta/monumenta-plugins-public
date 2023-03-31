@@ -70,6 +70,22 @@ public class SeasonalEventListener implements Listener {
 	}
 
 	/**
+	 * Called from the gallery game.
+	 * Run through any potential gallery missions and give credit
+	 */
+	public static void playerGalleryWave(Player p) {
+		//Check for weekly mission type of gallery rounds
+		int missionNumber = 1;
+		for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
+			if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.GALLERY_ROUND)) {
+				// Content matches up - award points
+				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+			}
+			missionNumber++;
+		}
+	}
+
+	/**
 	 * Main event handler for tracking Monumenta content completion.
 	 * Runs through most weekly mission types and checks for if
 	 * credit should be awarded.

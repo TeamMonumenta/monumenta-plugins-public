@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -19,8 +19,8 @@ public class SeasonalReward {
 	public @Nullable String mName;
 	public @Nullable String mDescription;
 	public @Nullable Material mDisplayItem;
-	public @Nullable NamedTextColor mNameColor;
-	public @Nullable NamedTextColor mDescriptionColor;
+	public @Nullable TextColor mNameColor;
+	public @Nullable TextColor mDescriptionColor;
 	public @Nullable ItemStack mLootTable;
 
 	public SeasonalReward(SeasonalRewardType type) {

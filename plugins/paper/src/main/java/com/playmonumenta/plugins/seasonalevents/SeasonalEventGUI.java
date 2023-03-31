@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -197,13 +198,13 @@ public class SeasonalEventGUI extends Gui {
 				meta.displayName(Component.text("Level " + level, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 				lore = new ArrayList<>();
 				if (level == playerLevel + 1) {
-					lore.add(Component.text("" + playerMP + "/" + mP + " MP", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+					lore.add(Component.text(playerMP + "/" + mP + " MP", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 					lore.add(Component.text("In Progress", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 				} else if (level <= playerLevel) {
-					lore.add(Component.text("" + mP + "/" + mP + " MP", NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false));
+					lore.add(Component.text(mP + "/" + mP + " MP", NamedTextColor.DARK_GREEN).decoration(TextDecoration.ITALIC, false));
 					lore.add(Component.text("Obtained", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 				} else {
-					lore.add(Component.text("" + playerMP + "/" + mP + " MP", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+					lore.add(Component.text(playerMP + "/" + mP + " MP", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 					lore.add(Component.text("Locked", NamedTextColor.DARK_RED).decoration(TextDecoration.ITALIC, false));
 				}
 				meta.lore(lore);
@@ -232,7 +233,7 @@ public class SeasonalEventGUI extends Gui {
 				if (description == null) {
 					description = "Description not set";
 				}
-				NamedTextColor namedTextColor = reward.mDescriptionColor;
+				TextColor namedTextColor = reward.mDescriptionColor;
 				if (namedTextColor == null) {
 					namedTextColor = NamedTextColor.WHITE;
 				}
