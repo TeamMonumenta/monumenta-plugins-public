@@ -236,7 +236,7 @@ public class HeadlessHorsemanBoss extends BossAbilityGroup {
 			if (!mCooldown) {
 				mCooldown = true;
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 20);
-				for (Player player : mPlayers) {
+				for (Player player : new ArrayList<>(mPlayers)) { // copy list as the damage may kill players and remove them from the list
 					if (player != damagee && player.getLocation().distance(loc) <= 4) {
 						BossUtils.blockableDamage(mBoss, player, DamageType.MELEE, event.getDamage());
 					}

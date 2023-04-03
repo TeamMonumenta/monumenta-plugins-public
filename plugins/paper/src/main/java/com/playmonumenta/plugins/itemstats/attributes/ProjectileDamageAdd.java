@@ -33,7 +33,7 @@ public class ProjectileDamageAdd implements Attribute {
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj) {
 			if (proj instanceof AbstractArrow arrow && !(arrow instanceof Trident) && !arrow.isCritical()) {
-				value *= Math.min(1, arrow.getVelocity().length() / Constants.PLAYER_BOW_INITIAL_SPEED / ProjectileSpeed.getProjectileSpeedModifier(arrow));
+				value *= Math.max(0, Math.min(1, arrow.getVelocity().length() / Constants.PLAYER_BOW_INITIAL_SPEED / Math.abs(ProjectileSpeed.getProjectileSpeedModifier(arrow))));
 			}
 			event.setDamage(value);
 		}

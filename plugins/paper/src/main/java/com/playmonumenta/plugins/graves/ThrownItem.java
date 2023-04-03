@@ -112,7 +112,9 @@ public class ThrownItem {
 	private void remove() {
 		if (mEntity != null) {
 			mManager.removeItem(mEntity);
-			mEntity.remove();
+			if (mEntity.isValid()) {
+				mEntity.remove();
+			}
 			mEntity = null;
 			stopTracking();
 		}

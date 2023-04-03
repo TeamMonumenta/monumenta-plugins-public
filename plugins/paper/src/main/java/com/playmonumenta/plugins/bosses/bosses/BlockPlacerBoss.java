@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -178,9 +177,9 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 
 								if (AUTO_DESTROYED_MATERIALS.contains(material) || block.getBlockData() instanceof TrapDoor) {
 									/* Break these blocks immediately, don't add them to the bad block list */
-									EntityExplodeEvent event = new EntityExplodeEvent(mBoss, mBoss.getLocation(), Arrays.asList(block), 0f);
+									EntityExplodeEvent event = new EntityExplodeEvent(mBoss, mBoss.getLocation(), new ArrayList<>(List.of(block)), 0f);
 									Bukkit.getServer().getPluginManager().callEvent(event);
-									if (!event.isCancelled()) {
+									if (!event.isCancelled() && !event.blockList().isEmpty()) {
 										/* Only allow bosses to break blocks in areas where explosions are allowed */
 										testloc.getBlock().setType(Material.AIR);
 										loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.2f, 0.6f);
