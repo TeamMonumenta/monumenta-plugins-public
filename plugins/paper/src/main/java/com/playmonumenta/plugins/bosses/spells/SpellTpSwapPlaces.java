@@ -22,30 +22,32 @@ public class SpellTpSwapPlaces extends Spell {
 	private final Plugin mPlugin;
 	private final LivingEntity mLauncher;
 	private final int mCooldown;
-	private final int mRANGE;
+	private final int mTargetRange;
+	private final int mTeleportRange;
 	private final int mDuration;
 	private final ParticlesList mParticles;
 
 	public SpellTpSwapPlaces(Plugin plugin, LivingEntity launcher, int cooldown) {
-		this(plugin, launcher, cooldown, 16, 50, ParticlesList.fromString("[(PORTAL,10,1,1,1,0.03)]"));
+		this(plugin, launcher, cooldown, 16, 50);
 	}
 
 	public SpellTpSwapPlaces(Plugin plugin, LivingEntity launcher, int cooldown, int range, int duration) {
-		this(plugin, launcher, cooldown, range, duration, ParticlesList.fromString("[(PORTAL,10,1,1,1,0.03)]"));
+		this(plugin, launcher, cooldown, range, range, duration, ParticlesList.fromString("[(PORTAL,10,1,1,1,0.03)]"));
 	}
 
-	public SpellTpSwapPlaces(Plugin plugin, LivingEntity launcher, int cooldown, int range, int duration, ParticlesList particles) {
+	public SpellTpSwapPlaces(Plugin plugin, LivingEntity launcher, int cooldown, int targetRange, int teleportRange, int duration, ParticlesList particles) {
 		mPlugin = plugin;
 		mLauncher = launcher;
 		mCooldown = cooldown;
-		mRANGE = range;
+		mTargetRange = targetRange;
+		mTeleportRange = teleportRange;
 		mDuration = duration;
 		mParticles = particles;
 	}
 
 	@Override
 	public void run() {
-		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mRANGE, false);
+		List<Player> players = PlayerUtils.playersInRange(mLauncher.getLocation(), mTargetRange, false);
 		while (!players.isEmpty()) {
 			Player target = players.get(FastUtils.RANDOM.nextInt(players.size()));
 
@@ -67,7 +69,7 @@ public class SpellTpSwapPlaces extends Spell {
 	}
 
 	private void launch(Player target) {
-		if (target.getLocation().distance(mLauncher.getLocation()) > mRANGE) {
+		if (target.getLocation().distance(mLauncher.getLocation()) > mTeleportRange) {
 			return;
 		}
 
@@ -101,8 +103,9 @@ public class SpellTpSwapPlaces extends Spell {
 				mTicks++;
 				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
 				mParticles.spawn(mLauncher, particleLoc);
+				mParticles.spawn(mLauncher, target.getLocation());
 
-				if (EntityUtils.shouldCancelSpells(mLauncher)) {
+				if (EntityUtils.shouldCancelSpells(mLauncher) || target.isDead()) {
 					this.cancel();
 				}
 
