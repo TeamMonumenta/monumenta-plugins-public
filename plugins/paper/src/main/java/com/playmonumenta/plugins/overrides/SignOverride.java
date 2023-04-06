@@ -93,6 +93,10 @@ public class SignOverride extends BaseOverride {
 
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block, PlayerInteractEvent event) {
+		if (item != null && item.getType() == Material.GLOW_INK_SAC && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.SHOPS_POSSIBLE)) {
+			return false;
+		}
+
 		Sign sign = (Sign) block.getState();
 		boolean output = item == null || !(item.hasItemMeta() && item.getItemMeta().hasLore() && (ItemUtils.isDye(item.getType()) || item.getType() == Material.GLOW_INK_SAC));
 
