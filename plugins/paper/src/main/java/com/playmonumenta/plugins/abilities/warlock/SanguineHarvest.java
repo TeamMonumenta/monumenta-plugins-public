@@ -169,9 +169,12 @@ public class SanguineHarvest extends Ability {
 			new PartialParticle(Particle.REDSTONE, bLoc, 16, 0.2, 0.2, 0.2, 0.1, COLOR).spawnAsPlayerActive(mPlayer);
 
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-				bLoc.subtract(direction.multiply(0.5));
-				explode(bLoc);
-				return;
+				//If the player is incapable of going through the block and doesn't have line of sight with the next possible position
+				if (!bLoc.getBlock().isPassable() && !mPlayer.hasLineOfSight(box.shift(shift).getCenter().toLocation(world))) {
+					bLoc.subtract(direction.multiply(0.5));
+					explode(bLoc);
+					return;
+				}
 			}
 
 			for (LivingEntity mob : nearbyMobs) {

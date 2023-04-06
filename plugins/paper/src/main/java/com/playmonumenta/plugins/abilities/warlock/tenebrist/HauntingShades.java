@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -103,9 +104,12 @@ public class HauntingShades extends Ability {
 			}
 
 			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-				bLoc.subtract(direction.multiply(0.5));
-				placeShade(bLoc);
-				return;
+				//If the player is incapable of going through the block and doesn't have line of sight with the next possible position
+				if (!bLoc.getBlock().isPassable() && !mPlayer.hasLineOfSight(box.shift(shift).getCenter().toLocation(world))) {
+					bLoc.subtract(direction.multiply(0.5));
+					placeShade(bLoc);
+					return;
+				}
 			}
 
 			box.shift(shift);
