@@ -14,10 +14,12 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,6 +49,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class VerdantMinibossBoss extends BossAbilityGroup {
@@ -91,6 +94,34 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 				mCrystalLoc = stand.getLocation().getBlock().getLocation();
 				break;
 			}
+		}
+
+		// Anti AI stuck workaround.
+		// This is necessary due to Vindicators not moving forwards enough to reach their target, sometimes.
+		//
+		// !!!! Remove this in the future if the problem, common to all Vindicators, is fixed in general !!!!
+		if (mBoss instanceof Vindicator) {
+			new BukkitRunnable() {
+				Location mLastLoc = mBoss.getLocation().clone();
+
+				@Override
+				public void run() {
+					if (!mBoss.isValid()) {
+						this.cancel();
+						return;
+					}
+
+					Location newLoc = mBoss.getLocation().clone();
+					// Check if the boss hasn't moved much at all. It means that it might be stuck
+					// (otherwise, it would be moving towards its target)
+					if (newLoc.distance(mLastLoc) <= 0.025) {
+						// Teleport the boss forward a bit
+						Vector forwards = VectorUtils.rotationToVector(newLoc.getYaw(), newLoc.getPitch()).multiply(0.5).setY(0);
+						NmsUtils.getVersionAdapter().moveEntity(mBoss, forwards);
+					}
+					mLastLoc = newLoc;
+				}
+			}.runTaskTimer(mPlugin, 0, 20);
 		}
 
 		new BukkitRunnable() {

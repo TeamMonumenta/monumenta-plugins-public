@@ -72,9 +72,11 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 		if (!isGruesome && mAlchemistPotions != null) {
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, BRUTAL_ALCHEMY_DURATION);
 
-			double baseDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, mAlchemistPotions.getDamage(playerItemStats));
+			double baseDamage = mAlchemistPotions.getDamage(playerItemStats);
 			double finalDamage = baseDamage * (isLevelOne() ? BRUTAL_ALCHEMY_1_DOT_MULTIPLIER : BRUTAL_ALCHEMY_2_DOT_MULTIPLIER);
-			CustomDamageOverTime dot = new CustomDamageOverTime(duration, finalDamage, mPeriod, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
+			double extraDamage = CharmManager.getLevel(mPlayer, CHARM_DOT_DAMAGE);
+
+			CustomDamageOverTime dot = new CustomDamageOverTime(duration, finalDamage + extraDamage, mPeriod, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
 			dot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
 			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, dot);
 
@@ -82,7 +84,7 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 				double finalEnhancedDamage = baseDamage * BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER;
 				// Apply the enhanced dot a little later for a cool effect
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					CustomDamageOverTime enhancementDot = new CustomDamageOverTime(duration, finalEnhancedDamage, mPeriod * 2, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
+					CustomDamageOverTime enhancementDot = new CustomDamageOverTime(duration, finalEnhancedDamage + extraDamage, mPeriod * 2, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
 					enhancementDot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
 					mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_ENHANCED_EFFECT_NAME, enhancementDot);
 				}, 10);
