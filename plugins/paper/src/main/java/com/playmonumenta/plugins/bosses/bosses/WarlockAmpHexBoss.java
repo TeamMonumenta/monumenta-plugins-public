@@ -60,6 +60,8 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_CONE_WARNING = ParticlesList.fromString("[(REDSTONE,2,0.1,0.1,0.1,0.1,RED,1)]");
 		public ParticlesList PARTICLE_CONE_HIT = ParticlesList.fromString("[(SPELL_WITCH,1,0.1,0.1,0.1,0.1),(CRIT_MAGIC,2,0.1,0.1,0.1,0.1)]");
 		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(CRIT_MAGIC,20,0.25,0.25,0.25,0.25)]");
+		@BossParam(help = "The ticks between one spawn of the particles and the next")
+		public int PARTICLE_CONE_WARNING_FREQUENCY = 2;
 
 		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,1,1),(ENTITY_BLAZE_SHOOT,3,1),(BLOCK_END_PORTAL_FRAME_FILL,3,0.5)]");
 	}
@@ -86,12 +88,14 @@ public class WarlockAmpHexBoss extends BossAbilityGroup {
 						Location tloc = mBoss.getLocation().setDirection(dir);
 
 						BukkitRunnable runB = new BukkitRunnable() {
+							final int mParticleFrequency = p.PARTICLE_CONE_WARNING_FREQUENCY;
+
 							int mT = 0;
 
 							@Override
 							public void run() {
 								mT++;
-								if (mT % 2 == 0) {
+								if (mT % mParticleFrequency == 0) {
 									Vector v;
 									for (double r = 0; r <= p.TARGETS.getRange(); r += 0.5) {
 										for (double degree = -p.CONE; degree < p.CONE; degree += 10) {
