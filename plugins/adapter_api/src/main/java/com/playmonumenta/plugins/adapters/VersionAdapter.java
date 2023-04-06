@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.adapters;
 import java.util.Set;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -174,9 +175,14 @@ public interface VersionAdapter {
 	Component getDisplayName(ItemStack item);
 
 	/**
-	 * Teleports the entity, with its passengers, to the target location in the same world
+	 * Moves an entity as if it moved on its own. Checks collision, updates fall distance, does fall damage, etc.
 	 */
+	void moveEntity(Entity entity, Vector movement);
 
+	/**
+	 * Moves an entity to another location in the same world. This directly updates the entity's position and does not call a teleport event.
+	 * Unlike {@link Entity#teleport(Location)}, this can be used to move an entity that has passengers.
+	 */
 	void setEntityLocation(Entity entity, Vector target, float yaw, float pitch);
 
 }

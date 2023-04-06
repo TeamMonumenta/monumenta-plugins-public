@@ -305,6 +305,8 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(RedstoneBoss.identityTag, RedstoneBoss::new);
 		mStatelessBosses.put(SlashAttackBoss.identityTag, SlashAttackBoss::new);
 		mStatelessBosses.put(DashBoss.identityTag, DashBoss::new);
+		mStatelessBosses.put(WormBoss.identityTag, WormBoss::new);
+
 
 		mStatelessBosses.put(LichMageBoss.identityTag, LichMageBoss::new);
 		mStatelessBosses.put(LichRogueBoss.identityTag, LichRogueBoss::new);
@@ -570,6 +572,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(RedstoneBoss.identityTag, RedstoneBoss::deserialize);
 		mBossDeserializers.put(SlashAttackBoss.identityTag, SlashAttackBoss::deserialize);
 		mBossDeserializers.put(DashBoss.identityTag, DashBoss::deserialize);
+		mBossDeserializers.put(WormBoss.identityTag, WormBoss::deserialize);
 
 		mBossDeserializers.put(Lich.identityTag, Lich::deserialize);
 		mBossDeserializers.put(LichAlchBoss.identityTag, LichAlchBoss::deserialize);
@@ -686,6 +689,8 @@ public class BossManager implements Listener {
 		mBossParameters.put(RedstoneBoss.identityTag, new RedstoneBoss.Parameters());
 		mBossParameters.put(SlashAttackBoss.identityTag, new SlashAttackBoss.Parameters());
 		mBossParameters.put(DashBoss.identityTag, new DashBoss.Parameters());
+		mBossParameters.put(WormBoss.identityTag, new WormBoss.Parameters());
+
 	}
 
 	/********************************************************************************

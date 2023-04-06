@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -168,7 +169,13 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
+	public void moveEntity(Entity entity, Vector movement) {
+		entity.teleport(entity.getLocation().add(movement));
+	}
+
+	@Override
 	public void setEntityLocation(Entity entity, Vector target, float yaw, float pitch) {
+		entity.teleport(new Location(entity.getWorld(), target.getX(), target.getY(), target.getZ(), yaw, pitch));
 	}
 
 }

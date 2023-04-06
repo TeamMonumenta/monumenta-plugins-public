@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
@@ -54,6 +55,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftVector;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.CaveSpider;
@@ -548,6 +550,11 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public net.kyori.adventure.text.Component getDisplayName(org.bukkit.inventory.ItemStack item) {
 		return PaperAdventure.asAdventure(CraftItemStack.asNMSCopy(item).getHoverName());
+	}
+
+	@Override
+	public void moveEntity(Entity entity, Vector movement) {
+		((CraftEntity) entity).getHandle().move(MoverType.SELF, CraftVector.toNMS(movement));
 	}
 
 	@Override

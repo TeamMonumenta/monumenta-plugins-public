@@ -1453,7 +1453,11 @@ public class EntityUtils {
 	}
 
 	public static LivingEntity copyMob(LivingEntity entity) {
-		LivingEntity newSpawn = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+		return copyMob(entity, entity.getLocation());
+	}
+
+	public static LivingEntity copyMob(LivingEntity entity, Location location) {
+		LivingEntity newSpawn = (LivingEntity) entity.getWorld().spawnEntity(location, entity.getType());
 		newSpawn.getEquipment().setBoots(entity.getEquipment().getBoots());
 		newSpawn.getEquipment().setLeggings(entity.getEquipment().getLeggings());
 		newSpawn.getEquipment().setChestplate(entity.getEquipment().getChestplate());
