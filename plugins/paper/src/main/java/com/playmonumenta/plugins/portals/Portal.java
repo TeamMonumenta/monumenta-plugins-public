@@ -241,7 +241,7 @@ public class Portal {
 		}
 
 		location = mPair.fromInterPortalCoords(toInterPortalCoords(location.add(0, halfHeight, 0))).subtract(0, halfHeight, 0);
-		fixInsideWall(entity, location);
+		mPair.fixInsideWall(entity, location);
 		if (willBeInBlock(entity, location)) {
 			location = mPair.defaultTeleportLocation(entity);
 		}
