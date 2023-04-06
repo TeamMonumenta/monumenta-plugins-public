@@ -37,13 +37,13 @@ import org.bukkit.util.Vector;
 
 public class ShieldWall extends Ability {
 
-	private static final int SHIELD_WALL_1_DURATION = 8 * 20;
+	private static final int SHIELD_WALL_1_DURATION = 6 * 20;
 	private static final int SHIELD_WALL_2_DURATION = 10 * 20;
 	private static final int SHIELD_WALL_DAMAGE = 3;
 	private static final int SHIELD_WALL_1_COOLDOWN = 20 * 30;
-	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 20;
+	private static final int SHIELD_WALL_2_COOLDOWN = 20 * 18;
 	private static final int SHIELD_WALL_ANGLE = 180;
-	private static final float SHIELD_WALL_2_KNOCKBACK = 0.3f;
+	private static final float SHIELD_WALL_KNOCKBACK = 0.3f;
 	private static final double SHIELD_WALL_RADIUS = 4.0;
 	private static final int SHIELD_WALL_HEIGHT = 5;
 
@@ -60,7 +60,7 @@ public class ShieldWall extends Ability {
 			.shorthandName("SW")
 			.descriptions(
 				String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles %s blocks high and %s blocks wide in front of the user. " +
-					"This blocks all enemy projectiles such as arrows or fireballs and deals %s melee damage to enemies that pass through the wall. The shield lasts %s seconds. Cooldown: %ss.",
+					"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The shield lasts %s seconds. Cooldown: %ss.",
 					SHIELD_WALL_ANGLE,
 					SHIELD_WALL_HEIGHT,
 					(int) SHIELD_WALL_RADIUS,
@@ -68,7 +68,7 @@ public class ShieldWall extends Ability {
 					StringUtils.ticksToSeconds(SHIELD_WALL_1_DURATION),
 					StringUtils.ticksToSeconds(SHIELD_WALL_1_COOLDOWN)
 				),
-				String.format("The shield lasts %s seconds instead. Additionally, the shield knocks back enemies that try to go through it. Cooldown: %ss.",
+				String.format("The shield lasts %s seconds instead. Cooldown: %ss.",
 					StringUtils.ticksToSeconds(SHIELD_WALL_2_DURATION),
 					StringUtils.ticksToSeconds(SHIELD_WALL_2_COOLDOWN)
 				)
@@ -92,7 +92,7 @@ public class ShieldWall extends Ability {
 		if (isOnCooldown()) {
 			return;
 		}
-		float knockback = (float) (isLevelTwo() ? CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_2_KNOCKBACK) : 0);
+		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, SHIELD_WALL_KNOCKBACK);
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, SHIELD_WALL_DAMAGE);
 		double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
 
@@ -141,36 +141,32 @@ public class ShieldWall extends Ability {
 								mCosmetic.shieldOnBlock(world, eLoc, mPlayer);
 							}
 						} else if (e instanceof LivingEntity le && EntityUtils.isHostileMob(e)) {
+							boolean shouldKnockback = knockback > 0 && !EntityUtils.isCCImmuneMob(e);
 							// Stores mobs hit this tick
 							mMobsHitThisTick.add(le);
 							// This list does not update to the mobs hit this tick until after everything runs
 							if (!mMobsAlreadyHit.contains(le)) {
 								mMobsAlreadyHit.add(le);
-								Vector v = le.getVelocity();
 
 								DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.MELEE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, false, true, false);
 
 								//Bosses should not be affected by slowness or knockback.
-								if (knockback > 0 && !e.getScoreboardTags().contains("Boss")) {
+								if (shouldKnockback) {
 									MovementUtils.knockAway(mLoc, le, knockback, true);
 									mCosmetic.shieldOnHit(world, eLoc, mPlayer);
-								} else {
-									le.setVelocity(v);
 								}
-							} else if (le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
-								if (knockback > 0 && !e.getScoreboardTags().contains("Boss")) {
-									/*
-									 * This is a temporary fix while we decide how to handle KBR mobs with Shield Wall level 2.
-									 *
-									 * If a mob collides with shield wall halfway through its invulnerability period, assume it
-									 * resists knockback and give it Slowness V for 5 seconds to simulate the old effect of
-									 * halting mobs with stunlock damage, minus the insane damage part.
-									 *
-									 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
-									 * after they leave shield wall hitbox.
-									 */
-									PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
-								}
+							} else if (shouldKnockback && le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {
+								/*
+								 * This is a temporary fix while we decide how to handle KBR mobs
+								 *
+								 * If a mob collides with shield wall halfway through its invulnerability period, assume it
+								 * resists knockback and give it Slowness V for 5 seconds to simulate the old effect of
+								 * halting mobs with stunlock damage, minus the insane damage part.
+								 *
+								 * This effect is reapplied each tick, so the mob is slowed drastically until 2 seconds
+								 * after they leave shield wall hitbox.
+								 */
+								PotionUtils.applyPotion(mPlayer, le, new PotionEffect(PotionEffectType.SLOW, 20 * 2, 4, true, false));
 							}
 						}
 					}

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.bosses.abilities;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -62,8 +61,7 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		// Set damage to 0 for non-boss hostile mobs to apply normal knockback. Bosses should not take any knockback
 		if (EntityUtils.isHostileMob(damagee)
-			    && !EntityUtils.isBoss(damagee)
-			    && !damagee.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag)) {
+			&& !EntityUtils.isCCImmuneMob(damagee)) {
 			event.setDamage(0);
 		} else {
 			event.setCancelled(true);

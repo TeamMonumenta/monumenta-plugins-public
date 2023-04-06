@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -11,7 +10,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -44,7 +42,7 @@ public class WindAspect implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double level, DamageEvent event, LivingEntity enemy) {
-		if (AbilityUtils.isAspectTriggeringEvent(event, player) && !EntityUtils.isBoss(enemy) && !ScoreboardUtils.checkTag(enemy, CrowdControlImmunityBoss.identityTag)) {
+		if (AbilityUtils.isAspectTriggeringEvent(event, player) && !EntityUtils.isCCImmuneMob(enemy)) {
 			launch(plugin, player, enemy, level * (event.getType() == DamageEvent.DamageType.MELEE ? player.getCooledAttackStrength(0) : 1));
 		}
 	}

@@ -745,6 +745,18 @@ public final class EffectManager implements Listener {
 		}
 	}
 
+	@EventHandler(ignoreCancelled = true)
+	public void customEffectAppliedEvent(CustomEffectApplyEvent event) {
+		Effects effects = mEntities.get(event.getEntity());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().customEffectAppliedEvent(event);
+				}
+			}
+		}
+	}
+
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void entityDeathEvent(EntityDeathEvent event) {
 		LivingEntity killed = event.getEntity();

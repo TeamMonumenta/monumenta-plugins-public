@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -108,27 +109,31 @@ public class ElementalArrows extends Ability {
 
 		boolean thunder = proj.hasMetadata(THUNDER_ARROW_METAKEY);
 		if (proj.hasMetadata(FIRE_ARROW_METAKEY)) {
-			applyArrowEffects(event, enemy, thunder, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
+			applyArrowEffects(event, proj, enemy, thunder, ABILITY_FIRE, playerItemStats, Stray.class, (entity) -> {
 				EntityUtils.applyFire(mPlugin, duration, entity, mPlayer, playerItemStats);
 			});
 		} else if (proj.hasMetadata(ICE_ARROW_METAKEY)) {
 			double slowAmplifier = SLOW_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
-			applyArrowEffects(event, enemy, thunder, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
+			applyArrowEffects(event, proj, enemy, thunder, ABILITY_ICE, playerItemStats, Blaze.class, (entity) -> {
 				EntityUtils.applySlow(mPlugin, duration, slowAmplifier, entity);
 			});
 		}
 		return false; // creates new damage instances, but of a type it doesn't handle again
 	}
 
-	private void applyArrowEffects(DamageEvent event, LivingEntity enemy, boolean thunder, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
+	private void applyArrowEffects(DamageEvent event, Projectile proj, LivingEntity enemy, boolean thunder, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
 		double baseDamage = playerItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+		ItemStack arrowItem = EntityListener.getArrowItem(proj.getUniqueId());
+		if (arrowItem != null) {
+			baseDamage *= 1 + ItemStatUtils.getAttributeAmount(arrowItem, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY, ItemStatUtils.Operation.MULTIPLY, ItemStatUtils.Slot.PROJECTILE);
+		}
 
 		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, baseDamage);
 		if (bonusEntity.isInstance(enemy)) {
 			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 		}
-		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getMainhandAddStats().get(ItemStatUtils.EnchantmentType.POINT_BLANK));
-		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getMainhandAddStats().get(ItemStatUtils.EnchantmentType.SNIPER));
+		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getItemStats().get(ItemStatUtils.EnchantmentType.POINT_BLANK));
+		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getItemStats().get(ItemStatUtils.EnchantmentType.SNIPER));
 		if (thunder) {
 			targetDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
 		}

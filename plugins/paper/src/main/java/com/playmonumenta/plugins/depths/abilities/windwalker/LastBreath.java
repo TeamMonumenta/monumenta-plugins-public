@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -13,7 +12,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -93,7 +91,7 @@ public class LastBreath extends DepthsAbility {
 		mPlugin.mEffectManager.addEffect(mPlayer, SPEED_EFFECT_NAME, new PercentSpeed(SPEED_DURATION, SPEED[mRarity - 1], SPEED_EFFECT_NAME));
 		mPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, RESISTANCE_TICKS[mRarity - 1], 4));
 		for (LivingEntity e : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-			if (!ScoreboardUtils.checkTag(e, CrowdControlImmunityBoss.identityTag)) {
+			if (!EntityUtils.isCCImmuneMob(e)) {
 				Vector knockback = e.getVelocity().add(e.getLocation().toVector().subtract(loc.toVector()).normalize().multiply(KNOCKBACK_SPEED));
 				knockback.setY(knockback.getY() * 2);
 				e.setVelocity(knockback.add(new Vector(0, 0.25, 0)));

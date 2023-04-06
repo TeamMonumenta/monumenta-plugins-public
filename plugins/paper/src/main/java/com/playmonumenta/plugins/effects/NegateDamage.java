@@ -46,6 +46,8 @@ public class NegateDamage extends Effect {
 		}
 		if (mCount > 0 && (mAffectedTypes == null || mAffectedTypes.contains(event.getType())) && !event.isCancelled() && !event.isBlockedByShield()) {
 			event.setCancelled(true);
+			entity.setLastDamage(event.getDamage());
+			entity.setNoDamageTicks(20);
 			World world = entity.getWorld();
 			Location loc = entity.getLocation();
 			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 1.2f);

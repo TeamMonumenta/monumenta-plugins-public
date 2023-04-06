@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.earthbound;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
@@ -15,7 +14,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -91,7 +89,7 @@ public class Earthquake extends DepthsAbility {
 				public void run() {
 					if (mTicks >= EARTHQUAKE_TIME) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
-							if (!ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag)) {
+							if (!EntityUtils.isCCImmuneMob(mob)) {
 								knockup(mob);
 							}
 

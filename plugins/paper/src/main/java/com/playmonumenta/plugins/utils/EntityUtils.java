@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Bleed;
+import com.playmonumenta.plugins.effects.CCImmuneEffect;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -322,6 +323,13 @@ public class EntityUtils {
 
 	public static boolean isBoss(Entity entity) {
 		return ScoreboardUtils.checkTag(entity, "Boss");
+	}
+
+	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, cannot be silenced, etc.
+	public static boolean isCCImmuneMob(Entity entity) {
+		return isBoss(entity)
+			|| ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
+			|| EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
 	}
 
 	public static boolean isTrainingDummy(Entity entity) {
@@ -835,7 +843,7 @@ public class EntityUtils {
 	public static final String SLOW_EFFECT_NAME = "SlowEffect";
 
 	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		if (!ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag)) {
+		if (!isCCImmuneMob(mob)) {
 			plugin.mEffectManager.addEffect(mob, SLOW_EFFECT_NAME, new PercentSpeed(ticks, -amount, SLOW_EFFECT_NAME));
 		}
 	}
@@ -1096,7 +1104,7 @@ public class EntityUtils {
 	}
 
 	public static void applyStun(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag) || !mob.hasAI()) {
+		if (isCCImmuneMob(mob) || !mob.hasAI()) {
 			return;
 		}
 

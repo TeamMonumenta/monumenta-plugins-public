@@ -72,6 +72,8 @@ public class DepthsDodging extends DepthsAbility {
 		// See if we should dodge. If false, allow the event to proceed normally
 		if (event.getType() == DamageType.PROJECTILE && !event.isBlocked() && dodge()) {
 			event.setCancelled(true);
+			mPlayer.setLastDamage(event.getDamage());
+			mPlayer.setNoDamageTicks(20);
 		}
 	}
 

@@ -67,6 +67,9 @@ public class VoodooBondsOtherPlayer extends Effect {
 			if (event.getType() == DamageType.FIRE || event.getType() == DamageType.AILMENT) {
 				return;
 			}
+
+			entity.setLastDamage(event.getDamage());
+			entity.setNoDamageTicks(20);
 			event.setDamage(0);
 			event.setCancelled(true);
 		}

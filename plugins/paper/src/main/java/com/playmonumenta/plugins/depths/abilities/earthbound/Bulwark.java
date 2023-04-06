@@ -53,6 +53,8 @@ public class Bulwark extends DepthsAbility {
 			new PartialParticle(Particle.BLOCK_DUST, particleLoc, 20, 0.5, 0.5, 0.5, 0.125, Material.STRIPPED_DARK_OAK_WOOD.createBlockData()).spawnAsPlayerPassive(mPlayer);
 			world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1, 1.2f);
 			event.setCancelled(true);
+			mPlayer.setLastDamage(event.getDamage());
+			mPlayer.setNoDamageTicks(20);
 			putOnCooldown();
 		}
 	}

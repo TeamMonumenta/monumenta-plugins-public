@@ -504,6 +504,8 @@ public class CharmManager {
 			Challenge.CHARM_DAMAGE,
 			Challenge.CHARM_ABSORPTION_PER,
 			Challenge.CHARM_ABSORPTION_MAX,
+			Challenge.CHARM_SPEED_PER,
+			Challenge.CHARM_CDR_PER,
 			Challenge.CHARM_DURATION,
 			Challenge.CHARM_RANGE,
 			ShieldWall.CHARM_DAMAGE,

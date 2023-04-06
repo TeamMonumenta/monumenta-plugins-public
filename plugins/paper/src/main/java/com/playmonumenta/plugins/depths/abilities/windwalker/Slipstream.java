@@ -3,10 +3,8 @@ package com.playmonumenta.plugins.depths.abilities.windwalker;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
-import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
@@ -16,7 +14,6 @@ import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -95,7 +92,7 @@ public class Slipstream extends DepthsAbility {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS, mPlayer)) {
-			if (!ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag)) {
+			if (!EntityUtils.isCCImmuneMob(mob)) {
 				MovementUtils.knockAway(mPlayer.getLocation(), mob, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);
 			}
 		}

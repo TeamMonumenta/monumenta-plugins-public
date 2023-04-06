@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -81,7 +80,7 @@ public class ThunderAspect implements Enchantment {
 			} else {
 				double chance = (CHANCE + CharmManager.getLevelPercentDecimal(player, CHARM_STUN_CHANCE)) * level;
 				if (FastUtils.RANDOM.nextDouble() < chance) {
-					if (!EntityUtils.isElite(enemy) && !(EntityUtils.isBoss(enemy) && !enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+					if (!EntityUtils.isElite(enemy) && !EntityUtils.isCCImmuneMob(enemy)) {
 						EntityUtils.applyStun(plugin, DURATION_PROJ, enemy);
 
 						World world = enemy.getWorld();
@@ -143,7 +142,7 @@ public class ThunderAspect implements Enchantment {
 				EntityUtils.applyStun(plugin, DURATION_MELEE, enemy);
 			}
 
-			if (particles && !(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+			if (particles && !EntityUtils.isCCImmuneMob(enemy)) {
 				Location loc = enemy.getLocation();
 				World world = enemy.getWorld();
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 0.65f, 1.5f);

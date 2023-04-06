@@ -101,6 +101,8 @@ public class Riposte extends Ability {
 				new PartialParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6).spawnAsPlayerActive(mPlayer);
 				putOnCooldown();
 				event.setCancelled(true);
+				mPlayer.setNoDamageTicks(20);
+				mPlayer.setLastDamage(event.getDamage());
 
 				if (isEnhanced()) {
 					double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, ENHANCEMENT_DAMAGE);

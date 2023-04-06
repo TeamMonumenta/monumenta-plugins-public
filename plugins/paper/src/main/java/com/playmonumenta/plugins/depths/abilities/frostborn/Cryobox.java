@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.frostborn;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.DepthsUtils;
@@ -86,7 +85,7 @@ public class Cryobox extends DepthsAbility {
 			MovementUtils.knockAway(mPlayer, mob, KNOCKBACK_SPEED, true);
 		}
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(center, ELEVATE_RADIUS, mPlayer)) {
-			if (EntityUtils.isBoss(mob) || ScoreboardUtils.checkTag(mob, CrowdControlImmunityBoss.identityTag) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG) || mob.getVehicle() != null) {
+			if (EntityUtils.isCCImmuneMob(mob) || ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG) || mob.getVehicle() != null) {
 				continue;
 			}
 			Location mobLoc = mob.getLocation();

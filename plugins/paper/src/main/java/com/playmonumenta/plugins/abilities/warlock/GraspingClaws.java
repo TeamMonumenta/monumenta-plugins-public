@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -18,7 +17,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -204,7 +202,7 @@ public class GraspingClaws extends Ability {
 								mMobsAlreadyHit.add(le);
 								Vector v = le.getVelocity();
 
-								if (!EntityUtils.isBoss(e) && !ScoreboardUtils.checkTag(e, CrowdControlImmunityBoss.identityTag)) {
+								if (!EntityUtils.isCCImmuneMob(e)) {
 									if (loc.distance(eLoc) > mRadius) {
 										MovementUtils.knockAway(loc, le, 0.3f, true);
 									} else {

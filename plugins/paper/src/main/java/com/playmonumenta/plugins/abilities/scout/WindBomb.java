@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -201,7 +200,7 @@ public class WindBomb extends Ability {
 						mTicks++;
 						if (mTicks % PULL_INTERVAL == 0) {
 							for (LivingEntity mob : pullHitbox.getHitMobs()) {
-								if (!(EntityUtils.isBoss(mob) || mob.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag) || ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES))) {
+								if (!EntityUtils.isCCImmuneMob(mob) || ZoneUtils.hasZoneProperty(mob.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 									Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
 									double ratio = PULL_RATIO + vector.length() / pullRadius;
 									Vector velocity = mob.getVelocity().add(vector.normalize().multiply(pullVelocity).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0)));

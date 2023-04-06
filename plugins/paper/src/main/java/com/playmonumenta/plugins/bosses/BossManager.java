@@ -625,6 +625,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(AntiRangeBoss.identityTag, new AntiRangeBoss.Parameters());
 		mBossParameters.put(AntiMeleeBoss.identityTag, new AntiMeleeBoss.Parameters());
 		mBossParameters.put(DamageCapBoss.identityTag, new DamageCapBoss.Parameters());
+		mBossParameters.put(RageBoss.identityTag, new RageBoss.Parameters());
 		mBossParameters.put(UnyieldingBoss.identityTag, new UnyieldingBoss.Parameters());
 		mBossParameters.put(ToughBoss.identityTag, new ToughBoss.Parameters());
 		mBossParameters.put(UnseenBoss.identityTag, new UnseenBoss.Parameters());

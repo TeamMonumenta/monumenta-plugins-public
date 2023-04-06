@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
@@ -87,7 +86,7 @@ public class Galvanic implements Infusion {
 				EntityUtils.applyStun(plugin, DURATION_NORMAL, enemy);
 			}
 
-			if (!(EntityUtils.isBoss(enemy) || enemy.getScoreboardTags().contains(CrowdControlImmunityBoss.identityTag))) {
+			if (!EntityUtils.isCCImmuneMob(enemy)) {
 				Location loc = enemy.getLocation();
 				World world = enemy.getWorld();
 				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 0.65f, 1.5f);

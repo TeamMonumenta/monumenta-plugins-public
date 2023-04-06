@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
+import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
@@ -67,6 +68,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 		} else {
 			return 0;
 		}
+	}
+
+	public void customEffectAppliedEvent(CustomEffectApplyEvent event) {
+
 	}
 
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
