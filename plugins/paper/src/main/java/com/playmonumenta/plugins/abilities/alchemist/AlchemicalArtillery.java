@@ -47,9 +47,9 @@ public class AlchemicalArtillery extends PotionAbility {
 	private static final double ARTILLERY_RANGE_MULTIPLIER = 1.5;
 	private static final int ARTILLERY_POTION_COST = 2;
 	private static final double ENHANCEMENT_REFUND_CHANCE = 0.5;
-	public static final String CHARM_DELAY = "Alchemical Artillery Delay";
+	public static final String CHARM_DAMAGE = "Alchemical Artillery Damage";
 	public static final String CHARM_RADIUS = "Alchemical Artillery Radius";
-	public static final String CHARM_KNOCKBACK = "Alchemical Artillery Knockback";
+	public static final String CHARM_VELOCITY = "Alchemical Artillery Velocity";
 	public static final String CHARM_EXPLOSION_MULTIPLIER = "Alchemical Artillery Explosion Damage Multiplier";
 
 	public static final AbilityInfo<AlchemicalArtillery> INFO =
@@ -111,7 +111,9 @@ public class AlchemicalArtillery extends PotionAbility {
 		}
 
 		loc.getWorld().playSound(loc, Sound.ENTITY_RAVAGER_STEP, SoundCategory.PLAYERS, 0.5f, 0.5f);
-		Vector vel = loc.getDirection().normalize().multiply((mAlchemistPotions.getSpeed() - 1) / 2 + 1);
+		double baseVelocityMultiplier = (mAlchemistPotions.getSpeed() - 1) / 2 + 1;
+		double velocityMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, baseVelocityMultiplier);
+		Vector vel = loc.getDirection().normalize().multiply(velocityMultiplier);
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
@@ -183,7 +185,7 @@ public class AlchemicalArtillery extends PotionAbility {
 			return;
 		}
 
-		double potionDamage = mAlchemistPotions.getDamage(playerItemStats);
+		double potionDamage = mAlchemistPotions.getDamage(playerItemStats) * (isLevelOne() ? ARTILLERY_1_DAMAGE_MULTIPLIER : ARTILLERY_2_DAMAGE_MULTIPLIER);
 		double potionRadius = mAlchemistPotions.getRadius(playerItemStats);
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, potionRadius * ARTILLERY_RANGE_MULTIPLIER);
@@ -191,7 +193,7 @@ public class AlchemicalArtillery extends PotionAbility {
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
 		List<LivingEntity> mobs = hitbox.getHitMobs();
 
-		double finalDamage = potionDamage * (isLevelOne() ? ARTILLERY_1_DAMAGE_MULTIPLIER : ARTILLERY_2_DAMAGE_MULTIPLIER);
+		double finalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, potionDamage);
 
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, true, false);
