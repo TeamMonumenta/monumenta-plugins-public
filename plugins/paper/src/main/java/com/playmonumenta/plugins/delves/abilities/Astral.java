@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -59,8 +60,9 @@ public class Astral {
 				}
 			}
 		}
-		if (!block.getLocation().clone().add(0, 1, 0).getBlock().isSolid() && !block.getLocation().clone().add(0, 2, 0).getBlock().isSolid() && !block.getLocation().clone().add(0, 3, 0).getBlock().isSolid()) {
-			validSpawnLocs.add(block.getLocation().clone().add(0.5, 1, 0.5));
+		Location currentBlockLocation = block.getLocation().clone().add(0.5, 1, 0.5);
+		if (isLocationValidSpawnLoc(currentBlockLocation)) {
+			validSpawnLocs.add(currentBlockLocation);
 		}
 		if (validSpawnLocs.size() > 0) {
 			Location loc = validSpawnLocs.get(FastUtils.RANDOM.nextInt(validSpawnLocs.size()));
@@ -84,13 +86,26 @@ public class Astral {
 
 	private static @Nullable Location getNearestBlockUnder(Location location, int distance) {
 		for (int i = 0; i < distance; i++) {
-			if (location.clone().add(0, -i, 0).getBlock().isSolid() && !location.clone().add(0, 1 - i, 0).getBlock().isSolid() && !location.clone().add(0, 2 - i, 0).getBlock().isSolid() && !location.clone().add(0, 3 - i, 0).getBlock().isSolid()) {
-				return location.clone().add(0, -i, 0);
+			Location locationUnder = location.clone().add(0, -i, 0);
+			if (isLocationValidSpawnLoc(locationUnder)) {
+				return locationUnder;
 			}
 		}
 		return null;
 	}
 
+	private static boolean isLocationValidSpawnLoc(Location testLocation) {
+		Block blockCurrent = testLocation.clone().add(0, 0, 0).getBlock();
+		Block block1Above = testLocation.clone().add(0, 1, 0).getBlock();
+		Block block2Above = testLocation.clone().add(0, 2, 0).getBlock();
+		Block block3Above = testLocation.clone().add(0, 3, 0).getBlock();
+		if (blockCurrent.isSolid() && !block1Above.isSolid() && !block2Above.isSolid() && !block3Above.isSolid()
+			    && !block1Above.getType().equals(Material.LAVA) && !block2Above.getType().equals(Material.LAVA)
+			    && !block3Above.getType().equals(Material.LAVA)) {
+			return true;
+		}
+		return false;
+	}
 	public static void applyModifiers(Chest chest, int level) {
 		if (level == 0 || ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
 			return;
