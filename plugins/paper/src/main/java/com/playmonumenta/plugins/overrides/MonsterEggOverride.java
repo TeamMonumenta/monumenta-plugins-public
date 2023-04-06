@@ -2,6 +2,8 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.listeners.EntityListener;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -48,8 +50,11 @@ public class MonsterEggOverride extends BaseOverride {
 
 	@Override
 	public boolean blockDispenseInteraction(Plugin plugin, Block block, ItemStack dispensed) {
-		Material blockType = (block != null) ? block.getType() : Material.AIR;
-		if (blockType.equals(Material.DISPENSER)) {
+		if (block.getType().equals(Material.DISPENSER)) {
+			if (!ServerProperties.getIsTownWorld() && InventoryUtils.testForItemWithName(dispensed, "Dummy", false)) {
+				return false;
+			}
+
 			if (!EntityListener.PLOT_ANIMAL_EGGS.contains(dispensed.getType())) {
 				return true;
 			}
