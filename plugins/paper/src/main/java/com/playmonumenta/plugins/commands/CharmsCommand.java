@@ -82,6 +82,20 @@ public class CharmsCommand extends GenericCommand {
 				}
 			}).register();
 
+		// CLEAR COMMAND
+
+		arguments.clear();
+		arguments.add(new LiteralArgument("clear"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+
+		new CommandAPICommand("charm")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				CharmManager.getInstance().clearCharms(player);
+			}).register();
+
 		//EFFECT SUMMARY COMMAND
 
 		arguments.clear();
