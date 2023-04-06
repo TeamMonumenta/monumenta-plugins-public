@@ -57,7 +57,8 @@ public class AmplifyingHex extends Ability {
 	public static final String CHARM_RANGE = "Amplifying Hex Range";
 	public static final String CHARM_COOLDOWN = "Amplifying Hex Cooldown";
 	public static final String CHARM_CONE = "Amplifying Hex Cone";
-	public static final String CHARM_EFFECT = "Amplifying Hex Damage per Effect Potency";
+	public static final String CHARM_POTENCY = "Amplifying Hex Damage per Effect Potency";
+	public static final String CHARM_POTENCY_CAP = "Amplifying Hex Potency Cap";
 
 	public static final AbilityInfo<AmplifyingHex> INFO =
 		new AbilityInfo<>(AmplifyingHex.class, "Amplifying Hex", AmplifyingHex::new)
@@ -86,8 +87,8 @@ public class AmplifyingHex extends Ability {
 
 	public AmplifyingHex(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
-		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_EFFECT, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
+		mAmplifierDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY, isLevelOne() ? AMPLIFIER_DAMAGE_1 : AMPLIFIER_DAMAGE_2);
+		mAmplifierCap = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_POTENCY_CAP, isLevelOne() ? AMPLIFIER_CAP_1 : AMPLIFIER_CAP_2);
 		mRadius = (float) CharmManager.getRadius(player, CHARM_RANGE, isLevelOne() ? RADIUS_1 : RADIUS_2);
 		mRegionCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? R3_CAP : ServerProperties.getClassSpecializationsEnabled(player) ? R2_CAP : R1_CAP;
 
