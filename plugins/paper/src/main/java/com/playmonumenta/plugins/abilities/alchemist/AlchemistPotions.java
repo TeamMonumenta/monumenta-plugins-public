@@ -238,8 +238,8 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		// Prevent the potion from splashing on players, summons, and other non-hostile mobs
 		// Most importantly, this prevents the potion from instantly splashing on the throwing player with certain combinations of projectile speed and throw direction when using Alchemical Artillery.
 		if (proj instanceof ThrownPotion potion
-			    && mPlayerItemStatsMap.containsKey(potion)
-			    && event.getHitEntity() != null) {
+			&& mPlayerItemStatsMap.containsKey(potion)
+			&& event.getHitEntity() != null) {
 			if (!EntityUtils.isHostileMob(event.getHitEntity())) {
 				event.setCancelled(true);
 			}
@@ -294,8 +294,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				return;
 			}
 
+			double beforeHealth = mob.getHealth();
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
-			mMobsIframeMap.put(mob.getUniqueId(), Bukkit.getServer().getCurrentTick());
+			double healthDelta = beforeHealth - mob.getHealth();
+			// Only apply iframes if the mob took damage from our potion
+			if (healthDelta > 0) {
+				mMobsIframeMap.put(mob.getUniqueId(), Bukkit.getServer().getCurrentTick());
+			}
 
 			// Intentionally apply effects after damage
 			applyEffects(mob, isGruesome, playerItemStats);
