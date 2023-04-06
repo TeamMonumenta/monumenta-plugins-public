@@ -63,15 +63,32 @@ public class ChestUtils {
 		if (blockState instanceof Container) {
 			Inventory inventory = ((Container) blockState).getInventory();
 			if (inventory instanceof DoubleChestInventory) {
+				boolean forceLootShare = lootTableInventoryHasBonusRolls(((DoubleChestInventory) inventory).getLeftSide());
 				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getLeftSide());
-				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getRightSide());
+				generateContainerLootWithScaling(player, ((DoubleChestInventory) inventory).getRightSide(), forceLootShare);
 			} else {
 				generateContainerLootWithScaling(player, inventory);
 			}
 		}
 	}
 
+	private static boolean lootTableInventoryHasBonusRolls(Inventory inventory) {
+		if (!(inventory.getHolder() instanceof Lootable lootable)) {
+			return false;
+		}
+		LootTable lootTable = lootable.getLootTable();
+		if (lootTable == null) {
+			return false;
+		}
+		LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
+		return lootEntry != null && lootEntry.hasBonusRolls();
+	}
+
 	private static void generateContainerLootWithScaling(Player player, Inventory inventory) {
+		generateContainerLootWithScaling(player, inventory, false);
+	}
+
+	private static void generateContainerLootWithScaling(Player player, Inventory inventory, boolean forceLootshare) {
 		if (inventory.getHolder() instanceof Lootable lootable) {
 			LootTable lootTable = lootable.getLootTable();
 			if (lootTable != null) {
@@ -90,8 +107,8 @@ public class ChestUtils {
 					luckAmount = 0;
 					otherPlayers = Collections.emptyList();
 				} else if (!lootEntry.hasBonusRolls()) {
-					// This chest doesn't have bonus rolls, don't apply luck or distribute the chest results
-					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which did not have scaling/lootbox enabled");
+					// This chest doesn't have bonus rolls, don't apply luck
+					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which did not have scaling enabled");
 					luckAmount = 0;
 					otherPlayers = Collections.emptyList();
 				} else {
@@ -126,6 +143,10 @@ public class ChestUtils {
 				Collection<ItemStack> popLoot = lootTable.populateLoot(FastUtils.RANDOM, context);
 				// Clear the original chest (vanilla behavior, loot table overrides whatever is in the chest, doesn't add to it
 				inventory.clear();
+
+				if (forceLootshare) {
+					otherPlayers = PlayerUtils.playersInLootScalingRange(player, true);
+				}
 
 				// Divide the items up into fractional buckets for all the players
 				List<List<ItemStack>> itemBuckets = distributeLootToBuckets(new ArrayList<>(popLoot), otherPlayers.size() + 1);
