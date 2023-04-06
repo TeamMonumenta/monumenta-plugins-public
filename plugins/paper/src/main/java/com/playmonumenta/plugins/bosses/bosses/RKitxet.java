@@ -15,12 +15,7 @@ import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellShardShield;
 import com.playmonumenta.plugins.bosses.spells.rkitxet.SpellVerdantProtection;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
-import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.plugins.utils.*;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,7 +126,9 @@ public class RKitxet extends BossAbilityGroup {
 						//Give 10 seconds at the beginning of the fight before actually damaging
 						if (mBoss.getTicksLived() >= 200) {
 							PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 30 * 20, 2));
-							BossUtils.bossDamagePercent(mBoss, player, 0.1);
+
+							double damage = 0.1 * EntityUtils.getMaxHealth(player);
+							DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, damage, null, false, false);
 						}
 					} else if (player.isInWaterOrBubbleColumn()) {
 						PotionUtils.applyPotion(mBoss, player, new PotionEffect(PotionEffectType.POISON, 25 * 20, 2));
