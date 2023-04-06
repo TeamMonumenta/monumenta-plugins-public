@@ -21,28 +21,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class MagmaShieldCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, MagmaShieldCS> SKIN_LIST = ImmutableMap.<String, MagmaShieldCS>builder()
-		.put(VolcanicBurstCS.NAME, new VolcanicBurstCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.MAGMA_SHIELD;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.MAGMA_CREAM;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void magmaEffects(World world, Player mPlayer, double radius, double angle) {
@@ -74,8 +60,8 @@ public class MagmaShieldCS implements CosmeticSkill {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumCount(0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
 				}
 
 				if (mRadius >= radius) {

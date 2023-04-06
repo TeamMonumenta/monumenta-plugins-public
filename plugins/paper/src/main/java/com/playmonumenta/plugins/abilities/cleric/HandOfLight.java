@@ -113,7 +113,7 @@ public class HandOfLight extends Ability {
 		mDamagePer = isLevelOne() ? DAMAGE_PER_1 : DAMAGE_PER_2;
 		mDamageMax = isLevelOne() ? DAMAGE_MAX_1 : DAMAGE_MAX_2;
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS(), HandOfLightCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HandOfLightCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
 	}

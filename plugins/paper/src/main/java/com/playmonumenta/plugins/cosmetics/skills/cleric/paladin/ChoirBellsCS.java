@@ -21,29 +21,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class ChoirBellsCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, ChoirBellsCS> SKIN_LIST = ImmutableMap.<String, ChoirBellsCS>builder()
-		.build();
-
 	private static final float[] CHOIR_BELLS_PITCHES = {0.6f, 0.8f, 0.6f, 0.8f, 1f};
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.CHOIR_BELLS;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.BELL;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void bellsCastEffect(Player mPlayer, double range) {

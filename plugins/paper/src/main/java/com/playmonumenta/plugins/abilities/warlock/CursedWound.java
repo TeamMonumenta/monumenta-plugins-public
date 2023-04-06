@@ -227,19 +227,19 @@ public class CursedWound extends Ability {
 								FastUtils.randomDoubleInRange(-0.05, 0.05),
 								FastUtils.randomDoubleInRange(-0.05, 0.05)),
 							1, red, green, blue, 1)
-							.directionalMode(true).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.directionalMode(true).minimumCount(0).spawnAsPlayerActive(mPlayer);
 					}
 					Color c = FastUtils.RANDOM.nextBoolean() ? DARK_COLOR : LIGHT_COLOR;
 					new PartialParticle(Particle.REDSTONE, mL, 1, 0, 0, 0, 0,
 						new Particle.DustOptions(c, 1.4f))
-						.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						.minimumCount(0).spawnAsPlayerActive(mPlayer);
 
 					if (mT > 5 && mL.distance(to) < 0.35) {
 						world.playSound(mPlayer.getLocation(), Sound.ITEM_ARMOR_EQUIP_CHAIN, SoundCategory.PLAYERS, 1, 0.8f);
 						new PartialParticle(Particle.SPELL, loc.add(0, 1, 0), 20, 0.4f, 0.4f, 0.4f, 0.6F)
 							.spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.FALLING_DUST, mL, 45, 0, 0, 0, 0.75F, Material.ANVIL.createBlockData())
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
@@ -16,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.ItemStack;
 
-public class EmpoweringOdor extends PotionAbility {
+public class EmpoweringOdor extends Ability implements PotionAbility {
 	public static final int POTION_RECHARGE_TIME_REDUCTION_2 = 10;
 
 	private static final int EMPOWERING_ODOR_DURATION = 8 * 20;
@@ -70,4 +71,5 @@ public class EmpoweringOdor extends PotionAbility {
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1, 2);
 		new PartialParticle(Particle.END_ROD, player.getLocation(), 15, 0.4, 0.6, 0.4, 0).spawnAsPlayerActive(mPlayer);
 	}
+
 }

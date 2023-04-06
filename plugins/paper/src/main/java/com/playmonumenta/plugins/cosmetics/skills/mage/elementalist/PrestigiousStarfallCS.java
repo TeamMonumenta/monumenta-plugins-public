@@ -30,16 +30,11 @@ public class PrestigiousStarfallCS extends StarfallCS implements PrestigeCS {
 	private static double CAST_EFFECT_RADIUS = 3.5;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"The weight of fate is oft",
 			"heavier than any stone."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.STARFALL;
 	}
 
 	@Override

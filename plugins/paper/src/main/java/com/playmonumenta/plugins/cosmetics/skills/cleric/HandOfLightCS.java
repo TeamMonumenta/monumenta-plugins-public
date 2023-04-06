@@ -19,28 +19,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class HandOfLightCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, HandOfLightCS> SKIN_LIST = ImmutableMap.<String, HandOfLightCS>builder()
-		.put(TouchOfEntropyCS.NAME, new TouchOfEntropyCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.HAND_OF_LIGHT;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.PINK_DYE;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void lightHealEffect(Player mPlayer, Location loc, Player mTarget) {

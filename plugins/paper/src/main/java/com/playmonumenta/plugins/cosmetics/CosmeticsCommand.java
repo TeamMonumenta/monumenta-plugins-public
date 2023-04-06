@@ -59,7 +59,7 @@ public class CosmeticsCommand extends GenericCommand {
 				if (added) {
 					sender.sendMessage(Component.text("Added " + type.getDisplayName() + " '" + name + "' to " + player.getName(), NamedTextColor.WHITE));
 				} else {
-					sender.sendMessage(Component.text(player.getName() + " already has " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
+					sender.sendMessage(Component.text(player.getName() + " already has " + type.getDisplayName() + " '" + name + "', or the cosmetic is invalid.", NamedTextColor.RED));
 				}
 			})
 			.register();

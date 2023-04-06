@@ -37,17 +37,12 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 	private static final int LAND_ANIM_FRAMES = 5;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"What makes glory? What makes a fool?",
 			"Loyalty is the trailhead, but for now",
 			"start from the next execution."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.GLORIOUS_BATTLE;
 	}
 
 	@Override

@@ -2,11 +2,10 @@ package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import java.util.List;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -29,15 +28,10 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 	private static final Color TWIST_COLOR_TIP = Color.fromRGB(127, 0, 0);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"This infernal flame was ignited",
 			"by your burning, twisted desires.");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.CHOLERIC_FLAMES;
 	}
 
 	@Override
@@ -79,11 +73,11 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 						vec = new Vector(FastUtils.cos(degree) * mRadius, 2 * FastMath.pow(mRadius / (range + 1), 3), FastUtils.sin(degree) * mRadius);
 						l = loc.clone().add(vec);
 						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0.04)
-							.minimumMultiplier(false).spawnAsPlayerActive(player);
+							.minimumCount(0).spawnAsPlayerActive(player);
 						new PartialParticle(Particle.SOUL, l, 1, 0.15, 0.15, 0.15, 0.01)
-							.minimumMultiplier(false).spawnAsPlayerActive(player);
+							.minimumCount(0).spawnAsPlayerActive(player);
 						new PartialParticle(Particle.SMOKE_NORMAL, l, 5, 0.1, 0.1, 0.1, 0.075)
-							.minimumMultiplier(false).spawnAsPlayerActive(player);
+							.minimumCount(0).spawnAsPlayerActive(player);
 					}
 				}
 
@@ -128,7 +122,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 
 					new PartialParticle(Particle.REDSTONE, tendrilLoc, 3, offset, offset, offset, 0, new Particle.DustOptions(
 						ParticleUtils.getTransition(TWIST_COLOR_TIP, TWIST_COLOR_BASE, transition), size))
-						.minimumMultiplier(false)
+						.minimumCount(0)
 						.spawnAsPlayerActive(mPlayer);
 
 					mL.add(0, 0.25, 0);

@@ -70,7 +70,7 @@ public class EagleEye extends Ability {
 		super(plugin, player, INFO);
 		// lmao
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS(), EagleEyeCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS());
 		mEagleEyeTeam = mCosmetic.createTeams();
 
 	}

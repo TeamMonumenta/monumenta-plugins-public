@@ -191,10 +191,10 @@ public class ElementalSpiritFire extends Ability {
 									// Else spawn particles at the new location and continue doing damage at this place the next tick
 									// These particles skip the first damage attempt
 									PartialParticle partialParticle = new PartialParticle(Particle.FLAME, newPotentialLocation)
-										.count(4)
-										.delta(PartialParticle.getWidthDelta(HITBOX))
-										.extra(0.05)
-										.minimumMultiplier(false)
+										                                  .count(4)
+										                                  .delta(PartialParticle.getWidthDelta(HITBOX))
+										                                  .extra(0.05)
+										                                  .minimumCount(0)
 										.spawnAsPlayerActive(mPlayer);
 									partialParticle
 										.particle(Particle.SMOKE_LARGE)

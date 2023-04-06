@@ -16,28 +16,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class AdvancingShadowsCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, AdvancingShadowsCS> SKIN_LIST = ImmutableMap.<String, AdvancingShadowsCS>builder()
-		.put(WindStepCS.NAME, new WindStepCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.ADVANCING_SHADOWS;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.ENDER_EYE;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void tpStart(Player mPlayer) {

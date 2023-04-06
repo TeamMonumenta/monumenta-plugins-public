@@ -19,30 +19,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class DaggerThrowCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, DaggerThrowCS> SKIN_LIST = ImmutableMap.<String, DaggerThrowCS>builder()
-		.put(DaggerOfNothingCS.NAME, new DaggerOfNothingCS())
-		.build();
-
 	private static final Particle.DustOptions DAGGER_THROW_COLOR = new Particle.DustOptions(Color.fromRGB(64, 64, 64), 1);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.DAGGER_THROW;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.WOODEN_SWORD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void daggerCastSound(World world, Location loc) {

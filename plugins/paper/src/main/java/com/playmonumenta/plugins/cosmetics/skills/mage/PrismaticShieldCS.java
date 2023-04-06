@@ -16,28 +16,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class PrismaticShieldCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, PrismaticShieldCS> SKIN_LIST = ImmutableMap.<String, PrismaticShieldCS>builder()
-		.put(SanguineAegisCS.NAME, new SanguineAegisCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.PRISMATIC_SHIELD;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.SHIELD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void prismaEffect(World world, Player mPlayer, double radius) {

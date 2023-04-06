@@ -17,28 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class TacticalManeuverCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, TacticalManeuverCS> SKIN_LIST = ImmutableMap.<String, TacticalManeuverCS>builder()
-		.put(PrestigiousManeuverCS.NAME, new PrestigiousManeuverCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.TACTICAL_MANEUVER;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.STRING;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void maneuverStartEffect(World world, Player mPlayer, Vector dir) {

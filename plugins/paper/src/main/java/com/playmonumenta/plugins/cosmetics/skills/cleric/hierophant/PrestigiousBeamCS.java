@@ -31,16 +31,11 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	private static final Particle.DustOptions BURN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 180, 0), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Golden winds follow",
 			"the beam's arc."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.HALLOWED_BEAM;
 	}
 
 	@Override

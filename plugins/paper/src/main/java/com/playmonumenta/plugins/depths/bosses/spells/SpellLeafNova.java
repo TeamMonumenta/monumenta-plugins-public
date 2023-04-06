@@ -37,15 +37,15 @@ public class SpellLeafNova extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		new PartialParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR).minimumCount(0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).minimumCount(0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumCount(0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumCount(0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -56,8 +56,8 @@ public class SpellLeafNova extends SpellBaseAoE {
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3).minimumCount(0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

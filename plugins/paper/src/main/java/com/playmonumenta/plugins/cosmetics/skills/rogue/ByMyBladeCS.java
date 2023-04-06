@@ -17,28 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class ByMyBladeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, ByMyBladeCS> SKIN_LIST = ImmutableMap.<String, ByMyBladeCS>builder()
-		.put(DecapitationCS.NAME, new DecapitationCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.BY_MY_BLADE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.ZOMBIE_HEAD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void bmbDamage(World world, Player mPlayer, LivingEntity enemy, int level) {

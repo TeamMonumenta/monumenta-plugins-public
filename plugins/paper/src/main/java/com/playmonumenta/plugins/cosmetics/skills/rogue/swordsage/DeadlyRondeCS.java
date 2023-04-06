@@ -17,30 +17,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class DeadlyRondeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, DeadlyRondeCS> SKIN_LIST = ImmutableMap.<String, DeadlyRondeCS>builder()
-		.put(PrestigiousRondeCS.NAME, new PrestigiousRondeCS())
-		.build();
-
 	private static final Particle.DustOptions SWORDSAGE_COLOR = new Particle.DustOptions(Color.fromRGB(150, 0, 0), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.DEADLY_RONDE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.BLAZE_ROD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void rondeHitEffect(World world, Player mPlayer, double radius, double rondeBaseRadius, boolean lv2) {

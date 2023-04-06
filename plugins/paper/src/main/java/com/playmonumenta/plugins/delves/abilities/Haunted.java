@@ -104,12 +104,12 @@ public class Haunted {
 						p.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 1f, 0.65f);
 
 						new PartialParticle(Particle.SOUL, loc, 70, 0, 0, 0, 0.15)
-							.minimumMultiplier(false).spawnAsPlayerActive(p);
+							.minimumCount(0).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 0, 0, 0, 0.185)
-							.minimumMultiplier(false).spawnAsPlayerActive(p);
+							.minimumCount(0).spawnAsPlayerActive(p);
 					} else {
 						new PartialParticle(Particle.SMOKE_LARGE, loc, 15, 0, 0, 0, 0.125)
-							.minimumMultiplier(false).spawnAsPlayerActive(p);
+							.minimumCount(0).spawnAsPlayerActive(p);
 					}
 					mHitTimer = 10;
 				}
@@ -117,9 +117,9 @@ public class Haunted {
 
 				// Visuals
 				new PartialParticle(Particle.SMOKE_LARGE, armorStand.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, 0)
-					.minimumMultiplier(false).spawnAsEntityActive(armorStand);
+					.minimumCount(0).spawnAsEntityActive(armorStand);
 				new PartialParticle(Particle.SOUL, armorStand.getLocation().add(0, 1, 0), 1, 0.3, 0.4, 0.3, 0.025)
-					.minimumMultiplier(false).spawnAsEntityActive(armorStand);
+					.minimumCount(0).spawnAsEntityActive(armorStand);
 
 				//Sounds
 				distance = sLoc.distance(p.getLocation());

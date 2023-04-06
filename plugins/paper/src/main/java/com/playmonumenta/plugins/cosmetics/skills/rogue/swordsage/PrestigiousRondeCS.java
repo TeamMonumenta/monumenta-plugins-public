@@ -31,16 +31,11 @@ public class PrestigiousRondeCS extends DeadlyRondeCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_TINY = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 0.65f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"A flurry of blows follows",
 			"the master's blade."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.DEADLY_RONDE;
 	}
 
 	@Override

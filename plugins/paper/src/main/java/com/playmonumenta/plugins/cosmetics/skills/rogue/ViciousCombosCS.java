@@ -17,28 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class ViciousCombosCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, ViciousCombosCS> SKIN_LIST = ImmutableMap.<String, ViciousCombosCS>builder()
-		.put(TranscCombosCS.NAME, new TranscCombosCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.VICIOUS_COMBOS;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.ZOMBIE_HEAD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void comboOnKill(World world, Location loc, Player mPlayer, double range, LivingEntity target) {

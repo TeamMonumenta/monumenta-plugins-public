@@ -108,7 +108,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		super(plugin, player, INFO);
 		mMaxCharges = (int) CharmManager.getLevel(player, CHARM_CHARGE) + (isLevelOne() ? HALLOWED_1_MAX_CHARGES : HALLOWED_2_MAX_CHARGES);
 		mCharges = getTrackedCharges();
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HallowedBeamCS(), HallowedBeamCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HallowedBeamCS());
 		if (player != null) {
 			int modeIndex = ScoreboardUtils.getScoreboardValue(player, MODE_SCOREBOARD).orElse(0);
 			mMode = Mode.values()[Math.max(0, Math.min(modeIndex, Mode.values().length - 1))];

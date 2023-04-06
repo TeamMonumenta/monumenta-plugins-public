@@ -157,10 +157,10 @@ public class DoomsdayClock extends Spell {
 
 			BoundingBox box = BoundingBox.of(l, 0.8, 50, 0.8);
 			boxes.add(box);
-			new PartialParticle(Particle.REDSTONE, l, 1, new Particle.DustOptions(color, 2)).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.REDSTONE, l, 1, new Particle.DustOptions(color, 2)).minimumCount(0).spawnAsEntityActive(mBoss);
 			if (color.equals(BLACK_COLOR)) {
 				for (int i = 1; i <= 3; i++) {
-					new PartialParticle(Particle.REDSTONE, l.clone().add(0, i, 0), 1, new Particle.DustOptions(color, 1)).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.REDSTONE, l.clone().add(0, i, 0), 1, new Particle.DustOptions(color, 1)).minimumCount(0).spawnAsEntityActive(mBoss);
 				}
 			}
 		}

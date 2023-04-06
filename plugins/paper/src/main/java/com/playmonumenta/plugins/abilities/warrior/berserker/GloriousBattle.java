@@ -95,7 +95,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 		mStacks = 0;
 		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS(), GloriousBattleCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS());
 	}
 
 	public void cast() {

@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -13,13 +11,8 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class HuntingCompanionCS implements CosmeticSkill {
-
-	public static final ImmutableMap<String, HuntingCompanionCS> SKIN_LIST = ImmutableMap.<String, HuntingCompanionCS>builder()
-		.put(TwistedCompanionCS.NAME, new TwistedCompanionCS())
-		.build();
 
 	private final String FOX_NAME = "FoxCompanion";
 	private final String AXOLOTL_NAME = "AxolotlCompanion";
@@ -28,23 +21,13 @@ public class HuntingCompanionCS implements CosmeticSkill {
 	private final String DOLPHIN_NAME = "DolphinCompanion";
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.HUNTING_COMPANION;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.SWEET_BERRIES;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public String getFoxName() {

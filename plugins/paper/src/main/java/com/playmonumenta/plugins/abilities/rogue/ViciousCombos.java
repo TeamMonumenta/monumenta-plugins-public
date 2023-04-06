@@ -71,7 +71,7 @@ public class ViciousCombos extends Ability {
 
 	public ViciousCombos(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ViciousCombosCS(), ViciousCombosCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ViciousCombosCS());
 	}
 
 	@Override

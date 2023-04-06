@@ -1,15 +1,14 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
+import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -40,15 +39,10 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 		new Particle.DustOptions(Color.fromRGB(252, 255, 196), 0.65f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"The purest drops of sunlight.",
-			"Radiant, shining, replenishing.");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.BEZOAR;
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"The purest drops of sunlight.",
+				"Radiant, shining, replenishing.");
 	}
 
 	@Override
@@ -67,37 +61,40 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 	}
 
 	@Override
-	public ItemStack bezoarItem() {
+	public ItemStack bezoarItem(boolean philosophersStone) {
+		if (philosophersStone) {
+			return super.bezoarItem(true);
+		}
 		ItemStack itemBezoar = new ItemStack(Material.HONEYCOMB_BLOCK);
 		ItemUtils.setPlainName(itemBezoar, "Sundrop");
 		ItemMeta sundropMeta = itemBezoar.getItemMeta();
 		sundropMeta.displayName(Component.text("Sundrop", NamedTextColor.WHITE)
-			.decoration(TextDecoration.ITALIC, false));
+			                        .decoration(TextDecoration.ITALIC, false));
 		itemBezoar.setItemMeta(sundropMeta);
 		return itemBezoar;
 	}
 
 	@Override
-	public void bezoarTick(Player mPlayer, Location loc, int tick) {
+	public void periodicBezoarEffects(Player mPlayer, Location loc, int tick, boolean philosophersStone) {
 		for (int i = 0; i < 2; i++) {
 			double radian = FastMath.toRadians((tick * 6) + (i * 180));
 			Vector vec = new Vector(FastMath.cos(radian) * 0.65, 0.125, FastMath.sin(radian) * 0.65);
 			Location l = loc.clone().add(vec);
-			new PartialParticle(Particle.SPELL, l, 1, 0, 0, 0, 0)
-				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PPPeriodic(Particle.SPELL, l)
+				.manualTimeOverride(tick).spawnAsPlayerActive(mPlayer);
 		}
 
 		for (int i = 0; i < 2; i++) {
 			double radian = FastMath.toRadians((tick * 6) + (i * 180) + 90);
 			Vector vec = new Vector(FastMath.cos(radian) * 0.65, 0.125, FastMath.sin(radian) * 0.65);
 			Location l = loc.clone().add(vec);
-			new PartialParticle(Particle.REDSTONE, l, 2, 0.1, 0.1, 0.1, 0, SUNDROP_COLOR)
-				.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PPPeriodic(Particle.REDSTONE, l).count(2).delta(0.1).data(SUNDROP_COLOR)
+				.manualTimeOverride(tick).spawnAsPlayerActive(mPlayer);
 		}
 	}
 
 	@Override
-	public void bezoarPickup(Player mPlayer, Location loc) {
+	public void pickupEffects(Player player, Location loc, boolean philosophersStone) {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 1, 1.15f);
 		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1, 1.65f);
@@ -106,20 +103,21 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 
 		loc.setPitch(0);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 60, 0, 0, 0, 0.75F)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.END_ROD, loc, 45, 0, 0, 0, 0.2F)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 50, 0.3f,
+			.minimumCount(0).spawnAsPlayerActive(player);
+		ParticleUtils.drawParticleCircleExplosion(player, loc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 50, 0.3f,
 			true, 0, Particle.END_ROD);
 	}
 
 	@Override
-	public void bezoarTarget(Player mPlayer, Location loc) {
+	public void targetEffects(Player mPlayer, Location loc, boolean philosophersStone) {
 		new BukkitRunnable() {
 
 			double mRadius = 0;
 			final Location mL = loc.clone();
 			final double RADIUS = 4;
+
 			@Override
 			public void run() {
 
@@ -131,7 +129,7 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 							FastUtils.sin(radian) * mRadius);
 						Location loc = mL.clone().add(vec);
 						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, SUNDROP_RING_COLOR)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 					}
 				}
 
@@ -188,9 +186,9 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 						world.playSound(mL, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, SoundCategory.PLAYERS, 1, 0.75f);
 						world.playSound(mL, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, SoundCategory.PLAYERS, 1, 0.5f);
 						new PartialParticle(Particle.CRIT_MAGIC, mL, 15, 0, 0, 0, 0.6F)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.END_ROD, mL, 3, 0, 0, 0, 0.125F)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

@@ -122,7 +122,7 @@ public final class MeteorSlam extends Ability {
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MeteorSlamCS(), MeteorSlamCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MeteorSlamCS());
 
 		mSlamAttackRunner = new BukkitRunnable() {
 			@Override

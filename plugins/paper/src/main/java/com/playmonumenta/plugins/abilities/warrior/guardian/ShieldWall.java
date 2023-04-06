@@ -85,7 +85,7 @@ public class ShieldWall extends Ability {
 	public ShieldWall(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, (isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION));
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS(), ShieldWallCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS());
 	}
 
 	public void cast() {

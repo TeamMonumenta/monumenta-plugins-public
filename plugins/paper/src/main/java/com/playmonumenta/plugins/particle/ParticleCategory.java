@@ -5,21 +5,23 @@ import org.jetbrains.annotations.Nullable;
 
 public enum ParticleCategory {
 
-	OWN_PASSIVE(Constants.Objectives.PP_OWN_PASSIVE),
-	OWN_ACTIVE(Constants.Objectives.PP_OWN_ACTIVE),
-	OWN_BUFF(Constants.Objectives.PP_OWN_BUFF),
-	OTHER_PASSIVE(Constants.Objectives.PP_OTHER_PASSIVE),
-	OTHER_ACTIVE(Constants.Objectives.PP_OTHER_ACTIVE),
-	OTHER_BUFF(Constants.Objectives.PP_OTHER_BUFF),
-	ENEMY(Constants.Objectives.PP_ENEMY),
-	ENEMY_BUFF(Constants.Objectives.PP_ENEMY_BUFF),
-	BOSS(Constants.Objectives.PP_BOSS),
-	FULL(null);
+	OWN_PASSIVE(Constants.Objectives.PP_OWN_PASSIVE, "Own Passive Abilities"),
+	OWN_ACTIVE(Constants.Objectives.PP_OWN_ACTIVE, "Own Active Abilities"),
+	OWN_BUFF(Constants.Objectives.PP_OWN_BUFF, "(De)Buffs on yourself"),
+	OTHER_PASSIVE(Constants.Objectives.PP_OTHER_PASSIVE, "Others' Passive Abilities"),
+	OTHER_ACTIVE(Constants.Objectives.PP_OTHER_ACTIVE, "Others' Active Abilities"),
+	OTHER_BUFF(Constants.Objectives.PP_OTHER_BUFF, "(De)Buffs on other players"),
+	ENEMY(Constants.Objectives.PP_ENEMY, "Other Enemies' Abilities"),
+	ENEMY_BUFF(Constants.Objectives.PP_ENEMY_BUFF, "(De)Buffs on Enemies"),
+	BOSS(Constants.Objectives.PP_BOSS, "Boss Abilities"),
+	FULL(null, "");
 
 	public final @Nullable String mObjectiveName;
+	public final String mDisplayName;
 
-	ParticleCategory(@Nullable String objectiveName) {
+	ParticleCategory(@Nullable String objectiveName, String displayName) {
 		mObjectiveName = objectiveName;
+		mDisplayName = displayName;
 	}
 
 }

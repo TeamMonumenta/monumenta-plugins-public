@@ -76,8 +76,9 @@ public class VectorUtils {
 
 	// convert [yaw, pitch] in degrees to direction vector
 	public static Vector rotationToVector(double yaw, double pitch) {
-		double x = -FastUtils.sinDeg(yaw) * FastUtils.cosDeg(pitch);
-		double z = FastUtils.cosDeg(yaw) * FastUtils.cosDeg(pitch);
+		double cosPitch = FastUtils.cosDeg(pitch);
+		double x = -FastUtils.sinDeg(yaw) * cosPitch;
+		double z = FastUtils.cosDeg(yaw) * cosPitch;
 		double y = -FastUtils.sinDeg(pitch);
 		return new Vector(x, y, z);
 	}
@@ -139,6 +140,15 @@ public class VectorUtils {
 			return null;
 		}
 		return rayStart.clone().add(rayDirection.clone().multiply(intersectionDistance));
+	}
+
+	public static Vector randomUnitVector() {
+		Vector v = new Vector(FastUtils.RANDOM.nextGaussian(), FastUtils.RANDOM.nextGaussian(), FastUtils.RANDOM.nextGaussian());
+		v.normalize();
+		if (!Double.isFinite(v.getX())) { // we got the 0-vector (or one close enough to 0)
+			return new Vector(1, 0, 0);
+		}
+		return v;
 	}
 
 }

@@ -22,31 +22,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class CosmicMoonbladeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, CosmicMoonbladeCS> SKIN_LIST = ImmutableMap.<String, CosmicMoonbladeCS>builder()
-		.put(PrestigiousMoonbladeCS.NAME, new PrestigiousMoonbladeCS())
-		.build();
-
 	private static final Particle.DustOptions FSWORD_COLOR1 = new Particle.DustOptions(Color.fromRGB(106, 203, 255), 1.0f);
 	private static final Particle.DustOptions FSWORD_COLOR2 = new Particle.DustOptions(Color.fromRGB(168, 226, 255), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.COSMIC_MOONBLADE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.DIAMOND_SWORD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void moonbladeSwingEffect(World world, Player mPlayer, Location origin, double range, int mSwings, int maxSwing) {

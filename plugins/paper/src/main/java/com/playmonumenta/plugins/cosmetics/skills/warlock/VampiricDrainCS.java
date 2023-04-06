@@ -38,17 +38,12 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	private static final int RING_FRAMES = 7;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"\"Vampires never use the tricks of human.\"",
 			"Compared to souls, blood will always offer",
 			"a far more effective path."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.SOUL_REND;
 	}
 
 	@Override

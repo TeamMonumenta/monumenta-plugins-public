@@ -16,28 +16,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class PredatorStrikeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, PredatorStrikeCS> SKIN_LIST = ImmutableMap.<String, PredatorStrikeCS>builder()
-		.put(FireworkStrikeCS.NAME, new FireworkStrikeCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.PREDATOR_STRIKE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.SPECTRAL_ARROW;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void strikeTick(Player mPlayer, int tick) {

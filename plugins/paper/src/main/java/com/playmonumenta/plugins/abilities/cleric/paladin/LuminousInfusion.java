@@ -75,7 +75,7 @@ public class LuminousInfusion extends Ability {
 	public LuminousInfusion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDoMultiplierAndFire = isLevelTwo();
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS(), LuminousInfusionCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class);

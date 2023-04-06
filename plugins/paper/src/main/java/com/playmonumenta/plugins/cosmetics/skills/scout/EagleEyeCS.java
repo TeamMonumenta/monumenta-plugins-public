@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -15,32 +13,17 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.Nullable;
 
 public class EagleEyeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, EagleEyeCS> SKIN_LIST = ImmutableMap.<String, EagleEyeCS>builder()
-		.put(EverseeingEyeCS.NAME, new EverseeingEyeCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.EAGLE_EYE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.ENDER_EYE;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void eyeStart(World world, Player mPlayer) {

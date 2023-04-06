@@ -711,8 +711,11 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 
 	private ItemStack createSkillIcon(String skin, TextColor color, Player player, List<String> price) {
 		CosmeticSkill skill = CosmeticSkills.getCosmeticSkill(skin);
+		if (skill == null) {
+			return new ItemStack(Material.BARRIER);
+		}
 		List<String> desc = new ArrayList<>();
-		desc.add("Cosmetic " + skill.getAbilityName().getName());
+		desc.add("Cosmetic " + skill.getAbility().getName());
 		if (skill instanceof LockableCS && !((LockableCS) skill).isUnlocked(player)) {
 			// Locked skin, show lock description to give info
 			return createBasicItem(LOCKED, skin, color, true, NamedTextColor.YELLOW, desc, NamedTextColor.RED, ((LockableCS) skill).getLockDesc());

@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.UUID;
+import java.util.function.Consumer;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -24,6 +25,9 @@ public class CustomDamageOverTime extends Effect {
 	private int mTicks;
 	private final DamageType mDamageType;
 
+	// This is not serialized
+	private Consumer<LivingEntity> mVisuals = entity -> new PartialParticle(Particle.SQUID_INK, entity.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+
 	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, DamageType damageType) {
 		super(duration, effectID);
 		mDamage = damage;
@@ -40,6 +44,10 @@ public class CustomDamageOverTime extends Effect {
 		mPlayer = player;
 		mSpell = spell;
 		mDamageType = DamageType.AILMENT;
+	}
+
+	public void setVisuals(Consumer<LivingEntity> visuals) {
+		mVisuals = visuals;
 	}
 
 	//Magnitude is equal to the level of wither that it is equivalent to, at low levels of wither
@@ -61,7 +69,7 @@ public class CustomDamageOverTime extends Effect {
 			if (mTicks >= mPeriod) {
 				mTicks %= mPeriod;
 				DamageUtils.damage(mPlayer, le, mDamageType, mDamage, mSpell, true, false);
-				new PartialParticle(Particle.SQUID_INK, le.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+				mVisuals.accept(le);
 			}
 		}
 	}

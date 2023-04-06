@@ -4,10 +4,19 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneAmalgamCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneBezoarCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneTinctureCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArtilleryBombCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeEchoesCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.SunriseBrewCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcanePanaceaCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcaneRemedyCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcaneTransmutationCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.PrestigiousRemedyCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.RitualRingCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneScorchedEarthCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.PrestigiousEsotericCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodyRetaliationCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DarkPunishmentCS;
@@ -43,71 +52,83 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloryExecuti
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.PrestigiousSlamCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.PrestigiousShieldCS;
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class CosmeticSkills {
 
-	/** For each class:
-	 * 1 = Depths theme
-	 * 2 = Delves theme
-	 * 3 = Gallery-Sanguine theme
-	 * 4 & 5 = Prestige theme
-	 */
-	private static final ImmutableMap<String, CosmeticSkill> COSMETIC_SKILLS =
-		ImmutableMap.<String, CosmeticSkill>builder()
-			//Alchemist
-			.put(SunriseBrewCS.NAME, new SunriseBrewCS())
-			.put(GruesomeEchoesCS.NAME, new GruesomeEchoesCS())
-			.put(RitualRingCS.NAME, new RitualRingCS())
-			.put(PrestigiousEsotericCS.NAME, new PrestigiousEsotericCS())
-			.put(PrestigiousRemedyCS.NAME, new PrestigiousRemedyCS())
-			//Cleric
-			.put(DarkPunishmentCS.NAME, new DarkPunishmentCS())
-			.put(TouchOfEntropyCS.NAME, new TouchOfEntropyCS())
-			.put(BloodyRetaliationCS.NAME, new BloodyRetaliationCS())
-			.put(PrestigiousInfusionCS.NAME, new PrestigiousInfusionCS())
-			.put(PrestigiousBeamCS.NAME, new PrestigiousBeamCS())
-			//Mage
-			.put(VolcanicBurstCS.NAME, new VolcanicBurstCS())
-			.put(TwistedLanceCS.NAME, new TwistedLanceCS())
-			.put(SanguineAegisCS.NAME, new SanguineAegisCS())
-			.put(PrestigiousMoonbladeCS.NAME, new PrestigiousMoonbladeCS())
-			.put(PrestigiousStarfallCS.NAME, new PrestigiousStarfallCS())
-			//Rogue
-			.put(WindStepCS.NAME, new WindStepCS())
-			.put(TranscCombosCS.NAME, new TranscCombosCS())
-			.put(DecapitationCS.NAME, new DecapitationCS())
-			.put(PrestigiousRondeCS.NAME, new PrestigiousRondeCS())
-			.put(PrestigiousBlitzCS.NAME, new PrestigiousBlitzCS())
-			//Scout
-			.put(FireworkStrikeCS.NAME, new FireworkStrikeCS())
-			.put(TwistedCompanionCS.NAME, new TwistedCompanionCS())
-			.put(EverseeingEyeCS.NAME, new EverseeingEyeCS())
-			.put(PrestigiousManeuverCS.NAME, new PrestigiousManeuverCS())
-			.put(PrestigiousPinningShotCS.NAME, new PrestigiousPinningShotCS())
-			//Warlock
-			.put(AvalanchexCS.NAME, new AvalanchexCS())
-			.put(InfernalFlamesCS.NAME, new InfernalFlamesCS())
-			.put(VampiricDrainCS.NAME, new VampiricDrainCS())
-			.put(PrestigiousBondsCS.NAME, new PrestigiousBondsCS())
-			.put(PrestigiousShadesCS.NAME, new PrestigiousShadesCS())
-			//Warrior
-			.put(BrambleShellCS.NAME, new BrambleShellCS())
-			.put(ColossalBruteCS.NAME, new ColossalBruteCS())
-			.put(GloryExecutionCS.NAME, new GloryExecutionCS())
-			.put(PrestigiousSlamCS.NAME, new PrestigiousSlamCS())
-			.put(PrestigiousShieldCS.NAME, new PrestigiousShieldCS())
-			//Deprecated or test only
-			.put(DarkLanceCS.NAME, new DarkLanceCS())
-			.put(HallowedLanceCS.NAME, new HallowedLanceCS())
-			.put(DaggerOfNothingCS.NAME, new DaggerOfNothingCS())
-			.build();
+	private static final ImmutableList<Supplier<CosmeticSkill>> COSMETIC_SKILLS = ImmutableList.of(
+		//Alchemist
+		SunriseBrewCS::new,
+		GruesomeEchoesCS::new,
+		RitualRingCS::new,
+		PrestigiousEsotericCS::new,
+		PrestigiousRemedyCS::new,
+		ArcanePotionsCS::new,
+		ArcanePanaceaCS::new,
+		ArcaneTinctureCS::new,
+		ArcaneScorchedEarthCS::new,
+		ArcaneRemedyCS::new,
+		ArcaneTransmutationCS::new,
+		ArcaneBezoarCS::new,
+		ArcaneAmalgamCS::new,
+		ArtilleryBombCS::new,
+
+		//Cleric
+		DarkPunishmentCS::new,
+		TouchOfEntropyCS::new,
+		BloodyRetaliationCS::new,
+		PrestigiousInfusionCS::new,
+		PrestigiousBeamCS::new,
+
+		//Mage
+		VolcanicBurstCS::new,
+		TwistedLanceCS::new,
+		SanguineAegisCS::new,
+		PrestigiousMoonbladeCS::new,
+		PrestigiousStarfallCS::new,
+
+		//Rogue
+		WindStepCS::new,
+		TranscCombosCS::new,
+		DecapitationCS::new,
+		PrestigiousRondeCS::new,
+		PrestigiousBlitzCS::new,
+
+		//Scout
+		FireworkStrikeCS::new,
+		TwistedCompanionCS::new,
+		EverseeingEyeCS::new,
+		PrestigiousManeuverCS::new,
+		PrestigiousPinningShotCS::new,
+
+		//Warlock
+		AvalanchexCS::new,
+		InfernalFlamesCS::new,
+		VampiricDrainCS::new,
+		PrestigiousBondsCS::new,
+		PrestigiousShadesCS::new,
+
+		//Warrior
+		BrambleShellCS::new,
+		ColossalBruteCS::new,
+		GloryExecutionCS::new,
+		PrestigiousSlamCS::new,
+		PrestigiousShieldCS::new,
+
+		//Deprecated or test only
+		DarkLanceCS::new,
+		HallowedLanceCS::new,
+		DaggerOfNothingCS::new
+	);
+
+	private static final ImmutableMap<String, Supplier<CosmeticSkill>> COSMETIC_SKILLS_BY_NAME = COSMETIC_SKILLS.stream()
+		                                                                                             .collect(ImmutableMap.toImmutableMap(skill -> skill.get().getName(), skill -> skill));
 
 	/* Notes for implementing more Cosmetic Skills
 	 * 0. 基础 If the ability is not skinned, add a default CS class!
-	 * 0.a 名单 A default CS should have an ImmutableList to store all skins of this ability.
 	 * 0.b 效果 A default CS should store all effects to be skinned.
 	 * 0.c 变量 Add skin checker and mCosmetic field in the ability
 	 * 1. 新类 Create new class in correct package, extending the base CS.
@@ -123,14 +144,12 @@ public class CosmeticSkills {
 	static {
 		ImmutableList.Builder<DepthsCS> depthsBuilder = ImmutableList.<DepthsCS>builder();
 		ImmutableList.Builder<GalleryCS> galleryBuilder = ImmutableList.<GalleryCS>builder();
-		for (CosmeticSkill cs : COSMETIC_SKILLS.values()) {
+		for (Supplier<CosmeticSkill> supplier : COSMETIC_SKILLS_BY_NAME.values()) {
+			CosmeticSkill cs = supplier.get();
 			if (cs instanceof DepthsCS) {
 				depthsBuilder.add((DepthsCS) cs);
-				continue;
-			}
-			if (cs instanceof GalleryCS) {
+			} else if (cs instanceof GalleryCS) {
 				galleryBuilder.add((GalleryCS) cs);
-				continue;
 			}
 		}
 		DEPTHS_CS = depthsBuilder.build();
@@ -155,21 +174,24 @@ public class CosmeticSkills {
 	}
 
 	public static @Nullable Cosmetic getCosmeticByName(String name) {
-		CosmeticSkill cs = COSMETIC_SKILLS.getOrDefault(name, null);
+		CosmeticSkill cs = getCosmeticSkill(name);
 		return cs != null ? cs.getCosmetic() : null;
 	}
 
 	public static @Nullable CosmeticSkill getCosmeticSkill(String name) {
-		return COSMETIC_SKILLS.getOrDefault(name, null);
+		Supplier<CosmeticSkill> cosmeticSkill = COSMETIC_SKILLS_BY_NAME.get(name);
+		return cosmeticSkill == null ? null : cosmeticSkill.get();
 	}
 
-	public static <T extends CosmeticSkill> T getPlayerCosmeticSkill(@Nullable Player player, T baseCosmetic, ImmutableMap<String, T> skinList) {
-		String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, baseCosmetic.getAbilityName());
-		return skinList.getOrDefault(name, baseCosmetic);
+	@SuppressWarnings("unchecked") // the cast is actually checked with baseCosmetic.getClass().isAssignableFrom
+	public static <T extends CosmeticSkill> T getPlayerCosmeticSkill(@Nullable Player player, T baseCosmetic) {
+		String name = CosmeticsManager.getInstance().getSkillCosmeticName(player, baseCosmetic.getAbility());
+		CosmeticSkill cosmeticSkill = getCosmeticSkill(name);
+		return cosmeticSkill != null && baseCosmetic.getClass().isAssignableFrom(cosmeticSkill.getClass()) ? (T) cosmeticSkill : baseCosmetic;
 	}
 
 	public static Material getDisplayItem(String cosmeticSkillName) {
-		CosmeticSkill cosmeticSkill = COSMETIC_SKILLS.get(cosmeticSkillName);
+		CosmeticSkill cosmeticSkill = getCosmeticSkill(cosmeticSkillName);
 		if (cosmeticSkill != null) {
 			return cosmeticSkill.getDisplayItem();
 		} else {
@@ -178,7 +200,7 @@ public class CosmeticSkills {
 	}
 
 	public static String[] getNames() {
-		return COSMETIC_SKILLS.keySet().toArray(new String[0]);
+		return COSMETIC_SKILLS_BY_NAME.keySet().toArray(new String[0]);
 	}
 
 	public static ImmutableList<DepthsCS> getDepthsSkins() {

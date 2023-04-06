@@ -36,17 +36,12 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	private static final int HEAL_UNIT = 9;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Blood and water are much the same in the",
 			"dream. With what is left of your strength,",
 			"seek hope, as the sanguine rush engulfs."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.PRISMATIC_SHIELD;
 	}
 
 	@Override

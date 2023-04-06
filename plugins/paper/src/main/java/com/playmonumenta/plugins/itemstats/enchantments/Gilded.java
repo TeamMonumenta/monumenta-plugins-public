@@ -44,7 +44,7 @@ public class Gilded implements Infusion {
 			.delta(doubleWidthDelta, PartialParticle.getHeightDelta(player), doubleWidthDelta)
 			.extra(1)
 			.data(COLOUR_GOLD)
-			.minimumMultiplier(false)
+			.minimumCount(0)
 			.spawnAsPlayerPassive(player);
 	}
 
@@ -59,16 +59,12 @@ public class Gilded implements Infusion {
 					return;
 				}
 
-				new PartialParticle(
-					PARTICLE,
-					LocationUtils.getHalfHeightLocation(item),
-					1,
-					PartialParticle.getWidthDelta(item) * 2,
-					1,
-					COLOUR_GOLD,
-					false,
-					0
-				).spawnFull();
+				new PartialParticle(PARTICLE, LocationUtils.getHalfHeightLocation(item))
+					.count(1)
+					.delta(PartialParticle.getWidthDelta(item) * 2)
+					.extra(1)
+					.data(COLOUR_GOLD)
+					.spawnFull();
 			}
 		}.runTaskTimer(
 			plugin,

@@ -42,16 +42,11 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	};
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"A radiant blade echoes",
 			"the perfect strike."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.LUMINOUS_INFUSION;
 	}
 
 	@Override
@@ -128,13 +123,13 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	public void infusionTickEffect(Player mPlayer, int tick) {
 		Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 		Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-		new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
 		if (FastUtils.RANDOM.nextDouble() < 0.75) {
-			new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
 		}
 		if (FastUtils.RANDOM.nextDouble() < 0.75) {
-			new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

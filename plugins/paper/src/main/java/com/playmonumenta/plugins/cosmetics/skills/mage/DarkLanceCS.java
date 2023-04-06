@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Color;
@@ -22,16 +19,6 @@ public class DarkLanceCS extends ManaLanceCS {
 	public static final String NAME = "Dark Lance";
 
 	private static final Particle.DustOptions DARK_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(102, 0, 118), 1.0f);
-
-	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName());
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.MANA_LANCE;
-	}
 
 	@Override
 	public Material getDisplayItem() {

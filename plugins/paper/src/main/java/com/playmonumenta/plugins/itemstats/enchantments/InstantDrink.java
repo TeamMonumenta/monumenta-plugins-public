@@ -54,7 +54,7 @@ public class InstantDrink implements Enchantment {
 					for (int i = 0; i < 30; i++) {
 						double y = FastUtils.randomDoubleInRange(0.25, 1.75);
 						new PartialParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 1, red, green, blue, 1)
-							.directionalMode(true).minimumMultiplier(false).spawnAsPlayerActive(player);
+							.directionalMode(true).minimumCount(0).spawnAsPlayerActive(player);
 					}
 				} else {
 					new PartialParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1).spawnAsPlayerActive(player);

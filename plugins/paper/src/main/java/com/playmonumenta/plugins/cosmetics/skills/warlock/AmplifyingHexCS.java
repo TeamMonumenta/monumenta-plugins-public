@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -12,21 +10,11 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class AmplifyingHexCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, AmplifyingHexCS> SKIN_LIST = ImmutableMap.<String, AmplifyingHexCS>builder()
-		.put(AvalanchexCS.NAME, new AvalanchexCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.AMPLIFYING;
 	}
 
@@ -35,14 +23,9 @@ public class AmplifyingHexCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
-	@Override
-	public @Nullable String getName() {
-		return null;
-	}
-
 	public void amplifyingParticle(Player mPlayer, Location l) {
-		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void amplifyingEffects(Player mPlayer, World world, Location soundLoc) {

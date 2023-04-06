@@ -6,13 +6,14 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.UnstableAmalgamCS;
 import com.playmonumenta.plugins.effects.UnstableAmalgamDisable;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -24,20 +25,15 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -99,8 +95,8 @@ public class UnstableAmalgam extends Ability {
 							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_2_COOLDOWN)
 					),
 				("Enemies hit by the Amalgam's explosion become unstable for %s seconds, and they are knocked straight up. " +
-				 "When an unstable mob is killed, a potion that deals %s%% of your potion damage is dropped at its location. " +
-				 "These potions apply both Brutal and Gruesome effects.")
+					 "When an unstable mob is killed, a potion that deals %s%% of your potion damage is dropped at its location. " +
+					 "These potions apply both Brutal and Gruesome effects, and bypass both normal and Alchemist Potion iframes.")
 					.formatted(
 							StringUtils.ticksToSeconds(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DURATION),
 							StringUtils.multiplierToPercentage(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)
@@ -118,7 +114,9 @@ public class UnstableAmalgam extends Ability {
 	private @Nullable Slime mAmalgam;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	private final double mDamage;
+	private final double mRadius;
 	private final Map<ThrownPotion, ItemStatManager.PlayerItemStats> mEnhancementPotionPlayerStat;
+	private final UnstableAmalgamCS mCosmetic;
 
 	public UnstableAmalgam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -126,6 +124,9 @@ public class UnstableAmalgam extends Ability {
 		mEnhancementPotionPlayerStat = new HashMap<>();
 
 		mDamage = isLevelOne() ? UNSTABLE_AMALGAM_1_DAMAGE : UNSTABLE_AMALGAM_2_DAMAGE;
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, UNSTABLE_AMALGAM_RADIUS);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new UnstableAmalgamCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
@@ -185,7 +186,6 @@ public class UnstableAmalgam extends Ability {
 
 		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, UNSTABLE_AMALGAM_DURATION);
 
-		World world = loc.getWorld();
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "UnstableAmalgam");
 		if (e instanceof Slime amalgam) {
 			mAmalgam = amalgam;
@@ -212,10 +212,9 @@ public class UnstableAmalgam extends Ability {
 						mAmalgam = null;
 						this.cancel();
 						return;
-					} else if (mTicks % (duration / 3) == 0) {
-						new PartialParticle(Particle.FLAME, loc, 20, 0.02, 0.02, 0.02, 0.1).spawnAsPlayerActive(mPlayer);
-						world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.6f, 1.7f);
 					}
+
+					mCosmetic.periodicEffects(mPlayer, loc, mRadius, mTicks, duration);
 
 					mTicks++;
 				}
@@ -224,16 +223,15 @@ public class UnstableAmalgam extends Ability {
 	}
 
 	private void explode(Location loc) {
-		if (!mPlayer.isOnline() || mAlchemistPotions == null) {
+		if (!mPlayer.isOnline() || mAlchemistPotions == null || mPlayerItemStats == null) {
 			return;
 		}
 
-		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, UNSTABLE_AMALGAM_RADIUS);
 		float horizontalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_HORIZONTAL);
 		float verticalKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL);
 		float playerVertical = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, UNSTABLE_AMALGAM_KNOCKBACK_SPEED_VERTICAL * 2);
 
-		Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
+		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mRadius);
 		List<LivingEntity> mobs = hitbox.getHitMobs(mAmalgam);
 		mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 
@@ -241,7 +239,7 @@ public class UnstableAmalgam extends Ability {
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), mPlayerItemStats), damage, true, true, false);
 
-			applyEffects(mob);
+			applyEffects(mob, mPlayerItemStats);
 
 			if (!EntityUtils.isBoss(mob)) {
 				if (isEnhanced()) {
@@ -276,12 +274,7 @@ public class UnstableAmalgam extends Ability {
 			}
 		}
 
-		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.8f, 0f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.8f, 1.25f);
-		new PartialParticle(Particle.FLAME, loc, 115, 0.02, 0.02, 0.02, 0.2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(mPlayer);
+		mCosmetic.explodeEffects(mPlayer, loc, mRadius);
 	}
 
 	private void disable(Player player) {
@@ -297,20 +290,27 @@ public class UnstableAmalgam extends Ability {
 			int mTimes = 0;
 			@Override public void run() {
 				mTimes++;
+				if (mPlayerItemStats != null) {
+					mobs.clear();
+					cancel();
+				}
 
-				for (LivingEntity mob : new ArrayList<>(mobs)) {
-					new PartialParticle(Particle.REDSTONE, mob.getEyeLocation(), 12, 0.5, 0.5, 0.5, 0.3, new Particle.DustOptions(Color.WHITE, 0.8f)).spawnAsPlayerActive(mPlayer);
-
-					if (mob.isDead() && mPlayerItemStats != null) {
-						mobs.remove(mob);
+				for (Iterator<LivingEntity> iterator = mobs.iterator(); iterator.hasNext(); ) {
+					LivingEntity mob = iterator.next();
+					if (mob.isDead()) {
+						iterator.remove();
 						ThrownPotion potion = mPlayer.launchProjectile(ThrownPotion.class);
 						potion.teleport(mob.getEyeLocation());
 						potion.setVelocity(new Vector(0, -1, 0));
 						setEnhancementThrownPotion(potion, mPlayerItemStats);
+						mCosmetic.unstableMobDeath(mPlayer, mob);
+					} else {
+						mCosmetic.unstableMobEffects(mPlayer, mob);
 					}
 				}
 
 				if (mobs.isEmpty() || mTimes >= duration || !mPlayer.isValid()) {
+					mobs.clear();
 					cancel();
 				}
 			}
@@ -333,10 +333,12 @@ public class UnstableAmalgam extends Ability {
 		if (isEnhanced() && stats != null) {
 			Location loc = potion.getLocation();
 
-			double damage = mAlchemistPotions.getDamage() * (UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POTION_DAMAGE));
-			for (LivingEntity entity : new Hitbox.SphereHitbox(loc, mAlchemistPotions.getPotionRadius()).getHitMobs()) {
+			double damage = mAlchemistPotions.getDamage(stats) * (UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_POTION_DAMAGE));
+			double radius = mAlchemistPotions.getRadius(stats);
+			mCosmetic.unstablePotionSplash(mPlayer, loc, radius);
+			for (LivingEntity entity : new Hitbox.SphereHitbox(loc, radius).getHitMobs()) {
 				DamageUtils.damage(mPlayer, entity, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), stats), damage, true, true, false);
-				applyEffects(entity);
+				applyEffects(entity, stats);
 			}
 		}
 
@@ -344,12 +346,12 @@ public class UnstableAmalgam extends Ability {
 		return true;
 	}
 
-	private void applyEffects(LivingEntity entity) {
-		if (mAlchemistPotions != null && mPlayerItemStats != null) {
+	private void applyEffects(LivingEntity entity, ItemStatManager.PlayerItemStats stats) {
+		if (mAlchemistPotions != null) {
 			if (mHasGruesome) {
-				mAlchemistPotions.applyEffects(entity, true, mPlayerItemStats);
+				mAlchemistPotions.applyEffects(entity, true, stats);
 			}
-			mAlchemistPotions.applyEffects(entity, false, mPlayerItemStats);
+			mAlchemistPotions.applyEffects(entity, false, stats);
 		}
 	}
 

@@ -34,17 +34,12 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	private static final Particle.DustOptions INJURY_COLOR = new Particle.DustOptions(Color.fromRGB(79, 24, 17), 1.2f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"The light cannot protect you forever.",
 			"It was never meant to be the color of blood.",
 			"For now this sanguine light protects you too."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.SANCTIFIED_ARMOR;
 	}
 
 	@Override

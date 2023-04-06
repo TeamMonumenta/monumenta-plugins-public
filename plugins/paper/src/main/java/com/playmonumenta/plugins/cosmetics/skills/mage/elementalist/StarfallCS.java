@@ -16,28 +16,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class StarfallCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, StarfallCS> SKIN_LIST = ImmutableMap.<String, StarfallCS>builder()
-		.put(PrestigiousStarfallCS.NAME, new PrestigiousStarfallCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.STARFALL;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.MAGMA_BLOCK;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void starfallCastEffect(World world, Player mPlayer) {

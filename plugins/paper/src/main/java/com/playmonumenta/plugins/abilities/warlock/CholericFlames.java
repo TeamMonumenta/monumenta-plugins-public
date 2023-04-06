@@ -80,7 +80,7 @@ public class CholericFlames extends Ability {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CholericFlamesCS(), CholericFlamesCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CholericFlamesCS());
 	}
 
 	public void cast() {

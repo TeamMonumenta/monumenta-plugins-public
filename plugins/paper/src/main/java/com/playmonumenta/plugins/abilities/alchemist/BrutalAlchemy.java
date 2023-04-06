@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
@@ -13,9 +14,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-public class BrutalAlchemy extends PotionAbility {
+public class BrutalAlchemy extends Ability implements PotionAbility {
 	private static final int BRUTAL_ALCHEMY_DURATION = 8 * 20;
 	private static final int BRUTAL_ALCHEMY_PERIOD = 1 * 20;
 	private static final double BRUTAL_ALCHEMY_1_DOT_MULTIPLIER = 0.20;
@@ -55,8 +56,7 @@ public class BrutalAlchemy extends PotionAbility {
 			.displayItem(new ItemStack(Material.REDSTONE, 1));
 
 	private final int mPeriod;
-	//private final double mDOTDamage;
-	private @Nullable AlchemistPotions mAlchemistPotions;
+	private @MonotonicNonNull AlchemistPotions mAlchemistPotions;
 
 	public BrutalAlchemy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -74,13 +74,17 @@ public class BrutalAlchemy extends PotionAbility {
 
 			double baseDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, mAlchemistPotions.getDamage(playerItemStats));
 			double finalDamage = baseDamage * (isLevelOne() ? BRUTAL_ALCHEMY_1_DOT_MULTIPLIER : BRUTAL_ALCHEMY_2_DOT_MULTIPLIER);
-			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, new CustomDamageOverTime(duration, finalDamage, mPeriod, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC));
+			CustomDamageOverTime dot = new CustomDamageOverTime(duration, finalDamage, mPeriod, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
+			dot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
+			mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_EFFECT_NAME, dot);
 
 			if (isEnhanced()) {
 				double finalEnhancedDamage = baseDamage * BRUTAL_ALCHEMY_ENHANCED_DOT_MULTIPLIER;
 				// Apply the enhanced dot a little later for a cool effect
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_ENHANCED_EFFECT_NAME, new CustomDamageOverTime(duration, finalEnhancedDamage, mPeriod * 2, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC));
+					CustomDamageOverTime enhancementDot = new CustomDamageOverTime(duration, finalEnhancedDamage, mPeriod * 2, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
+					enhancementDot.setVisuals(mAlchemistPotions.mCosmetic::damageOverTimeEffects);
+					mPlugin.mEffectManager.addEffect(mob, BRUTAL_ALCHEMY_DOT_ENHANCED_EFFECT_NAME, enhancementDot);
 				}, 10);
 			}
 		}

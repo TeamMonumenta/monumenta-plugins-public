@@ -92,7 +92,7 @@ public class PrismaticShield extends Ability {
 	public PrismaticShield(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS(), PrismaticShieldCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS());
 	}
 
 	@Override

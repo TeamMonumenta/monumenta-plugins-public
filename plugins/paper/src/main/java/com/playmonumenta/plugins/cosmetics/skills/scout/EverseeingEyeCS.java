@@ -42,17 +42,12 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	private static int EYE_ANIM_FRAMES = 4;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"The dream never ends. When its quivering eye",
 			"gazes upon the land, the beast will dictate",
 			"the realms of this dream. It will be endless."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.EAGLE_EYE;
 	}
 
 	@Override

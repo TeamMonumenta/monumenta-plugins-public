@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout.hunter;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Bukkit;
@@ -34,17 +32,11 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 	private static final float EXPLODE_VOLUME = 2f;
 	private static final Color TRAIL_COLOR = Color.fromRGB(255, 255, 199);
 
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"These twin fireworks will make",
-			"a spectacle out of your target!");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.PREDATOR_STRIKE;
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"These twin fireworks will make",
+				"a spectacle out of your target!");
 	}
 
 	@Override
@@ -74,10 +66,10 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 			if (i % 2 == 0) {
 				new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0,
 					new Particle.DustOptions(TRAIL_COLOR, 1))
-					.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					.minimumCount(0).spawnAsPlayerActive(mPlayer);
 			} else {
 				new PartialParticle(Particle.CRIT, l.clone().subtract(0, 0.25, 0), 1, 0, 0, 0, 0)
-					.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					.minimumCount(0).spawnAsPlayerActive(mPlayer);
 			}
 		}
 	}
@@ -99,7 +91,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 1.5f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_IRON_DOOR_OPEN, SoundCategory.PLAYERS, 1, 2f);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 75, 0, 0, 0, 0.75)
-			.minimumMultiplier(false)
+			.minimumCount(0)
 			.spawnAsPlayerActive(mPlayer);
 
 	}
@@ -113,7 +105,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1, 1.5f);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 25, 0, 0, 0, 0.175)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 42, 0.5f,
 			true, 0, Particle.EXPLOSION_NORMAL);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 55, 2.25f,
@@ -129,13 +121,13 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE_FAR, SoundCategory.PLAYERS, EXPLODE_VOLUME, 0.8f);
 		}, 10);
 		new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.2)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.END_ROD, loc, 60, 0, 0, 0, 0.25)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 1, 1, 1, 0)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, 0, 0, 0, 0.225)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -168,7 +160,7 @@ public class FireworkStrikeCS extends PredatorStrikeCS implements DepthsCS {
 						mL.add(mD);
 
 						new PartialParticle(Particle.REDSTONE, mL, 1, 0, 0, 0, 0, new Particle.DustOptions(TRAIL_COLOR, 2.5f))
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 						ParticleUtils.drawParticleCircleExplosion(mPlayer, mL, 0, 1, 0, 90, 2, 0.085f,
 							true, mAngle, Particle.END_ROD);
 						ParticleUtils.drawParticleCircleExplosion(mPlayer, mL, 0, 1, 0, 90, 2, 1f,

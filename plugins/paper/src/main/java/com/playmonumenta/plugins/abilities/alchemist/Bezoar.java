@@ -9,29 +9,19 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.BezoarCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -109,7 +99,7 @@ public class Bezoar extends Ability {
 		super(plugin, player, INFO);
 		mLingerTime = CharmManager.getDuration(mPlayer, CHARM_LINGER_TIME, LINGER_TIME);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS(), BezoarCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BezoarCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
@@ -135,10 +125,11 @@ public class Bezoar extends Ability {
 
 	private void spawnBezoar(Location loc) {
 		World world = loc.getWorld();
-		ItemStack itemBezoar = mCosmetic.bezoarItem();
+		ItemStack itemBezoar = mCosmetic.bezoarItem(false);
 		Item item = world.dropItemNaturally(loc, itemBezoar);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
+		item.setInvulnerable(true);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -146,29 +137,30 @@ public class Bezoar extends Ability {
 			public void run() {
 				mT++;
 				Location itemLoc = item.getLocation();
-				mCosmetic.bezoarTick(mPlayer, itemLoc, mT);
+				mCosmetic.periodicBezoarEffects(mPlayer, itemLoc, mT, false);
 				for (Player p : PlayerUtils.playersInRange(itemLoc, 1, true)) {
 					if (p != mPlayer) {
 						applyEffects(p, false);
-						mCosmetic.bezoarTarget(p, itemLoc);
+						mCosmetic.targetEffects(p, itemLoc, false);
 					}
 					applyEffects(mPlayer, false);
-					mCosmetic.bezoarTarget(mPlayer, itemLoc);
+					mCosmetic.targetEffects(mPlayer, itemLoc, false);
 
 					if (mAlchemistPotions != null) {
 						mAlchemistPotions.incrementCharges(POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_POTIONS));
 					}
 
 					item.remove();
-					mCosmetic.bezoarPickup(mPlayer, itemLoc);
+					mCosmetic.pickupEffects(mPlayer, itemLoc, false);
 
 					this.cancel();
-					break;
+					return;
 				}
 
 				if (mT >= mLingerTime || item.isDead()) {
 					this.cancel();
 					item.remove();
+					mCosmetic.expireEffects(mPlayer, itemLoc, false);
 				}
 			}
 
@@ -206,41 +198,33 @@ public class Bezoar extends Ability {
 
 	private void spawnPhilosopherStone(Location loc) {
 		World world = loc.getWorld();
-		ItemStack itemStone = new ItemStack(Material.RED_CONCRETE);
-		ItemMeta stoneMeta = itemStone.getItemMeta();
-		stoneMeta.displayName(Component.text("Philosopher's Stone", NamedTextColor.WHITE)
-			.decoration(TextDecoration.ITALIC, false));
-		itemStone.setItemMeta(stoneMeta);
-		ItemUtils.setPlainName(itemStone, "Philosopher's Stone");
+		ItemStack itemStone = mCosmetic.bezoarItem(true);
 		Item item = world.dropItemNaturally(loc, itemStone);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
+		item.setInvulnerable(true);
 
 		new BukkitRunnable() {
 			int mT = 0;
-			final BlockData mFallingDustData = Material.RED_CONCRETE.createBlockData();
 			@Override
 			public void run() {
 				mT++;
 				Location itemLoc = item.getLocation();
-				new PartialParticle(Particle.FALLING_DUST, itemLoc, 1, 0.2, 0.2, 0.2, mFallingDustData).spawnAsPlayerActive(mPlayer);
+				mCosmetic.periodicBezoarEffects(mPlayer, itemLoc, mT, true);
 				for (Player p : PlayerUtils.playersInRange(itemLoc, 1, true)) {
 					if (p != mPlayer) {
 						applyPhilosopherEffects(p);
+						mCosmetic.targetEffects(p, itemLoc, true);
 					}
 					applyPhilosopherEffects(mPlayer);
+					mCosmetic.targetEffects(mPlayer, itemLoc, true);
 
 					if (mAlchemistPotions != null) {
 						mAlchemistPotions.incrementCharges(PHILOSOPHER_STONE_POTIONS + (int) CharmManager.getLevel(mPlayer, CHARM_PHILOSOPHER_STONE_POTIONS));
 					}
 
 					item.remove();
-
-					world.playSound(itemLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
-					world.playSound(itemLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
-					world.playSound(itemLoc, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1, 1f);
-					new PartialParticle(Particle.BLOCK_CRACK, itemLoc, 30, 0.15, 0.15, 0.15, 0.75F, Material.LIME_CONCRETE.createBlockData()).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.TOTEM, itemLoc, 20, 0, 0, 0, 0.35F).spawnAsPlayerActive(mPlayer);
+					mCosmetic.pickupEffects(mPlayer, itemLoc, true);
 
 					this.cancel();
 					break;
@@ -249,6 +233,7 @@ public class Bezoar extends Ability {
 				if (mT >= mLingerTime || item.isDead()) {
 					this.cancel();
 					item.remove();
+					mCosmetic.expireEffects(mPlayer, itemLoc, true);
 				}
 			}
 

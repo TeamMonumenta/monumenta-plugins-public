@@ -69,7 +69,7 @@ public class HauntingShades extends Ability {
 
 	public HauntingShades(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS(), HauntingShadesCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS());
 	}
 
 	public void cast() {

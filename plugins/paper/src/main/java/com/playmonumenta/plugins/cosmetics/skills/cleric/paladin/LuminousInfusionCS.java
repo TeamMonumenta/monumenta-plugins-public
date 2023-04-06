@@ -19,28 +19,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class LuminousInfusionCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, LuminousInfusionCS> SKIN_LIST = ImmutableMap.<String, LuminousInfusionCS>builder()
-		.put(PrestigiousInfusionCS.NAME, new PrestigiousInfusionCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.LUMINOUS_INFUSION;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.BLAZE_POWDER;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void infusionStartEffect(World world, Player mPlayer) {
@@ -57,8 +43,8 @@ public class LuminousInfusionCS implements CosmeticSkill {
 	public void infusionTickEffect(Player mPlayer, int tick) {
 		Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 		Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-		new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumCount(0).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void infusionHitEffect(World world, Player mPlayer, LivingEntity damagee) {

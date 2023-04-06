@@ -91,7 +91,7 @@ public class BodkinBlitz extends MultipleChargeAbility {
 
 		mStealthDuration = CharmManager.getDuration(player, CHARM_STEALTH, (isLevelOne() ? STEALTH_DURATION_1 : STEALTH_DURATION_2));
 		mBonusDmg = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? BONUS_DMG_1 : BONUS_DMG_2);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodkinBlitzCS(), BodkinBlitzCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodkinBlitzCS());
 	}
 
 	public void cast() {

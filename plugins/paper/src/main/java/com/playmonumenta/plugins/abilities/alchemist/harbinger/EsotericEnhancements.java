@@ -1,38 +1,39 @@
 package com.playmonumenta.plugins.abilities.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AlchemicalAberrationBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.EsotericEnhancementsCS;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class EsotericEnhancements extends PotionAbility {
+public class EsotericEnhancements extends Ability implements PotionAbility {
 	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_1 = 0.8;
 	private static final double ABERRATION_POTION_DAMAGE_MULTIPLIER_2 = 1.35;
 	private static final double ABERRATION_DAMAGE_RADIUS = 3;
@@ -91,7 +92,7 @@ public class EsotericEnhancements extends PotionAbility {
 
 		mDamageMultiplier = isLevelOne() ? ABERRATION_POTION_DAMAGE_MULTIPLIER_1 : ABERRATION_POTION_DAMAGE_MULTIPLIER_2;
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS(), EsotericEnhancementsCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EsotericEnhancementsCS());
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class EsotericEnhancements extends PotionAbility {
 			mAppliedMobs.entrySet().removeIf((entry) -> (entry.getKey().getTicksLived() - entry.getValue() > reactionTime));
 
 			// If it's still in the list, it was applied recently enough
-			if (mAppliedMobs.containsKey(mob)) {
+			if (mAppliedMobs.remove(mob) != null) {
 				int num = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CREEPER);
 				for (int i = 0; i < num; i++) {
 					summonAberration(mob.getLocation(), playerItemStats);
@@ -146,17 +147,20 @@ public class EsotericEnhancements extends PotionAbility {
 				@Nullable LivingEntity mTarget = null;
 				@Override
 				public void run() {
-					if (mTicks >= ABERRATION_LIFETIME || !mPlayer.isOnline() || mPlayer.isDead() || aberration.isDead()) {
+					if (mTicks >= ABERRATION_LIFETIME || !mPlayer.isOnline() || mPlayer.isDead() || !aberration.isValid()) {
 						aberration.remove();
 						this.cancel();
 						return;
 					}
 
-					if (mTarget == null || mTarget.isDead()) {
-						mTarget = getHealthiestMob(aberration);
+					if (!isValidTarget(aberration, mTarget)) {
+						LivingEntity newTarget = findTarget(aberration);
+						if (newTarget != null) {
+							mTarget = newTarget;
+						}
 					}
 
-					if (mTarget != null) {
+					if (mTarget != null && mTarget.isValid()) {
 						aberration.setTarget(mTarget);
 					}
 
@@ -167,16 +171,20 @@ public class EsotericEnhancements extends PotionAbility {
 		}, 1);
 	}
 
-	private @Nullable LivingEntity getHealthiestMob(LivingEntity aberration) {
-		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration);
-		nearbyMobs.removeIf(Entity::isInvulnerable);
-		nearbyMobs.removeIf((mob) -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-		nearbyMobs.removeIf((mob) -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) > MAX_TARGET_Y);
-		nearbyMobs.sort(Comparator.comparingDouble(Damageable::getHealth));
-		if (!nearbyMobs.isEmpty()) {
-			return nearbyMobs.get(nearbyMobs.size() - 1);
-		}
-		return null;
+	private boolean isValidTarget(LivingEntity aberration, @Nullable LivingEntity mob) {
+		return mob != null
+			       && mob.isValid()
+			       && mob.getLocation().distance(aberration.getLocation()) <= 1.5 * ABERRATION_TARGET_RADIUS
+			       && Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= 2 * MAX_TARGET_Y
+			       && !DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC)
+			       && !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG);
+	}
+
+	private @Nullable LivingEntity findTarget(LivingEntity aberration) {
+		return EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
+			       .filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
+			       .filter(mob -> isValidTarget(aberration, mob))
+			       .max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
 	}
 
 }

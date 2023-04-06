@@ -1,9 +1,13 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
+import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,11 +35,15 @@ public class DamageUtils {
 	 * <ul>
 	 *     <li>Being invulnerable according to {@link LivingEntity#isInvulnerable()}
 	 *     <li>Having resistance 5+
+	 *     <li>Having a custom damage resistance effect of 100% (or more) to the given type of damage
 	 *     <li>Being in stasis
 	 *     <li>Being in creative or spectator mode
 	 * </ul>
+	 *
+	 * @param entity     The entity to check
+	 * @param damageType The damage type to check for, or null to check for any damage type (excluding true damage which bypasses some forms of invulnerability)
 	 */
-	public static boolean isImmuneToDamage(LivingEntity entity) {
+	public static boolean isImmuneToDamage(LivingEntity entity, @Nullable DamageType damageType) {
 		if (entity.isInvulnerable()) {
 			return true;
 		}
@@ -45,6 +53,14 @@ public class DamageUtils {
 		}
 		if (entity instanceof Player player && (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)) {
 			return true;
+		}
+		if (damageType != DamageType.TRUE) {
+			List<Effect> effects = Plugin.getInstance().mEffectManager.getEffects(entity);
+			if (effects != null && effects.stream().anyMatch(effect -> effect instanceof PercentDamageReceived dre
+				                                                           && dre.getMagnitude() <= -1
+				                                                           && (dre.getAffectedDamageTypes() == null || dre.getAffectedDamageTypes().contains(damageType)))) {
+				return true;
+			}
 		}
 		return StasisListener.isInStasis(entity);
 	}

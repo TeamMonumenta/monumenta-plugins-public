@@ -66,7 +66,7 @@ public class BruteForce extends Ability {
 		super(plugin, player, INFO);
 		mMultiplier = isLevelOne() ? 0 : BRUTE_FORCE_2_MODIFIER;
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS(), BruteForceCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BruteForceCS());
 	}
 
 	@Override

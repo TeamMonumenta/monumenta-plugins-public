@@ -71,7 +71,7 @@ public class ManaLance extends MultipleChargeAbility {
 		mCharges = getTrackedCharges();
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ManaLanceCS(), ManaLanceCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ManaLanceCS());
 	}
 
 	public void cast() {

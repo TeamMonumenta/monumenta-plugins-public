@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
-import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -11,7 +10,6 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.WardingRemedyCS;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -78,7 +76,7 @@ public class WardingRemedy extends Ability {
 
 	public WardingRemedy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WardingRemedyCS(), WardingRemedyCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WardingRemedyCS());
 	}
 
 	public void cast() {
@@ -102,16 +100,13 @@ public class WardingRemedy extends Ability {
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mPulses = 0;
-			int mTick = 10;
-			final ImmutableList<PPPeriodic> mParticles = mCosmetic.remedyPeriodicEffect(mPlayer.getLocation());
+			int mTick = delay;
 
 			@Override
 			public void run() {
 				Location playerLoc = mPlayer.getLocation();
 
-				for (PPPeriodic ppp : mParticles) {
-					ppp.location(playerLoc.clone().add(0, 0.5, 0)).spawnAsPlayerActive(mPlayer);
-				}
+				mCosmetic.remedyPeriodicEffect(playerLoc.clone().add(0, 0.5, 0), mPlayer, mTick + mPulses * delay);
 
 				if (mTick >= delay) {
 					mCosmetic.remedyPulseEffect(world, playerLoc, mPlayer, mPulses, pulses, radius);
@@ -141,9 +136,11 @@ public class WardingRemedy extends Ability {
 		}
 
 		double healing = WARDING_REMEDY_HEAL_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALING);
-		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_RANGE), true).stream().filter(player -> AbsorptionUtils.getAbsorption(player) > 0).toList()) {
-			mPlugin.mEffectManager.addEffect(p, "WardingRemedyBonusHealing", new PercentHeal(20, healing).displaysTime(false));
-			mCosmetic.remedyHealBuffEffect(mPlayer, p);
+		for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, WARDING_REMEDY_RANGE), true)) {
+			if (AbsorptionUtils.getAbsorption(p) > 0) {
+				mPlugin.mEffectManager.addEffect(p, "WardingRemedyBonusHealing", new PercentHeal(20, healing).displaysTime(false));
+				mCosmetic.remedyHealBuffEffect(mPlayer, p);
+			}
 		}
 	}
 

@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -17,35 +15,20 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class HauntingShadesCS implements CosmeticSkill {
-
-	public static final ImmutableMap<String, HauntingShadesCS> SKIN_LIST = ImmutableMap.<String, HauntingShadesCS>builder()
-		.put(PrestigiousShadesCS.NAME, new PrestigiousShadesCS())
-		.build();
 
 	private static final String AS_NAME = "HauntingShade";
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.HAUNTING_SHADES;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.SKELETON_SKULL;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public String getAsName() {

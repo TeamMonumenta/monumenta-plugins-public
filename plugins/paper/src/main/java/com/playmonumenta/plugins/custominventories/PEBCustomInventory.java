@@ -447,31 +447,31 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(4, "Particle Settings",
 				"Choose how many particles are shown for abilities of various categories. These settings can also be changed using the /particles command.", NamedTextColor.GRAY,
 				Material.NETHER_STAR, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
-			makePartialParticlePebItem(19, "Own Active Abilities", "Particle multiplier for your own active abilities", Material.PLAYER_HEAD, ParticleCategory.OWN_ACTIVE),
-			makePartialParticlePebItem(20, "Own Passive Abilities", "Particle multiplier for your own passive abilities", Material.FIREWORK_STAR, ParticleCategory.OWN_PASSIVE),
-			makePartialParticlePebItem(21, "(De)Buffs on yourself", "Particle multiplier for active effects on you, e.g. the Defensive Line buff", Material.ENDER_PEARL, ParticleCategory.OWN_BUFF),
-			makePartialParticlePebItem(23, "Others' Active Abilities", "Particle multiplier for other players' active abilities", Material.PLAYER_WALL_HEAD, ParticleCategory.OTHER_ACTIVE),
-			makePartialParticlePebItem(24, "Others' Passive Abilities", "Particle multiplier for other players' passive abilities", Material.FIREWORK_STAR, ParticleCategory.OTHER_PASSIVE),
-			makePartialParticlePebItem(25, "(De)Buffs on other players", "Particle multiplier for active effects on other players, e.g. the Defensive Line buff", Material.ENDER_PEARL, ParticleCategory.OTHER_BUFF),
-			makePartialParticlePebItem(39, "Boss Abilities", "Particle multiplier for bosses' abilities", Material.DRAGON_HEAD, ParticleCategory.BOSS),
-			makePartialParticlePebItem(40, "(De)Buffs on Enemies", "Particle multiplier for active effects on enemies, e.g. Spellshock's Static", Material.ENDER_PEARL, ParticleCategory.ENEMY_BUFF),
-			makePartialParticlePebItem(41, "Other Enemies' Abilities", "Particle multiplier for non-boss enemies' abilities", Material.ZOMBIE_HEAD, ParticleCategory.ENEMY)
+			makePartialParticlePebItem(19, "Particle multiplier for your own active abilities", Material.PLAYER_HEAD, ParticleCategory.OWN_ACTIVE),
+			makePartialParticlePebItem(20, "Particle multiplier for your own passive abilities", Material.FIREWORK_STAR, ParticleCategory.OWN_PASSIVE),
+			makePartialParticlePebItem(21, "Particle multiplier for active effects on you, e.g. the Defensive Line buff", Material.ENDER_PEARL, ParticleCategory.OWN_BUFF),
+			makePartialParticlePebItem(23, "Particle multiplier for other players' active abilities", Material.PLAYER_WALL_HEAD, ParticleCategory.OTHER_ACTIVE),
+			makePartialParticlePebItem(24, "Particle multiplier for other players' passive abilities", Material.FIREWORK_STAR, ParticleCategory.OTHER_PASSIVE),
+			makePartialParticlePebItem(25, "Particle multiplier for active effects on other players, e.g. the Defensive Line buff", Material.ENDER_PEARL, ParticleCategory.OTHER_BUFF),
+			makePartialParticlePebItem(39, "Particle multiplier for bosses' abilities", Material.DRAGON_HEAD, ParticleCategory.BOSS),
+			makePartialParticlePebItem(40, "Particle multiplier for active effects on enemies, e.g. Spellshock's Static", Material.ENDER_PEARL, ParticleCategory.ENEMY_BUFF),
+			makePartialParticlePebItem(41, "Particle multiplier for non-boss enemies' abilities", Material.ZOMBIE_HEAD, ParticleCategory.ENEMY)
 		);
 
 	}
 
-	private static PebItem makePartialParticlePebItem(int slot, String name, String description, Material material, ParticleCategory category) {
+	private static PebItem makePartialParticlePebItem(int slot, String description, Material material, ParticleCategory category) {
 		String objectiveName = Objects.requireNonNull(category.mObjectiveName);
-		return new PebItem(slot, gui -> name + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
-				gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", NamedTextColor.GRAY,
-				material, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS)
-				.action((gui, event) -> {
-					int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
-					value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
-					value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
-					ScoreboardUtils.setScoreboardValue(gui.mPlayer, objectiveName, value);
-					gui.setLayout(gui.mCurrentPage); // refresh GUI
-				});
+		return new PebItem(slot, gui -> category.mDisplayName + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
+			gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", NamedTextColor.GRAY,
+			material, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS)
+			       .action((gui, event) -> {
+				       int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
+				       value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
+				       value = Math.max(0, Math.min(value, PlayerData.MAX_PARTIAL_PARTICLE_VALUE));
+				       ScoreboardUtils.setScoreboardValue(gui.mPlayer, objectiveName, value);
+				       gui.setLayout(gui.mCurrentPage); // refresh GUI
+			       });
 	}
 
 	private final Player mPlayer;

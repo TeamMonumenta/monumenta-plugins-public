@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -11,32 +9,17 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class BruteForceCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, BruteForceCS> SKIN_LIST = ImmutableMap.<String, BruteForceCS>builder()
-		.put(ColossalBruteCS.NAME, new ColossalBruteCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.BRUTE_FORCE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.STONE_AXE;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void bruteOnDamage(Player mPlayer, Location loc, double radius, int combo) {

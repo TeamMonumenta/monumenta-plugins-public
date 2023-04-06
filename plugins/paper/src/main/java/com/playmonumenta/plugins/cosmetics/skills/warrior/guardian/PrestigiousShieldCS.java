@@ -28,16 +28,11 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.25f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"A radiant crescent glows",
-			"upon the hero's shield."
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"A radiant crescent glows",
+				"upon the hero's shield."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.SHIELD_WALL;
 	}
 
 	@Override
@@ -106,9 +101,9 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	@Override
 	public void shieldWallDot(Player mPlayer, Location l, double degree, double angle, int y, int height) {
 		if (goldCheck(degree / angle, 1.0 * y / height)) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
 		} else {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
 		}
 		if (FastUtils.RANDOM.nextDouble() < 0.3) {
 			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);

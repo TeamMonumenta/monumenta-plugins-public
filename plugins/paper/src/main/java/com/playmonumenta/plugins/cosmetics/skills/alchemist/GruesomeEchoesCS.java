@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -31,15 +29,10 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	private static final Color ECHO_COLOR = Color.fromRGB(39, 89, 97);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, GruesomeEchoesCS.NAME, false, this.getAbilityName(),
-			"Infuses your alchemy with",
-			"ghastly and twisted echoes.");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.GRUESOME_ALCHEMY;
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"Infuses your alchemy with",
+				"ghastly and twisted echoes.");
 	}
 
 	@Override
@@ -62,25 +55,21 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 1, 0.75f);
 		}
 		new PartialParticle(Particle.SOUL, mPlayer.getLocation().clone().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0.02)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, 0.7f);
 		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 2f, 0.5f);
 	}
 
 	@Override
-	public float getSwapBrewPitch() {
-		return 0.7f;
-	}
-
-	@Override
-	public void particlesOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius) {
+	public void effectsOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius, boolean isSpecialPot) {
 		loc = loc.clone().add(0, 0.1, 0);
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0, 0, 0, 0.125)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL, loc, 15, 0, 0, 0, 0.075)
-			.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+			.minimumCount(0).spawnAsPlayerActive(mPlayer);
 
 		Vector colorValues = isGruesome ? new Vector(ECHO_COLOR.getRed(), ECHO_COLOR.getGreen(), ECHO_COLOR.getBlue()).normalize() :
 			new Vector(TWISTED_COLOR.getRed(), TWISTED_COLOR.getGreen(), TWISTED_COLOR.getBlue()).normalize();
@@ -119,7 +108,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 						Location loc = l.clone().add(vec);
 						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(color, 0.75f))
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 					}
 					if (mRadius <= 0) {
 						this.cancel();

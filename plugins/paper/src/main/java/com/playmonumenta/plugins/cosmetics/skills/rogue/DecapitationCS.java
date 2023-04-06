@@ -38,17 +38,12 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 	private static final double CLEAVE_RADIUS = 2;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"All roads lead to the bloodstained dream.",
 			"Trapped in the nightmare, death is never",
 			"the end of those souls under the doom."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.BY_MY_BLADE;
 	}
 
 	@Override

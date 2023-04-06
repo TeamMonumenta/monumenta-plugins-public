@@ -127,9 +127,9 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				new PartialParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumCount(0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumCount(0).spawnAsPlayerActive(mPlayer);
 				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS)
 					    || mPlugin.mAbilityManager.getPlayerAbility(mPlayer, Blizzard.class) == null
 					    || !mPlayer.isValid()) { // Ensure player is not dead, is still online?

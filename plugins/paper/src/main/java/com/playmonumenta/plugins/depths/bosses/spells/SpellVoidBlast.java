@@ -43,7 +43,7 @@ public class SpellVoidBlast extends SpellBaseAoE {
 
 	@Override
 	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.25, 0.25, 0.25, 0).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.25, 0.25, 0.25, 0).minimumCount(0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class SpellVoidBlast extends SpellBaseAoE {
 
 	@Override
 	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.2).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.25, 0.25, 0.25, 0).minimumMultiplier(false).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.2).minimumCount(0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.25, 0.25, 0.25, 0).minimumCount(0).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

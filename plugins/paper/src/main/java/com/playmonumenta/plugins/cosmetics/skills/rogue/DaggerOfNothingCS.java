@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,15 +14,10 @@ public class DaggerOfNothingCS extends DaggerThrowCS {
 	public static final String NAME = "Dagger of Nothing";
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"New daggers of the EmpError"
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.DAGGER_THROW;
 	}
 
 	@Override

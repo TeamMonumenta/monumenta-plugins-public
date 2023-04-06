@@ -19,31 +19,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class DivineJusticeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, DivineJusticeCS> SKIN_LIST = ImmutableMap.<String, DivineJusticeCS>builder()
-		.put(DarkPunishmentCS.NAME, new DarkPunishmentCS())
-		.build();
-
 	private final float HEAL_PITCH_SELF = Constants.NotePitches.C18;
 	private final float HEAL_PITCH_OTHER = Constants.NotePitches.E22;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.DIVINE_JUSTICE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.IRON_SWORD;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public float getHealPitchSelf() {

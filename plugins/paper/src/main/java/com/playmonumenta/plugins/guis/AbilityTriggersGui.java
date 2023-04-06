@@ -49,10 +49,11 @@ public class AbilityTriggersGui extends Gui {
 
 			// help icon
 			setItem(4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Help", NamedTextColor.WHITE, false,
-					"Click on a trigger to change it.\n" +
-							"Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. " +
-							"If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.\n" +
-							"Eagle Eye is an exception: it allows other abilities to trigger after it.", NamedTextColor.GRAY, 40));
+				"Click on a trigger to change it.\n" +
+					"Triggers are shown in the order they are handled. Whenever a key is pressed, the top-left trigger is checked first if it matches. " +
+					"If not, the next trigger is checked, and so forth until a trigger matches and casts its ability.\n" +
+					"Eagle Eye is an exception: it allows other abilities to trigger after it.\n" +
+					"Right-click a trigger to immediately perform the trigger's action (e.g. toggle some state).", NamedTextColor.GRAY, 40));
 
 			// trigger icons
 			int i = 0;
@@ -73,11 +74,17 @@ public class AbilityTriggersGui extends Gui {
 
 					setItem(2 + (i / 7), 1 + (i % 7), item)
 						.onLeftClick(() -> {
-								mSelectedAbility = info;
-								mSelectedTrigger = trigger;
-								mNewTrigger = new AbilityTrigger(trigger.getTrigger());
-								update();
-							});
+							mSelectedAbility = info;
+							mSelectedTrigger = trigger;
+							mNewTrigger = new AbilityTrigger(trigger.getTrigger());
+							update();
+						})
+						.onRightClick(() -> {
+							if (trigger.getRestriction() == null || trigger.getRestriction().getPredicate().test(mPlayer)) {
+								// cast is fine here, as the trigger is for the ability we got it from
+								((AbilityTriggerInfo) trigger).getAction().accept(ability);
+							}
+						});
 					i++;
 				}
 			}
@@ -86,17 +93,18 @@ public class AbilityTriggersGui extends Gui {
 			int numberOfCustomTriggers = mPlugin.mAbilityManager.getNumberOfCustomTriggers(mPlayer);
 			if (numberOfCustomTriggers > 0) {
 				setItem(8, GUIUtils.createBasicItem(Material.BARRIER, 1, "Revert all triggers to defaults", NamedTextColor.DARK_RED, false,
-						Component.text("This resets all triggers of all abilities of all classes back to defaults!\nYou currently have ", NamedTextColor.RED)
-							.append(Component.text(numberOfCustomTriggers, NamedTextColor.GOLD))
-							.append(Component.text(" custom trigger" + (numberOfCustomTriggers == 1 ? "" : "s") + " defined.", NamedTextColor.RED)), 40, true)).onLeftClick(() -> {
-					mPlugin.mAbilityManager.clearCustomTriggers(mPlayer);
-					for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilitiesInTriggerOrder()) {
-						for (AbilityTriggerInfo<?> trigger : ability.getCustomTriggers()) {
-							trigger.setTrigger(new AbilityTrigger(ability.getInfo().getTrigger(trigger.getId()).getTrigger()));
+					Component.text("This resets all triggers of all abilities of all classes back to defaults!\nYou currently have ", NamedTextColor.RED)
+						.append(Component.text(numberOfCustomTriggers, NamedTextColor.GOLD))
+						.append(Component.text(" custom trigger" + (numberOfCustomTriggers == 1 ? "" : "s") + " defined.", NamedTextColor.RED)), 40, true))
+					.onLeftClick(() -> {
+						mPlugin.mAbilityManager.clearCustomTriggers(mPlayer);
+						for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilitiesInTriggerOrder()) {
+							for (AbilityTriggerInfo<?> trigger : ability.getCustomTriggers()) {
+								trigger.setTrigger(new AbilityTrigger(Objects.requireNonNull(ability.getInfo().getTrigger(trigger.getId())).getTrigger()));
+							}
 						}
-					}
-					update();
-				});
+						update();
+					});
 			}
 		} else {
 			// back icon
@@ -119,8 +127,8 @@ public class AbilityTriggersGui extends Gui {
 			}
 			// summary icon
 			setItem(0, 4, GUIUtils.createBasicItem(mSelectedAbility.getDisplayItem().getType(), 1,
-					mSelectedAbility.getDisplayName() + " - " + mSelectedAbility.getDisplayName(), NamedTextColor.GOLD, false,
-					summary, true));
+				mSelectedAbility.getDisplayName() + " - " + mSelectedTrigger.getDisplayName(), NamedTextColor.GOLD, false,
+				summary, true));
 
 			// options
 			makeOptionIcons(1, 0, GUIUtils.createBasicItem(Material.BARRIER, mNewTrigger.isEnabled() ? "Trigger enabled" : "Trigger disabled", mNewTrigger.isEnabled() ? NamedTextColor.GREEN : NamedTextColor.RED, false,

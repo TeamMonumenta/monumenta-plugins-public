@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -15,32 +13,17 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Nullable;
 
 public class CholericFlamesCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, CholericFlamesCS> SKIN_LIST = ImmutableMap.<String, CholericFlamesCS>builder()
-		.put(InfernalFlamesCS.NAME, new InfernalFlamesCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.CHOLERIC_FLAMES;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.FIRE_CHARGE;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void flameEffects(Player player, World world, Location loc, double range) {

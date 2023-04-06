@@ -14,10 +14,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT>> {
 
-	// https://minecraft.fandom.com/wiki/Commands/particle#Arguments
-	// https://papermc.io/javadocs/paper/1.16/org/bukkit/entity/Player.html#spawnParticle-org.bukkit.Particle-org.bukkit.Location-int-double-double-double-double-T-
-
 	private static final int PARTICLE_SPAWN_DISTANCE_SQUARED = 50 * 50;
+
+	private static long mSpawnedParticles;
 
 	public Particle mParticle;
 	public Location mLocation;
@@ -41,15 +40,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 */
 	public double mExtraVariance = 0;
 
-	/*
-	 * Set to true for players to always see at least 1 particle if their
-	 * particle multiplier setting is not completely off
-	 * (eg for 20% multipler against 3 mCount, that player would see 1 particle).
-	 * Set to false to determine by precise chance whether or not < 1 count
-	 * spawns 1 particle (eg 20% of 3 mCount would be 0.6,
-	 * player has 60% chance to see 1 particle, 40% chance for nothing).
-	 */
-	public boolean mMinimumMultiplier = true;
+	public int mMinimumCount = 1;
+	public double mMaximumMultiplier = 2;
 
 	public double mDistanceFalloff = 0;
 
@@ -65,6 +57,8 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	public boolean mVaryNegativeZ = false;
 
 	private @Nullable Predicate<Player> mPlayerCondition;
+
+	private double mSkipBelowMultiplier = 0;
 
 	public AbstractPartialParticle(Particle particle, Location location) {
 		mParticle = particle;
@@ -203,13 +197,18 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	}
 
 	public SelfT extraRange(double extraMin, double extraMax) {
-		mExtra = (extraMin + extraMin) / 2;
+		mExtra = (extraMin + extraMax) / 2;
 		mExtraVariance = (extraMax - extraMin) / 2;
 		return getSelf();
 	}
 
-	public SelfT minimumMultiplier(boolean minimumMultiplier) {
-		mMinimumMultiplier = minimumMultiplier;
+	public SelfT minimumCount(int minimumCount) {
+		mMinimumCount = minimumCount;
+		return getSelf();
+	}
+
+	public SelfT maximumMultiplier(double maximumMultiplier) {
+		mMaximumMultiplier = maximumMultiplier;
 		return getSelf();
 	}
 
@@ -223,6 +222,14 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	 */
 	public SelfT distanceFalloff(double distanceFalloff) {
 		mDistanceFalloff = distanceFalloff;
+		return getSelf();
+	}
+
+	/**
+	 * Sets a multiplier below which this particle won't be shown at all to the player.
+	 */
+	public SelfT skipBelowMultiplier(double skipBelowMultiplier) {
+		mSkipBelowMultiplier = skipBelowMultiplier;
 		return getSelf();
 	}
 
@@ -356,6 +363,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 			}
 			packagedValues.count(count);
 		}
+		mSpawnedParticles += packagedValues.count();
 		if (!(mDirectionalMode || isDeltaVaried() || isExtraVaried())) {
 			packagedValues.spawn();
 		} else {
@@ -428,7 +436,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	private SelfT forEachNearbyPlayer(Consumer<Player> playerAction) {
 		for (Player player : mLocation.getWorld().getPlayers()) {
 			if (player.getLocation().distanceSquared(mLocation) < PARTICLE_SPAWN_DISTANCE_SQUARED
-				&& (mPlayerCondition == null || mPlayerCondition.test(player))) {
+				    && (mPlayerCondition == null || mPlayerCondition.test(player))) {
 				playerAction.accept(player);
 			}
 		}
@@ -436,13 +444,12 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	}
 
 	private void spawnForPlayerInternal(Player player, ParticleCategory source) {
-		double multipliedCount = mCount * PlayerData.getParticleMultiplier(player, source);
-		if (multipliedCount == 0) {
+		double particleMultiplier = Math.min(PlayerData.getParticleMultiplier(player, source), mMaximumMultiplier);
+		if (particleMultiplier <= mSkipBelowMultiplier) {
 			return;
 		}
-
-		int partialCount = getPartialCount(multipliedCount, player, source);
-		if (partialCount == 0) {
+		int partialCount = getPartialCount(particleMultiplier, player, source);
+		if (partialCount <= 0) {
 			return;
 		}
 
@@ -459,8 +466,9 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		doSpawn(packagedValues);
 	}
 
-	protected int getPartialCount(double multipliedCount, Player player, ParticleCategory source) {
-		if (mMinimumMultiplier || multipliedCount >= 1) {
+	protected int getPartialCount(double multiplier, Player player, ParticleCategory source) {
+		double multipliedCount = Math.max(mMinimumCount, mCount * multiplier);
+		if (multipliedCount >= 1) {
 			return (int) Math.ceil(multipliedCount);
 		} else {
 			// If we don't want minimum multiplier (don't assume ceil 1 particle),
@@ -478,6 +486,13 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 	@SuppressWarnings("unchecked")
 	protected SelfT getSelf() {
 		return (SelfT) this;
+	}
+
+	/**
+	 * Returns the total number of particles spawned by any partial particle since the server started.
+	 */
+	public static long getSpawnedParticles() {
+		return mSpawnedParticles;
 	}
 
 }

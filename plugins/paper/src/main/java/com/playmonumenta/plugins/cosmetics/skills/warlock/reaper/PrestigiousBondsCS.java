@@ -31,16 +31,11 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Chains of radiance weave",
 			"a beautiful prison."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.VOODOO_BONDS;
 	}
 
 	@Override

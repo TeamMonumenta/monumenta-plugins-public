@@ -75,7 +75,7 @@ public class ByMyBlade extends Ability {
 		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, (isLevelOne() ? BY_MY_BLADE_1_DAMAGE : BY_MY_BLADE_2_DAMAGE) * (isEnhanced() ? 1 + ENHANCEMENT_DAMAGE_MULT : 1));
 		mHasteAmplifier = (isLevelOne() ? BY_MY_BLADE_1_HASTE_AMPLIFIER : BY_MY_BLADE_2_HASTE_AMPLIFIER) + (int) CharmManager.getLevel(mPlayer, CHARM_HASTE_AMPLIFIER);
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ByMyBladeCS(), ByMyBladeCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ByMyBladeCS());
 	}
 
 	@Override

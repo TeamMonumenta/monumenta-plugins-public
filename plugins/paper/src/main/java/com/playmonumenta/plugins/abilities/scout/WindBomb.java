@@ -156,7 +156,7 @@ public class WindBomb extends Ability {
 					for (double j = 0; j < 360; j += 6) {
 						double radian1 = Math.toRadians(j);
 						loc.add(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
-						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).minimumCount(0).spawnAsPlayerActive(mPlayer);
 						loc.subtract(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
 					}
 					this.cancel();

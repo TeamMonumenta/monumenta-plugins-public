@@ -18,32 +18,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class ManaLanceCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, ManaLanceCS> SKIN_LIST = ImmutableMap.<String, ManaLanceCS>builder()
-		.put(DarkLanceCS.NAME, new DarkLanceCS())
-		.put(HallowedLanceCS.NAME, new HallowedLanceCS())
-		.put(TwistedLanceCS.NAME, new TwistedLanceCS())
-		.build();
-
 	private static final Particle.DustOptions MANA_LANCE_COLOR = new Particle.DustOptions(Color.fromRGB(91, 187, 255), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.MANA_LANCE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.TRIDENT;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void lanceHitBlock(Player mPlayer, Location bLoc, World world) {

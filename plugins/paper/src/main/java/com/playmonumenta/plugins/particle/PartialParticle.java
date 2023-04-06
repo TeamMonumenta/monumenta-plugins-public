@@ -34,24 +34,8 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 	}
 
 	/*
-	 * Share the same delta for X, Y and Z.
-	 * Use default multiplier mode.
-	 */
-	public PartialParticle(Particle particle, Location location, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
-		this(particle, location, count, delta, delta, delta, extra, data, directionalMode, extraVariance);
-	}
-
-	/*
-	 * Share the same delta for X, Y and Z.
-	 */
-	public PartialParticle(Particle particle, Location location, int count, double delta, double extra, @Nullable Object data, boolean directionalMode, double extraVariance, boolean minimumMultiplier) {
-		this(particle, location, count, delta, delta, delta, extra, data, directionalMode, extraVariance, minimumMultiplier);
-	}
-
-	/*
 	 * Use default data.
 	 * Use default directional/variance settings.
-	 * Use default multiplier mode.
 	 */
 	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, 0);
@@ -60,7 +44,6 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 	/*
 	 * Use default data.
 	 * Use default directional/variance settings.
-	 * Use default multiplier mode.
 	 */
 	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, double extra) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, extra, null);
@@ -68,7 +51,6 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 
 	/*
 	 * Use default directional/variance settings.
-	 * Use default multiplier mode.
 	 */
 	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, @Nullable Object data) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, 0, data, false, 0);
@@ -76,21 +58,13 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 
 	/*
 	 * Use default directional/variance settings.
-	 * Use default multiplier mode.
 	 */
 	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data) {
 		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, false, 0);
 	}
 
 	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode) {
-		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, 0, true);
-	}
-
-	/*
-	 * Use default multiplier mode.
-	 */
-	public PartialParticle(Particle particle, Location location, int count, double deltaX, double deltaY, double deltaZ, double extra, @Nullable Object data, boolean directionalMode, double extraVariance) {
-		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, extraVariance, true);
+		this(particle, location, count, deltaX, deltaY, deltaZ, extra, data, directionalMode, 0);
 	}
 
 	public PartialParticle(
@@ -103,8 +77,7 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 		double extra,
 		@Nullable Object data,
 		boolean directionalMode,
-		double extraVariance,
-		boolean minimumMultiplier
+		double extraVariance
 	) {
 		super(particle, location);
 		mCount = count;
@@ -115,7 +88,6 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 		mData = data;
 		mDirectionalMode = directionalMode;
 		mExtraVariance = extraVariance;
-		mMinimumMultiplier = minimumMultiplier;
 	}
 
 }

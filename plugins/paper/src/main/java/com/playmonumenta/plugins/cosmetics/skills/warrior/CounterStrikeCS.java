@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -12,32 +10,17 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class CounterStrikeCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, CounterStrikeCS> SKIN_LIST = ImmutableMap.<String, CounterStrikeCS>builder()
-		.put(BrambleShellCS.NAME, new BrambleShellCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.COUNTER_STRIKE;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.CACTUS;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void counterOnHurt(Player mPlayer, Location loc, LivingEntity source) {

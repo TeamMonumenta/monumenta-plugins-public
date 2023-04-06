@@ -43,8 +43,6 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -63,24 +61,19 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AlchemistPotions extends Ability implements AbilityWithChargesOrStacks {
 
+	private static final String GRUESOME_MODE_TAG = "AlchPotionGruesomeMode";
 	public static final String METADATA_KEY = "PlayerThrowAlchPotionEvent";
 	public static final int MAX_CHARGES = 8;
 	public static final int POTIONS_TIMER_BASE = 2 * 20;
 	private static final int POTIONS_TIMER_TOWN = 1 * 20;
 	private static final int IFRAME_BETWEEN_POT = 10;
-	public static final double DAMAGE_PER_SKILL_POINT = 0.5;
-	public static final double DAMAGE_PER_SPEC_POINT = 2;
-	// Alchemist.java assumes that these two constants are equal - update the description there if you change these values to be different.
-	public static final double DAMAGE_PER_ENHANCEMENT = 1.5;
 	private static final String POTION_SCOREBOARD = "StoredPotions";
-	private static final double RADIUS = 4;
 
 	public static final String CHARM_CHARGES = "Alchemist Potion Charges";
 	public static final String CHARM_DAMAGE = "Alchemist Potion Damage";
 	public static final String CHARM_RADIUS = "Alchemist Potion Radius";
 
 	private final List<PotionAbility> mPotionAbilities = new ArrayList<>();
-	private double mRadius = 0;
 	private double mTimer = 0;
 	private int mSlot;
 	private final int mMaxCharges;
@@ -89,17 +82,15 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 	private final Map<UUID, Integer> mMobsIframeMap;
 
-	private boolean mGruesomeMode;
-
 	private static @Nullable ItemStack GRUESOME_POTION = null;
 	private static @Nullable ItemStack BRUTAL_POTION = null;
 
 	public static final AbilityInfo<AlchemistPotions> INFO =
-		new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
-			.linkedSpell(ClassAbility.ALCHEMIST_POTION)
-			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
+			new AbilityInfo<>(AlchemistPotions.class, null, AlchemistPotions::new)
+					.linkedSpell(ClassAbility.ALCHEMIST_POTION)
+					.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
 
-	private final GruesomeAlchemyCS mCosmetic;
+	public final GruesomeAlchemyCS mCosmetic;
 
 	private @Nullable ProjectileHitEvent mLastHitEvent;
 
@@ -115,12 +106,11 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CHARGES, MAX_CHARGES);
 		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0), mMaxCharges);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 
 		mPlayerItemStatsMap = new WeakHashMap<>();
 		mMobsIframeMap = new HashMap<>();
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS(), GruesomeAlchemyCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GruesomeAlchemyCS());
 
 		// Scan hotbar for alch potion
 		PlayerInventory inv = player.getInventory();
@@ -168,9 +158,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 				}
 			}
 		});
-
-		// Always switch back to the default mode when refreshing class
-		mGruesomeMode = false;
 	}
 
 	@Override
@@ -178,7 +165,10 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		if (ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand()) && ItemUtils.isAlchemistItem(potion.getItem())) {
 			mPlayer.setMetadata(METADATA_KEY, new FixedMetadataValue(mPlugin, mPlayer.getTicksLived()));
 			if (decrementCharge()) {
-				setPotionToAlchemistPotion(potion, mGruesomeMode);
+				setPotionToAlchemistPotion(potion, isGruesomeMode());
+				for (PotionAbility potionAbility : mPotionAbilities) {
+					potionAbility.alchemistPotionThrown(potion);
+				}
 			} else {
 				potion.remove();
 			}
@@ -236,7 +226,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	@Override
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
 		// Prevent the potion from splashing on players, summons, and other non-hostile mobs
-		// Most importantly, this prevents the potion from instantly splashing on the throwing player with certain combinations of projectile speed and throw direction when using Alchemical Artillery.
+		// Most importantly, this prevents the potion from instantly splashing on the throwing player with certain combinations of projectile speed and throw direction.
 		if (proj instanceof ThrownPotion potion
 			&& mPlayerItemStatsMap.containsKey(potion)
 			&& event.getHitEntity() != null) {
@@ -264,12 +254,17 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 			double radius = getRadius(playerItemStats);
 
+			boolean isSpecialPot = false;
+			for (PotionAbility potionAbility : mPotionAbilities) {
+				isSpecialPot |= potionAbility.createAura(loc, potion, playerItemStats);
+			}
+
+			mCosmetic.effectsOnSplash(mPlayer, loc, isGruesome, radius, isSpecialPot);
+
 			Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
 			for (LivingEntity entity : hitbox.getHitMobs()) {
 				apply(entity, potion, isGruesome, playerItemStats);
 			}
-
-			mCosmetic.particlesOnSplash(mPlayer, loc, isGruesome, radius);
 
 			List<Player> players = PlayerUtils.playersInRange(loc, radius, true);
 			players.remove(mPlayer);
@@ -424,18 +419,17 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 	}
 
-	public void swapMode(float brewPitch) {
-		mGruesomeMode = !mGruesomeMode;
-		String mode = mGruesomeMode ? "Gruesome" : "Brutal";
+	public void swapMode() {
+		boolean gruesome = ScoreboardUtils.toggleTag(mPlayer, GRUESOME_MODE_TAG);
+		String mode = gruesome ? "Gruesome" : "Brutal";
 
 		sendActionBarMessage("Alchemist's Potions swapped to " + mode + " mode");
-		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, brewPitch);
 		updateAlchemistItem();
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	public boolean isGruesomeMode() {
-		return mGruesomeMode;
+		return mPlayer.getScoreboardTags().contains(GRUESOME_MODE_TAG);
 	}
 
 	private boolean isGruesome(ThrownPotion potion) {
@@ -460,7 +454,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getDamage() {
-		return getDamage(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		return getDamage(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 	}
 
 	public double getDamage(ItemStatManager.PlayerItemStats playerItemStats) {
@@ -468,7 +462,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getRadius() {
-		return getRadius(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		return getRadius(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 	}
 
 	public double getRadius(ItemStatManager.PlayerItemStats playerItemStats) {
@@ -476,7 +470,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getSpeed() {
-		return getSpeed(mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		return getSpeed(mPlugin.mItemStatManager.getPlayerItemStats(mPlayer));
 	}
 
 	public double getSpeed(ItemStatManager.PlayerItemStats playerItemStats) {
@@ -493,10 +487,6 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		return mMaxCharges;
 	}
 
-	public double getPotionRadius() {
-		return mRadius;
-	}
-
 	private void updateAlchemistItem() {
 		// Display is handled virtually, just need to update the player's inventory to show changes
 		mPlayer.updateInventory();
@@ -504,7 +494,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	@Override
 	public @Nullable String getMode() {
-		return mGruesomeMode ? "gruesome" : null;
+		return isGruesomeMode() ? "gruesome" : null;
 	}
 
 	public boolean isAlchemistPotion(ThrownPotion potion) {

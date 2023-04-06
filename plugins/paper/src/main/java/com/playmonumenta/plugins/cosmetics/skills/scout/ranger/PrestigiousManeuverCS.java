@@ -29,16 +29,11 @@ public class PrestigiousManeuverCS extends TacticalManeuverCS implements Prestig
 	private static double START_EFFECT_RADIUS = 2.8;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Runes of light form an",
 			"afterimage from your speed."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.TACTICAL_MANEUVER;
 	}
 
 	@Override

@@ -182,7 +182,7 @@ public class GraspingClaws extends Ability {
 
 						Location l = loc.clone().add(vec);
 						if (mT % 4 == 0) {
-							new PartialParticle(Particle.FALLING_DUST, l, 1, 0.1, 0.2, 0.1, CHAIN_PARTICLE).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.FALLING_DUST, l, 1, 0.1, 0.2, 0.1, CHAIN_PARTICLE).minimumCount(0).spawnAsPlayerActive(mPlayer);
 						}
 						if (!mHitboxes) {
 							mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),

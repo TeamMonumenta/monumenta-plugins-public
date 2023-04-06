@@ -77,7 +77,7 @@ public class Starfall extends Ability {
 	public Starfall(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new StarfallCS(), StarfallCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new StarfallCS());
 	}
 
 	public void cast() {

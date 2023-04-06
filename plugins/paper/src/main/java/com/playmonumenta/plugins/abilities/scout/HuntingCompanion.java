@@ -130,7 +130,7 @@ public class HuntingCompanion extends Ability {
 		mSummons = new HashMap<>();
 		mRunnable = null;
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS(), HuntingCompanionCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS());
 	}
 
 	public void cast() {
@@ -419,7 +419,7 @@ public class HuntingCompanion extends Ability {
 		Location summonLoc = summon.getLocation();
 		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(summon.getLocation(), DETECTION_RANGE);
 
-		nearbyMobs.removeIf(DamageUtils::isImmuneToDamage);
+		nearbyMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageType.MELEE_SKILL));
 		nearbyMobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
 		mSummons.keySet().stream().map(Mob::getTarget).filter(Objects::nonNull).forEach(nearbyMobs::remove);
 

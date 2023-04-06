@@ -45,7 +45,7 @@ public class Cosmetic {
 		mAbility = ability;
 	}
 
-	public Cosmetic(CosmeticType type, String name, boolean isEquipped, @Nullable ClassAbility ability, String... description) {
+	public Cosmetic(CosmeticType type, String name, boolean isEquipped, @Nullable ClassAbility ability, String @Nullable ... description) {
 		this(type, name, isEquipped);
 		mAbility = ability;
 		mDescription = description;

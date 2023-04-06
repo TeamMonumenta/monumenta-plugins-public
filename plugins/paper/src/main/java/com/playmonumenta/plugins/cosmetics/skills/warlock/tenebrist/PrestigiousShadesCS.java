@@ -31,16 +31,11 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 	private static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 247, 207), 1.0f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Golden church bells haunt",
 			"the hero's requiem."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.HAUNTING_SHADES;
 	}
 
 	@Override

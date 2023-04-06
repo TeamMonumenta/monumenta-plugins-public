@@ -67,7 +67,7 @@ public class CoupDeGrace extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)
 			    && !EntityUtils.isBoss(enemy)
-			    && !DamageUtils.isImmuneToDamage(enemy)
+			    && !DamageUtils.isImmuneToDamage(enemy, DamageType.MELEE)
 			    && (event.getType() == DamageType.MELEE || event.getType() == DamageType.MELEE_SKILL || event.getType() == DamageType.MELEE_ENCH
 				        || event.getAbility() == ClassAbility.QUAKE || event.getAbility() == ClassAbility.SKIRMISHER)) {
 			// Cannot currently get the real final damage, as some effects like vulnerability will modify it later.

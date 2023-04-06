@@ -37,16 +37,11 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 	private double mDLongAngle;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Amber planes cleave",
 			"through your foes."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.COSMIC_MOONBLADE;
 	}
 
 	@Override

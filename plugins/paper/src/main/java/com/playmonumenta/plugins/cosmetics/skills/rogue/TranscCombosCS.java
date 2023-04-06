@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
@@ -36,15 +34,10 @@ public class TranscCombosCS extends ViciousCombosCS {
 	private static final double LINE_LENGTH = 2.25;
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"The transcendent one",
-			"will be bested by none.");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.VICIOUS_COMBOS;
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"The transcendent one",
+				"will be bested by none.");
 	}
 
 	@Override
@@ -206,7 +199,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.5f + (0.3f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustOptions(color, size)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(color, size)).minimumCount(0).spawnAsPlayerActive(mPlayer);
 			});
 
 		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 0.75f);
@@ -220,7 +213,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 				(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 					float size = (float) (0.5f + (0.3f * middleProgress));
 					new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-						new Particle.DustOptions(color, size)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						new Particle.DustOptions(color, size)).minimumCount(0).spawnAsPlayerActive(mPlayer);
 				});
 
 			ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, -35, 1, 0, 0, 75, 2.25f,
@@ -257,12 +250,12 @@ public class TranscCombosCS extends ViciousCombosCS {
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.3f + (0.35f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustOptions(TRANSC_LINE_COLOR, size)).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(TRANSC_LINE_COLOR, size)).minimumCount(0).spawnAsPlayerActive(mPlayer);
 				if (middle) {
 
 					ParticleUtils.drawParticleCircleExplosion(mPlayer, lineLoc.clone().setDirection(dir), 0, 1, 0, 90, 60, 1.75f,
 						true, 0, 0, Particle.CRIT_MAGIC);
-					new PartialParticle(Particle.END_ROD, lineLoc, 3, 0, 0, 0, 0.15f).minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.END_ROD, lineLoc, 3, 0, 0, 0, 0.15f).minimumCount(0).spawnAsPlayerActive(mPlayer);
 				}
 
 			});

@@ -61,7 +61,7 @@ public class CounterStrike extends Ability {
 		super(plugin, player, INFO);
 		mReflect = isLevelOne() ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
 
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CounterStrikeCS(), CounterStrikeCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CounterStrikeCS());
 	}
 
 	@Override

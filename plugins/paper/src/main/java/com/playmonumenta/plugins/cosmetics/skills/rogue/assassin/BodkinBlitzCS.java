@@ -18,28 +18,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class BodkinBlitzCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, BodkinBlitzCS> SKIN_LIST = ImmutableMap.<String, BodkinBlitzCS>builder()
-		.put(PrestigiousBlitzCS.NAME, new PrestigiousBlitzCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.BODKIN_BLITZ;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.BLAZE_POWDER;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void blitzStartSound(World world, Location loc) {

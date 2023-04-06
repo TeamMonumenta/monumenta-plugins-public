@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
-import com.google.common.collect.ImmutableList;
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
@@ -34,16 +32,11 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	private static final BlockData GOLD_DUST = Bukkit.createBlockData(Material.GOLD_BLOCK);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"Golden light escapes the",
-			"flask, soothing the weary."
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"Golden light escapes the",
+				"flask, soothing the weary."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.WARDING_REMEDY;
 	}
 
 	@Override
@@ -110,11 +103,9 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	}
 
 	@Override
-	public ImmutableList<PPPeriodic> remedyPeriodicEffect(Location loc) {
-		return new ImmutableList.Builder<PPPeriodic>()
-			.add(new PPPeriodic(Particle.END_ROD, loc).count(1).delta(0.35, 0.15, 0.35).extra(0.05))
-			.add(new PPPeriodic(Particle.REDSTONE, loc).count(1).delta(0.4, 0.2, 0.4).data(GOLD_COLOR2))
-			.build();
+	public void remedyPeriodicEffect(Location loc, Player mPlayer, int ticks) {
+		new PPPeriodic(Particle.END_ROD, loc).count(1).delta(0.35, 0.15, 0.35).extra(0.05).manualTimeOverride(ticks).spawnAsPlayerBuff(mPlayer);
+		new PPPeriodic(Particle.REDSTONE, loc).count(1).delta(0.4, 0.2, 0.4).data(GOLD_COLOR2).manualTimeOverride(ticks).spawnAsPlayerBuff(mPlayer);
 	}
 
 	@Override

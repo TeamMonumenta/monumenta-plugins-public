@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -13,32 +11,17 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class SoulRendCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, SoulRendCS> SKIN_LIST = ImmutableMap.<String, SoulRendCS>builder()
-		.put(VampiricDrainCS.NAME, new VampiricDrainCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.SOUL_REND;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.POTION;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void rendHitSound(World world, Location loc) {

@@ -86,7 +86,7 @@ public class SpellSurroundingDeath extends Spell {
 
 						for (int x = innerRadius; x < outerRadius; x++) {
 							new PartialParticle(Particle.SPELL_WITCH, mStartLoc.clone().add(cos * x, 0, sin * x), 1, 0.1, 0.1, 0.1, 0)
-								.minimumMultiplier(false).spawnAsEntityActive(mBoss);
+								.minimumCount(0).spawnAsEntityActive(mBoss);
 						}
 					}
 				}
@@ -113,15 +113,15 @@ public class SpellSurroundingDeath extends Spell {
 						for (int x = innerRadius; x < outerRadius; x += inc) {
 							Location loc = mStartLoc.clone().add(cos * x, 0, sin * x);
 
-							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+							new PartialParticle(Particle.SMOKE_NORMAL, loc, 1, 0.15, 0.15, 0.15, 0).minimumCount(0).spawnAsEntityActive(mBoss);
 							if (deg % 4 == 0) {
-								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.SHROOMLIGHT.createBlockData()).minimumCount(0).spawnAsEntityActive(mBoss);
 							} else {
-								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.15, 0.1, 0.15, 0.75, Material.CRIMSON_HYPHAE.createBlockData()).minimumCount(0).spawnAsEntityActive(mBoss);
 							}
 
 							if (deg % 30 == 0) {
-								new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.LAVA, loc, 1, 0.15, 0.1, 0.15, 0.25).minimumCount(0).spawnAsEntityActive(mBoss);
 							}
 
 						}

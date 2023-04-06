@@ -17,28 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class SanctifiedArmorCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, SanctifiedArmorCS> SKIN_LIST = ImmutableMap.<String, SanctifiedArmorCS>builder()
-		.put(BloodyRetaliationCS.NAME, new BloodyRetaliationCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.SANCTIFIED_ARMOR;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.IRON_CHESTPLATE;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void sanctOnTrigger1(World world, Player mPlayer, Location loc, LivingEntity source) {

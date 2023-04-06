@@ -232,6 +232,7 @@ public class Plugin extends JavaPlugin {
 		NameMCVerify.register(this);
 		TellMiniMessage.register();
 		RunWithPlaceholdersCommand.register();
+		ParticlesCommand.register();
 		PartialParticleCommand.register();
 		CustomEffect.register();
 		EffectFromPotionCommand.register(this);

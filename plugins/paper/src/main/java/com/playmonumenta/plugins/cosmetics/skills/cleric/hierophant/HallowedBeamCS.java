@@ -18,28 +18,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class HallowedBeamCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, HallowedBeamCS> SKIN_LIST = ImmutableMap.<String, HallowedBeamCS>builder()
-		.put(PrestigiousBeamCS.NAME, new PrestigiousBeamCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.HALLOWED_BEAM;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.BOW;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void beamHealEffect(World world, Player mPlayer, LivingEntity pe, Vector dir, double range) {

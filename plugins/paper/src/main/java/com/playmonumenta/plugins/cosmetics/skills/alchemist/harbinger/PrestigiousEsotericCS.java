@@ -32,16 +32,11 @@ public class PrestigiousEsotericCS extends EsotericEnhancementsCS implements Pre
 	};
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"The perfect permutation",
 			"forms a divine geometry."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.ESOTERIC_ENHANCEMENTS;
 	}
 
 	@Override

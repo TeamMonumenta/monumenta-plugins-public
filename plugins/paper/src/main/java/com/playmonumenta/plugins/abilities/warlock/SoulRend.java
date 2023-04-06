@@ -65,7 +65,7 @@ public class SoulRend extends Ability {
 	public SoulRend(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mHeal = CharmManager.calculateFlatAndPercentValue(player, CHARM_HEAL, isLevelOne() ? HEAL_1 : HEAL_2);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SoulRendCS(), SoulRendCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SoulRendCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mDarkPact = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DarkPact.class);

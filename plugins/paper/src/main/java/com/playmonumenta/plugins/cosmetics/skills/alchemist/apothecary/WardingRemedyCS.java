@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
@@ -20,31 +19,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class WardingRemedyCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, WardingRemedyCS> SKIN_LIST = ImmutableMap.<String, WardingRemedyCS>builder()
-		.put(PrestigiousRemedyCS.NAME, new PrestigiousRemedyCS())
-		.build();
-
 	private static final Color APOTHECARY_LIGHT_COLOR = Color.fromRGB(255, 255, 100);
 	private static final Particle.DustOptions APOTHECARY_DARK_COLOR = new Particle.DustOptions(Color.fromRGB(83, 0, 135), 1.5f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.WARDING_REMEDY;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.GOLDEN_CARROT;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void remedyStartEffect(World world, Location loc, Player mPlayer, double radius) {
@@ -60,10 +45,8 @@ public class WardingRemedyCS implements CosmeticSkill {
 		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 0.15, 0), 100, 2.8, 0, 2.8, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
 	}
 
-	public ImmutableList<PPPeriodic> remedyPeriodicEffect(Location loc) {
-		return new ImmutableList.Builder<PPPeriodic>()
-			.add(new PPPeriodic(Particle.END_ROD, loc).count(1).delta(0.35, 0.15, 0.35).extra(0.05))
-			.build();
+	public void remedyPeriodicEffect(Location loc, Player mPlayer, int ticks) {
+		new PPPeriodic(Particle.END_ROD, loc).count(1).delta(0.35, 0.15, 0.35).extra(0.05).manualTimeOverride(ticks).spawnAsPlayerBuff(mPlayer);
 	}
 
 	public void remedyPulseEffect(World world, Location playerLoc, Player mPlayer, int pulse, int maxPulse, double radius) {

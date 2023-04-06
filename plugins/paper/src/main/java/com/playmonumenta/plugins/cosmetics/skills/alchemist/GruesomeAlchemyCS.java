@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -15,23 +13,14 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 
 public class GruesomeAlchemyCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, GruesomeAlchemyCS> SKIN_LIST = ImmutableMap.<String, GruesomeAlchemyCS>builder()
-		.put(GruesomeEchoesCS.NAME, new GruesomeEchoesCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.GRUESOME_ALCHEMY;
 	}
 
@@ -40,12 +29,8 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
-	@Override
-	public @Nullable String getName() {
-		return null;
-	}
-
 	public void effectsOnSwap(Player mPlayer, boolean isGruesomeBeforeSwap) {
+		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, 1.0f);
 		if (isGruesomeBeforeSwap) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 1.25f);
 		} else {
@@ -53,7 +38,7 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 		}
 	}
 
-	public void particlesOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius) {
+	public void effectsOnSplash(Player mPlayer, Location loc, boolean isGruesome, double radius, boolean isSpecialPot) {
 		// Select color of the particle, based off of mojank
 		// (to color the SPELL_MOB particle, you have to use the delta values)
 		double deltaX = isGruesome ? 1 : 0;
@@ -67,10 +52,6 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 		);
 	}
 
-	public float getSwapBrewPitch() {
-		return 1.0f;
-	}
-
 	public Color splashColor(boolean isGruesome) {
 		if (isGruesome) {
 			return Color.RED;
@@ -78,4 +59,9 @@ public class GruesomeAlchemyCS implements CosmeticSkill {
 			return Color.fromRGB(0x00FF00);
 		}
 	}
+
+	public void damageOverTimeEffects(LivingEntity target) {
+		new PartialParticle(Particle.SQUID_INK, target.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+	}
+
 }

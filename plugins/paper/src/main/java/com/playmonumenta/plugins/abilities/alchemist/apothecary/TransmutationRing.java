@@ -1,36 +1,30 @@
 package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
-import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.TransmRingCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.TransmutationRingCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.Collection;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
-public class TransmutationRing extends PotionAbility {
+public class TransmutationRing extends Ability implements PotionAbility {
 	private static final int TRANSMUTATION_RING_1_COOLDOWN = 25 * 20;
 	private static final int TRANSMUTATION_RING_2_COOLDOWN = 20 * 20;
 	private static final int TRANSMUTATION_RING_RADIUS = 5;
@@ -81,80 +75,72 @@ public class TransmutationRing extends PotionAbility {
 	private final double mRadius;
 
 	private @Nullable Location mCenter;
-	private @Nullable AlchemistPotions mAlchemistPotions;
 	private int mKills = 0;
 
-	private final TransmRingCS mCosmetic;
+	private final TransmutationRingCS mCosmetic;
+
+	private @Nullable BukkitTask mActiveTask;
 
 	public TransmutationRing(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TRANSMUTATION_RING_RADIUS);
 
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-			mAlchemistPotions = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
-		});
-
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TransmRingCS(), TransmRingCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TransmutationRingCS());
 	}
 
 	@Override
-	public boolean playerThrewSplashPotionEvent(ThrownPotion potion) {
-		if (!isOnCooldown()
-			    && mPlayer.isSneaking()
-			    && ItemUtils.isAlchemistItem(mPlayer.getInventory().getItemInMainHand())
-			    && mAlchemistPotions != null
-			    && mAlchemistPotions.isAlchemistPotion(potion)) {
+	public void alchemistPotionThrown(ThrownPotion potion) {
+		if (!isOnCooldown() && mPlayer.isSneaking() && (mActiveTask == null || mActiveTask.isCancelled())) {
 			putOnCooldown();
 			potion.setMetadata(TRANSMUTATION_POTION_METAKEY, new FixedMetadataValue(mPlugin, null));
 		}
-		return true;
 	}
 
 	@Override
-	public boolean playerSplashPotionEvent(Collection<LivingEntity> affectedEntities, ThrownPotion potion, PotionSplashEvent event) {
-		if (potion.hasMetadata(TRANSMUTATION_POTION_METAKEY)) {
-			mCenter = potion.getLocation();
-			World world = mPlayer.getWorld();
-
-			mCosmetic.ringSoundStart(world, mCenter);
-
-			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
-			double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
-			double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
-			int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
-
-			PPCircle particles = mCosmetic.ringPPCircle(mCenter, mRadius);
-
-			new BukkitRunnable() {
-				int mTicks = 0;
-				int mMaxTicks = duration;
-
-				@Override
-				public void run() {
-					if (isLevelTwo()) {
-						mMaxTicks = duration + Math.min(mKills * DURATION_INCREASE, MAX_DURATION_INCREASE);
-					}
-
-					if (mTicks >= mMaxTicks || mCenter == null) {
-						mCenter = null;
-						mKills = 0;
-						this.cancel();
-						return;
-					}
-
-					double damageBoost = amplifier + Math.min(mKills, maxKills) * perKillAmplifier;
-					List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
-					players.remove(mPlayer);
-					for (Player player : players) {
-						mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
-					}
-
-					mCosmetic.ringEffect(mPlayer, mCenter, particles, mRadius, TRANSMUTATION_RING_RADIUS, mTicks);
-
-					mTicks += 5;
-				}
-			}.runTaskTimer(mPlugin, 0, 5);
+	public boolean createAura(Location loc, ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
+		if (!potion.hasMetadata(TRANSMUTATION_POTION_METAKEY)) {
+			return false;
 		}
+
+		mCenter = loc;
+		mCenter.setDirection(mCenter.toVector().subtract(mPlayer.getLocation().toVector()));
+
+		mCosmetic.startEffect(mPlayer, mCenter, mRadius);
+
+		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
+		double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
+		double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
+		int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
+
+		mActiveTask = new BukkitRunnable() {
+			int mTicks = 0;
+			int mMaxTicks = duration;
+
+			@Override
+			public void run() {
+				if (isLevelTwo()) {
+					mMaxTicks = duration + Math.min(mKills * DURATION_INCREASE, MAX_DURATION_INCREASE);
+				}
+
+				if (mTicks >= mMaxTicks || mCenter == null) {
+					mCenter = null;
+					mKills = 0;
+					this.cancel();
+					return;
+				}
+
+				double damageBoost = amplifier + Math.min(mKills, maxKills) * perKillAmplifier;
+				List<Player> players = PlayerUtils.playersInRange(mCenter, mRadius, true);
+				players.remove(mPlayer);
+				for (Player player : players) {
+					mPlugin.mEffectManager.addEffect(player, TRANSMUTATION_RING_DAMAGE_EFFECT_NAME, new PercentDamageDealt(20, damageBoost).displaysTime(false));
+				}
+
+				mCosmetic.periodicEffect(mPlayer, mCenter, mRadius, mTicks, mMaxTicks, duration + MAX_DURATION_INCREASE);
+
+				mTicks += 5;
+			}
+		}.runTaskTimer(mPlugin, 0, 5);
 
 		return true;
 	}
@@ -172,7 +158,7 @@ public class TransmutationRing extends PotionAbility {
 	@Override
 	public void entityDeathRadiusEvent(EntityDeathEvent event, boolean shouldGenDrops) {
 		mKills++;
-		mCosmetic.ringEffectOnKill(mPlayer, event.getEntity().getLocation());
+		mCosmetic.effectOnKill(mPlayer, event.getEntity().getLocation());
 	}
 
 }

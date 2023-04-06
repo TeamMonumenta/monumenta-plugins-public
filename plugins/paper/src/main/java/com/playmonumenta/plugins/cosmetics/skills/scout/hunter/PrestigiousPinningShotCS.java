@@ -29,16 +29,11 @@ public class PrestigiousPinningShotCS extends PinningShotCS implements PrestigeC
 	private static final Particle.DustOptions WARN_COLOR = new Particle.DustOptions(Color.fromRGB(240, 64, 0), 0.9f);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"A halo of light marks",
 			"those soon to depart."
 		);
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.PINNING_SHOT;
 	}
 
 	@Override

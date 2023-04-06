@@ -139,7 +139,7 @@ public class SpellSlashAttack extends Spell {
 					}
 					Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
 					new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
-							.data(data).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+						.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
 					Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
 					List<Player> targets = hitbox.getHitPlayers(true);
 					for (Player target : targets) {
@@ -158,7 +158,7 @@ public class SpellSlashAttack extends Spell {
 						}
 						Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
 						new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
-								.data(data).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+							.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
 						Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
 						List<Player> targets = hitbox.getHitPlayers(true);
 						for (Player target : targets) {
@@ -198,16 +198,16 @@ public class SpellSlashAttack extends Spell {
 		ParticleUtils.drawHalfArc(startLoc, mRadius, selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
 				(Location l, int ring) -> {
 					new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
-							.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
-							.minimumMultiplier(false).spawnAsEntityActive(mBoss);
+						.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
+						.minimumCount(0).spawnAsEntityActive(mBoss);
 				}
 		);
 		if (mXSlash) {
 			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
 					(Location l, int ring) -> {
 						new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
-								.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
-								.minimumMultiplier(false).spawnAsEntityActive(mBoss);
+							.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
+							.minimumCount(0).spawnAsEntityActive(mBoss);
 					}
 			);
 		}

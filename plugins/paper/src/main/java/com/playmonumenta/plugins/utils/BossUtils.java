@@ -83,7 +83,7 @@ public class BossUtils {
 
 	//Returns whether the attack was blocked or otherwise completely negated (true = not blocked)
 	public static boolean blockableDamage(@Nullable LivingEntity damager, LivingEntity damagee, DamageType type, double damage, boolean bypassIFrames, boolean causeKnockback, @Nullable String cause, @Nullable Location location, int stunTicks, int durability) {
-		if (DamageUtils.isImmuneToDamage(damagee)) {
+		if (DamageUtils.isImmuneToDamage(damagee, type)) {
 			return false;
 		}
 
@@ -131,7 +131,7 @@ public class BossUtils {
 			return true;
 		}
 
-		if (DamageUtils.isImmuneToDamage(target)) {
+		if (DamageUtils.isImmuneToDamage(target, null)) {
 			return true;
 		}
 

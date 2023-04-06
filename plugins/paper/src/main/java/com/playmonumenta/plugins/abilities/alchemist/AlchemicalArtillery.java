@@ -1,33 +1,30 @@
 package com.playmonumenta.plugins.abilities.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.AlchemicalArtilleryCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.AbstractMap;
 import java.util.List;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -39,7 +36,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class AlchemicalArtillery extends PotionAbility {
+public class AlchemicalArtillery extends Ability {
 	private static final int COOLDOWN = 20 * 6;
 
 	private static final double ARTILLERY_1_DAMAGE_MULTIPLIER = 1.5;
@@ -80,10 +77,15 @@ public class AlchemicalArtillery extends PotionAbility {
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
+	private final AlchemicalArtilleryCS mCosmetic;
+
 	public AlchemicalArtillery(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AlchemicalArtilleryCS());
+
 		Bukkit.getScheduler().runTask(plugin, () ->
-			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
+			                                      mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	public void cast() {
@@ -164,10 +166,7 @@ public class AlchemicalArtillery extends PotionAbility {
 						return;
 					}
 
-					Location particleLoc = mGrenade.getLocation().add(0, 1, 0);
-					new PartialParticle(Particle.END_ROD, particleLoc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_LARGE, particleLoc, 2, 0, 0, 0, 0.05).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.FLAME, particleLoc, 3, 0, 0, 0, 0.05).spawnAsPlayerActive(mPlayer);
+					mCosmetic.periodicEffects(mPlayer, mGrenade);
 
 					mTicks++;
 				}
@@ -189,7 +188,7 @@ public class AlchemicalArtillery extends PotionAbility {
 		double potionRadius = mAlchemistPotions.getRadius(playerItemStats);
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, potionRadius * ARTILLERY_RANGE_MULTIPLIER);
-		explosionEffect(loc, radius);
+		mCosmetic.explosionEffect(mPlayer, loc, radius);
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
 		List<LivingEntity> mobs = hitbox.getHitMobs();
 
@@ -203,25 +202,6 @@ public class AlchemicalArtillery extends PotionAbility {
 				MovementUtils.knockAwayRealistic(loc, mob, 1f, 0.5f, true);
 			}
 		}
-	}
-
-	private void explosionEffect(Location loc, double radius) {
-		ParticleUtils.explodingRingEffect(mPlugin, loc, radius, 1, 10,
-			List.of(
-				new AbstractMap.SimpleEntry<Double, ParticleUtils.SpawnParticleAction>(0.5, (Location location) ->
-					new PartialParticle(Particle.FLAME, location, 1, 0, 0, 0, 0.0025).spawnAsPlayerActive(mPlayer))
-			)
-		);
-		ParticleUtils.drawRing(loc, 45, new Vector(0, 1, 0), radius,
-			(loc1, t) -> new PartialParticle(Particle.REDSTONE, loc1, 1, 0, 0, 0, 0.0025, new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f)).spawnAsPlayerActive(mPlayer)
-		);
-		new PartialParticle(Particle.FLAME, loc, 100, radius/2, 0, radius/2, 0.2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
-
-		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 1.25f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1.5f, 2f);
 	}
 
 	private void applyEffects(LivingEntity entity, ItemStatManager.PlayerItemStats playerItemStats) {

@@ -2,12 +2,11 @@ package com.playmonumenta.plugins.cosmetics.skills.warrior;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,16 +28,11 @@ public class BrambleShellCS extends CounterStrikeCS implements DepthsCS {
 	private static final Color EARTH_COLOR = Color.fromRGB(51, 102, 0);
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
-			"Earthen thorns envelop your body,",
-			"ready to thrash out at anything that",
-			"threatens them.");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.COUNTER_STRIKE;
+	public @Nullable List<String> getDescription() {
+		return List.of(
+				"Earthen thorns envelop your body,",
+				"ready to thrash out at anything that",
+				"threatens them.");
 	}
 
 	@Override
@@ -105,7 +99,7 @@ public class BrambleShellCS extends CounterStrikeCS implements DepthsCS {
 						new Particle.DustOptions(
 							EARTH_COLOR, 1.125f * (1F - (0.75f * progress))
 						))
-						.minimumMultiplier(false)
+						.minimumCount(0)
 						.spawnAsPlayerActive(mPlayer);
 				}
 

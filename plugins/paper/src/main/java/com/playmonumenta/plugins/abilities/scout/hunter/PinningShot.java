@@ -54,7 +54,7 @@ public class PinningShot extends Ability {
 		super(plugin, player, INFO);
 		mDamageMultiplier = (isLevelOne() ? PINNING_SHOT_1_DAMAGE_MULTIPLIER : PINNING_SHOT_2_DAMAGE_MULTIPLIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mWeaken = (isLevelOne() ? PINNING_WEAKEN_1 : PINNING_WEAKEN_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
-		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PinningShotCS(), PinningShotCS.SKIN_LIST);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PinningShotCS());
 	}
 
 	@Override

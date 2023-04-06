@@ -699,7 +699,7 @@ public class AbilityManager {
 	}
 
 	public boolean playerConsumeArrowEvent(Player player) {
-		return conditionalCastCancellable(player, (ability) -> ability.playerConsumeArrowEvent());
+		return conditionalCastCancellable(player, Ability::playerConsumeArrowEvent);
 	}
 
 	public boolean playerThrewSplashPotionEvent(Player player, ThrownPotion potion) {
@@ -886,7 +886,8 @@ public class AbilityManager {
 
 			// When blocking with an offhand shield, the client first sends a mainhand click, then an offhand click,
 			// thus we have to ignore the usual click limiter here.
-			if (player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
+			if (event.getHand() != null
+				    && player.getInventory().getItem(event.getHand()).getType() == Material.SHIELD
 				    && player.getCooldown(Material.SHIELD) == 0
 				    && MetadataUtils.checkOnceThisTick(mPlugin, player, "BlockTrigger")) {
 				conditionalCast(player, Ability::blockWithShieldEvent);
@@ -955,6 +956,7 @@ public class AbilityManager {
 		for (Ability ability : playerAbilities.getAbilitiesInTriggerOrder()) {
 			for (AbilityTriggerInfo<?> triggerInfo : ability.mCustomTriggers) {
 				if (triggerInfo.check(player, key)) {
+					// the cast here is fine, as we're calling the action with the ability we got the action from
 					((Consumer<Ability>) triggerInfo.getAction()).accept(ability);
 					if (!(ability instanceof EagleEye)) { // hardcoded exception for eagle eye to keep triggering other abilities
 						return true;

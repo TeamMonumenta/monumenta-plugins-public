@@ -2,13 +2,12 @@ package com.playmonumenta.plugins.cosmetics.skills.mage;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,15 +27,10 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 	public static final String NAME = "Volcanic Burst";
 
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return new Cosmetic(CosmeticType.COSMETIC_SKILL, NAME, false, this.getAbilityName(),
+	public @Nullable List<String> getDescription() {
+		return List.of(
 			"Unleash forth volcanic havoc,",
 			"an unstoppable blast from the heavens.");
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
-		return ClassAbility.MAGMA_SHIELD;
 	}
 
 	@Override
@@ -96,12 +90,12 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 					for (int i = 0; i < mHeight; i++) {
 						Location hLoc = l.clone().add(0, i * 0.85, 0);
 						new PartialParticle(flame, hLoc, 5, 0.15, 0.15, 0.15, 0.1)
-							.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+							.minimumCount(0).spawnAsPlayerActive(mPlayer);
 					}
 					new PartialParticle(Particle.LAVA, l, 3, 0.2, 0.05, 0.2, 0.075)
-						.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						.minimumCount(0).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.SMOKE_NORMAL, l, 25, 0.1, 0.05, 0.1, 0.1)
-						.minimumMultiplier(false).spawnAsPlayerActive(mPlayer);
+						.minimumCount(0).spawnAsPlayerActive(mPlayer);
 
 					ParticleUtils.drawParticleCircleExplosion(mPlayer, l, 0, 1, 0, 0, 30, 0.25f,
 						true, 0, 0, flame);

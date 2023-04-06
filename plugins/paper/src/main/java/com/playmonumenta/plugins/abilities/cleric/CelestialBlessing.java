@@ -120,9 +120,9 @@ public class CelestialBlessing extends Ability {
 				(entity, fourHertz, twoHertz, oneHertz) -> {
 					// Tick effect
 					Location loc = p.getLocation().add(0, 1, 0);
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumMultiplier(false).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).minimumMultiplier(false).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1).minimumMultiplier(false).spawnAsPlayerBuff(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsPlayerBuff(mPlayer);
+					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).minimumCount(0).spawnAsPlayerBuff(mPlayer);
+					new PartialParticle(Particle.VILLAGER_HAPPY, loc, 2, 0.5, 0.5, 0.5, 0.1).minimumCount(0).spawnAsPlayerBuff(mPlayer);
 				},
 				(entity) -> {
 					// Lose effect

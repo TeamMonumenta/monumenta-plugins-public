@@ -17,28 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class PinningShotCS implements CosmeticSkill {
 
-	public static final ImmutableMap<String, PinningShotCS> SKIN_LIST = ImmutableMap.<String, PinningShotCS>builder()
-		.put(PrestigiousPinningShotCS.NAME, new PrestigiousPinningShotCS())
-		.build();
-
 	@Override
-	public @Nullable Cosmetic getCosmetic() {
-		return null;
-	}
-
-	@Override
-	public ClassAbility getAbilityName() {
+	public ClassAbility getAbility() {
 		return ClassAbility.PINNING_SHOT;
 	}
 
 	@Override
 	public Material getDisplayItem() {
 		return Material.CROSSBOW;
-	}
-
-	@Override
-	public @Nullable String getName() {
-		return null;
 	}
 
 	public void pinEffect1(World world, Player mPlayer, LivingEntity enemy) {

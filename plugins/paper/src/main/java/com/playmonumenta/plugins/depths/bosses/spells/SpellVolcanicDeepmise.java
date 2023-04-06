@@ -96,7 +96,7 @@ public class SpellVolcanicDeepmise extends Spell {
 				Location particle = mLoc.clone().add(0, mY, 0);
 				new PartialParticle(Particle.FLAME, particle, 3, 0.2f, 0.2f, 0.2f, 0.05, null, true).spawnAsEntityActive(mBoss);
 				if (FastUtils.RANDOM.nextBoolean()) {
-					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true).minimumMultiplier(false).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_LARGE, particle, 1, 0, 0, 0, 0, null, true).minimumCount(0).spawnAsEntityActive(mBoss);
 				}
 				mWorld.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
