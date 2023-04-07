@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.Collection;
@@ -142,17 +143,25 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			mAestheticsBoss.launch(mBoss, bossLocation);
 			for (LivingEntity target : targets) {
 				new BukkitRunnable() {
-					int mLobsLaunched = 0;
+					int mT = 0;
 
 					@Override
 					public void run() {
-						launchGrenade(bossLocation, target);
-						mLobsLaunched++;
-						if (mLobsLaunched >= mLobs) {
-							cancel();
+						if (EntityUtils.shouldCancelSpells(mBoss)) {
+							this.cancel();
+							return;
 						}
+
+						if (mT % mLobsDelay == 0) {
+							launchGrenade(bossLocation, target);
+							if (mT >= mLobs * mLobsDelay) {
+								this.cancel();
+							}
+						}
+
+						mT++;
 					}
-				}.runTaskTimer(mPlugin, 0, mLobsDelay);
+				}.runTaskTimer(mPlugin, 0, 1);
 			}
 		}
 	}
