@@ -66,10 +66,6 @@ public class SpellSwitcheroo extends Spell {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (target.getLocation().distance(mLauncher.getLocation()) > MAX_RANGE) {
-					return;
-				}
-
 				// set targetLoc to target and slightly elevate it
 				Location targetLoc = target.getLocation();
 				targetLoc.setY(target.getLocation().getY() + 0.1f);
@@ -77,6 +73,10 @@ public class SpellSwitcheroo extends Spell {
 				Location mobLoc = mLauncher.getLocation();
 				mobLoc.setY(mLauncher.getLocation().getY() + 0.1f);
 				World world = mLauncher.getWorld();
+
+				if (targetLoc.getWorld() != world || targetLoc.distance(mobLoc) > MAX_RANGE) {
+					return;
+				}
 
 				new PartialParticle(Particle.SPELL_WITCH, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
 				new PartialParticle(Particle.SMOKE_LARGE, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);

@@ -81,6 +81,11 @@ public class SpellShuraAS extends Spell {
 						mTrigger = false;
 						//tp behind
 						Location loc = mTarget.getLocation();
+						if (mBoss.getWorld() != loc.getWorld()) {
+							mTarget = null;
+							this.cancel();
+							return;
+						}
 						loc.setY(loc.getY() + 0.1f);
 						Vector shift = loc.getDirection();
 						shift.setY(0).normalize().multiply(-3);

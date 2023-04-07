@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -69,10 +70,6 @@ public class SpellTpSwapPlaces extends Spell {
 	}
 
 	private void launch(Player target) {
-		if (target.getLocation().distance(mLauncher.getLocation()) > mTeleportRange) {
-			return;
-		}
-
 		// set targetLoc to target and slightly elevate it
 		Location targetLoc = target.getLocation();
 		targetLoc.setY(target.getLocation().getY() + 0.1f);
@@ -83,13 +80,19 @@ public class SpellTpSwapPlaces extends Spell {
 		mobLoc.setYaw(target.getLocation().getYaw());
 		mobLoc.setPitch(target.getLocation().getPitch());
 
+		World world = mLauncher.getWorld();
+
+		if (targetLoc.getWorld() != world || targetLoc.distance(mobLoc) > mTeleportRange) {
+			return;
+		}
+
 		new PartialParticle(Particle.SPELL_WITCH, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
 		new PartialParticle(Particle.SMOKE_LARGE, mLauncher.getLocation().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
 		EntityUtils.teleportStack(mLauncher, targetLoc);
 		target.teleport(mobLoc);
 		new PartialParticle(Particle.SPELL_WITCH, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 30, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mLauncher);
 		new PartialParticle(Particle.SMOKE_LARGE, targetLoc.clone().add(0, mLauncher.getHeight() / 2, 0), 12, 0, 0.45, 0, 0.125).spawnAsEntityActive(mLauncher);
-		mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
+		world.playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 	}
 
 	private void animation(Player target) {
