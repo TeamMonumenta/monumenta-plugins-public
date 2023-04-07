@@ -154,7 +154,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 		return false;
 	}
 
-	// This is used by the Heavenly Boon enhancement to determine if the effect should be stored and transferred
+	// This is used by the Death System (Phylactery) to determine if the effect should be restored upon respawning
 	// Default to false, only make true for relatively simple effects
 	public boolean isBuff() {
 		return false;

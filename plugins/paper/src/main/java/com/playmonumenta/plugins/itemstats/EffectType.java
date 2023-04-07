@@ -213,6 +213,24 @@ public enum EffectType {
 		return mIsVanilla;
 	}
 
+	public static Boolean isEffectTypeAppliedEffect(@Nullable String source) {
+		// Inputs a source, and looks up through all the EffectTypes to check if their source starts with mName.
+		// Since Source is registered as:
+		// mName + <Source> or
+		// mName (if not source),
+		// We can determine if a source comes from a EffectType.applyEffect if the source starts with mName.
+		if (source == null) {
+			return false;
+		}
+
+		for (EffectType type : values()) {
+			if (source.startsWith(type.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static @Nullable EffectType fromType(String type) {
 		for (EffectType effectType : values()) {
 			if (effectType.mType.equals(type)) {

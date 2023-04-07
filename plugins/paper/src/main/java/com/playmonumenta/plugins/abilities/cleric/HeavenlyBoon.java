@@ -8,7 +8,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker;
 import com.playmonumenta.plugins.abilities.KillTriggeredAbilityTracker.KillTriggeredAbility;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.HeavenlyBoonTracker;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -26,13 +28,15 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 public final class HeavenlyBoon extends Ability implements KillTriggeredAbility {
+
+	private static final String BOON_EFFECT_NAME = "ClericHeavenlyBoonTracker";
+	private static final int MOB_EFFECT_DURATION = 30;
 
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.1;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
@@ -41,6 +45,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
+
+	private static final int GENERATE_POTION_COOLDOWN_TICKS = 20;
 
 	private static final int BOSS_DAMAGE_THRESHOLD_R1 = 100;
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 200;
@@ -55,7 +61,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.scoreboardId("HeavenlyBoon")
 			.shorthandName("HB")
 			.descriptions(
-				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever you kill an undead mob or deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.",
+				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever an undead mob you have hit within 1.5s dies or you deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.",
 				"The chance to be splashed upon killing an Undead increases to 20%, the effect potions now give Instant Health 2 and the durations of each are increased to 50 seconds.",
 				String.format(
 					"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
@@ -88,6 +94,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private final double mChance;
 	private final int mDurationChange;
 	private final double mRadius;
+	private int mLastSuccessfulProcTick = 0;
 
 	private @Nullable Crusade mCrusade;
 
@@ -152,20 +159,22 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		mTracker.updateDamageDealtToBosses(event);
-		return false;
-	}
 
-	@Override
-	public void entityDeathEvent(EntityDeathEvent event, boolean shouldGenDrops) {
-		if (shouldGenDrops) {
-			triggerOnKill(event.getEntity());
+		if (enemy.isValid()) {
+			// Construct custom source for each player.
+			String source = BOON_EFFECT_NAME + mPlayer.getName();
+			mPlugin.mEffectManager.addEffect(enemy, source, new HeavenlyBoonTracker(MOB_EFFECT_DURATION, mPlayer.getUniqueId()));
 		}
+		return false;
 	}
 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		if (Crusade.enemyTriggersAbilities(mob, mCrusade)
-			    && FastUtils.RANDOM.nextDouble() < mChance) {
+			&& FastUtils.RANDOM.nextDouble() < mChance
+			&& Bukkit.getCurrentTick() > mLastSuccessfulProcTick + GENERATE_POTION_COOLDOWN_TICKS) {
+			mLastSuccessfulProcTick = Bukkit.getCurrentTick();
+
 			ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));
 			ItemStack potion = InventoryUtils.getItemFromLootTable(mPlayer, lootTable);
@@ -180,8 +189,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					mPlugin.mPotionManager.modifyPotionDuration(p,
 						potionInfo -> {
 							if (potionInfo.mDuration > ENHANCEMENT_POTION_EFFECT_MAX_DURATION
-								    || potionInfo.mType == null
-								    || !PotionUtils.hasPositiveEffects(potionInfo.mType)) {
+								|| potionInfo.mType == null
+								|| !PotionUtils.hasPositiveEffects(potionInfo.mType)) {
 								return potionInfo.mDuration;
 							}
 							return Math.min(potionInfo.mDuration + Math.min((int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
@@ -189,7 +198,9 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					List<Effect> effects = mPlugin.mEffectManager.getEffects(p);
 					if (effects != null) {
 						for (Effect e : effects) {
-							if (e.isBuff() && e.getDuration() < ENHANCEMENT_POTION_EFFECT_MAX_DURATION) {
+							if (e.isBuff()
+								&& e.getDuration() < ENHANCEMENT_POTION_EFFECT_MAX_DURATION
+								&& EffectType.isEffectTypeAppliedEffect(mPlugin.mEffectManager.getSource(mPlayer, e))) {
 								e.setDuration(Math.min(e.getDuration() + Math.min((int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
 							}
 						}
