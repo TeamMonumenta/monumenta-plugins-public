@@ -43,8 +43,13 @@ public class Trivium implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.MAGIC && event.getAbility() != null) {
-			mDamageInTick.computeIfAbsent(player, key -> new HashMap<>()).computeIfAbsent(event.getAbility(), key -> new ArrayList<>()).add(event);
+		ClassAbility ca = event.getAbility();
+		if (ca != null && event.getType() == DamageEvent.DamageType.MAGIC) {
+			// Exception for Arcane Strike which can deal 2 different class abilities at once
+			if (ca == ClassAbility.ARCANE_STRIKE_ENHANCED) {
+				ca = ClassAbility.ARCANE_STRIKE;
+			}
+			mDamageInTick.computeIfAbsent(player, key -> new HashMap<>()).computeIfAbsent(ca, key -> new ArrayList<>()).add(event);
 
 			if (mRunDamageTask == null || !Bukkit.getScheduler().isQueued(mRunDamageTask.getTaskId())) {
 				mRunDamageTask = Bukkit.getScheduler().runTask(plugin, () -> {
