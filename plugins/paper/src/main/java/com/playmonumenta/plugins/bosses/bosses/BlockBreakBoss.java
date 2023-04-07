@@ -13,6 +13,8 @@ public class BlockBreakBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		public boolean ADAPT_TO_BOUNDING_BOX = false;
+
+		public boolean ALLOW_FOOTLEVEL_BREAK = false;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -22,7 +24,7 @@ public class BlockBreakBoss extends BossAbilityGroup {
 	public BlockBreakBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		List<Spell> passiveSpells = List.of(new SpellBlockBreak(boss, p.ADAPT_TO_BOUNDING_BOX));
+		List<Spell> passiveSpells = List.of(new SpellBlockBreak(boss, p.ADAPT_TO_BOUNDING_BOX, p.ALLOW_FOOTLEVEL_BREAK));
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

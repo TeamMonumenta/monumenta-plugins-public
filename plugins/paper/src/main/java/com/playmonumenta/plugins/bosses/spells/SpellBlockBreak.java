@@ -44,6 +44,12 @@ public class SpellBlockBreak extends Spell {
 		mAdaptToBoundingBox = adaptboundingbox;
 	}
 
+	public SpellBlockBreak(Entity launcher, boolean adaptboundingbox, boolean footLevelBreak) {
+		this(launcher);
+		mAdaptToBoundingBox = adaptboundingbox;
+		mFootLevelBreak = footLevelBreak;
+	}
+
 	public SpellBlockBreak(Entity launcher) {
 		this(launcher, 1, 3, 1);
 	}
@@ -72,7 +78,8 @@ public class SpellBlockBreak extends Spell {
 			return;
 		}
 		/* Get a list of all blocks that impede the boss's movement */
-		List<Block> badBlockList = new ArrayList<>();
+		List<Block> breakBlockList = new ArrayList<>();
+		int badScore = 0;
 		Location testloc = new Location(loc.getWorld(), 0, 0, 0);
 		int xRad = (int) (mAdaptToBoundingBox ? Math.round(mLauncher.getBoundingBox().getWidthX()) : mXRad);
 		int yRad = (int) (mAdaptToBoundingBox ? Math.ceil(mLauncher.getBoundingBox().getHeight()) : mYRad);
@@ -102,30 +109,41 @@ public class SpellBlockBreak extends Spell {
 								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 							}
 						}
-					} else if ((y > 0 || (mFootLevelBreak && y >= 0))
-						           && !BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material)
-						           && (material.isSolid() || ItemUtils.CARPETS.contains(material) || ItemUtils.CANDLES.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD) || ItemUtils.FLOWER_POTS.contains(material))
-						           && (!(block.getState() instanceof Lootable)
-							               || (!((Lootable) block.getState()).hasLootTable()
-								                   && !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
-						badBlockList.add(block);
+					} else if (!BlockUtils.isMechanicalBlock(material) && !mNoBreak.contains(material)
+						&& (material.isSolid() || ItemUtils.CARPETS.contains(material) || ItemUtils.CANDLES.contains(material) || material.equals(Material.PLAYER_HEAD) || material.equals(Material.PLAYER_WALL_HEAD) || ItemUtils.FLOWER_POTS.contains(material))
+						&& (!(block.getState() instanceof Lootable)
+						|| (!((Lootable) block.getState()).hasLootTable()
+						&& !block.getLocation().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK)))) {
+						// Threshold for BadScore is 6 (A "fully bad block" is 2)
+						// Example:
+						// 3 Bad blocks Top level (3 * 2) = 6 (Break)
+						// 4 Foot Level blocks (4 * 1) + 1 Top level block (1 * 2) = 6 (Break)
+						// 3 Foot Level blocks (2 * 1) + 1 Top level block (1 * 2) = 5 (Don't Break)
+						if (y == 0 && !mFootLevelBreak) {
+							// Even if we don't break foot level blocks, count them towards the threshold as half a block.
+							badScore += 1;
+						} else {
+							// If we plan to break this block, add to list and count them towards the threshold as full block.
+							breakBlockList.add(block);
+							badScore += 2;
+						}
 					}
 				}
 			}
 		}
 
-		/* If more than two blocks, destroy all blocking blocks */
-		if (badBlockList.size() > 2) {
+		/* If more than two blocks surrounding mob, and some are breakable, destroy all breakable blocking blocks */
+		if (badScore >= 6 && breakBlockList.size() > 0) {
 			/* Call an event with these exploding blocks to give plugins a chance to modify it */
-			EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), badBlockList, 0f);
+			EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), breakBlockList, 0f);
 			Bukkit.getServer().getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				return;
 			}
 
-			if (badBlockList.size() > 0) {
+			if (breakBlockList.size() > 0) {
 				/* Remove any remaining blocks, which might have been modified by the event */
-				for (Block block : badBlockList) {
+				for (Block block : breakBlockList) {
 					if (BlockUtils.isValuableBlock(block.getType())) {
 						block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
 					} else {
