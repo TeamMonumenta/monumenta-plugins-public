@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
+import com.playmonumenta.plugins.mmquest.commands.MMQuest;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.network.HttpManager;
 import com.playmonumenta.plugins.overrides.ItemOverrides;
@@ -253,6 +254,7 @@ public class Plugin extends JavaPlugin {
 		DungeonAccessCommand.register();
 		SpawnerCountCommand.register();
 		PersistentDataCommand.register();
+		MMQuest.register(this);
 		LoadoutManagerCommand.register();
 
 		try {
