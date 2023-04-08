@@ -196,15 +196,15 @@ public class CharmManager {
 	// If it is a "debuff" (i.e. a greater number is worse), then ALSO list it in the next method
 	private void loadCharmEffects() {
 		mCharmEffectList = Arrays.asList(
-				// Custom Enchantments
-				Inferno.CHARM_DAMAGE,
-				ThunderAspect.CHARM_STUN_CHANCE,
-				IceAspect.CHARM_DURATION,
-				IceAspect.CHARM_SLOW,
-				Decay.CHARM_DAMAGE,
-				Decay.CHARM_DURATION,
-				Sapper.CHARM_HEAL,
-				HexEater.CHARM_DAMAGE,
+			// Custom Enchantments
+			Inferno.CHARM_DAMAGE,
+			ThunderAspect.CHARM_STUN_CHANCE,
+			IceAspect.CHARM_DURATION,
+			IceAspect.CHARM_SLOW,
+			Decay.CHARM_DAMAGE,
+			Decay.CHARM_DURATION,
+			Sapper.CHARM_HEAL,
+			HexEater.CHARM_DAMAGE,
 			LifeDrain.CHARM_HEAL,
 			Retrieval.CHARM_CHANCE,
 			Regicide.CHARM_DAMAGE,
@@ -316,6 +316,7 @@ public class CharmManager {
 			Starfall.CHARM_DAMAGE,
 			Starfall.CHARM_RANGE,
 			Starfall.CHARM_FIRE,
+			Starfall.CHARM_RADIUS,
 			ElementalSpiritFire.CHARM_COOLDOWN,
 			ElementalSpiritFire.CHARM_DAMAGE,
 			ElementalSpiritFire.CHARM_SIZE,

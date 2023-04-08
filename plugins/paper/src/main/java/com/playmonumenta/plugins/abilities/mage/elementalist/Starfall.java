@@ -42,6 +42,7 @@ public class Starfall extends Ability {
 	public static final String CHARM_DAMAGE = "Starfall Damage";
 	public static final String CHARM_RANGE = "Starfall Range";
 	public static final String CHARM_COOLDOWN = "Starfall Cooldown";
+	public static final String CHARM_RADIUS = "Starfall Radius";
 	public static final String CHARM_FIRE = "Starfall Fire Duration";
 
 	public static final AbilityInfo<Starfall> INFO =
@@ -93,12 +94,13 @@ public class Starfall extends Ability {
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 		mCosmetic.starfallCastEffect(world, mPlayer);
 		Vector dir = loc.getDirection().normalize();
-		for (int i = 0; i < DISTANCE; i++) {
+		int dist = (int) Math.ceil(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DISTANCE));
+		for (int i = 0; i < dist; i++) {
 			loc.add(dir);
 
 			mCosmetic.starfallCastTrail(loc, mPlayer);
 			int size = EntityUtils.getNearbyMobs(loc, 2, mPlayer).size();
-			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= DISTANCE - 1 || size > 0) {
+			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid() || i >= dist - 1 || size > 0) {
 				launchMeteor(loc, playerItemStats, damage);
 				break;
 			}
@@ -123,7 +125,7 @@ public class Starfall extends Ability {
 							mCosmetic.starfallLandEffect(world, mPlayer, loc);
 							this.cancel();
 
-							Hitbox hitbox = new Hitbox.SphereHitbox(loc, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, SIZE));
+							Hitbox hitbox = new Hitbox.SphereHitbox(loc, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, SIZE));
 							int fireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE, FIRE_TICKS);
 							for (LivingEntity e : hitbox.getHitMobs()) {
 								EntityUtils.applyFire(mPlugin, fireDuration, e, mPlayer, playerItemStats);
