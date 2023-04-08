@@ -25,6 +25,8 @@ import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.point.Raycast;
+import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
@@ -60,7 +62,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -344,9 +345,9 @@ public class EntityUtils {
 			return false;
 		}
 		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
-			    || entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-			    || entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
-			    || entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
+			|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
+			|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
+			|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
@@ -382,68 +383,48 @@ public class EntityUtils {
 		return false;
 	}
 
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos) {
-		return getEntityAtCursor(player, range, targetPlayers, targetNonPlayers, checkLos, null);
+	/**
+	 * Get the nearest entity that the player is looking at
+	 *
+	 * @param player              player
+	 * @param range               range
+	 * @param targetPlayers       should we target players?
+	 * @param targetNonPlayers    should we target non-players?
+	 * @param checkLos            should we require line of sight?
+	 * @param throughNonOccluding should transparent blocks block line of sight?
+	 * @return entity
+	 */
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
+		return getEntityAtCursor(player, range, targetPlayers, targetNonPlayers, checkLos, throughNonOccluding, (t) -> true);
 	}
 
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, @Nullable Predicate<Entity> ignoreIf) {
-		ArrayList<LivingEntity> entities = new ArrayList<>();
-		if (targetNonPlayers) {
-			entities.addAll(getNearbyMobs(player.getLocation(), range));
-		}
-		if (targetPlayers) {
-			entities.addAll(PlayerUtils.otherPlayersInRange(player, range, true));
-		}
+	/**
+	 * Get the nearest entity that the player is looking at
+	 *
+	 * @param player              player
+	 * @param range               range
+	 * @param targetPlayers       should we target players?
+	 * @param targetNonPlayers    should we target non-players?
+	 * @param checkLos            should we require line of sight?
+	 * @param throughNonOccluding should transparent blocks block line of sight?
+	 * @param filter              predicate to filter mobs
+	 * @return entity
+	 */
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding, Predicate<Entity> filter) {
+		Location eyeLoc = player.getEyeLocation();
+		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
+		ray.mThroughBlocks = !checkLos;
+		ray.mThroughNonOccluding = throughNonOccluding;
+		ray.mTargetPlayers = targetPlayers;
+		ray.mTargetNonPlayers = targetNonPlayers;
 
-		if (ignoreIf != null) {
-			entities.removeIf(ignoreIf);
-		}
+		RaycastData data = ray.shootRaycast();
 
-		//  If there's no living entities nearby then we should just leave as there's no reason to continue.
-		if (entities.isEmpty()) {
-			return null;
-		}
-
-		BlockIterator bi;
-		try {
-			bi = new BlockIterator(player, (int) Math.ceil(range));
-		} catch (IllegalStateException e) {
-			return null;
-		}
-
-		int bx;
-		int by;
-		int bz;
-
-		while (bi.hasNext()) {
-			Block b = bi.next();
-			bx = b.getX();
-			by = b.getY();
-			bz = b.getZ();
-
-			//  If we want to check Line of sight we want to make sure that the blocks are transparent.
-			if (checkLos && BlockUtils.isLosBlockingBlock(b.getType())) {
-				break;
-			}
-
-			//  Loop through the entities and see if we hit one.
-			for (LivingEntity e : entities) {
-				Location loc = e.getLocation();
-				double ex = loc.getX();
-				double ey = loc.getY();
-				double ez = loc.getZ();
-
-				if ((bx - 0.75D <= ex) && (ex <= bx + 1.75D)
-					&& (bz - 0.75D <= ez) && (ez <= bz + 1.75D)
-					&& (by - 1.0D <= ey) && (ey <= by + 2.5D)) {
-
-					//  We got our target.
-					return e;
-				}
-			}
-		}
-
-		return null;
+		return data.getEntities().stream()
+			.filter(e -> e.isValid() && e != player)
+			.filter(filter)
+			.findFirst()
+			.orElse(null);
 	}
 
 	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends Projectile> projectileClass) {
@@ -1410,7 +1391,7 @@ public class EntityUtils {
 		if (lineOfSight.getX() > 0) {
 			angleCounterclockwise = -angleCounterclockwise;
 		}
-		return (float)angleCounterclockwise;
+		return (float) angleCounterclockwise;
 	}
 
 	public static boolean isAbilityTriggeringProjectile(Projectile proj, boolean requireCritical) {
@@ -1419,7 +1400,7 @@ public class EntityUtils {
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null
-				       && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
+				&& projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
 		}
 		return false;
 	}
@@ -1452,7 +1433,7 @@ public class EntityUtils {
 			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()
-					    && !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
+					&& !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
 					return true;
 				}
 			}

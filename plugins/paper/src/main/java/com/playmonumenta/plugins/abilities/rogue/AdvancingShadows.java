@@ -13,8 +13,6 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -112,19 +110,16 @@ public class AdvancingShadows extends Ability {
 			return;
 		}
 
-		// Basically makes sure if the target is in LoS and if there is a path.
-		Location eyeLoc = mPlayer.getEyeLocation();
-		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) Math.ceil(mActivationRange));
-		ray.mThroughBlocks = false;
-		ray.mThroughNonOccluding = false;
-		ray.mTargetPlayers = AbilityManager.getManager().isPvPEnabled(mPlayer);
-
-		RaycastData data = ray.shootRaycast();
-
-		LivingEntity entity = data.getEntities().stream()
-			.filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t) && !ScoreboardUtils.checkTag(t, AbilityUtils.IGNORE_TAG))
-			.findFirst()
-			.orElse(null);
+		LivingEntity entity = EntityUtils.getEntityAtCursor(
+			mPlayer,
+			(int) Math.ceil(mActivationRange),
+			AbilityManager.getManager().isPvPEnabled(mPlayer),
+			true,
+			true,
+			false,
+			(e) -> EntityUtils.isHostileMob(e)
+				&& !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)
+		);
 
 		if (entity == null) {
 			return;

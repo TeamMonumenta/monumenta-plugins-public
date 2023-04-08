@@ -13,8 +13,6 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -62,20 +60,17 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 		if (isOnCooldown()) {
 			return;
 		}
+		LivingEntity entity = EntityUtils.getEntityAtCursor(
+			mPlayer,
+			ADVANCING_SHADOWS_RANGE,
+			AbilityManager.getManager().isPvPEnabled(mPlayer),
+			true,
+			true,
+			false,
+			(e) -> EntityUtils.isHostileMob(e)
+				&& !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)
+		);
 
-		// Basically makes sure if the target is in LoS and if there is a path.
-		Location eyeLoc = mPlayer.getEyeLocation();
-		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), ADVANCING_SHADOWS_RANGE);
-		ray.mThroughBlocks = false;
-		ray.mThroughNonOccluding = false;
-		ray.mTargetPlayers = AbilityManager.getManager().isPvPEnabled(mPlayer);
-
-		RaycastData data = ray.shootRaycast();
-
-		LivingEntity entity = data.getEntities().stream()
-			                      .filter(t -> t != mPlayer && t.isValid() && EntityUtils.isHostileMob(t) && !ScoreboardUtils.checkTag(t, AbilityUtils.IGNORE_TAG))
-			                      .findFirst()
-			                      .orElse(null);
 		if (entity == null) {
 			return;
 		}

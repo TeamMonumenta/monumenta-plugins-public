@@ -72,7 +72,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 			.descriptions(
 				"Left-click with a projectile weapon while looking directly at a player or mob to shoot a beam of light. " +
 					"If aimed at a player, the beam instantly heals them for 30% of their max health, knocking back enemies within 4 blocks. " +
-					"If aimed at an Undead, it instantly deals magic damage equal to the your projectile damage to the target, and stuns them for one second. " +
+					"If aimed at an Undead, it instantly deals magic damage equal to your projectile damage to the target, and stuns them for one second. " +
 					"If aimed at a non-undead mob, it instantly stuns them for 2s. Two charges. " +
 					"Pressing Swap while holding a projectile weapon will change the mode of Hallowed Beam between 'Default' (default), " +
 					"'Healing' (only heals players, does not work on mobs), and 'Attack' (only applies mob effects, does not heal). " +
@@ -131,9 +131,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 			true,
 			0.425, // For future reference, you can increase or decrease this number to change the hitbox size for entity raytracing.
 			e -> e != player
-				     && e instanceof LivingEntity
-				     && ((mMode != Mode.ATTACK && e instanceof Player p && p.getGameMode() != GameMode.SPECTATOR)
-					         || (mMode != Mode.HEALING && EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)))
+				&& e instanceof LivingEntity
+				&& ((mMode != Mode.ATTACK && e instanceof Player p && p.getGameMode() != GameMode.SPECTATOR)
+				|| (mMode != Mode.HEALING && EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)))
 		);
 
 		if (raytrace == null || raytrace.getHitEntity() == null) {
@@ -214,9 +214,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
 		double recoil = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL);
 		if (recoil > 0
-			    && !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
-			    && !mPlayer.isSneaking()
-			    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
+			&& !mPlayer.isSneaking()
+			&& !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 			Recoil.applyRecoil(mPlayer, recoil);
 			EntityUtils.applyRecoilDisable(mPlugin, 9999, (int) EntityUtils.getRecoilDisableAmount(mPlugin, mPlayer) + 1, mPlayer);
 		}

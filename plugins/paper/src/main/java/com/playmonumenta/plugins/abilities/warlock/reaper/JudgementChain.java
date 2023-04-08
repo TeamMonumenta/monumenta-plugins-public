@@ -201,8 +201,19 @@ public class JudgementChain extends Ability {
 		World world = mPlayer.getWorld();
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, range, false, true, true, m -> ScoreboardUtils.checkTag(m, AbilityUtils.IGNORE_TAG));
-		if (e != null && !EntityUtils.isBoss(e)) {
+		LivingEntity e = EntityUtils.getEntityAtCursor(
+			mPlayer,
+			(int) range,
+			false,
+			true,
+			true,
+			true,
+			(entity) -> EntityUtils.isHostileMob(entity)
+				&& !ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG)
+				&& !EntityUtils.isBoss(entity)
+		);
+
+		if (e != null) {
 			mTarget = e;
 			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
 			world.playSound(loc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.75f, 1.0f);
@@ -380,7 +391,8 @@ public class JudgementChain extends Ability {
 				players.forEach(playerAction);
 			};
 		}
-		return (hostiles, players) -> { };
+		return (hostiles, players) -> {
+		};
 	}
 
 	@Override
