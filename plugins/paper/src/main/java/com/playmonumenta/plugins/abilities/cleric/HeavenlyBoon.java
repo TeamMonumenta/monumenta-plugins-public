@@ -46,7 +46,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
 	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
 
-	private static final int GENERATE_POTION_COOLDOWN_TICKS = 20;
+	private static final int ENHANCEMENT_COOLDOWN_TICKS = 20;
 
 	private static final int BOSS_DAMAGE_THRESHOLD_R1 = 100;
 	private static final int BOSS_DAMAGE_THRESHOLD_R2 = 200;
@@ -171,9 +171,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		if (Crusade.enemyTriggersAbilities(mob, mCrusade)
-			&& FastUtils.RANDOM.nextDouble() < mChance
-			&& Bukkit.getCurrentTick() > mLastSuccessfulProcTick + GENERATE_POTION_COOLDOWN_TICKS) {
-			mLastSuccessfulProcTick = Bukkit.getCurrentTick();
+			&& FastUtils.RANDOM.nextDouble() < mChance) {
 
 			ImmutableList<NamespacedKey> lootTables = isLevelOne() ? LEVEL_1_POTIONS : LEVEL_2_POTIONS;
 			NamespacedKey lootTable = lootTables.get(FastUtils.RANDOM.nextInt(lootTables.size()));
@@ -184,7 +182,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			Location pos = mPlayer.getLocation().add(0, 1, 0);
 			EntityUtils.spawnCustomSplashPotion(mPlayer, potion, pos);
 
-			if (isEnhanced()) {
+			if (isEnhanced() && Bukkit.getCurrentTick() > mLastSuccessfulProcTick + ENHANCEMENT_COOLDOWN_TICKS) {
+				mLastSuccessfulProcTick = Bukkit.getCurrentTick();
 				for (Player p : PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true)) {
 					mPlugin.mPotionManager.modifyPotionDuration(p,
 						potionInfo -> {
