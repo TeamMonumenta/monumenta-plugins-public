@@ -104,7 +104,7 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 				}
 			}
 
-			player.sendMessage(ChatColor.AQUA + "Your tesseract is on cooldown! You can use it in " + timespec);
+			player.sendMessage(ChatColor.AQUA + "Your tesseract is on cooldown! You can use it in " + timespec + ".");
 
 			return false;
 		}
