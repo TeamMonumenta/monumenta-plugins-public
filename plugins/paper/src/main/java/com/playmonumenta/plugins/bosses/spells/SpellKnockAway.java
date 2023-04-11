@@ -51,14 +51,16 @@ public class SpellKnockAway extends Spell {
 	private void deal_damage() {
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			for (Player player : PlayerUtils.playersInRange(mLauncher.getLocation(), mRadius, true)) {
-				BossUtils.blockableDamage(mLauncher, player, DamageType.MELEE, 9.0f);
-				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
-				player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));
+				if (!mLauncher.isDead() || mLauncher.isValid()) {
+					BossUtils.blockableDamage(mLauncher, player, DamageType.MELEE, 9.0f);
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 4));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 200, 1));
 
-				Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
-				dir.setY(0.5f);
+					Vector dir = player.getLocation().subtract(mLauncher.getLocation().toVector()).toVector().multiply(mSpeed);
+					dir.setY(0.5f);
 
-				player.setVelocity(dir);
+					player.setVelocity(dir);
+				}
 			}
 		}, mTime);
 	}
@@ -66,8 +68,11 @@ public class SpellKnockAway extends Spell {
 	private void animation(Location loc) {
 		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 		World world = loc.getWorld();
-
 		Runnable animLoop = () -> {
+			if (mLauncher.isDead() || !mLauncher.isValid()) {
+				this.cancel();
+				return;
+			}
 			Location centerLoc = loc.clone().add(0, 1, 0);
 			EntityUtils.teleportStack(mLauncher, loc);
 			world.playSound(centerLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, (float) mRadius / 7, (float) (0.5 + FastUtils.RANDOM.nextInt(150) / 100));
@@ -76,6 +81,10 @@ public class SpellKnockAway extends Spell {
 		};
 
 		Runnable animLoop2 = () -> {
+			if (mLauncher.isDead() || !mLauncher.isValid()) {
+				this.cancel();
+				return;
+			}
 			Location lloc = mLauncher.getLocation();
 			double precision = FastUtils.RANDOM.nextInt(50) + 100;
 			double increment = (2 * Math.PI) / precision;

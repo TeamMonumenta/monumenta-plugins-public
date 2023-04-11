@@ -124,7 +124,6 @@ public class SpellGraspingHands extends Spell {
 			PPCircle indicator = new PPCircle(Particle.REDSTONE, player.getLocation(), 0).ringMode(true).count(8).delta(0.25, 0.1, 0.25).data(GRASPING_HANDS_COLOR);
 			PPCircle indicator2 = new PPCircle(Particle.SMOKE_NORMAL, player.getLocation(), 0).ringMode(true).count(6).delta(0.2, 0, 0.2);
 			PPCircle indicator3 = new PPCircle(Particle.DRAGON_BREATH, player.getLocation(), 0).ringMode(true).count(4).delta(0.25, 0.1, 0.25).extraRange(0.01, 0.05);
-
 			BukkitRunnable runC = new BukkitRunnable() {
 				int mT = 0;
 				Location mLoc = player.getLocation();
@@ -133,7 +132,7 @@ public class SpellGraspingHands extends Spell {
 				@Override
 				public void run() {
 					mT++;
-					if (mT <= 20 * 4) {
+					if (mT <= 20 * 4 && player.getLocation().getY() > 27) {
 						mLoc = player.getLocation();
 					}
 
@@ -204,6 +203,7 @@ public class SpellGraspingHands extends Spell {
 			mActiveRunnables.add(runC);
 		}
 	}
+
 
 	@Override
 	public boolean canRun() {
