@@ -21,6 +21,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class VoodooBondsReaper extends Effect {
@@ -38,6 +39,7 @@ public class VoodooBondsReaper extends Effect {
 
 	private @Nullable VoodooBonds mVoodooBonds;
 	private boolean mDone = false;
+	private boolean mPlayerDied = false;
 
 	public VoodooBondsReaper(int duration, Player player, double damageTaken, double damagePercent, Plugin plugin) {
 		super(duration, effectID);
@@ -78,7 +80,7 @@ public class VoodooBondsReaper extends Effect {
 		if (mPlayer != null && !mDone && mPlayer.isValid() && !mPlayer.isDead() && mPlayer.getHealth() > 0) {
 			double absorbHealth = AbsorptionUtils.getAbsorption(mPlayer);
 			double maxHealth = EntityUtils.getMaxHealth(mPlayer);
-			if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
+			if (!mPlayerDied && !ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.RESIST_5)) {
 				if (absorbHealth <= 0) {
 					mPlayer.setHealth(Math.max(Math.min(mPlayer.getHealth() - maxHealth * mDamagePercent, mPlayer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()), 1));
 				} else {
@@ -100,6 +102,12 @@ public class VoodooBondsReaper extends Effect {
 			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.HOSTILE, 1f, 0.6f);
 			world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 		}
+	}
+
+	// After the player has died, the effect should no longer deal any damage.
+	@Override
+	public void onDeath(EntityDeathEvent event) {
+		mPlayerDied = true;
 	}
 
 	@Override

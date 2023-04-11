@@ -23,7 +23,7 @@ public class BoonOfThePit extends ZeroArgumentEffect {
 	}
 
 	@Override
-	public void onHurtByEntity(LivingEntity entity, DamageEvent event, Entity enemy) {
+	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
