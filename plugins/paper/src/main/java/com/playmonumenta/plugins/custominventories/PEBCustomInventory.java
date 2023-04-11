@@ -574,9 +574,14 @@ public class PEBCustomInventory extends CustomInventory {
 			}
 		}
 
+		ItemStack fillerItem = new ItemStack(FILLER, 1);
+		ItemMeta meta = fillerItem.getItemMeta();
+		meta.displayName(Component.empty());
+		fillerItem.setItemMeta(meta);
+
 		for (int i = 0; i < 54; i++) {
 			if (mInventory.getItem(i) == null) {
-				mInventory.setItem(i, new ItemStack(FILLER, 1));
+				mInventory.setItem(i, fillerItem);
 			}
 		}
 	}
