@@ -128,7 +128,7 @@ public class LuminousInfusion extends Ability {
 			execute(enemy);
 		}
 
-		if (mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH) && enemyTriggersAbilities) {
+		if (mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH || (event.getType() == DamageType.MAGIC && event.getAbility() != mInfo.getLinkedSpell())) && enemyTriggersAbilities) {
 			EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer);
 
 			double originalDamage = event.getDamage();
