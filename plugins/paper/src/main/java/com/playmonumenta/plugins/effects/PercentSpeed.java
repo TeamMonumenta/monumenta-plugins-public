@@ -24,7 +24,7 @@ public class PercentSpeed extends Effect {
 
 	public PercentSpeed(int duration, double amount, String modifierName) {
 		super(duration, effectID);
-		mAmount = amount;
+		mAmount = Math.max(-1, amount);
 		mModifierName = modifierName;
 	}
 

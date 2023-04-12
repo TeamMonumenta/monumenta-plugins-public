@@ -85,7 +85,7 @@ public abstract class SpellBaseAoE extends Spell {
 		}
 
 		if (!mCanMoveWhileCasting) {
-			mLauncher.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
+			EntityUtils.selfRoot(mLauncher, mDuration);
 		}
 
 		new BukkitRunnable() {
@@ -97,9 +97,11 @@ public abstract class SpellBaseAoE extends Spell {
 			public void run() {
 				Location loc = mLauncher.getLocation();
 
-				if (mLauncher.isDead() || !mLauncher.isValid() || EntityUtils.isStunned(mLauncher) || EntityUtils.isSilenced(mLauncher)) {
-					mLauncher.setAI(true);
+				if (EntityUtils.shouldCancelSpells(mLauncher)) {
 					this.cancel();
+					if (!mCanMoveWhileCasting) {
+						EntityUtils.cancelSelfRoot(mLauncher);
+					}
 					return;
 				}
 				mTicks++;

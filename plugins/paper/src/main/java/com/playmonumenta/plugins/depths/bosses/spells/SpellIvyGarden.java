@@ -103,7 +103,7 @@ public class SpellIvyGarden extends Spell {
 	}
 
 
-	public void runForce(Plugin plugin, Entity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
+	public void runForce(Plugin plugin, LivingEntity launcher, int radius, int duration, int cooldown, boolean canMoveWhileCasting, boolean needLineOfSight,
 	                     Sound chargeSound, float soundVolume, int soundDensity, Consumer<Location> chargeAuraAction, Consumer<Location> chargeCircleAction,
 	                     Consumer<Location> outburstAction, Consumer<Location> circleOutburstAction, Consumer<Location> dealDamageAction) {
 		if (needLineOfSight) {
@@ -121,21 +121,22 @@ public class SpellIvyGarden extends Spell {
 		}
 
 		if (!canMoveWhileCasting) {
-			((LivingEntity) launcher).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, duration, 20));
+			EntityUtils.selfRoot(launcher, duration);
 		}
 
 		new BukkitRunnable() {
 			float mTicks = 0;
 			double mCurrentRadius = mRadius;
-			World mWorld = launcher.getWorld();
+			final World mWorld = launcher.getWorld();
 
 			@Override
 			public void run() {
 				Location loc = launcher.getLocation();
 
-				if (launcher.isDead() || !launcher.isValid() || EntityUtils.isStunned(launcher) || EntityUtils.isSilenced(launcher)) {
-					if (launcher instanceof LivingEntity) {
-						((LivingEntity) launcher).setAI(true);
+				if (EntityUtils.shouldCancelSpells(launcher)) {
+					launcher.setAI(true);
+					if (!canMoveWhileCasting) {
+						EntityUtils.cancelSelfRoot(launcher);
 					}
 					this.cancel();
 					return;
@@ -158,7 +159,7 @@ public class SpellIvyGarden extends Spell {
 					outburstAction.accept(loc);
 
 					new BukkitRunnable() {
-						Location mLoc = launcher.getLocation();
+						final Location mLoc = launcher.getLocation();
 						double mBurstRadius = 0;
 
 						@Override

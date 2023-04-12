@@ -321,6 +321,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(PercentHealthBoost.effectID, PercentHealthBoost::deserialize);
 		mEffectDeserializer.put(PercentKnockbackResist.effectID, PercentKnockbackResist::deserialize);
 		mEffectDeserializer.put(PercentSpeed.effectID, PercentSpeed::deserialize);
+		mEffectDeserializer.put(BaseMovementSpeedModifyEffect.effectID, BaseMovementSpeedModifyEffect::deserialize);
 		mEffectDeserializer.put(RecoilDisable.effectID, RecoilDisable::deserialize);
 		mEffectDeserializer.put(RiptideDisable.effectID, RiptideDisable::deserialize);
 		mEffectDeserializer.put(SanctifiedArmorHeal.effectID, SanctifiedArmorHeal::deserialize);

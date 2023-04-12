@@ -138,7 +138,7 @@ public class SpellBaseSummon extends Spell {
 		mTimes++;
 
 		if (!mCanMove) {
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mSummoningDuration, 100));
+			EntityUtils.selfRoot(mBoss, mSummoningDuration);
 		}
 
 		aestheticBoss();
@@ -179,7 +179,7 @@ public class SpellBaseSummon extends Spell {
 					return;
 				}
 
-				if (mCanBeStopped && (EntityUtils.isStunned(mBoss) || mBoss.isDead())) {
+				if (mCanBeStopped && EntityUtils.shouldCancelSpells(mBoss)) {
 					this.cancel();
 					return;
 				}
@@ -198,9 +198,8 @@ public class SpellBaseSummon extends Spell {
 			public synchronized void cancel() {
 				super.cancel();
 				if (!mCanMove) {
-					mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1, 100));
+					EntityUtils.cancelSelfRoot(mBoss);
 				}
-
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1);

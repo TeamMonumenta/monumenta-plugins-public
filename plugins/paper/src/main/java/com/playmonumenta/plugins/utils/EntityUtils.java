@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.bosses.GenericTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.PlayerTargetBoss;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.effects.Aesthetics;
+import com.playmonumenta.plugins.effects.BaseMovementSpeedModifyEffect;
 import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.CCImmuneEffect;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
@@ -871,6 +872,19 @@ public class EntityUtils {
 		}
 	}
 
+	/**
+	 * Roots a mob in place without giving the mob a slowness debuff that is counted by abilities or such,
+	 * is not resisted by any mob, and can also be cancelled separately.
+	 * Currently only used for spells that root the caster.
+	 */
+	public static void selfRoot(LivingEntity mob, int ticks) {
+		Plugin.getInstance().mEffectManager.addEffect(mob, "SelfRoot", new BaseMovementSpeedModifyEffect(ticks, -1));
+	}
+
+	public static void cancelSelfRoot(LivingEntity mob) {
+		Plugin.getInstance().mEffectManager.clearEffects(mob, "SelfRoot");
+	}
+
 	private static final String WEAKEN_EFFECT_NAME = "WeakenEffect";
 	private static final String WEAKEN_EFFECT_AESTHETICS_NAME = "WeakenEffectAesthetics";
 
@@ -1102,10 +1116,10 @@ public class EntityUtils {
 			BossManager.getInstance().entityStunned(mob);
 		}
 
-		// Only reduce speed if mob is not already in map. We can avoid storing original speed by just +/- 10.
+		// Only reduce speed if mob is not already in map
 		Integer t = STUNNED_MOBS.get(mob);
 		if (t == null) {
-			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(STUN_ATTR_NAME, -10, AttributeModifier.Operation.ADD_NUMBER));
+			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(STUN_ATTR_NAME, -1, Operation.MULTIPLY_SCALAR_1));
 			if (mob instanceof Mob m) {
 				NmsUtils.getVersionAdapter().cancelStrafe(m);
 			}

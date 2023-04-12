@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
 import org.bukkit.Location;
@@ -56,7 +57,7 @@ public class SpellMobHealAoE extends Spell {
 	@Override
 	public void run() {
 		if (!mCanMoveWhileCasting) {
-			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, mDuration, 20));
+			EntityUtils.selfRoot(mBoss, mDuration);
 		}
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTimer = 0;
@@ -65,8 +66,11 @@ public class SpellMobHealAoE extends Spell {
 			@Override
 			public void run() {
 				Location loc = mBoss.getLocation();
-				if (!mBoss.isValid() || mBoss.isDead()) {
+				if (EntityUtils.shouldCancelSpells(mBoss)) {
 					this.cancel();
+					if (mCanMoveWhileCasting) {
+						EntityUtils.cancelSelfRoot(mBoss);
+					}
 					return;
 				}
 

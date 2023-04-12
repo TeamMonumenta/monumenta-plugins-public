@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Collections;
@@ -37,7 +38,7 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 		Spell spell = new Spell() {
 			@Override
 			public void run() {
-				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1000, 100));
+				EntityUtils.selfRoot(mBoss, 1000);
 
 
 				BukkitRunnable runnable = new BukkitRunnable() {
@@ -103,7 +104,7 @@ public class VolcanicDemiseTowerAbility extends TowerAbility {
 								public synchronized void cancel() throws IllegalStateException {
 									super.cancel();
 
-									mBoss.removePotionEffect(PotionEffectType.SLOW);
+									EntityUtils.cancelSelfRoot(mBoss);
 								}
 							};
 
