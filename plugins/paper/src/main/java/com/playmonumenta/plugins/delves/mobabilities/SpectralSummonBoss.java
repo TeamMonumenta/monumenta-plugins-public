@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.DelvesUtils;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -21,18 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class SpectralSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "Spectral";
-
-	private static final String[] SPECTERS = {
-		"SpecterofFury",
-		"SpecterofSilence",
-		"SpecterofIgnorance"
-	};
-
-	private static final String[] SPECTERS_WATER = {
-		"LeviathanofSilence",
-		"LeviathanofFury"
-	};
-
+	private static final LoSPool SPECTRAL_LAND_POOL = new LoSPool.LibraryPool("~DelveSpectralLand");
+	private static final LoSPool SPECTRAL_WATER_POOL = new LoSPool.LibraryPool("~DelveSpectralWater");
 
 	public static class Parameters extends BossParameters {
 		public double SPAWN_CHANCE = 0;
@@ -55,9 +45,9 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 				boolean isWaterLoc = BlockUtils.containsWater(loc.getBlock());
 				Entity entity;
 				if (isWaterLoc) {
-					entity = LibraryOfSoulsIntegration.summon(loc, SPECTERS_WATER[FastUtils.RANDOM.nextInt(SPECTERS_WATER.length)]);
+					entity = SPECTRAL_WATER_POOL.spawn(loc);
 				} else {
-					entity = LibraryOfSoulsIntegration.summon(loc, SPECTERS[FastUtils.RANDOM.nextInt(SPECTERS.length)]);
+					entity = SPECTRAL_LAND_POOL.spawn(loc);
 				}
 
 				// Safety net in case the Specter doesn't get summoned for some reason

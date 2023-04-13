@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -14,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,6 +49,10 @@ public class SpellSlashAttack extends Spell {
 	public final double mHitboxSize;
 	public final double mForcedParticleSize;
 	public final DamageEvent.DamageType mDamageType;
+	public final SoundsList mSoundsTelegraph;
+	public final SoundsList mSoundsSlashStart;
+	public final SoundsList mSoundsSlashTick;
+	public final SoundsList mSoundsSlashEnd;
 
 	public Vector mKnockback;
 
@@ -62,7 +66,8 @@ public class SpellSlashAttack extends Spell {
 							double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
 							double endAngle, double spacing, String startColorHex, String midColorHex, String endColorHex,
 							String xSlash, String horizontalColor, Vector knockback, String knockAway, double kbrEffectiveness,
-							String followCaster, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType) {
+							String followCaster, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
+							SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCooldown = cooldown;
@@ -88,6 +93,10 @@ public class SpellSlashAttack extends Spell {
 		mHitboxSize = hitboxSize;
 		mForcedParticleSize = forcedParticleSize;
 		mDamageType = damageType;
+		mSoundsTelegraph = soundsTelegraph;
+		mSoundsSlashStart = soundsSlashStart;
+		mSoundsSlashTick = soundsSlashTick;
+		mSoundsSlashEnd = soundsSlashEnd;
 	}
 
 	@Override
@@ -125,6 +134,27 @@ public class SpellSlashAttack extends Spell {
 	}
 
 	private void doSlash(double selectedAngle) {
+		mSoundsSlashStart.play(mBoss.getLocation());
+		BukkitRunnable runnableSounds = new BukkitRunnable() {
+			int mT = 0;
+
+			@Override public void run() {
+				mT++;
+
+				if (mT % 5 == 0) {
+					mSoundsSlashTick.play(mBoss.getLocation());
+				}
+
+				if (mT >= (mEndAngle - mStartAngle - 40) / 40) {
+					this.cancel();
+					mSoundsSlashEnd.play(mBoss.getLocation());
+					return;
+				}
+			}
+		};
+		runnableSounds.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnableSounds);
+
 		Location startLoc = mBoss.getLocation().clone();
 		startLoc.add(0, mBoss.getHeight() / 2, 0);
 		double maxAngleProgress = Math.abs(mEndAngle - mStartAngle) / 2;
@@ -132,22 +162,22 @@ public class SpellSlashAttack extends Spell {
 		mSwitchedColor = false;
 
 		ParticleUtils.drawHalfArc(startLoc, mRadius, selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-				(Location l, int ring) -> {
-					Location finalLoc = l.clone();
-					if (mFollowCaster) {
-						finalLoc.add(mBoss.getLocation().toVector().subtract(startLoc.toVector()));
-					}
-					Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
-					new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
-						.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
-					Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
-					List<Player> targets = hitbox.getHitPlayers(true);
-					for (Player target : targets) {
-						DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, false, false, mAttackName);
-						applyKnockback(target);
-					}
-					mCurrAngleProgress += 5 / (double) mRings;
+			(Location l, int ring) -> {
+				Location finalLoc = l.clone();
+				if (mFollowCaster) {
+					finalLoc.add(mBoss.getLocation().toVector().subtract(startLoc.toVector()));
 				}
+				Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
+				new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
+					.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
+				Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
+				List<Player> targets = hitbox.getHitPlayers(true);
+				for (Player target : targets) {
+					DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, false, false, mAttackName);
+					applyKnockback(target);
+				}
+				mCurrAngleProgress += 5 / (double) mRings;
+			}
 		);
 		if (mXSlash) {
 			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
@@ -168,7 +198,6 @@ public class SpellSlashAttack extends Spell {
 					}
 			);
 		}
-		mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 	}
 
 	private void applyKnockback(Player target) {
@@ -211,6 +240,7 @@ public class SpellSlashAttack extends Spell {
 					}
 			);
 		}
+		mSoundsTelegraph.play(mBoss.getLocation());
 	}
 
 	Particle.DustOptions calculateColorProgress(int ring, double maxAngleProgress) {

@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.DelvesUtils;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -21,14 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class DreadfulSummonBoss extends BossAbilityGroup {
 	public static final String identityTag = "Dreadful";
-
-	private static final String[] DREADNAUGHTS = {
-		"DreadnaughtofDoom",
-		"DreadnaughtofSorrow",
-		"DreadnaughtofSubjugation"
-	};
-
-	private static final String DREADNAUGHT_WATER = "LeviathanofDoom";
+	private static final LoSPool DREADNAUGHTS_LAND_POOL = new LoSPool.LibraryPool("~DelveDreadnaughtLand");
+	private static final LoSPool DREADNAUGHT_WATER_POOL = new LoSPool.LibraryPool("~DelveDreadnaughtWater");
 
 	public static class Parameters extends BossParameters {
 		public double SPAWN_CHANCE = 0;
@@ -52,9 +46,9 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 				boolean isWaterLoc = BlockUtils.containsWater(loc.getBlock());
 				Entity entity;
 				if (isWaterLoc) {
-					entity = LibraryOfSoulsIntegration.summon(loc, DREADNAUGHT_WATER);
+					entity = DREADNAUGHT_WATER_POOL.spawn(loc);
 				} else {
-					entity = LibraryOfSoulsIntegration.summon(loc, DREADNAUGHTS[FastUtils.RANDOM.nextInt(DREADNAUGHTS.length)]);
+					entity = DREADNAUGHTS_LAND_POOL.spawn(loc);
 				}
 
 				// Safety net in case the Dreadnaught doesn't get summoned for some reason

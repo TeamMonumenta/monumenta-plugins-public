@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellSlashAttack;
 import com.playmonumenta.plugins.events.DamageEvent;
 import java.util.Collections;
@@ -68,6 +69,14 @@ public class SlashAttackBoss extends BossAbilityGroup {
 		public double FORCED_PARTICLE_SIZE = -1;
 		@BossParam(help = "The type of the damage dealt by the attack. Default: MELEE")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
+		@BossParam(help = "The sound at the start of telegraph. Default: EMPTY")
+		public SoundsList SOUND_TELEGRAPH = SoundsList.fromString("[]");
+		@BossParam(help = "The sound at the start of the slash. Default: ENTITY_PLAYER_ATTACK_SWEEP")
+		public SoundsList SOUND_SLASH_START = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_SWEEP,1,1)]");
+		@BossParam(help = "The sound at every tick of the slash. Default: EMPTY")
+		public SoundsList SOUND_SLASH_TICK = SoundsList.fromString("[]");
+		@BossParam(help = "The sound at the end of the slash. Default: EMPTY")
+		public SoundsList SOUND_SLASH_END = SoundsList.fromString("[]");
 	}
 
 	public final Parameters mParams;
@@ -83,12 +92,12 @@ public class SlashAttackBoss extends BossAbilityGroup {
 
 		SpellManager activeSpells = new SpellManager(List.of(
 				new SpellSlashAttack(plugin, boss,
-						mParams.COOLDOWN, mParams.DAMAGE, mParams.TELEGRAPH_DURATION, mParams.RADIUS, mParams.MIN_ANGLE,
-						mParams.MAX_ANGLE, mParams.ATTACK_NAME, mParams.RINGS, mParams.START_ANGLE, mParams.END_ANGLE,
-						mParams.SPACING, mParams.START_HEX_COLOR, mParams.MID_HEX_COLOR, mParams.END_HEX_COLOR,
-						mParams.X_SLASH, mParams.HORIZONTAL_COLOR, new Vector(mParams.KB_X, mParams.KB_Y, mParams.KB_Z),
-						mParams.KNOCK_AWAY, mParams.KBR_EFFECTIVENESS, mParams.FOLLOW_CASTER, mParams.HITBOX_SIZE,
-						mParams.FORCED_PARTICLE_SIZE, mParams.DAMAGE_TYPE
+					mParams.COOLDOWN, mParams.DAMAGE, mParams.TELEGRAPH_DURATION, mParams.RADIUS, mParams.MIN_ANGLE,
+					mParams.MAX_ANGLE, mParams.ATTACK_NAME, mParams.RINGS, mParams.START_ANGLE, mParams.END_ANGLE,
+					mParams.SPACING, mParams.START_HEX_COLOR, mParams.MID_HEX_COLOR, mParams.END_HEX_COLOR,
+					mParams.X_SLASH, mParams.HORIZONTAL_COLOR, new Vector(mParams.KB_X, mParams.KB_Y, mParams.KB_Z),
+					mParams.KNOCK_AWAY, mParams.KBR_EFFECTIVENESS, mParams.FOLLOW_CASTER, mParams.HITBOX_SIZE,
+					mParams.FORCED_PARTICLE_SIZE, mParams.DAMAGE_TYPE, mParams.SOUND_TELEGRAPH, mParams.SOUND_SLASH_START, mParams.SOUND_SLASH_TICK, mParams.SOUND_SLASH_END
 				)
 		));
 

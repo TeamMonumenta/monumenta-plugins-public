@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Location;
@@ -12,22 +12,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Colossal {
 
 	private static final double SPAWN_CHANCE_PER_LEVEL = 0.05;
-
-	private static final String[] COLOSSI = {
-		"ColossusofTerror",
-		"ColossusofChaos",
-		"ColossusofEntropy"
-	};
-
-	private static final String COLOSSO_WATER = "LeviathanofChaos";
+	private static final LoSPool COLOSSAL_LAND_POOL = new LoSPool.LibraryPool("~DelveColossalLand");
+	private static final LoSPool COLOSSAL_WATER_POOL = new LoSPool.LibraryPool("~DelveColossalWater");
 
 	public static final String DESCRIPTION = "Broken spawners unleash enemies.";
 
 	public static String[] rankDescription(int level) {
-			return new String[]{
-				"Broken Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
-				"to spawn Colossi."
-			};
+		return new String[]{
+			"Broken Spawners have a " + Math.round(SPAWN_CHANCE_PER_LEVEL * level * 100) + "% chance",
+			"to spawn Colossi."
+		};
 	}
 
 	public static void applyModifiers(Location loc, int level) {
@@ -62,9 +56,9 @@ public class Colossal {
 			@Override
 			public void run() {
 				if (mAir >= mWater) {
-					LibraryOfSoulsIntegration.summon(loc, COLOSSI[FastUtils.RANDOM.nextInt(COLOSSI.length)]);
+					COLOSSAL_LAND_POOL.spawn(loc);
 				} else {
-					LibraryOfSoulsIntegration.summon(loc, COLOSSO_WATER);
+					COLOSSAL_WATER_POOL.spawn(loc);
 				}
 			}
 		}.runTaskLater(Plugin.getInstance(), 20);
