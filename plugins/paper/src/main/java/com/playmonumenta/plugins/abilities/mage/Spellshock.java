@@ -77,7 +77,7 @@ public class Spellshock extends Ability {
 					(int) (DAMAGE_2 * 100),
 					(int) (MELEE_BONUS_2 * 100),
 					(int) (SPEED_MULTIPLIER * 100)),
-				String.format("When an enemy that had ever had static applied dies, they explode, dealing %s damage to enemies in a %s block radius.",
+				String.format("When an enemy that has ever had static dies, they explode, dealing %s damage to enemies in a %s block radius.",
 					ENHANCEMENT_DAMAGE,
 					ENHANCEMENT_RADIUS))
 			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
