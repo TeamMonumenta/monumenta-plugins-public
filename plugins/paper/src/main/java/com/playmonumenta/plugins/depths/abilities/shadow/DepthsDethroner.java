@@ -13,7 +13,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class DepthsDethroner extends DepthsAbility {
 
@@ -23,7 +22,7 @@ public class DepthsDethroner extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsDethroner> INFO =
 		new DepthsAbilityInfo<>(DepthsDethroner.class, ABILITY_NAME, DepthsDethroner::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.DRAGON_HEAD))
+			.displayItem(Material.DRAGON_HEAD)
 			.descriptions(DepthsDethroner::getDescription);
 
 	public DepthsDethroner(Plugin plugin, Player player) {

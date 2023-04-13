@@ -22,7 +22,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -43,7 +42,7 @@ public class HowlingWinds extends DepthsAbility {
 			.linkedSpell(ClassAbility.HOWLINGWINDS)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HowlingWinds::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.HOPPER))
+			.displayItem(Material.HOPPER)
 			.descriptions(HowlingWinds::getDescription);
 
 	public HowlingWinds(Plugin plugin, Player player) {

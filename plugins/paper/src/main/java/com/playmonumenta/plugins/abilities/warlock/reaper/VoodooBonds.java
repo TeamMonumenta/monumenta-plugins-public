@@ -26,7 +26,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 
 public class VoodooBonds extends Ability {
@@ -65,10 +64,11 @@ public class VoodooBonds extends Ability {
 					),
 				"The duration before damage transfer increases to %ss, the on-hit damage when passing a hit increases to %s%% of the blocked damage, and the cooldown is reduced to %ss."
 					.formatted(StringUtils.ticksToSeconds(DURATION_2), StringUtils.multiplierToPercentage(VoodooBondsReaper.PERCENT_2), StringUtils.ticksToSeconds(COOLDOWN_2)))
+			.simpleDescription("Passively, your attacks also hit nearby mobs of the same type. Activate to protect yourself and nearby players, blocking 1 hit and adding the blocked damage to your next melee strike.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", VoodooBonds::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.JACK_O_LANTERN, 1));
+			.displayItem(Material.JACK_O_LANTERN);
 
 	private final int mTransferDuration;
 	private final VoodooBondsCS mCosmetic;

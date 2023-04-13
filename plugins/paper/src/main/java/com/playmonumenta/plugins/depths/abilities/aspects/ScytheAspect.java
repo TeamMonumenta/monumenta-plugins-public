@@ -27,7 +27,7 @@ public class ScytheAspect extends WeaponAspectDepthsAbility {
 
 	public static final DepthsAbilityInfo<ScytheAspect> INFO =
 		new DepthsAbilityInfo<>(ScytheAspect.class, ABILITY_NAME, ScytheAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
-			.displayItem(new ItemStack(Material.IRON_HOE))
+			.displayItem(Material.IRON_HOE)
 			.description("While holding a scythe, you gain an independent level of life drain and 5% damage reduction.");
 
 	public ScytheAspect(Plugin plugin, Player player) {

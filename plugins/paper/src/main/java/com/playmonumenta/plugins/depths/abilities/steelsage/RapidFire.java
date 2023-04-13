@@ -50,7 +50,7 @@ public class RapidFire extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.REPEATER))
+			.displayItem(Material.REPEATER)
 			.descriptions(RapidFire::getDescription);
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;

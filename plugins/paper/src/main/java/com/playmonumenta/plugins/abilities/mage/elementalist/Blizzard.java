@@ -27,7 +27,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
@@ -72,10 +71,11 @@ public class Blizzard extends Ability {
 					SIZE_1,
 					SIZE_2,
 					(int) (SLOW_MULTIPLIER_2 * 100)))
+			.simpleDescription("For a period of time, slightly damage and slow nearby mobs.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Blizzard::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.SNOWBALL, 1));
+			.displayItem(Material.SNOWBALL);
 
 	private final float mLevelDamage;
 	private final float mLevelSize;

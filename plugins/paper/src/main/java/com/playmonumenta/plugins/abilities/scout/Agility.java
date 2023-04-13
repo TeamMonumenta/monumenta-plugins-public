@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -47,7 +46,8 @@ public class Agility extends Ability {
 				String.format("You gain permanent Haste %s. Increase melee damage by +%d plus %d%% of final damage done.", StringUtils.toRoman(AGILITY_2_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE, (int) (SCALING_DAMAGE * 100)),
 				String.format("Breaking a spawner refreshes the cooldown of all your skills by %s%%.",
 					StringUtils.multiplierToPercentage(ENHANCEMENT_COOLDOWN_REFRESH)))
-			.displayItem(new ItemStack(Material.GOLDEN_PICKAXE, 1));
+			.simpleDescription("Gain haste and increased melee damage.")
+			.displayItem(Material.GOLDEN_PICKAXE);
 
 	private Ability[] mScoutAbilities = {};
 

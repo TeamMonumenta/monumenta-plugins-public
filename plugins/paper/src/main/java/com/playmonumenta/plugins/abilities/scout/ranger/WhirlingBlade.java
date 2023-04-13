@@ -23,7 +23,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -61,10 +60,11 @@ public class WhirlingBlade extends MultipleChargeAbility {
 					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness for " + BLADE_WEAKEN_DURATION / 20 + "s. " +
 					"Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".",
 				"The damage is increased to " + BLADE_2_DAMAGE + " and also silences for " + BLADE_2_SILENCE_DURATION / 20 + "s.")
+			.simpleDescription("Damage, weaken, and knock nearby mobs back.")
 			.cooldown(BLADE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WhirlingBlade::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)
 				                                                                          .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
-			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
+			.displayItem(Material.IRON_SWORD);
 
 	private final double mDamage;
 	private final float mKnockback;

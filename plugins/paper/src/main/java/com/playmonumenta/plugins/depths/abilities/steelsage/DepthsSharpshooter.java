@@ -19,7 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
 
 public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChargesOrStacks {
 
@@ -31,7 +30,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 
 	public static final DepthsAbilityInfo<DepthsSharpshooter> INFO =
 		new DepthsAbilityInfo<>(DepthsSharpshooter.class, ABILITY_NAME, DepthsSharpshooter::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.TARGET))
+			.displayItem(Material.TARGET)
 			.descriptions(DepthsSharpshooter::getDescription);
 
 	private int mStacks = 0;

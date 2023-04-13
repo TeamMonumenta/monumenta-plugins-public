@@ -40,7 +40,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -102,12 +101,13 @@ public class UnstableAmalgam extends Ability {
 							StringUtils.multiplierToPercentage(UNSTABLE_AMALGAM_ENHANCEMENT_UNSTABLE_DAMAGE)
 					)
 			)
+			.simpleDescription("Summon a ticking bomb that launches mobs (and players, if enabled) in the air, refunding you potions.")
 			.cooldown(UNSTABLE_AMALGAM_1_COOLDOWN, UNSTABLE_AMALGAM_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", UnstableAmalgam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("toggleRocketJump", "toggle rocket jump", "Toggles knockback from the Amalgam on or off, just like using the /rocketjump command.",
 				UnstableAmalgam::toggleRocketJump, new AbilityTrigger(AbilityTrigger.Key.DROP).enabled(false).lookDirections(AbilityTrigger.LookDirection.DOWN).sneaking(true), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(new ItemStack(Material.GUNPOWDER, 1));
+			.displayItem(Material.GUNPOWDER);
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 	private boolean mHasGruesome;

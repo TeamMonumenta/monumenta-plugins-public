@@ -27,7 +27,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class CrushingEarth extends DepthsAbility {
 
@@ -43,7 +42,7 @@ public class CrushingEarth extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CrushingEarth::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.SHIELD))
+			.displayItem(Material.SHIELD)
 			.descriptions(CrushingEarth::getDescription);
 
 	public CrushingEarth(Plugin plugin, Player player) {

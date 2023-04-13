@@ -51,7 +51,7 @@ public class BottledSunlight extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BottledSunlight::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.HONEY_BOTTLE))
+			.displayItem(Material.HONEY_BOTTLE)
 			.descriptions(BottledSunlight::getDescription);
 
 	public BottledSunlight(Plugin plugin, Player player) {

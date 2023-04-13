@@ -19,7 +19,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
 
 public class FocusedCombos extends DepthsAbility {
 
@@ -30,7 +29,7 @@ public class FocusedCombos extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<FocusedCombos> INFO =
 		new DepthsAbilityInfo<>(FocusedCombos.class, ABILITY_NAME, FocusedCombos::new, DepthsTree.STEELSAGE, DepthsTrigger.COMBO)
-			.displayItem(new ItemStack(Material.SPECTRAL_ARROW))
+			.displayItem(Material.SPECTRAL_ARROW)
 			.descriptions(FocusedCombos::getDescription);
 
 	private int mComboCount = 0;

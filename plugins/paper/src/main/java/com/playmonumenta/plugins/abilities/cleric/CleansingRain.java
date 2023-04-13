@@ -21,7 +21,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
@@ -55,10 +54,11 @@ public class CleansingRain extends Ability {
 					.formatted(StringUtils.multiplierToPercentage(Math.abs(PERCENT_DAMAGE_RESIST)), StringUtils.ticksToSeconds(CLEANSING_2_COOLDOWN)),
 				"The radius increases to %s blocks, and each player touched by the rain keeps its effect for the cast duration."
 					.formatted(CLEANSING_RADIUS_ENHANCED))
+			.simpleDescription("Summon a rain cloud that cleanses debuffs and grants resistance to players blow it.")
 			.cooldown(CLEANSING_1_COOLDOWN, CLEANSING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CleansingRain::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP),
 				AbilityTriggerInfo.NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.NETHER_STAR, 1));
+			.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;
 

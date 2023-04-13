@@ -28,7 +28,6 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -54,9 +53,10 @@ public class Swiftness extends Ability {
 				String.format("In addition, gain Jump Boost %s when you are not inside a town. " +
 					              "Swap hands looking up, not sneaking, and not holding a projectile weapon to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)),
 				String.format("You now have a %d%% chance to dodge any projectile or melee attack.", (int) (DODGE_CHANCE * 100)))
+			.simpleDescription("Gain speed and jump boost.")
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle jump boost", Swiftness::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.UP),
 				AbilityTriggerInfo.NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.RABBIT_FOOT, 1));
+			.displayItem(Material.RABBIT_FOOT);
 
 	private boolean mWasInNoMobilityZone = false;
 	private boolean mJumpBoost = true;

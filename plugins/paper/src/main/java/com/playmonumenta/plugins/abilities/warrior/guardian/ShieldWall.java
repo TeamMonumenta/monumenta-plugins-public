@@ -28,7 +28,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -73,11 +72,12 @@ public class ShieldWall extends Ability {
 					StringUtils.ticksToSeconds(SHIELD_WALL_2_COOLDOWN)
 				)
 			)
+			.simpleDescription("Deploy a wall that can block projectiles and mobs from entering.")
 			.cooldown(SHIELD_WALL_1_COOLDOWN, SHIELD_WALL_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ShieldWall::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
 				new AbilityTriggerInfo.TriggerRestriction("holding a shield in either hand",
 					player -> player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)))
-			.displayItem(new ItemStack(Material.STONE_BRICK_WALL, 1));
+			.displayItem(Material.STONE_BRICK_WALL);
 
 	private final int mDuration;
 	private final ShieldWallCS mCosmetic;

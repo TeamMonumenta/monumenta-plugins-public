@@ -70,10 +70,11 @@ public class AlchemicalArtillery extends Ability {
 					.formatted(StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
 				"After launching the bomb, you have a 50% chance to be refunded 1 potion."
 			)
+			.simpleDescription("Launch a bomb in the direction you're looking, which applies your selected potion's effects on impact.")
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AlchemicalArtillery::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(new ItemStack(Material.CROSSBOW, 1));
+			.displayItem(Material.CROSSBOW);
 
 	private @Nullable AlchemistPotions mAlchemistPotions;
 

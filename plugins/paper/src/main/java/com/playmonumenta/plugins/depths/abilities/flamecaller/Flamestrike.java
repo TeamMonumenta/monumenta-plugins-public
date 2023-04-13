@@ -29,7 +29,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -49,7 +48,7 @@ public class Flamestrike extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Flamestrike::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.FLINT_AND_STEEL))
+			.displayItem(Material.FLINT_AND_STEEL)
 			.descriptions(Flamestrike::getDescription);
 
 	public Flamestrike(Plugin plugin, Player player) {

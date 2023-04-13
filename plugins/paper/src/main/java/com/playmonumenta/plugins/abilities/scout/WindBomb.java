@@ -85,10 +85,11 @@ public class WindBomb extends Ability {
 					              "Additionally, you deal %d%% more damage to enemies affected by this skill for 4 seconds.",
 					(int) (DAMAGE_FRACTION_2 * 100), COOLDOWN_2 / 20, (int) (MIDAIR_DAMAGE_BONUS * 100)),
 				String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int) PULL_RADIUS, PULL_DURATION / 20))
+			.simpleDescription("Throw a bomb that damages and shoots mobs up in the air, weakening them.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindBomb::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.TNT, 1));
+			.displayItem(Material.TNT);
 
 	private final double mDamageFraction;
 

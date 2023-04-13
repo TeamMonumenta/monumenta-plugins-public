@@ -11,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class BowAspect extends WeaponAspectDepthsAbility {
 
@@ -21,7 +20,7 @@ public class BowAspect extends WeaponAspectDepthsAbility {
 
 	public static final DepthsAbilityInfo<BowAspect> INFO =
 		new DepthsAbilityInfo<>(BowAspect.class, ABILITY_NAME, BowAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
-			.displayItem(new ItemStack(Material.BOW))
+			.displayItem(Material.BOW)
 			.description("Your sneak fire with bow ability has " + StringUtils.multiplierToPercentage(COOLDOWN_REDUCTION) + "% reduced cooldown, and you have a " +
 				             StringUtils.multiplierToPercentage(PASSIVE_ARROW_SAVE) + "% chance for arrows to not be consumed when using a bow or crossbow.");
 

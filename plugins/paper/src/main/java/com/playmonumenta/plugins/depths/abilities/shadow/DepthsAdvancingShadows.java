@@ -30,7 +30,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class DepthsAdvancingShadows extends DepthsAbility {
@@ -49,7 +48,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsAdvancingShadows::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.WITHER_SKELETON_SKULL))
+			.displayItem(Material.WITHER_SKELETON_SKULL)
 			.descriptions(DepthsAdvancingShadows::getDescription);
 
 	public DepthsAdvancingShadows(Plugin plugin, Player player) {

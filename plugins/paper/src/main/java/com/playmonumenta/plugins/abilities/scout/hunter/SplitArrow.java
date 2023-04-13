@@ -25,7 +25,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -50,7 +49,8 @@ public class SplitArrow extends Ability {
 			.descriptions(
 				"When you hit an enemy with an arrow, the next nearest enemy within " + (int) SPLIT_ARROW_CHAIN_RANGE + " blocks takes " + (int) (100 * SPLIT_ARROW_1_DAMAGE_PERCENT) + "% of the original arrow damage (ignores invulnerability frames).",
 				"Damage to the second target is increased to " + (int) (100 * SPLIT_ARROW_2_DAMAGE_PERCENT) + "% of the original arrow damage.")
-			.displayItem(new ItemStack(Material.BLAZE_ROD, 1));
+			.simpleDescription("Hitting a mob with a projectile deals part of the damage to a nearby mob.")
+			.displayItem(Material.BLAZE_ROD);
 
 	private final double mDamagePercent;
 

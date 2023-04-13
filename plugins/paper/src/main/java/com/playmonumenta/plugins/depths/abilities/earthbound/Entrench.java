@@ -22,7 +22,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class Entrench extends DepthsAbility {
 
@@ -34,7 +33,7 @@ public class Entrench extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Entrench> INFO =
 		new DepthsAbilityInfo<>(Entrench.class, ABILITY_NAME, Entrench::new, DepthsTree.EARTHBOUND, DepthsTrigger.SPAWNER)
-			.displayItem(new ItemStack(Material.SOUL_SAND))
+			.displayItem(Material.SOUL_SAND)
 			.descriptions(Entrench::getDescription);
 
 	public Entrench(Plugin plugin, Player player) {

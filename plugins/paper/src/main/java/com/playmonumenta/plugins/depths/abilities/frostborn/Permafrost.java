@@ -16,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class Permafrost extends DepthsAbility {
 
@@ -27,7 +26,7 @@ public class Permafrost extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Permafrost> INFO =
 		new DepthsAbilityInfo<>(Permafrost.class, ABILITY_NAME, Permafrost::new, DepthsTree.FROSTBORN, DepthsTrigger.SPAWNER)
-			.displayItem(new ItemStack(Material.QUARTZ))
+			.displayItem(Material.QUARTZ)
 			.descriptions(Permafrost::getDescription);
 
 	public Permafrost(Plugin plugin, Player player) {

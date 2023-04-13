@@ -21,7 +21,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +60,8 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 				String.format("Damage increased to %s, and you can now store up to %s stacks.",
 					RONDE_2_DAMAGE,
 					RONDE_2_MAX_STACKS))
-			.displayItem(new ItemStack(Material.BLAZE_ROD, 1));
+			.simpleDescription("Damage nearby mobs when striking after casting an ability.")
+			.displayItem(Material.BLAZE_ROD);
 
 	private @Nullable BukkitRunnable mActiveRunnable = null;
 	private int mRondeStacks = 0;

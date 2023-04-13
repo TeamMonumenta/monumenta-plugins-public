@@ -37,7 +37,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -76,7 +75,8 @@ public class CursedWound extends Ability {
 				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
 					"as well as 3% of your melee attack's damage as magic damage per effect.")
-			.displayItem(new ItemStack(Material.GOLDEN_SWORD, 1));
+			.simpleDescription("Your attacks deal more damage for each ability on cooldown and apply damage over time.")
+			.displayItem(Material.GOLDEN_SWORD);
 
 	private final double mCursedWoundDamage;
 	private @Nullable Collection<PotionEffect> mStoredPotionEffects;

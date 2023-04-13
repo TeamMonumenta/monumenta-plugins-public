@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class BrutalAlchemy extends Ability implements PotionAbility {
@@ -53,7 +52,8 @@ public class BrutalAlchemy extends Ability implements PotionAbility {
 							StringUtils.ticksToSeconds(BRUTAL_ALCHEMY_DURATION)
 					)
 			)
-			.displayItem(new ItemStack(Material.REDSTONE, 1));
+			.simpleDescription("Apply a magic damage over time effect to mobs hit by your brutal potions.")
+			.displayItem(Material.REDSTONE);
 
 	private final int mPeriod;
 	private @MonotonicNonNull AlchemistPotions mAlchemistPotions;

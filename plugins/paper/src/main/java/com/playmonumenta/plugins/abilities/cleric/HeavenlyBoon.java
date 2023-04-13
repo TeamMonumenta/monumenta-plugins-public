@@ -70,7 +70,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					ENHANCEMENT_POTION_EFFECT_MAX_BOOST / 20,
 					ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
 				))
-			.displayItem(new ItemStack(Material.SPLASH_POTION, 1));
+			.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Undead enemies.")
+			.displayItem(Material.SPLASH_POTION);
 
 	private static final ImmutableSet<String> BOON_DROPS = ImmutableSet.of(
 		"Regeneration Boon", "Speed Boon", "Strength Boon", "Absorption Boon", "Resistance Boon",

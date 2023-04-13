@@ -31,7 +31,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -50,7 +49,7 @@ public class PiercingCold extends DepthsAbility {
 			.linkedSpell(ClassAbility.PIERCING_COLD)
 			.cooldown(COOLDOWN)
 			.actionBarColor(TextColor.color(80, 32, 140))
-			.displayItem(new ItemStack(Material.PRISMARINE_SHARD))
+			.displayItem(Material.PRISMARINE_SHARD)
 			.descriptions(PiercingCold::getDescription);
 
 	public PiercingCold(Plugin plugin, Player player) {

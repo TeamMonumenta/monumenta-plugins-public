@@ -23,7 +23,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class Fireball extends DepthsAbility {
@@ -41,7 +40,7 @@ public class Fireball extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Fireball::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.FIREWORK_STAR))
+			.displayItem(Material.FIREWORK_STAR)
 			.descriptions(Fireball::getDescription);
 
 	public Fireball(Plugin plugin, Player player) {

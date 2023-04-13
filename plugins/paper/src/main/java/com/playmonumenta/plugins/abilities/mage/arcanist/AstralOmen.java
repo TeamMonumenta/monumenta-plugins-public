@@ -33,7 +33,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class AstralOmen extends Ability {
 	public static final String NAME = "Astral Omen";
@@ -87,7 +86,8 @@ public class AstralOmen extends Ability {
 					StringUtils.ticksToSeconds(BONUS_TICKS)
 				)
 			)
-			.displayItem(new ItemStack(Material.NETHER_STAR, 1));
+			.simpleDescription("Upon damaging a mob with multiple types of magic, deal damage to nearby mobs.")
+			.displayItem(Material.NETHER_STAR);
 
 	static {
 		mElementClassification = new HashMap<>();

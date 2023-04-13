@@ -23,7 +23,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class FrigidCombos extends DepthsAbility {
 
@@ -35,7 +34,7 @@ public class FrigidCombos extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<FrigidCombos> INFO =
 		new DepthsAbilityInfo<>(FrigidCombos.class, ABILITY_NAME, FrigidCombos::new, DepthsTree.FROSTBORN, DepthsTrigger.COMBO)
-			.displayItem(new ItemStack(Material.BLUE_DYE))
+			.displayItem(Material.BLUE_DYE)
 			.descriptions(FrigidCombos::getDescription);
 
 	private int mComboCount = 0;

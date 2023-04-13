@@ -63,8 +63,9 @@ public class Riposte extends Ability {
 					.formatted(StringUtils.ticksToSeconds(RIPOSTE_2_COOLDOWN), StringUtils.ticksToSeconds(RIPOSTE_SWORD_DURATION), StringUtils.ticksToSeconds(RIPOSTE_AXE_DURATION)),
 				"When Riposte activates, deal %s melee damage to all mobs in a %s block radius and root them for %ss."
 					.formatted(ENHANCEMENT_DAMAGE, ENHANCEMENT_RADIUS, StringUtils.ticksToSeconds(ENHANCEMENT_ROOT_DURATION)))
+			.simpleDescription("While holding a weapon, cancel a mob's melee attack, stunning the mob or gaining damage.")
 			.cooldown(RIPOSTE_1_COOLDOWN, RIPOSTE_2_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
+			.displayItem(Material.SKELETON_SKULL);
 
 	private int mSwordTimer = Integer.MIN_VALUE;
 

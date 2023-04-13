@@ -105,10 +105,11 @@ public class HuntingCompanion extends Ability {
 					"The eagle can swoop towards its target. " +
 					"The eagle applies " + (int) (BLEED_AMOUNT * 100) + "% Bleed for " + BLEED_DURATION / 20 + "s instead of stunning, which can be reapplied on a mob. " +
 					"If used in water, a dolphin is spawned instead.")
+			.simpleDescription("Summon a fox to help you fight and stun mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.SWEET_BERRIES, 1));
+			.displayItem(Material.SWEET_BERRIES);
 
 	private final HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;

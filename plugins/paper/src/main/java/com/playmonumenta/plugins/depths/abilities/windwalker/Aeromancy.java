@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Aeromancy extends DepthsAbility {
 
@@ -24,7 +23,7 @@ public class Aeromancy extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Aeromancy> INFO =
 		new DepthsAbilityInfo<>(Aeromancy.class, ABILITY_NAME, Aeromancy::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.FEATHER))
+			.displayItem(Material.FEATHER)
 			.descriptions(Aeromancy::getDescription);
 
 	public Aeromancy(Plugin plugin, Player player) {

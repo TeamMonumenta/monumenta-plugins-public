@@ -33,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -50,7 +49,7 @@ public class Earthquake extends DepthsAbility {
 		new DepthsAbilityInfo<>(Earthquake.class, ABILITY_NAME, Earthquake::new, DepthsTree.EARTHBOUND, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.EARTHQUAKE)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.COARSE_DIRT))
+			.displayItem(Material.COARSE_DIRT)
 			.descriptions(Earthquake::getDescription);
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;

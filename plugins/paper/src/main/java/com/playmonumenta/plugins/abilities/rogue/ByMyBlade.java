@@ -20,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,8 +62,9 @@ public class ByMyBlade extends Ability {
 					(int) (ENHANCEMENT_DAMAGE_MULT * 100),
 					(int) (ENHANCEMENT_HEAL_PERCENT * 100),
 					(int) (ENHANCEMENT_HEAL_PERCENT_ELITE * 100)))
+			.simpleDescription("Critical hits periodically do more damage and give haste.")
 			.cooldown(BY_MY_BLADE_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
+			.displayItem(Material.SKELETON_SKULL);
 
 	private final double mDamageBonus;
 	private final int mHasteAmplifier;

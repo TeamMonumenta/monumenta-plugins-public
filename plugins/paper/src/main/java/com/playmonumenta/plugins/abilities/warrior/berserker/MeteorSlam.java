@@ -25,7 +25,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -103,9 +102,10 @@ public final class MeteorSlam extends Ability {
 					SIZE_2
 				)
 			)
+			.simpleDescription("Gain jump boost, and deal area damage when you fall from heights.")
 			.cooldown(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MeteorSlam::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)))
-			.displayItem(new ItemStack(Material.FIRE_CHARGE, 1));
+			.displayItem(Material.FIRE_CHARGE);
 
 	private final double mLevelDamage;
 	private final double mLevelReducedDamage;

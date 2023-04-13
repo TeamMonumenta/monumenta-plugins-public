@@ -23,7 +23,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,8 +70,9 @@ public class ScorchedEarth extends MultipleChargeAbility implements PotionAbilit
 							SCORCHED_EARTH_2_CHARGES
 					)
 			)
+			.simpleDescription("Deploy a circular zone in which enemies take extra damage based on your potion damage.")
 			.cooldown(SCORCHED_EARTH_1_COOLDOWN, SCORCHED_EARTH_2_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.BROWN_DYE, 1));
+			.displayItem(Material.BROWN_DYE);
 
 	private final List<Instance> mActiveInstances = new ArrayList<>();
 

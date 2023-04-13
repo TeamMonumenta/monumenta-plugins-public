@@ -22,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +61,8 @@ public class ViciousCombos extends Ability {
 					ENHANCEMENT_CHARGE_LIFETIME / 20,
 					(int) (ENHANCEMENT_DAMAGE_INCREASE * 100),
 					ENHANCEMENT_COOLDOWN_REDUCTION / 20))
-			.displayItem(new ItemStack(Material.ZOMBIE_HEAD, 1));
+			.simpleDescription("Killing mobs reduces cooldowns, and killing elite mobs completely refresh them.")
+			.displayItem(Material.ZOMBIE_HEAD);
 
 	private @Nullable ClassAbility mLastAbility = null;
 	private int mAbilityCastTime = 0;

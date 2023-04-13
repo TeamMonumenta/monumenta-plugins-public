@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -69,10 +68,11 @@ public class MelancholicLament extends Ability {
 					.formatted(StringUtils.multiplierToPercentage(WEAKEN_EFFECT_2), StringUtils.ticksToSeconds(CLEANSE_REDUCTION)),
 				"For %ss after casting this ability, you and your allies in a %s block radius gain +%s%% melee damage for each mob in that same radius targeting you (capped at %s mobs)."
 					.formatted(StringUtils.ticksToSeconds(DURATION), ENHANCE_RADIUS, StringUtils.multiplierToPercentage(ENHANCE_DAMAGE), ENHANCE_MAX_MOBS))
+			.simpleDescription("Weaken nearby mobs and force them to target you.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MelancholicLament::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.GHAST_TEAR, 1));
+			.displayItem(Material.GHAST_TEAR);
 
 	private final double mWeakenEffect;
 

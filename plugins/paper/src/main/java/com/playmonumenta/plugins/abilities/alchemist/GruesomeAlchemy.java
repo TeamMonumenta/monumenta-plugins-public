@@ -17,7 +17,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class GruesomeAlchemy extends Ability implements PotionAbility {
@@ -57,11 +56,12 @@ public class GruesomeAlchemy extends Ability implements PotionAbility {
 				"Your Gruesome potions now additionally paralyze (25%% chance for 100%% slowness for a second once a second) mobs for %ss."
 					.formatted(StringUtils.ticksToSeconds(GRUESOME_ALCHEMY_DURATION))
 			)
+			.simpleDescription("Throw potions that deal less damage, but slow and apply vulnerability to enemies.")
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", "Toggles between throwing gruesome or brutal potions.",
 				GruesomeAlchemy::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("throwOpposite", "throw opposite potion", "Throws a potion of the opposite type, e.g. a gruesome potion if brutal potions are selected.",
 				GruesomeAlchemy::throwOpposite, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
+			.displayItem(Material.SKELETON_SKULL);
 
 	private final double mSlownessAmount;
 	private final double mVulnerabilityAmount;

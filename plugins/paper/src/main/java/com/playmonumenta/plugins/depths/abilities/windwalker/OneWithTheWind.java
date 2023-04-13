@@ -15,7 +15,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class OneWithTheWind extends DepthsAbility {
@@ -29,7 +28,7 @@ public class OneWithTheWind extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<OneWithTheWind> INFO =
 		new DepthsAbilityInfo<>(OneWithTheWind.class, ABILITY_NAME, OneWithTheWind::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.LIGHT_GRAY_BANNER))
+			.displayItem(Material.LIGHT_GRAY_BANNER)
 			.descriptions(OneWithTheWind::getDescription);
 
 	private boolean mActive = false;

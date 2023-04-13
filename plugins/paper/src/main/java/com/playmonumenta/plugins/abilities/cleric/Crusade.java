@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -32,7 +31,8 @@ public class Crusade extends Ability {
 				String.format("Gain %s%% ability damage for every mob affected by this ability within %s blocks, capping at %s mobs.",
 					(int) (ENHANCEMENT_BONUS_DAMAGE * 100), ENHANCEMENT_RADIUS, ENHANCEMENT_MAX_MOBS)
 			)
-			.displayItem(new ItemStack(Material.ZOMBIE_HEAD, 1));
+			.simpleDescription("Passively count Humanoid mobs as Undead. Temporarily mark Monstrous mobs as Undead with abilities.")
+			.displayItem(Material.ZOMBIE_HEAD);
 
 	public Crusade(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

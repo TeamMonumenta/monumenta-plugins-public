@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -25,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class PrismaticShield extends Ability {
@@ -77,8 +75,9 @@ public class PrismaticShield extends Ability {
 					DAMAGE_BUFF_PERCENT,
 					HEAL_PERCENT)
 			)
+			.simpleDescription("When health drops below a threshold, gain absorption.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.SHIELD, 1))
+			.displayItem(Material.SHIELD)
 			.priorityAmount(10000);
 
 	private final int mAbsorptionHealth;

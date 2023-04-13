@@ -29,7 +29,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -97,10 +96,11 @@ public class Panacea extends Ability {
 							StringUtils.multiplierToPercentage(PANACEA_LEVEL_2_DOT_MULTIPLIER)
 					)
 			)
+			.simpleDescription("Launch a slow moving projectile that inflicts a heavy damage over time effect to mobs hit, shielding allies in the process.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Panacea::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(new ItemStack(Material.PURPLE_CONCRETE_POWDER, 1));
+			.displayItem(Material.PURPLE_CONCRETE_POWDER);
 
 	private final double mShield;
 	private final int mSlowTicks;

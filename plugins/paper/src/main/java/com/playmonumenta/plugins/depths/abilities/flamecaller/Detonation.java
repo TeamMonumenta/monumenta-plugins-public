@@ -25,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class Detonation extends DepthsAbility {
 
@@ -36,7 +35,7 @@ public class Detonation extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Detonation> INFO =
 		new DepthsAbilityInfo<>(Detonation.class, ABILITY_NAME, Detonation::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.TNT))
+			.displayItem(Material.TNT)
 			.descriptions(Detonation::getDescription);
 
 	public Detonation(Plugin plugin, Player player) {

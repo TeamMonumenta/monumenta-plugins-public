@@ -27,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -74,10 +73,11 @@ public class EscapeDeath extends Ability {
 				String.format("When this skill is triggered, gain a regenerating effect that heals you for %s%% hp every second for %ss. The effect is canceled if you take damage from an enemy.",
 					(int) (ENHANCEMENT_HEAL_PERCENT * 100),
 					ENHANCEMENT_DURATION / 20))
+			.simpleDescription("When health drops below a threshold, stun nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("toggleJumpBoost", "toggle jump boost", EscapeDeath::toggleJumpBoost,
 				new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP).enabled(false), AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.DRAGON_BREATH, 1))
+			.displayItem(Material.DRAGON_BREATH)
 			.priorityAmount(10000);
 
 	public EscapeDeath(Plugin plugin, Player player) {

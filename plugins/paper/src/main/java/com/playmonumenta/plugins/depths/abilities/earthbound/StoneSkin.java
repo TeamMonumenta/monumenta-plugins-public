@@ -22,7 +22,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class StoneSkin extends DepthsAbility {
@@ -41,7 +40,7 @@ public class StoneSkin extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", StoneSkin::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.POLISHED_ANDESITE))
+			.displayItem(Material.POLISHED_ANDESITE)
 			.descriptions(StoneSkin::getDescription);
 
 	public StoneSkin(Plugin plugin, Player player) {

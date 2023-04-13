@@ -25,7 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,9 +62,10 @@ public class LuminousInfusion extends Ability {
 				"Your melee attacks now passively deal 15% magic damage to undead enemies, " +
 					"and Divine Justice now passively deals 15% more total damage. " +
 					"Damaging an undead enemy now passively sets it on fire for 3s.")
+			.simpleDescription("Upon activating, the next damage dealt to an Undead enemy causes an explosion.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LuminousInfusion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
-			.displayItem(new ItemStack(Material.BLAZE_POWDER, 1));
+			.displayItem(Material.BLAZE_POWDER);
 
 	private boolean mActive = false;
 	private final LuminousInfusionCS mCosmetic;

@@ -98,7 +98,8 @@ public class DivineJustice extends Ability {
 					ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION / (60 * 20)
 				)
 			)
-			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
+			.simpleDescription("Deal extra damage on critical melee attacks against Undead enemies and heal when killing Undead enemies.")
+			.displayItem(Material.IRON_SWORD);
 
 	private final boolean mDoHealingAndMultiplier;
 

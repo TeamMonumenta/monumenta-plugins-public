@@ -27,7 +27,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -63,11 +62,12 @@ public class HolyJavelin extends Ability {
 					"It deals 22 magic damage to all undead enemies in a 0.75-block cube around it along its path, and 11 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.",
 				"Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. " +
 					"Damage is increased to 36 against undead, and to 22 against non-undead.")
+			.simpleDescription("Throw a piercing spear of light that ignites and damages mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HolyJavelin::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false).sprinting(true)
 					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
-			.displayItem(new ItemStack(Material.TRIDENT, 1))
+			.displayItem(Material.TRIDENT)
 			.priorityAmount(1001); // shortly after divine justice and luminous infusion
 
 	private @Nullable Crusade mCrusade;

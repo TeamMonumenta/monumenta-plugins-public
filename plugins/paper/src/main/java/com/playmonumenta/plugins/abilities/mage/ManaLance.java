@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 
 public class ManaLance extends MultipleChargeAbility {
@@ -54,10 +53,11 @@ public class ManaLance extends MultipleChargeAbility {
 					(int) DAMAGE_2,
 					COOLDOWN_2 / 20),
 				"Mana lance now has two charges.")
+			.simpleDescription("Shoot a beam that damages mobs in its path")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ManaLance::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.TRIDENT, 1));
+			.displayItem(Material.TRIDENT);
 
 	private final float mDamage;
 	private int mLastCastTicks = 0;

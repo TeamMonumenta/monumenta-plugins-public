@@ -28,7 +28,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class DarkPact extends Ability {
@@ -69,11 +68,13 @@ public class DarkPact extends Ability {
 				("Attacks with a scythe deal +%s%% melee damage, and Soul Rend bypasses the healing prevention, healing the player by +%s/+%s HP, depending on the level of Soul Rend. " +
 					 "Nearby players are still healed as normal.")
 					.formatted(StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_2), SoulRend.HEAL_1, SoulRend.HEAL_2))
+			.simpleDescription("Deal extra melee damage and gain absorption per kill at the cost of not being able to heal for a short period of time.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DarkPact::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.SOUL_SAND, 1))
+			.displayItem(Material.SOUL_SAND)
 			.priorityAmount(950); // multiplicative damage before additive
+
 
 	private final double mPercentDamageDealt;
 	private boolean mActive = false;

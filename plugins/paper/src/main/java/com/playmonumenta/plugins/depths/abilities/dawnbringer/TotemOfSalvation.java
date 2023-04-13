@@ -59,7 +59,7 @@ public class TotemOfSalvation extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.actionBarColor(TextColor.color(254, 212, 38))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemOfSalvation::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.TOTEM_OF_UNDYING))
+			.displayItem(Material.TOTEM_OF_UNDYING)
 			.descriptions(TotemOfSalvation::getDescription);
 
 	private static final Collection<Map.Entry<Double, SpawnParticleAction>> PARTICLES =

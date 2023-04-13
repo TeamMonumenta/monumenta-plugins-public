@@ -19,7 +19,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /*
  * Coup De Grâce: If you melee attack a normal enemy and that attack
@@ -53,7 +52,8 @@ public class CoupDeGrace extends Ability {
 				String.format("The health threshold is increased to %s%% for normal enemies and %s%% for elites.",
 					(int) (COUP_2_NORMAL_THRESHOLD * 100),
 					(int) (COUP_2_ELITE_THRESHOLD * 100)))
-			.displayItem(new ItemStack(Material.WITHER_SKELETON_SKULL, 1))
+			.simpleDescription("Instantly kill mobs brought below a health threshold.")
+			.displayItem(Material.WITHER_SKELETON_SKULL)
 			.priorityAmount(5000); // after all damage modifiers to get the proper final damage
 
 	public CoupDeGrace(Plugin plugin, Player player) {

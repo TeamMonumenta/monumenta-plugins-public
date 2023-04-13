@@ -31,7 +31,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
@@ -81,8 +80,9 @@ public class Dodging extends Ability {
 					(int) (PERCENT_SPEED * 100),
 					DODGING_SPEED_EFFECT_DURATION / 20),
 				"The projectile you dodged is now reflected back to the enemy at 3x damage.")
+			.simpleDescription("Dodge a projectile that would otherwise hit you.")
 			.cooldown(DODGING_COOLDOWN_1, DODGING_COOLDOWN_2, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.SHIELD, 1));
+			.displayItem(Material.SHIELD);
 
 	private int mTriggerTick = 0;
 

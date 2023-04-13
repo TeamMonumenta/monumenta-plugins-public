@@ -25,7 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -90,10 +89,11 @@ public class HandOfLight extends Ability {
 					(int) (ENHANCEMENT_COOLDOWN_REDUCTION_MAX * 100),
 					ENHANCEMENT_UNDEAD_STUN_DURATION / 20.0
 				))
+			.simpleDescription("Heal all players in front of the Cleric, and damage all mobs based on the number of Undead in the area.")
 			.cooldown(HEALING_1_COOLDOWN, HEALING_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HandOfLight::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK)
 				                                                                        .keyOptions(AbilityTrigger.KeyOptions.SNEAK_WITH_SHIELD).keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
-			.displayItem(new ItemStack(Material.PINK_DYE, 1));
+			.displayItem(Material.PINK_DYE);
 
 	private final double mRange;
 	private final int mFlat;

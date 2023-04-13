@@ -22,7 +22,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,9 +59,10 @@ public class EnchantedPrayer extends Ability {
 				"Swapping while shifted enchants the weapons of all players in a 15 block radius with holy magic. " +
 					"Their next melee or projectile attack deals an additional 12 damage in a 3-block radius while healing the player for 10% of max health. Cooldown: 15s.",
 				"Damage is increased to 20. Healing is increased to 20% of max health.")
+			.simpleDescription("The next attack by you and nearby players causes an explosion and heals the player.")
 			.cooldown(ENCHANTED_PRAYER_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EnchantedPrayer::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
-			.displayItem(new ItemStack(Material.CHORUS_FRUIT, 1));
+			.displayItem(Material.CHORUS_FRUIT);
 
 	public EnchantedPrayer(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

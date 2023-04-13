@@ -22,7 +22,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 
@@ -37,7 +36,7 @@ public class Whirlwind extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Whirlwind> INFO =
 		new DepthsAbilityInfo<>(Whirlwind.class, ABILITY_NAME, Whirlwind::new, DepthsTree.WINDWALKER, DepthsTrigger.SPAWNER)
-			.displayItem(new ItemStack(Material.IRON_PICKAXE))
+			.displayItem(Material.IRON_PICKAXE)
 			.descriptions(Whirlwind::getDescription);
 
 	public Whirlwind(Plugin plugin, Player player) {

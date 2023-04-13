@@ -26,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 
@@ -80,10 +79,11 @@ public class CelestialBlessing extends Ability {
 					.formatted(StringUtils.multiplierToPercentage(CELESTIAL_2_EXTRA_DAMAGE)),
 				"Magic damage is now increased as well. Cooldown: %ss."
 					.formatted(StringUtils.ticksToSeconds(CELESTIAL_COOLDOWN_ENHANCED)))
+			.simpleDescription("Grant yourself and nearby players speed and increased damage.")
 			.cooldown(CELESTIAL_COOLDOWN, CELESTIAL_COOLDOWN, CELESTIAL_COOLDOWN_ENHANCED, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CelestialBlessing::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
 				                                                                              .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
-			.displayItem(new ItemStack(Material.SUGAR, 1));
+			.displayItem(Material.SUGAR);
 
 	private final int mDuration;
 	private final double mExtraDamage;

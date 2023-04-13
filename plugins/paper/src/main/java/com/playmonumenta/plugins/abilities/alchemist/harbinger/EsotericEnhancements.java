@@ -29,7 +29,6 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,8 +77,9 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 				"Damage is increased to %s%% of your potion damage."
 					.formatted(StringUtils.multiplierToPercentage(ABERRATION_POTION_DAMAGE_MULTIPLIER_2))
 			)
+			.simpleDescription("Stack the effects of gruesome and brutal on an enemy to summon a friendly creeper.")
 			.cooldown(ABERRATION_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.CREEPER_HEAD, 1));
+			.displayItem(Material.CREEPER_HEAD);
 
 	private final double mDamageMultiplier;
 	private final HashMap<LivingEntity, Integer> mAppliedMobs;

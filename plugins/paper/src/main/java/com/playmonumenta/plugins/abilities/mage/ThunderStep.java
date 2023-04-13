@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -103,10 +102,11 @@ public class ThunderStep extends Ability {
 					ENHANCEMENT_PARALYZE_DURATION / 20
 				)
 			)
+			.simpleDescription("Teleport forward, damaging mobs at the origin and destination.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ThunderStep::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.HORN_CORAL, 1));
+			.displayItem(Material.HORN_CORAL);
 
 	private final float mLevelDamage;
 	private final int mLevelDistance;

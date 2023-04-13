@@ -21,7 +21,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CosmicMoonblade extends Ability {
@@ -63,10 +62,11 @@ public class CosmicMoonblade extends Ability {
 					(int) (REDUCTION_MULTIPLIER_2 * 100),
 					CAP_TICKS_2 / 20,
 					(int) DAMAGE_2))
+			.simpleDescription("Damage mobs in a cone twice and reduce cooldowns if mobs are damaged.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CosmicMoonblade::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.DIAMOND_SWORD, 1));
+			.displayItem(Material.DIAMOND_SWORD);
 
 	private final double mDamage;
 	private final double mLevelReduction;

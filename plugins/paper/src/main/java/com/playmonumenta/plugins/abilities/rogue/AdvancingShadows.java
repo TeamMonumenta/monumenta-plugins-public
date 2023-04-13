@@ -30,7 +30,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -80,10 +79,11 @@ public class AdvancingShadows extends Ability {
 				String.format("If the mob you teleported to dies within %ss, you can recast Advancing Shadows again in the next %ss.",
 					ENHANCEMENT_KILL_REQUIREMENT_TIME / 20,
 					ENHANCEMENT_CHAIN_DURATION / 20))
+			.simpleDescription("Teleport to a mob and gain a damage bonus.")
 			.cooldown(ADVANCING_SHADOWS_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AdvancingShadows::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.ENDER_EYE, 1));
+			.displayItem(Material.ENDER_EYE);
 
 	private final double mPercentDamageDealt;
 	private final double mActivationRange;

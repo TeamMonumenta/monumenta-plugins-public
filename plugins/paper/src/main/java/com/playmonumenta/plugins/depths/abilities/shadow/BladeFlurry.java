@@ -26,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -44,7 +43,7 @@ public class BladeFlurry extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeFlurry::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.IRON_SWORD))
+			.displayItem(Material.IRON_SWORD)
 			.descriptions(BladeFlurry::getDescription);
 
 	public BladeFlurry(Plugin plugin, Player player) {

@@ -15,7 +15,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.inventory.ItemStack;
 
 public class EmpoweringOdor extends Ability implements PotionAbility {
 	public static final int POTION_RECHARGE_TIME_REDUCTION_2 = 10;
@@ -51,7 +50,8 @@ public class EmpoweringOdor extends Ability implements PotionAbility {
 				"refreshing on each application.")
 					.formatted(StringUtils.multiplierToPercentage(EMPOWERING_ODOR_ENHANCEMENT_DAMAGE_AMPLIFIER))
 			)
-			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+			.simpleDescription("Buff allies splashed by your potions.")
+			.displayItem(Material.GLOWSTONE_DUST);
 
 	private final double mDamageAmplifier;
 

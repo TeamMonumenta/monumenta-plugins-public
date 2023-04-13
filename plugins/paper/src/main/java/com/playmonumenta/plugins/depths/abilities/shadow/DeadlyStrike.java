@@ -13,7 +13,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class DeadlyStrike extends DepthsAbility {
 
@@ -22,7 +21,7 @@ public class DeadlyStrike extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DeadlyStrike> INFO =
 		new DepthsAbilityInfo<>(DeadlyStrike.class, ABILITY_NAME, DeadlyStrike::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.BLACK_CONCRETE_POWDER))
+			.displayItem(Material.BLACK_CONCRETE_POWDER)
 			.descriptions(DeadlyStrike::getDescription);
 
 	public DeadlyStrike(Plugin plugin, Player player) {

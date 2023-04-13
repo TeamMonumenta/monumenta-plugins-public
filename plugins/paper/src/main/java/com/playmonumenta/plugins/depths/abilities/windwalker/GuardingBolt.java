@@ -30,7 +30,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -51,7 +50,7 @@ public class GuardingBolt extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GuardingBolt::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.HORN_CORAL))
+			.displayItem(Material.HORN_CORAL)
 			.descriptions(GuardingBolt::getDescription);
 
 	public GuardingBolt(Plugin plugin, Player player) {

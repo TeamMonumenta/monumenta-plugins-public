@@ -50,7 +50,7 @@ public class LightningBottle extends DepthsAbility {
 	public static final DepthsAbilityInfo<LightningBottle> INFO =
 		new DepthsAbilityInfo<>(LightningBottle.class, ABILITY_NAME, LightningBottle::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.LIGHTNING_BOTTLE)
-			.displayItem(new ItemStack(Material.BREWING_STAND))
+			.displayItem(Material.BREWING_STAND)
 			.descriptions(LightningBottle::getDescription);
 
 	private final WeakHashMap<ThrownPotion, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;

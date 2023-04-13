@@ -26,7 +26,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -67,8 +66,9 @@ public class SanctifiedArmor extends Ability {
 					" and the undead enemy is also afflicted with 20% Slowness for 3 seconds." +
 					" Cooldown: 2s",
 				"If the most recently affected mob is killed by any means other than Sanctified Armor or Thorns damage, regain half the health lost from the last damage taken.")
+			.simpleDescription("When taking damage from an Undead enemy, deal damage back based on your current health.")
 			.cooldown(DAMAGE_COOLDOWN_1, DAMAGE_COOLDOWN_2)
-			.displayItem(new ItemStack(Material.IRON_CHESTPLATE, 1))
+			.displayItem(Material.IRON_CHESTPLATE)
 			.priorityAmount(5000); // after all damage modifiers, but before lifelines, to get the proper final damage
 
 	private final double mMaxPercentDamage;

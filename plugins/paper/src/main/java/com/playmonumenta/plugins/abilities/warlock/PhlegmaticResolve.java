@@ -23,7 +23,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class PhlegmaticResolve extends Ability {
@@ -60,7 +59,8 @@ public class PhlegmaticResolve extends Ability {
 				"Increase to +2.5% Damage Reduction per spell on cooldown, and players within 7 blocks are given 33% of your bonuses. (Does not stack with multiple Warlocks.)",
 				"All non-ailment damage taken is instead converted into a short Damage-over-Time effect. " +
 					"A third of the damage stored is dealt every second for 3s. Each time this stored damage is dealt, deal 5% of the initial damage to all mobs in a 3 block radius.")
-			.displayItem(new ItemStack(Material.SHIELD, 1));
+			.simpleDescription("Gain resistance and knockback resistance for each ability on cooldown.")
+			.displayItem(Material.SHIELD);
 
 	public PhlegmaticResolve(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

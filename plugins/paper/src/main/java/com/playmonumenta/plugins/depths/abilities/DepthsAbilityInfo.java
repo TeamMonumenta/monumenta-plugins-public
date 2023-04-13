@@ -21,6 +21,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -71,7 +72,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	}
 
 	@Override
-	public DepthsAbilityInfo<T> displayItem(ItemStack displayItem) {
+	public DepthsAbilityInfo<T> displayItem(Material displayItem) {
 		super.displayItem(displayItem);
 		return this;
 	}
@@ -187,10 +188,11 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 			item.mRarity = rarity;
 			item.mAbility = getDisplayName();
 			item.mTrigger = mDepthsTrigger;
-			ItemStack stack = getDisplayItem();
-			if (stack == null) {
+			Material mat = getDisplayItem();
+			if (mat == null) {
 				return null;
 			}
+			ItemStack stack = new ItemStack(mat, 1);
 			ItemMeta meta = stack.getItemMeta();
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			TextColor color = mDepthsTree == null ? NamedTextColor.WHITE : mDepthsTree.getColor();

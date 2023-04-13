@@ -20,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -62,10 +61,11 @@ public class DaggerThrow extends Ability {
 				String.format("Targets are additionally silenced for %ss. Vulnerability is increased by %s%%.",
 					DAGGER_THROW_SILENCE_DURATION / 20,
 					(int) (DAGGER_THROW_VULN_ENHANCEMENT * 100)))
+			.simpleDescription("Throw daggers that deal damage and apply vulnerability.")
 			.cooldown(DAGGER_THROW_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DaggerThrow::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.WOODEN_SWORD, 1));
+			.displayItem(Material.WOODEN_SWORD);
 
 	private final double mDamage;
 	private final double mVulnAmplifier;

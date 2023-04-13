@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class Apocalypse extends DepthsAbility {
@@ -45,7 +44,7 @@ public class Apocalypse extends DepthsAbility {
 		new DepthsAbilityInfo<>(Apocalypse.class, ABILITY_NAME, Apocalypse::new, DepthsTree.FLAMECALLER, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.APOCALYPSE)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.ORANGE_DYE))
+			.displayItem(Material.ORANGE_DYE)
 			.descriptions(Apocalypse::getDescription)
 			.priorityAmount(10000);
 

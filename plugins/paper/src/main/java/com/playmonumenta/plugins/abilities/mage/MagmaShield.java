@@ -22,7 +22,6 @@ import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 
 public class MagmaShield extends Ability {
@@ -80,10 +79,11 @@ public class MagmaShield extends Ability {
 					(int) (100 * ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS),
 					ENHANCEMENT_BONUS_DURATION / 20
 				))
+			.simpleDescription("Damage and ignite mobs in a cone")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MagmaShield::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.MAGMA_CREAM, 1));
+			.displayItem(Material.MAGMA_CREAM);
 
 	private final float mLevelDamage;
 

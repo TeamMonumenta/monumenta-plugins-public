@@ -29,7 +29,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +46,7 @@ public class SteelStallion extends DepthsAbility {
 		new DepthsAbilityInfo<>(SteelStallion.class, ABILITY_NAME, SteelStallion::new, DepthsTree.STEELSAGE, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.STEEL_STALLION)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.IRON_HORSE_ARMOR))
+			.displayItem(Material.IRON_HORSE_ARMOR)
 			.descriptions(SteelStallion::getDescription)
 			.priorityAmount(10000);
 

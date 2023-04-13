@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class SwordAspect extends WeaponAspectDepthsAbility {
 
@@ -19,7 +18,7 @@ public class SwordAspect extends WeaponAspectDepthsAbility {
 
 	public static final DepthsAbilityInfo<SwordAspect> INFO =
 		new DepthsAbilityInfo<>(SwordAspect.class, ABILITY_NAME, SwordAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
-			.displayItem(new ItemStack(Material.IRON_SWORD))
+			.displayItem(Material.IRON_SWORD)
 			.description("You deal 2.5 extra melee damage when holding a sword.");
 
 	public SwordAspect(Plugin plugin, Player player) {

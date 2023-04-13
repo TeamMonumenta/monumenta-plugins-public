@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class Cryobox extends DepthsAbility {
@@ -47,7 +46,7 @@ public class Cryobox extends DepthsAbility {
 		new DepthsAbilityInfo<>(Cryobox.class, ABILITY_NAME, Cryobox::new, DepthsTree.FROSTBORN, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.CRYOBOX)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.GHAST_TEAR))
+			.displayItem(Material.GHAST_TEAR)
 			.descriptions(Cryobox::getDescription)
 			.priorityAmount(10000);
 

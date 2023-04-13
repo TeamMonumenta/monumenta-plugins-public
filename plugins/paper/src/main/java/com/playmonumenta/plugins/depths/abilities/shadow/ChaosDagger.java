@@ -56,7 +56,7 @@ public class ChaosDagger extends DepthsAbility {
 			.linkedSpell(ClassAbility.CHAOS_DAGGER)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChaosDagger::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.ITEM_FRAME))
+			.displayItem(Material.ITEM_FRAME)
 			.descriptions(ChaosDagger::getDescription);
 
 	private @Nullable Entity mHitMob;

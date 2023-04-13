@@ -29,7 +29,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
@@ -89,6 +88,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 						StringUtils.ticksToSeconds(DURATION)
 					)
 			)
+			.simpleDescription("Consume potions to give yourself mobility and damage buffs.")
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast",
 				EnergizingElixir::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
@@ -97,7 +97,7 @@ public class EnergizingElixir extends Ability implements AbilityWithChargesOrSta
 				EnergizingElixir::toggleRecast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("toggleJumpBoost", "toggle jump boost",
 				EnergizingElixir::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true).lookDirections(AbilityTrigger.LookDirection.UP).enabled(false), PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(new ItemStack(Material.RABBIT_FOOT, 1));
+			.displayItem(Material.RABBIT_FOOT);
 
 	private final double mSpeedAmp;
 	private final int mDuration;

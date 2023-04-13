@@ -23,7 +23,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class RadiantBlessing extends DepthsAbility {
 
@@ -41,7 +40,7 @@ public class RadiantBlessing extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RadiantBlessing::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.SUNFLOWER))
+			.displayItem(Material.SUNFLOWER)
 			.descriptions(RadiantBlessing::getDescription);
 
 	public RadiantBlessing(Plugin plugin, Player player) {

@@ -18,7 +18,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.25;
@@ -43,7 +42,8 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 				String.format("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to %d. Stacks decay after %d seconds of not gaining a stack. Each stack makes your projectiles deal an additional +%d%% damage. Additionally, passively gain a %d%% chance to not consume arrows when shot.",
 					MAX_STACKS, SHARPSHOOTER_DECAY_TIMER / 20, (int) (PERCENT_DAMAGE_PER_STACK * 100), (int) (ARROW_SAVE_CHANCE * 100)),
 				String.format("Your projectiles deal an extra %s%% damage per block of distance between you and the target, up to %s blocks.", DAMAGE_PER_BLOCK * 100, (int) MAX_DISTANCE))
-			.displayItem(new ItemStack(Material.TARGET, 1));
+			.simpleDescription("Gain increased projectile damage. Landing shots further increases damage.")
+			.displayItem(Material.TARGET);
 
 	private final int mMaxStacks;
 	private final int mDecayTime;

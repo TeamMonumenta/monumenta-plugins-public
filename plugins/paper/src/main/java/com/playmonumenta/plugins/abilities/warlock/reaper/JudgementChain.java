@@ -47,7 +47,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -109,10 +108,11 @@ public class JudgementChain extends Ability {
 				"While a mob is chained, the reaper gains 10% damage resistance. " +
 					"When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. " +
 					"Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.")
+			.simpleDescription("Chain a target mob, weakening it and redirecting damage it takes to other nearby mobs. Gain buffs for debuffing the chained mob.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.CHAIN, 1));
+			.displayItem(Material.CHAIN);
 
 	private final double mAmplifier;
 	private final HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();

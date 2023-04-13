@@ -575,8 +575,8 @@ public class CosmeticsGUI extends CustomInventory {
 
 	private ItemStack createItem(AbilityInfo<?> abilityToItemize, String desc, NamedTextColor loreColor) {
 		Objects.requireNonNull(mCurrentClass);
-		ItemStack baseItem = Objects.requireNonNull(abilityToItemize.getDisplayItem());
-		return GUIUtils.createBasicItem(baseItem.getType(), Objects.requireNonNull(abilityToItemize.getDisplayName()), mCurrentClass.mClassColor,
+		Material baseItem = Objects.requireNonNull(abilityToItemize.getDisplayItem());
+		return GUIUtils.createBasicItem(baseItem, Objects.requireNonNull(abilityToItemize.getDisplayName()), mCurrentClass.mClassColor,
 			true, desc, loreColor);
 	}
 

@@ -25,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -70,10 +69,11 @@ public class BladeDance extends Ability {
 					DANCE_2_DAMAGE,
 					SLOW_DURATION_2 / 20.0,
 					COOLDOWN_2 / 20))
+			.simpleDescription("Damage nearby mobs and become immune to damage for a short time.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BladeDance::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.STRING, 1));
+			.displayItem(Material.STRING);
 
 
 	private final double mDamage;

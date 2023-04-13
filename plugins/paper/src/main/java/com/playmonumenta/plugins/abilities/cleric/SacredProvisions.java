@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class SacredProvisions extends Ability {
 
@@ -29,7 +28,8 @@ public class SacredProvisions extends Ability {
 				String.format(
 					"Each player in the radius gains +%s%% healing bonus when they are at %s%% hunger or higher.",
 					(int) (100 * ENHANCEMENT_HEALING_BONUS), (int) (100 * ENHANCEMENT_HEALING_HUNGER_REQUIREMENT / 20.0)))
-			.displayItem(new ItemStack(Material.COOKED_BEEF, 1));
+			.simpleDescription("All consumable resources have a chance not to be consumed.")
+			.displayItem(Material.COOKED_BEEF);
 
 	private final double mChance;
 

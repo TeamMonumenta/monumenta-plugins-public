@@ -20,7 +20,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class FrozenDomain extends DepthsAbility {
@@ -34,7 +33,7 @@ public class FrozenDomain extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<FrozenDomain> INFO =
 		new DepthsAbilityInfo<>(FrozenDomain.class, ABILITY_NAME, FrozenDomain::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.IRON_BOOTS))
+			.displayItem(Material.IRON_BOOTS)
 			.descriptions(FrozenDomain::getDescription);
 	private boolean mWasOnIce = false;
 	private int mSecondWhenIce = 0;

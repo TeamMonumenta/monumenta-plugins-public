@@ -17,7 +17,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class WardingRemedy extends Ability {
@@ -68,9 +67,10 @@ public class WardingRemedy extends Ability {
 							StringUtils.ticksToSeconds(WARDING_REMEDY_2_COOLDOWN)
 					)
 			)
+			.simpleDescription("Periodically grant absorption to you and nearby allies, for a short period of time.")
 			.cooldown(WARDING_REMEDY_1_COOLDOWN, WARDING_REMEDY_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardingRemedy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)))
-			.displayItem(new ItemStack(Material.GOLDEN_CARROT, 1));
+			.displayItem(Material.GOLDEN_CARROT);
 
 	private final WardingRemedyCS mCosmetic;
 

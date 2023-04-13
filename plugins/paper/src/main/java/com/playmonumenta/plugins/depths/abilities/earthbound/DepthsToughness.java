@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class DepthsToughness extends DepthsAbility {
 
@@ -24,7 +23,7 @@ public class DepthsToughness extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsToughness> INFO =
 		new DepthsAbilityInfo<>(DepthsToughness.class, ABILITY_NAME, DepthsToughness::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.CRYING_OBSIDIAN))
+			.displayItem(Material.CRYING_OBSIDIAN)
 			.descriptions(DepthsToughness::getDescription);
 
 	public DepthsToughness(Plugin plugin, Player player) {

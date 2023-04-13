@@ -23,7 +23,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class WardOfLight extends DepthsAbility {
@@ -40,7 +39,7 @@ public class WardOfLight extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WardOfLight::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.LANTERN))
+			.displayItem(Material.LANTERN)
 			.descriptions(WardOfLight::getDescription);
 
 	public WardOfLight(Plugin plugin, Player player) {

@@ -18,6 +18,7 @@ import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -612,12 +613,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	}
 
 	public ItemStack createAbilityItem(PlayerClass theClass, AbilityInfo<?> ability) {
-		return GUIUtils.createBasicItem(ability.getDisplayItem().getType(), ability.getDisplayName(),
-			theClass.mClassColor, true, "Click here to remove your levels in this skill, and click the panes to the right to pick a level in this skill.", NamedTextColor.WHITE);
-		//in case someone makes ability descriptions not the length of a short essay:
-		//also need to getlore from the function call, then add to it if these lines are used
-		//GUIUtils.splitLoreLine(meta, "Level 1: " + ability.mInfo.mDescriptions.get(0), 30, ChatColor.WHITE, true);
-		//GUIUtils.splitLoreLine(meta, "Level 2: " + ability.mInfo.mDescriptions.get(1), 30, ChatColor.WHITE, false);
+		String desc = ability.getSimpleDescription();
+		TextComponent clickHere = Component.text("Click here to remove your levels in this skill, and click the panes to the right to pick a level in this skill.", NamedTextColor.GRAY);
+		TextComponent lore = (desc == null ? clickHere : Component.text(desc + "\n", NamedTextColor.WHITE).append(clickHere));
+		return GUIUtils.createBasicItem(ability.getDisplayItem(), 1, ability.getDisplayName(),
+			theClass.mClassColor, true, lore, 30, true);
 	}
 
 	public ItemStack createClassItem(PlayerClass classToItemize, boolean otherChosen, boolean locked) {

@@ -31,7 +31,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
@@ -90,8 +89,9 @@ public class ElementalSpiritFire extends Ability {
 					StringUtils.multiplierToPercentage(ElementalSpiritIce.BOW_MULTIPLIER_2)
 				)
 			)
+			.simpleDescription("Deal extra damage in a radius upon dealing fire or ice damage.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.SUNFLOWER, 1));
+			.displayItem(Material.SUNFLOWER);
 
 	private final float mLevelDamage;
 	private final double mLevelBowMultiplier;

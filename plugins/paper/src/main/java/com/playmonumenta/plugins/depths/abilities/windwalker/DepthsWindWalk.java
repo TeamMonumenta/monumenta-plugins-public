@@ -29,7 +29,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -53,7 +52,7 @@ public class DepthsWindWalk extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsWindWalk::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.WHITE_DYE))
+			.displayItem(Material.WHITE_DYE)
 			.descriptions(DepthsWindWalk::getDescription);
 
 	private boolean mIsWalking = false;

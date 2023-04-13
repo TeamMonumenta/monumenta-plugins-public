@@ -24,7 +24,6 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +52,8 @@ public class BruteForce extends Ability {
 					"and knocks all non-boss enemies away from you.",
 				"Damage is increased to 10 percent of the attack's damage plus 2.",
 				"Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.")
-			.displayItem(new ItemStack(Material.STONE_AXE, 1));
+			.simpleDescription("Critical hits deal extra damage and knock back nearby mobs.")
+			.displayItem(Material.STONE_AXE);
 
 	private final double mMultiplier;
 

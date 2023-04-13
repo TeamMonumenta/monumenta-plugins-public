@@ -30,7 +30,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Challenge extends Ability {
 
@@ -78,9 +77,10 @@ public class Challenge extends Ability {
 						StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(COOLDOWN)),
 				"You gain %s Absorption per affected mob (up to %s Absorption) and +%s%% melee damage instead. When %s affected mobs (or all if there are fewer) are dead, for each mob, gain +%s%% speed for %s seconds and reduce the cooldown of Guardian skills by %s seconds."
 					.formatted(ABSORPTION_PER_MOB_2, MAX_ABSORPTION_2, StringUtils.multiplierToPercentage(PERCENT_DAMAGE_DEALT_EFFECT_2), KILLED_MOBS_CAP, StringUtils.multiplierToPercentage(SPEED_PER), StringUtils.ticksToSeconds(DURATION), StringUtils.ticksToSeconds(CDR_PER)))
+			.simpleDescription("Taunt all mobs around you, gaining absorption and damage.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Challenge::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)))
-			.displayItem(new ItemStack(Material.IRON_AXE, 1));
+			.displayItem(Material.IRON_AXE);
 
 	private final double mPercentDamageDealtEffect;
 	private final double mAbsorptionPerMob;

@@ -32,7 +32,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
@@ -51,7 +50,7 @@ public class RingOfFlames extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RingOfFlames::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.BLAZE_POWDER))
+			.displayItem(Material.BLAZE_POWDER)
 			.descriptions(RingOfFlames::getDescription);
 
 	public RingOfFlames(Plugin plugin, Player player) {

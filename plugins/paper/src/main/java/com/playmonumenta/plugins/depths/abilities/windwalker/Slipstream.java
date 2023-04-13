@@ -26,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -48,7 +47,7 @@ public class Slipstream extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Slipstream::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.PHANTOM_MEMBRANE))
+			.displayItem(Material.PHANTOM_MEMBRANE)
 			.descriptions(Slipstream::getDescription);
 
 	public Slipstream(Plugin plugin, Player player) {

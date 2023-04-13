@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -67,10 +66,11 @@ public class Starfall extends Ability {
 					DAMAGE_2
 				)
 			)
+			.simpleDescription("Summon a meteor, which upon impact damages and ignites mobs.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Starfall::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.MAGMA_BLOCK, 1));
+			.displayItem(Material.MAGMA_BLOCK);
 
 	private final float mLevelDamage;
 	private final StarfallCS mCosmetic;

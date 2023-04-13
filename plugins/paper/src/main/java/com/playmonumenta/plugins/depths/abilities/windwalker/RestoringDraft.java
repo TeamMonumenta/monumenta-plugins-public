@@ -24,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +37,7 @@ public final class RestoringDraft extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<RestoringDraft> INFO =
 		new DepthsAbilityInfo<>(RestoringDraft.class, ABILITY_NAME, RestoringDraft::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.GOLDEN_BOOTS))
+			.displayItem(Material.GOLDEN_BOOTS)
 			.descriptions(RestoringDraft::getDescription);
 
 	private final BukkitRunnable mSlamAttackRunner;

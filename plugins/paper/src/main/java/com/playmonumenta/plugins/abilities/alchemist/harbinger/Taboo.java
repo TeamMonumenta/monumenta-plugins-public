@@ -26,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -72,6 +71,7 @@ public class Taboo extends Ability {
 							StringUtils.ticksToSeconds(COOLDOWN)
 					)
 			)
+			.simpleDescription("Periodically lose health in exchange for increased magic damage and potion recharge rate.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("heal", "heal", Taboo::heal, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
 				                                                                  .lookDirections(AbilityTrigger.LookDirection.DOWN),
@@ -84,7 +84,7 @@ public class Taboo extends Ability {
 					})))
 			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle", Taboo::toggle, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
-			.displayItem(new ItemStack(Material.HONEY_BOTTLE, 1));
+			.displayItem(Material.HONEY_BOTTLE);
 
 	private final double mMagicDamageIncrease;
 	private final int mRechargeRateDecrease;

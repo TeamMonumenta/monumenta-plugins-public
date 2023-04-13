@@ -19,7 +19,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class DepthsRejuvenation extends DepthsAbility {
 
@@ -32,7 +31,7 @@ public class DepthsRejuvenation extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsRejuvenation> INFO =
 		new DepthsAbilityInfo<>(DepthsRejuvenation.class, ABILITY_NAME, DepthsRejuvenation::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.NETHER_STAR))
+			.displayItem(Material.NETHER_STAR)
 			.descriptions(DepthsRejuvenation::getDescription);
 
 	private int mTimer = 0;

@@ -27,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 
 public class CloakAndDagger extends Ability implements KillTriggeredAbility, AbilityWithChargesOrStacks {
 
@@ -64,9 +63,10 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 				String.format("Cloak stacks are now capped at %s and bonus damage is increased to (%s * X) where X is the number of stacks you have upon activating this skill.",
 					CLOAK_2_MAX_STACKS,
 					(int) CLOAK_2_DAMAGE_MULTIPLIER))
+			.simpleDescription("Killing mobs gains cloak stacks, which can be consumed to enter stealth mode and buff the next melee attack.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakAndDagger::cast, new AbilityTrigger(AbilityTrigger.Key.DROP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
+			.displayItem(Material.IRON_SWORD);
 
 	private final KillTriggeredAbilityTracker mTracker;
 

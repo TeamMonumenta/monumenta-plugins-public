@@ -54,7 +54,7 @@ public class CloakOfShadows extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CloakOfShadows::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.BLACK_CONCRETE))
+			.displayItem(Material.BLACK_CONCRETE)
 			.descriptions(CloakOfShadows::getDescription);
 
 	public CloakOfShadows(Plugin plugin, Player player) {

@@ -31,7 +31,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -83,10 +82,11 @@ public class SanguineHarvest extends Ability {
 				("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
 					 "Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
 					.formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)))
+			.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.NETHER_STAR, 1));
+			.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;
 	private final double mBleedLevel;

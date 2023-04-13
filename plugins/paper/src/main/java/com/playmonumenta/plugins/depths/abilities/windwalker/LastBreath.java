@@ -25,7 +25,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -47,7 +46,7 @@ public class LastBreath extends DepthsAbility {
 		new DepthsAbilityInfo<>(LastBreath.class, ABILITY_NAME, LastBreath::new, DepthsTree.WINDWALKER, DepthsTrigger.LIFELINE)
 			.linkedSpell(ClassAbility.LAST_BREATH)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.DRAGON_BREATH))
+			.displayItem(Material.DRAGON_BREATH)
 			.descriptions(LastBreath::getDescription)
 			.priorityAmount(10000);
 

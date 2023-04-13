@@ -28,7 +28,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,8 +61,9 @@ public class Volley extends Ability {
 					              "Only one arrow is consumed, and each projectile deals %d%% bonus damage. Cooldown: 15s.", VOLLEY_1_ARROW_COUNT, (int) ((VOLLEY_1_DAMAGE_MULTIPLIER - 1) * 100)),
 				String.format("Increases the number of projectiles to %d and enhances the bonus damage to %d%%.", VOLLEY_2_ARROW_COUNT, (int) ((VOLLEY_2_DAMAGE_MULTIPLIER - 1) * 100)),
 				String.format("Volley now fires in a 360 degree arc. The projectiles inflict %d%% Bleed for %ds.", (int) (ENHANCEMENT_BLEED_POTENCY * 100), ENHANCEMENT_BLEED_DURATION / 20))
+			.simpleDescription("Fire a volley of projectiles in front of you.")
 			.cooldown(VOLLEY_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.ARROW, 1))
+			.displayItem(Material.ARROW)
 			.priorityAmount(900); // cancels damage events of volley arrows, so needs to run before other abilities
 
 	private final int mArrows;

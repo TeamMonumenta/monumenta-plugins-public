@@ -36,7 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -57,7 +56,7 @@ public class DummyDecoy extends DepthsAbility {
 		new DepthsAbilityInfo<>(DummyDecoy.class, ABILITY_NAME, DummyDecoy::new, DepthsTree.SHADOWDANCER, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.DUMMY_DECOY)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.ARMOR_STAND))
+			.displayItem(Material.ARMOR_STAND)
 			.descriptions(DummyDecoy::getDescription);
 
 	public DummyDecoy(Plugin plugin, Player player) {

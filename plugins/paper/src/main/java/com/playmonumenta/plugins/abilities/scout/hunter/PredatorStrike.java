@@ -72,10 +72,11 @@ public class PredatorStrike extends Ability {
 					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), COOLDOWN_1 / 20),
 				String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). Cooldown: %ds.", StringUtils.multiplierToPercentage(DISTANCE_SCALE_2),
 					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER), COOLDOWN_2 / 20))
+			.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", PredatorStrike::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.SPECTRAL_ARROW, 1));
+			.displayItem(Material.SPECTRAL_ARROW);
 
 	private boolean mActive = false;
 	private final double mDistanceScale;

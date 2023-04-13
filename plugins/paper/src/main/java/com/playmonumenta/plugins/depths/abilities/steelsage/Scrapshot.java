@@ -27,7 +27,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -48,7 +47,7 @@ public class Scrapshot extends DepthsAbility {
 			.actionBarColor(TextColor.color(130, 130, 130))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Scrapshot::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.NETHERITE_SCRAP))
+			.displayItem(Material.NETHERITE_SCRAP)
 			.descriptions(Scrapshot::getDescription);
 
 	public Scrapshot(Plugin plugin, Player player) {

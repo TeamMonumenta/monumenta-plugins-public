@@ -27,7 +27,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class FrostNova extends Ability {
@@ -87,10 +86,11 @@ public class FrostNova extends Ability {
 					StringUtils.ticksToSeconds(ENHANCED_FROZEN_DURATION)
 				)
 			)
+			.simpleDescription("Damage and slow nearby mobs")
 			.cooldown(COOLDOWN_TICKS, COOLDOWN_TICKS, ENHANCED_COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FrostNova::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))
-			.displayItem(new ItemStack(Material.ICE, 1));
+			.displayItem(Material.ICE);
 
 	private final float mLevelDamage;
 	private final double mLevelSlowMultiplier;

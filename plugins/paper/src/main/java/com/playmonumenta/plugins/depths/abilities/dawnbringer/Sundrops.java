@@ -44,7 +44,7 @@ public class Sundrops extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Sundrops> INFO =
 		new DepthsAbilityInfo<>(Sundrops.class, ABILITY_NAME, Sundrops::new, DepthsTree.DAWNBRINGER, DepthsTrigger.SPAWNER)
-			.displayItem(new ItemStack(Material.HONEYCOMB_BLOCK))
+			.displayItem(Material.HONEYCOMB_BLOCK)
 			.descriptions(Sundrops::getDescription);
 
 	public Sundrops(Plugin plugin, Player player) {

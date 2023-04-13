@@ -20,7 +20,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class SwiftCuts extends Ability {
@@ -44,7 +43,8 @@ public class SwiftCuts extends Ability {
 				String.format("If you perform a melee attack on the same mob 2 or more times in a row, each hit after the first does +%d%% damage and deals %d%% of the damage to all other mobs in a %s block radius.", (int) (CONSECUTIVE_PERCENT_DAMAGE_1 * 100), (int) (PERCENT_AOE_DAMAGE_1 * 100), SWEEP_RADIUS),
 				String.format("Bonus damage increased to +%d%%, sweep damage increased to %d%%.", (int) (CONSECUTIVE_PERCENT_DAMAGE_2 * 100), (int) (PERCENT_AOE_DAMAGE_2 * 100)),
 				"Every third fully charged melee attack in a row against the same mob deals " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% more damage and reduces the cooldowns of your skills by " + (ENHANCEMENT_CDR / 20) + "s.")
-			.displayItem(new ItemStack(Material.STONE_SWORD, 1));
+			.simpleDescription("Deal more melee damage to mobs hit 2 or more times in a row.")
+			.displayItem(Material.STONE_SWORD);
 
 	private final double mConsecutivePercentDamage;
 	private final double mPercentAoEDamage;

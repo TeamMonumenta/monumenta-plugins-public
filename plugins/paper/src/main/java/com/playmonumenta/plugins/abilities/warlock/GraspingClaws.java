@@ -36,7 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -83,10 +82,11 @@ public class GraspingClaws extends Ability {
 					 "and players within the cage are granted %s%% max health healing every second. " +
 					 "The cage disappears after %s seconds. Mobs that are immune to crowd control cannot be trapped.")
 					.formatted(CAGE_RADIUS, StringUtils.multiplierToPercentage(HEAL_AMOUNT), StringUtils.ticksToSeconds(CAGE_DURATION)))
+			.simpleDescription("Fire a projectile that damages, pulls, and slows mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
 				new AbilityTriggerInfo.TriggerRestriction("holding a scythe or projectile weapon", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()) || ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()))))
-			.displayItem(new ItemStack(Material.BOW, 1));
+			.displayItem(Material.BOW);
 
 	private final double mAmplifier;
 	private final double mDamage;

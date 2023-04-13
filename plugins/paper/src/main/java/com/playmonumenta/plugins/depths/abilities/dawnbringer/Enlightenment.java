@@ -11,7 +11,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Enlightenment extends DepthsAbility {
 
@@ -23,7 +22,7 @@ public class Enlightenment extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Enlightenment> INFO =
 		new DepthsAbilityInfo<>(Enlightenment.class, ABILITY_NAME, Enlightenment::new, DepthsTree.DAWNBRINGER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.EXPERIENCE_BOTTLE))
+			.displayItem(Material.EXPERIENCE_BOTTLE)
 			.descriptions(Enlightenment::getDescription);
 
 

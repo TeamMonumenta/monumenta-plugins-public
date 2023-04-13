@@ -17,7 +17,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Smokescreen extends Ability {
@@ -57,10 +56,11 @@ public class Smokescreen extends Ability {
 					ENHANCEMENT_SMOKECLOUD_RADIUS,
 					ENHANCEMENT_SMOKECLOUD_DURATION / 20,
 					ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION / 20))
+			.simpleDescription("Weaken and slow nearby mobs.")
 			.cooldown(SMOKESCREEN_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Smokescreen::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true).lookDirections(AbilityTrigger.LookDirection.DOWN),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.DEAD_TUBE_CORAL, 1));
+			.displayItem(Material.DEAD_TUBE_CORAL);
 
 	private final double mWeakenEffect;
 

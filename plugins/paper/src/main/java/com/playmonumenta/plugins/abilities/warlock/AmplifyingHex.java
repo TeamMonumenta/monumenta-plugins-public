@@ -28,7 +28,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -72,10 +71,11 @@ public class AmplifyingHex extends Ability {
 					"and an extra +1 damage per extra level of debuff, capped at 2 extra levels. 10% Slowness, Weaken, etc. count as one level. Cooldown: 10s.",
 				"The range is increased to 10 blocks, extra damage increased to +2 per extra level, and the extra level cap is increased to 3 extra levels.",
 				"For every 1% health you have above 80% of your max health, Amplifying Hex will deal 1.25% more damage to enemies and deal 1% max health damage to yourself.")
+			.simpleDescription("Deal damage to mobs in front of you for each debuff they have.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AmplifyingHex::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.DRAGON_BREATH, 1));
+			.displayItem(Material.DRAGON_BREATH);
 
 	private final float mAmplifierDamage;
 	private final int mAmplifierCap;

@@ -14,7 +14,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Pyromania extends DepthsAbility {
 
@@ -25,7 +24,7 @@ public class Pyromania extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Pyromania> INFO =
 		new DepthsAbilityInfo<>(Pyromania.class, ABILITY_NAME, Pyromania::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.CAMPFIRE))
+			.displayItem(Material.CAMPFIRE)
 			.descriptions(Pyromania::getDescription);
 
 	public Pyromania(Plugin plugin, Player player) {

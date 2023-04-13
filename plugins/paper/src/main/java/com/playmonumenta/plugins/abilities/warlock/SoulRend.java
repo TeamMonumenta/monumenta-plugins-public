@@ -22,7 +22,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -53,8 +52,9 @@ public class SoulRend extends Ability {
 				"Attacking an enemy with a critical scythe attack heals you for 2 health and 20% of the melee damage dealt, capped at 10 total health. Cooldown: 8s.",
 				"Players within 7 blocks of you are now also healed. Flat healing is increased from 2 to 4 health.",
 				"Healing above max health, as well as any healing from this skill that remains negated by Dark Pact, is converted into Absorption, up to 4 absorption health, for 2.5s.")
+			.simpleDescription("Critical strikes heal you for a portion of the damage dealt.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.POTION, 1));
+			.displayItem(Material.POTION);
 
 	private final double mHeal;
 

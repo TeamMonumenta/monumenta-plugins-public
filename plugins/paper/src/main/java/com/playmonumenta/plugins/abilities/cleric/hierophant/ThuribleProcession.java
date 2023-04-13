@@ -29,7 +29,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ThuribleProcession extends Ability implements AbilityWithChargesOrStacks {
@@ -76,8 +75,9 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 					"+15% Speed (after 8s of no health threshold reached), " +
 					"+15% Attack and Projectile Damage (after 12s of no health threshold reached), " +
 					"Cleric's passive heal is tripled, to 15% of max health every 5s (after 16s of no health threshold reached)")
+			.simpleDescription("Keep high health to passively build up buffs that are shared with nearby players.")
 			.cooldown(THURIBLE_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+			.displayItem(Material.GLOWSTONE_DUST);
 
 	private int mSeconds = 0;
 	private int mBuffs = 0;

@@ -32,7 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Pyroblast extends DepthsAbility {
@@ -48,7 +47,7 @@ public class Pyroblast extends DepthsAbility {
 		new DepthsAbilityInfo<>(Pyroblast.class, ABILITY_NAME, Pyroblast::new, DepthsTree.FLAMECALLER, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.PYROBLAST)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.TNT_MINECART))
+			.displayItem(Material.TNT_MINECART)
 			.descriptions(Pyroblast::getDescription);
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;

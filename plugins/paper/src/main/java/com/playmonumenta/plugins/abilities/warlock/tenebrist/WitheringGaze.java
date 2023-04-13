@@ -23,7 +23,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -60,10 +59,11 @@ public class WitheringGaze extends Ability {
 						StringUtils.ticksToSeconds(WITHERING_GAZE_DOT_DURATION_1), StringUtils.ticksToSeconds(WITHERING_GAZE_1_COOLDOWN)),
 				"Your damage over time lasts for %s seconds. Cooldown: %ss."
 					.formatted(StringUtils.ticksToSeconds(WITHERING_GAZE_DOT_DURATION_2), StringUtils.ticksToSeconds(WITHERING_GAZE_2_COOLDOWN)))
+			.simpleDescription("Stun and deal damage over time to all mobs in front of you.")
 			.cooldown(WITHERING_GAZE_1_COOLDOWN, WITHERING_GAZE_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WitheringGaze::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.WITHER_ROSE, 1));
+			.displayItem(Material.WITHER_ROSE);
 
 	private final int mDOTDuration;
 

@@ -25,7 +25,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,8 +54,9 @@ public class ShieldBash extends Ability {
 					"Elites and bosses are rooted instead of stunned. Cooldown: 8s.",
 				"Additionally, apply damage, stun, and taunt to all enemies in a 3 block radius from the enemy you are looking at.",
 				"Blocking damage with a shield within 1s of beginning to block refreshes 50% of this skill's cooldown.")
+			.simpleDescription("Bash mobs with your shield, stunning and taunting them.")
 			.cooldown(SHIELD_BASH_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.IRON_DOOR, 1));
+			.displayItem(Material.IRON_DOOR);
 
 	private boolean mIsEnhancementUsed = true;
 

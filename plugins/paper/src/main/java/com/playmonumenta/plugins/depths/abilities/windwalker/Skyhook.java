@@ -25,7 +25,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Entity;
@@ -34,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -49,7 +47,7 @@ public class Skyhook extends DepthsAbility {
 		new DepthsAbilityInfo<>(Skyhook.class, ABILITY_NAME, Skyhook::new, DepthsTree.WINDWALKER, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.SKYHOOK)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.FISHING_ROD))
+			.displayItem(Material.FISHING_ROD)
 			.descriptions(Skyhook::getDescription);
 
 	public Skyhook(Plugin plugin, Player player) {

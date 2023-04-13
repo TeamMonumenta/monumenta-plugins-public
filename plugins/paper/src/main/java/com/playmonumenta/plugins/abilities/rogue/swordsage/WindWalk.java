@@ -24,7 +24,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -61,10 +60,11 @@ public class WindWalk extends MultipleChargeAbility {
 				String.format("Casting this ability reduces the cooldown of all other abilities by %s seconds. Cooldown: %ss.",
 					WIND_WALK_CDR / 20,
 					WIND_WALK_2_COOLDOWN / 20))
+			.simpleDescription("Dash forwards, stunning and levitating mobs along the path.")
 			.cooldown(WIND_WALK_1_COOLDOWN, WIND_WALK_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindWalk::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.QUARTZ, 1));
+			.displayItem(Material.QUARTZ);
 
 	private final int mDuration;
 

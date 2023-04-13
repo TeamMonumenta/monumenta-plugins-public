@@ -22,7 +22,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class EarthenCombos extends DepthsAbility {
 
@@ -34,7 +33,7 @@ public class EarthenCombos extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<EarthenCombos> INFO =
 		new DepthsAbilityInfo<>(EarthenCombos.class, ABILITY_NAME, EarthenCombos::new, DepthsTree.EARTHBOUND, DepthsTrigger.COMBO)
-			.displayItem(new ItemStack(Material.WOODEN_SWORD))
+			.displayItem(Material.WOODEN_SWORD)
 			.descriptions(EarthenCombos::getDescription);
 
 	private int mComboCount = 0;

@@ -21,7 +21,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class FlameSpirit extends DepthsAbility {
@@ -35,7 +34,7 @@ public class FlameSpirit extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<FlameSpirit> INFO =
 		new DepthsAbilityInfo<>(FlameSpirit.class, ABILITY_NAME, FlameSpirit::new, DepthsTree.FLAMECALLER, DepthsTrigger.SPAWNER)
-			.displayItem(new ItemStack(Material.SOUL_CAMPFIRE))
+			.displayItem(Material.SOUL_CAMPFIRE)
 			.descriptions(FlameSpirit::getDescription);
 
 	public FlameSpirit(Plugin plugin, Player player) {

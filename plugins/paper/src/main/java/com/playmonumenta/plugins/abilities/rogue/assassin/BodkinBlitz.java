@@ -24,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -69,10 +68,11 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					STEALTH_DURATION_2 / 20.0,
 					BONUS_DMG_2,
 					COOLDOWN_2 / 20))
+			.simpleDescription("Teleport forward, gaining momentary stealth and bonus melee damage.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", BodkinBlitz::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_TWO_SWORDS_RESTRICTION))
-			.displayItem(new ItemStack(Material.BLAZE_POWDER, 1));
+			.displayItem(Material.BLAZE_POWDER);
 
 	private final int mStealthDuration;
 	private final double mBonusDmg;

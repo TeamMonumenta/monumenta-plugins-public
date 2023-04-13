@@ -34,7 +34,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -59,7 +58,7 @@ public class Metalmancy extends DepthsAbility {
 			.linkedSpell(ClassAbility.METALMANCY)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Metalmancy::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.IRON_BLOCK))
+			.displayItem(Material.IRON_BLOCK)
 			.descriptions(Metalmancy::getDescription);
 
 	private @Nullable Mob mGolem;

@@ -35,7 +35,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -53,7 +52,7 @@ public class EarthenWrath extends DepthsAbility {
 			.linkedSpell(ClassAbility.EARTHEN_WRATH)
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenWrath::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.TURTLE_HELMET))
+			.displayItem(Material.TURTLE_HELMET)
 			.descriptions(EarthenWrath::getDescription);
 
 	public boolean mAbsorbDamage = false;

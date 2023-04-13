@@ -18,7 +18,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PinningShot extends Ability {
@@ -43,7 +42,8 @@ public class PinningShot extends Ability {
 				String.format("The first time you shoot a non-boss enemy, pin it for %ss. Pinned enemies are afflicted with %d%% Slowness and %d%% Weaken (Bosses receive %d%% Slowness and no Weaken). Shooting a pinned non-boss enemy deals %d%% of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than once.",
 					PINNING_SHOT_DURATION / 20.0, (int) (PINNING_SLOW * 100), (int) (PINNING_WEAKEN_1 * 100), (int) (PINNING_SLOW_BOSS * 100), (int) (PINNING_SHOT_1_DAMAGE_MULTIPLIER * 100)),
 				String.format("Weaken increased to %d%% and bonus damage increased to %d%% max health.", (int) (PINNING_WEAKEN_2 * 100), (int) (PINNING_SHOT_2_DAMAGE_MULTIPLIER * 100)))
-			.displayItem(new ItemStack(Material.CROSSBOW, 1));
+			.simpleDescription("Shooting a mob for the first time roots and weakens it. Shooting it again damages it for a percentage of its maximum health.")
+			.displayItem(Material.CROSSBOW);
 
 	private final double mDamageMultiplier;
 	private final double mWeaken;

@@ -30,7 +30,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DepthsFrostNova extends DepthsAbility {
@@ -49,7 +48,7 @@ public class DepthsFrostNova extends DepthsAbility {
 			.cooldown(COOLDOWN_TICKS)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DepthsFrostNova::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.ICE))
+			.displayItem(Material.ICE)
 			.descriptions(DepthsFrostNova::getDescription);
 
 	public DepthsFrostNova(Plugin plugin, Player player) {

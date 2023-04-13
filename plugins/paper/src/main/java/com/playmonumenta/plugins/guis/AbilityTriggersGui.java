@@ -68,7 +68,7 @@ public class AbilityTriggersGui extends Gui {
 						         Component.text("Current Trigger (default):", NamedTextColor.GRAY) :
 						         Component.text("Custom Trigger:", NamedTextColor.AQUA));
 					lore.addAll(trigger.getTriggerDescription());
-					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem().getType(), 1,
+					ItemStack item = GUIUtils.createBasicItem(info.getDisplayItem(), 1,
 						info.getDisplayName() + " - " + trigger.getDisplayName(), NamedTextColor.GOLD, false,
 						lore, true);
 
@@ -126,7 +126,7 @@ public class AbilityTriggersGui extends Gui {
 					.append(Component.text(mSelectedTrigger.getRestriction().getDisplay(), NamedTextColor.WHITE)));
 			}
 			// summary icon
-			setItem(0, 4, GUIUtils.createBasicItem(mSelectedAbility.getDisplayItem().getType(), 1,
+			setItem(0, 4, GUIUtils.createBasicItem(mSelectedAbility.getDisplayItem(), 1,
 				mSelectedAbility.getDisplayName() + " - " + mSelectedTrigger.getDisplayName(), NamedTextColor.GOLD, false,
 				summary, true));
 

@@ -26,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public final class ShadowSlam extends DepthsAbility {
@@ -41,7 +40,7 @@ public final class ShadowSlam extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<ShadowSlam> INFO =
 		new DepthsAbilityInfo<>(ShadowSlam.class, ABILITY_NAME, ShadowSlam::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.ANVIL))
+			.displayItem(Material.ANVIL)
 			.descriptions(ShadowSlam::getDescription);
 
 	private final BukkitRunnable mSlamAttackRunner;

@@ -34,7 +34,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -50,7 +49,7 @@ public class DepthsVolley extends DepthsAbility {
 		new DepthsAbilityInfo<>(DepthsVolley.class, ABILITY_NAME, DepthsVolley::new, DepthsTree.STEELSAGE, DepthsTrigger.SHIFT_BOW)
 			.linkedSpell(ClassAbility.VOLLEY_DEPTHS)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.ARROW))
+			.displayItem(Material.ARROW)
 			.descriptions(DepthsVolley::getDescription)
 			.priorityAmount(900); // cancels damage events of volley arrows, so needs to run before other abilities
 	public Set<Projectile> mDepthsVolley;

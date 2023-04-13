@@ -26,7 +26,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SagesInsight extends Ability implements AbilityWithChargesOrStacks {
@@ -67,7 +66,8 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 				String.format("Sage's Insight now refreshes the cooldowns of your previous %s spells, upon activating.",
 					ABILITIES_COUNT_2
 				))
-			.displayItem(new ItemStack(Material.ENDER_EYE, 1));
+			.simpleDescription("Refresh a spell's cooldown after multiple spells damage enemies in succession.")
+			.displayItem(Material.ENDER_EYE);
 
 
 	private final HashMap<ClassAbility, Boolean> mStacksMap;

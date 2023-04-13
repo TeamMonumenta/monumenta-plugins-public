@@ -79,12 +79,13 @@ public class HallowedBeam extends MultipleChargeAbility {
 					"This skill can only apply Recoil twice before touching the ground. Cooldown: 16s each charge.",
 				"Hallowed Beam gains a third charge (and can apply Recoil three times before touching the ground), " +
 					"the cooldown is reduced to 12 seconds, and players healed by it gain 10% damage resistance for 5 seconds.")
+			.simpleDescription("Heal the targeted player, damage the targeted Undead, or stun the targeted non-Undead.")
 			.cooldown(HALLOWED_1_COOLDOWN, HALLOWED_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HallowedBeam::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.addTrigger(new AbilityTriggerInfo<>("swapMode", "swap mode", HallowedBeam::swapMode, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.BOW, 1));
+			.displayItem(Material.BOW);
 
 	private @Nullable Crusade mCrusade;
 

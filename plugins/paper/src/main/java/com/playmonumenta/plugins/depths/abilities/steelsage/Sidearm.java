@@ -25,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -46,7 +45,7 @@ public class Sidearm extends DepthsAbility {
 			.actionBarColor(TextColor.color(130, 130, 130))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Sidearm::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.CROSSBOW))
+			.displayItem(Material.CROSSBOW)
 			.descriptions(Sidearm::getDescription);
 
 	public Sidearm(Plugin plugin, Player player) {

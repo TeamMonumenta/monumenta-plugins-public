@@ -25,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Taunt extends DepthsAbility {
 
@@ -42,7 +41,7 @@ public class Taunt extends DepthsAbility {
 			.cooldown(COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Taunt::cast,
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true).keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.GOLDEN_CHESTPLATE))
+			.displayItem(Material.GOLDEN_CHESTPLATE)
 			.descriptions(Taunt::getDescription);
 
 	public Taunt(Plugin plugin, Player player) {

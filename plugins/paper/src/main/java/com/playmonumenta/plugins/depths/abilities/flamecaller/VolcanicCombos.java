@@ -23,7 +23,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class VolcanicCombos extends DepthsAbility {
 	public static final String ABILITY_NAME = "Volcanic Combos";
@@ -33,7 +32,7 @@ public class VolcanicCombos extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<VolcanicCombos> INFO =
 		new DepthsAbilityInfo<>(VolcanicCombos.class, ABILITY_NAME, VolcanicCombos::new, DepthsTree.FLAMECALLER, DepthsTrigger.COMBO)
-			.displayItem(new ItemStack(Material.BLAZE_ROD))
+			.displayItem(Material.BLAZE_ROD)
 			.descriptions(VolcanicCombos::getDescription);
 
 	private int mComboCount = 0;

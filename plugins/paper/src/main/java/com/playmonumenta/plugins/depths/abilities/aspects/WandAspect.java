@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class WandAspect extends WeaponAspectDepthsAbility {
 
@@ -21,7 +20,7 @@ public class WandAspect extends WeaponAspectDepthsAbility {
 
 	public static final DepthsAbilityInfo<WandAspect> INFO =
 		new DepthsAbilityInfo<>(WandAspect.class, ABILITY_NAME, WandAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
-			.displayItem(new ItemStack(Material.STICK))
+			.displayItem(Material.STICK)
 			.description("You deal " + DAMAGE + " extra melee damage while holding a wand, and all ability damage is increased by " + (int) (SPELL_MOD * 100) + "% of the wand's spell power.");
 
 	public WandAspect(Plugin plugin, Player player) {

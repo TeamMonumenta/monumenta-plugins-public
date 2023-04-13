@@ -26,7 +26,6 @@ import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -67,10 +66,11 @@ public class CholericFlames extends Ability {
 				("Mobs ignited by this ability are inflicted with an additional level of Inferno for every two debuffs they have (rounded down) prior to this ability, up to %s. " +
 					 "Additionally, when these mobs die, they explode, applying all Inferno they have at the time of death to all mobs within a %s block radius for %ss.")
 					.formatted(MAX_DEBUFFS, SPREAD_EFFECT_RADIUS, StringUtils.ticksToSeconds(SPREAD_EFFECT_DURATION_APPLIED)))
+			.simpleDescription("Deal damage and ignite nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", CholericFlames::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.FIRE_CHARGE, 1));
+			.displayItem(Material.FIRE_CHARGE);
 
 	private final double mDamage;
 

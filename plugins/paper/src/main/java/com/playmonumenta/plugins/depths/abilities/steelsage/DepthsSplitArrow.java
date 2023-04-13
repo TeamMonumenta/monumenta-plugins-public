@@ -27,7 +27,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -42,7 +41,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DepthsSplitArrow> INFO =
 		new DepthsAbilityInfo<>(DepthsSplitArrow.class, ABILITY_NAME, DepthsSplitArrow::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.CHAIN))
+			.displayItem(Material.CHAIN)
 			.descriptions(DepthsSplitArrow::getDescription);
 
 	public DepthsSplitArrow(Plugin plugin, Player player) {

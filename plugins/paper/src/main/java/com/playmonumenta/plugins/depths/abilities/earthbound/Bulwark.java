@@ -21,7 +21,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class Bulwark extends DepthsAbility {
@@ -33,7 +32,7 @@ public class Bulwark extends DepthsAbility {
 		new DepthsAbilityInfo<>(Bulwark.class, ABILITY_NAME, Bulwark::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.BULWARK)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.NETHERITE_HELMET))
+			.displayItem(Material.NETHERITE_HELMET)
 			.descriptions(Bulwark::getDescription);
 
 	public Bulwark(Plugin plugin, Player player) {

@@ -20,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,10 +55,11 @@ public class EagleEye extends Ability {
 					EAGLE_EYE_RADIUS, EAGLE_EYE_DURATION / 20, (int) (EAGLE_EYE_1_VULN_LEVEL * 100), EAGLE_EYE_REFRESH / 20, EAGLE_EYE_COOLDOWN / 20),
 				String.format("The effect is increased to %d%% Vulnerability.", (int) (EAGLE_EYE_2_VULN_LEVEL * 100)),
 				"Your first attack against every enemy affected by this ability will deal " + (int) (ENHANCEMENT_DAMAGE_PERCENT * 100) + "% extra damage.")
+			.simpleDescription("Reveal nearby mobs, making them more vulnerable to attacks.")
 			.cooldown(EAGLE_EYE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EagleEye::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
 				                                                                     .keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
-			.displayItem(new ItemStack(Material.ENDER_EYE, 1));
+			.displayItem(Material.ENDER_EYE);
 
 	private final double mVulnLevel;
 	private final Team mEagleEyeTeam;

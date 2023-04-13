@@ -28,7 +28,6 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +41,7 @@ public class DepthsDodging extends DepthsAbility {
 		new DepthsAbilityInfo<>(DepthsDodging.class, ABILITY_NAME, DepthsDodging::new, DepthsTree.WINDWALKER, DepthsTrigger.PASSIVE)
 			.linkedSpell(ClassAbility.DODGING)
 			.cooldown(COOLDOWN)
-			.displayItem(new ItemStack(Material.COBWEB))
+			.displayItem(Material.COBWEB)
 			.descriptions(DepthsDodging::getDescription);
 
 	private int mTriggerTick = 0;

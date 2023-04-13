@@ -31,7 +31,6 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -54,7 +53,7 @@ public class IceLance extends DepthsAbility {
 			.actionBarColor(TextColor.color(194, 224, 249))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", IceLance::cast,
 				new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.SNOWBALL))
+			.displayItem(Material.SNOWBALL)
 			.descriptions(IceLance::getDescription);
 
 	public IceLance(Plugin plugin, Player player) {

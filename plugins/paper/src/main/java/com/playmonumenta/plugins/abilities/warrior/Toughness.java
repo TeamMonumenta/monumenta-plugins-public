@@ -15,7 +15,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class Toughness extends Ability {
@@ -41,7 +40,8 @@ public class Toughness extends Ability {
 				"Gain +10% max health and damage from Poison, Wither, and Drowning is reduced by 20%.",
 				"Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 40%.",
 				"Gain an additional +5% max health. Additionally, when below 50% health, gain 20% healing.")
-			.displayItem(new ItemStack(Material.IRON_HELMET, 1));
+			.simpleDescription("Increase your max health and resistance to ailment damage.")
+			.displayItem(Material.IRON_HELMET);
 
 	private final double mDoTDamageReduction;
 

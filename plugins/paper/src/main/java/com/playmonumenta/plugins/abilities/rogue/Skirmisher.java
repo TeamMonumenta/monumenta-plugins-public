@@ -22,7 +22,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Skirmisher extends Ability {
 
@@ -54,7 +53,8 @@ public class Skirmisher extends Ability {
 				String.format("When you hit an enemy with a sword, the nearest enemy within %s blocks takes %s%% of the original attack's damage.",
 					(int) ENHANCEMENT_SPLASH_RADIUS,
 					(int) (ENHANCEMENT_SPLASH_PERCENT_DAMAGE * 100)))
-			.displayItem(new ItemStack(Material.BONE, 1));
+			.simpleDescription("Deal more damage if other mobs are nearby.")
+			.displayItem(Material.BONE);
 
 	private final double mIsolatedPercentDamage;
 	private final double mIsolatedFlatDamage;

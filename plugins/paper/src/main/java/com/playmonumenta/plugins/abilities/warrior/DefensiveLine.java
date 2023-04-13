@@ -25,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DefensiveLine extends Ability {
@@ -57,8 +56,9 @@ public class DefensiveLine extends Ability {
 					"Upon activating this skill mobs in a 3 block radius of you and your allies are knocked back. Cooldown: 30s.",
 				"The effect is increased to 30% Resistance.",
 				"Additionally, all affected players negate the next melee attack dealt to them within the duration.")
+			.simpleDescription("Increase resistance for you and surrounding players.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.CHAIN, 1));
+			.displayItem(Material.CHAIN);
 
 	private final double mPercentDamageReceived;
 

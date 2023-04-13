@@ -23,9 +23,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.HSVLike;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -43,6 +43,8 @@ public class AbilityInfo<T extends Ability> {
 	private @Nullable String mShorthandName;
 	// List of descriptions to aid ability selection
 	private List<TextComponent> mDescriptions = new ArrayList<>();
+	// Simplified description
+	private @Nullable String mSimpleDescription = null;
 	// Color used by action bar messages
 	private TextColor mActionBarColor;
 
@@ -52,7 +54,7 @@ public class AbilityInfo<T extends Ability> {
 	private @Nullable ClassAbility mLinkedSpell = null;
 	private final List<AbilityTriggerInfo<T>> mTriggers = new ArrayList<>();
 
-	private @Nullable ItemStack mDisplayItem;
+	private @Nullable Material mDisplayItem;
 
 	private double mPriorityAmount = 1000;
 
@@ -132,7 +134,7 @@ public class AbilityInfo<T extends Ability> {
 		return this;
 	}
 
-	public AbilityInfo<T> displayItem(ItemStack displayItem) {
+	public AbilityInfo<T> displayItem(Material displayItem) {
 		mDisplayItem = displayItem;
 		return this;
 	}
@@ -149,6 +151,11 @@ public class AbilityInfo<T extends Ability> {
 
 	public AbilityInfo<T> descriptions(IntFunction<TextComponent> supplier, int levels) {
 		mDescriptions = IntStream.range(1, levels + 1).mapToObj(supplier).toList();
+		return this;
+	}
+
+	public AbilityInfo<T> simpleDescription(String desc) {
+		mSimpleDescription = desc;
 		return this;
 	}
 
@@ -270,8 +277,8 @@ public class AbilityInfo<T extends Ability> {
 		mRemove.accept(player);
 	}
 
-	public @Nullable ItemStack getDisplayItem() {
-		return mDisplayItem == null ? null : mDisplayItem.clone();
+	public @Nullable Material getDisplayItem() {
+		return mDisplayItem == null ? null : mDisplayItem;
 	}
 
 	public List<TextComponent> getDescriptions() {
@@ -319,6 +326,10 @@ public class AbilityInfo<T extends Ability> {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled));
 		}
 		return component;
+	}
+
+	public @Nullable String getSimpleDescription() {
+		return mSimpleDescription;
 	}
 
 	/*

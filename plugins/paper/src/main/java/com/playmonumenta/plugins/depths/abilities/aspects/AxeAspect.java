@@ -12,7 +12,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class AxeAspect extends WeaponAspectDepthsAbility {
 
@@ -22,7 +21,7 @@ public class AxeAspect extends WeaponAspectDepthsAbility {
 
 	public static final DepthsAbilityInfo<AxeAspect> INFO =
 		new DepthsAbilityInfo<>(AxeAspect.class, ABILITY_NAME, AxeAspect::new, null, DepthsTrigger.WEAPON_ASPECT)
-			.displayItem(new ItemStack(Material.IRON_AXE))
+			.displayItem(Material.IRON_AXE)
 			.description("You deal " + DAMAGE + " extra melee damage and gain " + StringUtils.multiplierToPercentage(ATTACK_SPEED) + "% attack speed when holding an axe.");
 
 	public AxeAspect(Plugin plugin, Player player) {

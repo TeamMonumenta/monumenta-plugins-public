@@ -86,7 +86,8 @@ public class Bezoar extends Ability {
 							PHILOSOPHER_STONE_POTIONS
 					)
 			)
-			.displayItem(new ItemStack(Material.LIME_CONCRETE, 1));
+			.simpleDescription("Every few mobs that are killed nearby, spawn an item that can be picked up for damage and healing buffs.")
+			.displayItem(Material.LIME_CONCRETE);
 
 	private int mKills = 0;
 	private int mBezoarsSpawned = 0;

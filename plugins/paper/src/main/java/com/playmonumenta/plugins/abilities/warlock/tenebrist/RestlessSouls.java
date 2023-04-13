@@ -31,7 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vex;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +70,8 @@ public class RestlessSouls extends Ability {
 					"Additionally, the possessed mob is inflicted with a level 1 debuff of the corresponding active skill that is on cooldown for " + DEBUFF_DURATION / 20 + " seconds. " +
 					"Grasping Claws > 10% Slowness. Level 1 Choleric Flames > Set mobs on Fire. Level 2 Choleric Flames > Hunger. " +
 					"Melancholic Lament > 10% Weaken. Withering Gaze > Wither. Haunting Shades > 10% Vulnerability.")
-			.displayItem(new ItemStack(Material.VEX_SPAWN_EGG, 1));
+			.simpleDescription("Mobs that die near you spawn a vex that targets enemies, dealing damage and silencing them.")
+			.displayItem(Material.VEX_SPAWN_EGG);
 
 
 	private final boolean mLevel;

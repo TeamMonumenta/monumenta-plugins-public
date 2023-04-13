@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -25,7 +24,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -60,10 +58,11 @@ public class HauntingShades extends Ability {
 					"Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.",
 				"Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. " +
 					"Effects do not stack with other Tenebrists.")
+			.simpleDescription("Place a Shade that debuffs nearby enemies with Vulnerability.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
 				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(new ItemStack(Material.SKELETON_SKULL, 1));
+			.displayItem(Material.SKELETON_SKULL);
 
 	private final HauntingShadesCS mCosmetic;
 

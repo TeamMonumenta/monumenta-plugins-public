@@ -23,7 +23,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Brutalize extends DepthsAbility {
 
@@ -33,7 +32,7 @@ public class Brutalize extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Brutalize> INFO =
 		new DepthsAbilityInfo<>(Brutalize.class, ABILITY_NAME, Brutalize::new, DepthsTree.SHADOWDANCER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.STONE_SWORD))
+			.displayItem(Material.STONE_SWORD)
 			.descriptions(Brutalize::getDescription);
 
 	public Brutalize(Plugin plugin, Player player) {

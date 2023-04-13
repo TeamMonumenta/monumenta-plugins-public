@@ -21,7 +21,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class CounterStrike extends Ability {
@@ -49,7 +48,8 @@ public class CounterStrike extends Ability {
 				"The damage is increased to 40% of pre-mitigation damage.",
 				"When this ability activates, gain 5% damage reduction against future melee damage from the mob that activated it for 10 seconds. " +
 					"This effect stacks up to 3 times (15% damage reduction).")
-			.displayItem(new ItemStack(Material.CACTUS, 1));
+			.simpleDescription("Getting hit by melee attacks damages mobs in a radius around you.")
+			.displayItem(Material.CACTUS);
 
 	private final double mReflect;
 	private final HashMap<LivingEntity, Integer> mLastDamageTime = new HashMap<>();

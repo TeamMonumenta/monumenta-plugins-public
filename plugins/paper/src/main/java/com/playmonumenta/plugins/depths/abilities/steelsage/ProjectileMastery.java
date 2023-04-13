@@ -13,7 +13,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class ProjectileMastery extends DepthsAbility {
 
@@ -22,7 +21,7 @@ public class ProjectileMastery extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<ProjectileMastery> INFO =
 		new DepthsAbilityInfo<>(ProjectileMastery.class, ABILITY_NAME, ProjectileMastery::new, DepthsTree.STEELSAGE, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.BOW))
+			.displayItem(Material.BOW)
 			.descriptions(ProjectileMastery::getDescription);
 
 	public ProjectileMastery(Plugin plugin, Player player) {

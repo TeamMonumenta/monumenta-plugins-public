@@ -76,12 +76,13 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 					.formatted(DAMAGE_1, RADIUS, RADIUS),
 				"Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
 					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING))
+			.simpleDescription("Lunge forward, dealing damage upon landing.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				new AbilityTriggerInfo.TriggerRestriction("holding a sword or axe", p -> {
 					ItemStack mainhand = p.getInventory().getItemInMainHand();
 					return ItemUtils.isSword(mainhand) || ItemUtils.isAxe(mainhand);
 				})))
-			.displayItem(new ItemStack(Material.IRON_SWORD, 1));
+			.displayItem(Material.IRON_SWORD);
 
 	private int mStacks;
 	private final int mStackLimit;

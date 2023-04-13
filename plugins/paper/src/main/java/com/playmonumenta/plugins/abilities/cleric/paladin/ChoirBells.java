@@ -19,7 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -53,9 +52,10 @@ public class ChoirBells extends Ability {
 					"Undead enemies also switch targets over to you, are dealt " + DAMAGE + " magic damage, " +
 					"and are afflicted with 20% vulnerability and 20% weakness for 8s. Cooldown: 16s.",
 				"Slowness is increased from 10% to 20%. Vulnerability and weakness are increased from 20% to 35%.")
+			.simpleDescription("Taunt, slow, and apply vulnerability to nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", ChoirBells::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)))
-			.displayItem(new ItemStack(Material.BELL, 1));
+			.displayItem(Material.BELL);
 
 	private final double mSlownessAmount;
 	private final double mWeakenEffect;

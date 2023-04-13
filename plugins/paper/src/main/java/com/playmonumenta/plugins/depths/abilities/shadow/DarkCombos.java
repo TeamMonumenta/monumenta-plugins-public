@@ -19,7 +19,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -31,7 +30,7 @@ public class DarkCombos extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<DarkCombos> INFO =
 		new DepthsAbilityInfo<>(DarkCombos.class, ABILITY_NAME, DarkCombos::new, DepthsTree.SHADOWDANCER, DepthsTrigger.COMBO)
-			.displayItem(new ItemStack(Material.FLINT))
+			.displayItem(Material.FLINT)
 			.descriptions(DarkCombos::getDescription);
 
 	private int mComboCount = 0;

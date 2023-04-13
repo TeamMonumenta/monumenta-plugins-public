@@ -25,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 
 public class Spellshock extends Ability {
@@ -80,7 +79,8 @@ public class Spellshock extends Ability {
 				String.format("When an enemy that has ever had static dies, they explode, dealing %s damage to enemies in a %s block radius.",
 					ENHANCEMENT_DAMAGE,
 					ENHANCEMENT_RADIUS))
-			.displayItem(new ItemStack(Material.GLOWSTONE_DUST, 1));
+			.simpleDescription("Deal extra damage to nearby mobs when damaging a mob recently damaged by a spell.")
+			.displayItem(Material.GLOWSTONE_DUST);
 
 	private final float mLevelDamage;
 	private final float mMeleeBonus;

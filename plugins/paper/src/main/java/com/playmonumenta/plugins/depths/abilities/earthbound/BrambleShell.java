@@ -23,7 +23,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class BrambleShell extends DepthsAbility {
@@ -33,7 +32,7 @@ public class BrambleShell extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<BrambleShell> INFO =
 		new DepthsAbilityInfo<>(BrambleShell.class, ABILITY_NAME, BrambleShell::new, DepthsTree.EARTHBOUND, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.SWEET_BERRIES))
+			.displayItem(Material.SWEET_BERRIES)
 			.descriptions(BrambleShell::getDescription);
 
 	public BrambleShell(Plugin plugin, Player player) {

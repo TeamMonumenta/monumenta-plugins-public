@@ -18,7 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -69,8 +68,9 @@ public class TransmutationRing extends Ability implements PotionAbility {
 							StringUtils.ticksToSeconds(TRANSMUTATION_RING_2_COOLDOWN)
 					)
 			)
+			.simpleDescription("Deploy a circular zone that buffs the damage dealt by allies.")
 			.cooldown(TRANSMUTATION_RING_1_COOLDOWN, TRANSMUTATION_RING_2_COOLDOWN, CHARM_COOLDOWN)
-			.displayItem(new ItemStack(Material.GOLD_NUGGET, 1));
+			.displayItem(Material.GOLD_NUGGET);
 
 	private final double mRadius;
 

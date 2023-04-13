@@ -25,7 +25,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -57,6 +56,7 @@ public class Bodyguard extends Ability {
 					"Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 4 Absorption hearts for 10 seconds. " +
 					"Left-click twice while looking down to cast on yourself. Cooldown: 30s.",
 				"Absorption increased to 6 hearts. Additionally, affected mobs are stunned for 3 seconds.")
+			.simpleDescription("Teleport to another player, giving them and yourself absorption and stunning nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("castSelf", "cast on self or others", bg -> bg.cast(true),
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).doubleClick().lookDirections(AbilityTrigger.LookDirection.DOWN)
@@ -64,7 +64,7 @@ public class Bodyguard extends Ability {
 			.addTrigger(new AbilityTriggerInfo<>("castOthers", "cast on others only", bg -> bg.cast(false),
 				new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).doubleClick()
 					.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
-			.displayItem(new ItemStack(Material.IRON_CHESTPLATE, 1));
+			.displayItem(Material.IRON_CHESTPLATE);
 
 	private final double mAbsorptionHealth;
 

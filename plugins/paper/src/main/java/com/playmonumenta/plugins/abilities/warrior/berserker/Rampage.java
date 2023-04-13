@@ -29,7 +29,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class Rampage extends Ability implements AbilityWithChargesOrStacks {
@@ -71,9 +70,10 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 						StringUtils.multiplierToPercentage(HEAL_PERCENT)),
 				"Gain a stack of rage for each %s melee damage dealt, with stacks capping at %s."
 					.formatted(RAMPAGE_2_DAMAGE_PER_STACK, RAMPAGE_2_STACK_LIMIT))
+			.simpleDescription("Dealing damage grants rage stacks that give resistance, which can be consume to deal area damage and heal yourself.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Rampage::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN)
 				                                                                    .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
-			.displayItem(new ItemStack(Material.BLAZE_POWDER, 1));
+			.displayItem(Material.BLAZE_POWDER);
 
 	private final double mDamagePerStack;
 	private final int mStackLimit;

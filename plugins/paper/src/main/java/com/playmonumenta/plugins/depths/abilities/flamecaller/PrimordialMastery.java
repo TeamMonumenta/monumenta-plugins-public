@@ -12,7 +12,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class PrimordialMastery extends DepthsAbility {
 
@@ -21,7 +20,7 @@ public class PrimordialMastery extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<PrimordialMastery> INFO =
 		new DepthsAbilityInfo<>(PrimordialMastery.class, ABILITY_NAME, PrimordialMastery::new, DepthsTree.FLAMECALLER, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.FIRE_CORAL_FAN))
+			.displayItem(Material.FIRE_CORAL_FAN)
 			.descriptions(PrimordialMastery::getDescription);
 
 	public PrimordialMastery(Plugin plugin, Player player) {

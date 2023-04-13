@@ -19,7 +19,6 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 public class Icebreaker extends DepthsAbility {
@@ -30,7 +29,7 @@ public class Icebreaker extends DepthsAbility {
 
 	public static final DepthsAbilityInfo<Icebreaker> INFO =
 		new DepthsAbilityInfo<>(Icebreaker.class, ABILITY_NAME, Icebreaker::new, DepthsTree.FROSTBORN, DepthsTrigger.PASSIVE)
-			.displayItem(new ItemStack(Material.TUBE_CORAL_FAN))
+			.displayItem(Material.TUBE_CORAL_FAN)
 			.descriptions(Icebreaker::getDescription);
 
 	public Icebreaker(Plugin plugin, Player player) {

@@ -29,7 +29,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Avalanche extends DepthsAbility {
 
@@ -47,7 +46,7 @@ public class Avalanche extends DepthsAbility {
 			.cooldown(COOLDOWN_TICKS)
 			.actionBarColor(TextColor.color(91, 187, 255))
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Avalanche::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP), HOLDING_WEAPON_RESTRICTION))
-			.displayItem(new ItemStack(Material.SNOW_BLOCK))
+			.displayItem(Material.SNOW_BLOCK)
 			.descriptions(Avalanche::getDescription);
 
 	public Avalanche(Plugin plugin, Player player) {
