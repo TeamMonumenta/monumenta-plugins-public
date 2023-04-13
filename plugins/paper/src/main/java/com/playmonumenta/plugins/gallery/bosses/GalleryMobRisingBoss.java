@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSummon;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryUtils;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
@@ -81,7 +82,7 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 							p.SOUNDS.play(bos.getLocation());
 						}
 
-						loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+						new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
 						if (ticks >= p.DURATION) {
 							bos.setGlowing(false);
@@ -92,7 +93,7 @@ public class GalleryMobRisingBoss extends BossAbilityGroup {
 						if (ticks == 0) {
 							mob.setGlowing(true);
 						}
-						loc.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0);
+						new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.5, 0.5, 0.5, 0).spawnAsEntityActive(boss);
 
 						if (ticks >= p.DURATION) {
 							mob.setGlowing(false);

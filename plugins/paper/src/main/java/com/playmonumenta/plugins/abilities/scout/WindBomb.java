@@ -182,8 +182,8 @@ public class WindBomb extends Ability {
 
 			if (isEnhanced()) {
 				loc.add(0, 2, 0);
-				world.spawnParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125);
-				world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125);
+				new PartialParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125).minimumCount(0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125).minimumCount(0).spawnAsPlayerActive(mPlayer);
 				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1f);
 				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
 
@@ -212,9 +212,9 @@ public class WindBomb extends Ability {
 								}
 							}
 						}
-						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1);
-						world.spawnParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05);
-						world.spawnParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15);
+						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumCount(0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumCount(0).spawnAsPlayerActive(mPlayer);
 						if (mTicks >= pullDuration) {
 							this.cancel();
 						}

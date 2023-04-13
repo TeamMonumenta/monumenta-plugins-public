@@ -161,11 +161,11 @@ public class ArcaneStrike extends Ability {
 				}
 				if (wind > 0) {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.30f);
-					mPlayer.getWorld().spawnParticle(Particle.CLOUD, loc, 20, radius, radius, radius);
+					new PartialParticle(Particle.CLOUD, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
 				}
 				if (fire > 0) {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.PLAYERS, 0.6f, 0.9f);
-					mPlayer.getWorld().spawnParticle(Particle.LAVA, loc, 20, radius, radius, radius);
+					new PartialParticle(Particle.LAVA, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
 				}
 			}
 

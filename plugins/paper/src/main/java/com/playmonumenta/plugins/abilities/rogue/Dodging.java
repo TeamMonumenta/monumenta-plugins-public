@@ -265,8 +265,8 @@ public class Dodging extends Ability {
 		for (int i = 0; i <= playerLocation.distance(sourceLocation); i++) {
 			particleLocation.add(direction);
 
-			world.spawnParticle(Particle.VILLAGER_HAPPY, particleLocation, 3, 0.25, 0.25, 0.25, 0);
-			world.spawnParticle(Particle.CLOUD, particleLocation, 6, 0.05, 0.05, 0.05, 0.05);
+			new PartialParticle(Particle.VILLAGER_HAPPY, particleLocation, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.CLOUD, particleLocation, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -103,7 +104,7 @@ public class PhlegmaticResolve extends Ability {
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), ENHANCE_RADIUS);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
 						DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.OTHER, mLastPreMitigationDamage * ENHANCEMENT_DAMAGE);
-						mPlayer.getWorld().spawnParticle(Particle.WAX_OFF, mob.getLocation(), 6, 0.5f, 0.5f, 0.5f);
+						new PartialParticle(Particle.WAX_OFF, mob.getLocation(), 6, 0.5f, 0.5f, 0.5f).spawnAsPlayerActive(mPlayer);
 					}
 
 					// Shift the array forward
