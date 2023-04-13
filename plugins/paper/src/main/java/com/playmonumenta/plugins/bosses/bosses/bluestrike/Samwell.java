@@ -35,7 +35,6 @@ import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -90,6 +89,7 @@ public class Samwell extends BossAbilityGroup {
 	public boolean mDaggerPhase = false;
 	public @Nullable BossBar mGatheringBar;
 	public @Nullable BossBar mCraftingBar;
+	private final List<Spell> mInactivePassives;
 	private final List<Spell> mBasePassives;
 	List<Spell> mPhase1Passives;
 	List<Spell> mPhase2Passives;
@@ -147,20 +147,24 @@ public class Samwell extends BossAbilityGroup {
 		mDagger = InventoryUtils.getItemFromLootTable(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
 		mShards = InventoryUtils.getItemFromLootTable(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_shard"));
 
+		mInactivePassives = List.of(
+			new SpellDominion(plugin, boss, mSpawnLoc, false)
+		);
+
 		mBasePassives = Arrays.asList(
 			new SpellBlockBreak(mBoss),
 			new SpellConditionalTeleport(boss, startLoc, b -> {
 				// Boss isn't stuck in lava or bedrock
 				boolean condition1 = b.getLocation().getBlock().getType() == Material.BEDROCK ||
-					                     b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
-					                     b.getLocation().getBlock().getType() == Material.LAVA;
+					b.getLocation().add(0, 1, 0).getBlock().getType() == Material.BEDROCK ||
+					b.getLocation().getBlock().getType() == Material.LAVA;
 
 				// Boss isn't too far off arena.
 				boolean condition2 = (boss.getLocation().distance(startLoc) > 30) || Math.abs(boss.getLocation().getY() - startLoc.getY()) > 5;
 
 				return condition1 || condition2;
 			}),
-			new SpellDominion(plugin, boss, mSpawnLoc),
+			new SpellDominion(plugin, boss, mSpawnLoc, true),
 			new SpellTargetVisiblePlayer((Mob) boss, detectionRange, 60, 160),
 			new SpellRunAction(() -> {
 				if (boss.hasPotionEffect(PotionEffectType.GLOWING)) {
@@ -247,7 +251,7 @@ public class Samwell extends BossAbilityGroup {
 		));
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.BLUE, BarStyle.SEGMENTED_10, null, false);
 
-		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, bossBar);
+		super.constructBoss(SpellManager.EMPTY, mInactivePassives, detectionRange, bossBar);
 	}
 
 	@Override
@@ -536,18 +540,17 @@ public class Samwell extends BossAbilityGroup {
 		};
 
 		for (Player player : players) {
-			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 25, 10));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 25, 1));
 
 			if (Math.abs(player.getLocation().getY() - mSpawnLoc.getY()) > 4
-				    || player.getLocation().distance(mSpawnLoc) > 30) {
+				|| player.getLocation().distance(mSpawnLoc) > 30) {
 				// Feeling nice today?
 				player.teleport(mSpawnLoc);
 			}
 		}
 
-		changePhase(SpellManager.EMPTY, Collections.emptyList(), null);
+		changePhase(SpellManager.EMPTY, mInactivePassives, null);
 		mBoss.setHealth(100);
 		mBoss.setInvulnerable(true);
 		mBoss.setAI(false);
@@ -613,8 +616,6 @@ public class Samwell extends BossAbilityGroup {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_RED + "Samwell, Usurper Of Life");
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
-							player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-							player.removePotionEffect(PotionEffectType.REGENERATION);
 						}
 						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						mBoss.remove();
