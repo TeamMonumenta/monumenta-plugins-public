@@ -42,13 +42,24 @@ public class SpellSpawnMobs extends Spell {
 		Location loc = mBoss.getLocation();
 
 		for (int i = 0; i < mSpawns; i++) {
-			double r = FastUtils.randomDoubleInRange(mMinSummonRange, mSummonRange);
-			double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
+			Location sLoc = loc.clone();
 
-			double x = r * Math.cos(theta);
-			double z = r * Math.sin(theta);
+			// try 20 times to find an open block
+			for (int j = 0; j < 20; j++) {
+				double r = FastUtils.randomDoubleInRange(mMinSummonRange, mSummonRange);
+				double theta = FastUtils.randomDoubleInRange(0, 2 * Math.PI);
 
-			Location sLoc = loc.clone().add(x, 0.25, z);
+				double x = r * Math.cos(theta);
+				double z = r * Math.sin(theta);
+
+				Location tLoc = loc.clone().add(x, 0.25, z);
+
+				if (mBoss.getWorld().getBlockAt(tLoc).isPassable()) {
+					sLoc = tLoc.clone();
+					break;
+				}
+			}
+
 			//Can skip some summons but doesn't matter I don't think - this is the edgiest of edge cases
 			if (ZoneUtils.hasZoneProperty(sLoc, ZoneUtils.ZoneProperty.RESIST_5) && !ZoneUtils.hasZoneProperty(mBoss.getLocation(), ZoneUtils.ZoneProperty.BLITZ)) {
 				continue;
