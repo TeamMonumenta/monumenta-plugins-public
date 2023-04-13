@@ -103,6 +103,10 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
+		if (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.LEGACY) {
+			return;
+		}
+
 		ClickType click = event.getClick();
 		Material mat = item.getType();
 		if (click == ClickType.LEFT && mat == Material.GLASS_BOTTLE) {
