@@ -381,7 +381,7 @@ public final class EffectManager implements Listener {
 										effectGroup.last().entityTickEffect(entry.getKey(), fourHertz, twoHertz, oneHertz);
 									}
 								} catch (Exception ex) {
-									Plugin.getInstance().getLogger().severe("Error in effect manager entityTickEffect: " + ex.getMessage());
+									MMLog.severe("Error in effect manager entityTickEffect: " + ex.getMessage());
 									ex.printStackTrace();
 								}
 							}
@@ -393,19 +393,15 @@ public final class EffectManager implements Listener {
 					while (entityIter.hasNext()) {
 						Effects effects = entityIter.next();
 						Entity entity = effects.mEntity;
-						if (entity.isDead() || !entity.isValid()) {
-							if (!(entity instanceof Player)) {
-								entityIter.remove();
-								continue;
-							}
-						}
-
-						// Remove effects from players who are no longer logged in here - those effects will be re-added when they return
 						if (entity instanceof Player player) {
+							// Remove effects from players who are no longer logged in here - those effects will be re-added when they return
 							if (!player.isOnline()) {
 								entityIter.remove();
 								continue;
 							}
+						} else if (entity.isDead() || !entity.isValid()) {
+							entityIter.remove();
+							continue;
 						}
 
 						for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
@@ -427,7 +423,7 @@ public final class EffectManager implements Listener {
 										try {
 											effect.entityGainEffect(entity);
 										} catch (Exception ex) {
-											Plugin.getInstance().getLogger().severe("Error in effect manager entityGainEffect: " + ex.getMessage());
+											MMLog.severe("Error in effect manager entityGainEffect: " + ex.getMessage());
 											ex.printStackTrace();
 										}
 										currentEffectRemoved = false;
@@ -437,17 +433,18 @@ public final class EffectManager implements Listener {
 									try {
 										tickResult = effect.tick(PERIOD);
 									} catch (Exception ex) {
-										Plugin.getInstance().getLogger().severe("Error in effect manager tick: " + ex.getMessage());
+										MMLog.severe("Error in effect manager tick: " + ex.getMessage());
 										ex.printStackTrace();
 										/* If ticking throws an exception (e.g. NPE) remove it */
 										tickResult = false;
 									}
+
 									if (tickResult) {
 										if (effect == currentEffect) {
 											try {
 												effect.entityLoseEffect(entity);
 											} catch (Exception ex) {
-												Plugin.getInstance().getLogger().severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
+												MMLog.severe("Error in effect manager entityLoseEffect: " + ex.getMessage());
 												ex.printStackTrace();
 											}
 											currentEffectRemoved = true;
@@ -466,7 +463,7 @@ public final class EffectManager implements Listener {
 						}
 					}
 				} catch (Exception ex) {
-					Plugin.getInstance().getLogger().severe("SEVERE error in effect manager ticking task that caused many pieces to be skipped: " + ex.getMessage());
+					MMLog.severe("Error in effect manager ticking task that caused many pieces to be skipped: " + ex.getMessage());
 					ex.printStackTrace();
 				}
 			}
@@ -482,7 +479,7 @@ public final class EffectManager implements Listener {
 	/**
 	 * Applies an effect to an entity.
 	 * <p>
-	 * You MUST assign difference "sources" to different effect types. The source should only be used to track level and duration overrides of the same effect.
+	 * You MUST assign different "sources" to different effect types. The source should only be used to track level and duration overrides of the same effect.
 	 * <p>
 	 * You MUST create a new Effect object for each effect applied, as durations are tracked by the Effect object.
 	 *

@@ -61,13 +61,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	@Override
 	public int compareTo(Effect otherEffect) {
-		if (getMagnitude() > otherEffect.getMagnitude()) {
-			return 1;
-		} else if (getMagnitude() < otherEffect.getMagnitude()) {
-			return -1;
-		} else {
-			return 0;
-		}
+		return Double.compare(getMagnitude(), otherEffect.getMagnitude());
 	}
 
 	public void customEffectAppliedEvent(CustomEffectApplyEvent event) {

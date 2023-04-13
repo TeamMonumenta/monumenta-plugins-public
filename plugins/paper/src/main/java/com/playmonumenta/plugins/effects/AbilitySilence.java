@@ -32,6 +32,16 @@ public class AbilitySilence extends ZeroArgumentEffect {
 	}
 
 	@Override
+	public int compareTo(Effect otherEffect) {
+		if (otherEffect instanceof AbilitySilence) {
+			// All silences are equal, yet getMagnitude() considers them different based on duration
+			// This prevents multiple silences being present at the same time, which causes bugs
+			return 0;
+		}
+		return super.compareTo(otherEffect);
+	}
+
+	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			player.sendActionBar(Component.text("You are silenced! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
