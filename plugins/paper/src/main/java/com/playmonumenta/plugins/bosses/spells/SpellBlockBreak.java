@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,8 @@ import org.bukkit.block.data.type.Gate;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
@@ -99,7 +102,7 @@ public class SpellBlockBreak extends Spell {
 						/* Break cobwebs immediately, don't add them to the bad block list */
 						List<Block> list = new ArrayList<>(1);
 						list.add(block);
-						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), list, 0f);
+						EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, loc, list, 0f);
 						Bukkit.getServer().getPluginManager().callEvent(event);
 						if (!event.isCancelled()) {
 							/* Only allow bosses to break blocks in areas where explosions are allowed */
@@ -132,28 +135,36 @@ public class SpellBlockBreak extends Spell {
 			}
 		}
 
+		if (breakBlockList.isEmpty()) {
+			return;
+		}
+
+		int requiredScore = 6;
+		if (mLauncher instanceof Mob mob && mob.getTarget() instanceof Player target && target.getLocation().getY() >= loc.getY() + 2 && PlayerUtils.isOnGround(target)) {
+			// If changing the score makes a difference, the player the mob is targeting is probably trying to pillar
+			requiredScore = 3;
+		}
+
 		/* If more than two blocks surrounding mob, and some are breakable, destroy all breakable blocking blocks */
-		if (badScore >= 6 && breakBlockList.size() > 0) {
+		if (badScore >= requiredScore) {
 			/* Call an event with these exploding blocks to give plugins a chance to modify it */
 			EntityExplodeEvent event = new EntityExplodeEvent(mLauncher, mLauncher.getLocation(), breakBlockList, 0f);
 			Bukkit.getServer().getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
+			if (event.isCancelled() || breakBlockList.isEmpty()) {
 				return;
 			}
 
-			if (breakBlockList.size() > 0) {
-				/* Remove any remaining blocks, which might have been modified by the event */
-				for (Block block : breakBlockList) {
-					if (BlockUtils.isValuableBlock(block.getType())) {
-						block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
-					} else {
-						block.setType(Material.AIR);
-					}
+			/* Remove any remaining blocks, which might have been modified by the event */
+			for (Block block : breakBlockList) {
+				if (BlockUtils.isValuableBlock(block.getType())) {
+					block.breakNaturally(new ItemStack(Material.IRON_PICKAXE));
+				} else {
+					block.setType(Material.AIR);
 				}
-
-				loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
-				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 			}
+
+			loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
+			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(mLauncher);
 		}
 	}
 
