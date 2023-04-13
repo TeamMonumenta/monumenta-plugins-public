@@ -71,7 +71,7 @@ public class SignOverride extends BaseOverride {
 								signBlock.setBlockData(originalBlockData, true);
 								Sign sign = (Sign) signBlock.getState();
 								sign.setColor(signColor);
-								sign.setGlowingText(glowing);
+								sign.setGlowingText(glowing && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
 								for (int lineNum = 0; lineNum < signLines.size(); ++lineNum) {
 									sign.line(lineNum, signLines.get(lineNum));
 								}
