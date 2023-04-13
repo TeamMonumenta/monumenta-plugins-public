@@ -154,7 +154,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 
 						if (mT % mLobsDelay == 0) {
 							launchGrenade(bossLocation, target);
-							if (mT >= mLobs * mLobsDelay) {
+							if (mT >= (mLobs - 1) * mLobsDelay) {
 								this.cancel();
 							}
 						}

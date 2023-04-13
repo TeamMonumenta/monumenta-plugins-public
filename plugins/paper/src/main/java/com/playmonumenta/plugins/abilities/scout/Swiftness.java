@@ -73,6 +73,8 @@ public class Swiftness extends Ability {
 		DamageEvent.DamageType type = event.getType();
 		if ((type == DamageEvent.DamageType.MELEE || type == DamageEvent.DamageType.PROJECTILE) && isEnhanced() && FastUtils.RANDOM.nextDouble() < DODGE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DODGE)) {
 			event.setCancelled(true);
+			mPlayer.setNoDamageTicks(20);
+			mPlayer.setLastDamage(event.getDamage());
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.CLOUD, loc, 40, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
