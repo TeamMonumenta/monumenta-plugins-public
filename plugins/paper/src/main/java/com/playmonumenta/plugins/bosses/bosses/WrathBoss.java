@@ -79,8 +79,10 @@ public class WrathBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
+						if (EntityUtils.shouldCancelSpells(mBoss)) {
+							this.cancel();
+						}
 						mTime++;
-
 						if (mTime <= 5) {
 							Location locParticle = mBoss.getLocation().add(0, 1.5, 0);
 							Vector sideways = new Vector(mDirection.getZ(), 1, -mDirection.getX()).multiply(3);
