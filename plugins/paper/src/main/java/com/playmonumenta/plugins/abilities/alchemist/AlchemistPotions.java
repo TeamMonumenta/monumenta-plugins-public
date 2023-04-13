@@ -5,12 +5,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
-import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.EsotericEnhancements;
 import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
-import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -20,7 +17,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -39,8 +35,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -91,18 +89,13 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 					.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Alchemist.CLASS_ID);
 
 	public final GruesomeAlchemyCS mCosmetic;
+	private boolean mHasGruesomeAlchemy = false;
 
 	private @Nullable ProjectileHitEvent mLastHitEvent;
 
 	public AlchemistPotions(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		/*
-		 * Run this stuff 5 ticks later. As of now, the AbilityManager takes a tick
-		 * to initialize everything, and the PotionAbility classes take a tick to
-		 * initialize their damage values, but just give a few extra ticks for slight
-		 * future-proofing.
-		 */
 		mChargeTime = POTIONS_TIMER_BASE;
 		mMaxCharges = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_CHARGES, MAX_CHARGES);
 		mCharges = Math.min(ScoreboardUtils.getScoreboardValue(player, POTION_SCOREBOARD).orElse(0), mMaxCharges);
@@ -123,38 +116,16 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 		}
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			Ability[] classAbilities = new Ability[8];
-			Ability[] specAbilities = new Ability[6];
-			classAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, GruesomeAlchemy.class);
-			classAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, BrutalAlchemy.class);
-			classAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EmpoweringOdor.class);
-			classAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, IronTincture.class);
-			classAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, AlchemicalArtillery.class);
-			classAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, UnstableAmalgam.class);
-			classAbilities[6] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EnergizingElixir.class);
-			classAbilities[7] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Bezoar.class);
-			specAbilities[0] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Taboo.class);
-			specAbilities[1] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, EsotericEnhancements.class);
-			specAbilities[2] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, ScorchedEarth.class);
-			specAbilities[3] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, WardingRemedy.class);
-			specAbilities[4] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, TransmutationRing.class);
-			specAbilities[5] = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Panacea.class);
+			List<? extends PotionAbility> potionAbilities = Stream.of(GruesomeAlchemy.class, BrutalAlchemy.class, EmpoweringOdor.class, TransmutationRing.class, EsotericEnhancements.class, ScorchedEarth.class)
+				.map(c -> AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, c)).filter(Objects::nonNull).toList();
 
-			for (Ability classAbility : classAbilities) {
-				if (classAbility instanceof PotionAbility potionAbility) {
-					mPotionAbilities.add(potionAbility);
-				}
+			for (PotionAbility potionAbility : potionAbilities) {
+				mPotionAbilities.add(potionAbility);
 
-				if (classAbility instanceof EmpoweringOdor odor && odor.isLevelTwo()) {
+				if (potionAbility instanceof GruesomeAlchemy) {
+					mHasGruesomeAlchemy = true;
+				} else if (potionAbility instanceof EmpoweringOdor odor && odor.isLevelTwo()) {
 					mChargeTime -= EmpoweringOdor.POTION_RECHARGE_TIME_REDUCTION_2;
-				}
-			}
-
-			if (ServerProperties.getClassSpecializationsEnabled(mPlayer)) {
-				for (Ability specAbility : specAbilities) {
-					if (specAbility instanceof PotionAbility potionAbility) {
-						mPotionAbilities.add(potionAbility);
-					}
 				}
 			}
 		});
@@ -429,7 +400,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public boolean isGruesomeMode() {
-		return mPlayer.getScoreboardTags().contains(GRUESOME_MODE_TAG);
+		return mHasGruesomeAlchemy && mPlayer.getScoreboardTags().contains(GRUESOME_MODE_TAG);
 	}
 
 	private boolean isGruesome(ThrownPotion potion) {
