@@ -254,47 +254,48 @@ public class Hedera extends BossAbilityGroup {
 
 		//Consume random plant if there are any
 		if (mBoss.getHealth() < PLANT_CONSUME_PERCENT * EntityUtils.getMaxHealth(mBoss) && plantsAlive) {
-
-			//If not being damaged from a source, don't consume plants but don't take damage
-			if (event.getSource() == null) {
+			// If not being damaged from a source OR If damage is a form of DoT, don't consume plants and don't take damage
+			if (event.getSource() == null ||
+				event.getType() == DamageEvent.DamageType.AILMENT || event.getType() == DamageEvent.DamageType.FIRE) {
 				event.setDamage(1);
-			}
+			} else {
+				Collection<Location> plantsCollection = mPlants.keySet();
+				List<Location> plants = new ArrayList<>(plantsCollection);
+				Collections.shuffle(plants);
+				Location unluckyPlant = plants.get(0);
 
-			Collection<Location> plantsCollection = mPlants.keySet();
-			List<Location> plants = new ArrayList<>(plantsCollection);
-			Collections.shuffle(plants);
-			Location unluckyPlant = plants.get(0);
-
-			Objects.requireNonNull(mPlants.get(unluckyPlant)).damage(10000);
-			mPlants.remove(unluckyPlant);
-			mPlantTypes.remove(unluckyPlant);
-			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
+				Objects.requireNonNull(mPlants.get(unluckyPlant)).damage(10000);
+				mPlants.remove(unluckyPlant);
+				mPlantTypes.remove(unluckyPlant);
+				PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
 					.sendMessage(Component.text("", NamedTextColor.DARK_GREEN)
 						.append(Component.text("[Hedera]", NamedTextColor.GOLD))
 						.append(Component.text(" Consumeth me mine hydrophytes, the vines begone now give me life!")));
-			//Heal Hedera
-			double amountToHeal = Math.max(.05, .25 - (mTimesHealed * .05));
-			mBoss.setHealth(mBoss.getHealth() + (EntityUtils.getMaxHealth(mBoss) * amountToHeal));
-			mTimesHealed++;
+				//Heal Hedera
+				double amountToHeal = Math.max(.05, .25 - (mTimesHealed * .05));
+				mBoss.setHealth(mBoss.getHealth() + (EntityUtils.getMaxHealth(mBoss) * amountToHeal));
+				mTimesHealed++;
 
-			//Particles from consumed plant to Hedera
-			new BukkitRunnable() {
-				int mCount = 0;
-				final int mMaxCount = Math.max(15, (int) mBoss.getEyeLocation().distance(unluckyPlant));
-				@Override
-				public void run() {
-					if (mCount >= mMaxCount) {
-						this.cancel();
+				//Particles from consumed plant to Hedera
+				new BukkitRunnable() {
+					int mCount = 0;
+					final int mMaxCount = Math.max(15, (int) mBoss.getEyeLocation().distance(unluckyPlant));
+
+					@Override
+					public void run() {
+						if (mCount >= mMaxCount) {
+							this.cancel();
+						}
+
+						Location bossEyeLoc = mBoss.getEyeLocation();
+						Vector particleVector = bossEyeLoc.subtract(unluckyPlant).toVector().multiply(((double) mCount) / mMaxCount);
+						new PartialParticle(Particle.VILLAGER_HAPPY, unluckyPlant.add(particleVector), 5).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.SPELL_WITCH, unluckyPlant.add(particleVector), 5).spawnAsEntityActive(mBoss);
+
+						mCount++;
 					}
-
-					Location bossEyeLoc = mBoss.getEyeLocation();
-					Vector particleVector = bossEyeLoc.subtract(unluckyPlant).toVector().multiply(((double) mCount) / mMaxCount);
-					new PartialParticle(Particle.VILLAGER_HAPPY, unluckyPlant.add(particleVector), 5).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.SPELL_WITCH, unluckyPlant.add(particleVector), 5).spawnAsEntityActive(mBoss);
-
-					mCount++;
-				}
-			}.runTaskTimer(mPlugin, 0, 1);
+				}.runTaskTimer(mPlugin, 0, 1);
+			}
 		}
 	}
 }
