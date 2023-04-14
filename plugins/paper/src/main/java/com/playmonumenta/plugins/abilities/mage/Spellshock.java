@@ -137,6 +137,9 @@ public class Spellshock extends Ability {
 
 				Hitbox hitbox = new Hitbox.SphereHitbox(loc, SIZE);
 				for (LivingEntity hitMob : hitbox.getHitMobs()) {
+					if (hitMob.isDead()) {
+						continue;
+					}
 					// Only damage a mob once per tick
 					if (MetadataUtils.checkOnceThisTick(mPlugin, hitMob, DAMAGED_THIS_TICK_METAKEY)) {
 						DamageUtils.damage(mPlayer, hitMob, DamageType.OTHER, spellShockDamage, ClassAbility.SPELLSHOCK, true);
