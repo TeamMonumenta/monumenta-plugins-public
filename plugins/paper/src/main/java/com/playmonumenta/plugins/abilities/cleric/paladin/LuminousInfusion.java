@@ -131,13 +131,15 @@ public class LuminousInfusion extends Ability {
 		if (mDoMultiplierAndFire && (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE || event.getType() == DamageType.MELEE_ENCH || (event.getType() == DamageType.MAGIC && event.getAbility() != mInfo.getLinkedSpell())) && enemyTriggersAbilities) {
 			EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, enemy, mPlayer);
 
-			double originalDamage = event.getDamage();
-			// Store the raw pre-event damage.
-			// When it is used by Holy Javelin later,
-			// the custom damage event will fire including this raw damage,
-			// then event processing runs for it from there
-			mLastPassiveMeleeDamage = originalDamage * DAMAGE_MULTIPLIER_2;
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.getLinkedSpell(), true);
+			if (event.getType() != DamageType.MAGIC && event.getType() != DamageType.PROJECTILE) {
+				double originalDamage = event.getDamage();
+				// Store the raw pre-event damage.
+				// When it is used by Holy Javelin later,
+				// the custom damage event will fire including this raw damage,
+				// then event processing runs for it from there
+				mLastPassiveMeleeDamage = originalDamage * DAMAGE_MULTIPLIER_2;
+				DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, mLastPassiveMeleeDamage, mInfo.getLinkedSpell(), true);
+			}
 		}
 		return false;
 	}
