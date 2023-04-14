@@ -60,7 +60,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 
 		// Forget about this target if they die, leave the game, switch to spectator, or are invisible
 		if (mLastTarget != null) {
-			if (!mLastTarget.isValid() || mLastTarget.getGameMode() == GameMode.SPECTATOR || AbilityUtils.isStealthed(mLastTarget)) {
+			if (!mLastTarget.isValid() || !mLastTarget.getWorld().equals(mBoss.getWorld()) || mLastTarget.getGameMode() == GameMode.SPECTATOR || AbilityUtils.isStealthed(mLastTarget)) {
 				mLastTarget = null;
 				mBoss.setTarget(null);
 				mCooldownRemaining = 0;

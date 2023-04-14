@@ -131,15 +131,17 @@ public class SpellFireball extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				// Summon a fireball slightly offset from the boss in the direction of the player
-				Location spawnLoc = mBoss.getEyeLocation();
-				Vector direction = target.getEyeLocation().subtract(spawnLoc).toVector().normalize();
-				spawnLoc = spawnLoc.add(direction.multiply(2));
-				Fireball fireball = (Fireball) mBoss.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
-				fireball.setDirection(direction);
-				fireball.setVelocity(direction.multiply(2));
-				fireball.setYield(mYield);
-				fireball.setIsIncendiary(mIsIncendiary);
+				if (target.getWorld().equals(mBoss.getWorld())) {
+					// Summon a fireball slightly offset from the boss in the direction of the player
+					Location spawnLoc = mBoss.getEyeLocation();
+					Vector direction = target.getEyeLocation().subtract(spawnLoc).toVector().normalize();
+					spawnLoc = spawnLoc.add(direction.multiply(2));
+					Fireball fireball = (Fireball) mBoss.getWorld().spawnEntity(spawnLoc, EntityType.FIREBALL);
+					fireball.setDirection(direction);
+					fireball.setVelocity(direction.multiply(2));
+					fireball.setYield(mYield);
+					fireball.setIsIncendiary(mIsIncendiary);
+				}
 				mActiveRunnables.remove(this);
 			}
 		};

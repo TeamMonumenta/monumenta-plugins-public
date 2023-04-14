@@ -1006,7 +1006,7 @@ public class EntityListener implements Listener {
 			    && !MetadataUtils.getMetadata(fallingBlock, FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, true)) {
 			if (fallingBlock.getDropItem()) {
 				Material material = fallingBlock.getBlockData().getMaterial();
-				if (!material.isAir()) { // this can apparently happen
+				if (!material.isAir() && material != Material.FROSTED_ICE) { // this can apparently happen, and frosted ice somehow gets turned into air too?
 					try {
 						fallingBlock.getWorld().dropItemNaturally(fallingBlock.getLocation(), new ItemStack(material));
 					} catch (IllegalArgumentException e) {

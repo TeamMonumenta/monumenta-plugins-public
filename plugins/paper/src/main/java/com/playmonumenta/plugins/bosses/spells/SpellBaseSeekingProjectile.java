@@ -370,6 +370,10 @@ public class SpellBaseSeekingProjectile extends Spell {
 
 	public <V extends LivingEntity> void launch(V target, Location targetLoc, boolean fixed, double fYaw, double fPitch,
 	                                            double offsetX, double offsetY, double offsetZ, double offsetYaw, double offsetPitch) {
+		if (!targetLoc.getWorld().equals(mBoss.getWorld())) {
+			return;
+		}
+
 		mLaunchAesthetic.run(mWorld, mBoss.getEyeLocation(), 0);
 
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -395,7 +399,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 				mTicks++;
 				mCollisionDelayTicks--;
 
-				if ((mTarget != null && (!mTarget.isValid() || mTarget.isDead()))
+				if ((mTarget != null && (!mTarget.isValid() || mTarget.isDead() || !mTarget.getWorld().equals(mLocation.getWorld())))
 					    || !Double.isFinite(mDirection.getX())) {
 					this.cancel();
 					if (!mLingers) {

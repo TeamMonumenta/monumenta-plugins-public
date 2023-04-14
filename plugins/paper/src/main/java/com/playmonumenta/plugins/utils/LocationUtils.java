@@ -143,6 +143,9 @@ public class LocationUtils {
 	}
 
 	public static boolean hasLineOfSight(Location fromLocation, Location toLocation) {
+		if (!fromLocation.getWorld().equals(toLocation.getWorld())) {
+			return false;
+		}
 		int range = (int)fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
 
@@ -346,7 +349,11 @@ public class LocationUtils {
 	 * @return Whether the box collides with any blocks or is in unloaded chunks
 	 */
 	public static boolean collidesWithBlocks(BoundingBox boundingBox, World world) {
-		return NmsUtils.getVersionAdapter().hasCollisionWithBlocks(world, boundingBox, true);
+		return collidesWithBlocks(boundingBox, world, true);
+	}
+
+	public static boolean collidesWithBlocks(BoundingBox boundingBox, World world, boolean loadChunks) {
+		return NmsUtils.getVersionAdapter().hasCollisionWithBlocks(world, boundingBox, loadChunks);
 	}
 
 	public static boolean travelTillObstructed(
@@ -396,11 +403,17 @@ public class LocationUtils {
 			testBox.shift(vectorIncrement);
 			Vector testBoxCentre = testBox.getCenter();
 
+			if (!testBox.getMin().toLocation(world).isChunkLoaded() || !testBox.getMax().toLocation(world).isChunkLoaded()) {
+				// don't travel into unloaded chunks
+				return true;
+			}
+
 			if (start.distanceSquared(testBoxCentre) > maxDistance * maxDistance) {
 				// Gone too far
 				return false;
 			}
-			if (collidesWithBlocks(testBox, world)) {
+
+			if (collidesWithBlocks(testBox, world, false)) {
 				// Collision on path
 				// If wiggleY is enabled, look for a free spot up to half of the bounding box height below or above the blocked location
 				if (wiggleY) {
@@ -411,7 +424,7 @@ public class LocationUtils {
 					wiggleBox.shift(0, -wiggleBox.getHeight() / 2 + step / 2, 0);
 					for (int dy = 0; dy < steps; dy++) {
 						// Scan along the y-axis, from -height/2+step/2 to +height/2-step/2, to find the lowest available space.
-						if (!collidesWithBlocks(wiggleBox, world)) {
+						if (!collidesWithBlocks(wiggleBox, world, false)) {
 							blocked = false;
 							break;
 						}

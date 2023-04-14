@@ -170,12 +170,11 @@ public class SpellBaseLeapAttack extends Spell {
 			velocity = mVelocityModifier.run(velocity, mBoss.getLocation(), locTarget);
 		}
 
-		final Player finalTargetPlayer = targetPlayer;
 		final Vector finalVelocity = velocity;
 
 		BukkitRunnable leap = new BukkitRunnable() {
-			Location mLeapLocation = moveTo;
-			Vector mDirection = finalVelocity.clone().setY(0).normalize();
+			final Location mLeapLocation = moveTo;
+			final Vector mDirection = finalVelocity.clone().setY(0).normalize();
 			boolean mLeaping = false;
 			boolean mHasBeenOneTick = false;
 			int mTime = 0;
@@ -217,8 +216,8 @@ public class SpellBaseLeapAttack extends Spell {
 					}
 
 					// Give the caller a chance to run extra effects or manipulate the boss's leap velocity
-					if (finalTargetPlayer.isOnline() && mMidLeapTick != null) {
-						mMidLeapTick.run(mBoss, finalTargetPlayer);
+					if (targetPlayer.isOnline() && targetPlayer.getWorld().equals(mBoss.getWorld()) && mMidLeapTick != null) {
+						mMidLeapTick.run(mBoss, targetPlayer);
 					}
 
 					// At least one tick has passed to avoid insta smacking a nearby player

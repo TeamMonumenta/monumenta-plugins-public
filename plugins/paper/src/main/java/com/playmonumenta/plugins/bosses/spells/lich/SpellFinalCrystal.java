@@ -155,7 +155,7 @@ public class SpellFinalCrystal extends Spell {
 				mT++;
 				//boss bar stuff
 				int remain = mCrystal.size();
-				double progress = remain * 1.0d / mCount;
+				double progress = Math.min(remain * 1.0d / mCount, 1);
 				bar.setTitle(ChatColor.YELLOW + "" + remain + " Death Crystals Remaining!");
 				bar.setProgress(progress);
 				if (progress <= 0.34) {

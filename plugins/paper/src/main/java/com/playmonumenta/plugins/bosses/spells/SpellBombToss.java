@@ -141,7 +141,11 @@ public class SpellBombToss extends Spell {
 			Location pLoc = target.getLocation();
 			Location tLoc = tnt.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
+			vect.normalize();
+			if (!Double.isFinite(vect.getX())) {
+				vect = new Vector(0, 1, 0);
+			}
+			vect.multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
 			tnt.setVelocity(vect);
 
 			int delay = mFuse % 4;

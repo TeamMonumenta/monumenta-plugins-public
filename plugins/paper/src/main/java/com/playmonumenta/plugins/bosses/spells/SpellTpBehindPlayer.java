@@ -95,7 +95,7 @@ public class SpellTpBehindPlayer extends Spell {
 			public void run() {
 				Location loc = target.getLocation();
 				// We need a second check when the teleport is actually about to occur
-				if (loc.distance(mLauncher.getLocation()) > maxRange || ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
+				if (!loc.getWorld().equals(mLauncher.getWorld()) || loc.distance(mLauncher.getLocation()) > maxRange || ZoneUtils.hasZoneProperty(target, ZoneProperty.RESIST_5)) {
 					return;
 				}
 

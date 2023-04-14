@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -70,10 +69,10 @@ public class SpellShuraJump extends Spell {
 		mActiveRunnables.add(a);
 	}
 
-	private void jump(Player p) {
+	private void jump(Player targetPlayer) {
 		World world = mBoss.getWorld();
 		Location loc = mBoss.getLocation();
-		Location locTarget = p.getLocation();
+		Location locTarget = targetPlayer.getLocation();
 		world.playSound(loc, Sound.ENTITY_PILLAGER_CELEBRATE, SoundCategory.PLAYERS, 1f, 1.1f);
 		new PartialParticle(Particle.CLOUD, loc, 15, 1, 0f, 1, 0).spawnAsEntityActive(mBoss);
 
@@ -98,7 +97,6 @@ public class SpellShuraJump extends Spell {
 		Vector velocity = locTarget.subtract(moveTo).toVector().normalize().multiply(mVelocityMultiplier);
 		velocity.setY(1.1);
 
-		final Player finalTargetPlayer = p;
 		final Vector finalVelocity = velocity;
 
 		BukkitRunnable leap = new BukkitRunnable() {
@@ -138,8 +136,8 @@ public class SpellShuraJump extends Spell {
 					}
 
 					// Give the caller a chance to run extra effects or manipulate the boss's leap velocity
-					if (finalTargetPlayer.isOnline()) {
-						Vector towardsPlayer = finalTargetPlayer.getLocation().subtract(mBoss.getLocation()).toVector().setY(0).normalize();
+					if (targetPlayer.isOnline() && targetPlayer.getWorld().equals(mBoss.getWorld())) {
+						Vector towardsPlayer = targetPlayer.getLocation().subtract(mBoss.getLocation()).toVector().setY(0).normalize();
 						Vector originalVelocity = mBoss.getVelocity();
 						double scale = 0.5;
 						Vector newVelocity = new Vector();

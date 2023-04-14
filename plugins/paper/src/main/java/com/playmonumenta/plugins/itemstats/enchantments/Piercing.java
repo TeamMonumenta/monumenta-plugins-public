@@ -38,7 +38,7 @@ public class Piercing implements Enchantment {
 			}
 
 			// Some skills can add piercing
-			arrow.setPierceLevel(arrow.getPierceLevel() + (int) level);
+			arrow.setPierceLevel(Math.max(0, Math.min(arrow.getPierceLevel() + (int) level, 127)));
 		}
 	}
 }

@@ -127,7 +127,7 @@ public class Quickdraw extends Ability {
 
 		proj.setShooter(mPlayer);
 		if (proj instanceof AbstractArrow arrow) {
-			arrow.setPierceLevel((isLevelTwo() ? 1 : 0) + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING));
+			arrow.setPierceLevel(Math.max(0, Math.min((isLevelTwo() ? 1 : 0) + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING), 127)));
 			arrow.setCritical(true);
 			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 		}
