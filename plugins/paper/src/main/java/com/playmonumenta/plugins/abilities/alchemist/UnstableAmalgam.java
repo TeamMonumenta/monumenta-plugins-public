@@ -290,7 +290,7 @@ public class UnstableAmalgam extends Ability {
 			int mTimes = 0;
 			@Override public void run() {
 				mTimes++;
-				if (mPlayerItemStats != null) {
+				if (mPlayerItemStats == null) {
 					mobs.clear();
 					cancel();
 				}
