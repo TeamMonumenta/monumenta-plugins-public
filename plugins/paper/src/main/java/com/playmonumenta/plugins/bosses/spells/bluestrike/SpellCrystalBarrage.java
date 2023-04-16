@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.ChatColor;
@@ -22,6 +23,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -45,6 +47,7 @@ public class SpellCrystalBarrage extends Spell {
 	private static final int BULLET_DURATION = 5 * 20;
 	private static final Material BULLET_MATERIAL = Material.AMETHYST_BLOCK;
 	private static final double HITBOX = 0.3125;
+	private final String BULLET_TAG = "samwell_bullet";
 
 	private PartialParticle mPHit;
 	private List<Player> mHitPlayers;
@@ -83,7 +86,7 @@ public class SpellCrystalBarrage extends Spell {
 		mCenter.getWorld().playSound(mCenter, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
 		mHitPlayers.clear();
 
-		new BukkitRunnable() {
+		BukkitRunnable charge = new BukkitRunnable() {
 
 			@Override
 			public void run() {
@@ -112,9 +115,11 @@ public class SpellCrystalBarrage extends Spell {
 					}.runTaskTimer(mPlugin, 0, 1);
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
+		};
+		charge.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(charge);
 
-		new BukkitRunnable() {
+		BukkitRunnable spawnBullets = new BukkitRunnable() {
 			int mT = 0;
 			int mBullets = 0;
 
@@ -165,7 +170,9 @@ public class SpellCrystalBarrage extends Spell {
 
 				mT++;
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		spawnBullets.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(spawnBullets);
 	}
 
 	private void launchAcceleratingBullet(Location detLoc, Vector dir, int accelStart) {
@@ -177,8 +184,9 @@ public class SpellCrystalBarrage extends Spell {
 		bullet.setMarker(true);
 		bullet.setCollidable(false);
 		bullet.getEquipment().setHelmet(new ItemStack(BULLET_MATERIAL));
+		bullet.addScoreboardTag(BULLET_TAG);
 
-		new BukkitRunnable() {
+		BukkitRunnable bulletRun = new BukkitRunnable() {
 			BoundingBox mBox = BoundingBox.of(detLoc, HITBOX, HITBOX, HITBOX);
 			int mTicks = 0;
 			double mInnerVelocity = 0;
@@ -210,7 +218,9 @@ public class SpellCrystalBarrage extends Spell {
 					mInnerVelocity += 0.05;
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		};
+		bulletRun.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(bulletRun);
 	}
 
 
@@ -247,5 +257,17 @@ public class SpellCrystalBarrage extends Spell {
 		} else {
 			DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, 40, null, false, false, SPELL_NAME);
 		}
+	}
+
+	@Override
+	public void cancel() {
+		super.cancel();
+		mChargeUp.reset();
+
+		// Remove already spawned crystal barrage projectiles
+		mCenter.getNearbyEntitiesByType(ArmorStand.class, 100)
+			.stream()
+			.filter(e -> ScoreboardUtils.checkTag(e, BULLET_TAG))
+			.forEach(Entity::remove);
 	}
 }
