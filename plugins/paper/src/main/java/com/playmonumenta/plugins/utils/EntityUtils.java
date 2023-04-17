@@ -82,7 +82,8 @@ public class EntityUtils {
 		EntityType.ZOMBIE_HORSE,
 		EntityType.SKELETON_HORSE,
 		EntityType.PHANTOM,
-		EntityType.DROWNED
+		EntityType.DROWNED,
+		EntityType.ZOGLIN
 	);
 
 	private static final EnumSet<EntityType> BEAST_MOBS = EnumSet.of(
