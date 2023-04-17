@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 enum PSGUIStat {
 
 	// health and healing
-	HEALTH("Max Health", Formatting.NUMBER, stats -> stats.getAttributeAmount(ItemStatUtils.AttributeType.MAX_HEALTH, 20) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.VITALITY))),
+	HEALTH("Max Health", Formatting.NUMBER, stats -> Math.max(1, stats.getAttributeAmount(ItemStatUtils.AttributeType.MAX_HEALTH, 20)) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.VITALITY))),
 	HEALING_RATE("Healing Rate", Formatting.PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(ItemStatUtils.EnchantmentType.SUSTENANCE), stats.get(ItemStatUtils.EnchantmentType.CURSE_OF_ANEMIA))
 		                                                          * Nutriment.getHealingMultiplier(stats.getInfusion(ItemStatUtils.InfusionType.NUTRIMENT))),
 	EFFECTIVE_HEALING_RATE("Effective Healing Rate", Formatting.PERCENT, stats -> HEALING_RATE.get(stats) * 20.0 / HEALTH.get(stats)),

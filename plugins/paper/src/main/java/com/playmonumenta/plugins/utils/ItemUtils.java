@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -26,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -809,6 +811,17 @@ public class ItemUtils {
 		}
 		NBTCompound display = plain.getCompound(DISPLAY_KEY);
 		return display.hasKey(NAME_KEY) ? display.getString(NAME_KEY) : "";
+	}
+
+	public static String getPlainNameOrDefault(@Nullable ItemStack itemStack) {
+		if (itemStack == null || itemStack.getType().isAir()) {
+			return "";
+		}
+		String name = getPlainNameIfExists(itemStack);
+		if (name != null && !name.isEmpty()) {
+			return name;
+		}
+		return MessagingUtils.plainText(GlobalTranslator.render(Component.translatable(itemStack.translationKey()), Locale.ENGLISH));
 	}
 
 	public static boolean hasPlainName(@Nullable ItemStack itemStack) {

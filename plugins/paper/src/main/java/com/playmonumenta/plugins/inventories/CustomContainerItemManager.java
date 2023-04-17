@@ -134,7 +134,7 @@ public class CustomContainerItemManager implements Listener {
 						ItemStack item = inventory.getItem(i);
 						if (item != null && config.canPutIntoContainer(item)) {
 							deposited += item.getAmount();
-							depositedItems.merge(ItemUtils.getPlainName(item), item.getAmount(), Integer::sum);
+							depositedItems.merge(ItemUtils.getPlainNameOrDefault(item), item.getAmount(), Integer::sum);
 							addToContainer(player, container, config, item, false, false);
 						}
 					}
