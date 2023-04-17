@@ -62,7 +62,7 @@ public class BossTagCommand {
 
 	private static final Pattern COMMAS_REMOVER = Pattern.compile(",+");
 
-	private static final int MAXIMUS_TAG_LENGTH = 150;
+	private static final int MAXIMUM_TAG_LENGTH = 150;
 
 	private static final String COMMAND = "bosstag";
 
@@ -222,7 +222,7 @@ public class BossTagCommand {
 				String newTag = PhasesManagerBoss.identityTag + "[phases=[(" + phaseName + "," + reusable + "," + phaseString + ")]]";
 
 				player.sendMessage(Component.empty()
-					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					.append(Component.text(newTag, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 				tags.add(newTag, player);
 				bos.saveBook();
@@ -273,7 +273,7 @@ public class BossTagCommand {
 					Tooltip.ofString(bossTags[0] + "[", description)
 				);
 			} else {
-				// Tag is a real tag but doesn't have paremeters - don't bother offering opening [
+				// Tag is a real tag but doesn't have parameters - don't bother offering opening [
 				return Tooltip.arrayOf(Tooltip.ofString(bossTags[0], description));
 			}
 		} else if (bossTags.length > 1) {
@@ -369,14 +369,14 @@ public class BossTagCommand {
 				BossUtils.checkParametersStringProperty(newTag);
 			} catch (Exception e) {
 				player.sendMessage(Component.empty()
-					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					.append(Component.text("problems during parsing bosstag. Reason: " + e.getMessage(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 				player.sendMessage(Component.empty()
-					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					.append(Component.text(newTag, NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
 
 				player.sendMessage(Component.empty()
-					.append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					.append(Component.text("Do you still want to add this tag?", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 				player.sendMessage(Component.empty()
 					.append(Component.text("[YES] ", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, true).clickEvent(
@@ -405,14 +405,14 @@ public class BossTagCommand {
 			//checking if the bosstag is implemented or not
 			if (!found) {
 				player.sendMessage(Component.empty()
-					                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
 					                   .append(Component.text(" is missing! \n", NamedTextColor.GRAY))
 					                   .append(Component.text("Going to implement. Wait...", NamedTextColor.GRAY)));
 				tags.add(bossTag, player);
 				bos.saveBook();
 				player.sendMessage(Component.empty()
-					                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
 					                   .append(Component.text(" correctly implemented! ", NamedTextColor.GRAY)));
 			}
@@ -432,7 +432,7 @@ public class BossTagCommand {
 		tags.add(newTag, player);
 		bos.saveBook();
 		player.sendMessage(Component.empty()
-			                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Tag added! ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 	}
 
@@ -451,7 +451,7 @@ public class BossTagCommand {
 	private static void infoBossTag(Player player, String bossTag) throws IllegalArgumentException, IllegalAccessException {
 
 		player.sendMessage(Component.empty()
-			                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Help ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 			                   .append(Component.text(bossTag, NamedTextColor.WHITE)));
 
@@ -516,7 +516,7 @@ public class BossTagCommand {
 				}
 
 				player.sendMessage(Component.empty()
-					                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+					                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 					                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
 					                   .append(Component.text(" is implemented!", NamedTextColor.GRAY)));
 
@@ -539,7 +539,7 @@ public class BossTagCommand {
 
 		} else {
 			player.sendMessage(Component.empty()
-				                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 				                   .append(Component.text("Didn't find any bosstag for this entity", NamedTextColor.RED).decoration(TextDecoration.BOLD, false)));
 		}
 	}
@@ -563,7 +563,7 @@ public class BossTagCommand {
 
 		if (found) {
 			player.sendMessage(Component.empty()
-				                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 				                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
 				                   .append(Component.text(" is implemented!", NamedTextColor.GRAY)));
 
@@ -584,7 +584,7 @@ public class BossTagCommand {
 			}
 		} else {
 			player.sendMessage(Component.empty()
-				                   .append(Component.text("[bosstag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 				                   .append(Component.text(bossTag, NamedTextColor.WHITE).decoration(TextDecoration.BOLD, false))
 				                   .append(Component.text(" is not implemented", NamedTextColor.RED)));
 		}
@@ -694,7 +694,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Book Of Soul of " + bos.getLabel(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+			                   .append(Component.text("Book of Souls for " + bos.getLabel(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
@@ -730,7 +730,7 @@ public class BossTagCommand {
 				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 				                   .append(Component.text("Removing ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 				                   .append(Component.text(realBossTag, NamedTextColor.WHITE))
-				                   .append(Component.text(" and all the dependency", NamedTextColor.GRAY))
+				                   .append(Component.text(" and all dependencies.", NamedTextColor.GRAY))
 			);
 		}
 
@@ -791,7 +791,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Tags removed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("Tag(s) removed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 	}
 
@@ -865,7 +865,7 @@ public class BossTagCommand {
 	private static void squashBossTags(Player player) throws WrapperCommandSyntaxException {
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Start squashing!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("Started squashing!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 		BookOfSouls bos = getBos(player);
@@ -921,7 +921,7 @@ public class BossTagCommand {
 					if (parametersMap.containsKey(translated)) {
 						tag += translated + "=" + parametersMap.get(translated) + ",";
 
-						if (tag.length() >= MAXIMUS_TAG_LENGTH) {
+						if (tag.length() >= MAXIMUM_TAG_LENGTH) {
 							tag = tag.substring(0, tag.length() - 1) + "]";
 							nextTags.add(tag);
 							tag = bossTag + "[";
@@ -942,7 +942,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Squash complited!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("Squash completed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 	}
 
@@ -951,7 +951,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-			                   .append(Component.text("Working! it may take a while...", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("Checking all the mobs in the Library of Souls. This may take a while...", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
 			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
@@ -972,7 +972,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Checked all the mobs in the LoS", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+								.append(Component.text("Checked all the mobs in the Library of Souls.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 		Map<Soul, List<String>> soulDeprecatedTagMap = new LinkedHashMap<>();
@@ -1014,7 +1014,7 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Summoning chest", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+								.append(Component.text("Generating a chest with one or more Book of Souls.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
 		Location loc = player.getLocation().add(1, 0, 0);
@@ -1079,53 +1079,53 @@ public class BossTagCommand {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag add <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
-			                   .append(Component.text(" Add the bosstag to the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text(" Adds a boss tag to your currently held Book of Souls.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag add <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag add ")))
-			                   .append(Component.text(" Add the bosstag to the holding BoS and checks if the BoS has the current boss_tag implemented", NamedTextColor.GRAY))
+			                   .append(Component.text(" Add a boss tag to your currently held Book of Souls. Checks if the BoS has the current boss_tag implemented.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag remove <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
-			                   .append(Component.text(" Remove the boss_tag and all the dependencies to the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text(" Remove a boss tag and all its dependencies in your currently held Book of Souls.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag remove <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag remove ")))
-			                   .append(Component.text(" Remove the parameters selected inside [...] for the boss_tag selected", NamedTextColor.GRAY))
+			                   .append(Component.text(" Remove the specified parameter(s) of the boss tag without removing the tag entirely.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag show", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag show")))
-			                   .append(Component.text(" Show all the bosstag implemented and parameters in the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text(" Display every boss tag implemented in your currently held Book of Souls.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag show <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag show ")))
-			                   .append(Component.text(" Show the parameters implemented for the selected boss_tag in the holding BoS", NamedTextColor.GRAY))
+			                   .append(Component.text(" Only display the parameter(s) for the selected boss tag if implemented in your currently held Book of Souls.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag search <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
-			                   .append(Component.text(" Search inside the BoS database for matching tags", NamedTextColor.GRAY))
+			                   .append(Component.text(" Search the Library of Souls database for matching boss tags.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag search <boss_tag[...]>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
-			                   .append(Component.text(" Search inside the BoS database for matching tags with the selected parameters", NamedTextColor.GRAY))
+			                   .append(Component.text(" Search the Library of Souls database for matching boss tags with the same parameter(s).", NamedTextColor.GRAY))
 		);
 
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag get <search_id>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag get ")))
-			                   .append(Component.text(" Get the first BoS of the outcome of /bosstag search <search_id> ", NamedTextColor.GRAY))
+			                   .append(Component.text(" Get the first Book of Souls returned by /bosstag search <boss_tag[...]>.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag info <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag info ")))
-			                   .append(Component.text(" Show the info about the boss_tag selected and the default value of the parameters ", NamedTextColor.GRAY))
+			                   .append(Component.text(" Display information about the boss tag selected including its default parameter values.", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()
