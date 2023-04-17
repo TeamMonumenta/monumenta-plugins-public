@@ -53,7 +53,8 @@ public class PotionUtils {
 		PotionEffectType.SATURATION,
 		PotionEffectType.SPEED,
 		PotionEffectType.LUCK,
-		PotionEffectType.WATER_BREATHING
+		PotionEffectType.WATER_BREATHING,
+		PotionEffectType.CONDUIT_POWER
 	);
 
 	private static final ImmutableSet<PotionEffectType> NEGATIVE_EFFECTS = ImmutableSet.of(
