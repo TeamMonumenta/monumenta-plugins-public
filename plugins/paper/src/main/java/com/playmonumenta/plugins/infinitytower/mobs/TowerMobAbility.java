@@ -60,13 +60,13 @@ public class TowerMobAbility {
 	static {
 		ABILITIES.add(new Tuple(
 			"Arcanum Leviosa",
-			"Applies a short levitation on hit.",
+			"Applies a short-duration levitation effect on hit.",
 			null
 		));
 
 		ABILITIES.add(new Tuple(
 			"Taunt",
-			"Taunt enemy hit by this mob attacks",
+			"Enemies attacked by this mob are taunted.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob,
@@ -92,7 +92,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Shellcracker",
-			"Increases damage taken by 15% to the mob it attacks.",
+			"The mob gains 15% vulnerability for 3s after attacking.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob,
@@ -113,7 +113,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Jungle's Vengenance",
-			"Leaves a lingering damage field on death that deals 2 damage every second to enemies in it, lasting 8 seconds.",
+			"Leaves a lingering damage field on death that lasts 8s which deals 2 damage every second to enemies in it.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//On death summmon
 				if (BossManager.getInstance() != null) {
@@ -167,7 +167,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Frost Nova",
-			"Unleashes a channeled aoe attack that deals 12 damage around itself and gives 10% slowness for 4s. 6s cooldown",
+			"Unleashes a channeled AoE attack that deals 12 damage and applies 4s of 10% Slowness. 6s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Frost nova ability
 				mob.addScoreboardTag(NovaBoss.identityTag);
@@ -184,10 +184,10 @@ public class TowerMobAbility {
 		));
 
 		ABILITIES.add(new Tuple(
-			"Rejuvination",
-			"Heals 3 hp to itself and allies close to it every 2s",
+			"Rejuvenation",
+			"Heals itself and every nearby friendly mob for 3 HP every 2s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
-				//Frost nova ability
+				//Rejuvenation ability
 				mob.addScoreboardTag(RejuvenationBoss.identityTag);
 				if (!playerMob) {
 					mob.addScoreboardTag(RejuvenationBoss.identityTag + "[targets=[MOB,3,false,limit=(ALL,RANDOM),filters=[],tags=[\"" + TowerConstants.MOB_TAG_FLOOR_TEAM + "\"]]]");
@@ -201,7 +201,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Meteor Slam",
-			"Slams on top of an enemy, dealing 15 aoe damage and knocking up enemies. 8s cooldown",
+			"Slams on top of an enemy, dealing 15 AoE damage and knocking up enemies. 8s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Meteor Slam
 				if (BossManager.getInstance() != null) {
@@ -230,7 +230,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Frost Bolt",
-			"Shoots a projectile that deals 6 damage and slow by 15%. 4s cooldown",
+			"Shoots a projectile that deals 6 damage and slows by 15%. 4s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Mana Arrow ability
 				mob.addScoreboardTag(ProjectileBoss.identityTag);
@@ -248,7 +248,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Force",
-			"Unleashes an aoe attack that knocks away enemies and slows them by 30% for 6s, 6s cooldown",
+			"Unleashes an AoE attack that knocks away enemies and slows them by 30% for 6s, 6s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				mob.addScoreboardTag(ForceBoss.identityTag);
 				if (playerMob) {
@@ -306,7 +306,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Forceful Grip",
-			"Throws a hook to the farthest enemy that deals 20 damage, silences for 5s and pulls the target to him, then Varcosa switches aggro to it. 8s cooldown",
+			"Throws a hook to the farthest enemy that deals 20 damage, silences for 5s and pulls the target to him. Varcosa switches aggro to it. 8s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Frost nova ability
 				if (BossManager.getInstance() != null) {
@@ -317,7 +317,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Advancing Shadows",
-			"Teleports behind the lowest health enemy and teleports again when the target dies",
+			"Teleports behind the lowest health enemy and teleports again when the target dies.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				//Frost nova ability
 				if (BossManager.getInstance() != null) {
@@ -328,7 +328,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Avenger",
-			"Each time a unit on the arena dies, this unit gains 5% attack and movement speed for the rest of the fight and heals 10% of its max hp",
+			"Each time a unit on the arena dies, this unit gains 5% attack and movement speed for the rest of the fight and heals 10% of its max HP.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				mob.addScoreboardTag(AvengerBoss.identityTag);
 				mob.addScoreboardTag(AvengerBoss.identityTag + "[damagepercentincrement=0.05,speedpercentincrement=0.05,healpercent=0.1,maxstacks=20]");
@@ -338,7 +338,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Ancestral Rejuvenation",
-			"Heals 6 hp to the entire team every 4s",
+			"Heals every friendly mob for 6 HP every 4s",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new AncestralRejuvenationTowerAbility(TowerManager.mPlugin, "Ancestral Rejuvenation", mob, game, towerMob, playerMob, 6.0));
@@ -349,7 +349,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Curse of The Jungle",
-			"Constant AoE 20% slowness, 20% weaken and 1 damage every second debuff all enemy",
+			"Applies a constant AoE of 20% slowness, 20% weaken and 1 damage every second to all enemies",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new CurseOfTheJungleTowerAbility(TowerManager.mPlugin, "Curse of The Jungle", mob, game, towerMob, playerMob));
@@ -359,7 +359,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Soulspeaker",
-			"Channels a beam to the highest health enemy, and at the end of the channel, it deals 27 damage, 4s cooldown",
+			"Channels a beam targeting the highest health enemy. At the end of the channel, it deals 27 damage. 4s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				mob.addScoreboardTag(LaserBoss.identityTag);
 				if (playerMob) {
@@ -375,7 +375,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Dark Summoner",
-			"Summons one demon, and it attacks the same targets as this unit. 6s cooldown",
+			"Summons a demon that attacks the same target(s) as this unit. 6s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new DarkSummonerTowerAbility(TowerManager.mPlugin, "Dark Summoner", mob, game, towerMob, playerMob));
@@ -385,7 +385,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Immortal",
-			"This unit cannot die until it's the last on the battlefield of it's side. (Other Immortals do not count as units for this ability)",
+			"This unit cannot die unless all its allies die. (Other Immortals do not count as units for this ability.)",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new ImmortalTowerAbility(TowerManager.mPlugin, "Immortal", mob, game, towerMob, playerMob));
@@ -395,7 +395,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Earthquake",
-			"Summons earthquakes under enemies that deal 16 aoe damage. 5s cooldown",
+			"Summons earthquakes under enemies that deal 16 AoE damage. 5s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new EarthquakeTowerAbility(TowerManager.mPlugin, "Earthquake", mob, game, towerMob, playerMob));
@@ -405,7 +405,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Svalgot & Ghalkor",
-			"At the start of the turn, summon Svalgot & Ghalkor",
+			"At the start of a turn, summon Svalgot and Ghalkor",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new SvalgotGhalkorTowerAbility(TowerManager.mPlugin, "Svalgot & Ghalkor", mob, game, towerMob, playerMob));
@@ -415,21 +415,21 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"The Void Walker",
-			"Svalgot summons an orb that moves slowly to a target, that then explodes dealing massive damage in an area based on their max health",
+			"Svalgot summons an orb that moves slowly to a target that explodes dealing massive AoE damage based on their max health",
 			null
 			//fake ability, Svalgot will get this ability when summoned by "Svalgot & Ghalkor"
 		));
 
 		ABILITIES.add(new Tuple(
 			"The Forgemaster",
-			"Ghalkor dashes quickly, leaving a flaming trail on the ground, that damages enemies that pass on it.",
+			"Ghalkor dashes quickly, leaving a flaming trail on the ground that damages enemies that touch it.",
 			null
 			//fake ability, Ghalkor will get this ability when summoned by "Svalgot & Ghalkor"
 		));
 
 		ABILITIES.add(new Tuple(
 			"Great Sword Slam",
-			"Eldrask jumps and slams the ground with his greatsword, generating a wave that knocks up in a cone enemies in front of him, and then leaving ice on the ground which slows enemies by 30%",
+			"Eldrask jumps and slams the ground with his greatsword, generating a wave that knocks up enemies in a cone in front of him that leaves ice on the ground which slows enemies by 30%",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new GreatswordSlamTowerAbility(TowerManager.mPlugin, "Great Sword Slam", mob, game, towerMob, playerMob));
@@ -439,7 +439,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Void Gazer",
-			"Hekawt teleports around instead of moving, dealing 20 damage if it teleports at the location of an enemy.",
+			"Hekawt teleports around instead of moving. He deals 20 damage if he teleports to the location of an enemy.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new RandomTeleportTowerAbility(TowerManager.mPlugin, "Void Gazer", mob, game, towerMob, playerMob));
@@ -449,7 +449,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Ancestral Sorcery",
-			"Hekawt, instead of using his normal attacks, has 2 unique attacks, depending on the range of the target : Ranged attack shoots a projectile that deals 13 damage and increases damage taken on the target by 10% permanently, hitting the same target again will increase the damage taken further. Melee attack : charges a cone attack in front of him that deals 15 damage and pushes enemies away. 2.5s cooldown.",
+			"Hekawt, instead of using normal attacks, has 2 unique attacks depending on the distance to his target. Ranged attack: Shoots a projectile that deals 13 damage and applies 10% Vulnerability on the target permanently. Hitting the same target again increases the Vulnerability further. Melee attack: Charges a cone attack in front of him that deals 15 damage and pushes enemies away. 2.5s cooldown",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new AutoAttackTowerAbility(TowerManager.mPlugin, "Ancestral Sorcery", mob, game, towerMob, playerMob));
@@ -459,7 +459,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Phylactery",
-			"When Hekawt dies, it revives after 6s.",
+			"When Hekawt dies, he revives after 6s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new PhylacteryTowerAbility(TowerManager.mPlugin, "Pylacetry", mob, game, towerMob, playerMob));
@@ -470,7 +470,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Earth's Wrath",
-			"Generates an aoe attack in every direction that deals 20 damage and roots every mob that goes into it for 3s. ",
+			"Generates an AoE attack in every direction that deals 20 damage and roots every mob that touches it for 3s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new EarthsWrathTowerAbility(TowerManager.mPlugin, "Earth's Wrath", mob, game, towerMob, playerMob));
@@ -480,7 +480,7 @@ public class TowerMobAbility {
 
 		ABILITIES.add(new Tuple(
 			"Volcanic Demise",
-			"Summons meteor strikes that target the entire arena and deal 20 damage, Kaul doesn't attack or move during this attack. cooldown 8s.",
+			"Summons meteor strikes that target the entire arena and deal 20 damage. Kaul doesn't attack or move during this attack. Cooldown 8s.",
 			(TowerMob towerMob, LivingEntity mob, TowerGame game, boolean playerMob) -> {
 				if (BossManager.getInstance() != null) {
 					BossManager.getInstance().createBossInternal(mob, new VolcanicDemiseTowerAbility(TowerManager.mPlugin, "Volcanic Demise", mob, game, towerMob, playerMob));
@@ -507,7 +507,7 @@ public class TowerMobAbility {
 		}
 
 		TowerFileUtils.warning("No ability match for: " + name);
-		mDescription = "FAIL! please contact a mod";
+		mDescription = "FAIL! Please contact a moderator";
 		mBuilder = null;
 	}
 

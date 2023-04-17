@@ -41,7 +41,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 		meta.displayName(Component.text("Refresh the shop!", NamedTextColor.AQUA).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 
 		List<Component> lore = new ArrayList<>();
-		lore.add(Component.text("This will cost " + TowerConstants.COST_REROLL + " coin", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		lore.add(Component.text("This will cost " + TowerConstants.COST_REROLL + " gold", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 
 		meta.lore(lore);
 		REFRESH_ITEM.setItemMeta(meta);
@@ -51,7 +51,7 @@ public class TowerGuiBuyMob extends CustomInventory {
 		List<Component> lore2 = new ArrayList<>();
 		lore2.add(Component.text("1 free refresh!", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
 		lore2.add(Component.empty());
-		lore2.add(Component.text("Each round from 1 to 5 have a free shop refresh", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		lore2.add(Component.text("Each round from 1 to 5 has a free shop refresh", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore2);
 		FREE_REFRESH_ITEM.setItemMeta(meta);
 
