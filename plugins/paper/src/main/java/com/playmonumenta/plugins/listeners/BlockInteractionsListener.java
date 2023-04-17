@@ -11,12 +11,16 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -40,6 +44,11 @@ public final class BlockInteractionsListener implements Listener {
 		Material.FLETCHING_TABLE,
 		Material.BREWING_STAND,
 		Material.LECTERN
+	);
+
+	private static final EnumSet<EntityType> INTERACTABLE_ENTITIES = EnumSet.of(
+		EntityType.ITEM_FRAME,
+		EntityType.GLOW_ITEM_FRAME
 	);
 
 	public BlockInteractionsListener() {
@@ -71,11 +80,31 @@ public final class BlockInteractionsListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
+		Entity entity = event.getRightClicked();
+		Player player = event.getPlayer();
+		if (checkEntityAction(entity, player) && INTERACTABLE_ENTITIES.contains(entity.getType())) {
+			event.setCancelled(true);
+		}
+	}
+
 	// Called in PlayerListener
 	public static void playerEnteredNonTeleporterBed(PlayerBedEnterEvent event) {
 		if (checkAction(event.getBed(), event.getPlayer())) {
 			event.setCancelled(true);
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public static void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
+		if (checkEntityAction(event.getRightClicked(), event.getPlayer())) {
+			event.setCancelled(true);
+		}
+	}
+
+	private static boolean checkEntityAction(@Nullable Entity entity, Player player) {
+		return entity != null && player.getGameMode() == GameMode.SURVIVAL && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG);
 	}
 
 	private static boolean checkAction(@Nullable Block block, Player player) {
