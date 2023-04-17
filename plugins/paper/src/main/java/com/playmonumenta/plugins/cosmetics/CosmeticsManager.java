@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
+import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -75,18 +76,26 @@ public class CosmeticsManager implements Listener {
 		return false;
 	}
 
+	public boolean addCosmetic(@Nullable Player player, CosmeticType type, String name) {
+		return addCosmetic(player, type, name, false);
+	}
+
 	/**
 	 * Unlocks a new cosmetic for the player with given name and type.
 	 * Checks to make sure there isn't a duplicate.
 	 */
-	public boolean addCosmetic(Player player, CosmeticType type, String name) {
+	public boolean addCosmetic(@Nullable Player player, CosmeticType type, String name, boolean equipImmediately) {
 		if (player == null) {
 			return false;
 		}
 		List<Cosmetic> playerCosmetics = mPlayerCosmetics.computeIfAbsent(player.getUniqueId(), key -> new ArrayList<>());
 		if (!listHasCosmetic(playerCosmetics, type, name)) {
 			if (type != CosmeticType.COSMETIC_SKILL) {
-				playerCosmetics.add(new Cosmetic(type, name));
+				Cosmetic c = new Cosmetic(type, name);
+				playerCosmetics.add(c);
+				if (equipImmediately) {
+					CosmeticsGUI.toggleCosmetic(player, c);
+				}
 				return true;
 			} else {
 				//Test only
@@ -100,6 +109,9 @@ public class CosmeticsManager implements Listener {
 				Cosmetic c = CosmeticSkills.getCosmeticByName(name);
 				if (c != null) {
 					playerCosmetics.add(c);
+					if (equipImmediately) {
+						CosmeticsGUI.toggleCosmetic(player, c);
+					}
 					return true;
 				}
 			}
@@ -146,7 +158,7 @@ public class CosmeticsManager implements Listener {
 	/**
 	 * Gets a list of unlocked cosmetic of certain type, sorted alphabetically by name
 	 */
-	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability) {
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable ClassAbility ability) {
 		if (type != CosmeticType.COSMETIC_SKILL) {
 			return getCosmetics(player).stream()
 				       .filter(c -> c.getType() == type)
@@ -155,7 +167,7 @@ public class CosmeticsManager implements Listener {
 		} else if (ability != null) {
 			return getCosmetics(player).stream()
 				       .filter(c -> c.getType() == type)
-				       .filter(c -> c.getAbility() == ability.getLinkedSpell())
+				       .filter(c -> c.getAbility() == ability)
 				       .sorted(Comparator.comparing(Cosmetic::getName))
 				.toList();
 		} else {
@@ -166,8 +178,12 @@ public class CosmeticsManager implements Listener {
 		}
 	}
 
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability) {
+		return getCosmeticsOfTypeAlphabetical(player, type, ability == null ? null : ability.getLinkedSpell());
+	}
+
 	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type) {
-		return getCosmeticsOfTypeAlphabetical(player, type, null);
+		return getCosmeticsOfTypeAlphabetical(player, type, (ClassAbility) null);
 	}
 
 	/**

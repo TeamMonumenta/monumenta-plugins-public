@@ -216,41 +216,39 @@ public class CosmeticsGUI extends CustomInventory {
 		}
 
 		if (mDisplayPage != null && item.getType() != FILLER && mDisplayPage.isEquippable() && slot >= COSMETICS_START) {
-			//Get the list of cosmetics back
-			List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(player, mDisplayPage, mCurrentAbility);
-			if (playerCosmetics != null) {
-				int index = (slot - COSMETICS_START) + (COSMETICS_PER_PAGE * (mPageNumber - 1));
-				if (mDisplayPage.canEquipMultiple()) {
-					if (!playerCosmetics.get(index).mEquipped) {
-						player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-						playerCosmetics.get(index).mEquipped = true;
-					} else {
-						player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-						playerCosmetics.get(index).mEquipped = false;
-					}
-				} else {
-					for (int i = 0; i < playerCosmetics.size(); i++) {
-						if (i == index) {
-							if (!playerCosmetics.get(i).mEquipped) {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-								playerCosmetics.get(i).mEquipped = true;
-							} else {
-								player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
-								playerCosmetics.get(i).mEquipped = false;
-							}
-						} else {
-							playerCosmetics.get(i).mEquipped = false;
-						}
-					}
-				}
-				if (mDisplayPage == CosmeticType.TITLE) {
-					MonumentaNetworkChatIntegration.refreshPlayer(player);
-				}
-				if (mDisplayPage == CosmeticType.COSMETIC_SKILL && mCurrentAbility != null) {
-					mCosmeticSkillChanged = true;
-				}
-				setUpCosmetics(player);
+			int index = (slot - COSMETICS_START) + (COSMETICS_PER_PAGE * (mPageNumber - 1));
+			toggleCosmetic(player, mDisplayPage, mCurrentAbility, index);
+
+			if (mDisplayPage == CosmeticType.TITLE) {
+				MonumentaNetworkChatIntegration.refreshPlayer(player);
 			}
+			if (mDisplayPage == CosmeticType.COSMETIC_SKILL && mCurrentAbility != null) {
+				mCosmeticSkillChanged = true;
+			}
+			setUpCosmetics(player);
+		}
+	}
+
+	public static void toggleCosmetic(Player player, Cosmetic cosmetic) {
+		List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(player, cosmetic.mType, cosmetic.mAbility);
+		toggleCosmetic(player, playerCosmetics, cosmetic);
+	}
+
+	public static void toggleCosmetic(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability, int index) {
+		List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(player, type, ability);
+		toggleCosmetic(player, playerCosmetics, playerCosmetics.get(index));
+	}
+
+	public static void toggleCosmetic(Player player, List<Cosmetic> playerCosmetics, Cosmetic cosmetic) {
+		if (!cosmetic.getType().canEquipMultiple()) {
+			playerCosmetics.stream().filter(c -> c != cosmetic).forEach(c -> c.mEquipped = false);
+		}
+		if (cosmetic.isEquipped()) {
+			player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
+			cosmetic.mEquipped = false;
+		} else {
+			player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.8f, 1f);
+			cosmetic.mEquipped = true;
 		}
 	}
 
