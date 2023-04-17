@@ -70,7 +70,7 @@ public class ArcaneStrike extends Ability {
 					DAMAGE_2,
 					BONUS_DAMAGE_2),
 				"Your enchantment on-hit effects are now also applied to all other enemies hit in the radius. Also this skill's damage is increased by 30%.")
-			.simpleDescription("Attack an enemy with a wand to damage and ignite nearby mobs")
+			.simpleDescription("Attack an enemy with a wand to damage and ignite nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.GOLDEN_SWORD);
 

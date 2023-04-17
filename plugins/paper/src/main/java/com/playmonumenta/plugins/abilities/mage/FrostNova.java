@@ -86,7 +86,7 @@ public class FrostNova extends Ability {
 					StringUtils.ticksToSeconds(ENHANCED_FROZEN_DURATION)
 				)
 			)
-			.simpleDescription("Damage and slow nearby mobs")
+			.simpleDescription("Damage and slow nearby mobs.")
 			.cooldown(COOLDOWN_TICKS, COOLDOWN_TICKS, ENHANCED_COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FrostNova::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))

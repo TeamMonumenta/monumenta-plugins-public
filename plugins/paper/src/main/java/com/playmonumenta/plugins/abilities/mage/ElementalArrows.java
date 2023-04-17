@@ -84,7 +84,7 @@ public class ElementalArrows extends Ability {
 					ENHANCED_ARROW_STUN_DURATION / 20,
 					(int) (ENHANCED_DAMAGE_MULTIPLIER * 100)
 				))
-			.simpleDescription("Shoot fire and ice projectiles that deal magic damage")
+			.simpleDescription("Shoot fire and ice projectiles that deal magic damage.")
 			.cooldown(0, 0, ENHANCED_ARROW_COOLDOWN, CHARM_THUNDER_COOLDOWN)
 			.displayItem(Material.SPECTRAL_ARROW);
 

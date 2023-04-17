@@ -79,7 +79,7 @@ public class MagmaShield extends Ability {
 					(int) (100 * ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS),
 					ENHANCEMENT_BONUS_DURATION / 20
 				))
-			.simpleDescription("Damage and ignite mobs in a cone")
+			.simpleDescription("Damage and ignite mobs in a cone.")
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", MagmaShield::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_MAGIC_WAND_RESTRICTION))

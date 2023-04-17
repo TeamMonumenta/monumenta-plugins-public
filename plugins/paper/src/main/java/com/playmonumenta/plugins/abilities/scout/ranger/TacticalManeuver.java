@@ -56,7 +56,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 					              "Cooldown: %ds. Charges: %d.",
 					TACTICAL_DASH_DAMAGE, TACTICAL_MANEUVER_RADIUS, TACTICAL_DASH_STUN_DURATION / 20, TACTICAL_MANEUVER_RADIUS, TACTICAL_LEAP_DAMAGE, TACTICAL_MANEUVER_1_COOLDOWN / 20, TACTICAL_MANEUVER_1_MAX_CHARGES),
 				String.format("Cooldown: %ds. Charges: %d.", TACTICAL_MANEUVER_2_COOLDOWN / 20, TACTICAL_MANEUVER_2_MAX_CHARGES))
-			.simpleDescription("Dash in the direction you are facing, or backwards if you are sneaking, stunning nearby mobs.")
+			.simpleDescription("Dash forward and stun nearby mobs. While sneaking, dash backwards and knock away nearby mobs.")
 			.cooldown(TACTICAL_MANEUVER_1_COOLDOWN, TACTICAL_MANEUVER_2_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("castForward", "dash forwards", tm -> tm.cast(true), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false)))
 			.addTrigger(new AbilityTriggerInfo<>("castBackwards", "leap backwards", tm -> tm.cast(false), new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true)))
