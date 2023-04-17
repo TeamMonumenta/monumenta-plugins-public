@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.WindWalkCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -18,9 +19,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,6 +65,7 @@ public class WindWalk extends MultipleChargeAbility {
 			.displayItem(Material.QUARTZ);
 
 	private final int mDuration;
+	private final WindWalkCS mCosmetic;
 
 	private int mLastCastTicks = 0;
 
@@ -75,6 +74,7 @@ public class WindWalk extends MultipleChargeAbility {
 		mDuration = WIND_WALK_DURATION;
 		mMaxCharges = WIND_WALK_MAX_CHARGES + (int) CharmManager.getLevel(player, CHARM_CHARGE);
 		mCharges = getTrackedCharges();
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WindWalkCS());
 	}
 
 	public void cast() {
@@ -100,17 +100,14 @@ public class WindWalk extends MultipleChargeAbility {
 	public void walk() {
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1, 1f);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
+		mCosmetic.initialEffects(mPlayer, loc, world);
 		Vector direction = loc.getDirection();
 		Vector yVelocity = new Vector(0, direction.getY() * WIND_WALK_Y_VELOCITY_MULTIPLIER + WIND_WALK_Y_VELOCITY, 0);
 		mPlayer.setVelocity(direction.multiply(WIND_WALK_VELOCITY_BONUS).add(yVelocity));
 
 		cancelOnDeath(new BukkitRunnable() {
 			final List<LivingEntity> mMobsNotHit = EntityUtils.getNearbyMobs(mPlayer.getLocation(), 32);
-			boolean mTickOne = true;
+			int mTicks = 0;
 
 			@Override
 			public void run() {
@@ -119,7 +116,7 @@ public class WindWalk extends MultipleChargeAbility {
 					return;
 				}
 
-				new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1, 0), 7, 0.25, 0.45, 0.25, 0).spawnAsPlayerActive(mPlayer);
+				mCosmetic.trailEffect(mPlayer, mTicks);
 
 				Iterator<LivingEntity> iter = mMobsNotHit.iterator();
 				while (iter.hasNext()) {
@@ -127,16 +124,14 @@ public class WindWalk extends MultipleChargeAbility {
 
 					if (mob.getLocation().distance(mPlayer.getLocation()) < WIND_WALK_RADIUS) {
 						if (!EntityUtils.isBoss(mob)) {
-							new PartialParticle(Particle.SWEEP_ATTACK, mob.getLocation().add(0, 1, 0), 16, 0.5, 0.5, 0.5, 0).spawnAsPlayerActive(mPlayer);
-							world.playSound(mob.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 1.25f);
+							mCosmetic.enemyStunEffect(mPlayer, mob, world);
 
 							EntityUtils.applyStun(mPlugin, mDuration, mob);
 
 							if (EntityUtils.isElite(mob)) {
-								new PartialParticle(Particle.EXPLOSION_NORMAL, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-								world.playSound(mob.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 0.75f);
+								mCosmetic.eliteStunEffect(mPlayer, mob, world);
 							} else {
-								new PartialParticle(Particle.CLOUD, mob.getLocation().add(0, 1, 0), 20, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
+								mCosmetic.nonEliteStunEffect(mPlayer, mob);
 
 								mob.setVelocity(mob.getVelocity().setY(0.5));
 								PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.LEVITATION, mDuration, 0, true, false));
@@ -148,11 +143,11 @@ public class WindWalk extends MultipleChargeAbility {
 				}
 
 				Material block = mPlayer.getLocation().getBlock().getType();
-				if (!mTickOne && (PlayerUtils.isOnGround(mPlayer) || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
+				if (mTicks > 1 && (PlayerUtils.isOnGround(mPlayer) || block == Material.WATER || block == Material.LAVA || block == Material.LADDER)) {
 					this.cancel();
 					return;
 				}
-				mTickOne = false;
+				mTicks++;
 			}
 
 		}.runTaskTimer(mPlugin, 0, 1));

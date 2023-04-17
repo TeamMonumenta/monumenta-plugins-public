@@ -4,11 +4,12 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.DodgingCS;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -16,9 +17,6 @@ import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
@@ -84,11 +82,13 @@ public class Dodging extends Ability {
 			.cooldown(DODGING_COOLDOWN_1, DODGING_COOLDOWN_2, CHARM_COOLDOWN)
 			.displayItem(Material.SHIELD);
 
+	private final DodgingCS mCosmetic;
 	private int mTriggerTick = 0;
 
 	public Dodging(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		// NOTE: This skill will get events even when it is on cooldown!
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new DodgingCS());
 	}
 
 	@Override
@@ -240,11 +240,10 @@ public class Dodging extends Ability {
 		if (isLevelTwo()) {
 			mPlugin.mEffectManager.addEffect(mPlayer, ATTR_NAME,
 				new PercentSpeed(DODGING_SPEED_EFFECT_DURATION, PERCENT_SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED), ATTR_NAME));
-			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 20, 0.25, 0.45, 0.25, 0.15).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1, 1.35f);
+
+			mCosmetic.dodgeEffectLv2(mPlayer, world, loc);
 		}
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 90, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 2f);
+		mCosmetic.dodgeEffect(mPlayer, world, loc);
 		return true;
 	}
 
@@ -254,19 +253,15 @@ public class Dodging extends Ability {
 	 * @param source Hostile enemy that shot the projectile / potion
 	 */
 	private void deflectParticles(LivingEntity source) {
-		World world = mPlayer.getWorld();
-
 		Location playerLocation = mPlayer.getEyeLocation();
 		Location sourceLocation = source.getEyeLocation();
-
 		Location particleLocation = sourceLocation.clone();
 
 		Vector direction = playerLocation.toVector().subtract(sourceLocation.toVector()).normalize();
+
 		for (int i = 0; i <= playerLocation.distance(sourceLocation); i++) {
 			particleLocation.add(direction);
-
-			new PartialParticle(Particle.VILLAGER_HAPPY, particleLocation, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CLOUD, particleLocation, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
+			mCosmetic.deflectTrailEffect(mPlayer, particleLocation);
 		}
 	}
 

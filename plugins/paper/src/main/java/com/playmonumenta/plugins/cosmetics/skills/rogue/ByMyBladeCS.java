@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -13,7 +11,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class ByMyBladeCS implements CosmeticSkill {
 
@@ -24,7 +21,7 @@ public class ByMyBladeCS implements CosmeticSkill {
 
 	@Override
 	public Material getDisplayItem() {
-		return Material.ZOMBIE_HEAD;
+		return Material.SKELETON_SKULL;
 	}
 
 	public void bmbDamage(World world, Player mPlayer, LivingEntity enemy, int level) {

@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.rogue.assassin;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
+import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,9 +12,8 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
-public class BodkinBlitzCS implements CosmeticSkill {
+public class BodkinBlitzCS implements StealthCosmeticSkill {
 
 	@Override
 	public ClassAbility getAbility() {
@@ -55,7 +52,7 @@ public class BodkinBlitzCS implements CosmeticSkill {
 		new PartialParticle(Particle.CRIT, tpLoc.clone().add(0, 1, 0), 25, 1, 1, 1, 0.3).spawnAsPlayerActive(mPlayer);
 	}
 
-	public void blitzBuffEffect(Player mPlayer) {
+	public void blitzBuffEffect(Player mPlayer, int mTicks) {
 		new PartialParticle(Particle.FALLING_DUST, mPlayer.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, Bukkit.createBlockData("gray_concrete")).spawnAsPlayerActive(mPlayer);
 	}
 

@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.classes.Rogue;
 import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
@@ -76,7 +77,7 @@ public class AbilityUtils {
 
 	public static final String IGNORE_TAG = "summon_ignore";
 
-	private static void startInvisTracker(Plugin plugin) {
+	private static void startInvisTracker(Plugin plugin, @Nullable StealthCosmeticSkill cosmetic) {
 		invisTracker = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -96,10 +97,10 @@ public class AbilityUtils {
 						ItemStack item = player.getInventory().getItemInMainHand();
 						if (entry.getValue() <= 0) {
 							// Run after this loop is complete to avoid concurrent modification
-							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false));
+							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, false, cosmetic));
 						} else if (ItemUtils.isPickaxe(item) || !(DepthsUtils.isWeaponItem(item) || ItemUtils.isProjectileWeapon(item))) {
 							// Run after this loop is complete to avoid concurrent modification
-							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true));
+							Bukkit.getScheduler().runTask(plugin, () -> removeStealth(plugin, player, true, cosmetic));
 						} else {
 							player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().clone().add(0, 0.5, 0), 1, 0.35, 0.25, 0.35, 0.05f);
 							entry.setValue(entry.getValue() - 1);
@@ -118,14 +119,12 @@ public class AbilityUtils {
 		return INVISIBLE_PLAYERS.containsKey(player) || Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class);
 	}
 
-	public static void removeStealth(Plugin plugin, Player player, boolean inflictPenalty) {
-		Location loc = player.getLocation();
-		World world = player.getWorld();
-
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
-		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1f, 0.5f);
-		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 0.6f, 0.5f);
+	public static void removeStealth(Plugin plugin, Player player, boolean inflictPenalty, @Nullable StealthCosmeticSkill cosmetic) {
+		if (cosmetic == null) {
+			defaultStealthRemove(player);
+		} else {
+			cosmetic.removeStealthCosmetic(player);
+		}
 
 		plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
 
@@ -136,14 +135,12 @@ public class AbilityUtils {
 		}
 	}
 
-	public static void applyStealth(Plugin plugin, Player player, int duration) {
-		Location loc = player.getLocation();
-		World world = player.getWorld();
-
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
-		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.5f, 2f);
+	public static void applyStealth(Plugin plugin, Player player, int duration, @Nullable StealthCosmeticSkill cosmetic) {
+		if (cosmetic == null) {
+			defaultStealthApply(player);
+		} else {
+			cosmetic.applyStealthCosmetic(player);
+		}
 
 		if (!isStealthed(player)) {
 			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.INVISIBILITY, duration, 0));
@@ -156,7 +153,7 @@ public class AbilityUtils {
 		}
 
 		if (invisTracker == null || invisTracker.isCancelled()) {
-			startInvisTracker(plugin);
+			startInvisTracker(plugin, cosmetic);
 		}
 
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(player.getLocation(), 64)) {
@@ -166,6 +163,26 @@ public class AbilityUtils {
 				}
 			}
 		}
+	}
+
+	public static void defaultStealthApply(Player player) {
+		Location loc = player.getLocation();
+		World world = player.getWorld();
+
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
+		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.5f, 2f);
+	}
+
+	public static void defaultStealthRemove(Player player) {
+		Location loc = player.getLocation();
+		World world = player.getWorld();
+
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 0.6f, 0.5f);
 	}
 
 	private static final String ABILITY_SILENCE_EFFECT_NAME = "AbilitySilence";

@@ -30,12 +30,26 @@ import com.playmonumenta.plugins.cosmetics.skills.mage.TwistedLanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.PrestigiousMoonbladeCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.PrestigiousStarfallCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.AstralWeaverCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DaggerOfNothingCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DecapitationCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.GalacticCloakCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.LightspeedCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.SolarChainsCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.StarShurikenCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.StarburstCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.StarstruckCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.SupernovaShieldCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.TranscCombosCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.WindStepCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.AstralObfuscationCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.GalacticRainCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.PrestigiousBlitzCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.SolarEruptionCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.CosmicCleaveCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.PrestigiousRondeCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.StarfireSpinCS;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.StellarDanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.EverseeingEyeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.TwistedCompanionCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
@@ -96,6 +110,20 @@ public class CosmeticSkills {
 		DecapitationCS::new,
 		PrestigiousRondeCS::new,
 		PrestigiousBlitzCS::new,
+		StarfireSpinCS::new,
+		StarstruckCS::new,
+		StarburstCS::new,
+		StarShurikenCS::new,
+		GalacticCloakCS::new,
+		SupernovaShieldCS::new,
+		LightspeedCS::new,
+		SolarChainsCS::new,
+		AstralWeaverCS::new,
+		StellarDanceCS::new,
+		CosmicCleaveCS::new,
+		GalacticRainCS::new,
+		AstralObfuscationCS::new,
+		SolarEruptionCS::new,
 
 		//Scout
 		FireworkStrikeCS::new,

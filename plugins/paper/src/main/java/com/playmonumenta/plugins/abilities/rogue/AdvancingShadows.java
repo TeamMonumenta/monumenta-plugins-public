@@ -24,8 +24,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,8 +47,6 @@ public class AdvancingShadows extends Ability {
 	private static final int ADVANCING_SHADOWS_COOLDOWN = 20 * 20;
 	private static final int ENHANCEMENT_KILL_REQUIREMENT_TIME = 20;
 	private static final int ENHANCEMENT_CHAIN_DURATION = 20 * 4;
-
-	private static final float[] PITCHES = {1.6f, 1.8f, 1.6f, 1.8f, 2f};
 
 	public static final String CHARM_DAMAGE = "Advancing Shadows Damage Multiplier";
 	public static final String CHARM_COOLDOWN = "Advancing Shadows Cooldown";
@@ -139,7 +135,6 @@ public class AdvancingShadows extends Ability {
 			World world = mPlayer.getWorld();
 			Location loc = mPlayer.getLocation();
 
-			mCosmetic.tpStart(mPlayer);
 			int i = 0;
 			while (loc.distance(entity.getLocation()) > ADVANCING_SHADOWS_OFFSET) {
 				i++;
@@ -197,9 +192,6 @@ public class AdvancingShadows extends Ability {
 				return;
 			}
 
-			mCosmetic.tpParticle(mPlayer);
-			mCosmetic.tpSound(world, mPlayer);
-
 			if (loc.distance(entity.getLocation()) <= origDistance) {
 				mPlayer.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 			}
@@ -235,15 +227,8 @@ public class AdvancingShadows extends Ability {
 							cancel();
 							return;
 						} else if (entity.isDead() || !entity.isValid()) {
-							for (int i = 0; i < PITCHES.length; i++) {
-								float pitch = PITCHES[i];
-								new BukkitRunnable() {
-									@Override
-									public void run() {
-										world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1, pitch);
-									}
-								}.runTaskLater(mPlugin, i);
-							}
+							mCosmetic.tpChain(world, mPlayer);
+
 							mCanRecast = true;
 							mEnhancementKillTick = Bukkit.getCurrentTick();
 							mEnhancementChain++;
@@ -258,7 +243,7 @@ public class AdvancingShadows extends Ability {
 				}.runTaskTimer(mPlugin, 0, 1));
 			}
 
-			mCosmetic.tpParticle(mPlayer);
+			mCosmetic.tpParticle(mPlayer, entity);
 			mCosmetic.tpSound(world, mPlayer);
 
 			putOnCooldown();

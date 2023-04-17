@@ -162,14 +162,14 @@ public class BodkinBlitz extends MultipleChargeAbility {
 					mPlugin.mPotionManager.addPotion(mPlayer, PotionID.ABILITY_SELF,
 						new PotionEffect(PotionEffectType.FAST_DIGGING, 5, 19, true, false));
 
-					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration);
+					AbilityUtils.applyStealth(mPlugin, mPlayer, mStealthDuration, mCosmetic);
 
 					mTicks = 100;
 					if (mRunnable == null || mRunnable.isCancelled()) {
 						mRunnable = new BukkitRunnable() {
 							@Override
 							public void run() {
-								mCosmetic.blitzBuffEffect(mPlayer);
+								mCosmetic.blitzBuffEffect(mPlayer, mTicks);
 								if (mTicks <= 0) {
 									mTicks = 0;
 									this.cancel();

@@ -84,7 +84,7 @@ public class CloakOfShadows extends DepthsAbility {
 		tincture.setGlowing(true);
 
 		putOnCooldown();
-		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1]);
+		AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION[mRarity - 1], null);
 
 		mPlugin.mEffectManager.addEffect(mPlayer, "CloakOfShadowsDamageEffect", new PercentDamageDealtSingle(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageEvent.DamageType.MELEE)));
 

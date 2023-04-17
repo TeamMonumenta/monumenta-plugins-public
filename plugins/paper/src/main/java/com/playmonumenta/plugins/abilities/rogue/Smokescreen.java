@@ -6,14 +6,12 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.SmokescreenCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,6 +33,8 @@ public class Smokescreen extends Ability {
 	public static final String CHARM_WEAKEN = "Smokescreen Weakness Amplifier";
 	public static final String CHARM_COOLDOWN = "Smokescreen Cooldown";
 	public static final String CHARM_RANGE = "Smokescreen Range";
+
+	private final SmokescreenCS mCosmetic;
 
 	public static final AbilityInfo<Smokescreen> INFO =
 		new AbilityInfo<>(Smokescreen.class, "Smokescreen", Smokescreen::new)
@@ -66,6 +66,7 @@ public class Smokescreen extends Ability {
 
 	public Smokescreen(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SmokescreenCS());
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKEN) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
 	}
 
@@ -75,9 +76,9 @@ public class Smokescreen extends Ability {
 		}
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 750, 4.5, 0.8, 4.5, 0.05).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 1500, 4.5, 0.2, 4.5, 0.1).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0f, 0.35f);
+
+		mCosmetic.smokescreenEffects(mPlayer, world, loc);
+
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RANGE, SMOKESCREEN_RANGE), mPlayer)) {
 			EntityUtils.applySlow(mPlugin, SMOKESCREEN_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOW), mob);
 			EntityUtils.applyWeaken(mPlugin, SMOKESCREEN_DURATION, mWeakenEffect, mob);
@@ -96,13 +97,7 @@ public class Smokescreen extends Ability {
 						return;
 					} else {
 						if (mT > 0) {
-							// Visuals are based off of Hekawt's UndeadRogue Smokescreen Spell
-							new PartialParticle(Particle.SMOKE_NORMAL, mCloudLocation, 3, 0.3, 0.05, 0.3, 0.075).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.SMOKE_NORMAL, mCloudLocation, 75, 3.5, 0.2, 4.5, 0.05).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.SMOKE_LARGE, mCloudLocation, 2, 0.3, 0.05, 0.3, 0.075).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.SMOKE_LARGE, mCloudLocation, 30, 3.5, 0.8, 4.5, 0.025).spawnAsPlayerActive(mPlayer);
-
-							world.playSound(mCloudLocation, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1, 0.7f);
+							mCosmetic.residualEnhanceEffects(mPlayer, world, mCloudLocation);
 
 							for (LivingEntity mob : EntityUtils.getNearbyMobs(mCloudLocation, ENHANCEMENT_SMOKECLOUD_RADIUS, mPlayer)) {
 								EntityUtils.applySlow(mPlugin, ENHANCEMENT_SMOKECLOUD_EFFECT_DURATION, SMOKESCREEN_SLOWNESS_AMPLIFIER, mob);

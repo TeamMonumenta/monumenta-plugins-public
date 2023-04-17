@@ -14,6 +14,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,7 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 	}
 
 	@Override
-	public void tpParticle(Player mPlayer) {
+	public void tpParticle(Player mPlayer, LivingEntity entity) {
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		loc.setPitch(loc.getPitch() + 90);
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 40, 0.3f,

@@ -4,19 +4,16 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.assassin.CoupDeGraceCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -36,6 +33,7 @@ public class CoupDeGrace extends Ability {
 
 	private final double mNormalThreshold;
 	private final double mEliteThreshold;
+	private final CoupDeGraceCS mCosmetic;
 
 	public static final String CHARM_THRESHOLD = "Coup de Grace Threshold";
 	public static final String CHARM_NORMAL = "Coup de Grace Normal Enemy Threshold";
@@ -43,6 +41,7 @@ public class CoupDeGrace extends Ability {
 
 	public static final AbilityInfo<CoupDeGrace> INFO =
 		new AbilityInfo<>(CoupDeGrace.class, "Coup de Grace", CoupDeGrace::new)
+			.linkedSpell(ClassAbility.COUP_DE_GRACE)
 			.scoreboardId("CoupDeGrace")
 			.shorthandName("CdG")
 			.descriptions(
@@ -61,6 +60,7 @@ public class CoupDeGrace extends Ability {
 		double sharedThreshold = CharmManager.getLevelPercentDecimal(player, CHARM_THRESHOLD);
 		mNormalThreshold = (isLevelOne() ? COUP_1_NORMAL_THRESHOLD : COUP_2_NORMAL_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_NORMAL) + sharedThreshold;
 		mEliteThreshold = (isLevelOne() ? COUP_1_ELITE_THRESHOLD : COUP_2_ELITE_THRESHOLD) + CharmManager.getLevelPercentDecimal(player, CHARM_ELITE) + sharedThreshold;
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CoupDeGraceCS());
 	}
 
 	@Override
@@ -83,13 +83,9 @@ public class CoupDeGrace extends Ability {
 
 	private void execute(LivingEntity le) {
 		DamageUtils.damage(mPlayer, le, DamageType.TRUE, 9001, ClassAbility.COUP_DE_GRACE, true, false);
-		World world = le.getWorld();
-		world.playSound(le.getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS, 0.75f, 0.75f);
-		world.playSound(le.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.5f, 1.5f);
-		new PartialParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_WIRE.createBlockData()).spawnAsPlayerActive(mPlayer);
+		mCosmetic.execution(mPlayer, le);
 		if (isLevelTwo()) {
-			new PartialParticle(Particle.SPELL_WITCH, le.getLocation().add(0, le.getHeight() / 2, 0), 10, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.BLOCK_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 20, le.getWidth() / 2, le.getHeight() / 3, le.getWidth() / 2, 0.65, Material.REDSTONE_BLOCK.createBlockData()).spawnAsPlayerActive(mPlayer);
+			mCosmetic.executionLv2(mPlayer, le);
 		}
 	}
 

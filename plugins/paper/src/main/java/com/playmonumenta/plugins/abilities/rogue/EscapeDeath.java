@@ -6,11 +6,12 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.rogue.EscapeDeathCS;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -20,9 +21,6 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -80,8 +78,11 @@ public class EscapeDeath extends Ability {
 			.displayItem(Material.DRAGON_BREATH)
 			.priorityAmount(10000);
 
+	private final EscapeDeathCS mCosmetic;
+
 	public EscapeDeath(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EscapeDeathCS());
 	}
 
 	private void toggleJumpBoost() {
@@ -143,11 +144,8 @@ public class EscapeDeath extends Ability {
 				loc.add(0, 1, 0);
 
 				World world = mPlayer.getWorld();
-				new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 80, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 125, 0, 0, 0, 0.3).spawnAsPlayerActive(mPlayer);
 
-				world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.75f, 1.5f);
-				world.playSound(loc, Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1f, 0f);
+				mCosmetic.activate(mPlayer, world, loc);
 
 				MessagingUtils.sendActionBarMessage(mPlayer, "Escape Death has been activated");
 

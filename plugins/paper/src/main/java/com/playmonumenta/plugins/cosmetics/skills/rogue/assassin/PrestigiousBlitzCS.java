@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.rogue.assassin;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -120,7 +117,7 @@ public class PrestigiousBlitzCS extends BodkinBlitzCS implements PrestigeCS {
 	}
 
 	@Override
-	public void blitzBuffEffect(Player mPlayer) {
+	public void blitzBuffEffect(Player mPlayer, int mTicks) {
 		Location loc = mPlayer.getLocation().clone().add(0, 0.5, 0);
 		new PartialParticle(Particle.FALLING_DUST, loc, 1, 0.35, 0.25, 0.35, Bukkit.createBlockData(Material.WHITE_CONCRETE)).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FALLING_DUST, loc, 1, 0.35, 0.25, 0.35, Bukkit.createBlockData(Material.LIGHT_GRAY_CONCRETE_POWDER)).spawnAsPlayerActive(mPlayer);
@@ -139,8 +136,8 @@ public class PrestigiousBlitzCS extends BodkinBlitzCS implements PrestigeCS {
 		new BukkitRunnable() {
 			int mT = 40;
 			final int THRESH = 12;
-			double mDHeight = 0.1;
-			double mDRadius = 0.25;
+			final double mDHeight = 0.1;
+			final double mDRadius = 0.25;
 
 			@Override
 			public void run() {
