@@ -107,6 +107,9 @@ public class SpellBaseShatter extends Spell {
 
 		if (target != null) {
 			Vector dir = LocationUtils.getDirectionTo(target.getLocation(), mBoss.getLocation()).setY(0).normalize();
+			if (!Double.isFinite(dir.getX())) {
+				dir = new Vector(0, 1, 0);
+			}
 			mBoss.teleport(mBoss.getLocation().setDirection(dir));
 		}
 

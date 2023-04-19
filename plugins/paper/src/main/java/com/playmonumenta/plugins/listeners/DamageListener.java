@@ -252,7 +252,7 @@ public class DamageListener implements Listener {
 		UUID uuid = proj.getUniqueId();
 		if (proj instanceof AbstractArrow && !(proj instanceof Trident)) {
 			ItemStack item = EntityListener.getArrowItem(uuid);
-			if (item != null) {
+			if (item != null && item.getType() != Material.AIR) {
 				NBTItem nbtItem = new NBTItem(item);
 
 				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbtItem);

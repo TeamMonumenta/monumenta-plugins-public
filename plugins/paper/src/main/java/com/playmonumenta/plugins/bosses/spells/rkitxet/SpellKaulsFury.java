@@ -77,13 +77,17 @@ public class SpellKaulsFury extends Spell {
 
 				@Override
 				public void run() {
-					if (!mBoss.isValid() || mBoss.isDead()) {
+					if (!mBoss.isValid() || mBoss.isDead() || !mLocation.getWorld().equals(world)) {
 						this.cancel();
 						return;
 					}
 
 					if (mT < mChargeTime) {
 						mLocation = target.getLocation().add(0, HEIGHT, 0);
+						if (!mLocation.getWorld().equals(world)) {
+							this.cancel();
+							return;
+						}
 
 						double completionRatio = ((double) mT) / mChargeTime;
 						double chargingRadius = RADIUS * completionRatio;
@@ -103,14 +107,16 @@ public class SpellKaulsFury extends Spell {
 						// 5.0 because 5 ticks and mImpactTime is in ticks, and to make it a double
 						mLocation = mLocation.subtract(0, (5.0 * HEIGHT) / mImpactTime, 0);
 						new PartialParticle(Particle.SPELL_WITCH, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
-						new PartialParticle(Particle.FLAME, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0).spawnAsEntityActive(mBoss);
-						new PartialParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2, RADIUS / 2, RADIUS / 2, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.FLAME, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.CLOUD, mLocation, 18, RADIUS / 2.0, RADIUS / 2.0, RADIUS / 2.0, 0).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.SMOKE_LARGE, mLocation, 25, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, mLocation, 1, RADIUS / 2.5, RADIUS / 2.5, RADIUS / 2.5, 0).spawnAsEntityActive(mBoss);
 
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
-						target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+						if (target.getWorld().equals(world)) {
+							target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+							target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+							target.playSound(mLocation, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 3.0f, 1);
+						}
 						world.playSound(mLocation, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 2.0f);
 					} else {
 						for (Player player : PlayerUtils.playersInRange(mLocation, DAMAGE_RADIUS, true)) {

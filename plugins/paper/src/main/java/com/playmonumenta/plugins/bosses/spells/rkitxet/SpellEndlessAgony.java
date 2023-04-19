@@ -87,7 +87,8 @@ public class SpellEndlessAgony extends Spell {
 
 				Location targetLoc = target.getLocation();
 				//If they die, stop
-				if (targetLoc.distance(mRKitxet.getBossLocation()) > RKitxet.detectionRange) {
+				if (!targetLoc.getWorld().equals(mRKitxet.getBossLocation().getWorld())
+					    || targetLoc.distance(mRKitxet.getBossLocation()) > RKitxet.detectionRange) {
 					mChargeUp.reset();
 					this.cancel();
 					return;
