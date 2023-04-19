@@ -203,11 +203,37 @@ public class DungeonAccessCommand extends GenericCommand {
 		Set<Player> otherPlayers = new HashSet<>(otherPlayersRaw);
 		otherPlayers.remove(invitingPlayer);
 
-		// only invite players with no open instance
-		otherPlayers.removeIf(p -> ScoreboardUtils.getScoreboardValue(p, mapping.getAccessName()).orElse(0) != 0);
+		int accessScore = ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getAccessName()).orElseThrow();
+		if (accessScore == 0) {
+			// This shouldn't happen, but handle it anyway
+			invitingPlayer.sendMessage(Component.text("You don't have an open " + mapping.getDisplayName() + " instance to invite other players to!", NamedTextColor.RED));
+			return;
+		}
+
+		// Only invite players with no open instance
+		for (Iterator<Player> iterator = otherPlayers.iterator(); iterator.hasNext(); ) {
+			Player otherPlayer = iterator.next();
+			int otherAccessScore = ScoreboardUtils.getScoreboardValue(otherPlayer, mapping.getAccessName()).orElse(0);
+			if (otherAccessScore == accessScore) {
+				// Same instance: send directly without changing any scores on the player
+				iterator.remove();
+				send(List.of(otherPlayer), mapping, returnLocation, returnYaw, returnPitch);
+			} else if (otherAccessScore != 0) {
+				// Other instance: send error message and don't send the player anywhere
+				iterator.remove();
+				otherPlayer.sendMessage(Component.text("You already have an open " + mapping.getDisplayName() + " instance!", NamedTextColor.RED));
+				if (mapping.getStartDateName() != null) {
+					int otherStartDate = ScoreboardUtils.getScoreboardValue(otherPlayer, mapping.getStartDateName()).orElse(0);
+					if (DateUtils.getWeeklyVersion(otherStartDate) == DateUtils.getWeeklyVersion()) {
+						otherPlayer.sendMessage(Component.text("Since you started your instance this week, you won't be able to abandon it to join.", NamedTextColor.GRAY));
+					} else {
+						otherPlayer.sendMessage(Component.text("Since your instance was started in a past week, you can abandon it to be invited again.", NamedTextColor.GRAY));
+					}
+				}
+			}
+		}
 
 		if (!otherPlayers.isEmpty()) {
-			int accessScore = ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getAccessName()).orElseThrow();
 			int startDate = mapping.getStartDateName() == null ? 0 : ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getStartDateName()).orElseThrow();
 			int type = mapping.getTypeName() == null ? 0 : ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getTypeName()).orElse(0);
 

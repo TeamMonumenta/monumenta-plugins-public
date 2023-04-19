@@ -356,23 +356,30 @@ public class ItemStatUtils {
 		static final String KEY = "Location";
 
 		final String mName;
+		final String mDisplayName;
 		final Component mDisplay;
 		final TextColor mColor;
 
 		Location(String name, String display, TextColor color) {
 			mName = name;
+			mDisplayName = display;
 			mDisplay = Component.text(display, color).decoration(TextDecoration.ITALIC, false);
 			mColor = color;
 		}
 
 		Location(String name, Component display) {
 			mName = name;
+			mDisplayName = MessagingUtils.plainText(display);
 			mDisplay = display;
 			mColor = display.color();
 		}
 
 		public String getName() {
 			return mName;
+		}
+
+		public String getDisplayName() {
+			return mDisplayName;
 		}
 
 		public Component getDisplay() {
