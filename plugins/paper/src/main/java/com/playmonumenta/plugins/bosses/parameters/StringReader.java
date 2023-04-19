@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
-import com.playmonumenta.plugins.Plugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -180,12 +180,9 @@ public class StringReader {
 
 	public @Nullable PotionEffectType readPotionEffectType() {
 		skipWhitespace();
-		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
+		String remain = remaining().toUpperCase(Locale.ROOT);
 		for (PotionEffectType type : POTION_EFFECT_TYPES_SORTED) {
 			if (remain.startsWith(type.getName())) {
-				if (!remaining().startsWith(type.getName())) { // TODO: Remove this entire statement once all these bugs are fixed
-					Plugin.getInstance().getLogger().severe("Incorrectly capitalized potion in boss tag: " + remaining());
-				}
 				advance(type.getName().length());
 				return type;
 			}
@@ -195,12 +192,9 @@ public class StringReader {
 
 	public @Nullable Sound readSound() {
 		skipWhitespace();
-		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
+		String remain = remaining().toUpperCase(Locale.ROOT);
 		for (Sound type : SOUNDS_SORTED) {
 			if (remain.startsWith(type.name())) {
-				if (!remaining().startsWith(type.name())) { // TODO: Remove this entire statement once all these bugs are fixed
-					Plugin.getInstance().getLogger().severe("Incorrectly capitalized sound in boss tag: " + remaining());
-				}
 				advance(type.name().length());
 				return type;
 			}
@@ -212,12 +206,9 @@ public class StringReader {
 	//aka CRIT_MAGIC can be read with CRIT
 	public @Nullable Particle readParticle() {
 		skipWhitespace();
-		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
+		String remain = remaining().toUpperCase(Locale.ROOT);
 		for (Particle type : PARTICLES_SORTED) {
 			if (remain.startsWith(type.name())) {
-				if (!remaining().startsWith(type.name())) { // TODO: Remove this entire statement once all these bugs are fixed
-					Plugin.getInstance().getLogger().severe("Incorrectly capitalized particle in boss tag: " + remaining());
-				}
 				advance(type.name().length());
 				return type;
 			}
@@ -228,13 +219,10 @@ public class StringReader {
 	public @Nullable Material readMaterial() {
 		skipWhitespace();
 
-		String remain = remaining().toUpperCase(); // TODO: Remove toUpperCase()
+		String remain = remaining().toUpperCase(Locale.ROOT);
 
 		for (Material material : MATERIALS_SORTED) {
 			if (remain.startsWith(material.name())) {
-				if (!remaining().startsWith(material.name())) { // TODO: Remove this entire statement once all these bugs are fixed
-					Plugin.getInstance().getLogger().severe("Incorrectly capitalized material in boss tag: " + remaining());
-				}
 				advance(material.name().length());
 				return material;
 			}

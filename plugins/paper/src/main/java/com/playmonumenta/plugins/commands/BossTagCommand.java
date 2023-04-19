@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.goncalomb.bukkit.mylib.reflect.NBTTagCompound;
 import com.goncalomb.bukkit.mylib.reflect.NBTTagList;
 import com.goncalomb.bukkit.nbteditor.bos.BookOfSouls;
 import com.goncalomb.bukkit.nbteditor.nbt.variables.ListVariable;
@@ -15,18 +16,18 @@ import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.IStringTooltip;
 import dev.jorel.commandapi.StringTooltip;
 import dev.jorel.commandapi.SuggestionInfo;
 import dev.jorel.commandapi.Tooltip;
-import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.SafeSuggestions;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -44,7 +45,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -70,190 +73,183 @@ public class BossTagCommand {
 
 	public static void register() {
 
-		List<Argument<?>> arguments = new ArrayList<>();
-
-
-		arguments.add(new MultiLiteralArgument("add"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionsBossTag)));
-
 		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.add")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				addNewBossTag(player, (String) args[1]);
-			})
-			.register();
+			.withPermission("monumenta.bosstag")
+			.withSubcommand(
+				new CommandAPICommand("add")
+					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossTagCommand::suggestionsBossTag)))
+					.executesPlayer((player, args) -> {
+						addNewBossTag(player, (String) args[0]);
+					})
+			)
 
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("info"));
-		arguments.add(new StringArgument("boss_tag").includeSuggestions(ArgumentSuggestions.strings(t -> getPossibleBosses(t.currentArg()))));
-
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.help")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				try {
-					infoBossTag(player, (String) args[1]);
-				} catch (Exception e) {
-					throw CommandAPI.failWithString(e.getMessage());
-				}
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("show"));
-
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.show")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				showBossTag(player);
-			})
-			.register();
-
-		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionBossTagBasedonBoS)));
-
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.show")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				showBossTag(player, (String) args[1]);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("search"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionsBossTag)));
-
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.search")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				searchTag(player, (String) args[1]);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("get"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.suggest(SEARCH_OUTCOME_MAP.keySet())));
-
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.search")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				getBosSearched(player, (String) args[1]);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("remove"));
-		arguments.add(new GreedyStringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.stringsWithTooltipsCollection(BossTagCommand::suggestionBossTagBasedonBoSAndParams)));
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.remove")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				removeBossTag(player, (String) args[1]);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("squash"));
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.squash")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				squashBossTags(player);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("deprecated"));
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.deprecated")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				checksAllLos(player);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("help"));
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.help")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				helpBossTags(player);
-			})
-			.register();
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("phase"));
-		arguments.add(new MultiLiteralArgument("add"));
-		arguments.add(new StringArgument("PhaseName"));
-		arguments.add(new BooleanArgument("reusable"));
-		arguments.add(new GreedyStringArgument("PhaseExpression").replaceSafeSuggestions(SafeSuggestions.tooltips(BossPhasesList::suggestionPhases)));
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.Phase")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				String phaseName = (String) args[2];
-				boolean reusable = (boolean) args[3];
-				String phaseString = (String) args[4];
-
-				BookOfSouls bos = getBos(player);
-				ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
-				NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
-
-				boolean foundBaseTag = false;
-				if (nbtTagsList != null && nbtTagsList.size() > 0) {
-					for (Object object : nbtTagsList.getAsArray()) {
-						if (object.toString().contains(PhasesManagerBoss.identityTag)) {
-							foundBaseTag = true;
-							break;
+			.withSubcommand(
+				new CommandAPICommand("info")
+					.withArguments(new StringArgument("boss_tag").includeSuggestions(ArgumentSuggestions.strings(t -> getPossibleBosses(t.currentArg()))))
+					.executesPlayer((player, args) -> {
+						try {
+							infoBossTag(player, (String) args[1]);
+						} catch (Exception e) {
+							throw CommandAPI.failWithString(e.getMessage());
 						}
-					}
-				}
+					})
+			)
 
-				if (!foundBaseTag) {
-					tags.add(PhasesManagerBoss.identityTag, player);
-					bos.saveBook();
-				}
+			.withSubcommand(
+				new CommandAPICommand("show")
+					.executesPlayer((player, args) -> {
+						showBossTag(player);
+					})
+			)
+			.withSubcommand(
+				new CommandAPICommand("show")
+					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltips(BossTagCommand::suggestionBossTagBasedonBoS)))
+					.executesPlayer((player, args) -> {
+						showBossTag(player, (String) args[0]);
+					})
+			)
 
-				String newTag = PhasesManagerBoss.identityTag + "[phases=[(" + phaseName + "," + reusable + "," + phaseString + ")]]";
+			.withSubcommand(
+				new CommandAPICommand("search")
+					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossTagCommand::suggestionsBossTag)))
+					.executesPlayer((player, args) -> {
+						searchTag(player, (String) args[0]);
+					})
+			)
 
-				player.sendMessage(Component.empty()
-					.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-					.append(Component.text(newTag, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
-				tags.add(newTag, player);
-				bos.saveBook();
+			.withSubcommand(
+				new CommandAPICommand("get")
+					.withArguments(new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.suggest(SEARCH_OUTCOME_MAP.keySet())))
+					.executesPlayer((player, args) -> {
+						getBosSearched(player, (String) args[0]);
+					})
+			)
 
-			})
+			.withSubcommand(
+				new CommandAPICommand("remove")
+					.withArguments(new GreedyStringArgument("boss_tag").replaceSuggestions(ArgumentSuggestions.stringsWithTooltipsCollection(BossTagCommand::suggestionBossTagBasedonBoSAndParams)))
+					.executesPlayer((player, args) -> {
+						removeBossTag(player, (String) args[0]);
+					})
+			)
+
+			.withSubcommand(
+				new CommandAPICommand("list")
+					.executesPlayer((player, args) -> {
+						listBossTags(player);
+					})
+			)
+			.withSubcommand(
+				new CommandAPICommand("edit")
+					.withArguments(
+						new IntegerArgument("index"),
+						new GreedyStringArgument("boss_tag").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossTagCommand::suggestionsBossTag)))
+					.executesPlayer((player, args) -> {
+						editBossTag(player, (int) args[0], (String) args[1]);
+					})
+			)
+			.withSubcommand(
+				new CommandAPICommand("delete")
+					.withArguments(new IntegerArgument("index"))
+					.executesPlayer((player, args) -> {
+						deleteBossTag(player, (int) args[0]);
+					})
+			)
+
+			.withSubcommand(
+				new CommandAPICommand("squash")
+					.executesPlayer((player, args) -> {
+						squashBossTags(player);
+					})
+			)
+
+			.withSubcommand(
+				new CommandAPICommand("los_errors")
+					.executesPlayer((player, args) -> {
+						checkAllLos(player, true);
+					})
+			)
+			.withSubcommand(
+				new CommandAPICommand("los_errors")
+					.withArguments(new BooleanArgument("spawn chest"))
+					.executesPlayer((player, args) -> {
+						checkAllLos(player, (boolean) args[0]);
+					})
+			)
+
+			.withSubcommand(
+				new CommandAPICommand("help")
+					.executesPlayer((player, args) -> {
+						helpBossTags(player);
+					})
+			)
+
+			.withSubcommand(
+				new CommandAPICommand("phase")
+					.withSubcommand(
+						new CommandAPICommand("add")
+							.withArguments(
+								new StringArgument("PhaseName"),
+								new BooleanArgument("reusable"),
+								new GreedyStringArgument("PhaseExpression").replaceSafeSuggestions(SafeSuggestions.tooltipCollection(BossPhasesList::suggestionPhases)))
+							.executesPlayer((player, args) -> {
+								String phaseName = (String) args[0];
+								boolean reusable = (boolean) args[1];
+								String phaseString = (String) args[2];
+
+								BookOfSouls bos = getBos(player);
+								ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
+								NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+
+								boolean foundBaseTag = false;
+								if (nbtTagsList != null && nbtTagsList.size() > 0) {
+									for (Object object : nbtTagsList.getAsArray()) {
+										if (object.toString().contains(PhasesManagerBoss.identityTag)) {
+											foundBaseTag = true;
+											break;
+										}
+									}
+								}
+
+								if (!foundBaseTag) {
+									tags.add(PhasesManagerBoss.identityTag, player);
+									bos.saveBook();
+								}
+
+								String newTag = PhasesManagerBoss.identityTag + "[phases=[(" + phaseName + "," + reusable + "," + phaseString + ")]]";
+
+								player.sendMessage(Component.empty()
+									                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+									                   .append(Component.text(newTag, NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false)));
+								tags.add(newTag, player);
+								bos.saveBook();
+
+							})
+					)
+					.withSubcommand(
+						new CommandAPICommand("trigger")
+							.withArguments(
+								new EntitySelectorArgument.ManyEntities("bosses"),
+								new GreedyStringArgument("triggerKey"))
+							.executesPlayer((player, args) -> {
+								String triggerKey = (String) args[3];
+								BossManager bossManager = BossManager.getInstance();
+								PhasesManagerBoss boss;
+								for (Entity entity : (Collection<Entity>) args[2]) {
+									boss = bossManager.getBoss(entity, PhasesManagerBoss.class);
+									if (boss != null) {
+										boss.onCustomTrigger(triggerKey);
+									}
+								}
+
+							})
+					)
+			)
 			.register();
 
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("phase"));
-		arguments.add(new MultiLiteralArgument("trigger"));
-		arguments.add(new EntitySelectorArgument.ManyEntities("bosses"));
-		arguments.add(new GreedyStringArgument("triggerKey"));
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.bosstag.Phase")
-			.withArguments(arguments)
-			.executesPlayer((player, args) -> {
-				String triggerKey = (String) args[3];
-				BossManager bossManager = BossManager.getInstance();
-				PhasesManagerBoss boss;
-				for (Entity entity : (Collection<Entity>) args[2]) {
-					boss = bossManager.getBoss(entity, PhasesManagerBoss.class);
-					if (boss != null) {
-						boss.onCustomTrigger(triggerKey);
-					}
-				}
-
-			})
-			.register();
 	}
 
-	private static Tooltip<String>[] suggestionsBossTag(SuggestionInfo info) {
+	private static List<Tooltip<String>> suggestionsBossTag(SuggestionInfo info) {
 		String currentArg = info.currentArg();
 
 		String[] bossTags = getPossibleBosses(currentArg);
@@ -268,16 +264,16 @@ public class BossTagCommand {
 				}
 			}
 			if (BossManager.mBossParameters.containsKey(bossTags[0])) {
-				return Tooltip.arrayOf(
+				return List.of(
 					Tooltip.ofString(bossTags[0], description),
 					Tooltip.ofString(bossTags[0] + "[", description)
 				);
 			} else {
 				// Tag is a real tag but doesn't have parameters - don't bother offering opening [
-				return Tooltip.arrayOf(Tooltip.ofString(bossTags[0], description));
+				return List.of(Tooltip.ofString(bossTags[0], description));
 			}
 		} else if (bossTags.length > 1) {
-			List<Tooltip<String>> entries = new ArrayList<Tooltip<String>>(bossTags.length);
+			List<Tooltip<String>> entries = new ArrayList<>(bossTags.length);
 			for (String bossTag : bossTags) {
 				String description = "undefined";
 				BossParameters parameters = BossManager.mBossParameters.get(bossTag);
@@ -289,28 +285,28 @@ public class BossTagCommand {
 				}
 				entries.add(Tooltip.ofString(bossTag, description));
 			}
-			return entries.toArray(Tooltip.arrayOf());
+			return entries;
 		} else {
 			StringReader reader = new StringReader(info.currentArg());
 			String currentBossTag = reader.readUntil("[");
 			if (currentBossTag == null) {
 				// Invalid, boss tag doesn't match any suggestions and has no opening bracket for arguments
-				return Tooltip.arrayOf();
+				return List.of();
 			}
 
 			BossParameters parameter = BossManager.mBossParameters.get(currentBossTag);
 			if (parameter == null) {
 				// Invalid, boss tag doesn't have parameters
-				return Tooltip.arrayOf();
+				return List.of();
 			}
 
 			// TODO: parameter.clone(), very important!
-			ParseResult<BossParameters> result = BossParameters.parseParameters(reader, parameter);
+			ParseResult<BossParameters> result = BossParameters.parseParameters(reader, parameter, false);
 			if (result.getTooltip() != null) {
 				return result.getTooltip();
 			}
 		}
-		return Tooltip.arrayOf();
+		return List.of();
 	}
 
 	public static class TypeAndDesc {
@@ -795,9 +791,71 @@ public class BossTagCommand {
 		);
 	}
 
+	private static void listBossTags(Player player) throws WrapperCommandSyntaxException {
+		BookOfSouls bos = getBos(player);
+		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Tags in BoS:", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+
+
+		for (int i = 0; i < nbtTagsList.size(); i++) {
+			String tagString = (String) nbtTagsList.get(i);
+			player.sendMessage(
+				Component.empty()
+					.append(Component.text("[X]", NamedTextColor.RED)
+						        .hoverEvent(HoverEvent.showText(Component.text("Click to delete this tag", NamedTextColor.RED)))
+						        .clickEvent(ClickEvent.suggestCommand("/bosstag delete " + i)))
+					.append(Component.text(" "))
+					.append(Component.text(tagString, NamedTextColor.WHITE)
+						        .clickEvent(ClickEvent.suggestCommand("/bosstag edit " + i + " " + tagString))));
+		}
+	}
+
+	private static void deleteBossTag(Player player, int index) throws WrapperCommandSyntaxException {
+		BookOfSouls bos = getBos(player);
+		ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
+		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+		if (index < 0 || index >= nbtTagsList.size()) {
+			throw CommandAPI.failWithString("Invalid index " + index);
+		}
+		String tag = (String) nbtTagsList.get(index);
+		tags.remove(index);
+
+		bos.saveBook();
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Tag " + tag + " removed!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+		listBossTags(player);
+	}
+
+	private static void editBossTag(Player player, int index, String tag) throws WrapperCommandSyntaxException {
+		BookOfSouls bos = getBos(player);
+		ListVariable tags = (ListVariable) bos.getEntityNBT().getVariable("Tags");
+		NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
+		if (index < 0 || index >= nbtTagsList.size()) {
+			throw CommandAPI.failWithString("Invalid index " + index);
+		}
+		tags.remove(index);
+		tags.add(tag, player);
+
+		bos.saveBook();
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Tag edited!", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+		);
+		listBossTags(player);
+	}
+
+
 	private static Tooltip<String>[] suggestionBossTagBasedonBoS(SuggestionInfo info) {
 		try {
-			BookOfSouls bos = getBos((Player)info.sender());
+			BookOfSouls bos = getBos((Player) info.sender());
 			NBTTagList nbtTagsList = bos.getEntityNBT().getData().getList("Tags");
 
 			List<Tooltip<String>> bossTags = new ArrayList<>();
@@ -946,101 +1004,126 @@ public class BossTagCommand {
 		);
 	}
 
-	public static void checksAllLos(Player player) throws WrapperCommandSyntaxException {
-		Map<Soul, List<String>> soulsBosTagMap = new LinkedHashMap<>();
+	private static List<String> checkEntity(Component description, String soulLabel, NBTTagCompound entityNBT, Player sender) {
+
+		List<String> errors = new ArrayList<>();
+
+		List<String> bosTags = new ArrayList<>();
+		NBTTagList tags = entityNBT.getList("Tags");
+		if (tags != null) {
+			for (int i = 0; i < tags.size(); i++) {
+				String tag = (String) tags.get(i);
+				if (BossManager.mBossParameters.get(tag) != null) {
+					//this Soul may be with some parameters, lets save it to check later
+					bosTags.add(tag);
+				}
+			}
+		}
+
+		String customName = entityNBT.getString("CustomName");
+		Component bossDescription = (customName == null || customName.isEmpty() ? Component.text("Unnamed " + entityNBT.getString("id"), NamedTextColor.BLUE) : MessagingUtils.parseComponent(customName)).append(description);
+
+		for (String bossTag : bosTags) {
+			for (int i = 0; i < tags.size(); i++) {
+				String tag = (String) tags.get(i);
+				if (tag.startsWith(bossTag + "[")) {
+					//found a param string
+					StringReader reader = new StringReader(tag);
+					reader.advance(bossTag);
+
+					Component descWithClickEvent = bossDescription.hoverEvent(HoverEvent.showText(Component.text("Click to get (base) BoS")))
+						                               .clickEvent(ClickEvent.runCommand("/los get " + soulLabel));
+					ParseResult<?> result = BossParameters.parseParametersWithWarnings(descWithClickEvent, reader, Objects.requireNonNull(BossManager.mBossParameters.get(bossTag)), List.of(sender));
+
+					if (result.getResult() == null) {
+						errors.add(tag);
+					} else if (result.mDeprecatedParameters != null) {
+						sender.sendMessage(Component.text("[BossParameters] ", NamedTextColor.GOLD)
+							                   .append(Component.text("problems during parsing tag for ", NamedTextColor.RED))
+							                   .append(descWithClickEvent)
+							                   .append(Component.text(" | on tag: ", NamedTextColor.RED))
+							                   .append(Component.text(reader.getString(), NamedTextColor.WHITE))
+							                   .append(Component.text(" | deprecated parameter(s) used: ", NamedTextColor.RED))
+							                   .append(Component.text(result.mDeprecatedParameters.toString(), NamedTextColor.YELLOW)));
+						errors.add(tag + " contains deprecated parameter(s): " + result.mDeprecatedParameters);
+					}
+				}
+			}
+		}
+
+		// recursively check passengers
+		NBTTagList passengers = entityNBT.getList("Passengers");
+		if (passengers != null) {
+			for (Object passenger : passengers.getAsArray()) {
+				TextComponent nestedDescription = Component.text(" (passenger of ", NamedTextColor.GRAY).append(bossDescription).append(Component.text(")", NamedTextColor.GRAY));
+				List<String> passengerErrors = checkEntity(nestedDescription, soulLabel, (NBTTagCompound) passenger, sender);
+				for (String passengerError : passengerErrors) {
+					errors.add("  in passenger: " + passengerError);
+				}
+			}
+		}
+
+		return errors;
+
+	}
+
+	public static void checkAllLos(Player player, boolean spawnChest) throws WrapperCommandSyntaxException {
 
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
 			                   .append(Component.text("Checking all the mobs in the Library of Souls. This may take a while...", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
-		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
-			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
-			NBTTagList tags = soul.getNBT().getList("Tags");
-			if (tags != null) {
-				for (int i = 0; i < tags.size(); i++) {
-					String tag = (String) tags.get(i);
-					if (BossManager.mBossParameters.get(tag) != null) {
-						//this Soul may be with some parameters, lets save it to check later
-						if (soulsBosTagMap.get(soul) == null) {
-							soulsBosTagMap.put(soul, new ArrayList<>());
-						}
-						soulsBosTagMap.get(soul).add(tag);
-					}
-				}
-			}
-		}
-
-		player.sendMessage(Component.empty()
-								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Checked all the mobs in the Library of Souls.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
-		);
 
 		Map<Soul, List<String>> soulDeprecatedTagMap = new LinkedHashMap<>();
-
-		for (Map.Entry<Soul, List<String>> entry : soulsBosTagMap.entrySet()) {
-			Soul soul = entry.getKey();
-			List<String> bossTags = entry.getValue();
-			NBTTagList tags = soul.getNBT().getList("Tags");
-
-			for (String bossTag : bossTags) {
-				for (int i = 0; i < tags.size(); i++) {
-					String tag = (String) tags.get(i);
-					if (tag.startsWith(bossTag + "[")) {
-						//found a param string
-						StringReader reader = new StringReader(tag);
-						reader.advance(bossTag);
-
-						ParseResult<?> result = BossParameters.parseParameters(reader, Objects.requireNonNull(BossManager.mBossParameters.get(bossTag)));
-
-						if (result.getResult() == null || result.mContainsDeprecated) {
-							//we get a deprecated tag somehow
-							//lets save it to give it to the player
-							if (soulDeprecatedTagMap.get(soul) == null) {
-								soulDeprecatedTagMap.put(soul, new ArrayList<>());
-							}
-
-							soulDeprecatedTagMap.get(soul).add(tag);
-						}
-					}
-				}
+		for (String soulName : LibraryOfSoulsIntegration.getSoulNames()) {
+			Soul soul = SoulsDatabase.getInstance().getSoul(soulName);
+			List<String> errors = checkEntity(Component.text(" (soul label: " + soul.getLabel() + ")", NamedTextColor.BLUE), soul.getLabel(), soul.getNBT(), player);
+			if (!errors.isEmpty()) {
+				soulDeprecatedTagMap.put(soul, errors);
 			}
 		}
 
 		player.sendMessage(Component.empty()
-								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Found some problems on: " + soulDeprecatedTagMap.keySet().size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Checked all the mobs in the Library of Souls", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
-
 
 		player.sendMessage(Component.empty()
-								.append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
-								.append(Component.text("Generating a chest with one or more Book of Souls.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+			                   .append(Component.text("Found some problems on: " + soulDeprecatedTagMap.keySet().size(), NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
 		);
 
-		Location loc = player.getLocation().add(1, 0, 0);
-		Block block = loc.getBlock();
-		block.setType(Material.CHEST);
-		Chest chest = ((Chest)block.getState());
-		Inventory chestInventory = chest.getBlockInventory();
-		int startPoint = 0;
-		for (Map.Entry<Soul, List<String>> entry : soulDeprecatedTagMap.entrySet()) {
-			Soul soul = entry.getKey();
-			List<String> bossTags = entry.getValue();
+		if (spawnChest && !soulDeprecatedTagMap.isEmpty()) {
+			player.sendMessage(Component.empty()
+				                   .append(Component.text("[BossTag] ", NamedTextColor.GOLD).decoration(TextDecoration.BOLD, true))
+				                   .append(Component.text("Generating a chest with one or more Book of Souls.", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false))
+			);
 
-			ItemStack book = soul.getBoS();
-			ItemStack paper = buildPaper(soul.getLabel(), bossTags);
+			Location loc = player.getLocation();
+			Inventory chestInventory = null;
+			int startPoint = 0;
+			for (Map.Entry<Soul, List<String>> entry : soulDeprecatedTagMap.entrySet()) {
+				if (chestInventory == null || startPoint >= 26) {
+					// First chest, or previous chest is full: create a new one
+					startPoint = 0;
+					loc = loc.add(1, 0, 0);
+					while (loc.getBlock().getType() != Material.AIR) {
+						loc.add(1, 0, 0);
+					}
+					Block block = loc.getBlock();
+					block.setType(Material.CHEST);
+					Chest chest = ((Chest) block.getState());
+					chestInventory = chest.getBlockInventory();
+				}
 
-			chestInventory.addItem(book, paper);
-			startPoint += 2;
+				Soul soul = entry.getKey();
+				List<String> bossTags = entry.getValue();
 
-			if (startPoint >= 26) {
-				//the chest is full, create a new one
-				startPoint = 0;
-				loc = loc.add(1, 0, 0);
-				block = loc.getBlock();
-				block.setType(Material.CHEST);
-				chest = ((Chest)block.getState());
-				chestInventory = chest.getBlockInventory();
+				ItemStack book = soul.getBoS();
+				ItemStack paper = buildPaper(soul.getLabel(), bossTags);
+
+				chestInventory.addItem(book, paper);
+				startPoint += 2;
 			}
 		}
 
@@ -1108,6 +1191,11 @@ public class BossTagCommand {
 		);
 
 		player.sendMessage(Component.empty()
+			                   .append(Component.text("/bosstag list", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag list")))
+			                   .append(Component.text(" Lists all raw boss tags in the held BoS, and provides options to delete or edit specific tags.", NamedTextColor.GRAY))
+		);
+
+		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag search <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag search ")))
 			                   .append(Component.text(" Search the Library of Souls database for matching boss tags.", NamedTextColor.GRAY))
 		);
@@ -1126,6 +1214,11 @@ public class BossTagCommand {
 		player.sendMessage(Component.empty()
 			                   .append(Component.text("/bosstag info <boss_tag>", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag info ")))
 			                   .append(Component.text(" Display information about the boss tag selected including its default parameter values.", NamedTextColor.GRAY))
+		);
+
+		player.sendMessage(Component.empty()
+			                   .append(Component.text("/bosstag los_errors", NamedTextColor.GOLD).clickEvent(ClickEvent.suggestCommand("/bosstag los_errors")))
+			                   .append(Component.text(" Searches through the LoS to find any errors in boss tags, and spawns chests containing BopS with mobs in error. ", NamedTextColor.GRAY))
 		);
 
 		player.sendMessage(Component.empty()

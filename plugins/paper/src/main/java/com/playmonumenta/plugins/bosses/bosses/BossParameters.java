@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.BossPhasesList;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
@@ -12,20 +13,26 @@ import com.playmonumenta.plugins.bosses.parameters.StringReader;
 import com.playmonumenta.plugins.commands.BossTagCommand.TypeAndDesc;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 public abstract class BossParameters {
@@ -38,18 +45,52 @@ public abstract class BossParameters {
 				StringReader reader = new StringReader(tag);
 				reader.advance(identityTag);
 
+				Location mobLoc = boss.getLocation();
+				Component bossDescription = Objects.requireNonNullElseGet(boss.customName(), () -> Component.text("Unnamed " + boss.getType(), NamedTextColor.WHITE))
+					                            .append(Component.text(" (at x: " + mobLoc.getBlockX() + " y: " + mobLoc.getBlockY() + " z: " + mobLoc.getBlockZ() + ")", NamedTextColor.GRAY));
 				// Parse as many parameters as possible... but ignore the result, and just return the populated parameters
-				ParseResult<T> res = parseParameters(reader, parameters);
-				if (res.getResult() == null) {
-					Location mobLoc = boss.getLocation();
-					MMLog.warning("[BossParameters] problems during parsing tag for entity: " + boss.getName() + " | at x: " + mobLoc.getBlockX() + " y: " + mobLoc.getBlockY() + " z: " + mobLoc.getBlockZ() + " | on tag: " + tag);
-				}
+				parseParametersWithWarnings(bossDescription, reader, parameters, Plugin.IS_PLAY_SERVER ? Collections.emptyList() : boss.getWorld().getPlayers());
 			}
 		}
 		return parameters;
 	}
 
-	public static <T extends BossParameters> ParseResult<T> parseParameters(StringReader reader, T parameters) {
+	public static <T extends BossParameters> ParseResult<T> parseParametersWithWarnings(Component bossDescription, StringReader reader, T parameters, List<Player> receivingPlayers) {
+		ParseResult<T> res = parseParameters(reader, parameters, true);
+		if (res.getResult() == null) {
+			String readSoFar = reader.readSoFar();
+			String remaining = reader.remaining();
+			List<String> expected = Objects.requireNonNull(res.getTooltip()).stream().filter(Objects::nonNull).map(Tooltip::getSuggestion).map(s -> s.startsWith(readSoFar) ? s.substring(readSoFar.length()) : s).toList();
+			Component message = Component.text("[BossParameters] ", NamedTextColor.GOLD)
+				                    .append(Component.text("problems during parsing tag for ", NamedTextColor.RED))
+				                    .append(bossDescription)
+				                    .append(Component.text(" | on tag: ", NamedTextColor.RED))
+				                    .append(Component.text(reader.getString(), NamedTextColor.WHITE));
+			if (expected.isEmpty()) {
+				message = message.append(Component.text(" | unspecified error", NamedTextColor.RED));
+			} else {
+				message = message.append(Component.text(" | expected one of [", NamedTextColor.RED));
+				message = message.append(expected.stream().limit(8).map(e -> e.isEmpty() ? Component.text("<end>", NamedTextColor.RED) : Component.text(e, NamedTextColor.AQUA))
+					                         .reduce(Component.empty(), (c1, c2) -> c1.equals(Component.empty()) ? c2 : c1.append(Component.text(", ", NamedTextColor.RED)).append(c2)));
+				if (expected.size() > 8) {
+					message = message.append(Component.text(", and " + (expected.size() - 8) + " more possibilities", NamedTextColor.RED));
+				}
+				message = message.append(Component.text("]", NamedTextColor.RED));
+			}
+			message = message.append(Component.text(" at position " + readSoFar.length() + " (", NamedTextColor.RED))
+				          .append(Component.text(readSoFar.length() > 10 ? "..." + readSoFar.substring(readSoFar.length() - 10) : readSoFar, NamedTextColor.WHITE))
+				          .append(Component.text("<here>", NamedTextColor.RED))
+				          .append(Component.text(remaining.length() > 10 ? remaining.substring(0, 10) + "..." : remaining, NamedTextColor.WHITE))
+				          .append(Component.text(")", NamedTextColor.RED));
+			MMLog.warning(MessagingUtils.plainText(message));
+			for (Player player : receivingPlayers) {
+				player.sendMessage(message);
+			}
+		}
+		return res;
+	}
+
+	public static <T extends BossParameters> ParseResult<T> parseParameters(StringReader reader, T parameters, boolean fullSuggestions) {
 		String bossDescription = "undefined";
 		BossParam annotations = parameters.getClass().getAnnotation(BossParam.class);
 		if (annotations != null) {
@@ -77,40 +118,20 @@ public abstract class BossParameters {
 
 		Set<String> usedParams = new LinkedHashSet<>(fields.length);
 		boolean atLeastOneIter = false;
-		boolean containsDeprecatedField = false;
-		while (true) {
+		Set<String> deprecatedParameters = null;
+		while (!reader.advance("]")) {
 			// Require a comma to separate arguments the 2nd time through
-			if (atLeastOneIter) {
-				if (!reader.advance(",")) {
-					if (reader.advance("]")) {
-						ParseResult<T> res = ParseResult.of(parameters);
-						res.mContainsDeprecated = containsDeprecatedField;
-						return res;
-					} else {
-						return ParseResult.of(Tooltip.arrayOf(
-							Tooltip.ofString(reader.readSoFar() + ",", ""),
-							Tooltip.ofString(reader.readSoFar() + "]", "")
-						));
-					}
-				}
-			} else {
-				if (reader.advance("]")) {
-					ParseResult<T> res = ParseResult.of(parameters);
-					res.mContainsDeprecated = containsDeprecatedField;
-					return res;
-				}
+			if (atLeastOneIter
+				    && !reader.advance(",")) {
+				return ParseResult.of(Tooltip.arrayOf(
+					Tooltip.ofString(reader.readSoFar() + ",", ""),
+					Tooltip.ofString(reader.readSoFar() + "]", "")
+				));
 			}
 
 			atLeastOneIter = true;
 
 			try {
-				if (reader.advance("]")) {
-					// End!
-					ParseResult<T> res = ParseResult.of(parameters);
-					res.mContainsDeprecated = containsDeprecatedField;
-					return res;
-				}
-
 				String validKey = reader.readOneOf(validParams.keySet());
 				if (validKey == null) {
 					// Could not read a valid key. Either we haven't entered anything yet or possibly we match some but not others
@@ -118,7 +139,7 @@ public abstract class BossParameters {
 					String soFar = reader.readSoFar();
 					List<Tooltip<String>> suggArgs = new ArrayList<>(fields.length);
 					for (Map.Entry<String, TypeAndDesc> valid : validParams.entrySet()) {
-						if (valid.getKey().startsWith(remaining) && !usedParams.contains(valid.getKey()) && !valid.getValue().getDeprecated()) {
+						if ((valid.getKey().startsWith(remaining) || fullSuggestions) && !usedParams.contains(valid.getKey()) && !valid.getValue().getDeprecated()) {
 							Object def = valid.getValue().getField().get(parameters);
 							final String defStr;
 							if (def instanceof PotionEffectType) {
@@ -129,11 +150,7 @@ public abstract class BossParameters {
 								if (StringReader.COLOR_NAME_MAP.containsKey(color)) {
 									defStr = StringReader.COLOR_NAME_MAP.get(color);
 								} else {
-									String rgbDef = "" + ((Color) def).asRGB();
-									while (rgbDef.length() < 6) {
-										rgbDef = "0" + rgbDef;
-									}
-									defStr = "#" + rgbDef;
+									defStr = "#" + Integer.toString(color.asRGB(), 16);
 								}
 							} else {
 								defStr = def.toString();
@@ -150,7 +167,10 @@ public abstract class BossParameters {
 					}
 
 					if (validType.getDeprecated()) {
-						containsDeprecatedField = true;
+						if (deprecatedParameters == null) {
+							deprecatedParameters = new HashSet<>();
+						}
+						deprecatedParameters.add(validKey);
 					}
 
 					Class<?> validTypeClass = validType.getField().getType();
@@ -322,5 +342,9 @@ public abstract class BossParameters {
 				return ParseResult.of(Tooltip.arrayOf());
 			}
 		}
+
+		ParseResult<T> res = ParseResult.of(parameters);
+		res.mDeprecatedParameters = deprecatedParameters;
+		return res;
 	}
 }

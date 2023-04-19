@@ -102,6 +102,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("deprecation") // we have to use deprecated boss tags here still
 public class BossManager implements Listener {
 
 	/********************************************************************************

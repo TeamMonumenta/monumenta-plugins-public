@@ -88,14 +88,14 @@ public class BossPhasesList {
 		return new BossPhasesList(new ArrayList<>());
 	}
 
-	public static Tooltip<String>[] suggestionPhases(SuggestionInfo info) {
+	public static List<Tooltip<String>> suggestionPhases(SuggestionInfo info) {
 		StringReader reader = new StringReader(info.currentArg());
 		ParseResult<Phase> phaseParseResult = Phase.fromReader(reader);
 		if (phaseParseResult.getResult() == null) {
 			return Objects.requireNonNull(phaseParseResult.getTooltip());
 		}
 
-		return Tooltip.arrayOf();
+		return List.of();
 	}
 
 	public static ParseResult<BossPhasesList> fromReader(StringReader reader) {
