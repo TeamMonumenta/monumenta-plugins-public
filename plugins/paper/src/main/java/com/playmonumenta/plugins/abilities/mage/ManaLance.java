@@ -16,13 +16,11 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.RayTraceResult;
 
 public class ManaLance extends MultipleChargeAbility {
 
@@ -90,15 +88,10 @@ public class ManaLance extends MultipleChargeAbility {
 		double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, RANGE);
 		World world = mPlayer.getWorld();
 
-		RayTraceResult rayTraceResult = world.rayTraceBlocks(startLoc, mPlayer.getLocation().getDirection(), range, FluidCollisionMode.NEVER, true);
-		Location endLoc = (rayTraceResult != null ? rayTraceResult.getHitPosition() : startLoc.toVector().add(mPlayer.getLocation().getDirection().multiply(range))).toLocation(world);
-
-		if (rayTraceResult != null) {
-			mCosmetic.lanceHitBlock(mPlayer, rayTraceResult.getHitPosition().toLocation(world), world);
-		}
+		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, range, loc -> mCosmetic.lanceHitBlock(mPlayer, loc, world));
 
 		boolean hit = false;
-		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.2).getHitMobs()) {
+		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 			MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
 			if (!hit) {

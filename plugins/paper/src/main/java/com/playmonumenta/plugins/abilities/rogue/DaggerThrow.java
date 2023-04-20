@@ -10,17 +10,19 @@ import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DaggerThrowCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import java.util.List;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 public class DaggerThrow extends Ability {
@@ -82,12 +84,13 @@ public class DaggerThrow extends Ability {
 		if (isOnCooldown()) {
 			return;
 		}
-		Location loc = mPlayer.getEyeLocation();
-		Vector dir = loc.getDirection();
-		double adjustedRange = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE);
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, adjustedRange + 1, mPlayer);
+		putOnCooldown();
+
+		Location startLoc = mPlayer.getEyeLocation();
+		Vector dir = startLoc.getDirection();
+		double range = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DAGGER_THROW_RANGE);
 		World world = mPlayer.getWorld();
-		mCosmetic.daggerCastSound(world, loc);
+		mCosmetic.daggerCastSound(world, startLoc);
 
 		int daggers = DAGGER_THROW_DAGGERS + (int) CharmManager.getLevel(mPlayer, CHARM_DAGGERS);
 
@@ -98,36 +101,30 @@ public class DaggerThrow extends Ability {
 			Vector newDir = new Vector(FastUtils.cos(angle) * dir.getX() + FastUtils.sin(angle) * dir.getZ(), dir.getY(), FastUtils.cos(angle) * dir.getZ() - FastUtils.sin(angle) * dir.getX());
 			newDir.normalize();
 
-			// Since we want some hitbox allowance, we use bounding boxes instead of a raycast
-			BoundingBox box = BoundingBox.of(loc, 0.55, 0.55, 0.55);
+			RayTraceResult result = world.rayTrace(startLoc, newDir, range, FluidCollisionMode.NEVER, true, 0.425,
+				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
-			for (int i = 0; i <= adjustedRange; i++) {
-				box.shift(newDir);
-				Location bLoc = box.getCenter().toLocation(world);
-				mCosmetic.daggerLineEffect(bLoc, newDir, mPlayer);
-
-				for (LivingEntity mob : mobs) {
-					if (mob.getBoundingBox().overlaps(box)
-						&& MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
-						bLoc.subtract(newDir.clone().multiply(0.5));
-						mCosmetic.daggerHitEffect(world, loc, bLoc, mPlayer);
-
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
-						EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
-						if (isEnhanced()) {
-							EntityUtils.applySilence(mPlugin, DAGGER_THROW_SILENCE_DURATION, mob);
-						}
-						break;
-
-					} else if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-						bLoc.subtract(newDir.clone().multiply(0.5));
-						mCosmetic.daggerHitBlockEffect(bLoc, mPlayer);
-						break;
-					}
-				}
+			if (result == null) {
+				Location endLoc = startLoc.clone().add(newDir.multiply(range));
+				mCosmetic.daggerParticle(startLoc, endLoc, mPlayer);
+				continue;
 			}
+
+			Location endLoc = result.getHitPosition().toLocation(world);
+
+			if (result.getHitEntity() instanceof LivingEntity mob && MetadataUtils.checkOnceThisTick(mPlugin, mob, DAGGER_THROW_MOB_HIT_TICK)) {
+				mCosmetic.daggerHitEffect(world, startLoc, mob.getLocation(), mPlayer);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
+				EntityUtils.applyVulnerability(mPlugin, DAGGER_THROW_DURATION, mVulnAmplifier, mob);
+				if (isEnhanced()) {
+					EntityUtils.applySilence(mPlugin, DAGGER_THROW_SILENCE_DURATION, mob);
+				}
+			} else if (result.getHitBlock() != null) {
+				mCosmetic.daggerHitBlockEffect(endLoc, mPlayer);
+			}
+
+			mCosmetic.daggerParticle(startLoc, endLoc, mPlayer);
 		}
-		putOnCooldown();
 	}
 
 }

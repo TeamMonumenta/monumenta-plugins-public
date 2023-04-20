@@ -9,12 +9,12 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
@@ -22,6 +22,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,7 +31,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 public class GuardingBolt extends DepthsAbility {
@@ -62,68 +63,48 @@ public class GuardingBolt extends DepthsAbility {
 			return;
 		}
 
-		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
-		Location oLoc = mPlayer.getLocation();
-		World world = mPlayer.getWorld();
-		Vector dir = oLoc.getDirection();
-		List<Player> players = PlayerUtils.playersInRange(mPlayer.getEyeLocation(), RANGE, true);
-		players.remove(mPlayer);
+		Location startLoc = mPlayer.getEyeLocation();
+		Vector dir = startLoc.getDirection();
+		World world = startLoc.getWorld();
+		RayTraceResult result = world.rayTraceEntities(startLoc, dir, RANGE, 0.425,
+			e -> e instanceof Player player && player != mPlayer && player.getGameMode() != GameMode.SPECTATOR);
 
-		//Do not teleport to players who are in loot rooms
-		players.removeIf(p -> ZoneUtils.hasZoneProperty(p, ZoneUtils.ZoneProperty.LOOTROOM));
-
-		for (int i = 0; i < RANGE; i++) {
-			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(world);
-			boolean hasTeleported = false;
-			for (Player player : players) {
-				//Prevents bodyguarding to multiple people
-				if (hasTeleported) {
-					break;
-				}
-
-				// If looking at another player
-				if (player.getBoundingBox().overlaps(box)) {
-					putOnCooldown();
-
-					Location loc = mPlayer.getEyeLocation();
-					for (int j = 0; j < 45; j++) {
-						loc.add(dir.clone().multiply(0.33));
-						new PartialParticle(Particle.CLOUD, loc, 4, 0.25, 0.25, 0.25, 0f).spawnAsPlayerActive(mPlayer);
-						if (loc.distance(bLoc) < 1) {
-							break;
-						}
-					}
-
-					// Wind particles
-					for (int k = 0; k < 120; k++) {
-						double x = FastUtils.randomDoubleInRange(-3, 3);
-						double z = FastUtils.randomDoubleInRange(-3, 3);
-						Location to = player.getLocation().add(x, 0.15, z);
-						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						new PartialParticle(Particle.CLOUD, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4)).spawnAsPlayerActive(mPlayer);
-					}
-
-					// Yellow particles
-					for (int k = 0; k < 60; k++) {
-						double x = FastUtils.randomDoubleInRange(-3, 3);
-						double z = FastUtils.randomDoubleInRange(-3, 3);
-						Location to = player.getLocation().add(x, 0.15, z);
-						Vector pdir = LocationUtils.getDirectionTo(to, player.getLocation().add(0, 0.15, 0));
-						new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5), COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
-					}
-
-					Location userLoc = mPlayer.getLocation();
-					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-					if (userLoc.distance(player.getLocation()) > 1) {
-						mPlayer.teleport(targetLoc);
-						doDamage(targetLoc);
-						hasTeleported = true;
-					}
-
-					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
-				}
+		if (result != null && result.getHitEntity() instanceof Player targetPlayer) {
+			if (ZoneUtils.hasZoneProperty(targetPlayer, ZoneUtils.ZoneProperty.LOOTROOM)) {
+				return;
 			}
+
+			putOnCooldown();
+
+			new PPLine(Particle.CLOUD, mPlayer.getEyeLocation(), targetPlayer.getEyeLocation())
+				.countPerMeter(12)
+				.delta(0.25)
+				.spawnAsPlayerActive(mPlayer);
+
+			for (int k = 0; k < 120; k++) {
+				double x = FastUtils.randomDoubleInRange(-3, 3);
+				double z = FastUtils.randomDoubleInRange(-3, 3);
+				Location to = targetPlayer.getLocation().add(x, 0.15, z);
+				Vector pdir = LocationUtils.getDirectionTo(to, targetPlayer.getLocation().add(0, 0.15, 0));
+				new PartialParticle(Particle.CLOUD, targetPlayer.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.1, 0.4)).spawnAsPlayerActive(mPlayer);
+			}
+
+			for (int k = 0; k < 60; k++) {
+				double x = FastUtils.randomDoubleInRange(-3, 3);
+				double z = FastUtils.randomDoubleInRange(-3, 3);
+				Location to = targetPlayer.getLocation().add(x, 0.15, z);
+				Vector pdir = LocationUtils.getDirectionTo(to, targetPlayer.getLocation().add(0, 0.15, 0));
+				new PartialParticle(Particle.REDSTONE, targetPlayer.getLocation().add(0, 0.15, 0), 0, (float) pdir.getX(), 0f, (float) pdir.getZ(), FastUtils.randomDoubleInRange(0.15, 0.5), COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
+			}
+
+			Location userLoc = mPlayer.getLocation();
+			Location targetLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+			if (userLoc.distance(targetLoc) > 1) {
+				mPlayer.teleport(targetLoc);
+				doDamage(targetLoc);
+			}
+
+			world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
 		}
 	}
 

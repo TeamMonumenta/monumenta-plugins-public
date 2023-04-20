@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities.rogue;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -13,12 +12,12 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -106,16 +105,7 @@ public class AdvancingShadows extends Ability {
 			return;
 		}
 
-		LivingEntity entity = EntityUtils.getEntityAtCursor(
-			mPlayer,
-			(int) Math.ceil(mActivationRange),
-			AbilityManager.getManager().isPvPEnabled(mPlayer),
-			true,
-			true,
-			false,
-			(e) -> EntityUtils.isHostileMob(e)
-				&& !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)
-		);
+		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, mActivationRange);
 
 		if (entity == null) {
 			return;
@@ -192,7 +182,7 @@ public class AdvancingShadows extends Ability {
 				return;
 			}
 
-			if (loc.distance(entity.getLocation()) <= origDistance) {
+			if (loc.distance(entity.getLocation()) <= origDistance && !ZoneUtils.hasZoneProperty(loc, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
 				mPlayer.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 			}
 

@@ -738,6 +738,7 @@ public class CharmManager {
 			PredatorStrike.CHARM_DAMAGE,
 			PredatorStrike.CHARM_RADIUS,
 			PredatorStrike.CHARM_COOLDOWN,
+			PredatorStrike.CHARM_RANGE,
 			SplitArrow.CHARM_DAMAGE,
 			SplitArrow.CHARM_RANGE,
 			SplitArrow.CHARM_BOUNCES,

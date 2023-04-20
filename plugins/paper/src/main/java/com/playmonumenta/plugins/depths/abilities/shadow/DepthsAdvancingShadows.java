@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.depths.abilities.shadow;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -16,7 +15,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
@@ -59,16 +57,8 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 		if (isOnCooldown()) {
 			return;
 		}
-		LivingEntity entity = EntityUtils.getEntityAtCursor(
-			mPlayer,
-			ADVANCING_SHADOWS_RANGE,
-			AbilityManager.getManager().isPvPEnabled(mPlayer),
-			true,
-			true,
-			false,
-			(e) -> EntityUtils.isHostileMob(e)
-				&& !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)
-		);
+
+		LivingEntity entity = EntityUtils.getHostileEntityAtCursor(mPlayer, ADVANCING_SHADOWS_RANGE);
 
 		if (entity == null) {
 			return;

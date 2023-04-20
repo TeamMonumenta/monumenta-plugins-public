@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Color;
@@ -55,15 +56,17 @@ public class StarShurikenCS extends DaggerThrowCS {
 	}
 
 	@Override
-	public void daggerLineEffect(Location bLoc, Vector newDir, Player player) {
-		Vector starCentre = bLoc.toVector();
-		Vector direction = player.getLocation().clone().subtract(starCentre.clone()).getDirection();
+	public void daggerParticle(Location startLoc, Location endLoc, Player player) {
+		Vector direction = LocationUtils.getDirectionTo(endLoc, startLoc);
 		double angle = Math.atan2(direction.getX(), direction.getZ()) + Math.PI / 2;
-		double angle2 = (-Math.PI / 3) * bLoc.clone().distance(player.getLocation());
-		ArrayList<Vector> shuriken = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(4, 0.25, 0.2, false, false), 1);
+		for (int i = 0; i <= startLoc.distance(endLoc); i++) {
+			Location starCentre = startLoc.clone().add(direction.clone().multiply(i));
+			double angle2 = (-Math.PI / 3) * starCentre.clone().distance(player.getLocation());
+			ArrayList<Vector> shuriken = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(4, 0.25, 0.2, false, false), 1);
 
-		for (Vector v : shuriken) {
-			drawParticle(v.rotateAroundZ(angle2).rotateAroundY(angle).add(starCentre.clone()).toLocation(player.getWorld()), player);
+			for (Vector v : shuriken) {
+				drawParticle(v.rotateAroundZ(angle2).rotateAroundY(angle).add(starCentre.toVector()).toLocation(player.getWorld()), player);
+			}
 		}
 	}
 

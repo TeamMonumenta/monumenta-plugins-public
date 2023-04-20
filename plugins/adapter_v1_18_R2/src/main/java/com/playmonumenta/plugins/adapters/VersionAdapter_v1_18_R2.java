@@ -303,7 +303,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public void setAggressive(Creature entity, DamageAction action) {
 		PathfinderMob mob = ((CraftCreature) entity).getHandle();
-		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action));
+		mob.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(mob, action, true));
 		mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(mob, net.minecraft.world.entity.player.Player.class, true));
 	}
 
@@ -325,7 +325,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		}
 
 
-		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action) {
+		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action, true) {
 			@Override
 			protected double getAttackReachSqr(net.minecraft.world.entity.LivingEntity target) {
 				double x = mob.getX();
@@ -357,7 +357,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		for (WrappedGoal wrapped : list) {
 			entityCreature.targetSelector.removeGoal(wrapped);
 		}
-		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action) {
+		entityCreature.goalSelector.addGoal(0, new CustomMobAgroMeleeAttack18(entityCreature, action, true) {
 			@Override
 			protected double getAttackReachSqr(net.minecraft.world.entity.LivingEntity target) {
 				double x = mob.getX();

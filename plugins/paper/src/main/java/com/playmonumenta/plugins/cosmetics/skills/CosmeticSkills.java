@@ -31,7 +31,6 @@ import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.PrestigiousMoonbladeCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.PrestigiousStarfallCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.AstralWeaverCS;
-import com.playmonumenta.plugins.cosmetics.skills.rogue.DaggerOfNothingCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DecapitationCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.GalacticCloakCS;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.LightspeedCS;
@@ -148,8 +147,7 @@ public class CosmeticSkills {
 
 		//Deprecated or test only
 		DarkLanceCS::new,
-		HallowedLanceCS::new,
-		DaggerOfNothingCS::new
+		HallowedLanceCS::new
 	);
 
 	private static final ImmutableMap<String, Supplier<CosmeticSkill>> COSMETIC_SKILLS_BY_NAME = COSMETIC_SKILLS.stream()

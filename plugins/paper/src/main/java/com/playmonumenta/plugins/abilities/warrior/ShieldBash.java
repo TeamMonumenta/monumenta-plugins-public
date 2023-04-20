@@ -8,13 +8,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -69,42 +66,35 @@ public class ShieldBash extends Ability {
 		if (isOnCooldown() || mPlayer.isSneaking()) {
 			return;
 		}
+
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, SHIELD_BASH_RANGE);
+		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, range);
+
+		if (mob == null) {
+			return;
+		}
+
+		Location mobLoc = mob.getEyeLocation();
 		Location eyeLoc = mPlayer.getEyeLocation();
-		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), (int) CharmManager.getRadius(mPlayer, CHARM_RANGE, SHIELD_BASH_RANGE));
-		ray.mThroughBlocks = false;
-		ray.mThroughNonOccluding = false;
+		World world = eyeLoc.getWorld();
+		new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
+		world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1);
+		world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
 
-		RaycastData data = ray.shootRaycast();
-
-		List<LivingEntity> mobs = data.getEntities();
-		if (mobs != null && !mobs.isEmpty()) {
-			World world = mPlayer.getWorld();
-			for (LivingEntity mob : mobs) {
-				if (mob.isValid() && !mob.isDead() && EntityUtils.isHostileMob(mob)) {
-					Location mobLoc = mob.getEyeLocation();
-					new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
-					world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1);
-					world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
-
-					bash(mob, ClassAbility.SHIELD_BASH);
-					if (isLevelTwo()) {
-						Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS));
-						for (LivingEntity le : hitbox.getHitMobs(mob)) {
-							bash(le, ClassAbility.SHIELD_BASH_AOE);
-						}
-					}
-
-					if (isEnhanced()) {
-						mIsEnhancementUsed = false;
-					}
-					putOnCooldown();
-					break;
-				}
+		bash(mob, ClassAbility.SHIELD_BASH);
+		if (isLevelTwo()) {
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mob), CharmManager.getRadius(mPlayer, CHARM_RADIUS, SHIELD_BASH_2_RADIUS));
+			for (LivingEntity le : hitbox.getHitMobs(mob)) {
+				bash(le, ClassAbility.SHIELD_BASH_AOE);
 			}
 		}
 
+		if (isEnhanced()) {
+			mIsEnhancementUsed = false;
+		}
+		putOnCooldown();
 	}
 
 	@Override

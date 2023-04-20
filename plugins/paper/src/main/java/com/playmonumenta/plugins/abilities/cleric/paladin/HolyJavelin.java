@@ -11,11 +11,12 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Iterator;
-import java.util.List;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -27,7 +28,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,43 +120,27 @@ public class HolyJavelin extends Ability {
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
 		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.9f);
-		Location playerLoc = mPlayer.getEyeLocation();
-		Location location = playerLoc.clone();
-		Vector increment = location.getDirection();
-		new PartialParticle(Particle.EXPLOSION_NORMAL, location.clone().add(increment), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
+		Location startLoc = mPlayer.getEyeLocation();
+		Vector dir = startLoc.getDirection();
+		new PartialParticle(Particle.EXPLOSION_NORMAL, startLoc.clone().add(dir), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
 
-		// Get a list of all the mobs this could possibly hit (that are within range of the player)
-		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(location, range + HITBOX_LENGTH, mPlayer);
-		BoundingBox box = BoundingBox.of(playerLoc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-		for (double i = 0; i < range; i += HITBOX_LENGTH) {
-			box.shift(increment);
-			Location loc = box.getCenter().toLocation(world);
-			new PartialParticle(Particle.REDSTONE, loc, 22, 0.25, 0.25, 0.25, COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 2, 0f, 0f, 0f, 0.025f).spawnAsPlayerActive(mPlayer);
+		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, range, loc -> {
+			new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
+			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, 0.9f);
+		});
 
-			Iterator<LivingEntity> iterator = potentialTargets.iterator();
-			while (iterator.hasNext()) {
-				LivingEntity enemy = iterator.next();
-				if (enemy.getBoundingBox().overlaps(box)) {
-					double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
-					if (enemy != triggeringEnemy) {
-						// Triggering enemy would've already received the melee damage from Luminous
-						// Infusion
-						damage += bonusDamage;
-					}
-					EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
-					DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
-					iterator.remove();
-				}
+		new PPLine(Particle.EXPLOSION_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0).extra(0.025).spawnAsPlayerActive(mPlayer);
+		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(22).delta(0.25).data(COLOR).spawnAsPlayerActive(mPlayer);
+
+		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
+			double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
+			if (enemy != triggeringEnemy) {
+				// Triggering enemy would've already received the melee damage from Luminous Infusion
+				damage += bonusDamage;
 			}
-
-			if (!loc.isChunkLoaded() || loc.getBlock().getType().isSolid()) {
-				loc.subtract(increment.multiply(0.5));
-				new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
-				world.playSound(loc, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, 0.9f);
-				break;
-			}
+			EntityUtils.applyFire(mPlugin, FIRE_DURATION, enemy, mPlayer);
+			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
 		}
 	}
 }

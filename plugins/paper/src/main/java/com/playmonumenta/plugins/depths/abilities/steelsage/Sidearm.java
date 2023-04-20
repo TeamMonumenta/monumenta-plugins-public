@@ -9,14 +9,17 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.List;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,7 +28,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 public class Sidearm extends DepthsAbility {
@@ -57,50 +60,45 @@ public class Sidearm extends DepthsAbility {
 			return;
 		}
 		putOnCooldown();
-		Location loc = mPlayer.getEyeLocation();
-		BoundingBox box = BoundingBox.of(loc, 0.75, 0.75, 0.75);
-		Vector dir = loc.getDirection();
-		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer);
-		World world = mPlayer.getWorld();
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 2);
+		Location startLoc = mPlayer.getEyeLocation();
+		Vector dir = startLoc.getDirection();
+		World world = startLoc.getWorld();
+		RayTraceResult result = world.rayTrace(startLoc, dir, RANGE, FluidCollisionMode.NEVER, true, 0.425,
+			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
-		for (int i = 0; i < RANGE; i++) {
-			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(world);
-
-			new PartialParticle(Particle.SMOKE_NORMAL, bLoc, 6, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, bLoc, 18, 0.1, 0.1, 0.1, SIDEARM_COLOR).spawnAsPlayerActive(mPlayer);
-
-			if (bLoc.getBlock().getType().isSolid()) {
-				bLoc.subtract(dir.multiply(0.5));
-				new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
-				break;
-			}
-			for (LivingEntity mob : mobs) {
-				if (box.overlaps(mob.getBoundingBox())) {
-					DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
-					if (mob.isDead() || mob.getHealth() <= 0) {
-						mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.SIDEARM, getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
-					}
-
-					mob.setVelocity(new Vector(0, 0, 0));
-
-					new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-					world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
-
-					return;
-				}
-			}
-
-			if (i == 5) {
-				new PartialParticle(Particle.SQUID_INK, bLoc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
-			}
+		if (result == null) {
+			Location endLoc = startLoc.clone().add(dir.multiply(RANGE));
+			hitEffect(endLoc);
+			lineEffect(startLoc, endLoc);
+			return;
 		}
 
+		Location endLoc = result.getHitPosition().toLocation(world);
+		hitEffect(endLoc);
+		if (startLoc.distance(endLoc) > 5) {
+			hitEffect(startLoc.clone().add(startLoc.getDirection().multiply(5)));
+		}
+
+		if (result.getHitEntity() instanceof LivingEntity mob) {
+			DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
+			if (mob.isDead() || mob.getHealth() <= 0) {
+				mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.SIDEARM, getModifiedCooldown(COOLDOWN - KILL_COOLDOWN_REDUCTION));
+			}
+			mob.setVelocity(new Vector(0, 0, 0));
+		}
+
+		lineEffect(startLoc, endLoc);
+	}
+
+	private void lineEffect(Location startLoc, Location endLoc) {
+		new PPLine(Particle.SMOKE_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(6).minParticlesPerMeter(0).delta(0.05).extra(0.05).spawnAsPlayerActive(mPlayer);
+		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(18).delta(0.1).data(SIDEARM_COLOR).spawnAsPlayerActive(mPlayer);
+	}
+
+	private void hitEffect(Location loc) {
+		new PartialParticle(Particle.SQUID_INK, loc, 30, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+		loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0);
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {

@@ -2,17 +2,14 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -49,23 +46,9 @@ public class PlayerInventoryView implements Listener {
 			    && InventoryUtils.testForItemWithLore(mainHand, "* Skin :")
 			    && player.hasPermission(PERMISSION)) {
 
-			Location eyeLoc = player.getEyeLocation();
-			Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), 3);
-			ray.mThroughBlocks = false;
-			ray.mTargetPlayers = true;
-			ray.mThroughNonOccluding = false;
-			ray.mTargetNonPlayers = false;
-
-			RaycastData data = ray.shootRaycast();
-			List<LivingEntity> entities = data.getEntities();
-			if (entities != null && !entities.isEmpty()) {
-				//Below if check is almost certainly not necessary, but always be careful
-				if (data.getEntities().get(0) instanceof Player clickedPlayer) {
-					if (!clickedPlayer.equals(player)) {
-						inventoryView(event.getPlayer(), clickedPlayer);
-					}
-				}
-
+			Player clickedPlayer = EntityUtils.getPlayerAtCursor(player, 3);
+			if (clickedPlayer != null) {
+				inventoryView(player, clickedPlayer);
 			}
 		}
 	}

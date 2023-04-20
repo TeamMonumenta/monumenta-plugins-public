@@ -9,7 +9,9 @@ import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 import org.bukkit.Chunk;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -22,6 +24,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -695,5 +698,25 @@ public class LocationUtils {
 			hitbox = hitbox == null ? hb : hitbox.union(hb);
 		}
 		return hitbox != null && !hitbox.getHitPlayers(excludedPlayer, true).isEmpty();
+	}
+
+	public static Location rayTraceToBlock(Player player, double maxDist) {
+		return rayTraceToBlock(player, maxDist, null);
+	}
+
+	public static Location rayTraceToBlock(Player player, double maxDist, @Nullable Consumer<Location> onHitBlock) {
+		Location startLoc = player.getEyeLocation();
+		Vector dir = startLoc.getDirection();
+		World world = startLoc.getWorld();
+		RayTraceResult result = world.rayTraceBlocks(startLoc, dir, maxDist, FluidCollisionMode.NEVER, true);
+		if (result == null) {
+			return startLoc.clone().add(dir.multiply(maxDist));
+		} else {
+			Location hitLoc = result.getHitPosition().toLocation(world);
+			if (onHitBlock != null) {
+				onHitBlock.accept(hitLoc);
+			}
+			return hitLoc;
+		}
 	}
 }

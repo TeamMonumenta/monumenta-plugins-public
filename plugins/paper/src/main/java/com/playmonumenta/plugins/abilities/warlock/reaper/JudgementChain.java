@@ -201,17 +201,7 @@ public class JudgementChain extends Ability {
 		World world = mPlayer.getWorld();
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		LivingEntity e = EntityUtils.getEntityAtCursor(
-			mPlayer,
-			(int) range,
-			false,
-			true,
-			true,
-			true,
-			(entity) -> EntityUtils.isHostileMob(entity)
-				&& !ScoreboardUtils.checkTag(entity, AbilityUtils.IGNORE_TAG)
-				&& !EntityUtils.isBoss(entity)
-		);
+		LivingEntity e = EntityUtils.getHostileEntityAtCursor(mPlayer, range, entity -> !EntityUtils.isBoss(entity));
 
 		if (e != null) {
 			mTarget = e;

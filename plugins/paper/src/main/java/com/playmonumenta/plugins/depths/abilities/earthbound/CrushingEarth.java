@@ -10,12 +10,9 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -54,33 +51,25 @@ public class CrushingEarth extends DepthsAbility {
 			return;
 		}
 
-		Location eyeLoc = mPlayer.getEyeLocation();
-		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), CAST_RANGE);
-		ray.mThroughBlocks = false;
-		ray.mThroughNonOccluding = false;
+		LivingEntity mob = EntityUtils.getHostileEntityAtCursor(mPlayer, CAST_RANGE);
 
-		RaycastData data = ray.shootRaycast();
-
-		List<LivingEntity> mobs = data.getEntities();
-		if (mobs != null && !mobs.isEmpty()) {
-			World world = mPlayer.getWorld();
-			for (LivingEntity mob : mobs) {
-				if (mob.isValid() && !mob.isDead() && EntityUtils.isHostileMob(mob)) {
-					Location mobLoc = mob.getEyeLocation();
-					new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SPIT, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
-					world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
-					world.playSound(eyeLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.0f);
-
-					EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], mob);
-					DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
-
-					putOnCooldown();
-					break;
-				}
-			}
+		if (mob == null) {
+			return;
 		}
+
+		Location mobLoc = mob.getEyeLocation();
+		Location eyeLoc = mPlayer.getEyeLocation();
+		World world = eyeLoc.getWorld();
+		new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPIT, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
+		world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		world.playSound(eyeLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.5f, 1.0f);
+
+		EntityUtils.applyStun(mPlugin, STUN_DURATION[mRarity - 1], mob);
+		DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, DAMAGE[mRarity - 1], mInfo.getLinkedSpell());
+
+		putOnCooldown();
 	}
 
 

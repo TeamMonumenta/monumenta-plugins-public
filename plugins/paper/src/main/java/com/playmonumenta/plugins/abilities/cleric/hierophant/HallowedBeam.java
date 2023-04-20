@@ -26,8 +26,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Locale;
+import java.util.function.Predicate;
 import org.bukkit.Bukkit;
-import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,7 +37,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,7 +93,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 		HEALING("Healing"),
 		ATTACK("Attack");
 
-		private String mLabel;
+		private final String mLabel;
 
 		Mode(String label) {
 			mLabel = label;
@@ -121,29 +120,16 @@ public class HallowedBeam extends MultipleChargeAbility {
 	}
 
 	public void cast() {
-		Player player = mPlayer;
 		World world = mPlayer.getWorld();
 
-		RayTraceResult raytrace = world.rayTrace(
-			mPlayer.getEyeLocation(),
-			player.getLocation().getDirection(),
-			(int) CharmManager.getRadius(mPlayer, CHARM_DISTANCE, CAST_RANGE),
-			FluidCollisionMode.NEVER,
-			true,
-			0.425, // For future reference, you can increase or decrease this number to change the hitbox size for entity raytracing.
-			e -> e != player
-				&& e instanceof LivingEntity
-				&& ((mMode != Mode.ATTACK && e instanceof Player p && p.getGameMode() != GameMode.SPECTATOR)
-				|| (mMode != Mode.HEALING && EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG)))
-		);
+		double range = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, CAST_RANGE);
+		Predicate<Entity> playerFilter = e -> mMode != Mode.ATTACK && e instanceof Player p && p != mPlayer && p.getGameMode() != GameMode.SPECTATOR;
+		Predicate<Entity> hostileFilter = e -> mMode != Mode.HEALING && EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid();
+		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, range, playerFilter.or(hostileFilter));
 
-		if (raytrace == null || raytrace.getHitEntity() == null) {
+		if (e == null) {
 			return;
 		}
-		LivingEntity e = (LivingEntity) raytrace.getHitEntity();
-
-		PlayerInventory inventory = mPlayer.getInventory();
-		ItemStack inMainHand = inventory.getItemInMainHand();
 
 		int ticks = Bukkit.getServer().getCurrentTick();
 		// Prevent double casting on accident
@@ -152,9 +138,12 @@ public class HallowedBeam extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
+		PlayerInventory inventory = mPlayer.getInventory();
+		ItemStack inMainHand = inventory.getItemInMainHand();
+
 		//Unsure why the runnable needs to exist, but it breaks if I don't have it
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			Location loc = player.getEyeLocation();
+			Location loc = mPlayer.getEyeLocation();
 			Vector dir = loc.getDirection();
 
 			LivingEntity targetedEntity = e;
@@ -191,7 +180,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 					DamageUtils.damage(mPlayer, targetedEntity, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 
 					if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT) > 0) {
-						EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, player);
+						EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, mPlayer);
 					}
 
 					stunDuration = HALLOWED_UNDEAD_STUN;

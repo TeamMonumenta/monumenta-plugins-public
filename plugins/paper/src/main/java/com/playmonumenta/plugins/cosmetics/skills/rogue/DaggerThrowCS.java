@@ -12,7 +12,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 public class DaggerThrowCS implements CosmeticSkill {
 
@@ -34,16 +33,16 @@ public class DaggerThrowCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.9f, 1.0f);
 	}
 
-	public void daggerLineEffect(Location bLoc, Vector newDir, Player mPlayer) {
-		new PPLine(Particle.REDSTONE, bLoc, newDir, 0.9).countPerMeter(10).delta(0.1).data(DAGGER_THROW_COLOR).spawnAsPlayerActive(mPlayer);
+	public void daggerParticle(Location startLoc, Location endLoc, Player player) {
+		new PPLine(Particle.REDSTONE, startLoc, endLoc).countPerMeter(10).delta(0.1).data(DAGGER_THROW_COLOR).spawnAsPlayerActive(player);
 	}
 
-	public void daggerHitEffect(World world, Location loc, Location bLoc, Player mPlayer) {
-		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
+	public void daggerHitEffect(World world, Location loc, Location bLoc, Player player) {
+		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(player);
 		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.4f, 2.5f);
 	}
 
-	public void daggerHitBlockEffect(Location bLoc, Player mPlayer) {
-		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
+	public void daggerHitBlockEffect(Location bLoc, Player player) {
+		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(player);
 	}
 }

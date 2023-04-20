@@ -15,16 +15,17 @@ import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.bukkit.Color;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -36,7 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +57,7 @@ public class PredatorStrike extends Ability {
 	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
 	public static final String CHARM_RADIUS = "Predator Strike Radius";
+	public static final String CHARM_RANGE = "Predator Strike Range";
 
 	public static final AbilityInfo<PredatorStrike> INFO =
 		new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
@@ -128,50 +130,24 @@ public class PredatorStrike extends Ability {
 
 		Location loc = mPlayer.getEyeLocation();
 		Vector direction = loc.getDirection();
-		Vector shift = direction.normalize().multiply(HITBOX_LENGTH);
-		BoundingBox box = BoundingBox.of(loc, HITBOX_LENGTH, HITBOX_LENGTH, HITBOX_LENGTH);
-		box.shift(direction);
+		World world = loc.getWorld();
 
-		World world = mPlayer.getWorld();
-		mCosmetic.strikeLaunch(world, mPlayer);
+		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
+		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
+			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
-		Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, MAX_RANGE));
-
-		boolean hit = false;
-		for (double r = 0; r < MAX_RANGE; r += HITBOX_LENGTH) {
-			Location bLoc = box.getCenter().toLocation(world);
-			mCosmetic.strikeParticleProjectile(mPlayer, bLoc);
-
-			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-				bLoc.subtract(direction.multiply(0.5));
-				mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-				explode(bLoc);
-				hit = true;
-				break;
-			}
-
-			for (LivingEntity mob : nearbyMobs) {
-				if (mob.getBoundingBox().overlaps(box)) {
-					if (EntityUtils.isHostileMob(mob)) {
-						mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
-						explode(bLoc);
-						hit = true;
-						break;
-					}
-				}
-			}
-
-			if (hit) {
-				break;
-			}
-			box.shift(shift);
-		}
-		if (!hit) {
-			Location bLoc = box.getCenter().toLocation(world);
+		if (result == null) {
 			if (mCosmetic instanceof FireworkStrikeCS) {
-				mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, bLoc, mExplodeRadius), bLoc, mPlayer);
+				Location endLoc = loc.clone().add(direction.multiply(range));
+				mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
 			}
+			return true;
 		}
+
+		Location endLoc = result.getHitPosition().toLocation(world);
+		mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
+		explode(endLoc);
+
 		return true;
 	}
 

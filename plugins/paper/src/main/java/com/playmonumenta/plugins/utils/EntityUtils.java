@@ -26,8 +26,6 @@ import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.point.Raycast;
-import com.playmonumenta.plugins.point.RaycastData;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.ArrayList;
@@ -45,6 +43,8 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -64,6 +64,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -385,19 +386,32 @@ public class EntityUtils {
 		return false;
 	}
 
-	/**
-	 * Get the nearest entity that the player is looking at
-	 *
-	 * @param player              player
-	 * @param range               range
-	 * @param targetPlayers       should we target players?
-	 * @param targetNonPlayers    should we target non-players?
-	 * @param checkLos            should we require line of sight?
-	 * @param throughNonOccluding should transparent blocks block line of sight?
-	 * @return entity
-	 */
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding) {
-		return getEntityAtCursor(player, range, targetPlayers, targetNonPlayers, checkLos, throughNonOccluding, (t) -> true);
+	public static @Nullable Player getPlayerAtCursor(Player player, double range) {
+		return getPlayerAtCursor(player, range, null);
+	}
+
+	public static @Nullable Player getPlayerAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		Predicate<Entity> playerFilter = e -> e instanceof Player p && p != player && p.getGameMode() != GameMode.SPECTATOR;
+		if (filter != null) {
+			playerFilter = playerFilter.and(filter);
+		}
+		return (Player) getEntityAtCursor(player, range, playerFilter);
+	}
+
+	public static @Nullable LivingEntity getHostileEntityAtCursor(Player player, double range) {
+		return getHostileEntityAtCursor(player, range, null);
+	}
+
+	public static @Nullable LivingEntity getHostileEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		Predicate<Entity> hostileFilter = e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid();
+		if (filter != null) {
+			hostileFilter = hostileFilter.and(filter);
+		}
+		return getEntityAtCursor(player, range, hostileFilter);
+	}
+
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range) {
+		return getEntityAtCursor(player, range, null);
 	}
 
 	/**
@@ -405,28 +419,18 @@ public class EntityUtils {
 	 *
 	 * @param player              player
 	 * @param range               range
-	 * @param targetPlayers       should we target players?
-	 * @param targetNonPlayers    should we target non-players?
-	 * @param checkLos            should we require line of sight?
-	 * @param throughNonOccluding should transparent blocks block line of sight?
 	 * @param filter              predicate to filter mobs
 	 * @return entity
 	 */
-	public static @Nullable LivingEntity getEntityAtCursor(Player player, int range, boolean targetPlayers, boolean targetNonPlayers, boolean checkLos, boolean throughNonOccluding, Predicate<Entity> filter) {
+	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		World world = player.getWorld();
 		Location eyeLoc = player.getEyeLocation();
-		Raycast ray = new Raycast(eyeLoc, eyeLoc.getDirection(), range);
-		ray.mThroughBlocks = !checkLos;
-		ray.mThroughNonOccluding = throughNonOccluding;
-		ray.mTargetPlayers = targetPlayers;
-		ray.mTargetNonPlayers = targetNonPlayers;
-
-		RaycastData data = ray.shootRaycast();
-
-		return data.getEntities().stream()
-			.filter(e -> e.isValid() && e != player)
-			.filter(filter)
-			.findFirst()
-			.orElse(null);
+		// Stole 0.425 ray size from hallowed beam. Could be made into an argument, but it's probably good that it is consistent everywhere
+		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, 0.425, filter);
+		if (result != null && result.getHitEntity() instanceof LivingEntity le) {
+			return le;
+		}
+		return null;
 	}
 
 	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends Projectile> projectileClass) {

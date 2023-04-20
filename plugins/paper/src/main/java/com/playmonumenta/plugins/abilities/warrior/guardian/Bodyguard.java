@@ -13,10 +13,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,7 +23,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class Bodyguard extends Ability {
@@ -79,71 +76,51 @@ public class Bodyguard extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		Location oLoc = mPlayer.getLocation();
+		Location userLoc = mPlayer.getLocation();
 
-		BoundingBox box = BoundingBox.of(mPlayer.getEyeLocation(), 1, 1, 1);
-		Vector dir = oLoc.getDirection();
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
-		List<Player> players = PlayerUtils.otherPlayersInRange(mPlayer, range, true);
-		boolean foundPlayer = false;
-		for (int i = 0; i < range; i++) {
-			box.shift(dir);
-			Location bLoc = box.getCenter().toLocation(world);
-			if (!bLoc.isChunkLoaded() || bLoc.getBlock().getType().isSolid()) {
-				break;
+		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, range);
+		if (targetPlayer != null) {
+			new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), targetPlayer.getEyeLocation())
+				.countPerMeter(12)
+				.delta(0.25)
+				.spawnAsPlayerActive(mPlayer);
+
+			new PPExplosion(Particle.FLAME, targetPlayer.getLocation().add(0, 0.15, 0))
+				.flat(true)
+				.speed(1)
+				.count(120)
+				.extraRange(0.1, 0.4)
+				.spawnAsPlayerActive(mPlayer);
+
+			new PPExplosion(Particle.EXPLOSION_NORMAL, targetPlayer.getLocation().add(0, 0.15, 0))
+				.flat(true)
+				.speed(1)
+				.count(60)
+				.extraRange(0.15, 0.5)
+				.spawnAsPlayerActive(mPlayer);
+
+			Vector dir = userLoc.getDirection();
+			Location targetLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
+
+			world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.75f, 0.75f);
+			world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
+
+			giveAbsorption(targetPlayer);
+
+			if (userLoc.distance(targetLoc) > 1
+				    && !ZoneUtils.hasZoneProperty(userLoc, ZoneProperty.NO_MOBILITY_ABILITIES)
+				    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
+				mPlayer.teleport(targetLoc);
 			}
-
-			for (Player player : players) {
-				// If looking at another player
-				if (player.getBoundingBox().overlaps(box)) {
-					new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), bLoc)
-						.countPerMeter(12)
-						.delta(0.25, 0.25, 0.25)
-						.spawnAsPlayerActive(mPlayer);
-
-					// Flame
-					new PPExplosion(Particle.FLAME, player.getLocation().add(0, 0.15, 0))
-						.flat(true)
-						.speed(1)
-						.count(120)
-						.extraRange(0.1, 0.4)
-						.spawnAsPlayerActive(mPlayer);
-
-					// Explosion_Normal
-					new PPExplosion(Particle.EXPLOSION_NORMAL, player.getLocation().add(0, 0.15, 0))
-						.flat(true)
-						.speed(1)
-						.count(60)
-						.extraRange(0.15, 0.5)
-						.spawnAsPlayerActive(mPlayer);
-
-					Location userLoc = mPlayer.getLocation();
-					Location targetLoc = player.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-
-					world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.75f, 0.75f);
-					world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
-
-					giveAbsorption(player);
-
-					if (userLoc.distance(player.getLocation()) > 1
-						    && !ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)
-						    && !ZoneUtils.hasZoneProperty(targetLoc, ZoneProperty.NO_MOBILITY_ABILITIES)) {
-						mPlayer.teleport(targetLoc);
-					}
-
-					foundPlayer = true;
-					break;
-				}
-			}
-		}
-		if (!foundPlayer && !allowSelfCast) {
+		} else if (!allowSelfCast) {
 			return;
 		}
 
 		putOnCooldown();
 
-		world.playSound(oLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
-		new PartialParticle(Particle.FLAME, oLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
+		world.playSound(userLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
+		new PartialParticle(Particle.FLAME, userLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 
 		giveAbsorption(mPlayer);
 
