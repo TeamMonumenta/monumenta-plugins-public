@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -9,9 +10,7 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.EnumSet;
 import java.util.HashMap;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,14 +35,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class SilverBolts extends SpellBaseSeekingProjectile {
-
-	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
-		Material.COMMAND_BLOCK,
-		Material.CHAIN_COMMAND_BLOCK,
-		Material.REPEATING_COMMAND_BLOCK,
-		Material.BEDROCK,
-		Material.BARRIER
-	);
 
 	private final LivingEntity mLauncher;
 	private final Plugin mPlugin;
@@ -180,21 +171,10 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 		MessagingUtils.sendActionBarMessage(player, ChatColor.RED + "You have 50% reduced healing for 10s");
 
 		Location loc = player.getLocation();
-		HashMap<Block, BlockData> oldBlocks = new HashMap<>();
 		CAGE_LOCATIONS.forEach((offset, data) -> {
 			Block block = loc.clone().add(offset).getBlock();
-			if (!IGNORED_MATS.contains(block.getType())) {
-				oldBlocks.put(block, block.getBlockData());
-				block.setBlockData(data);
-			}
+			TemporaryBlockChangeManager.INSTANCE.changeBlock(block, data, CAGE_DURATION);
 		});
 
-		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			oldBlocks.forEach((block, blockData) -> {
-				if (!block.getType().isAir()) {
-					block.setBlockData(blockData);
-				}
-			});
-		}, SilverBolts.CAGE_DURATION);
 	}
 }

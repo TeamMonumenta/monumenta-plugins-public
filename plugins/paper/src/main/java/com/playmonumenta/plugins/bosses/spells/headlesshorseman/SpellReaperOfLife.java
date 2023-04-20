@@ -69,6 +69,7 @@ public class SpellReaperOfLife extends Spell {
 		try {
 			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.JACK_O_LANTERN.createBlockData());
 			fallingBlock.setDropItem(false);
+			EntityUtils.disableBlockPlacement(fallingBlock);
 
 			Location pLoc = mCenter;
 			Location tLoc = fallingBlock.getLocation();
@@ -103,7 +104,6 @@ public class SpellReaperOfLife extends Spell {
 				public void run() {
 					if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 						fallingBlock.remove();
-						fallingBlock.getLocation().getBlock().setType(Material.AIR);
 
 						List<Player> players = PlayerUtils.playersInRange(mCenter, mRange, true);
 						if (players.size() == 0) {

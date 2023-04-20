@@ -15,10 +15,12 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Spell implements Cloneable {
-	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<BukkitRunnable>();
+	protected final Set<BukkitRunnable> mActiveRunnables = new LinkedHashSet<>();
+	protected final Set<BukkitTask> mActiveTasks = new LinkedHashSet<>();
 
 	/*
 	 * Used by some spells to indicate if they can be run
@@ -41,12 +43,19 @@ public abstract class Spell implements Cloneable {
 		 * Iterate over a copy of mActiveRunnables and cancel each task that isn't already cancelled.
 		 * Need to iterate over a copy because some runnables remove themselves from mActiveRunnables when cancelled
 		 */
-		new ArrayList<>(mActiveRunnables).forEach((runnable) -> {
+		for (BukkitRunnable runnable : new ArrayList<>(mActiveRunnables)) {
 			if (!runnable.isCancelled()) {
 				runnable.cancel();
 			}
-		});
+		}
 		mActiveRunnables.clear();
+
+		for (BukkitTask task : new ArrayList<>(mActiveTasks)) {
+			if (!task.isCancelled()) {
+				task.cancel();
+			}
+		}
+		mActiveTasks.clear();
 	}
 
 	/**
@@ -71,7 +80,7 @@ public abstract class Spell implements Cloneable {
 	 * By default, this checks if there are active runnables, but may be overridden by spells to be more specific.
 	 */
 	public boolean isRunning() {
-		return mActiveRunnables.stream().anyMatch(r -> !r.isCancelled());
+		return mActiveRunnables.stream().anyMatch(r -> !r.isCancelled()) || mActiveTasks.stream().anyMatch(r -> !r.isCancelled());
 	}
 
 	public void onDamage(DamageEvent event, LivingEntity damagee) {

@@ -13,17 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -95,14 +92,6 @@ public class TowerManager implements Listener {
 				TowerGame.clearPlayer(player);
 				//clearing all the tags
 			}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	public void onBlockChange(EntityChangeBlockEvent event) {
-		//this is used for when Eldrask use GreatSword Slam
-		if (event.getEntity() instanceof FallingBlock && ((FallingBlock)event.getEntity()).getBlockData().getMaterial() == Material.BLUE_ICE && event.getEntity().getScoreboardTags().contains(TowerConstants.FALLING_BLOCK_TAG)) {
-			event.setCancelled(true);
 		}
 	}
 

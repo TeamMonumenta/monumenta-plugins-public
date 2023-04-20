@@ -198,6 +198,8 @@ public class SpellFinalCrystal extends Spell {
 			for (int i = 0; i < 5; i++) {
 				//Velocity randomized of the frosted ice as a falling block
 				FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.CRYING_OBSIDIAN));
+				block.setDropItem(false);
+				EntityUtils.disableBlockPlacement(block);
 				block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-0.55, 0.55), FastUtils.randomDoubleInRange(0.25, 1), FastUtils.randomDoubleInRange(-0.55, 0.55)));
 
 				PPCircle indicator = new PPCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 4).ringMode(true).count(12).delta(0.2, 0, 0.2);
@@ -209,7 +211,6 @@ public class SpellFinalCrystal extends Spell {
 						// horseman bomb toss copy and paste
 						if (block.isOnGround() || !block.isValid()) {
 							block.remove();
-							block.getLocation().getBlock().setType(Material.AIR);
 							//limit particle count for ability stacking
 							world.playSound(block.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 							Location loc = block.getLocation();

@@ -3,18 +3,21 @@ package com.playmonumenta.plugins.bosses.spells.frostgiant;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
-
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -127,6 +130,7 @@ public class SpellFallingIcicle extends Spell {
 		for (FallingBlock ice : ices) {
 			ice.setVelocity(new Vector(0, -2, 0));
 			ice.setDropItem(false);
+			EntityUtils.disableBlockPlacement(ice);
 		}
 
 		FallingBlock ice = ices.get(0);
@@ -148,9 +152,6 @@ public class SpellFallingIcicle extends Spell {
 					new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
 					for (FallingBlock b : ices) {
 						Location bLoc = b.getLocation();
-						if (bLoc.getBlock().getType() == Material.ICE || bLoc.getBlock().getType() == Material.FROSTED_ICE) {
-							bLoc.getBlock().setType(Material.AIR);
-						}
 						bLoc.add(0, -1, 0);
 						if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
 							bLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);
@@ -165,9 +166,6 @@ public class SpellFallingIcicle extends Spell {
 					new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation(), 40, 0, 0, 0, 1, Bukkit.createBlockData(Material.ICE)).spawnAsEntityActive(mBoss);
 					for (FallingBlock b : ices) {
 						Location bLoc = b.getLocation();
-						if (bLoc.getBlock().getType() == Material.ICE || bLoc.getBlock().getType() == Material.FROSTED_ICE) {
-							bLoc.getBlock().setType(Material.AIR);
-						}
 						bLoc.add(0, -1, 0);
 						if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
 							bLoc.getBlock().setType(Material.CRACKED_STONE_BRICKS);

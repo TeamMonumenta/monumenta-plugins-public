@@ -94,6 +94,7 @@ public class SpellHellzoneGrenade extends Spell {
 		try {
 			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.JACK_O_LANTERN.createBlockData());
 			fallingBlock.setDropItem(false);
+			EntityUtils.disableBlockPlacement(fallingBlock);
 
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
@@ -119,7 +120,6 @@ public class SpellHellzoneGrenade extends Spell {
 						fallingBlock.remove();
 						Location loc = fallingBlock.getLocation();
 
-						loc.getBlock().setType(Material.AIR);
 						new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
 						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();

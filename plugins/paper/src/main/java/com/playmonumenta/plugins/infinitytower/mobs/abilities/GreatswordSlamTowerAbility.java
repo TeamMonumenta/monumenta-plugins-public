@@ -3,24 +3,22 @@ package com.playmonumenta.plugins.infinitytower.mobs.abilities;
 import com.destroystokyo.paper.entity.Pathfinder;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.infinitytower.TowerConstants;
 import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -30,9 +28,9 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -41,6 +39,8 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class GreatswordSlamTowerAbility extends TowerAbility {
+
+	private static final Material ICE_TYPE = Material.FROSTED_ICE;
 
 	private static final double DEG = 50;
 	private static final int DAMAGE = 8;
@@ -57,14 +57,9 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 
 		BLACKLIST_MATERIALS.add(Material.BEDROCK);
 		BLACKLIST_MATERIALS.add(Material.BARRIER);
-
 	}
 
-
 	private static final Particle.DustOptions BLUE_COLOR = new Particle.DustOptions(Color.fromRGB(66, 185, 245), 1.0f);
-
-	//Starts deleting ice immediately when this is true
-	private final boolean mDeleteIce = false;
 
 	public GreatswordSlamTowerAbility(Plugin plugin, String identityTag, LivingEntity boss, TowerGame game, TowerMob mob, boolean isPlayerMob) {
 		super(plugin, identityTag, boss, game, mob, isPlayerMob);
@@ -82,13 +77,9 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 				Vector bossDir = mBoss.getLocation().getDirection();
 				Location loc = mBoss.getLocation();
 
-				//Saves locations for places to convert from frosted ice back to its original block
-				Map<Location, Material> oldBlocks = new HashMap<>();
-				Map<Location, BlockData> oldData = new HashMap<>();
-
-
 				BukkitRunnable runnable1 = new BukkitRunnable() {
 					int mT = 0;
+
 					@Override
 					public void run() {
 
@@ -182,14 +173,12 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 
 											//Put less frosted ice than the entire cone
 											if (degree % 10 == 0) {
-												if (l.getBlock().getType() != Material.FROSTED_ICE) {
-													oldBlocks.put(l, l.getBlock().getType());
-													oldData.put(l, l.getBlock().getBlockData());
+												Block block = l.getBlock();
+												if (TemporaryBlockChangeManager.INSTANCE.changeBlock(block, ICE_TYPE, DURATION - mRadius + FastUtils.randomIntInRange(0, 10))) {
+													Ageable age = (Ageable) block.getBlockData();
+													age.setAge(1 + FastUtils.RANDOM.nextInt(3));
+													block.setBlockData(age);
 												}
-												l.getBlock().setType(Material.FROSTED_ICE);
-												Ageable age = (Ageable) l.getBlock().getBlockData();
-												age.setAge(1 + FastUtils.RANDOM.nextInt(3));
-												l.getBlock().setBlockData(age);
 											}
 
 											//15 -> 3.65 lol
@@ -198,18 +187,15 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 
 											FallingBlock fallBlock = world.spawnFallingBlock(l.add(0, 0.4, 0), Bukkit.createBlockData(Material.BLUE_ICE));
 											fallBlock.setDropItem(false);
+											EntityUtils.disableBlockPlacement(fallBlock);
 											fallBlock.setVelocity(new Vector(0, 0.4, 0));
 											fallBlock.setHurtEntities(false);
-											fallBlock.addScoreboardTag(TowerConstants.FALLING_BLOCK_TAG);
 
 											new BukkitRunnable() {
 												@Override
 												public void run() {
-													if (!fallBlock.isDead() || fallBlock.isValid()) {
+													if (fallBlock.isValid()) {
 														fallBlock.remove();
-														if (fallBlock.getLocation().getBlock().getType() == Material.BLUE_ICE) {
-															fallBlock.getLocation().getBlock().setType(Material.AIR);
-														}
 													}
 												}
 											}.runTaskLater(mPlugin, 15);
@@ -249,63 +235,19 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 				runnable2.runTaskTimer(mPlugin, 0, 2);
 				mActiveRunnables.add(runnable2);
 
-
-				//Revert frosted ice after 60 seconds, and also damage players that step on it during that
-				new BukkitRunnable() {
+				mActiveTasks.add(new BukkitRunnable() {
 					int mT = 0;
+
 					@Override
 					public void run() {
 
 						//Stop running after duration seconds
-						if (mT >= DURATION || mBoss.isDead() || !mBoss.isValid() || mDeleteIce || mGame.isTurnEnded() || mGame.isGameEnded()) {
-							new BukkitRunnable() {
-								int mTicks = 0;
-								final Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
-								@Override
-								public void run() {
-									mTicks++;
-
-									if (mTicks >= 20 * 3 || !mBlocks.hasNext()) {
-										while (mBlocks.hasNext()) {
-											Map.Entry<Location, Material> e = mBlocks.next();
-											if (e.getKey().getBlock().getType() == Material.FROSTED_ICE) {
-												e.getKey().getBlock().setType(e.getValue());
-												if (oldData.containsKey(e.getKey())) {
-													e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-												}
-											}
-											mBlocks.remove();
-										}
-
-										this.cancel();
-									} else {
-										//Remove 50 blocks per tick
-										for (int i = 0; i < 50; i++) {
-											if (!mBlocks.hasNext()) {
-												break;
-											}
-											Map.Entry<Location, Material> e = mBlocks.next();
-											//If doing shatter, wait for another tick
-											if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-												break;
-											}
-											if (e.getKey().getBlock().getType() == Material.FROSTED_ICE) {
-												e.getKey().getBlock().setType(e.getValue());
-												if (oldData.containsKey(e.getKey())) {
-													e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-												}
-											}
-											mBlocks.remove();
-										}
-									}
-								}
-							}.runTaskTimer(mPlugin, 0, 1);
-
+						if (mT >= DURATION || mBoss.isDead() || !mBoss.isValid() || mGame.isTurnEnded() || mGame.isGameEnded()) {
 							this.cancel();
 						}
 						for (LivingEntity target : new ArrayList<>(mIsPlayerMob ? mGame.mFloorMobs : mGame.mPlayerMobs)) {
 							if ((target.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || target.getLocation().getBlock().getType() != Material.AIR)
-								&& (target.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || target.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
+								    && (target.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == ICE_TYPE || target.getLocation().getBlock().getType() == ICE_TYPE)) {
 
 								plugin.mEffectManager.addEffect(target, "ITPercentSpeedModifyGreatsword",
 									new PercentSpeed(20, -0.3, "ITPercentSpeedModifyGreatsword"));
@@ -314,7 +256,7 @@ public class GreatswordSlamTowerAbility extends TowerAbility {
 						}
 						mT += 10;
 					}
-				}.runTaskTimer(mPlugin, 0, 10); //Every 0.5 seconds, check if player is on cone area damage
+				}.runTaskTimer(mPlugin, 0, 10)); //Every 0.5 seconds, check if player is on cone area damage
 
 			}
 

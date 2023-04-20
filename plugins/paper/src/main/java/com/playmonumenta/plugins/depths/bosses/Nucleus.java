@@ -33,7 +33,6 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -366,7 +365,9 @@ public final class Nucleus extends BossAbilityGroup {
 				if (mTicks >= 6 * 20) {
 					this.cancel();
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Gyrhaeddant", ChatColor.DARK_RED + "The Nucleus");
+						MessagingUtils.sendTitle(player,
+							Component.text("Gyrhaeddant", NamedTextColor.DARK_RED, TextDecoration.BOLD),
+							Component.text("The Nucleus", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 						player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 					}

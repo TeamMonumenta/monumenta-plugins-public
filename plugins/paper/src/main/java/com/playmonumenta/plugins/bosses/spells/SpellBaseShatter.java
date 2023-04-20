@@ -1,20 +1,18 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,7 +33,7 @@ public class SpellBaseShatter extends Spell {
 	private final WarningAesthetics mWarningAesthetics;
 	private final LaunchAesthetics mLaunchAesthetics;
 
-	private Map<Location, BlockState> mOldBlocks = new HashMap<>();
+	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	public SpellBaseShatter(
 		Plugin plugin,
@@ -159,10 +157,10 @@ public class SpellBaseShatter extends Spell {
 										if (BlockUtils.isMechanicalBlock(l.getBlock().getType()) || BlockUtils.isValuableBlock(l.getBlock().getType())) {
 											l.add(0, 1, 0);
 										}
-										if (l.getBlock().getType() != mIndicator && l.getBlock().getType().isSolid()
-											    && !(BlockUtils.isMechanicalBlock(l.getBlock().getType()) || BlockUtils.isValuableBlock(l.getBlock().getType()))) {
-											mOldBlocks.put(l, l.getBlock().getState());
-											l.getBlock().setType(mIndicator);
+										if (l.getBlock().getType() != mIndicator && l.getBlock().getType().isSolid()) {
+											if (TemporaryBlockChangeManager.INSTANCE.changeBlock(l.getBlock(), mIndicator, mDelay + FastUtils.randomIntInRange(0, 10))) {
+												mChangedBlocks.add(l.getBlock());
+											}
 										}
 									}
 								}
@@ -205,41 +203,6 @@ public class SpellBaseShatter extends Spell {
 							}
 						}
 					}
-
-					if (!mOldBlocks.isEmpty()) {
-						BukkitRunnable runnableB = new BukkitRunnable() {
-							int mTicks = 0;
-
-							@Override
-							public void run() {
-								mTicks++;
-
-								if (mTicks >= 20 * 2 || mOldBlocks.isEmpty()) {
-									//Restore everything that is currently hyphae to original state, and clear map
-									for (Map.Entry<Location, BlockState> e : mOldBlocks.entrySet()) {
-										if (e.getKey().getBlock().getType() == mIndicator) {
-											e.getValue().update(true, false);
-										}
-									}
-									mOldBlocks.clear();
-
-									this.cancel();
-								} else {
-									//Remove 100 blocks per tick
-									Iterator<Map.Entry<Location, BlockState>> blockIter = mOldBlocks.entrySet().iterator();
-									for (int i = 0; i < 100 && blockIter.hasNext(); i++) {
-										Map.Entry<Location, BlockState> e = blockIter.next();
-										if (e.getKey().getBlock().getType() == mIndicator) {
-											e.getValue().update(true, false);
-										}
-										blockIter.remove();
-									}
-								}
-							}
-						};
-						runnableB.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnableB);
-					}
 				}
 			}
 		};
@@ -257,13 +220,8 @@ public class SpellBaseShatter extends Spell {
 	public void cancel() {
 		super.cancel();
 
-		//Restore everything that is currently hyphae to original state, and clear map
-		for (Map.Entry<Location, BlockState> e : mOldBlocks.entrySet()) {
-			if (e.getKey().getBlock().getType() == mIndicator) {
-				e.getValue().update(true, false);
-			}
-		}
-		mOldBlocks.clear();
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, mIndicator);
+		mChangedBlocks.clear();
 	}
 
 	@FunctionalInterface

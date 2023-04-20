@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.bluestrike;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.Samwell;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -11,9 +12,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +20,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -31,13 +30,13 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellRealitySlash extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Samwell mSamwell;
-	private Location mStartLoc;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Samwell mSamwell;
+	private final Location mStartLoc;
 
 	private boolean mCooldown;
-	private int mPhase;
+	private final int mPhase;
 
 	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
@@ -101,10 +100,10 @@ public class SpellRealitySlash extends Spell {
 		new BukkitRunnable() {
 			double mT = 0;
 			float mPitch = 1;
-			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
-			double mBossX = mLoc.getX();
-			double mBossY = mLoc.getY();
-			double mBossZ = mLoc.getZ();
+			final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+			final double mBossX = mLoc.getX();
+			final double mBossY = mLoc.getY();
+			final double mBossZ = mLoc.getZ();
 
 			@Override
 			public void run() {
@@ -146,16 +145,14 @@ public class SpellRealitySlash extends Spell {
 
 	private void createRift(Location loc, List<Player> players) {
 		List<Location> locs = new ArrayList<>();
-
-		Map<Location, Material> oldBlocks = new HashMap<>();
-		Map<Location, BlockData> oldData = new HashMap<>();
+		List<Block> changedBlocks = new ArrayList<>();
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
-			World mWorld = mLoc.getWorld();
-			Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
-			BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 1.2, 0.85);
-			Location mOgLoc = mLoc.clone();
+			final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+			final World mWorld = mLoc.getWorld();
+			final Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
+			final BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 1.2, 0.85);
+			final Location mOgLoc = mLoc.clone();
 
 			@Override
 			public void run() {
@@ -181,9 +178,9 @@ public class SpellRealitySlash extends Spell {
 					}
 				}
 
-				oldBlocks.put(bLoc.clone(), bLoc.getBlock().getType());
-				oldData.put(bLoc.clone(), bLoc.getBlock().getBlockData());
-				bLoc.getBlock().setType(Material.CRYING_OBSIDIAN);
+				if (TemporaryBlockChangeManager.INSTANCE.changeBlock(bLoc.getBlock(), Material.CRYING_OBSIDIAN, LINGERING_DURATION)) {
+					changedBlocks.add(bLoc.getBlock());
+				}
 
 				bLoc.add(0, 0.5, 0);
 
@@ -243,17 +240,11 @@ public class SpellRealitySlash extends Spell {
 					}
 				}
 
-				if (mT >= LINGERING_DURATION || mPhase != mSamwell.mPhase || mSamwell.mDefeated) {
+				if (mPhase != mSamwell.mPhase || mSamwell.mDefeated) {
 					this.cancel();
-					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
-						if (e.getKey().getBlock().getType() != Material.AIR) {
-							e.getKey().getBlock().setType(e.getValue());
-							if (oldData.containsKey(e.getKey())) {
-								e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-							}
-						}
-					}
-					locs.clear();
+					TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(changedBlocks, Material.CRYING_OBSIDIAN);
+				} else if (mT >= LINGERING_DURATION) {
+					this.cancel();
 				}
 			}
 

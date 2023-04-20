@@ -2,6 +2,7 @@ package com.playmonumenta.plugins;
 
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
@@ -423,6 +424,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new CustomContainerItemManager(), this);
 		manager.registerEvents(StatTrackManager.getInstance(), this);
 		manager.registerEvents(new PotionBarrelListener(), this);
+		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);

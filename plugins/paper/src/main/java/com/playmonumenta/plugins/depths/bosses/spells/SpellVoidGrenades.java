@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
@@ -82,6 +83,7 @@ public class SpellVoidGrenades extends Spell {
 		try {
 			FallingBlock fallingBlock = sLoc.getWorld().spawnFallingBlock(sLoc, Material.CRYING_OBSIDIAN.createBlockData());
 			fallingBlock.setDropItem(false);
+			EntityUtils.disableBlockPlacement(fallingBlock);
 
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
@@ -106,7 +108,6 @@ public class SpellVoidGrenades extends Spell {
 						fallingBlock.remove();
 						Location loc = fallingBlock.getLocation();
 
-						loc.getBlock().setType(Material.AIR);
 						new PartialParticle(Particle.SOUL, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 						new PartialParticle(Particle.SPELL_WITCH, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
 						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.shura;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +50,7 @@ public class SpellShuraSmoke extends Spell {
 		Location spawnLoc = mBoss.getLocation().add(0, 1.7, 0);
 		FallingBlock block = world.spawnFallingBlock(spawnLoc, Bukkit.createBlockData(Material.COAL_BLOCK));
 		block.setDropItem(false);
+		EntityUtils.disableBlockPlacement(block);
 
 		Location pLoc = p.getLocation();
 		Location tLoc = block.getLocation();
@@ -59,7 +61,7 @@ public class SpellShuraSmoke extends Spell {
 		PartialParticle smokeTrail = new PartialParticle(Particle.SMOKE_NORMAL, block.getLocation(), 2, 0.25, .25, .25, 0.025);
 
 		new BukkitRunnable() {
-			World mWorld = mBoss.getWorld();
+			final World mWorld = mBoss.getWorld();
 
 			@Override
 			public void run() {
@@ -72,7 +74,6 @@ public class SpellShuraSmoke extends Spell {
 					block.remove();
 					Location loc = block.getLocation();
 
-					loc.getBlock().setType(Material.AIR);
 					new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();

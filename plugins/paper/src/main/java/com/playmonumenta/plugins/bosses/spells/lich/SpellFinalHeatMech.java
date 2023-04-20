@@ -119,6 +119,7 @@ public class SpellFinalHeatMech extends Spell {
 				VectorUtils.rotateYAxis(v, 90 * i);
 				FallingBlock fallingBlock = world.spawnFallingBlock(mBoss.getLocation().add(0, 5, 0), Material.MAGMA_BLOCK.createBlockData());
 				fallingBlock.setDropItem(false);
+				EntityUtils.disableBlockPlacement(fallingBlock);
 				fallingBlock.setVelocity(v);
 
 				BukkitRunnable runB = new BukkitRunnable() {
@@ -131,14 +132,12 @@ public class SpellFinalHeatMech extends Spell {
 						if (fallingBlock.isOnGround() || !fallingBlock.isValid()) {
 							this.cancel();
 							fallingBlock.remove();
-							fallingBlock.getLocation().getBlock().setType(Material.AIR);
 							world.playSound(l, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.5f, 1);
 							damage();
 						}
 						if (Lich.bossDead()) {
 							this.cancel();
 							fallingBlock.remove();
-							fallingBlock.getLocation().getBlock().setType(Material.AIR);
 						}
 					}
 

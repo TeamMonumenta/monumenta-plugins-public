@@ -23,7 +23,6 @@ public class EnderChestOverride extends BaseOverride {
 		return false;
 	}
 
-	/* Chests placed on barriers can not be broken */
 	@Override
 	public boolean blockBreakInteraction(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		if ((player.getGameMode() == GameMode.CREATIVE) || ChestOverride.breakable(block)) {

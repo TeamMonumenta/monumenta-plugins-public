@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -9,9 +10,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,7 +18,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -39,13 +38,15 @@ import org.bukkit.util.Vector;
  */
 public class SpellFrostRift extends Spell {
 
+	private static final int DURATION = 20 * 18;
+	public static final Material RIFT_BLOCK_TYPE = Material.BLACKSTONE;
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final Location mStartLoc;
 	private boolean mCooldown = false;
 
-	//Removes frost rift lines, used in cancelling spell
-	private boolean mRemoveLines = false;
+	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	private static final Particle.DustOptions BLACK_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 1.0f);
 
@@ -71,13 +72,10 @@ public class SpellFrostRift extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0.5f);
 
 		List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange, true);
-		List<Player> targets = new ArrayList<Player>();
-		List<Location> locs = new ArrayList<Location>();
+		List<Player> targets = new ArrayList<>();
+		List<Location> locs = new ArrayList<>();
 		if (players.size() >= 2) {
-			int cap = (int) Math.ceil(players.size() / 2);
-			if (cap >= 3) {
-				cap = 3;
-			}
+			int cap = (int) Math.min(Math.ceil(players.size() / 2.0), 3);
 			for (int i = 0; i < cap; i++) {
 				Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 				if (!targets.contains(player)) {
@@ -111,7 +109,6 @@ public class SpellFrostRift extends Spell {
 					double yloc = line.getY();
 					double zloc = line.getZ();
 					for (int i = 1; i < 30; i++) {
-						//new PartialParticle(Particle.BARRIER, particleLine, 1, 0, 0, 0).spawnAsEntityActive(mBoss);
 						new PartialParticle(Particle.SQUID_INK, mLoc.clone().add(xloc * i, yloc * i, zloc * i), 1, 0.25, 0.25, 0.25, 0).spawnAsEntityActive(mBoss);
 					}
 				}
@@ -135,9 +132,6 @@ public class SpellFrostRift extends Spell {
 
 	private void createRift(Location loc, List<Player> players) {
 		List<Location> locs = new ArrayList<>();
-
-		Map<Location, Material> oldBlocks = new HashMap<>();
-		Map<Location, BlockData> oldData = new HashMap<>();
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
@@ -170,14 +164,9 @@ public class SpellFrostRift extends Spell {
 					}
 				}
 
-				//Do not replace frosted ice back down, set it to cracked stone bricks
-				if (bLoc.getBlock().getType() == Material.FROSTED_ICE) {
-					oldBlocks.put(bLoc.clone(), Material.CRACKED_STONE_BRICKS);
-				} else {
-					oldBlocks.put(bLoc.clone(), bLoc.getBlock().getType());
-					oldData.put(bLoc.clone(), bLoc.getBlock().getBlockData());
+				if (TemporaryBlockChangeManager.INSTANCE.changeBlock(bLoc.getBlock(), RIFT_BLOCK_TYPE, DURATION)) {
+					mChangedBlocks.add(bLoc.getBlock());
 				}
-				bLoc.getBlock().setType(Material.BLACKSTONE);
 
 				bLoc.add(0, 0.5, 0);
 
@@ -201,8 +190,8 @@ public class SpellFrostRift extends Spell {
 		runnable.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(runnable);
 
-		//If touching the "line" of particles, get debuffed and take damaged. Can be blocked over
-		new BukkitRunnable() {
+		// If touching the line of particles, get debuffed and take damage
+		mActiveTasks.add(new BukkitRunnable() {
 			int mT = 0;
 
 			@Override
@@ -224,28 +213,20 @@ public class SpellFrostRift extends Spell {
 					}
 				}
 
-				if (mT >= 20 * 18 || mRemoveLines) {
+				if (mT >= DURATION) {
 					this.cancel();
-					for (Map.Entry<Location, Material> e : oldBlocks.entrySet()) {
-						if (e.getKey().getBlock().getType() == Material.BLACKSTONE) {
-							e.getKey().getBlock().setType(e.getValue());
-							if (oldData.containsKey(e.getKey())) {
-								e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-							}
-						}
-					}
-					locs.clear();
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 5);
+		}.runTaskTimer(mPlugin, 0, 5));
 	}
 
 	@Override
 	public void cancel() {
 		super.cancel();
 
-		mRemoveLines = true;
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, RIFT_BLOCK_TYPE);
+		mChangedBlocks.clear();
 	}
 
 	@Override

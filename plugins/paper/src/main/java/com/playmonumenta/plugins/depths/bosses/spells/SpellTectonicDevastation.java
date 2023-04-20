@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths.bosses.spells;
 
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.depths.bosses.Nucleus;
 import com.playmonumenta.plugins.effects.PercentHeal;
@@ -12,19 +13,17 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -38,16 +37,17 @@ import org.bukkit.util.Vector;
 public class SpellTectonicDevastation extends Spell {
 
 	public static final String TAG = "HitByShatter";
+	public static final int TELEGRAPH_DURATION = 50;
+	public static final Material TELEGRAPH_TYPE = Material.STRIPPED_WARPED_HYPHAE;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	public int mCooldownTicks;
 	public Nucleus mBossInstance;
 
-	private Map<Location, Material> mOldBlocks = new HashMap<>();
-	private Map<Location, BlockData> mOldData = new HashMap<>();
+	private final List<Block> mChangedBlocks = new ArrayList<>();
 
-	private Location mStartLoc;
+	private final Location mStartLoc;
 
 	public SpellTectonicDevastation(Plugin plugin, LivingEntity boss, Location startLoc, int cooldownTicks, Nucleus bossInstance) {
 		mPlugin = plugin;
@@ -82,8 +82,6 @@ public class SpellTectonicDevastation extends Spell {
 	}
 
 	public void cast(int offset) {
-		mOldBlocks = new HashMap<>();
-		mOldData = new HashMap<>();
 
 		//mBoss.setAI(false);
 		World world = mBoss.getWorld();
@@ -108,9 +106,12 @@ public class SpellTectonicDevastation extends Spell {
 
 		loc.setYaw(loc.getYaw() + offset);
 
+		mChangedBlocks.clear();
+
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 0;
+
 			@Override
 			public void run() {
 				mT += 2;
@@ -136,8 +137,8 @@ public class SpellTectonicDevastation extends Spell {
 								Location l = loc.clone().add(vec);
 
 								l.subtract(0, 1, 0);
-								//Spawns crimson hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
-								if (l.getBlock().getType() != Material.STRIPPED_WARPED_HYPHAE) {
+								//Spawns stripped warped hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
+								if (l.getBlock().getType() != TELEGRAPH_TYPE) {
 									if (FastUtils.RANDOM.nextInt(3) == 0 || mT == 20 * 2) {
 										while (l.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR && l.getBlockY() <= mStartLoc.getBlockY() + 3) {
 											l.add(0, 1, 0);
@@ -147,18 +148,16 @@ public class SpellTectonicDevastation extends Spell {
 										}
 										//Once it leaves the arena, stop iterating
 										if ((l.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR && l.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
-												|| l.distance(mStartLoc) > 30) {
+											    || l.distance(mStartLoc) > 30) {
 											continue;
 										}
 										//Move up one block if on barrier or bedrock level
 										if (l.getBlock().getType() == Material.BEDROCK || l.getBlock().getType() == Material.BARRIER) {
 											l.add(0, 1, 0);
 										}
-										if (l.getBlock().getType() != Material.STRIPPED_WARPED_HYPHAE) {
-											mOldBlocks.put(l, l.getBlock().getType());
-											mOldData.put(l, l.getBlock().getBlockData());
+										if (TemporaryBlockChangeManager.INSTANCE.changeBlock(l.getBlock(), TELEGRAPH_TYPE, TELEGRAPH_DURATION - mT + FastUtils.randomIntInRange(0, 10))) {
+											mChangedBlocks.add(l.getBlock());
 										}
-										l.getBlock().setType(Material.STRIPPED_WARPED_HYPHAE);
 									}
 								}
 							}
@@ -167,7 +166,7 @@ public class SpellTectonicDevastation extends Spell {
 				}
 
 				//End shatter, deal damage, show visuals
-				if (mT >= 50) {
+				if (mT >= TELEGRAPH_DURATION) {
 					//mBoss.setAI(true);
 					Mob mob = (Mob) mBoss;
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), Nucleus.detectionRange, true);
@@ -222,66 +221,22 @@ public class SpellTectonicDevastation extends Spell {
 										public void run() {
 											player.removeScoreboardTag(TAG);
 										}
-
 									}.runTaskLater(mPlugin, 100);
 								}
 								player.setVelocity(player.getVelocity().setY(1.0f));
 								com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(player, "Tectonic", new PercentHeal(6 * 20, -1.00));
-								player.sendActionBar(ChatColor.RED + "You cannot heal for 6s");
+								player.sendActionBar(Component.text("You cannot heal for 6s", NamedTextColor.RED));
 								PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.BAD_OMEN, 6 * 20, 1));
 							}
 						}
 					}
 					for (LivingEntity le : EntityUtils.getNearbyMobs(mStartLoc, 40)) {
 						for (BoundingBox box : boxes) {
-							if (le.getBoundingBox().overlaps(box) && !le.getScoreboardTags().contains("Boss")) {
+							if (le.getBoundingBox().overlaps(box) && !EntityUtils.isBoss(le)) {
 								le.damage(12);
 								le.setVelocity(le.getVelocity().setY(1.0f));
 							}
 						}
-					}
-
-					if (!mOldBlocks.isEmpty()) {
-						BukkitRunnable runnable = new BukkitRunnable() {
-							int mTicks = 0;
-							Iterator<Map.Entry<Location, Material>> mBlocks = mOldBlocks.entrySet().iterator();
-							@Override
-							public void run() {
-								mTicks++;
-
-								if (mTicks >= 20 * 2 || !mBlocks.hasNext()) {
-									while (mBlocks.hasNext()) {
-										Map.Entry<Location, Material> e = mBlocks.next();
-										if (e.getKey().getBlock().getType() == Material.STRIPPED_WARPED_HYPHAE) {
-											e.getKey().getBlock().setType(e.getValue());
-											if (mOldData.containsKey(e.getKey())) {
-												e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-											}
-										}
-										mBlocks.remove();
-									}
-
-									this.cancel();
-								} else {
-									//Remove 100 blocks per tick
-									for (int i = 0; i < 100; i++) {
-										if (!mBlocks.hasNext()) {
-											break;
-										}
-										Map.Entry<Location, Material> e = mBlocks.next();
-										if (e.getKey().getBlock().getType() == Material.STRIPPED_WARPED_HYPHAE) {
-											e.getKey().getBlock().setType(e.getValue());
-											if (mOldData.containsKey(e.getKey())) {
-												e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-											}
-										}
-										mBlocks.remove();
-									}
-								}
-							}
-						};
-						runnable.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnable);
 					}
 				}
 			}
@@ -296,44 +251,8 @@ public class SpellTectonicDevastation extends Spell {
 	public void cancel() {
 		super.cancel();
 
-		new BukkitRunnable() {
-			int mTicks = 0;
-			Iterator<Map.Entry<Location, Material>> mBlocks = mOldBlocks.entrySet().iterator();
-			@Override
-			public void run() {
-				mTicks++;
-
-				if (mTicks >= 20 * 2 || !mBlocks.hasNext()) {
-					while (mBlocks.hasNext()) {
-						Map.Entry<Location, Material> e = mBlocks.next();
-						if (e.getKey().getBlock().getType() == Material.STRIPPED_WARPED_HYPHAE) {
-							e.getKey().getBlock().setType(e.getValue());
-							if (mOldData.containsKey(e.getKey())) {
-								e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-							}
-						}
-						mBlocks.remove();
-					}
-
-					this.cancel();
-				} else {
-					//Remove 100 blocks per tick
-					for (int i = 0; i < 100; i++) {
-						if (!mBlocks.hasNext()) {
-							break;
-						}
-						Map.Entry<Location, Material> e = mBlocks.next();
-						if (e.getKey().getBlock().getType() == Material.STRIPPED_WARPED_HYPHAE) {
-							e.getKey().getBlock().setType(e.getValue());
-							if (mOldData.containsKey(e.getKey())) {
-								e.getKey().getBlock().setBlockData(mOldData.get(e.getKey()));
-							}
-						}
-						mBlocks.remove();
-					}
-				}
-			}
-		}.runTaskTimer(mPlugin, 0, 1);
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, TELEGRAPH_TYPE);
+		mChangedBlocks.clear();
 	}
 
 	@Override

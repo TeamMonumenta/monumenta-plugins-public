@@ -70,6 +70,11 @@ public class RingOfFrost extends Spell {
 
 			@Override
 			public void run() {
+				if (!mBoss.isValid()) {
+					cancel();
+					return;
+				}
+
 				Location loc = mBoss.getLocation().add(0, 0.1, 0);
 				mTicks += 2;
 

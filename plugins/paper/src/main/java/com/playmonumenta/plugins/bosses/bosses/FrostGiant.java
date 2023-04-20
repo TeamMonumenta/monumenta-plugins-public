@@ -259,7 +259,7 @@ public class FrostGiant extends BossAbilityGroup {
 		}
 
 		mStartLoc = start != null ? start.getLocation() : boss.getLocation();
-		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mStartLoc, detectionRange);
+		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mStartLoc, fighterRange);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 
 		//Adds directions of the arena that seismic ruin destroys

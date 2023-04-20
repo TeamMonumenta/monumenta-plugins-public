@@ -29,7 +29,7 @@ public class UltimateSeismicRuin extends Spell {
 	private final @Nullable LivingEntity mSouthStand;
 	private final @Nullable LivingEntity mWestStand;
 
-	public UltimateSeismicRuin(Plugin plugin, LivingEntity boss, List<Character> dirs, LivingEntity n, LivingEntity e, LivingEntity s, LivingEntity w) {
+	public UltimateSeismicRuin(Plugin plugin, LivingEntity boss, List<Character> dirs, @Nullable LivingEntity n, @Nullable LivingEntity e, @Nullable LivingEntity s, @Nullable LivingEntity w) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();

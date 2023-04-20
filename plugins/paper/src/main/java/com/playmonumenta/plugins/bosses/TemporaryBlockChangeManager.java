@@ -1,0 +1,211 @@
+package com.playmonumenta.plugins.bosses;
+
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.BlockUtils;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * Handles temporary block changes, usually from mob abilities.
+ * These block changes are real, i.e. they actually change the block on the server and not just visually alter them for clients.
+ */
+public class TemporaryBlockChangeManager implements Listener {
+
+	public static final TemporaryBlockChangeManager INSTANCE = new TemporaryBlockChangeManager();
+
+	private final Map<World, Map<Block, ChangedBlock>> mChangedBlocks = new HashMap<>();
+
+	private static class ChangedBlock {
+		private final Material mTemporaryType;
+		/**
+		 * Old state of the block. Will always be the original state, even if there's more changes to this block ({@link #mPreviousChange}).
+		 */
+		private final BlockState mOldState;
+		private final int mExpiration;
+		/**
+		 * An older change to the same block that outlasts the current change, i.e. {@code mExpiration < mPreviousChange.mExpiration}
+		 */
+		private @Nullable ChangedBlock mPreviousChange = null;
+
+		public ChangedBlock(Material temporaryType, BlockState oldState, int expiration) {
+			this.mTemporaryType = temporaryType;
+			this.mOldState = oldState;
+			this.mExpiration = expiration;
+		}
+	}
+
+	private @Nullable BukkitTask mExpirationTask = null;
+
+	/**
+	 * Temporarily changes a block. Will not change certain mechanical or valuable blocks.
+	 *
+	 * @param block         The block to change
+	 * @param temporaryType The type to change the block to
+	 * @param duration      How long to change the block for (in ticks)
+	 * @return Whether the block has been changed (i.e. was a valid block or already of the correct type)
+	 */
+	public boolean changeBlock(Block block, Material temporaryType, int duration) {
+		return changeBlock(block, temporaryType.createBlockData(), duration);
+	}
+
+	public boolean changeBlock(Block block, BlockData temporaryData, int duration) {
+		if (duration <= 0) {
+			return false;
+		}
+		Material existingType = block.getType();
+		if (temporaryData.getMaterial() == existingType || (BlockUtils.isMechanicalBlock(existingType) && existingType != Material.AIR) || BlockUtils.isValuableBlock(existingType)) {
+			return false;
+		}
+		int expiration = Bukkit.getCurrentTick() + duration;
+		Map<Block, ChangedBlock> worldMap = mChangedBlocks.computeIfAbsent(block.getWorld(), key -> new HashMap<>());
+		ChangedBlock existingChangedBlock = worldMap.get(block);
+		if (existingChangedBlock != null && existingChangedBlock.mTemporaryType == existingType && existingChangedBlock.mExpiration > expiration) {
+			ChangedBlock changedBlock = new ChangedBlock(temporaryData.getMaterial(), existingChangedBlock.mOldState, expiration);
+			changedBlock.mPreviousChange = existingChangedBlock;
+			worldMap.put(block, changedBlock);
+		} else {
+			worldMap.put(block, new ChangedBlock(temporaryData.getMaterial(), existingChangedBlock == null ? block.getState(true) : existingChangedBlock.mOldState, expiration));
+		}
+		block.setBlockData(temporaryData, false);
+		if (mExpirationTask == null) {
+			mExpirationTask = Bukkit.getScheduler().runTaskTimer(Plugin.getInstance(), this::handleExpiration, 1, 1);
+		}
+		return true;
+	}
+
+	/**
+	 * Handles expired blocks and changes them back. Since we don't expect there to be more than a few hundred blocks changed at a time,
+	 * simply iterating all active blocks every tick is sufficiently performant and there's no need to order them by expiration time.
+	 */
+	private void handleExpiration() {
+		int tick = Bukkit.getCurrentTick();
+		for (Iterator<Map<Block, ChangedBlock>> worldIter = mChangedBlocks.values().iterator(); worldIter.hasNext(); ) {
+			Map<Block, ChangedBlock> worldMap = worldIter.next();
+			for (Iterator<Map.Entry<Block, ChangedBlock>> blockIter = worldMap.entrySet().iterator(); blockIter.hasNext(); ) {
+				Map.Entry<Block, ChangedBlock> entry = blockIter.next();
+				ChangedBlock changedBlock = entry.getValue();
+				if (tick >= changedBlock.mExpiration) {
+					Block block = entry.getKey();
+					if (!block.getLocation().isChunkLoaded()) {
+						blockIter.remove();
+					} else if (block.getType() == changedBlock.mTemporaryType) {
+						if (changedBlock.mPreviousChange == null) {
+							changedBlock.mOldState.update(true, false);
+							blockIter.remove();
+						} else {
+							block.setType(changedBlock.mPreviousChange.mTemporaryType, false);
+							entry.setValue(changedBlock.mPreviousChange);
+						}
+					} else {
+						if (changedBlock.mPreviousChange == null) {
+							blockIter.remove();
+						} else {
+							entry.setValue(changedBlock.mPreviousChange);
+						}
+					}
+				}
+			}
+			if (worldMap.isEmpty()) {
+				worldIter.remove();
+			}
+		}
+		if (mExpirationTask != null && mChangedBlocks.isEmpty()) {
+			mExpirationTask.cancel();
+			mExpirationTask = null;
+		}
+	}
+
+	/**
+	 * Checks if a given block is currently changed.
+	 *
+	 * @param block        The block to check
+	 * @param expectedType The expected temporary type of the block. If changed but not of this type, will return false.
+	 */
+	public boolean isChangedBlock(Block block, Material expectedType) {
+		Map<Block, ChangedBlock> worldMap = mChangedBlocks.get(block.getWorld());
+		if (worldMap == null) {
+			return false;
+		}
+		ChangedBlock changedBlock = worldMap.get(block);
+		return changedBlock != null && changedBlock.mTemporaryType == expectedType && block.getLocation().isChunkLoaded() && block.getType() == expectedType;
+	}
+
+	/**
+	 * Instantly reverts a changed block.
+	 *
+	 * @param block        The block to check
+	 * @param expectedType The expected temporary type of the block. If changed but not of this type, will not revert and return false.
+	 * @return Whether the block has been changed back (can be false if already changed back, or another change happened in the meantime)
+	 */
+	public boolean revertChangedBlock(Block block, Material expectedType) {
+		Map<Block, ChangedBlock> worldMap = mChangedBlocks.get(block.getWorld());
+		if (worldMap == null) {
+			return false;
+		}
+		ChangedBlock parent = null;
+		ChangedBlock changedBlock = worldMap.get(block);
+		while (changedBlock != null) {
+			if (changedBlock.mTemporaryType == expectedType) {
+				if (parent != null) {
+					parent.mPreviousChange = changedBlock.mPreviousChange;
+				} else if (changedBlock.mPreviousChange != null) {
+					worldMap.put(block, changedBlock.mPreviousChange);
+				} else {
+					worldMap.remove(block);
+				}
+				if (block.getLocation().isChunkLoaded() && block.getType() == expectedType) {
+					if (changedBlock.mPreviousChange == null) {
+						changedBlock.mOldState.update(true, false);
+					} else {
+						block.setType(changedBlock.mPreviousChange.mTemporaryType, false);
+					}
+					return true;
+				}
+				return false;
+			}
+			parent = changedBlock;
+			changedBlock = changedBlock.mPreviousChange;
+		}
+		return false;
+	}
+
+	public void revertChangedBlocks(Collection<Block> blocks, Material expectedType) {
+		for (Block block : blocks) {
+			revertChangedBlock(block, expectedType);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+		Map<Block, ChangedBlock> worldBlocks = mChangedBlocks.get(event.getWorld());
+		if (worldBlocks == null) {
+			return;
+		}
+		long chunkKey = event.getChunk().getChunkKey();
+		for (Iterator<Map.Entry<Block, ChangedBlock>> iterator = worldBlocks.entrySet().iterator(); iterator.hasNext(); ) {
+			Map.Entry<Block, ChangedBlock> entry = iterator.next();
+			if (chunkKey == Chunk.getChunkKey(entry.getKey().getLocation())) {
+				if (entry.getKey().getType() == entry.getValue().mTemporaryType) {
+					entry.getValue().mOldState.update(true, false);
+				}
+				iterator.remove();
+			}
+		}
+	}
+
+}

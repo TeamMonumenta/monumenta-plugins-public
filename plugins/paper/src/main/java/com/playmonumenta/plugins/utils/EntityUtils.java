@@ -1396,6 +1396,10 @@ public class EntityUtils {
 		e.getScoreboardTags().add("REMOVE_ON_UNLOAD");
 	}
 
+	public static void disableBlockPlacement(FallingBlock fallingBlock) {
+		fallingBlock.getScoreboardTags().add("DisableBlockPlacement");
+	}
+
 	public static float getCounterclockwiseAngle(Entity e1, Entity e2) {
 		Vector loc1 = e1.getLocation().toVector();
 		Vector loc2 = e2.getLocation().toVector();

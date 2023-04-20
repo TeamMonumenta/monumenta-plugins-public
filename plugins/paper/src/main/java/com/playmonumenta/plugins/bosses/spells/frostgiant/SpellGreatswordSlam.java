@@ -1,21 +1,20 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
 import com.destroystokyo.paper.entity.Pathfinder;
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -24,9 +23,9 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -38,6 +37,8 @@ import org.bukkit.util.Vector;
 
 public class SpellGreatswordSlam extends Spell {
 
+	private static final Material ICE_TYPE = Material.FROSTED_ICE;
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final double mDeg;
@@ -48,8 +49,7 @@ public class SpellGreatswordSlam extends Spell {
 
 	private final Location mStartLoc;
 
-	//Starts deleting ice immediately when this is true
-	private boolean mDeleteIce = false;
+	private final List<Block> mChangedBlocks = new ArrayList<>();
 
 	public SpellGreatswordSlam(Plugin plugin, LivingEntity boss, int dur, double deg, Location startLoc) {
 		mPlugin = plugin;
@@ -74,10 +74,6 @@ public class SpellGreatswordSlam extends Spell {
 		pathfinder.stopPathfinding();
 
 		Vector bossDir = mBoss.getLocation().getDirection();
-
-		//Saves locations for places to convert from frosted ice back to its original block
-		Map<Location, Material> oldBlocks = new HashMap<>();
-		Map<Location, BlockData> oldData = new HashMap<>();
 
 		Location loc = mBoss.getLocation();
 
@@ -114,6 +110,8 @@ public class SpellGreatswordSlam extends Spell {
 		};
 		runnable1.runTaskTimer(mPlugin, 0, 10);
 		mActiveRunnables.add(runnable1);
+
+		mChangedBlocks.clear();
 
 		BukkitRunnable runnable2 = new BukkitRunnable() {
 			int mT = 0;
@@ -174,14 +172,14 @@ public class SpellGreatswordSlam extends Spell {
 
 									//Put less frosted ice than the entire cone
 									if (degree % 10 == 0) {
-										if (l.getBlock().getType() != Material.FROSTED_ICE) {
-											oldBlocks.put(l, l.getBlock().getType());
-											oldData.put(l, l.getBlock().getBlockData());
+										Block block = l.getBlock();
+										if (block.getType() != SpellFrostRift.RIFT_BLOCK_TYPE
+											    && TemporaryBlockChangeManager.INSTANCE.changeBlock(block, ICE_TYPE, 20 * mDuration - mRadius + FastUtils.randomIntInRange(0, 10))) {
+											mChangedBlocks.add(block);
+											Ageable age = (Ageable) block.getBlockData();
+											age.setAge(1 + FastUtils.RANDOM.nextInt(3));
+											block.setBlockData(age);
 										}
-										l.getBlock().setType(Material.FROSTED_ICE);
-										Ageable age = (Ageable) l.getBlock().getBlockData();
-										age.setAge(1 + FastUtils.RANDOM.nextInt(3));
-										l.getBlock().setBlockData(age);
 									}
 
 									//15 -> 3.65 lol
@@ -190,20 +188,18 @@ public class SpellGreatswordSlam extends Spell {
 
 									FallingBlock fallBlock = world.spawnFallingBlock(l.add(0, 0.4, 0), Bukkit.createBlockData(Material.BLUE_ICE));
 									fallBlock.setDropItem(false);
+									EntityUtils.disableBlockPlacement(fallBlock);
 									fallBlock.setVelocity(new Vector(0, 0.4, 0));
 									fallBlock.setHurtEntities(false);
 
 									new BukkitRunnable() {
 										@Override
 										public void run() {
-											if (!fallBlock.isDead() || fallBlock.isValid()) {
+											if (fallBlock.isValid()) {
 												fallBlock.remove();
-												if (fallBlock.getLocation().getBlock().getType() == Material.BLUE_ICE) {
-													fallBlock.getLocation().getBlock().setType(Material.AIR);
-												}
 											}
 										}
-									}.runTaskLater(mPlugin, 10);
+									}.runTaskLater(mPlugin, 20);
 
 									new PartialParticle(Particle.CLOUD, l, 2, 0.15, 0.15, 0.15, 0.125).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.CRIT, l, 8, 0.15, 0.15, 0.15, 0.7).spawnAsEntityActive(mBoss);
@@ -245,81 +241,34 @@ public class SpellGreatswordSlam extends Spell {
 		runnable2.runTaskTimer(mPlugin, 0, 2);
 		mActiveRunnables.add(runnable2);
 
-
-		//Revert frosted ice after 60 seconds, and also damage players that step on it during that
-		new BukkitRunnable() {
+		// Damage players standing on frosted ice for the duration
+		mActiveTasks.add(new BukkitRunnable() {
 			int mT = 0;
 
 			@Override
 			public void run() {
 
 				//Stop running after duration seconds
-				if (mT >= 20 * mDuration || mBoss.isDead() || !mBoss.isValid() || mDeleteIce) {
-					new BukkitRunnable() {
-						int mTicks = 0;
-						final Iterator<Map.Entry<Location, Material>> mBlocks = oldBlocks.entrySet().iterator();
-
-						@Override
-						public void run() {
-							mTicks++;
-
-							if (mTicks >= 20 * 3 || !mBlocks.hasNext()) {
-								while (mBlocks.hasNext()) {
-									Map.Entry<Location, Material> e = mBlocks.next();
-									if (e.getKey().getBlock().getType() == Material.FROSTED_ICE) {
-										e.getKey().getBlock().setType(e.getValue());
-										if (oldData.containsKey(e.getKey())) {
-											e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-										}
-									}
-									mBlocks.remove();
-								}
-
-								this.cancel();
-							} else {
-								//Remove 50 blocks per tick
-								for (int i = 0; i < 50; i++) {
-									if (!mBlocks.hasNext()) {
-										break;
-									}
-									Map.Entry<Location, Material> e = mBlocks.next();
-									//If doing shatter, wait for another tick
-									if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-										break;
-									}
-									if (e.getKey().getBlock().getType() == Material.FROSTED_ICE) {
-										e.getKey().getBlock().setType(e.getValue());
-										if (oldData.containsKey(e.getKey())) {
-											e.getKey().getBlock().setBlockData(oldData.get(e.getKey()));
-										}
-									}
-									mBlocks.remove();
-								}
-							}
-						}
-					}.runTaskTimer(mPlugin, 0, 1);
-
+				if (mT >= 20 * mDuration || mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();
 				}
 				for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, false)) {
 					if ((player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR || player.getLocation().getBlock().getType() != Material.AIR)
-						    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.FROSTED_ICE || player.getLocation().getBlock().getType() == Material.FROSTED_ICE)) {
-						Vector vel = player.getVelocity();
-						//TODO don't call this greatsword slam since it's just standing on ice damage
-						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Frosted Ice");
-						player.setVelocity(vel);
+						    && (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == ICE_TYPE || player.getLocation().getBlock().getType() == ICE_TYPE)) {
+						DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, false, "Frosted Ice");
 					}
 				}
 				mT += 10;
 			}
-		}.runTaskTimer(mPlugin, 0, 10); //Every 0.5 seconds, check if player is on cone area damage
+		}.runTaskTimer(mPlugin, 0, 10)); //Every 0.5 seconds, check if player is on cone area damage
 	}
 
 	@Override
 	public void cancel() {
 		super.cancel();
 
-		mDeleteIce = true;
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, ICE_TYPE);
+		mChangedBlocks.clear();
 	}
 
 	@Override

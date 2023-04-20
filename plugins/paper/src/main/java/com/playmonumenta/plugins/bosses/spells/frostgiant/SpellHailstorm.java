@@ -106,7 +106,7 @@ public class SpellHailstorm extends Spell {
 
 					@Override
 					public void run() {
-						if (player.isDead() || mBoss.isDead() || !mBoss.isValid()) {
+						if (player.isDead() || mBoss.isDead() || !mBoss.isValid() || player.getLocation().distanceSquared(loc) > FrostGiant.fighterRange * FrostGiant.fighterRange) {
 							mDamage.remove(player);
 							this.cancel();
 							return;

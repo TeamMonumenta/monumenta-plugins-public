@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -14,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -125,21 +127,23 @@ public class SpellGlacialPrison extends Spell {
 							center.clone().add(0, -1, 0)
 						};
 
-						Material[] mats = new Material[locs.length];
-						for (int i = 0; i < locs.length; i++) {
-							Location loc = locs[i];
-							mats[i] = loc.getBlock().getType();
-							loc.getBlock().setType(Material.BLUE_ICE);
+						List<Block> changedBlocks = new ArrayList<>();
+						int prisonDuration = 20 * 8;
+						for (Location loc : locs) {
+							Material mat = Material.BLUE_ICE;
+							if (Math.abs(loc.getY() - (center.getY() + 1)) < 0.1) {
+								// Ice at eye level to see through
+								mat = Material.ICE;
+							} else if (loc.getY() < center.getY()) {
+								// A sea lantern below the player's feet
+								mat = Material.SEA_LANTERN;
+							}
+							if (TemporaryBlockChangeManager.INSTANCE.changeBlock(loc.getBlock(), mat, prisonDuration - 1)) {
+								changedBlocks.add(loc.getBlock());
+							}
 						}
 
-						center.clone().add(1, 1, 0).getBlock().setType(Material.ICE);
-						center.clone().add(-1, 1, 0).getBlock().setType(Material.ICE);
-						center.clone().add(0, 1, 1).getBlock().setType(Material.ICE);
-						center.clone().add(0, 1, -1).getBlock().setType(Material.ICE);
-
-						center.clone().add(0, -1, 0).getBlock().setType(Material.SEA_LANTERN);
-
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 4, 1));
+						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, prisonDuration / 2, 1));
 
 						//Only lasts 4 seconds, needs to be done more than once
 						FrostGiant.delayHailstormDamage();
@@ -157,14 +161,10 @@ public class SpellGlacialPrison extends Spell {
 
 								if (mBoss.isDead() || !mBoss.isValid()) {
 									this.cancel();
-									for (int i = 0; i < locs.length; i++) {
-										Location loc = locs[i];
-										if (mats[i] != Material.FROSTED_ICE) {
-											loc.getBlock().setType(mats[i]);
-										} else {
-											loc.getBlock().setType(Material.AIR);
-										}
-									}
+									TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(changedBlocks, Material.BLUE_ICE);
+									TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(changedBlocks, Material.ICE);
+									TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(changedBlocks, Material.SEA_LANTERN);
+									return;
 								}
 
 								new PartialParticle(Particle.FIREWORKS_SPARK, middle, 3, 1, 1, 1, 0).spawnAsEntityActive(mBoss);
@@ -180,17 +180,9 @@ public class SpellGlacialPrison extends Spell {
 								}
 
 								//If player did not escape within 4 seconds, damage by 80% of health and remove the ice prison
-								if (mTicks >= 20 * 4) {
+								if (mTicks >= prisonDuration / 2) {
 									FrostGiant.unfreezeGolems(mBoss);
 									this.cancel();
-									for (int i = 0; i < locs.length; i++) {
-										Location loc = locs[i];
-										if (mats[i] != Material.FROSTED_ICE) {
-											loc.getBlock().setType(mats[i]);
-										} else {
-											loc.getBlock().setType(Material.AIR);
-										}
-									}
 									new PartialParticle(Particle.FIREWORKS_SPARK, middle, 50, 1, 1, 1, 0.35).spawnAsEntityActive(mBoss);
 									new PartialParticle(Particle.CLOUD, middle, 75, 1, 1, 1, 0.25).spawnAsEntityActive(mBoss);
 									world.playSound(center, Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1, 0.75f);

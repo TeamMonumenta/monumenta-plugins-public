@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells.frostgiant;
 
+import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -12,18 +13,15 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -42,14 +40,15 @@ idea) for 2 seconds.
  */
 public class Shatter extends Spell {
 	private static final double DAMAGE = 25;
+	private static final int DURATION = (int) (20 * 2.5);
+	private static final Material TELEGRAPH_TYPE = Material.CRIMSON_HYPHAE;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	public float mKnockback;
 
-	private Map<Location, BlockState> mOldBlocks = new HashMap<>();
-
-	private Location mStartLoc;
+	private final List<Block> mChangedBlocks = new ArrayList<>();
+	private final Location mStartLoc;
 
 	public Shatter(Plugin plugin, LivingEntity boss, float knock, Location startLoc) {
 		mPlugin = plugin;
@@ -83,6 +82,8 @@ public class Shatter extends Spell {
 
 		Location loc = mBoss.getLocation();
 
+		mChangedBlocks.clear();
+
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mT = 0;
 			float mPitch = 0;
@@ -98,7 +99,7 @@ public class Shatter extends Spell {
 				}
 
 				//Every half-second, do visuals
-				if (mT % 10 == 0) {
+				if (mT % 10 == 0 && mT < DURATION) {
 					//Creates 4 cones in 4 different directions
 					for (int dir = 0; dir <= 270; dir += 90) {
 						Vector vec;
@@ -114,7 +115,7 @@ public class Shatter extends Spell {
 
 								l.subtract(0, 1, 0);
 								//Spawns crimson hyphae as a warning at a 1/3 rate, will try to climb 1 block up or down if needed
-								if (l.getBlock().getType() != Material.CRIMSON_HYPHAE) {
+								if (l.getBlock().getType() != TELEGRAPH_TYPE) {
 									if (FastUtils.RANDOM.nextInt(3) == 0 || mT == 20 * 2) {
 										while (l.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR && l.getBlockY() <= mStartLoc.getBlockY() + 3) {
 											l.add(0, 1, 0);
@@ -131,10 +132,10 @@ public class Shatter extends Spell {
 										if (l.getBlock().getType() == Material.BEDROCK || l.getBlock().getType() == Material.BARRIER) {
 											l.add(0, 1, 0);
 										}
-										if (l.getBlock().getType() != Material.CRIMSON_HYPHAE) {
-											mOldBlocks.put(l, l.getBlock().getState());
+										if (l.getBlock().getType() != SpellFrostRift.RIFT_BLOCK_TYPE
+											    && TemporaryBlockChangeManager.INSTANCE.changeBlock(l.getBlock(), TELEGRAPH_TYPE, DURATION - mT + FastUtils.randomIntInRange(0, 10))) {
+											mChangedBlocks.add(l.getBlock());
 										}
-										l.getBlock().setType(Material.CRIMSON_HYPHAE);
 									}
 								}
 							}
@@ -143,7 +144,7 @@ public class Shatter extends Spell {
 				}
 
 				//End shatter, deal damage, show visuals
-				if (mT >= 20 * 2.5) {
+				if (mT >= DURATION) {
 					mBoss.setAI(true);
 					Mob mob = (Mob) mBoss;
 					List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange, true);
@@ -203,41 +204,6 @@ public class Shatter extends Spell {
 					}
 
 					FrostGiant.unfreezeGolems(mBoss);
-
-					if (!mOldBlocks.isEmpty()) {
-						BukkitRunnable runnable = new BukkitRunnable() {
-							int mTicks = 0;
-
-							@Override
-							public void run() {
-								mTicks++;
-
-								if (mTicks >= 20 * 2 || mOldBlocks.isEmpty()) {
-									//Restore everything that is currently hyphae to original state, and clear map
-									for (Map.Entry<Location, BlockState> e : mOldBlocks.entrySet()) {
-										if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-											e.getValue().update(true, false);
-										}
-									}
-									mOldBlocks.clear();
-
-									this.cancel();
-								} else {
-									//Remove 100 blocks per tick
-									Iterator<Map.Entry<Location, BlockState>> blockIter = mOldBlocks.entrySet().iterator();
-									for (int i = 0; i < 100 && blockIter.hasNext(); i++) {
-										Map.Entry<Location, BlockState> e = blockIter.next();
-										if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-											e.getValue().update(true, false);
-										}
-										blockIter.remove();
-									}
-								}
-							}
-						};
-						runnable.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnable);
-					}
 				}
 			}
 
@@ -251,13 +217,8 @@ public class Shatter extends Spell {
 	public void cancel() {
 		super.cancel();
 
-		//Restore everything that is currently hyphae to original state, and clear map
-		for (Map.Entry<Location, BlockState> e : mOldBlocks.entrySet()) {
-			if (e.getKey().getBlock().getType() == Material.CRIMSON_HYPHAE) {
-				e.getValue().update(true, false);
-			}
-		}
-		mOldBlocks.clear();
+		TemporaryBlockChangeManager.INSTANCE.revertChangedBlocks(mChangedBlocks, TELEGRAPH_TYPE);
+		mChangedBlocks.clear();
 	}
 
 	@Override

@@ -170,6 +170,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		try {
 			FallingBlock fallingBlock = bossLocation.getWorld().spawnFallingBlock(mBoss.getEyeLocation().add(0, 1, 0), mGrenadeMaterial.createBlockData());
 			fallingBlock.setDropItem(false);
+			EntityUtils.disableBlockPlacement(fallingBlock);
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
 			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
@@ -220,10 +221,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 						mDelay -= 1;
 						if (mDelay <= 0) {
 							mFallingBlock.remove();
-							if (blockLocation.getBlock().getType() == mFallingBlock.getBlockData().getMaterial()) {
-								blockLocation.getBlock().setType(Material.AIR);
-							}
-
 							mExplosionAesthetics.launch(mBoss, blockLocation);
 							List<? extends LivingEntity> targets = mExplosionTargets.getTargets(blockLocation);
 							launchLingering(blockLocation);
@@ -255,9 +252,6 @@ public class SpellBaseGrenadeLauncher extends Spell {
 				public synchronized void cancel() throws IllegalStateException {
 					super.cancel();
 					mFallingBlock.remove();
-					if (mFallingBlock.getLocation().getBlock().getType() == mFallingBlock.getBlockData().getMaterial()) {
-						mFallingBlock.getLocation().getBlock().setType(Material.AIR);
-					}
 					mActiveRunnables.remove(this);
 				}
 

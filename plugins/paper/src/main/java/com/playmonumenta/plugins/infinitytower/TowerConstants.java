@@ -54,11 +54,6 @@ public class TowerConstants {
 	public static final String MOB_TAG_UNTARGETABLE = "UNTARGETABLE";
 
 
-
-	//Blocks
-	public static final String FALLING_BLOCK_TAG = "ITFallingBlock";
-
-
 	//Floors
 	public static int FLOOR_SIZE_X = 27;
 	public static int FLOOR_SIZE_Z = 27;
