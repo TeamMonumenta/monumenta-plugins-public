@@ -30,6 +30,28 @@ public class CosmeticsCommand extends GenericCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.cosmetics");
 		String[] types = Arrays.stream(CosmeticType.values()).map(CosmeticType::getType).toArray(String[]::new);
 
+		GreedyStringArgument allCosmeticsArgument = (GreedyStringArgument) new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(info -> {
+			CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
+			if (type == CosmeticType.ELITE_FINISHER) {
+				return EliteFinishers.getNames();
+			} else if (type == CosmeticType.PLOT_BORDER) {
+				return PlotBorderCustomInventory.getCosmeticNames();
+			} else if (type == CosmeticType.VANITY) {
+				return Arrays.stream(Material.values()).filter(mat -> !mat.isLegacy()).map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":").toArray(String[]::new);
+			} else if (type == CosmeticType.COSMETIC_SKILL) {
+				return CosmeticSkills.getNames();
+			} else {
+				return new String[0];
+			}
+		}));
+
+		// requires the first argument to be the player, and the second to be the cosmetic type
+		GreedyStringArgument ownedCosmeticsArgument = (GreedyStringArgument) new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
+			info -> CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical((Player) info.previousArgs()[0], CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
+				        .map(Cosmetic::getName)
+				        .filter(n -> n.startsWith(info.currentArg()))
+				        .toArray(String[]::new)));
+
 		// ADD COSMETIC COMMAND
 		new CommandAPICommand("cosmetics")
 			.withPermission(perms)
@@ -37,29 +59,41 @@ public class CosmeticsCommand extends GenericCommand {
 				new LiteralArgument("add"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(types),
-				new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(info -> {
-					CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
-					if (type == CosmeticType.ELITE_FINISHER) {
-						return EliteFinishers.getNames();
-					} else if (type == CosmeticType.PLOT_BORDER) {
-						return PlotBorderCustomInventory.getCosmeticNames();
-					} else if (type == CosmeticType.VANITY) {
-						return Arrays.stream(Material.values()).filter(mat -> !mat.isLegacy()).map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":").toArray(String[]::new);
-					} else if (type == CosmeticType.COSMETIC_SKILL) {
-						return CosmeticSkills.getNames();
-					} else {
-						return new String[0];
-					}
-				})))
+				allCosmeticsArgument)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
 				String name = (String) args[2];
 				boolean added = CosmeticsManager.getInstance().addCosmetic(player, type, name);
-				if (added) {
-					sender.sendMessage(Component.text("Added " + type.getDisplayName() + " '" + name + "' to " + player.getName(), NamedTextColor.WHITE));
-				} else {
-					sender.sendMessage(Component.text(player.getName() + " already has " + type.getDisplayName() + " '" + name + "', or the cosmetic is invalid.", NamedTextColor.RED));
+				if (sender instanceof Player) {
+					if (added) {
+						sender.sendMessage(Component.text("Added " + type.getDisplayName() + " '" + name + "' to " + player.getName(), NamedTextColor.WHITE));
+					} else {
+						sender.sendMessage(Component.text(player.getName() + " already has " + type.getDisplayName() + " '" + name + "', or the cosmetic is invalid.", NamedTextColor.RED));
+					}
+				}
+			})
+			.register();
+
+		// EQUIP COSMETIC COMMAND
+		new CommandAPICommand("cosmetics")
+			.withPermission(perms)
+			.withArguments(
+				new LiteralArgument("equip"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				new MultiLiteralArgument(types),
+				ownedCosmeticsArgument)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
+				String name = (String) args[2];
+				boolean equipped = CosmeticsManager.getInstance().equipCosmetic(player, type, name, true);
+				if (sender instanceof Player) {
+					if (equipped) {
+						sender.sendMessage(Component.text("Equipped " + type.getDisplayName() + " '" + name + "' on " + player.getName(), NamedTextColor.WHITE));
+					} else {
+						sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
+					}
 				}
 			})
 			.register();
@@ -71,20 +105,18 @@ public class CosmeticsCommand extends GenericCommand {
 				new LiteralArgument("remove"),
 				new EntitySelectorArgument.OnePlayer("player"),
 				new MultiLiteralArgument(types),
-				new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
-					info -> CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical((Player) info.previousArgs()[0], CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
-						.map(Cosmetic::getName)
-						.filter(n -> n.startsWith(info.currentArg()))
-						.toArray(String[]::new))))
+				ownedCosmeticsArgument)
 			.executes((sender, args) -> {
 				Player player = (Player) args[0];
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
 				String name = (String) args[2];
 				boolean removed = CosmeticsManager.getInstance().removeCosmetic(player, type, name);
-				if (removed) {
-					sender.sendMessage(Component.text("Removed " + type.getDisplayName() + " '" + name + "' from " + player.getName(), NamedTextColor.WHITE));
-				} else {
-					sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
+				if (sender instanceof Player) {
+					if (removed) {
+						sender.sendMessage(Component.text("Removed " + type.getDisplayName() + " '" + name + "' from " + player.getName(), NamedTextColor.WHITE));
+					} else {
+						sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
+					}
 				}
 			})
 			.register();
@@ -101,7 +133,9 @@ public class CosmeticsCommand extends GenericCommand {
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
 
 				CosmeticsManager.getInstance().clearCosmetics(player, type);
-				sender.sendMessage(Component.text("Removed all " + type.getDisplayName() + "s from " + player.getName(), NamedTextColor.RED));
+				if (sender instanceof Player) {
+					sender.sendMessage(Component.text("Removed all " + type.getDisplayName() + "s from " + player.getName(), NamedTextColor.RED));
+				}
 			}).register();
 
 		// GET COSMETICS COMMAND
@@ -127,6 +161,30 @@ public class CosmeticsCommand extends GenericCommand {
 				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
 				listCosmetics(player, type, sender);
 			}).register();
+
+		// TEST COSMETIC COMMAND
+		new CommandAPICommand("cosmetics")
+			.withPermission(perms)
+			.withArguments(
+				new LiteralArgument("test"),
+				new EntitySelectorArgument.OnePlayer("player"),
+				new MultiLiteralArgument(types),
+				allCosmeticsArgument)
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				CosmeticType type = CosmeticType.valueOf(((String) args[1]).toUpperCase(Locale.ROOT));
+				String name = (String) args[2];
+				boolean hasCosmetic = CosmeticsManager.getInstance().playerHasCosmetic(player, type, name);
+				if (sender instanceof Player) {
+					if (hasCosmetic) {
+						sender.sendMessage(Component.text(player.getName() + " has " + type.getDisplayName() + " '" + name + "'", NamedTextColor.GREEN));
+					} else {
+						sender.sendMessage(Component.text(player.getName() + " does not have " + type.getDisplayName() + " '" + name + "'", NamedTextColor.RED));
+					}
+				}
+				return hasCosmetic ? 1 : 0;
+			})
+			.register();
 
 		//OPEN GUI COMMAND
 		new CommandAPICommand("cosmetics")

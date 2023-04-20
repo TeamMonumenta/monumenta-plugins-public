@@ -3,16 +3,15 @@ package com.playmonumenta.plugins.abilities.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.EmpoweringOdorCS;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageDealtSingle;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 
@@ -35,6 +34,7 @@ public class EmpoweringOdor extends Ability implements PotionAbility {
 
 	public static final AbilityInfo<EmpoweringOdor> INFO =
 		new AbilityInfo<>(EmpoweringOdor.class, "Empowering Odor", EmpoweringOdor::new)
+			.linkedSpell(ClassAbility.EMPOWERING_ODOR)
 			.scoreboardId("EmpoweringOdor")
 			.shorthandName("EO")
 			.descriptions(
@@ -54,10 +54,13 @@ public class EmpoweringOdor extends Ability implements PotionAbility {
 			.displayItem(Material.GLOWSTONE_DUST);
 
 	private final double mDamageAmplifier;
+	private final EmpoweringOdorCS mCosmetic;
 
 	public EmpoweringOdor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamageAmplifier = (isLevelOne() ? EMPOWERING_ODOR_1_DAMAGE_AMPLIFIER : EMPOWERING_ODOR_2_DAMAGE_AMPLIFIER) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EmpoweringOdorCS());
 	}
 
 	@Override
@@ -68,8 +71,7 @@ public class EmpoweringOdor extends Ability implements PotionAbility {
 		if (isEnhanced()) {
 			mPlugin.mEffectManager.addEffect(player, EMPOWERING_ODOR_ENHANCEMENT_EFFECT_NAME, new PercentDamageDealtSingle(duration, EMPOWERING_ODOR_ENHANCEMENT_DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SINGLE_HIT_DAMAGE)));
 		}
-		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1, 2);
-		new PartialParticle(Particle.END_ROD, player.getLocation(), 15, 0.4, 0.6, 0.4, 0).spawnAsPlayerActive(mPlayer);
+		mCosmetic.applyEffects(mPlayer, player, duration);
 	}
 
 }

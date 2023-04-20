@@ -11,6 +11,8 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -47,10 +49,16 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 		mRotation = 0;
 		mIncreasedRotation = 0;
 		Collections.shuffle(mSideSymbols, FastUtils.RANDOM);
+
+		center.getWorld().playSound(center, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 1, 0.5f);
 	}
 
 	@Override
 	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks) {
+
+		if (tick % 40 == 0) {
+			center.getWorld().playSound(center, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.5f, 0.75f);
+		}
 
 		double maxRotationDelta = 20;
 		double rotationDelta = -maxRotationDelta * (maxTicks - tick) / maximumPotentialTicks;

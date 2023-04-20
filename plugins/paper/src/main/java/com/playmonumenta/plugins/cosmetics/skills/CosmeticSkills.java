@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneAmalgamCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneBezoarCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneOdorCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneTinctureCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArtilleryBombCS;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcaneTra
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.PrestigiousRemedyCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.RitualRingCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneScorchedEarthCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneTabooCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.PrestigiousEsotericCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodyRetaliationCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.DarkPunishmentCS;
@@ -87,6 +89,8 @@ public class CosmeticSkills {
 		ArcaneTransmutationCS::new,
 		ArcaneBezoarCS::new,
 		ArcaneAmalgamCS::new,
+		ArcaneOdorCS::new,
+		ArcaneTabooCS::new,
 		ArtilleryBombCS::new,
 
 		//Cleric

@@ -145,6 +145,7 @@ public enum ClassAbility {
 	GRUESOME_ALCHEMY("Gruesome Alchemy"), //placeholder for cosmetic
 	IRON_TINCTURE("Iron Tincture"),
 	UNSTABLE_AMALGAM("Unstable Amalgam"),
+	EMPOWERING_ODOR("Empowering Odor"),
 
 	// Apothecary
 	PANACEA("Panacea"),

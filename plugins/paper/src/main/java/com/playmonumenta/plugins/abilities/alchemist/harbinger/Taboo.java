@@ -8,22 +8,19 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.TabooCS;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -92,6 +89,7 @@ public class Taboo extends Ability {
 	private @Nullable AlchemistPotions mAlchemistPotions;
 
 	private boolean mActive;
+	private final TabooCS mCosmetic;
 
 	public Taboo(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -101,6 +99,8 @@ public class Taboo extends Ability {
 
 		mActive = false;
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TabooCS());
+
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 		});
@@ -108,18 +108,16 @@ public class Taboo extends Ability {
 
 	public void toggle() {
 		if (mAlchemistPotions != null) {
-			World world = mPlayer.getWorld();
 			if (mActive) {
 				mAlchemistPotions.increaseChargeTime(mRechargeRateDecrease);
 				mActive = false;
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.8f, 1.2f);
 				ClientModHandler.updateAbility(mPlayer, this);
 			} else if (mAlchemistPotions.decrementCharge()) {
 				mAlchemistPotions.reduceChargeTime(mRechargeRateDecrease);
 				mActive = true;
-				world.playSound(mPlayer.getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, SoundCategory.PLAYERS, 1, 0.9f);
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
+			mCosmetic.toggle(mPlayer, mActive);
 		}
 	}
 
@@ -129,8 +127,7 @@ public class Taboo extends Ability {
 			    && mAlchemistPotions.decrementCharges(2)) {
 			putOnCooldown();
 			PlayerUtils.healPlayer(mPlugin, mPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, EntityUtils.getMaxHealth(mPlayer) * PERCENT_HEALTH_HEALING), mPlayer);
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 1, 1.2f);
-			new PartialParticle(Particle.HEART, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
+			mCosmetic.healEffects(mPlayer);
 		}
 	}
 
@@ -143,12 +140,11 @@ public class Taboo extends Ability {
 				if (mPlayer.getHealth() > selfDamage) {
 					mPlayer.setHealth(Math.min(mPlayer.getHealth(), maxHealth) - selfDamage); // Health is sometimes lower than max for whatever reason, raising an exception
 					mPlayer.damage(0);
-					new PartialParticle(Particle.DAMAGE_INDICATOR, mPlayer.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(mPlayer);
-					new PartialParticle(Particle.SQUID_INK, mPlayer.getEyeLocation(), 1, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(mPlayer);
-					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, SoundCategory.PLAYERS, 0.8f, 1);
 				}
 			}
 			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(6, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
+
+			mCosmetic.periodicEffects(mPlayer, twoHertz, oneSecond, ticks);
 		}
 	}
 

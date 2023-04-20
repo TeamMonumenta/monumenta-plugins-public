@@ -148,6 +148,32 @@ public class CosmeticsManager implements Listener {
 		}
 	}
 
+	public void toggleCosmetic(Player player, Cosmetic cosmetic) {
+		equipCosmetic(player, cosmetic, !cosmetic.mEquipped);
+	}
+
+	public boolean equipCosmetic(Player player, CosmeticType cosmeticType, String name, boolean equipped) {
+		Cosmetic cosmetic = getCosmetic(player, cosmeticType, name);
+		if (cosmetic != null) {
+			equipCosmetic(player, cosmetic, equipped);
+			return true;
+		}
+		return false;
+	}
+
+	public void equipCosmetic(Player player, Cosmetic cosmetic, boolean equipped) {
+		if (equipped) {
+			if (!cosmetic.getType().canEquipMultiple()) {
+				for (Cosmetic c : getCosmeticsOfTypeAlphabetical(player, cosmetic.mType, cosmetic.mAbility)) {
+					c.mEquipped = false;
+				}
+			}
+			cosmetic.mEquipped = true;
+		} else {
+			cosmetic.mEquipped = false;
+		}
+	}
+
 	/**
 	 * Gets a list of all unlocked cosmetics for the given player
 	 */
@@ -169,13 +195,34 @@ public class CosmeticsManager implements Listener {
 				       .filter(c -> c.getType() == type)
 				       .filter(c -> c.getAbility() == ability)
 				       .sorted(Comparator.comparing(Cosmetic::getName))
-				.toList();
+				       .toList();
 		} else {
 			return getCosmetics(player).stream()
-				.filter(c -> c.getType() == type)
-				.sorted(Comparator.comparing(Cosmetic::getName))
-				.toList();
+				       .filter(c -> c.getType() == type)
+				       .sorted(Comparator.comparing(Cosmetic::getName))
+				       .toList();
 		}
+	}
+
+	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name) {
+		for (Cosmetic cosmetic : getCosmetics(player)) {
+			if (cosmetic.getType() == type
+				    && cosmetic.getName().equals(name)) {
+				return cosmetic;
+			}
+		}
+		return null;
+	}
+
+	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name, @Nullable ClassAbility ability) {
+		for (Cosmetic cosmetic : getCosmetics(player)) {
+			if (cosmetic.getType() == type
+				    && cosmetic.getName().equals(name)
+				    && cosmetic.getAbility() == ability) {
+				return cosmetic;
+			}
+		}
+		return null;
 	}
 
 	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability) {

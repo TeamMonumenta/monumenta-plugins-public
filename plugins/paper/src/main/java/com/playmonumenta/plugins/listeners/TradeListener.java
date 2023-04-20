@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -43,10 +44,13 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
  *     <li>Adds new trades for "re-skin" trades that match existing items in a player's inventory to allow re-skinning of items with infusions and other modifiers.
  *     <li>Adds a reduced version of the above for other trades that only keeps infusions whose price is constant (delve infusions, Locked, Hope, etc.)
  *     <li>Add new trades for modified shulker box, leather armor, and shield (dyed, different banner pattern) (except for Arena or Terth trades)
+ *     <li>Modifies the Soulbound infusion's infuser to the player if it is NULL (00000000-0000-0000-0000-000000000000), i.e. allows trading for soulbound items
  * </ul>
  * Also prevents doing trades with filled shulker boxes to prevent deleting their contents
  */
 public class TradeListener implements Listener {
+
+	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
 	// Ignore stat checks for trades between items in these sets
 	private static final ImmutableSet<ImmutableSet<String>> SKIP_STAT_CHECK_TRADES = ImmutableSet.of(
@@ -82,11 +86,13 @@ public class TradeListener implements Listener {
 			TradeWindowOpenEvent.Trade trade = trades.get(i);
 			if (trade.getOriginalResult() != null) {
 				// Only not null if we are modifying the count, which will never happen when we are reskinning
+				// And in other cases, this just makes handling the trades much more complicated and likely introduces bugs
 				continue;
 			}
 			MerchantRecipe recipe = trade.getRecipe();
 			handleReskinTrades(player, trades, trade, recipe);
 			handleDyedTrades(player, trades, trade, recipe);
+			handleSoulboundTradess(player, trade, recipe);
 		}
 	}
 
@@ -298,6 +304,18 @@ public class TradeListener implements Listener {
 
 				createdTrades.add(playerItem);
 			}
+		}
+	}
+
+	private static void handleSoulboundTradess(Player player, TradeWindowOpenEvent.Trade trade, MerchantRecipe recipe) {
+		ItemStack result = trade.getRecipe().getResult();
+		if (NULL_UUID.equals(ItemStatUtils.getInfuser(result, ItemStatUtils.InfusionType.SOULBOUND))) {
+			result = ItemUtils.clone(result);
+			ItemStatUtils.addInfusion(result, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId(), true);
+			MerchantRecipe newRecipe = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
+				recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.shouldIgnoreDiscounts());
+			newRecipe.setIngredients(recipe.getIngredients());
+			trade.setRecipe(newRecipe);
 		}
 	}
 

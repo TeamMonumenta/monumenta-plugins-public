@@ -55,7 +55,7 @@ public class ArcaneRemedyCS extends WardingRemedyCS {
 			return;
 		}
 
-		world.playSound(playerLoc, pulse < maxPulse - 1 ? Sound.BLOCK_AMETHYST_BLOCK_STEP : Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, pulse < maxPulse - 1 ? 0.75f : 1, 0.5f);
+		// world.playSound(playerLoc, pulse < maxPulse - 1 ? Sound.BLOCK_AMETHYST_BLOCK_STEP : Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, pulse < maxPulse - 1 ? 0.75f : 1, 0.5f);
 
 	}
 
