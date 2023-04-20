@@ -96,9 +96,12 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			mPlayer.setVelocity(dir.setY(dir.getY() * 0.5 + 0.4));
 
 			cancelOnDeath(new BukkitRunnable() {
+				int mTicks = 0;
+
 				@Override
 				public void run() {
-					if (PlayerUtils.isOnGround(mPlayer) || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
+					// Needs the 5 tick delay since being close to the ground will cancel the runnable
+					if ((mTicks > 5 && PlayerUtils.isOnGround(mPlayer)) || mPlayer.isDead() || !mPlayer.isOnline() || !mPlayer.getLocation().isChunkLoaded()) {
 						this.cancel();
 						return;
 					}
@@ -129,9 +132,10 @@ public class TacticalManeuver extends MultipleChargeAbility {
 
 						this.cancel();
 					}
+
+					mTicks++;
 				}
-			}.runTaskTimer(mPlugin, 5, 1));
-			// Needs the 5 tick delay since being close to the ground will cancel the runnable
+			}.runTaskTimer(mPlugin, 0, 1));
 		} else {
 			for (LivingEntity le : EntityUtils.getNearbyMobs(mPlayer.getLocation(), radius, mPlayer)) {
 				DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, TACTICAL_LEAP_DAMAGE), mInfo.getLinkedSpell(), true);
