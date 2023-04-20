@@ -23,6 +23,7 @@ public class SpellBaseLaser extends Spell {
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final int mRange;
+	private final int mMaxRange;
 	private final int mDuration;
 	private final boolean mStopWhenBlocked;
 	private final boolean mSingleTarget;
@@ -104,6 +105,7 @@ public class SpellBaseLaser extends Spell {
 		mParticleFrequency = particleFrequency;
 		mParticleChance = particleChance;
 		mFinishAction = finishAction;
+		mMaxRange = 0;
 	}
 
 	public SpellBaseLaser(
@@ -117,7 +119,8 @@ public class SpellBaseLaser extends Spell {
 		ParticleAction particleAction,
 		int particleFrequency,
 		int particleChance,
-		FinishAction finishAction
+		FinishAction finishAction,
+		int maxRange
 	) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -132,6 +135,7 @@ public class SpellBaseLaser extends Spell {
 		mParticleFrequency = particleFrequency;
 		mParticleChance = particleChance;
 		mFinishAction = finishAction;
+		mMaxRange = maxRange;
 	}
 
 
@@ -231,7 +235,9 @@ public class SpellBaseLaser extends Spell {
 					mParticleChance
 				);
 
-				if ((mStopWhenBlocked && blocked) || EntityUtils.shouldCancelSpells(mBoss)) {
+				boolean outOfRange = mMaxRange != 0 && startLocation.distance(targetedLocation) > mMaxRange;
+
+				if ((mStopWhenBlocked && blocked) || EntityUtils.shouldCancelSpells(mBoss) || outOfRange) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;

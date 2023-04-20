@@ -79,6 +79,8 @@ public class LaserBoss extends BossAbilityGroup {
 		public int PARTICLE_FREQUENCY = 1;
 		@BossParam(help = "not written")
 		public int PARTICLE_CHANCE = 6;
+		@BossParam(help = "If the player exceeds this range, the laser gets cancelled. If 0, laser has no max range.")
+		public int MAX_RANGE = 0;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -142,7 +144,8 @@ public class LaserBoss extends BossAbilityGroup {
 					}
 
 
-				})
+				},
+				p.MAX_RANGE)
 		));
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
