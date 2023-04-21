@@ -50,6 +50,7 @@ public class StatTrackItem extends GenericCommand {
 		options.put("repair", InfusionType.STAT_TRACK_REPAIR);
 		options.put("convert", InfusionType.STAT_TRACK_CONVERT);
 		options.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN);
+		options.put("healdone", InfusionType.STAT_TRACK_HEALING_DONE);
 
 		Argument<?> selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
 
@@ -97,6 +98,7 @@ public class StatTrackItem extends GenericCommand {
 
 	/**
 	 * The typical infusion logic that players will run themselves from an npc
+	 *
 	 * @param player the player who is stat tracking their gear
 	 * @param option the stat track enchant option to infuse with
 	 */
@@ -123,8 +125,9 @@ public class StatTrackItem extends GenericCommand {
 
 	/**
 	 * Command to be run by moderators to manually set the stat on an item
+	 *
 	 * @param player the mod who ran the command (get their item in hand)
-	 * @param stat the numerical value the stat should have
+	 * @param stat   the numerical value the stat should have
 	 */
 	private static void runMod(Player player, int stat) {
 		//Check to see if the item in hand is already infused
@@ -148,6 +151,7 @@ public class StatTrackItem extends GenericCommand {
 
 	/**
 	 * Removes the stat track infusion from the item in hand
+	 *
 	 * @param player player to get item from
 	 */
 	private static void runRemove(Player player) {

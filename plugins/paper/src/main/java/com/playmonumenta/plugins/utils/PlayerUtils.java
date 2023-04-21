@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackHealingDone;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -192,12 +193,16 @@ public class PlayerUtils {
 			if (sourcePlayer != null && player != sourcePlayer && ActivityManager.getManager().isActive(player)) {
 				ActivityManager.getManager().addHealingDealt(sourcePlayer, healAmount);
 			}
-
-			return newHealth - oldHealth;
+			double amountHealed = newHealth - oldHealth;
+			if (sourcePlayer != null) {
+				StatTrackHealingDone.healingDone(sourcePlayer, amountHealed);
+			}
+			return amountHealed;
 		}
 
 		return 0;
 	}
+
 
 	public static Location getRightSide(Location location, double distance) {
 		double angle = location.getYaw() / 57.296;
@@ -304,7 +309,7 @@ public class PlayerUtils {
 	public static boolean hasLineOfSight(Player player, Block block) {
 		Location fromLocation = player.getEyeLocation();
 		Location toLocation = block.getLocation();
-		int range = (int)fromLocation.distance(toLocation) + 1;
+		int range = (int) fromLocation.distance(toLocation) + 1;
 		Vector direction = toLocation.toVector().subtract(fromLocation.toVector()).normalize();
 
 		try {

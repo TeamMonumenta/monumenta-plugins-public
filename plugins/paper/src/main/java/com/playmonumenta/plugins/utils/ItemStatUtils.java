@@ -707,8 +707,8 @@ public class ItemStatUtils {
 		STAT_TRACK_DEATH(new StatTrackDeath(), "", true, false, false, true, false),
 		STAT_TRACK_REPAIR(new StatTrackRepair(), "", true, false, false, true, false),
 		STAT_TRACK_CONVERT(new StatTrackConvert(), "", true, false, false, true, false),
-		STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false);
-
+		STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false),
+		STAT_TRACK_HEALING_DONE(new StatTrackHealingDone(), "", true, false, false, true, false);
 		public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
 			                                                                 .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
@@ -1885,7 +1885,7 @@ public class ItemStatUtils {
 		}
 
 		attributes.removeIf((attribute) ->
-			attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
+			                    attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 
