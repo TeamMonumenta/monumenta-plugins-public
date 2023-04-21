@@ -961,7 +961,7 @@ public class CharmManager {
 					MMLog.warning("Unknown effect '" + info.mEffect + "' in charm '" + ItemUtils.getPlainName(charm) + "'!");
 					continue;
 				}
-				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, Double::sum);
+				allEffects.merge(info.mEffect + (info.mIsPercent ? "%" : ""), info.mValue, (a, b) -> (Math.ceil((a + b) * 1000) / 1000));
 			}
 		}
 
