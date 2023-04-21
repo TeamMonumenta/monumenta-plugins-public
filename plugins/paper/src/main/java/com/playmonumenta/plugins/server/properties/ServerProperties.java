@@ -51,6 +51,7 @@ public class ServerProperties {
 	private boolean mInfusionsEnabled = true;
 	private boolean mMasterworkRefundEnabled = false;
 	private boolean mLootBoxEnabled = true;
+	private boolean mTimeTestingEnabled = false;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
@@ -155,6 +156,10 @@ public class ServerProperties {
 		return INSTANCE.mLootBoxEnabled;
 	}
 
+	public static boolean getTimeTestingEnabled() {
+		return INSTANCE.mTimeTestingEnabled;
+	}
+
 	public static int getHTTPStatusPort() {
 		return INSTANCE.mHTTPStatusPort;
 	}
@@ -240,6 +245,7 @@ public class ServerProperties {
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
 			mMasterworkRefundEnabled = getPropertyValueBool(object, "masterworkRefundEnabled", mMasterworkRefundEnabled);
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
+			mTimeTestingEnabled = getPropertyValueBool(object, "timeTestingEnabled", mTimeTestingEnabled);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
 			mShardName = getPropertyValueString(object, "shardName", mShardName);
@@ -299,6 +305,7 @@ public class ServerProperties {
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
 		out.add("masterworkRefundEnabled = " + mMasterworkRefundEnabled);
 		out.add("lootBoxEnabled = " + mLootBoxEnabled);
+		out.add("timeTestingEnabled = " + mTimeTestingEnabled);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
 		out.add("shardName = " + mShardName);
@@ -322,10 +329,10 @@ public class ServerProperties {
 		return out;
 	}
 
-	private boolean getPropertyValueBool(JsonObject object, String properyName, boolean defaultVal) {
+	private boolean getPropertyValueBool(JsonObject object, String propertyName, boolean defaultVal) {
 		boolean value = defaultVal;
 
-		JsonElement element = object.get(properyName);
+		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			value = element.getAsBoolean();
 		}
@@ -333,10 +340,10 @@ public class ServerProperties {
 		return value;
 	}
 
-	private int getPropertyValueInt(JsonObject object, String properyName, int defaultVal) {
+	private int getPropertyValueInt(JsonObject object, String propertyName, int defaultVal) {
 		int value = defaultVal;
 
-		JsonElement element = object.get(properyName);
+		JsonElement element = object.get(propertyName);
 		if (element != null) {
 			value = element.getAsInt();
 		}

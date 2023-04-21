@@ -30,7 +30,6 @@ public class SeasonalEventManager {
 		}
 	}
 
-	public static final int LEVEL_COUNT = 25;
 	public static final int MP_PER_LEVEL = 75;
 	public static final String MISSION_SCOREBOARD = "WeeklyMission";
 	public static final String ALL_MISSIONS_TITLE_NAME = "Tryhard";

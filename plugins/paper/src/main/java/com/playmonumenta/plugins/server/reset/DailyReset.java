@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.TimerTask;
 import java.util.TreeSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -29,56 +30,62 @@ public class DailyReset {
 		0));
 	private static final String DAILY_PLAYER_CHANGES_COMMAND = "execute as @S at @s run function monumenta:mechanisms/daily_player_changes";
 	static ScheduledThreadPoolExecutor mRealTimePool = new ScheduledThreadPoolExecutor(1);
-	private static @MonotonicNonNull Runnable mRealTimeRunnable = null;
-	private static @MonotonicNonNull BukkitRunnable mCountdownRunnable = null;
+	private static @MonotonicNonNull TimerTask mRealTimeRunnable = null;
 	private static int mLastDailyVersion;
 	private static int mLastCountdownTarget;
 
 	public static void startTimer(final Plugin plugin) {
 		mLastDailyVersion = getDailyVersion();
-		mLastCountdownTarget = getNextSecondsTarget();
-		if (mRealTimeRunnable == null) {
-			scheduleCountdownTick(plugin);
+		if (mRealTimeRunnable != null) {
+			mRealTimeRunnable.cancel();
 		}
+		scheduleCountdownTick(plugin);
+	}
+
+	public static void timeWarp(final Plugin plugin) {
+		if (mRealTimeRunnable != null) {
+			mRealTimeRunnable.cancel();
+		}
+		handle(plugin);
+		scheduleCountdownTick(plugin);
 	}
 
 	private static void scheduleCountdownTick(Plugin plugin) {
-		long remainingMillis = Math.max(DateUtils.untilNewDay(ChronoUnit.MILLIS) - 1000L * mLastCountdownTarget, 0) + 1;
-		if (mCountdownRunnable != null) {
-			mCountdownRunnable.cancel();
-		}
-		mCountdownRunnable = new BukkitRunnable() {
+		mLastCountdownTarget = getNextSecondsTarget();
+		long remainingMillis = Math.max(DateUtils.untilNewDay(ChronoUnit.MILLIS) - 1000L * getNextSecondsTarget(), 0) + 1;
+		mRealTimeRunnable = new TimerTask() {
 			@Override
 			public void run() {
-				int nextTarget = getNextSecondsTarget();
-				int dailyVersion = getDailyVersion();
-				String message;
-				boolean targetIsNew = mLastCountdownTarget != nextTarget;
-				boolean newDailyVersion = mLastDailyVersion != dailyVersion;
-				if (newDailyVersion) {
-					message = getNewDayMessage(mLastDailyVersion);
-					plugin.getLogger().info("[DailyReset] " + message);
-					SeasonalEventManager.reloadPasses(Bukkit.getConsoleSender());
-					for (Player player : plugin.getServer().getOnlinePlayers()) {
-						handle(plugin, player);
-					}
-				} else if (targetIsNew) {
-					message = getCountdownMessage(mLastCountdownTarget);
-					if (message != null) {
-						Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
-						plugin.getLogger().info("[DailyReset] " + message);
-						for (Player player : plugin.getServer().getOnlinePlayers()) {
-							player.sendMessage(component);
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						int nextTarget = getNextSecondsTarget();
+						int dailyVersion = getDailyVersion();
+						String message;
+						boolean targetIsNew = mLastCountdownTarget != nextTarget;
+						boolean newDailyVersion = mLastDailyVersion != dailyVersion;
+						plugin.getLogger().fine("[DailyReset] nextTarget = " + nextTarget);
+						plugin.getLogger().fine("[DailyReset] targetIsNew = " + targetIsNew);
+						plugin.getLogger().fine("[DailyReset] newDailyVersion = " + newDailyVersion);
+						if (newDailyVersion) {
+							handle(plugin);
+						} else if (targetIsNew) {
+							message = getCountdownMessage(mLastCountdownTarget);
+							if (message != null) {
+								Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
+								plugin.getLogger().info("[DailyReset] " + message);
+								for (Player player : plugin.getServer().getOnlinePlayers()) {
+									player.sendMessage(component);
+								}
+							}
 						}
+						scheduleCountdownTick(plugin);
 					}
-				}
-				mLastCountdownTarget = nextTarget;
-				mLastDailyVersion = dailyVersion;
-				scheduleCountdownTick(plugin);
+				}.runTaskLater(plugin, 1);
 			}
 		};
-		mRealTimeRunnable = () -> mCountdownRunnable.runTaskLater(plugin, 1);
 		mRealTimePool.schedule(mRealTimeRunnable, remainingMillis, TimeUnit.MILLISECONDS);
+		plugin.getLogger().fine(String.format("[DailyReset] Scheduled for %5.3f seconds", remainingMillis / 1000.0));
 	}
 
 	private static int getNextSecondsTarget() {
@@ -188,6 +195,20 @@ public class DailyReset {
 				.append(" days");
 		}
 		return builder.toString();
+	}
+
+	public static void handle(Plugin plugin) {
+		int dailyVersion = getDailyVersion();
+		if (mLastDailyVersion == dailyVersion) {
+			return;
+		}
+		String message = getNewDayMessage(mLastDailyVersion);
+		mLastDailyVersion = dailyVersion;
+		plugin.getLogger().info("[DailyReset] " + message);
+		SeasonalEventManager.reloadPasses(Bukkit.getConsoleSender());
+		for (Player player : plugin.getServer().getOnlinePlayers()) {
+			handle(plugin, player);
+		}
 	}
 
 	public static void handle(Plugin plugin, Player player) {

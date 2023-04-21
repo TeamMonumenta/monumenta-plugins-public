@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.managers.TimeWarpManager;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -9,17 +10,26 @@ public class DateUtils {
 	// TODO Read from config, default to system time zone aka ZoneId.systemDefault() - Tim
 
 	// Offset server time to UTC-17 to change when the new day arrives.
-	// getDaysSinceEpoch() uses its own perceived epoch
+	// getDaysSinceEpoch() uses its own perceived epoch,
 	// so it should sync up nicely with changes in getDayOfWeek().
 	public static final int HOURS_OFFSET = -17;
 	public static final ZoneId TIMEZONE = ZoneOffset.ofHours(HOURS_OFFSET);
+	// For use on the dev and stage servers in testing time-based content
 
-	public static LocalDateTime utcDateTime() {
+	public static LocalDateTime trueUtcDateTime() {
 		return LocalDateTime.now(ZoneId.of("UTC"));
 	}
 
-	public static LocalDateTime localDateTime() {
+	public static LocalDateTime utcDateTime() {
+		return trueUtcDateTime().plusSeconds(TimeWarpManager.get());
+	}
+
+	public static LocalDateTime trueLocalDateTime() {
 		return LocalDateTime.now(TIMEZONE);
+	}
+
+	public static LocalDateTime localDateTime() {
+		return trueLocalDateTime().plusSeconds(TimeWarpManager.get());
 	}
 
 	public static LocalDateTime localDateTime(long dailyVersion) {
@@ -91,7 +101,7 @@ public class DateUtils {
 
 	// Note: This method is intentionally UTC-only.
 	public static long getSecondsSinceEpoch() {
-		return LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC);
+		return utcDateTime().toEpochSecond(ZoneOffset.UTC);
 	}
 
 	public static boolean getAmPm() {

@@ -43,6 +43,7 @@ import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.managers.LoadoutManager;
+import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -257,6 +258,7 @@ public class Plugin extends JavaPlugin {
 		PersistentDataCommand.register();
 		MMQuest.register(this);
 		LoadoutManagerCommand.register();
+		TimeWarpCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -287,6 +289,8 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		INSTANCE = this;
+
+		TimeWarpManager.load();
 
 		/*
 		 * Set the score '$IsPlay const' to indicate whether this is the build (0) or play (1) server
@@ -577,6 +581,8 @@ public class Plugin extends JavaPlugin {
 	public void onDisable() {
 		INSTANCE = null;
 		getServer().getScheduler().cancelTasks(this);
+
+		TimeWarpManager.unload();
 
 		if (ServerProperties.getShardName().contains("gallery")) {
 			GalleryManager.close(); //TODO - test this

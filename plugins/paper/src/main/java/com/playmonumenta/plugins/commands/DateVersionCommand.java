@@ -10,6 +10,8 @@ import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -102,43 +104,66 @@ public class DateVersionCommand {
 
 	private static int getDateVersionResult(CommandSender sender, LocalDateTime localDateTime, VersionField versionField) {
 		switch (versionField) {
-			case DAILY_VERSION:
+			case DAILY_VERSION -> {
 				return (int) DateUtils.getDaysSinceEpoch(localDateTime);
-			case WEEKLY_VERSION:
+			}
+			case WEEKLY_VERSION -> {
 				return (int) DateUtils.getWeeklyVersion(localDateTime);
-			case DAYS_INTO_WEEK:
+			}
+			case DAYS_INTO_WEEK -> {
 				return (int) DateUtils.getDaysIntoWeeklyVersion(localDateTime);
-			case DAYS_LEFT_IN_WEEK:
+			}
+			case DAYS_LEFT_IN_WEEK -> {
 				return (int) DateUtils.getDaysLeftInWeeklyVersion(localDateTime);
-			case WEEK_START_DATE:
+			}
+			case WEEK_START_DATE -> {
 				return (int) DateUtils.getWeeklyVersionStartDate(localDateTime);
-			case WEEK_END_DATE:
+			}
+			case WEEK_END_DATE -> {
 				return (int) DateUtils.getWeeklyVersionEndDate(localDateTime);
-			case NEXT_WEEK_DATE:
+			}
+			case NEXT_WEEK_DATE -> {
 				return (int) DateUtils.getNextWeeklyVersionStartDate(localDateTime);
-			case SECONDS_TO_NEXT_DAY:
+			}
+			case SECONDS_TO_NEXT_DAY -> {
 				return (int) DateUtils.untilNewDay(ChronoUnit.SECONDS);
-			case SECONDS_TO_NEXT_WEEK:
+			}
+			case SECONDS_TO_NEXT_WEEK -> {
 				return (int) DateUtils.untilNewWeek(ChronoUnit.SECONDS);
-			default:
+			}
+			default -> {
 				debugDate(sender, localDateTime);
 				return 1;
+			}
 		}
 	}
 
-	private static void debugDate(CommandSender sender, LocalDateTime localDateTime) {
-		sender.sendMessage(Component.text("Current Tick: " + Bukkit.getCurrentTick()));
-		sender.sendMessage(Component.text("Now UntilNextDay: " + DateUtils.untilNewDay()));
-		sender.sendMessage(Component.text("Now UntilNextWeek: " + DateUtils.untilNewWeek()));
+	public static void debugDate(CommandSender sender, LocalDateTime localDateTime) {
+		sender.sendMessage(Component.text("Date version debug:", NamedTextColor.AQUA, TextDecoration.BOLD));
+		sender.sendMessage(Component.text("Current Tick: ", NamedTextColor.AQUA)
+			.append(Component.text(Bukkit.getCurrentTick(), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("Now UntilNextDay: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.untilNewDay(), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("Now UntilNextWeek: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.untilNewWeek(), NamedTextColor.GOLD)));
 		sender.sendMessage(Component.empty());
 
-		sender.sendMessage(Component.text("For " + localDateTime + ":"));
-		sender.sendMessage(Component.text("DailyVersion: " + DateUtils.getDaysSinceEpoch(localDateTime)));
-		sender.sendMessage(Component.text("WeeklyVersion: " + DateUtils.getWeeklyVersion(localDateTime)));
-		sender.sendMessage(Component.text("DaysIntoWeeklyVersion: " + DateUtils.getDaysIntoWeeklyVersion(localDateTime)));
-		sender.sendMessage(Component.text("DaysLeftInWeeklyVersion: " + DateUtils.getDaysLeftInWeeklyVersion(localDateTime)));
-		sender.sendMessage(Component.text("WeeklyVersionStartDate: " + DateUtils.getWeeklyVersionStartDate(localDateTime)));
-		sender.sendMessage(Component.text("WeeklyVersionEndDate: " + DateUtils.getWeeklyVersionEndDate(localDateTime)));
-		sender.sendMessage(Component.text("NextWeeklyVersionStartDate: " + DateUtils.getNextWeeklyVersionStartDate(localDateTime)));
+		sender.sendMessage(Component.text("For ", NamedTextColor.AQUA)
+			.append(Component.text(localDateTime.toString(), NamedTextColor.GOLD))
+			.append(Component.text(":")));
+		sender.sendMessage(Component.text("DailyVersion: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getDaysSinceEpoch(localDateTime), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("WeeklyVersion: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getWeeklyVersion(localDateTime), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("DaysIntoWeeklyVersion: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getDaysIntoWeeklyVersion(localDateTime), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("DaysLeftInWeeklyVersion: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getDaysLeftInWeeklyVersion(localDateTime), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("WeeklyVersionStartDate: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getWeeklyVersionStartDate(localDateTime), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("WeeklyVersionEndDate: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getWeeklyVersionEndDate(localDateTime), NamedTextColor.GOLD)));
+		sender.sendMessage(Component.text("NextWeeklyVersionStartDate: ", NamedTextColor.AQUA)
+			.append(Component.text(DateUtils.getNextWeeklyVersionStartDate(localDateTime), NamedTextColor.GOLD)));
 	}
 }
