@@ -167,6 +167,10 @@ public class DamageEvent extends Event implements Cancellable {
 			return mType;
 		}
 
+		public void setType(DamageType type) {
+			mType = type;
+		}
+
 		public @Nullable String getBossSpellName() {
 			return mBossSpellName;
 		}
@@ -211,6 +215,7 @@ public class DamageEvent extends Event implements Cancellable {
 			}
 		} else if (mDamager instanceof EvokerFangs fangs) {
 			mSource = fangs.getOwner();
+			mMetadata.setType(DamageType.MAGIC);
 		} else if (mDamager instanceof LivingEntity le) {
 			mSource = le;
 		} else {
