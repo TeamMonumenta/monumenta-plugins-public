@@ -51,10 +51,7 @@ public class ThrowingKnife implements Enchantment {
 			ItemStack item = event.getItem();
 			if (item != null && (item.getType() == Material.ARROW || item.getType() == Material.SPECTRAL_ARROW || item.getType() == Material.TIPPED_ARROW)) {
 				if (player.getCooldown(item.getType()) <= 0) {
-					if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) == 0 && player.getGameMode() != GameMode.CREATIVE) {
-						item.setAmount(item.getAmount() - 1);
-					}
-					player.setCooldown(item.getType(), (int)(20 * 0.75));
+					player.setCooldown(item.getType(), (int) (20 * 0.75));
 					Location loc = player.getLocation();
 					Vector dir = loc.getDirection();
 					if (item.getType() == Material.ARROW) {
@@ -80,6 +77,10 @@ public class ThrowingKnife implements Enchantment {
 						arrow.setCritical(true);
 						arrow.setMetadata(METADATA_KEY, new FixedMetadataValue(plugin, null));
 						arrow.setPickupStatus(PickupStatus.DISALLOWED);
+					}
+
+					if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.INFINITY) == 0 && player.getGameMode() != GameMode.CREATIVE) {
+						item.setAmount(item.getAmount() - 1);
 					}
 
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 1.65f);
