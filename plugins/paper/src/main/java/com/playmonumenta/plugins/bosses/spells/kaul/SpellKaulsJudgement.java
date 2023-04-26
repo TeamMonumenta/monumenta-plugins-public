@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.*;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -64,6 +65,10 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final String KAULS_JUDGEMENT_MOB_SPAWN_TAG = "KaulsJudgementMobSpawn";
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
 	private static final int KAULS_JUDGEMENT_TIME = 20 * 55;
+	private static final String NEGATIVE_HEALTH_EFFECT_NAME = "KaulsJudgementNegativeHealthBoost";
+	private static final String SLOWNESS_EFFECT_NAME = "KaulsJudgementSlowness";
+	private static final String STRENGTH_EFFECT_NAME = "KaulsJudgementStrength";
+	private static final String SPEED_EFFECT_NAME = "KaulsJudgementSpeed";
 
 	private static @Nullable SpellKaulsJudgement INSTANCE = null;
 
@@ -230,8 +235,9 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	}
 
 	private void fail(Player player) {
-		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.HEALTH_BOOST, 60 * 20, -2));
-		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SLOW, 60 * 20, 1));
+		mPlugin.mEffectManager.addEffect(player, NEGATIVE_HEALTH_EFFECT_NAME, new PercentHealthBoost(60 * 20, -0.2, NEGATIVE_HEALTH_EFFECT_NAME));
+		mPlugin.mEffectManager.addEffect(player, SLOWNESS_EFFECT_NAME, new PercentSpeed(60 * 20, -0.3, SLOWNESS_EFFECT_NAME));
+
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 0.2f);
 		new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData()).spawnAsBoss();
@@ -241,8 +247,9 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	}
 
 	private void succeed(Player player) {
-		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 30 * 20, 0));
-		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.SPEED, 30 * 20, 0));
+		mPlugin.mEffectManager.addEffect(player, STRENGTH_EFFECT_NAME, new PercentDamageDealt(60 * 20, 0.2));
+		mPlugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(60 * 20, 0.2, SPEED_EFFECT_NAME));
+
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 		player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
 

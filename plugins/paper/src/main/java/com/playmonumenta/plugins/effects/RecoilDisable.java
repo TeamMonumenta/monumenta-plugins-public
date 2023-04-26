@@ -45,7 +45,7 @@ public class RecoilDisable extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		if (fourHertz) {
-			if (entity.isOnGround()) {
+			if (entity.isOnGround() || entity.isInWater()) {
 				setDuration(0);
 			}
 		}
