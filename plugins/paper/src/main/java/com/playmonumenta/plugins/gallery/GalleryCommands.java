@@ -206,6 +206,20 @@ public class GalleryCommands {
 			.withPermission(PERMISSION)
 			.withArguments(
 				util,
+				new MultiLiteralArgument("get"),
+				new MultiLiteralArgument("coin"))
+			.executes((sender, args) -> {
+				GalleryGame game = getGameFromSender(sender);
+				if (game == null) {
+					throw CommandAPI.failWithString("Could not detect game");
+				}
+				return game.getPlayersCoins();
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERMISSION)
+			.withArguments(
+				util,
 				new MultiLiteralArgument("box"),
 				new MultiLiteralArgument("get"),
 				new MultiLiteralArgument("locations"))
