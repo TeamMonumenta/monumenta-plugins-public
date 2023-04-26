@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 public class HolyJavelin extends Ability {
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
 
-	private static final double HITBOX_LENGTH = 0.75;
 	private static final int RANGE = 12;
 	private static final int UNDEAD_DAMAGE_1 = 22;
 	private static final int UNDEAD_DAMAGE_2 = 36;
@@ -133,7 +132,7 @@ public class HolyJavelin extends Ability {
 		new PPLine(Particle.EXPLOSION_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0).extra(0.025).spawnAsPlayerActive(mPlayer);
 		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(22).delta(0.25).data(COLOR).spawnAsPlayerActive(mPlayer);
 
-		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
+		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, 0.95, true).accuracy(0.5).getHitMobs()) {
 			double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;
 			if (enemy != triggeringEnemy) {
 				// Triggering enemy would've already received the melee damage from Luminous Infusion

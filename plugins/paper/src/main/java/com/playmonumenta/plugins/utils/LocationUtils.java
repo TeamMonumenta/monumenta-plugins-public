@@ -707,6 +707,10 @@ public class LocationUtils {
 	public static Location rayTraceToBlock(Player player, double maxDist, @Nullable Consumer<Location> onHitBlock) {
 		Location startLoc = player.getEyeLocation();
 		Vector dir = startLoc.getDirection();
+		return rayTraceToBlock(startLoc, dir, maxDist, onHitBlock);
+	}
+
+	public static Location rayTraceToBlock(Location startLoc, Vector dir, double maxDist, @Nullable Consumer<Location> onHitBlock) {
 		World world = startLoc.getWorld();
 		RayTraceResult result = world.rayTraceBlocks(startLoc, dir, maxDist, FluidCollisionMode.NEVER, true);
 		if (result == null) {
