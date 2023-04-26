@@ -270,7 +270,8 @@ public class CosmeticsGUI extends CustomInventory {
 		}
 
 		// Get list of cosmetics
-		List<Cosmetic> playerCosmetics = CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(targetPlayer, mDisplayPage, mCurrentAbility);
+		List<Cosmetic> playerCosmetics = mCurrentAbility != null && mCurrentAbility.getLinkedSpell() == null ? List.of()
+			                                 : CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical(targetPlayer, mDisplayPage, mCurrentAbility);
 		if (playerCosmetics == null) {
 			mDisplayPage = null;
 			setUpCosmetics(targetPlayer);
