@@ -49,7 +49,10 @@ public class StarstruckCS extends ByMyBladeCS {
 		}
 
 		Location playerLocation = player.getLocation();
-		world.playSound(playerLocation, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 0.8f, 0.5f);
+		world.playSound(playerLocation, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
+		world.playSound(playerLocation, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.PLAYERS, 0.6f, 2f);
+		world.playSound(playerLocation, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 1f, 1.3f);
+		world.playSound(playerLocation, Sound.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 0.18f, 1.6f);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -63,7 +66,7 @@ public class StarstruckCS extends ByMyBladeCS {
 
 				mTicks++;
 				if (mTicks >= 8) {
-					world.playSound(playerLocation, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.3f, 2f);
+					world.playSound(playerLocation, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.22f, 2f);
 					this.cancel();
 				}
 			}

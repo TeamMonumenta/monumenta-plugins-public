@@ -60,6 +60,8 @@ public class SupernovaShieldCS extends EscapeDeathCS {
 
 		world.playSound(loc, Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.PLAYERS, 0.75f, 0.5f);
 		world.playSound(loc, Sound.ITEM_ARMOR_EQUIP_ELYTRA, SoundCategory.PLAYERS, 1f, 1.1f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.6f, 2f);
 
 		new BukkitRunnable() {
 			@Override
@@ -80,7 +82,7 @@ public class SupernovaShieldCS extends EscapeDeathCS {
 	}
 
 	private void drawParticle(Location location, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, location, 2, 0.04, 0.02, 0.04, 0, new Particle.DustOptions(color, 1.5f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 4, 0.04, 0.02, 0.04, 0, new Particle.DustOptions(color, 1.5f)).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 

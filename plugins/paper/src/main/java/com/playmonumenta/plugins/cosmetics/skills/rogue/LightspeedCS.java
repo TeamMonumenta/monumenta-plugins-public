@@ -43,7 +43,7 @@ public class LightspeedCS extends AdvancingShadowsCS {
 		Vector starCentre = target.getLocation().clone().add(0, target.getEyeHeight(), 0).toVector();
 		double starSize = 4 * target.getHeight() / 5;
 
-		ArrayList<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(5, starSize, 0.5, false, false), 3);
+		ArrayList<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(5, starSize, 0.5, false, false), 5);
 
 		Vector direction = player.getLocation().clone().subtract(starCentre.clone()).getDirection();
 		double angle = Math.atan2(direction.getX(), direction.getZ());
@@ -66,11 +66,16 @@ public class LightspeedCS extends AdvancingShadowsCS {
 
 	@Override
 	public void tpSound(World world, Player mPlayer) {
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 0.7f, 1.4f + FastUtils.randomFloatInRange(0f, 0.2f));
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.0f, 2.0f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.0f, 1.2f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_HIT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 		world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_HIT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_HIT, SoundCategory.PLAYERS, 1.0f, 2.0f);
+				world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_FALL, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				world.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_FALL, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 2);
@@ -94,17 +99,17 @@ public class LightspeedCS extends AdvancingShadowsCS {
 	}
 
 	private void drawCrit(Location location, Player player) {
-		new PartialParticle(Particle.CRIT, location, 3, 0, 0, 0, 0).minimumCount(0)
+		new PartialParticle(Particle.CRIT, location, 6, 0, 0, 0, 0).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawGold(Location location, Player player) {
-		new PartialParticle(Particle.REDSTONE, location, 5, 0.04, 0, 0.04, 0, new Particle.DustOptions(Color.fromRGB(255, 200, 70), 0.9f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 10, 0.04, 0, 0.04, 0, new Particle.DustOptions(Color.fromRGB(255, 200, 70), 0.9f)).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawSpark(Location location, Player player) {
-		new PartialParticle(Particle.ELECTRIC_SPARK, location, 4, 0.03, 0, 0.03, 0).minimumCount(0)
+		new PartialParticle(Particle.ELECTRIC_SPARK, location, 8, 0.03, 0, 0.03, 0).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 }

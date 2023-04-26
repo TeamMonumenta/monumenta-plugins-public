@@ -65,13 +65,15 @@ public class StarburstCS extends ViciousCombosCS {
 					for (Vector v : starFull) {
 						drawParticle(scaleVector(v, starCentre, (double) mTicks / 16).toLocation(world), player, colors[mTicks / 2]);
 					}
-					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 0.8f, 1.4f - (float)mTicks / 20);
+					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1.4f - (float)mTicks / 20);
+					world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 1f, 1.4f - (float)mTicks / 20);
+					world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.4f, 1.6f - (float)mTicks / 20);
 				} else if (mTicks == 16) {
 					for (Vector v : starFull) {
 						drawStar(v.toLocation(world), player);
 					}
-					world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.8f, 0.8f);
-					world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 0.5f, 1.6f);
+					world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1f, 0.8f);
+					world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 0.8f, 1.6f);
 				}
 				if (mTicks > 16) {
 					this.cancel();
@@ -100,7 +102,7 @@ public class StarburstCS extends ViciousCombosCS {
 	}
 
 	private void drawParticle(Location location, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, location, 2, 0.02, 0.02, 0.02, 0.4, new Particle.DustOptions(color, 0.5f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 4, 0.02, 0.02, 0.02, 0.4, new Particle.DustOptions(color, 0.5f)).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 

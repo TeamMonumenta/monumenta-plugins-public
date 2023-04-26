@@ -60,7 +60,10 @@ public class GalacticRainCS extends CoupDeGraceCS {
 		ArrayList<Vector> pentagramStar = StarCosmeticsFunctions.interpolatePolygon(pentagramStarVertices, 4);
 		pentagramStar.addAll(pentagramPentagon);
 
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 2f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.3f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.35f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 1f, 1.4f);
+
 		new BukkitRunnable() {
 			int mTicks = 0;
 			@Override
@@ -77,6 +80,8 @@ public class GalacticRainCS extends CoupDeGraceCS {
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.5, 0.1, 0.5, 0).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 15, 0.5, 0.1, 0.5, 0).spawnAsPlayerActive(player);
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1f, 2f);
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1f, 2f);
 					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1f, 2f);
 				} else if (mTicks < 14) {
 					for (Vector v : pentagramStar) {

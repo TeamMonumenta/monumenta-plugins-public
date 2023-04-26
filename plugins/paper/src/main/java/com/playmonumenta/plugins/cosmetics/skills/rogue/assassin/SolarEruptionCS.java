@@ -120,7 +120,8 @@ public class SolarEruptionCS extends BodkinBlitzCS {
 		new PartialParticle(Particle.ELECTRIC_SPARK, loc, 30, 0.5, 0.5, 0.5, 0.1).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, loc, 30, 0.5, 0.5, 0.5, 0, new Particle.DustOptions(rollSolarColor(), 1f)).spawnAsPlayerActive(player);
 
-		player.getWorld().playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1, 0.5f);
+		player.getWorld().playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.8f, 0.5f);
+		player.getWorld().playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.2f);
 	}
 
 	private void drawSolar(Player player, Location loc) {

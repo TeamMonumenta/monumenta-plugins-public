@@ -44,18 +44,34 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 		switch (mMode) {
 			case 0 -> {
 				drawArc(player, viewDirection, Math.PI / 6);
-				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.7f);
+				world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.4f, 1.6f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 0.6f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 1.8f);
+				world.playSound(loc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 0.7f, 1.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 1.7f);
 				mMode = 1;
 			}
 			case 1 -> {
 				drawArc(player, viewDirection, -Math.PI / 6);
-				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.7f);
+				world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.4f, 1.6f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 0.6f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 1.8f);
+				world.playSound(loc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 0.7f, 1.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 1.7f);
 				mMode = 2;
 			}
 			default -> {
 				drawArc(player, viewDirection, Math.PI / 6);
 				drawArc(player, viewDirection, -Math.PI / 6);
-				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.8f, 2.0f);
+				world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.4f, 1.3f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 0.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1f, 1.5f);
+				world.playSound(loc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 0.7f, 1.2f);
+				world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.15f, 1.2f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.7f, 2.0f);
 				mMode = 0;
 			}
 		}
@@ -85,11 +101,11 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 					this.cancel();
 				}
 
-				for (int i = 0; i < 4; i++) {
+				for (int i = 0; i < 6; i++) {
 					Vector offsetX = viewDirection.clone().multiply(2.3 * FastUtils.cos(Math.signum(tilt) * mAngle));
 					Vector offsetZ = viewNormal.clone().multiply(2.3 * FastUtils.sin(Math.signum(tilt) * mAngle));
 					drawCosmic(player, player.getEyeLocation().add(offsetX.add(offsetZ).rotateAroundAxis(viewDirection, tilt)));
-					mAngle += Math.PI / 30;
+					mAngle += Math.PI / 45;
 				}
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
@@ -97,9 +113,9 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 
 	private void drawCosmic(Player player, Location loc) {
 		if (FastUtils.randomIntInRange(0, 3) == 0) {
-			new PartialParticle(Particle.CRIT_MAGIC, loc, 4, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.CRIT_MAGIC, loc, 10, 0.06, 0.06, 0.06, 0).minimumCount(0).spawnAsPlayerActive(player);
 		} else {
-			new PartialParticle(Particle.REDSTONE, loc, 6, 0.1, 0.1, 0.1, 0, new Particle.DustOptions(rollCosmicColor(), 0.6f)).minimumCount(0).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, loc, 15, 0.06, 0.06, 0.06, 0, new Particle.DustOptions(rollCosmicColor(), 0.4f)).minimumCount(0).spawnAsPlayerActive(player);
 		}
 	}
 

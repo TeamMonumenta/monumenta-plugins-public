@@ -40,9 +40,9 @@ public class SolarChainsCS extends SkirmisherCS {
 	public void aesthetics(Player mPlayer, Location loc, World world, LivingEntity enemy) {
 		double halfHeight = enemy.getHeight() / 2;
 		double halfWidth = enemy.getWidth() / 2;
-		world.playSound(loc, Sound.BLOCK_IRON_DOOR_CLOSE, SoundCategory.PLAYERS, 1.5f, 2f);
-		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 1f, 1.5f);
-		world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 1f, 0.8f);
+		world.playSound(loc, Sound.BLOCK_IRON_DOOR_CLOSE, SoundCategory.PLAYERS, 1f, 2f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, 0.6f, 1.5f);
+		world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.6f, 0.8f);
 
 		if (FastUtils.randomIntInRange(1, 5) <= 4) {
 			new PPCircle(Particle.CRIT, loc, halfWidth * 2).ringMode(true).delta(0.02).count(40).spawnAsPlayerActive(mPlayer);

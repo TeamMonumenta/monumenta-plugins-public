@@ -70,9 +70,9 @@ public class StellarDanceCS extends WindWalkCS {
 				Vector offsetX = perpendicularPlaneVector.clone().multiply(3 * FastUtils.cos(angle));
 				Vector offsetZ = perpendicularPlaneVectorUp.clone().multiply(3 * FastUtils.sin(angle));
 				if (mSolar) {
-					drawSolar(player, playerLocation.clone().add(offsetX).add(offsetZ), 1);
+					drawSolar(player, playerLocation.clone().add(offsetX).add(offsetZ), 2);
 				} else {
-					drawCosmic(player, playerLocation.clone().add(offsetX).add(offsetZ), 1);
+					drawCosmic(player, playerLocation.clone().add(offsetX).add(offsetZ), 2);
 				}
 			}
 		}

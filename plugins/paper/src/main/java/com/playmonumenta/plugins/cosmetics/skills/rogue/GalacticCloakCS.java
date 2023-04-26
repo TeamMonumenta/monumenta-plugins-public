@@ -42,7 +42,7 @@ public class GalacticCloakCS extends SmokescreenCS {
 	public void smokescreenEffects(Player player, World world, Location loc) {
 		ArrayList<Vector> spiralPoints = new ArrayList<>();
 		for (double d = 0; d < SPIRAL_POINTS; d++) {
-			spiralPoints.add(new Vector(loc.getX() + d / 35.0 * FastUtils.cos(d * Math.PI / 21.0), loc.getY() + 0.3, loc.getZ() + d / 35.0 * FastUtils.sin(d * Math.PI / 21.0)));
+			spiralPoints.add(new Vector(loc.getX() + d / 35.0 * FastUtils.cos(d * Math.PI / 21.0), loc.getY() + 0.2, loc.getZ() + d / 35.0 * FastUtils.sin(d * Math.PI / 21.0)));
 		}
 
 		for (double d = 0; d < 2 * Math.PI; d += Math.PI / 20) {
@@ -73,8 +73,8 @@ public class GalacticCloakCS extends SmokescreenCS {
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
-		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.6f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.8f, 0.5f);
+		world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1f, 0.5f);
+		world.playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1f, 0.5f);
 	}
 
 	@Override
@@ -91,12 +91,12 @@ public class GalacticCloakCS extends SmokescreenCS {
 	}
 
 	private void drawParticle(Location location, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, location, 2, 0.02, 0, 0.02, 0, new Particle.DustOptions(color, 1.6f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 5, 0.03, 0, 0.03, 0, new Particle.DustOptions(color, 2.0f)).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawCrit(Location location, Player player) {
-		new PartialParticle(Particle.CRIT_MAGIC, location, 3, 0.3, 0.05, 0.3, 0.075).minimumCount(0)
+		new PartialParticle(Particle.CRIT_MAGIC, location, 5, 0.3, 0.05, 0.3, 0.075).minimumCount(0)
 			.spawnAsPlayerActive(player);
 	}
 }

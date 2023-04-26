@@ -69,11 +69,11 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		new PPCircle(Particle.END_ROD, loc.clone().add(0, 0.2, 0), 2).ringMode(true).count(10).spawnAsPlayerActive(player);
 
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.6f, 2f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1f, 2f);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.6f, 0.8f);
+				world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1f, 0.8f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 4);
 	}
