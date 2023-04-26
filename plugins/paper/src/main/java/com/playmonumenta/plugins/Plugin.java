@@ -259,6 +259,7 @@ public class Plugin extends JavaPlugin {
 		MMQuest.register(this);
 		LoadoutManagerCommand.register();
 		TimeWarpCommand.register();
+		ChargeUpBarCommand.register(this);
 
 		try {
 			mHttpManager = new HttpManager(this);

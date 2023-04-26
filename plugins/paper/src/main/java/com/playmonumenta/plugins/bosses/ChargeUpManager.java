@@ -1,163 +1,99 @@
 package com.playmonumenta.plugins.bosses;
 
-import com.playmonumenta.plugins.Plugin;
-import org.bukkit.Bukkit;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class ChargeUpManager {
 
-	private int mTime;
-	private int mChargeTime;
-	private String mTitle;
-	private @Nullable LivingEntity mBoss;
-	private Location mLoc;
-	private final int mRange;
-	private final BossBar mBar;
-	private @Nullable BukkitRunnable mRunnable;
-	private int mRefresh;
+	private final AdventureChargeUpManager mChargeUp;
 
 	public ChargeUpManager(LivingEntity boss, int chargeTime, String title, BarColor color, BarStyle style, int range) {
 		this(boss.getLocation(), boss, chargeTime, title, color, style, range);
 	}
 
 	public ChargeUpManager(Location loc, @Nullable LivingEntity boss, int chargeTime, String title, BarColor color, BarStyle style, int range) {
-		mLoc = loc;
-		mChargeTime = chargeTime;
-		mBoss = boss;
-		mTitle = title;
-		mTime = 0;
-		mRange = range;
-		mBar = Bukkit.getServer().createBossBar(title, color, style);
-		mBar.setVisible(false);
-		mBar.setProgress(0);
-		mRefresh = 0;
-		mRunnable = null;
+		mChargeUp = new AdventureChargeUpManager(loc, boss, chargeTime, MessagingUtils.LEGACY_SERIALIZER.deserialize(title), net.kyori.adventure.bossbar.BossBar.Color.valueOf(color.name()), legacyBarStyleConversion(style), range);
 	}
 
+	public static net.kyori.adventure.bossbar.BossBar.Overlay legacyBarStyleConversion(BarStyle style) {
+		switch (style) {
+			case SEGMENTED_6 -> {
+				return net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_6;
+			}
+			case SEGMENTED_10 -> {
+				return net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_10;
+			}
+			case SEGMENTED_12 -> {
+				return net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_12;
+			}
+			case SEGMENTED_20 -> {
+				return net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_20;
+			}
+			default -> {
+				return net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS;
+			}
+		}
+	}
+
+
 	public void setChargeTime(int chargeTime) {
-		mChargeTime = chargeTime;
+		mChargeUp.setChargeTime(chargeTime);
 	}
 
 	public void reset() {
-		mBar.setProgress(0);
-		mBar.setVisible(false);
-		mTime = 0;
-		mRunnable = null;
+		mChargeUp.reset();
 	}
 
 	public int getTime() {
-		return mTime;
+		return mChargeUp.getTime();
 	}
 
 	public void setTime(int time) {
-		mTime = time;
+		mChargeUp.setTime(time);
 	}
 
 	public boolean nextTick() {
-		return nextTick(1);
+		return mChargeUp.nextTick(1);
 	}
 
 	public boolean nextTick(int time) {
-		mTime += time;
-		update();
-		return mTime >= mChargeTime;
+		return mChargeUp.nextTick(time);
 	}
 
 	public boolean previousTick() {
-		return previousTick(1);
+		return mChargeUp.previousTick(1);
 	}
 
 	public boolean previousTick(int time) {
-		mTime -= time;
-		update();
-		return mTime <= 0;
+		return mChargeUp.previousTick(time);
 	}
 
 	public void setTitle(String title) {
-		mBar.setTitle(title);
-		mTitle = title;
+		mChargeUp.setTitle(MessagingUtils.LEGACY_SERIALIZER.deserialize(title));
 	}
 
 	public void setColor(BarColor color) {
-		mBar.setColor(color);
+		mChargeUp.setColor(net.kyori.adventure.bossbar.BossBar.Color.valueOf(color.name()));
 	}
 
 	public BarColor getColor() {
-		return mBar.getColor();
+		return BarColor.valueOf(mChargeUp.getColor().name());
 	}
 
 	public void update() {
-
-		if (!mBar.isVisible()) {
-			mBar.setVisible(true);
-			mBar.setTitle(mTitle);
-		}
-		if (mBoss != null) {
-			mLoc = mBoss.getLocation();
-			if (mBoss.getHealth() <= 0 || mBoss.isDead() || !mBoss.isValid()) {
-				mBar.setVisible(false);
-
-			}
-		}
-
-		mRefresh = 0;
-		if (mRunnable == null) {
-			mRunnable = new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					mRefresh++;
-
-					if (mRefresh >= 20 * 1) {
-						this.cancel();
-						mBar.setVisible(false);
-						mRefresh = 0;
-						mRunnable = null;
-					}
-				}
-
-			};
-
-			mRunnable.runTaskTimer(Plugin.getInstance(), 0, 1);
-		}
-
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld().equals(mLoc.getWorld()) && player.getLocation().distance(mLoc) < mRange) {
-				mBar.addPlayer(player);
-			} else {
-				mBar.removePlayer(player);
-			}
-		}
-
-		double progress = (double) mTime / (double) mChargeTime;
-		if (progress > 1) {
-			progress = 1;
-		} else if (progress < 0) {
-			progress = 0;
-		}
-		mBar.setProgress(progress);
+		mChargeUp.update();
 	}
 
 	public void setProgress(double progress) {
-		if (progress > 1) {
-			progress = 1;
-		} else if (progress < 0) {
-			progress = 0;
-		}
-		mBar.setProgress(progress);
-		mRefresh = 0;
+		mChargeUp.setProgress((float) progress);
 	}
 
 	public void remove() {
-		mBar.setVisible(false);
+		mChargeUp.remove();
 	}
-
 }
-
