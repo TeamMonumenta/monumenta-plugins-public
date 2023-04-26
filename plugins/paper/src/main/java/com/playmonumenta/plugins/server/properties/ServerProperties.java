@@ -217,7 +217,7 @@ public class ServerProperties {
 	}
 
 	private void loadInternal(Plugin plugin, @Nullable CommandSender sender) {
-		QuestUtils.loadScriptedQuests(plugin, ".", sender, (object) -> {
+		QuestUtils.loadScriptedQuests(plugin, "properties", sender, (object) -> {
 			mJoinMessagesEnabled = getPropertyValueBool(object, "joinMessagesEnabled", mJoinMessagesEnabled);
 			mIsTownWorld = getPropertyValueBool(object, "isTownWorld", mIsTownWorld);
 			mPlotSurvivalMinHeight = getPropertyValueInt(object, "plotSurvivalMinHeight", mPlotSurvivalMinHeight);
