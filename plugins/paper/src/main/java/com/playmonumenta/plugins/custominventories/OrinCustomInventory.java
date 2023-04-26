@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DungeonUtils.DungeonCommandMapping;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -15,7 +16,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -336,7 +336,7 @@ public class OrinCustomInventory extends CustomInventory {
 				}
 			} else {
 				String finalCommand = cmd.replace("@S", player.getName());
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(finalCommand);
 				player.closeInventory();
 			}
 		}

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -118,12 +119,12 @@ public class SpellFinalCrystal extends Spell {
 			public void run() {
 				//glowy crystal to tell players to break
 				if (mT == 0) {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color white");
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify crystal color white");
 					for (EnderCrystal e : mCrystal) {
 						e.setGlowing(true);
 						e.setBeamTarget(mBoss.getLocation().add(0, 1.5, 0));
 						UUID uuid = e.getUniqueId();
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join crystal " + uuid);
+						NmsUtils.getVersionAdapter().runConsoleCommandSilently("team join crystal " + uuid);
 					}
 				}
 				//exit function
@@ -136,12 +137,12 @@ public class SpellFinalCrystal extends Spell {
 				//warning 1
 				if (mT == 20 * 2) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color yellow");
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify crystal color yellow");
 				}
 				//warning 2
 				if (mT == 20 * 4) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3.0f, 0.75f);
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify crystal color red");
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify crystal color red");
 				}
 				//execute order 66
 				if (mT >= 20 * 6) {

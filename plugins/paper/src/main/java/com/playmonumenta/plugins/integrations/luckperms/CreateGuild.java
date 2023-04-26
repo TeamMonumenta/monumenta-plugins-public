@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -141,9 +142,9 @@ public class CreateGuild {
 						MonumentaNetworkChatIntegration.refreshPlayer(founder);
 
 						// fireworks!
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + founder.getName()
-							+ " run summon minecraft:firework_rocket ~ ~1 ~ "
-							+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
+						NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + founder.getName()
+							                                                       + " run summon minecraft:firework_rocket ~ ~1 ~ "
+							                                                       + "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");
 					}
 
 					try {

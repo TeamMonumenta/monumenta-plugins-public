@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -100,7 +101,7 @@ public class JoinGuild {
 									p.sendMessage(ChatColor.GOLD + "Congratulations! You have joined " + currentGuildName + "!");
 									founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has joined your guild");
 									MonumentaNetworkChatIntegration.refreshPlayer(p);
-									Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+									NmsUtils.getVersionAdapter().runConsoleCommandSilently(
 										"execute at " + p.getName()
 											+ " run summon minecraft:firework_rocket ~ ~1 ~ "
 											+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");

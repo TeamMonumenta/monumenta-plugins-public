@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -81,8 +81,7 @@ public class AnvilOverride extends BaseOverride {
 				int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;
 				ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
 
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-					"execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
 			}
 		} else {
 			player.sendMessage(ChatColor.GOLD + "Right click the anvil with the item you want to repair");

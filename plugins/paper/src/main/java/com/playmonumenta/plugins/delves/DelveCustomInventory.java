@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
@@ -492,7 +493,7 @@ public class DelveCustomInventory extends CustomInventory {
 					if (dungeonFunc == null) {
 						playerWhoClicked.sendMessage(Component.text("There have been some problem, please contact the dev team, reason: DUNGEON_FUNCTION_MAPPINGS.get() is null", NamedTextColor.RED));
 					} else {
-						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getConsoleSender().getServer().dispatchCommand(Bukkit.getConsoleSender(),
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> NmsUtils.getVersionAdapter().runConsoleCommandSilently(
 							"execute as " + mOwner.getName() + " at @s run " + dungeonFunc), 0);
 					}
 				}

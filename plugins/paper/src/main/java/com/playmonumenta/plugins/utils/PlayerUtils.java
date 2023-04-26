@@ -230,8 +230,7 @@ public class PlayerUtils {
 	}
 
 	public static void executeCommandOnPlayer(Player player, String command) {
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-			"execute as " + player.getUniqueId() + " at @s run " + command);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getUniqueId() + " at @s run " + command);
 	}
 
 	// How far back the player drew their bow,

@@ -108,21 +108,24 @@ public class Effect {
 	private static void giveEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,
 	                               PotionEffectType type, int seconds, int amplifier, boolean hideParticles) {
 		PotionManager manager = plugin.mPotionManager;
-
+		World world = null;
 		for (Entity e : entities) {
+			world = e.getWorld();
 			if (e instanceof Player player && manager != null) {
 				// This is a player - use the potion manager
 
 				/* Apply potion via potion manager */
 				manager.addPotion(player, PotionID.APPLIED_POTION,
-				                  new PotionEffect(type, seconds * 20, amplifier, true, !hideParticles));
+					new PotionEffect(type, seconds * 20, amplifier, true, !hideParticles));
 			} else if (e instanceof LivingEntity entity) {
 				// Not a player - apply the effect directly
 				entity.addPotionEffect(new PotionEffect(type, seconds * 20, amplifier, false, !hideParticles));
 			}
 		}
-		sender.sendMessage("Applied " + type.toString() + ":" + Integer.toString(amplifier + 1) +
-		                   " to entities for " + Integer.toString(seconds) + "s");
+		if (world != null && Boolean.TRUE.equals(world.getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK))) {
+			sender.sendMessage("Applied " + type + ":" + (amplifier + 1) +
+				                   " to entities for " + seconds + "s");
+		}
 	}
 
 	private static void clearEffect(Plugin plugin, CommandSender sender, Collection<Entity> entities,

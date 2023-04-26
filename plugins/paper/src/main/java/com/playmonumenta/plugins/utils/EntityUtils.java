@@ -1212,7 +1212,7 @@ public class EntityUtils {
 	public static Entity getSummonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
 		String worldName = Bukkit.getWorlds().get(0).equals(loc.getWorld()) ? "overworld" : loc.getWorld().getName();
 		String cmd = "execute in " + worldName + " run summon " + type.getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		return loc.getNearbyEntities(1f, 1f, 1f)
 			.stream()

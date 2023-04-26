@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -109,8 +110,7 @@ public class AnvilFixInInventory implements Listener {
 
 			int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;
 			ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-				"execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
+			NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
 
 			StatTrackManager.getInstance().incrementStatImmediately(event.getCurrentItem(), player, ItemStatUtils.InfusionType.STAT_TRACK_REPAIR, 1);
 

@@ -19,6 +19,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
@@ -33,7 +34,6 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -347,7 +347,7 @@ public final class Nucleus extends BossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
 		mBoss.setHealth(modifiedHealth);
 
-		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);

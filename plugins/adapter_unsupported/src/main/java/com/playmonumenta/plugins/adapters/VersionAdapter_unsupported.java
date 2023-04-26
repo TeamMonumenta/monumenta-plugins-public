@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -117,6 +118,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public void executeCommandAsBlock(Block block, String command) {
 
+	}
+
+	@Override
+	public void runConsoleCommandSilently(String command) {
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
 	}
 
 	@Override

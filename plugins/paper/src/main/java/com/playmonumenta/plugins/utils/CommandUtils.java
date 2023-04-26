@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.point.AreaBounds;
 import com.playmonumenta.plugins.point.Point;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -139,7 +138,7 @@ public class CommandUtils {
 	}
 
 	public static void runCommandViaConsole(String cmd) {
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 	}
 
 	/**

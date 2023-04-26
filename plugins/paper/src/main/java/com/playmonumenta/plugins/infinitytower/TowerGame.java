@@ -8,12 +8,12 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
@@ -334,7 +334,7 @@ public class TowerGame {
 	}
 
 	public void start() {
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as " + mPlayer.mPlayer.getName() + " run function monumenta:mechanisms/music/music_stop_reset");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + mPlayer.mPlayer.getName() + " run function monumenta:mechanisms/music/music_stop_reset");
 		mPlayer.mPlayer.teleport(new Location(mPlayer.mPlayer.getWorld(), mFloor.mVector.getX() + 0.5, mFloor.mVector.getY() + 5, mFloor.mVector.getZ() + 0.5));
 		launchCooldown();
 	}

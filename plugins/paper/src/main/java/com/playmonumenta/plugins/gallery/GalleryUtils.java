@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
-import org.bukkit.Bukkit;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -87,7 +87,7 @@ public class GalleryUtils {
 	}
 
 	public static void runCommandAsEntity(@NotNull Entity entity, @NotNull String command) {
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + entity.getUniqueId() + " as " + entity.getUniqueId() + " run " + command);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + entity.getUniqueId() + " as " + entity.getUniqueId() + " run " + command);
 	}
 
 	public static boolean canBuy(GalleryGame game, Integer value) {

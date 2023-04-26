@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.custominventories;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.time.Instant;
@@ -13,7 +14,6 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -124,7 +124,7 @@ public class EmojiCustomInventory extends CustomInventory {
 				COOLDOWNS.put(player.getUniqueId(), Instant.now().getEpochSecond() + 60);
 			}
 			String command = "execute as @S at @S run function monumenta:mechanisms/emojis/" + cmd + "_run";
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command.replace("@S", player.getName()));
+			NmsUtils.getVersionAdapter().runConsoleCommandSilently(command.replace("@S", player.getName()));
 		}
 		player.closeInventory();
 	}

@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
@@ -407,6 +408,11 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		CommandBlockEntity tileEntity = new CommandBlockEntity(((CraftBlock) block).getPosition(), ((CraftBlockState) block.getState()).getHandle());
 		tileEntity.setLevel(((CraftBlock) block).getHandle().getMinecraftWorld());
 		Bukkit.dispatchCommand(tileEntity.getCommandBlock().getBukkitSender(tileEntity.getCommandBlock().createCommandSourceStack()), command);
+	}
+
+	@Override
+	public void runConsoleCommandSilently(String command) {
+		MinecraftServer.getServer().getCommands().performCommand(MinecraftServer.getServer().createCommandSourceStack().withSuppressedOutput(), command);
 	}
 
 	public boolean hasCollision(World world, BoundingBox aabb) {

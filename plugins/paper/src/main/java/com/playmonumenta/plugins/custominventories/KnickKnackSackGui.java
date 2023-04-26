@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -680,12 +681,12 @@ public class KnickKnackSackGui extends Gui {
 	}
 
 	private void runConsoleCommand(String command) {
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("@S", mPlayer.getName()));
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(command.replace("@S", mPlayer.getName()));
 	}
 
 	private void runFunction(String function) {
 		// This is how it's done in ScriptedQuests
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as " + mPlayer.getName() + " run function " + function);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + mPlayer.getName() + " run function " + function);
 	}
 
 	private static class Talisman {

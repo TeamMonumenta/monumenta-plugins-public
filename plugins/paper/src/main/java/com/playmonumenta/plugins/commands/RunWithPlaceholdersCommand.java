@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.NmsUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
@@ -45,9 +46,9 @@ public class RunWithPlaceholdersCommand {
 		command = PlaceholderAPI.setPlaceholders(player, command);
 		if (sender instanceof NativeProxyCommandSender proxy) { // Bukkit doesn't like this command sender type
 			if (proxy.getCallee() instanceof Entity entity) {
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as " + entity.getUniqueId() + " at @s run " + command);
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + entity.getUniqueId() + " at @s run " + command);
 			} else {
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(command);
 			}
 		} else {
 			Bukkit.dispatchCommand(sender, command);

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.parameters.phases;
 
 import com.playmonumenta.plugins.bosses.parameters.ParseResult;
 import com.playmonumenta.plugins.bosses.parameters.StringReader;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,11 +21,9 @@ public class CommandAction implements Action {
 		mCommand = command;
 	}
 
-	@Override public void runAction(LivingEntity boss) {
-		Bukkit.dispatchCommand(
-			Bukkit.getConsoleSender(),
-			"execute as " + boss.getUniqueId() + " at " + boss.getUniqueId() + " run " + mCommand
-		);
+	@Override
+	public void runAction(LivingEntity boss) {
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + boss.getUniqueId() + " at " + boss.getUniqueId() + " run " + mCommand);
 	}
 
 	public static ParseResult<Action> fromReader(StringReader reader) {

@@ -39,6 +39,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -212,12 +213,12 @@ public final class Lich extends BossAbilityGroup {
 
 		//summon key mob in shadow realm
 		mKey = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(mStart.getLocation().subtract(0, 41, 0), "ShadowPhylactery"));
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty lichphylactery");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty crystal");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team empty Hekawt");
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color white");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team empty lichphylactery");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team empty crystal");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team empty Hekawt");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify lichphylactery color white");
 		UUID keyUUID = mKey.getUniqueId();
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join lichphylactery " + keyUUID);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team join lichphylactery " + keyUUID);
 		mPhylactHealth = PHYLACT_HP * mDefenseScaling;
 		EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
 		mKey.setHealth(mPhylactHealth);
@@ -266,10 +267,10 @@ public final class Lich extends BossAbilityGroup {
 				double health = mKey.getHealth();
 				if (health / mPhylactHealth <= 0.34 && mColor == 1) {
 					mColor++;
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color red");
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify lichphylactery color red");
 				} else if (health / mPhylactHealth <= 0.67 && mColor == 0) {
 					mColor++;
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team modify lichphylactery color yellow");
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify lichphylactery color yellow");
 				}
 
 				// key death
@@ -591,7 +592,7 @@ public final class Lich extends BossAbilityGroup {
 						Collections.shuffle(mPassive2Loc);
 						Location l = mPassive2Loc.get(0);
 						String cmd = "summon minecraft:lightning_bolt " + l.getX() + " " + l.getY() + " " + l.getZ();
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+						NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 					}
 					if (mT == 30) {
 						new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 20, 0.1, 0.1, 0.1, 0.05).spawnAsBoss();
@@ -746,7 +747,7 @@ public final class Lich extends BossAbilityGroup {
 
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
 		UUID uuid = mBoss.getUniqueId();
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "team join Hekawt " + uuid);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team join Hekawt " + uuid);
 		mBoss.setAI(false);
 		mBoss.setSilent(true);
 		mBoss.setInvulnerable(true);
@@ -783,14 +784,14 @@ public final class Lich extends BossAbilityGroup {
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
 								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
 								             + ani[mT];
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+							NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 							mT++;
 						} else {
 							this.cancel();
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
 								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
 								             + end[0];
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+							NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 							// make boss visible
 							new PartialParticle(Particle.END_ROD, mStart.getLocation().add(0, 17, 0), 750, 6, 6, 6, 0).spawnAsBoss();
 							new PartialParticle(Particle.EXPLOSION_HUGE, mStart.getLocation().add(0, 18, 0), 10, 4, 4,
@@ -816,7 +817,7 @@ public final class Lich extends BossAbilityGroup {
 									String cmd = "execute positioned " + mStart.getLocation().getX() + " "
 										             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
 										             + end[1];
-									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+									NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 									world.playSound(mStart.getLocation().add(0, 17, 0), Sound.BLOCK_ENDER_CHEST_CLOSE,
 										SoundCategory.HOSTILE, 10.0f, 0.5f);
 								}
@@ -1593,7 +1594,7 @@ public final class Lich extends BossAbilityGroup {
 		// partial respawn arena
 		String cmd = "execute positioned " + mStart.getLocation().getX() + " " + mStart.getLocation().getY() + " "
 			             + mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), cmd);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		//warning smoke ring
 		PPCircle indicator = new PPCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 8).ringMode(true).count(20).delta(0.1);

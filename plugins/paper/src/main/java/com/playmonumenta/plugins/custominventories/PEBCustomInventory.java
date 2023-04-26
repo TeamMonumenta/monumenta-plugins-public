@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
@@ -19,7 +20,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -87,7 +87,7 @@ public class PEBCustomInventory extends CustomInventory {
 		public PebItem serverCommand(String command) {
 			mAction = (gui, event) -> {
 				String finalCommand = command.replace("@S", gui.mPlayer.getName());
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(finalCommand);
 				if (mCloseAfter) {
 					gui.mPlayer.closeInventory();
 				}

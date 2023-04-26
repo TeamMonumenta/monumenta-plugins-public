@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.Collections;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -31,6 +31,6 @@ public class MistMob extends BossAbilityGroup {
 			return;
 		}
 		Entity entity = event.getEntity();
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at " + entity.getUniqueId() + " run function monumenta:dungeons/mist/mob_death");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + entity.getUniqueId() + " run function monumenta:dungeons/mist/mob_death");
 	}
 }

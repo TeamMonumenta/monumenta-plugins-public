@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.integrations.luckperms;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -13,7 +14,6 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ProxiedCommandSender;
@@ -79,7 +79,7 @@ public class PromoteGuild {
 				// Flair (mostly stolen from CreateGuild)
 				p.sendMessage(ChatColor.GOLD + "Congratulations! You are now a founder of " + currentGuildName + "!");
 				founder.sendMessage(ChatColor.WHITE + p.getName() + ChatColor.GOLD + " has been promoted to guild founder");
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(
 					"execute at " + p.getName()
 						+ " run summon minecraft:firework_rocket ~ ~1 ~ "
 						+ "{LifeTime:0,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16528693],FadeColors:[I;16777215]}]}}}}");

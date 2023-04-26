@@ -129,6 +129,11 @@ public interface VersionAdapter {
 	void executeCommandAsBlock(Block block, String command);
 
 	/**
+	 * Runs a command as the console, without logging output to server logs.
+	 */
+	void runConsoleCommandSilently(String command);
+
+	/**
 	 * Checks if the given bounding box collides with any blocks or "hard-colliding" entities (e.g. boats, shulkers).
 	 */
 	boolean hasCollision(World world, BoundingBox aabb);
