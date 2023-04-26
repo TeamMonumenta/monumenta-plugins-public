@@ -31,8 +31,9 @@ public class SpellThrowSummon extends Spell {
 	private final int mCooldown;
 	private final String mSummonName;
 	private final boolean mFromPool;
+	private final int mLobDelay;
 
-	public SpellThrowSummon(Plugin plugin, LivingEntity boss, int range, int lobs, int cooldownTicks, String summonName, boolean fromPool) {
+	public SpellThrowSummon(Plugin plugin, LivingEntity boss, int range, int lobs, int cooldownTicks, String summonName, boolean fromPool, int lobDelay) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -40,6 +41,7 @@ public class SpellThrowSummon extends Spell {
 		mCooldown = cooldownTicks;
 		mSummonName = summonName;
 		mFromPool = fromPool;
+		mLobDelay = lobDelay;
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class SpellThrowSummon extends Spell {
 
 		};
 
-		task.runTaskTimer(mPlugin, 0, 15);
+		task.runTaskTimer(mPlugin, 0, mLobDelay);
 		mActiveRunnables.add(task);
 	}
 

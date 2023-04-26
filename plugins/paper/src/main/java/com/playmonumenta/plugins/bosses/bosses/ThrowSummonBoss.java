@@ -33,6 +33,9 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 		@BossParam(help = "Delay of the spell")
 		public int DELAY = 100;
 
+		@BossParam(help = "Delay between each mob throw, in ticks")
+		public int LOB_DELAY = 15;
+
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -44,7 +47,7 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellThrowSummon(plugin, boss, p.DETECTION, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL)));
+			new SpellThrowSummon(plugin, boss, p.DETECTION, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL, p.LOB_DELAY)));
 
 
 		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
