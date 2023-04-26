@@ -176,7 +176,7 @@ public class AbstractPartialParticle<SelfT extends AbstractPartialParticle<SelfT
 		return getSelf();
 	}
 
-	public SelfT data(Object data) {
+	public SelfT data(@Nullable Object data) {
 		mData = data;
 		return getSelf();
 	}

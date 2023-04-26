@@ -14,9 +14,9 @@ public class SpellBaseParticleAura extends Spell {
 	}
 
 
-	private LivingEntity mBoss;
-	private int mTicksPerIteration;
-	private ParticleEffect[] mEffects;
+	private final LivingEntity mBoss;
+	private final int mTicksPerIteration;
+	private final ParticleEffect[] mEffects;
 	private int mEffectIter;
 
 	public SpellBaseParticleAura(LivingEntity boss, int ticksPerIteration, ParticleEffect... effects) {
