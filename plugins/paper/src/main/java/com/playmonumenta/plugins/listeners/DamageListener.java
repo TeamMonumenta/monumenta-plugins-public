@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
 import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
@@ -203,6 +204,7 @@ public class DamageListener implements Listener {
 		}
 		if (!event.isLifelineCancel()) {
 			mPlugin.mEffectManager.damageEvent(event);
+			GalleryManager.onEntityDamageEvent(event);
 		}
 
 		// Reverb custom enchant needs to calculate final damage after effects are applied.

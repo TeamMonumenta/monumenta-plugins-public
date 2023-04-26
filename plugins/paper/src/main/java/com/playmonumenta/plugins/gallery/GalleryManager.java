@@ -109,8 +109,9 @@ public class GalleryManager implements Listener {
 		game.onMobExplodeEvent(event, entity, ticks);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onEntityDamageEvent(DamageEvent event) {
+	//Called in DamageListener
+	//@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public static void onEntityDamageEvent(DamageEvent event) {
 		LivingEntity damagee = event.getDamagee();
 		Entity damager = event.getDamager();
 		LivingEntity source = event.getSource();
