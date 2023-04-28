@@ -17,7 +17,6 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.io.File;
 import java.util.Map;
 import java.util.Random;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -25,13 +24,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -250,27 +250,29 @@ public class DepthsListener implements Listener {
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		//Call util to check for ice barrier slow
 		DepthsUtils.explodeEvent(event);
-		EntityType entityType = event.getEntityType();
-		if (!(entityType == EntityType.CREEPER || entityType == EntityType.PRIMED_TNT)) {
+		Entity exploder = event.getEntity();
+		if (EntityUtils.isBoss(exploder)) {
 			return;
 		}
 
-		event.blockList().removeIf(block -> block.getType().equals(Material.CHEST));
-		event.blockList().removeIf(block -> block.getType().equals(Material.STONE_BUTTON) && block.getRelative(BlockFace.EAST).getType() == Material.OBSIDIAN);
-		if (entityType == EntityType.PRIMED_TNT) {
-			event.blockList().removeIf(block -> block.getType().equals(Material.SPAWNER));
+		// Only remove 1 chest from the list
+		Block removedChest = null;
+		for (Block block : event.blockList()) {
+			if (block.getType() == Material.CHEST) {
+				removedChest = block;
+				break;
+			}
 		}
-
-		for (Block b : event.blockList()) {
-			Material mat = b.getType();
-			Location loc = b.getLocation();
-
-			DepthsManager dm = DepthsManager.getInstance();
-			Player p = EntityUtils.getNearestPlayer(loc, 100);
-			if (p != null && dm.isInSystem(p)) {
-				if (mat == Material.SPAWNER) { // count spawners exploded by creepers
-					dm.playerBrokeSpawner(p, loc);
-				}
+		if (removedChest != null) {
+			event.blockList().remove(removedChest);
+		}
+		event.blockList().removeIf(block -> block.getType().equals(Material.STONE_BUTTON) && block.getRelative(BlockFace.EAST).getType() == Material.OBSIDIAN);
+		if (exploder instanceof TNTPrimed) {
+			event.blockList().removeIf(block -> block.getType().equals(Material.SPAWNER));
+		} else if (exploder instanceof Creeper) {
+			Player p = EntityUtils.getNearestPlayer(event.getLocation(), 100);
+			if (p != null && DepthsManager.getInstance().isInSystem(p)) {
+				event.blockList().stream().filter(b -> b.getType() == Material.SPAWNER).forEach(b -> DepthsManager.getInstance().playerBrokeSpawner(p, b.getLocation()));
 			}
 		}
 	}
