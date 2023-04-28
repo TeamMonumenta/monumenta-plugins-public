@@ -9,6 +9,7 @@ public class MonumentaNetworkRelayIntegration {
 	public static final String AUDIT_LOG_CHANNEL = "Monumenta.Automation.AuditLog";
 	public static final String AUDIT_LOG_SEVERE_CHANNEL = "Monumenta.Automation.AuditLogSevere";
 	public static final String AUDIT_LOG_DEATH_CHANNEL = "Monumenta.Automation.DeathAuditLog";
+	public static final String AUDIT_LOG_PLAYERS_CHANNEL = "Monumenta.Automation.PlayerAuditLog";
 	public static final String ADMIN_ALERT_CHANNEL = "Monumenta.Automation.AdminNotification";
 
 	private final Logger mLogger;
@@ -20,43 +21,33 @@ public class MonumentaNetworkRelayIntegration {
 		INSTANCE = this;
 	}
 
-	public static void sendDeathAuditLogMessage(String message) {
+	private static void sendAuditLogMessage(String message, String channel) {
 		if (INSTANCE != null) {
 			JsonObject data = new JsonObject();
 			data.addProperty("message", message);
 			try {
-				NetworkRelayAPI.sendMessage("automation-bot", AUDIT_LOG_DEATH_CHANNEL, data);
+				NetworkRelayAPI.sendMessage("automation-bot", channel, data);
 			} catch (Exception ex) {
 				INSTANCE.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	public static void sendDeathAuditLogMessage(String message) {
+		sendAuditLogMessage(message, AUDIT_LOG_DEATH_CHANNEL);
+	}
+
+	public static void sendPlayerAuditLogMessage(String message) {
+		sendAuditLogMessage(message, AUDIT_LOG_PLAYERS_CHANNEL);
 	}
 
 	public static void sendAuditLogSevereMessage(String message) {
-		if (INSTANCE != null) {
-			JsonObject data = new JsonObject();
-			data.addProperty("message", message);
-			try {
-				NetworkRelayAPI.sendMessage("automation-bot", AUDIT_LOG_SEVERE_CHANNEL, data);
-			} catch (Exception ex) {
-				INSTANCE.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
+		sendAuditLogMessage(message, AUDIT_LOG_SEVERE_CHANNEL);
 	}
 
-	public static void sendAuditLogMessage(String message) {
-		if (INSTANCE != null) {
-			JsonObject data = new JsonObject();
-			data.addProperty("message", message);
-			try {
-				NetworkRelayAPI.sendMessage("automation-bot", AUDIT_LOG_CHANNEL, data);
-			} catch (Exception ex) {
-				INSTANCE.mLogger.severe("Failed to send audit log message: " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
+	public static void sendModAuditLogMessage(String message) {
+		sendAuditLogMessage(message, AUDIT_LOG_CHANNEL);
 	}
 
 	public static void broadcastCommand(String command) {

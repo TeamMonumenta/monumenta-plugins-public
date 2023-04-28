@@ -427,7 +427,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 		if (MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(item)) >
 			MasterworkUtils.getMasterworkAsInt(ItemStatUtils.getMasterwork(nextItem))) {
-			MasterworkUtils.payCost(cost, p, true);
+			MasterworkUtils.payCost(cost, p, item, true);
 			item.setItemMeta(nextItem.getItemMeta());
 			ItemStatUtils.generateItemStats(item);
 			p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f);
@@ -436,7 +436,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 		try {
 			if (MasterworkUtils.canPayCost(cost, p, false)) {
-				MasterworkUtils.payCost(cost, p, false);
+				MasterworkUtils.payCost(cost, p, item, false);
 				item.setItemMeta(nextItem.getItemMeta());
 				ItemStatUtils.generateItemStats(item);
 				MasterworkUtils.animate(p, ItemStatUtils.getMasterwork(nextItem));

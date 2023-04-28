@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
@@ -185,13 +186,15 @@ public class DelveInfusionUtils {
 			giveMaterials(player, mats);
 		}
 
-		AuditListener.log("Delve infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + auditLevel + "' stack size=" + item.getAmount() + " mats=" + matStr);
-
-		int xp = ExperienceUtils.getTotalExperience(player);
+		int xp = 0;
 		for (int i = 0; i <= levelXp; i++) {
 			xp += (int) (XP_COST_PER_LEVEL[i] * (FULL_REFUND ? 1 : REFUND_PERCENT) * item.getAmount());
 		}
-		ExperienceUtils.setTotalExperience(player, xp);
+		ExperienceUtils.setTotalExperience(player, ExperienceUtils.getTotalExperience(player) + xp);
+
+		AuditListener.logPlayer("[Delve Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + infusionType
+			                        + "', from level=" + auditLevel + ", stack size=" + item.getAmount() + ", refunded materials=" + matStr + ", refunded XP=" + xp);
+
 	}
 
 	private static void giveMaterials(Player player, List<ItemStack> mats) {
@@ -233,13 +236,19 @@ public class DelveInfusionUtils {
 	}
 
 	public static boolean payInfusion(ItemStack item, DelveInfusionSelection selection, Player p) {
-		//if the player is in creative -> free infusion
-		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
-			Plugin.getInstance().getLogger().warning("[Delve Infusion] Player: " + p.getName() + " infused an item while be on creative mode! InfusionType: " + selection.getLabel());
-			return true;
-		}
 		int targetLevel = getInfuseLevel(item);
 		List<ItemStack> mats = getCurrenciesCost(item, selection, targetLevel, p);
+
+		String matStr = mats.stream().filter(it -> it != null && it.getAmount() > 0)
+			                .map(it -> "'" + ItemUtils.getPlainName(it) + ":" + it.getAmount() + "'")
+			                .collect(Collectors.joining(","));
+
+		//if the player is in creative -> free infusion
+		if (selection == DelveInfusionSelection.REFUND || p.getGameMode() == GameMode.CREATIVE) {
+			AuditListener.log("[Delve Infusion] Player " + p.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
+				                  + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", normal material cost=" + matStr + ", normal XP cost=" + XP_COST_PER_LEVEL[targetLevel]);
+			return true;
+		}
 
 		int playerXP = ExperienceUtils.getTotalExperience(p);
 
@@ -254,6 +263,9 @@ public class DelveInfusionUtils {
 		for (ItemStack currencies : mats) {
 			inventory.removeItem(currencies);
 		}
+
+		AuditListener.logPlayer("[Delve Infusion] Item infused - player=" + p.getName() + ", item='" + ItemUtils.getPlainName(item) + "', infusion type=" + selection.mInfusionType
+			                        + "', new level=" + (targetLevel + 1) + ", stack size=" + item.getAmount() + ", material cost=" + matStr + ", XP cost=" + XP_COST_PER_LEVEL[targetLevel]);
 
 		return true;
 	}

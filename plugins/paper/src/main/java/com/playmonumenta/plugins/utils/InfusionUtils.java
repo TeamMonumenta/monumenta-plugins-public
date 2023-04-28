@@ -104,20 +104,6 @@ public class InfusionUtils {
 
 		int level = getInfuseLevel(item);
 
-		AuditListener.log("Infusion refund - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "' level=" + level + "' stack size=" + item.getAmount());
-
-		//Remove the infusion enchants from the item
-		for (InfusionSelection sel : InfusionSelection.values()) {
-			InfusionType infusionType = sel.getInfusionType();
-			if (infusionType != null) {
-				ItemStatUtils.removeInfusion(item, infusionType, false);
-			}
-		}
-		ItemStatUtils.generateItemStats(item);
-		if (refundMaterials > 0 && region != null) {
-			giveMaterials(player, region, refundMaterials);
-		}
-
 		int xp = ExperienceUtils.getTotalExperience(player);
 		int refundXP = 0;
 
@@ -209,8 +195,24 @@ public class InfusionUtils {
 			}
 		}
 
+		//Remove the infusion enchants from the item
+		for (InfusionSelection sel : InfusionSelection.values()) {
+			InfusionType infusionType = sel.getInfusionType();
+			if (infusionType != null) {
+				ItemStatUtils.removeInfusion(item, infusionType, false);
+			}
+		}
+		ItemStatUtils.generateItemStats(item);
+		if (refundMaterials > 0 && region != null) {
+			giveMaterials(player, region, refundMaterials);
+		}
+
 		refundXP = (int) (refundXP * (FULL_REFUND ? 1 : REFUND_PERCENT) * item.getAmount());
 		ExperienceUtils.setTotalExperience(player, xp + refundXP);
+
+		AuditListener.logPlayer("[Infusion] Refund - player=" + player.getName() + ", item='" + ItemUtils.getPlainName(item) + "', from level=" + level + ", stack size=" + item.getAmount()
+			                        + ", refunded material count=" + refundMaterials + ", refunded XP=" + refundXP);
+
 	}
 
 	private static void giveMaterials(Player player, Region region, int refundMaterials) throws WrapperCommandSyntaxException {
@@ -523,11 +525,6 @@ public class InfusionUtils {
 	}
 
 	public static boolean payInfusion(Player player, ItemStack item) {
-		if (player.getGameMode() == GameMode.CREATIVE) {
-			Plugin.getInstance().getLogger().warning("[Infusion] Player: " + player.getName() + " infused an item while be on creative mode!");
-			return true;
-		}
-
 		//currency
 		ItemStack currency = null;
 		if (ItemStatUtils.getRegion(item) == Region.RING) {
@@ -550,18 +547,29 @@ public class InfusionUtils {
 			return false;
 		}
 
-		currency.setAmount(amount);
-		player.getInventory().removeItem(currency);
-
-		//exp
 		int expCost;
-		int currentExp;
-
 		try {
 			expCost = getExpInfuseCost(item);
 		} catch (WrapperCommandSyntaxException e) {
 			return false;
 		}
+
+		int newLevel = getInfuseLevel(item) + 1;
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			AuditListener.log("[Infusion] Player " + player.getName() + " infused an item while in creative mode! item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel
+				                  + ", stack size=" + item.getAmount() + ", normal material cost count=" + amount + ", normal XP cost=" + expCost);
+			return true;
+		}
+
+		AuditListener.logPlayer("[Infusion] Item infused - player=" + player.getName() + " item='" + ItemUtils.getPlainName(item) + "', to level=" + newLevel + ", stack size=" + item.getAmount()
+			                        + ", material cost count=" + amount + ", XP cost=" + expCost);
+
+
+		currency.setAmount(amount);
+		player.getInventory().removeItem(currency);
+
+		//exp
+		int currentExp;
 
 		currentExp = ExperienceUtils.getTotalExperience(player);
 

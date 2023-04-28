@@ -275,7 +275,7 @@ public class AuditListener implements Listener {
 	public static void log(String message) {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + message);
-			MonumentaNetworkRelayIntegration.sendAuditLogMessage(createLocationData() + " " + message);
+			MonumentaNetworkRelayIntegration.sendModAuditLogMessage(createLocationData() + " " + message);
 		}
 	}
 
@@ -283,6 +283,13 @@ public class AuditListener implements Listener {
 		if (INSTANCE != null) {
 			INSTANCE.mLogger.info("Audit | " + createLocationData() + " " + message);
 			MonumentaNetworkRelayIntegration.sendDeathAuditLogMessage(createLocationData() + " " + message);
+		}
+	}
+
+	public static void logPlayer(String message) {
+		if (INSTANCE != null) {
+			INSTANCE.mLogger.info("Audit | " + message);
+			MonumentaNetworkRelayIntegration.sendPlayerAuditLogMessage(createLocationData() + " " + message);
 		}
 	}
 

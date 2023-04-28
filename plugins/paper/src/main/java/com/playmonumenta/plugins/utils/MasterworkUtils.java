@@ -324,7 +324,7 @@ public class MasterworkUtils {
 		return true;
 	}
 
-	public static void payCost(MasterworkCost m, Player p, boolean isRefund) {
+	public static void payCost(MasterworkCost m, Player p, ItemStack item, boolean isRefund) {
 		//if the player is in creative -> free upgrade
 		if (p.getGameMode() == GameMode.CREATIVE) {
 			AuditListener.log("[Masterwork] Player " + p.getName() + (isRefund ? " downgraded" : " upgraded") + " an item in creative mode (cost=" + m.mLabel + ")");
@@ -339,9 +339,15 @@ public class MasterworkUtils {
 		itemB.setAmount(m.getCostB());
 
 		if (isRefund) {
+			AuditListener.logPlayer("[Masterwork] Refund - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' from level=" + m.mLabel + " stack size=" + item.getAmount()
+				                        + " material refund=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount());
+
 			InventoryUtils.giveItem(p, itemA);
 			InventoryUtils.giveItem(p, itemB);
 		} else {
+			AuditListener.logPlayer("[Masterwork] Upgrade - player=" + p.getName() + " item='" + ItemUtils.getPlainName(item) + "' to level=" + m.mLabel + " stack size=" + item.getAmount()
+				                        + " material cost=" + ItemUtils.getPlainName(itemA) + ":" + itemA.getAmount() + "," + ItemUtils.getPlainName(itemB) + ":" + itemB.getAmount());
+
 			inventory.removeItem(itemA);
 			inventory.removeItem(itemB);
 		}
