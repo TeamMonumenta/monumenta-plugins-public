@@ -5,11 +5,11 @@ import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneAmalgamCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneArtilleryCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneBezoarCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneOdorCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneTinctureCS;
-import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArtilleryBombCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeEchoesCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.SunriseBrewCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.ArcanePanaceaCS;
@@ -91,7 +91,7 @@ public class CosmeticSkills {
 		ArcaneAmalgamCS::new,
 		ArcaneOdorCS::new,
 		ArcaneTabooCS::new,
-		ArtilleryBombCS::new,
+		ArcaneArtilleryCS::new,
 
 		//Cleric
 		DarkPunishmentCS::new,

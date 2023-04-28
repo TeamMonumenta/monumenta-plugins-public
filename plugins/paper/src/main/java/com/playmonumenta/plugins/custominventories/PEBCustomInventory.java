@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -190,11 +191,12 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(20, "Glowing options",
 				"Click to choose your preferences for the \"glowing\" effect.", NamedTextColor.LIGHT_PURPLE,
 				Material.SPECTRAL_ARROW, false).switchToPage(PebPage.GLOWING),
-			new PebItem(21, "Show name on patron buff announcement.",
-				Component.text("Toggles whether the player has their IGN in the buff announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
-					.append(Component.text("Patreon ", NamedTextColor.GOLD))
-					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
-				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
+			new PebItem(21, "Passive ability sounds",
+				"Click to toggle whether buffs and other long-lasting ability effects will play sounds.", NamedTextColor.LIGHT_PURPLE,
+				Material.NOTE_BLOCK, false).action((pebCustomInventory, event) -> {
+				boolean disabled = ScoreboardUtils.toggleTag((Player) event.getWhoClicked(), AbilityUtils.PASSIVE_SOUNDS_DISABLED_TAG);
+				event.getWhoClicked().sendMessage(Component.text("Passive ability sounds are now " + (disabled ? "disabled" : "enabled"), NamedTextColor.GOLD, TextDecoration.BOLD));
+			}),
 			new PebItem(23, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, false).playerCommand("clickable peb_tid"),
@@ -204,7 +206,12 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(25, "Compass Particles",
 				"Click to toggle a trail of guiding particles when following the quest compass.", NamedTextColor.LIGHT_PURPLE,
 				Material.COMPASS, false).playerCommand("clickable peb_comp_particles"),
-			new PebItem(29, "Rocket Jump",
+			new PebItem(28, "Show name on patron buff announcement.",
+				Component.text("Toggles whether the player has their IGN in the buff announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
+					.append(Component.text("Patreon ", NamedTextColor.GOLD))
+					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
+				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
+			new PebItem(30, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
 			new PebItem(32, "Auto-abandon completed dungeons",

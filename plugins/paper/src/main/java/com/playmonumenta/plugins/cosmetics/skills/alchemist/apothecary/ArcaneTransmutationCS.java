@@ -1,13 +1,17 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
+import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneAmalgamCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -57,7 +61,7 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks) {
 
 		if (tick % 40 == 0) {
-			center.getWorld().playSound(center, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.5f, 0.75f);
+			AbilityUtils.playPassiveAbilitySound(center, Sound.BLOCK_BEACON_POWER_SELECT, 0.5f, 0.75f);
 		}
 
 		double maxRotationDelta = 20;
@@ -135,15 +139,25 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 
 		// rays
 		double centerSymbolSizeRingRadius = centerSymbolSize * 1.05;
-		new PPCircle(Particle.END_ROD, raisedLoc, centerSymbolSizeRingRadius)
-			.ringMode(true)
-			.count(8).minimumCount(3).maximumMultiplier(1) // 3 to 8 rays
-			.arcDegree(mRotation, mRotation + 360)
-			.directionalMode(true)
-			.delta(1, 0, 0)
-			.extra((radius - centerSymbolSizeRingRadius) / 11)
-			.rotateDelta(true)
+		PPCircle rayCircle = new PPCircle(Particle.END_ROD, raisedLoc, centerSymbolSizeRingRadius)
+			                     .ringMode(true)
+			                     .count(8).minimumCount(3).maximumMultiplier(1) // 3 to 8 rays
+			                     .arcDegree(mRotation, mRotation + 360)
+			                     .directionalMode(true)
+			                     .delta(1, 0, 0)
+			                     .extra((radius - centerSymbolSizeRingRadius) / 11)
+			                     .rotateDelta(true)
+			                     .spawnAsPlayerActive(player);
+		// sparks at the origin of the rays
+		rayCircle.particle(Particle.ELECTRIC_SPARK)
+			.delta(-0.2, 0, 0.98)
+			.extra(ArcaneAmalgamCS.SPARK_PARTICLE_SPEED * centerSymbolSizeRingRadius * Math.toRadians(rotationDelta) / 5)
 			.spawnAsPlayerActive(player);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			rayCircle
+				.arcDegree(mRotation + rotationDelta * 2 / 5, mRotation + rotationDelta * 2 / 5 + 360)
+				.spawnAsPlayerActive(player);
+		}, 2);
 
 	}
 

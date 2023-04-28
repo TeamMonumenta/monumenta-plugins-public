@@ -1,11 +1,10 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
@@ -111,9 +110,9 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 	@Override
 	public void remedyPulseEffect(World world, Location playerLoc, Player mPlayer, int pulse, int maxPulse, double radius) {
 		float pitch = (float) Math.pow(2, 1.0 * pulse / maxPulse - 0.75);
-		world.playSound(playerLoc, Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1f, pitch);
-		world.playSound(playerLoc, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, SoundCategory.PLAYERS, 0.9f, pitch);
-		world.playSound(playerLoc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 0.85f, pitch);
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_BELL, 1f, pitch);
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.9f, pitch);
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.BLOCK_NOTE_BLOCK_GUITAR, 0.85f, pitch);
 
 		float delta = (float) (radius / 2.1);
 		double radiusShrink = radius * (maxPulse - pulse + 1) / (maxPulse + 1);

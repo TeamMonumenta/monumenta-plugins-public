@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
-	public static final double ENCHANT_PARTICLE_PER_METER = 3.5;
+	public static final double ENCHANT_PARTICLE_PER_METER = 4;
 	public static final double SYMBOL_PARTICLES_PER_METER = 5;
 
 	public static final String NAME = "Arcane Potions";
@@ -86,6 +86,9 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 			.spawnAsEnemy();
 	}
 
+	/**
+	 * Draws an alchemy circle with a big symbol in the center, 3 small circles with fire or water symbols in them and connected by a triangle, and optionally 3 side symbols in the space between the triangle and big circle
+	 */
 	public static void drawAlchemyCircle(Player player, Location loc, double radius, boolean gruesome, Symbol centerSymbol, boolean withSideSymbols) {
 		Particle symbolParticle = gruesome ? Particle.SCRAPE : Particle.WAX_ON;
 		float rotation = loc.getYaw();
@@ -102,32 +105,55 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 			Collections.shuffle(symbols, FastUtils.RANDOM);
 		}
 
-		double smallRadius = 0.2 * radius;
+		drawSimpleAlchemyCircle(player, loc, radius, gruesome ? -90 : 90, 3, 0.2, gruesome ? WATER : FIRE, gruesome ? Particle.SCRAPE : Particle.WAX_ON, false, true);
+
+		// side symbols
+		if (symbols != null) {
+			for (int i = 0; i < 3; i++) {
+				double currentAngle = startAngle + i * 120;
+				Vector dir = VectorUtils.rotateYAxis(new Vector(1, 0, 0), currentAngle);
+				Location symbolLoc = loc.clone().add(dir.clone().multiply(-0.75 * radius));
+				double sideSymbolSize = radius * 0.15;
+				symbols.get(i).draw(new Transform(symbolLoc, sideSymbolSize, rotation + 180).skipBelowMultiplier(0.325), symbolParticle, player);
+			}
+		}
+
+	}
+
+	/**
+	 * Draws an alchemy circle with multiple smaller circles with a symbol inside them, and which are optionally connected via lines.
+	 */
+	public static void drawSimpleAlchemyCircle(Player player, Location loc, double radius, double startAngle, int numCircles, double smallRadiusFactor, Symbol circleSymbol, Particle symbolParticle, boolean rotateSymbols, boolean connectCircles) {
+		float rotation = loc.getYaw();
+
+		double smallRadius = smallRadiusFactor * radius;
 		double arcCut = Math.toDegrees(2 * Math.asin(smallRadius / radius / 2));
 		double enchantParticleDelta = 0.25;
 
-		for (int i = 0; i < 3; i++) {
-			double currentAngle = startAngle + i * 120;
+		for (int i = 0; i < numCircles; i++) {
+			double currentAngle = rotation + startAngle + i * 360.0 / numCircles;
 			Vector dir = VectorUtils.rotateYAxis(new Vector(1, 0, 0), currentAngle);
 			Location lineStartLoc = loc.clone().add(dir.clone().multiply(radius));
 
 			// big circle
 			new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, enchantParticleDelta, 0), radius)
 				.ringMode(true)
-				.arcDegree(currentAngle + arcCut, currentAngle + 120 - arcCut)
+				.arcDegree(currentAngle + arcCut, currentAngle + 360.0 / numCircles - arcCut)
 				.countPerMeter(ENCHANT_PARTICLE_PER_METER)
 				.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
 				.spawnAsPlayerActive(player);
 
-			// triangle
-			Location nextLineStart = loc.clone().add(VectorUtils.rotateYAxis(new Vector(radius, 0, 0), currentAngle + 120));
-			Vector dirToNext = nextLineStart.clone().toVector().subtract(lineStartLoc.toVector()).normalize();
-			new PPLine(Particle.ENCHANTMENT_TABLE,
-				lineStartLoc.clone().add(0, enchantParticleDelta, 0).add(dirToNext.clone().multiply(smallRadius)),
-				nextLineStart.clone().add(0, enchantParticleDelta, 0).add(dirToNext.clone().multiply(-smallRadius)))
-				.countPerMeter(ENCHANT_PARTICLE_PER_METER)
-				.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
-				.spawnAsPlayerActive(player);
+			// lines between small circles
+			if (connectCircles) {
+				Location nextLineStart = loc.clone().add(VectorUtils.rotateYAxis(new Vector(radius, 0, 0), currentAngle + 360.0 / numCircles));
+				Vector dirToNext = nextLineStart.clone().toVector().subtract(lineStartLoc.toVector()).normalize();
+				new PPLine(Particle.ENCHANTMENT_TABLE,
+					lineStartLoc.clone().add(0, enchantParticleDelta, 0).add(dirToNext.clone().multiply(smallRadius)),
+					nextLineStart.clone().add(0, enchantParticleDelta, 0).add(dirToNext.clone().multiply(-smallRadius)))
+					.countPerMeter(ENCHANT_PARTICLE_PER_METER)
+					.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
+					.spawnAsPlayerActive(player);
+			}
 
 			// smaller circles
 			new PPCircle(Particle.ENCHANTMENT_TABLE, lineStartLoc.clone().add(0, enchantParticleDelta, 0), smallRadius)
@@ -136,14 +162,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 				.spawnAsPlayerActive(player);
 
 			// accent symbol in small circle
-			(gruesome ? WATER : FIRE).draw(new Transform(lineStartLoc, smallRadius * 0.8, rotation + 180), symbolParticle, player);
-
-			// side symbols
-			if (symbols != null) {
-				Location symbolLoc = loc.clone().add(dir.clone().multiply(-0.75 * radius));
-				double sideSymbolSize = radius * 0.15;
-				symbols.get(i).draw(new Transform(symbolLoc, sideSymbolSize, rotation + 180).skipBelowMultiplier(0.325), symbolParticle, player);
-			}
+			circleSymbol.draw(new Transform(lineStartLoc, smallRadius * 0.8, (rotateSymbols ? currentAngle - 90 : rotation) + 180), symbolParticle, player);
 		}
 	}
 
@@ -241,6 +260,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 	}
 
 	// Sulphur 🜍
+	// Also used for Artillery
 	public static final Symbol SULPHUR = (transform, particle, player) -> {
 		// triangle
 		drawTriangle(particle, player, transform,

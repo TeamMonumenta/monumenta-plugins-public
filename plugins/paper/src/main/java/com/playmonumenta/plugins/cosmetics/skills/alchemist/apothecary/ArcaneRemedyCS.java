@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -55,7 +56,9 @@ public class ArcaneRemedyCS extends WardingRemedyCS {
 			return;
 		}
 
-		// world.playSound(playerLoc, pulse < maxPulse - 1 ? Sound.BLOCK_AMETHYST_BLOCK_STEP : Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, pulse < maxPulse - 1 ? 0.75f : 1, 0.5f);
+		for (int i = 0; i < 2; i++) {
+			AbilityUtils.playPassiveAbilitySound(playerLoc, pulse < maxPulse - 1 ? Sound.BLOCK_AMETHYST_BLOCK_STEP : Sound.BLOCK_LARGE_AMETHYST_BUD_BREAK, 1, 0.5f);
+		}
 
 	}
 

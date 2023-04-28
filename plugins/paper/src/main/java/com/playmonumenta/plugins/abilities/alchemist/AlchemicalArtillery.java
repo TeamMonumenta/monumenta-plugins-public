@@ -167,7 +167,7 @@ public class AlchemicalArtillery extends Ability {
 						return;
 					}
 
-					mCosmetic.periodicEffects(mPlayer, mGrenade);
+					mCosmetic.periodicEffects(mPlayer, mGrenade, mPhysicsItem, mTicks);
 
 					mTicks++;
 				}

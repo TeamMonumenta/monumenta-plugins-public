@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class GalacticCloakCS extends SmokescreenCS {
 			drawParticle(new Location(world, loc.getX() + 4 * FastUtils.cos(d), loc.getY(), loc.getZ() + 4 * FastUtils.sin(d)), player, rollColor());
 		}
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 65, 3.5, 0.2, 3.5, 0.05).spawnAsPlayerActive(player);
-		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.3f, 1.5f);
+		AbilityUtils.playPassiveAbilitySound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, 0.3f, 1.5f);
 	}
 
 	private Color rollColor() {

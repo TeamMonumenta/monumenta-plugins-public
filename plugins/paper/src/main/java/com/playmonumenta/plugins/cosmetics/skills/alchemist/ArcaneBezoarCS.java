@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -76,15 +77,47 @@ public class ArcaneBezoarCS extends BezoarCS {
 
 	@Override
 	public void pickupEffects(Player player, Location loc, boolean philosophersStone) {
-		loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_STEP, SoundCategory.PLAYERS, 1, 0.5f);
+
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 0.3, 0))
 			.count(20).delta(0.1, 0.1, 0.1)
 			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SPELL_INSTANT, loc, 10, 0.25, 0.1, 0.25, 1).spawnAsPlayerActive(player);
+
 	}
 
 	@Override
 	public void targetEffects(Player player, Location loc, boolean philosophersStone) {
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_PLACE, SoundCategory.PLAYERS, 1, 0.5f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.5f, 2);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.4f, 1.5f);
 
+		// Symbol: Cancer ♋
+		double bigRadius = 1;
+		double smallRadius = 0.3;
+		float forwardYaw = player.getLocation().getYaw();
+		Location center = player.getLocation().add(0, 0.4, 0);
+		Vector right = VectorUtils.rotationToVector(forwardYaw - 90, 0).multiply(bigRadius - smallRadius);
+		// small circles
+		new PPCircle(Particle.ENCHANTMENT_TABLE, center.clone().add(right), smallRadius)
+			.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.directionalMode(true).delta(0, -0.2, 0).extra(1)
+			.spawnAsPlayerActive(player)
+			.location(center.clone().subtract(right))
+			.spawnAsPlayerActive(player);
+		// accent particle in center of small circles
+		new PartialParticle(Particle.SCRAPE, player.getLocation().add(0, 0.2, 0).add(right))
+			.spawnAsPlayerActive(player)
+			.location(player.getLocation().add(0, 0.2, 0).clone().subtract(right))
+			.spawnAsPlayerActive(player);
+
+		// tails/big circle parts
+		new PPCircle(Particle.ENCHANTMENT_TABLE, center, bigRadius)
+			.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.directionalMode(true).delta(0, -0.2, 0).extra(1)
+			.arcDegree(forwardYaw, forwardYaw + 120)
+			.spawnAsPlayerActive(player)
+			.arcDegree(forwardYaw + 180, forwardYaw + 180 + 120)
+			.spawnAsPlayerActive(player);
 	}
 
 	@Override

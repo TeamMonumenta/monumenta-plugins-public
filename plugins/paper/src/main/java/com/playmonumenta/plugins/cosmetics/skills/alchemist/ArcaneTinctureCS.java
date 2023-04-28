@@ -92,35 +92,34 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 	public void pickupEffectsForPlayer(Player player, Location tinctureLocation) {
 		World world = player.getWorld();
 		world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.2f, 1.25f);
-		new PartialParticle(Particle.SPELL_INSTANT, player.getLocation(), 20, 0.25, 0.1, 0.25, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SPELL_INSTANT, tinctureLocation, 20, 0.25, 0.1, 0.25, 1).spawnAsPlayerActive(player);
 		double radius = 1.15;
 		new PPCircle(Particle.ENCHANTMENT_TABLE, player.getLocation().add(0, 0.2, 0), radius)
 				.ringMode(true).countPerMeter(8)
 				.spawnAsPlayerActive(player);
 		new BukkitRunnable() {
-			double mRotation = 0;
-			double mY = 0.15;
-
-			final PPPeriodic mParticleMain = new PPPeriodic(Particle.SCRAPE, player.getLocation());
-			final PPPeriodic mParticleEnchant = new PPPeriodic(Particle.ENCHANTMENT_TABLE, player.getLocation());
+			int mT = 0;
 
 			@Override
 			public void run() {
 				double rotStep = 20;
 				double yStep = 0.175;
-				mRotation += rotStep;
-				mY += yStep;
+				double rotation = mT * rotStep;
+				double y = 0.15 + yStep * mT;
 				for (int i = 0; i < 3; i++) {
-					double degree = mRotation + (i * 120);
-					mParticleMain.location(player.getLocation().add(FastUtils.cosDeg(degree) * radius, mY, FastUtils.sinDeg(degree) * radius))
-							.spawnAsPlayerActive(player);
-					mParticleEnchant.location(player.getLocation().add(FastUtils.cosDeg(degree - rotStep / 2) * radius, mY - yStep / 2, FastUtils.sinDeg(degree - rotStep / 2) * radius))
-							.spawnAsPlayerActive(player);
+					double degree = rotation + (i * 120);
+					new PPPeriodic(Particle.SCRAPE, player.getLocation().add(FastUtils.cosDeg(degree) * radius, y, FastUtils.sinDeg(degree) * radius))
+						.manualTimeOverride(mT)
+						.spawnAsPlayerActive(player);
+					new PPPeriodic(Particle.ENCHANTMENT_TABLE, player.getLocation().add(FastUtils.cosDeg(degree - rotStep / 2) * radius, y - yStep / 2, FastUtils.sinDeg(degree - rotStep / 2) * radius))
+						.manualTimeOverride(mT)
+						.spawnAsPlayerActive(player);
 				}
 
-				if (mY >= 1.8) {
+				if (y >= 1.8) {
 					this.cancel();
 				}
+				mT++;
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}

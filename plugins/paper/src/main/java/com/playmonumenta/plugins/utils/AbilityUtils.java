@@ -72,6 +72,8 @@ public class AbilityUtils {
 	public static final int MAX_SKILL_POINTS = 10;
 	public static final int MAX_SPEC_POINTS = 4;
 
+	public static final String PASSIVE_SOUNDS_DISABLED_TAG = "PassiveAbilitySoundsDisabled";
+
 	private static final Map<Player, Integer> INVISIBLE_PLAYERS = new HashMap<>();
 	private static @Nullable BukkitRunnable invisTracker = null;
 
@@ -585,4 +587,21 @@ public class AbilityUtils {
 		// One of a few "class abilities" that trigger aspects (i.e. Eruption, Quake)
 		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || TRIGGERS_ASPECTS.contains(event.getAbility());
 	}
+
+	public static void playPassiveAbilitySound(Location location, Sound sound, float volume, float pitch) {
+		for (Player player : PlayerUtils.playersInRange(location, 50, true)) {
+			playPassiveAbilitySound(player, location, sound, volume, pitch);
+		}
+	}
+
+	public static void playPassiveAbilitySound(Player player, Location location, Sound sound, float volume, float pitch) {
+		if (hasPassiveAbilitySoundsEnabled(player)) {
+			player.playSound(location, sound, SoundCategory.PLAYERS, volume, pitch);
+		}
+	}
+
+	public static boolean hasPassiveAbilitySoundsEnabled(Player player) {
+		return !player.getScoreboardTags().contains(PASSIVE_SOUNDS_DISABLED_TAG);
+	}
+
 }

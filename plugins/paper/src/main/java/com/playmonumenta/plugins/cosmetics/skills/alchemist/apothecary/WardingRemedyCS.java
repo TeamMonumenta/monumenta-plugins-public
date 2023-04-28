@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,7 +14,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class WardingRemedyCS implements CosmeticSkill {
 
@@ -50,7 +48,7 @@ public class WardingRemedyCS implements CosmeticSkill {
 	}
 
 	public void remedyPulseEffect(World world, Location playerLoc, Player mPlayer, int pulse, int maxPulse, double radius) {
-		world.playSound(playerLoc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 0.7f, 2f);
+		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7f, 2f);
 
 		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.15, 0), 6).ringMode(true).count(1).data(APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPELL_INSTANT, playerLoc.clone().add(0, 0.15, 0), 15, 2.8, 0, 2.8, 0).spawnAsPlayerActive(mPlayer);

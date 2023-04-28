@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,7 +64,7 @@ public class HauntingShadesCS implements CosmeticSkill {
 		}
 
 		if (mT % 20 == 0) {
-			world.playSound(bLoc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.3f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(bLoc, Sound.ENTITY_BLAZE_HURT, 0.3f, 0.5f);
 		}
 	}
 

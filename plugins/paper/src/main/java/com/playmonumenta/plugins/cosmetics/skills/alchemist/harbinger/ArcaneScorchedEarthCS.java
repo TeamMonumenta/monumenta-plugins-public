@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 	public void activeEffects(Player player, Location loc, double radius, int timeRemaining, int duration) {
 		// sound
 		if (timeRemaining > 60 && timeRemaining % 30 < 5) {
-			loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, SoundCategory.PLAYERS, 1, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_FIRE_AMBIENT, 1, 0.5f);
 		}
 
 		int totalTicks = duration - timeRemaining;

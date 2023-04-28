@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,6 +151,38 @@ public class VectorUtils {
 			return new Vector(1, 0, 0);
 		}
 		return v;
+	}
+
+	/**
+	 * Creates a list of direction vectors that are not close to each other.
+	 * Will try up to 100 times per vector to make a random vector that isn't close to another vector already.
+	 * If this limit is exceeded, completely random vectors are used instead for any remaining vectors (they will still not point in the disallowed direction though).
+	 *
+	 * @param count               Number of vectors to make
+	 * @param length              Length of each vector
+	 * @param maxCloseness        Minimum angle between vectors, in degrees
+	 * @param disallowedDirection An optional direction where none of the created vectors may point to. Must be a unit vector.
+	 * @param disallowedCloseness How close to the disallowed direction vectors may not be, in degrees. Must not be greater than 90.
+	 */
+	public static List<Vector> semiRandomDirections(int count, double length, double maxCloseness, @Nullable Vector disallowedDirection, double disallowedCloseness) {
+		double maxClosenessCos = FastUtils.cosDeg(maxCloseness);
+		double disallowedClosenessCos = FastUtils.cosDeg(disallowedCloseness);
+		List<Vector> result = new ArrayList<>(count);
+		int triesRemaining = 100 * count;
+		for (int i = 0; i < count; i++) {
+			Vector dir = randomUnitVector();
+			if (disallowedDirection != null && dir.dot(disallowedDirection) > disallowedClosenessCos) {
+				dir.multiply(-1);
+			}
+			if (triesRemaining > 0 && result.stream().anyMatch(v -> v.dot(dir) > maxClosenessCos)) {
+				i--;
+				triesRemaining--;
+				continue;
+			}
+			result.add(dir);
+		}
+		result.forEach(v -> v.multiply(length));
+		return result;
 	}
 
 }

@@ -102,7 +102,7 @@ public class DarkPact extends Ability {
 				new PartialParticle(Particle.SPELL_WITCH, entity.getLocation(), 3, 0.2, 0.2, 0.2, 0.2).spawnAsPlayerActive(mPlayer);
 			},
 			(entity) -> {
-				world.playSound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.3f, 0.75f);
+				AbilityUtils.playPassiveAbilitySound(entity.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.3f, 0.75f);
 			}));
 
 		putOnCooldown();

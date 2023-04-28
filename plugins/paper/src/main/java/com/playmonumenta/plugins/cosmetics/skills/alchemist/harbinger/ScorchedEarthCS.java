@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -67,7 +68,7 @@ public class ScorchedEarthCS implements CosmeticSkill {
 			.minimumCount(0).spawnAsPlayerActive(player);
 
 		if (60 <= timeRemaining % 120 && timeRemaining % 120 < 65 && timeRemaining < duration) {
-			loc.getWorld().playSound(loc, Sound.BLOCK_FIRE_AMBIENT, SoundCategory.PLAYERS, 1f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(loc, Sound.BLOCK_FIRE_AMBIENT, 1f, 0.5f);
 		}
 	}
 

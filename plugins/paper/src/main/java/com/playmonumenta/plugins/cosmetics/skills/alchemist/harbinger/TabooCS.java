@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -25,7 +26,7 @@ public class TabooCS implements CosmeticSkill {
 		if (oneSecond) {
 			new PartialParticle(Particle.DAMAGE_INDICATOR, player.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(player);
 			new PartialParticle(Particle.SQUID_INK, player.getEyeLocation(), 1, 0.2, 0.2, 0.2, 0).spawnAsPlayerBuff(player);
-			player.playSound(player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, SoundCategory.PLAYERS, 0.8f, 1);
+			AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
 		}
 	}
 

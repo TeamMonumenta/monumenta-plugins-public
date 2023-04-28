@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
  */
 public class PPLine extends AbstractPartialParticle<PPLine> {
 
-	private final Vector mDirection;
+	private Vector mDirection;
 	private double mLength;
 
 	private double mParticlesPerMeter = -1;
@@ -33,6 +33,13 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		super(particle, startLocation);
 		mDirection = direction;
 		mLength = length;
+	}
+
+	public PPLine location(Location start, Location end) {
+		mLocation = start;
+		mDirection = LocationUtils.getDirectionTo(end, start);
+		mLength = start.distance(end);
+		return this;
 	}
 
 	/**

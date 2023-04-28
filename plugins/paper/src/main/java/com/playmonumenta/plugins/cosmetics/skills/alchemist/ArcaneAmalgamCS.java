@@ -27,7 +27,7 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 	public static final String NAME = "Arcane Amalgam";
 
 	private static final double COS_30 = Math.cos(Math.toRadians(30));
-	private static final double SPARK_PARTICLE_SPEED = 4.5;
+	public static final double SPARK_PARTICLE_SPEED = 4.5;
 	private static final int SPARK_PARTICLE_LIFETIME = 3;
 
 	@Override
@@ -128,38 +128,34 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 		world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
 
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(caster);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1).spawnAsPlayerActive(caster);
+
 		// exploding enchantment particles
 		new PPParametric(Particle.ENCHANTMENT_TABLE, loc,
 			(param, builder) -> {
 				double yaw = FastUtils.randomDoubleInRange(0, 360);
 				double pitch = -FastUtils.randomDoubleInRange(-20, 80);
-				double distance = FastUtils.randomDoubleInRange(0.5, 1) * radius;
+				double distance = FastUtils.randomDoubleInRange(1, 1.5) * radius;
 				Vector dir = VectorUtils.rotationToVector(yaw, pitch).multiply(distance);
 				builder.offset(-dir.getX(), -dir.getY(), -dir.getZ());
 				builder.location(loc.clone().add(dir));
-			}).count(30)
+			}).count(40)
 			.directionalMode(true)
 			.extra(1)
 			.spawnAsPlayerActive(caster);
 
 		// sparks with enchantment particle trails
-		int numSparks = 8;
+		int numSparks = 12;
 		int numSplitSparks = 4;
-		double sparkLength = 0.75 * radius;
-		double splitSparkLength = 0.5 * radius;
-		int sparkTime = 2 * SPARK_PARTICLE_LIFETIME; // time before splitting
+		double sparkLength = 0.9 * radius;
+		double splitSparkLength = 0.75 * radius;
+		int sparkTime = 2 * SPARK_PARTICLE_LIFETIME; // time before splitting, in ticks
 		int splitSparkTime = 1 * SPARK_PARTICLE_LIFETIME;
 		new BukkitRunnable() {
 			int mT = 0;
 			List<Location> mStarts = new ArrayList<>(IntStream.range(0, numSparks).mapToObj(i -> loc).toList());
-			List<Vector> mDirections = new ArrayList<>(IntStream.range(0, numSparks).mapToObj(i -> {
-				Vector v = VectorUtils.randomUnitVector().multiply(sparkLength);
-				if (i < 2 && v.getY() < 0) {
-					// make sure at least 2 sparks travel upwards
-					v.multiply(-1);
-				}
-				return v;
-			}).toList());
+			List<Vector> mDirections = VectorUtils.semiRandomDirections(numSparks, sparkLength, 45, null, 0);
 
 			@Override
 			public void run() {
@@ -171,11 +167,14 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 					mStarts = new ArrayList<>(numSparks * numSplitSparks);
 					mDirections = new ArrayList<>(numSparks * numSplitSparks);
 					for (int i = 0; i < numSparks; i++) {
-						Location start = oldStarts.get(i).clone().add(oldDirections.get(i));
+						Vector oldDir = oldDirections.get(i);
+						Location start = oldStarts.get(i).clone().add(oldDir);
 						for (int j = 0; j < numSplitSparks; j++) {
 							mStarts.add(start);
-							mDirections.add(VectorUtils.randomUnitVector().multiply(splitSparkLength));
 						}
+						// Make sparks go mostly outwards by disallowing going back by more than 30°
+						Vector disallowedDir = oldDir.clone().normalize().multiply(-1);
+						mDirections.addAll(VectorUtils.semiRandomDirections(numSplitSparks, splitSparkLength, 30, disallowedDir, 60));
 					}
 				}
 

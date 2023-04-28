@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.List;
@@ -123,8 +121,8 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 		}
 
 		if (mT % 20 == 0) {
-			world.playSound(bLoc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.5f);
-			world.playSound(bLoc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 2.0f, 0.6f);
+			AbilityUtils.playPassiveAbilitySound(bLoc, Sound.BLOCK_BELL_USE, 2.0f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(bLoc, Sound.BLOCK_CONDUIT_ACTIVATE, 2.0f, 0.6f);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
@@ -8,6 +9,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -48,9 +50,14 @@ public class ArcanePanaceaCS extends PanaceaCS {
 	@Override
 	public void castEffects(Player player, double radius) {
 		World world = player.getWorld();
-		world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 2f, 0.5f);
-		world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 2f, 0.5f);
-		world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.75f, 0.5f);
+		for (int i = 0; i < 2; i++) {
+			world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.75f, 0.5f);
+		}
+		for (int i = 0; i < 5; i++) {
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				world.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
+			}, 3 * i);
+		}
 
 		// big circle
 		Vector up = VectorUtils.rotationToVector(player.getLocation().getYaw(), player.getLocation().getPitch() - 90);
@@ -80,7 +87,7 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		// fire/water symbols in the small circles
 		double symbolRadius = smallRadius * 0.8;
 		ArcanePotionsCS.FIRE.draw(new ArcanePotionsCS.Transform(fireRingLoc, symbolRadius, 0, right, up), Particle.WAX_ON, player);
-		ArcanePotionsCS.WATER.draw(new ArcanePotionsCS.Transform(waterRingLoc, symbolRadius, 0, right, up), Particle.WAX_ON, player);
+		ArcanePotionsCS.WATER.draw(new ArcanePotionsCS.Transform(waterRingLoc, symbolRadius, 0, right, up), Particle.SCRAPE, player);
 
 	}
 
@@ -117,8 +124,14 @@ public class ArcanePanaceaCS extends PanaceaCS {
 	@Override
 	public void projectileReverseEffects(Player player, Location loc, double radius) {
 		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 2f, 0.5f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 0.65f);
+		for (int i = 0; i < 2; i++) {
+			world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.5f, 0.65f);
+		}
+		for (int i = 0; i < 3; i++) {
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
+			}, 3 * i);
+		}
 
 		Vector vec1 = VectorUtils.rotateYAxis(new Vector(1, 0, 0), loc.getYaw());
 		Vector vec2 = vec1.getCrossProduct(loc.getDirection());
@@ -131,11 +144,20 @@ public class ArcanePanaceaCS extends PanaceaCS {
 
 	@Override
 	public void projectileEndEffects(Player player, Location loc, double radius) {
+		for (int i = 0; i < 3; i++) {
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_FALL, SoundCategory.PLAYERS, 1, 0.5f);
+			}, 3 * i);
+		}
 	}
 
 	@Override
 	public void projectileHitEffects(Player player, LivingEntity hitEntity, double radius) {
-		hitEntity.getWorld().playSound(hitEntity.getLocation(), Sound.BLOCK_MEDIUM_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, 1, 0.5f);
+		if (hitEntity instanceof Player) {
+			hitEntity.getWorld().playSound(hitEntity.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1, 2f);
+		} else {
+			hitEntity.getWorld().playSound(hitEntity.getLocation(), Sound.BLOCK_MEDIUM_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, 1, 0.5f);
+		}
 	}
 
 	@Override

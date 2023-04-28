@@ -341,6 +341,13 @@ public class CosmeticsManager implements Listener {
 						if (data.has("ability")) {
 							toAdd.mAbility = ClassAbility.getAbility(data.getAsJsonPrimitive("ability").getAsString());
 						}
+
+						// Renamed cosmetic. There's currently no simple automation way to change these, and only few people have this skin,
+						// so this can just be left in for a week or two and then removed.
+						if (toAdd.mAbility == ClassAbility.ALCHEMICAL_ARTILLERY && "Artillery Bomb".equals(toAdd.mName)) {
+							toAdd.mName = "Arcane Artillery";
+						}
+
 						playerCosmetics.add(toAdd);
 					}
 				}

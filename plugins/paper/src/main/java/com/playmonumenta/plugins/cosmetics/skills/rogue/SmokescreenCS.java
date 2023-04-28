@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.rogue;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,6 +36,6 @@ public class SmokescreenCS implements CosmeticSkill {
 		new PartialParticle(Particle.SMOKE_LARGE, mCloudLocation, 2, 0.3, 0.05, 0.3, 0.075).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_LARGE, mCloudLocation, 30, 3.5, 0.8, 4.5, 0.025).spawnAsPlayerActive(mPlayer);
 
-		world.playSound(mCloudLocation, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1, 0.7f);
+		AbilityUtils.playPassiveAbilitySound(mCloudLocation, Sound.BLOCK_FIRE_EXTINGUISH, 1, 0.7f);
 	}
 }
