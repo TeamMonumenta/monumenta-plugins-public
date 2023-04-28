@@ -31,7 +31,6 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
@@ -1106,7 +1105,7 @@ public class Kaul extends BossAbilityGroup {
 							mBoss.setAI(true);
 							mBoss.setSilent(false);
 							mBoss.setInvulnerable(false);
-							NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify kaul color white");
+							ScoreboardUtils.modifyTeamColor("kaul", NamedTextColor.WHITE);
 							mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 							mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 							mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 99999, 0));

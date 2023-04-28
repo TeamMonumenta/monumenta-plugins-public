@@ -5,17 +5,20 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -62,7 +65,7 @@ public class SpellVolcanicDemise extends Spell {
 		mRange = range;
 		mCenter = center;
 
-		mChargeUp = new ChargeUpManager(mBoss, 20 * 2, ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...",
+		mChargeUp = new ChargeUpManager(mBoss, 20 * 2, ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + ChatColor.BOLD + "Volcanic Demise...",
 			BarColor.RED, BarStyle.SEGMENTED_10, 60);
 	}
 
@@ -74,7 +77,9 @@ public class SpellVolcanicDemise extends Spell {
 		for (Player player : players) {
 			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
 		}
-		CommandUtils.runCommandViaConsole("function monumenta:kaul/volcanic_demise_count"); // For the advancement "Such Devastation"
+		// For the advancement "Such Devastation"
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(
+			"function monumenta:kaul/volcanic_demise_count");
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 
@@ -91,14 +96,16 @@ public class SpellVolcanicDemise extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 0.5f);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1, 0.7f);
 
-					mChargeUp.setTitle(ChatColor.GREEN + "Unleashing " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...");
+					mChargeUp.setTitle(Component.text("Unleashing ", NamedTextColor.GREEN)
+						.append(Component.text("Volcanic Demise...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 					BukkitRunnable runnable = new BukkitRunnable() {
 
 						@Override
 						public synchronized void cancel() {
 							super.cancel();
 							mChargeUp.reset();
-							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Volcanic Demise...");
+							mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN)
+								.append(Component.text("Volcanic Demise...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 						}
 
 						int mI = 0;
@@ -179,9 +186,17 @@ public class SpellVolcanicDemise extends Spell {
 										.count(1).extra(0.15).directionalMode(true).distanceFalloff(15).spawnAsBoss();
 							}
 					);
-					ParticleUtils.drawRing(mLoc.clone().add(0, 0.2, 0), 60, new Vector(0, 1, 0), 2, (l, t) -> {
-						new PartialParticle(Particle.REDSTONE, l).count(1).extra(0).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1)).distanceFalloff(15).spawnAsBoss();
-					});
+					ParticleUtils.drawRing(mLoc.clone().add(0, 0.2, 0),
+						60,
+						new Vector(0, 1, 0),
+						2,
+						(l, t) ->
+						new PartialParticle(Particle.REDSTONE, l)
+							.count(1)
+							.extra(0)
+							.data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1))
+							.distanceFalloff(15)
+							.spawnAsBoss());
 				}
 				new PartialParticle(Particle.LAVA, mLoc, 3, 2.5, 0, 2.5, 0.05)
 						.distanceFalloff(20).spawnAsBoss();

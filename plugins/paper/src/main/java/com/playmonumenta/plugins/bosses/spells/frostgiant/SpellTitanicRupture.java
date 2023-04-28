@@ -5,8 +5,8 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -80,7 +80,7 @@ public class SpellTitanicRupture extends Spell {
 				if (mT >= 20 * 2.5) {
 					this.cancel();
 					List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange, true);
-					List<Player> targets = new ArrayList<Player>();
+					List<Player> targets = new ArrayList<>();
 					if (players.size() >= 3) {
 						while (targets.size() < 3) {
 							Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
@@ -149,7 +149,7 @@ public class SpellTitanicRupture extends Spell {
 							}
 						}
 					}
-					//Forces velocity to -1 for y so it drops quickly
+					//Forces velocity to -1 for y, so it drops quickly
 					for (FallingBlock ice : ices) {
 						ice.setVelocity(new Vector(0, -1, 0));
 						ice.setDropItem(false);
@@ -166,7 +166,7 @@ public class SpellTitanicRupture extends Spell {
 
 							// If player is in Stasis, grant advancement of Lonely Soloist
 							if (StasisListener.isInStasis(player)) {
-								CommandUtils.runCommandViaConsole("advancement grant " + player.getName() + " only monumenta:challenges/r2/fg/lonely_soloist");
+								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r2/fg/lonely_soloist");
 							}
 						}
 					}
@@ -181,7 +181,7 @@ public class SpellTitanicRupture extends Spell {
 					//Creates line of particles
 					for (int y = loc.getBlockY(); y < loc.getBlockY() + 10; y += 1) {
 						particleLoc.setY(y);
-						for (double deg = 0; deg < 360; deg += (1 * 10)) {
+						for (double deg = 0; deg < 360; deg += 10) {
 							double cos = FastUtils.cos(deg);
 							double sin = FastUtils.sin(deg);
 							new PartialParticle(Particle.REDSTONE, loc.clone().add(4 * cos, 0, 4 * sin), 1, 0.15, 0.15, 0.15, RED_COLOR).spawnAsEntityActive(mBoss);
@@ -199,7 +199,7 @@ public class SpellTitanicRupture extends Spell {
 				}
 				mPitch += 0.05f;
 
-				for (double deg = 0; deg < 360; deg += (1 * 10)) {
+				for (double deg = 0; deg < 360; deg += 10) {
 					if (FastUtils.RANDOM.nextDouble() > 0.4) {
 						double cos = FastUtils.cos(deg);
 						double sin = FastUtils.sin(deg);

@@ -31,8 +31,8 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -54,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -138,7 +137,7 @@ public final class Lich extends BossAbilityGroup {
 	private static boolean mActivated = false;
 	private static boolean mGotHit = false;
 	private boolean mTrigger = false;
-	private boolean mDefeated = false;
+	private boolean mDefeated;
 	private boolean mCutscene = false;
 	private static boolean mDead = false;
 	private static boolean mPhaseCD = false;
@@ -213,12 +212,11 @@ public final class Lich extends BossAbilityGroup {
 
 		//summon key mob in shadow realm
 		mKey = Objects.requireNonNull((LivingEntity) LibraryOfSoulsIntegration.summon(mStart.getLocation().subtract(0, 41, 0), "ShadowPhylactery"));
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team empty lichphylactery");
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team empty crystal");
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team empty Hekawt");
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify lichphylactery color white");
-		UUID keyUUID = mKey.getUniqueId();
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team join lichphylactery " + keyUUID);
+		ScoreboardUtils.emptyTeam("lichphylactery");
+		ScoreboardUtils.emptyTeam("crystal");
+		ScoreboardUtils.emptyTeam("Hekawt");
+		ScoreboardUtils.modifyTeamColor("lichphylactery", NamedTextColor.WHITE);
+		ScoreboardUtils.addEntityToTeam(mKey, "lichphylactery");
 		mPhylactHealth = PHYLACT_HP * mDefenseScaling;
 		EntityUtils.setAttributeBase(mKey, Attribute.GENERIC_MAX_HEALTH, mPhylactHealth);
 		mKey.setHealth(mPhylactHealth);
@@ -267,10 +265,10 @@ public final class Lich extends BossAbilityGroup {
 				double health = mKey.getHealth();
 				if (health / mPhylactHealth <= 0.34 && mColor == 1) {
 					mColor++;
-					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify lichphylactery color red");
+					ScoreboardUtils.modifyTeamColor("lichphylactery", NamedTextColor.RED);
 				} else if (health / mPhylactHealth <= 0.67 && mColor == 0) {
 					mColor++;
-					NmsUtils.getVersionAdapter().runConsoleCommandSilently("team modify lichphylactery color yellow");
+					ScoreboardUtils.modifyTeamColor("lichphylactery", NamedTextColor.YELLOW);
 				}
 
 				// key death
@@ -746,8 +744,7 @@ public final class Lich extends BossAbilityGroup {
 		});
 
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 1000, 0));
-		UUID uuid = mBoss.getUniqueId();
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("team join Hekawt " + uuid);
+		ScoreboardUtils.addEntityToTeam(mBoss, "Hekawt");
 		mBoss.setAI(false);
 		mBoss.setSilent(true);
 		mBoss.setInvulnerable(true);
@@ -760,14 +757,14 @@ public final class Lich extends BossAbilityGroup {
 		                             "loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17"};
 
 		EntityEquipment equips = mBoss.getEquipment();
-		ItemStack[] a = equips.getArmorContents();
+		ItemStack[] a = Objects.requireNonNull(equips).getArmorContents();
 		ItemStack m = equips.getItemInMainHand();
 		ItemStack o = equips.getItemInOffHand();
 		new BukkitRunnable() {
 
 			@Override
 			public void run() {
-				mBoss.getEquipment().clear();
+				Objects.requireNonNull(mBoss.getEquipment()).clear();
 				List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
 				for (Player p : players) {
 					p.removePotionEffect(PotionEffectType.GLOWING);
@@ -873,7 +870,9 @@ public final class Lich extends BossAbilityGroup {
 		if (e != null) {
 			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				EntityEquipment equip = e.getEquipment();
-				mBoss.getEquipment().setArmorContents(equip.getArmorContents());
+				Objects.requireNonNull(mBoss.getEquipment())
+					.setArmorContents(Objects.requireNonNull(equip)
+						.getArmorContents());
 				mBoss.getEquipment().setItemInMainHand(equip.getItemInMainHand());
 				mBoss.getEquipment().setItemInOffHand(equip.getItemInOffHand());
 				e.remove();
@@ -913,7 +912,7 @@ public final class Lich extends BossAbilityGroup {
 		if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent damageByEntityEvent) {
 			for (Player p : world.getPlayers()) {
 				if (damageByEntityEvent.getDamager().getScoreboardTags().contains("Undead" + p.getName())) {
-					CommandUtils.runCommandViaConsole("advancement grant " + p.getName() + " only monumenta:challenges/r2/lich/player_slayer");
+					AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r2/lich/player_slayer");
 					break;
 				}
 			}
@@ -1901,7 +1900,7 @@ public final class Lich extends BossAbilityGroup {
 							mBoss.setAI(false);
 							mBoss.setSilent(true);
 							mBoss.setInvulnerable(true);
-							mBoss.getEquipment().clear();
+							Objects.requireNonNull(mBoss.getEquipment()).clear();
 							mBoss.setGlowing(false);
 							// kill mobs
 							List<LivingEntity> en = EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange);

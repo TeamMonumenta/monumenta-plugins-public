@@ -4,8 +4,8 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +38,8 @@ public class ArmorOfFrost extends Spell {
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
-	private final List<Player> mWarned = new ArrayList<Player>();
-	//Gets frostArmorActive, which determines whether or not the permafrost armor is up
+	private final List<Player> mWarned = new ArrayList<>();
+	//Gets frostArmorActive, which determines if the permafrost armor is up
 	private final FrostGiant mBossClass;
 	private @Nullable
 	BukkitRunnable mCooldown;
@@ -115,7 +115,8 @@ public class ArmorOfFrost extends Spell {
 	public void hitByIcicle() {
 		World world = mBoss.getWorld();
 		// For Icicle Crash advancement
-		CommandUtils.runCommandViaConsole("function monumenta:frost_giant/fight/icicles_hit_count");
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(
+			"function monumenta:frost_giant/fight/icicles_hit_count");
 
 		if (mBossClass.mFrostArmorActive) {
 			world.playSound(mBoss.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 3, 0);
@@ -147,7 +148,7 @@ public class ArmorOfFrost extends Spell {
 	}
 
 	private void runCooldown() {
-		//Re-run cooldown whenver called
+		//Re-run cooldown whenever called
 		if (mCooldown != null) {
 			mCooldown.cancel();
 		}

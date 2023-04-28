@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -60,7 +60,8 @@ public class OnHitBoss extends BossAbilityGroup {
 		mParams.EFFECTS.apply(damagee, mBoss);
 		if (!mParams.COMMAND_AS_BOSS.equals("")) {
 			try {
-				CommandUtils.runCommandViaConsole("execute as " + mBoss.getUniqueId() + " at @s run " + mParams.COMMAND_AS_BOSS);
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(
+					"execute as " + mBoss.getUniqueId() + " at @s run " + mParams.COMMAND_AS_BOSS);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -68,7 +69,8 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		if (!mParams.COMMAND_AS_PLAYER.equals("")) {
 			try {
-				CommandUtils.runCommandViaConsole("execute as " + damagee.getUniqueId() + " at @s run " + mParams.COMMAND_AS_PLAYER);
+				NmsUtils.getVersionAdapter().runConsoleCommandSilently(
+					"execute as " + damagee.getUniqueId() + " at @s run " + mParams.COMMAND_AS_PLAYER);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

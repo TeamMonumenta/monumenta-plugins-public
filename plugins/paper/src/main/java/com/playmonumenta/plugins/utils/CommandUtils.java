@@ -1,7 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.point.AreaBounds;
-import com.playmonumenta.plugins.point.Point;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.ChatColor;
@@ -49,23 +47,8 @@ public class CommandUtils {
 		}
 	}
 
-	public static int parseIntFromString(@Nullable CommandSender sender, String str) throws Exception {
-		int value = 0;
-
-		try {
-			value = Integer.parseInt(str);
-		} catch (NumberFormatException e) {
-			if (sender != null) {
-				error(sender, "Invalid parameter " + str + ". Must be whole number value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE);
-			}
-			throw new Exception(e);
-		}
-
-		return value;
-	}
-
 	public static double parseDoubleFromString(@Nullable CommandSender sender, String str) throws Exception {
-		double value = 0;
+		double value;
 
 		try {
 			value = Float.parseFloat(str);
@@ -77,37 +60,6 @@ public class CommandUtils {
 		}
 
 		return value;
-	}
-
-	public static AreaBounds parseAreaFromString(@Nullable CommandSender sender,
-	                                             String xStr1, String yStr1, String zStr1,
-	                                             String xStr2, String yStr2, String zStr2) throws Exception {
-		Point pos1;
-		Point pos2;
-
-		try {
-			pos1 = Point.fromString(sender, xStr1, yStr1, zStr1, true);
-		} catch (Exception e) {
-			if (sender != null) {
-				error(sender, "Failed to parse first coordinate");
-			}
-			throw new Exception(e);
-		}
-
-		try {
-			pos2 = Point.fromString(sender, xStr2, yStr2, zStr2, true);
-		} catch (Exception e) {
-			if (sender != null) {
-				error(sender, "Failed to parse second coordinate");
-			}
-			throw new Exception(e);
-		}
-
-		pos2.mX += 1;
-		pos2.mY += 1;
-		pos2.mZ += 1;
-
-		return new AreaBounds(pos1, pos2);
 	}
 
 	public static double parseCoordFromString(@Nullable CommandSender sender,
@@ -135,10 +87,6 @@ public class CommandUtils {
 		} else {
 			sender.sendMessage(msg);
 		}
-	}
-
-	public static void runCommandViaConsole(String cmd) {
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 	}
 
 	/**

@@ -23,7 +23,7 @@ public class CommandAction implements Action {
 
 	@Override
 	public void runAction(LivingEntity boss) {
-		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + boss.getUniqueId() + " at " + boss.getUniqueId() + " run " + mCommand);
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + boss.getUniqueId() + " at @s run " + mCommand);
 	}
 
 	public static ParseResult<Action> fromReader(StringReader reader) {

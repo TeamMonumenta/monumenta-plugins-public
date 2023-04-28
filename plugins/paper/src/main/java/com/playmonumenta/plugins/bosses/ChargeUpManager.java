@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses;
 
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -74,7 +75,11 @@ public class ChargeUpManager {
 	}
 
 	public void setTitle(String title) {
-		mChargeUp.setTitle(MessagingUtils.LEGACY_SERIALIZER.deserialize(title));
+		setTitle(MessagingUtils.LEGACY_SERIALIZER.deserialize(title));
+	}
+
+	public void setTitle(Component title) {
+		mChargeUp.setTitle(title);
 	}
 
 	public void setColor(BarColor color) {

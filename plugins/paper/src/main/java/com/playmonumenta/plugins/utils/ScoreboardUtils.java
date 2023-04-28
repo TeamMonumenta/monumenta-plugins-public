@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.HashSet;
 import java.util.OptionalInt;
+import java.util.Set;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -111,6 +113,24 @@ public class ScoreboardUtils {
 			team.addEntry(player.getName());
 		} else {
 			team.addEntry(entity.getUniqueId().toString());
+		}
+	}
+
+	public static void modifyTeamColor(String teamName, NamedTextColor color) {
+		Team team = getExistingTeam(teamName);
+		if (team != null) {
+			team.color(color);
+		}
+	}
+
+	public static void emptyTeam(String teamName) {
+		Team team = getExistingTeam(teamName);
+		if (team == null) {
+			return;
+		}
+		Set<String> entries = new HashSet<>(team.getEntries());
+		for (String entry : entries) {
+			team.removeEntry(entry);
 		}
 	}
 

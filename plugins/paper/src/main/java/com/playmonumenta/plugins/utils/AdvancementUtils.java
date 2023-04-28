@@ -1,12 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import java.util.Iterator;
-import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
@@ -14,38 +7,37 @@ import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 
 public class AdvancementUtils {
-	public static JsonObject getAsJsonObject(Player player) {
-		Gson gson = new Gson();
-		JsonObject returnData = new JsonObject();
-		Iterator<Advancement> iterator = Bukkit.advancementIterator();
-		while (iterator.hasNext()) {
-			Advancement advancement = iterator.next();
-			AdvancementProgress progress = player.getAdvancementProgress(advancement);
-			JsonElement awardedCriteria = gson.toJsonTree(progress.getAwardedCriteria(), progress.getAwardedCriteria().getClass());
-			if (awardedCriteria.isJsonArray()) {
-				returnData.add(advancement.getKey().getNamespace() + ":" + advancement.getKey().getKey(), awardedCriteria);
-			}
+	public static void grantAdvancement(Player player, String key) {
+		NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+		if (namespacedKey != null) {
+			grantAdvancement(player, namespacedKey);
 		}
-		return returnData;
 	}
 
-	public static void loadFromJsonObject(Player player, JsonObject object) {
-		if (object != null) {
-			for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-				JsonArray awardedCriteria = entry.getValue().getAsJsonArray();
-				String[] keys = entry.getKey().split(":", 2);
-				Advancement advancement = Bukkit.getAdvancement(NamespacedKey.fromString(keys[0] + ":" + keys[1]));
-				if (advancement != null) {
-					AdvancementProgress progress = player.getAdvancementProgress(advancement);
-					for (String criteria : advancement.getCriteria()) {
-						if (awardedCriteria.contains(new JsonPrimitive(criteria))) {
-							progress.awardCriteria(criteria);
-						} else {
-							progress.revokeCriteria(criteria);
-						}
-					}
-				}
-			}
+	public static void grantAdvancement(Player player, NamespacedKey namespacedKey) {
+		Advancement advancement = Bukkit.getAdvancement(namespacedKey);
+		if (advancement == null) {
+			return;
 		}
+		AdvancementProgress progress = player.getAdvancementProgress(advancement);
+		for (String criteria : progress.getRemainingCriteria()) {
+			progress.awardCriteria(criteria);
+		}
+	}
+
+	public static void grantAdvancementCriteria(Player player, String key, String criteria) {
+		NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+		if (namespacedKey != null) {
+			grantAdvancementCriteria(player, namespacedKey, criteria);
+		}
+	}
+
+	public static void grantAdvancementCriteria(Player player, NamespacedKey namespacedKey, String criteria) {
+		Advancement advancement = Bukkit.getAdvancement(namespacedKey);
+		if (advancement == null) {
+			return;
+		}
+		AdvancementProgress progress = player.getAdvancementProgress(advancement);
+		progress.awardCriteria(criteria);
 	}
 }

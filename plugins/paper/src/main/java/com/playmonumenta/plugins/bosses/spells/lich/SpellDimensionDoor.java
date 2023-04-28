@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.AdvancementUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -51,11 +51,11 @@ public class SpellDimensionDoor extends Spell {
 	private LivingEntity mBoss;
 	private Location mSpawnLoc;
 	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
-	private static List<Player> mShadowed = new ArrayList<Player>();
-	private static List<Player> mWarned = new ArrayList<Player>();
-	private List<Player> mByPortal = new ArrayList<Player>();
-	private List<Location> mPortalLoc = new ArrayList<Location>();
-	private List<Location> mReplaceLoc = new ArrayList<Location>();
+	private static List<Player> mShadowed = new ArrayList<>();
+	private static List<Player> mWarned = new ArrayList<>();
+	private List<Player> mByPortal = new ArrayList<>();
+	private List<Location> mPortalLoc = new ArrayList<>();
+	private List<Location> mReplaceLoc = new ArrayList<>();
 	private double mRange;
 	private int mCoolDown = 20 * 45;
 	private int mT = 20 * 10;
@@ -107,7 +107,7 @@ public class SpellDimensionDoor extends Spell {
 		if (mShadowed != null && mShadowed.size() > 0) {
 			players.removeAll(mShadowed);
 		}
-		List<Player> toRemove = new ArrayList<Player>();
+		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
 			p.sendMessage(ChatColor.LIGHT_PURPLE + "THE SHADOWS HOLD MANY SECRETS.");
 			if (Lich.getCursed().contains(p) || PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
@@ -119,7 +119,7 @@ public class SpellDimensionDoor extends Spell {
 		}
 		players.removeAll(toRemove);
 
-		List<Player> targets = new ArrayList<Player>();
+		List<Player> targets = new ArrayList<>();
 		if (players.size() <= 2) {
 			targets = players;
 		} else {
@@ -188,13 +188,13 @@ public class SpellDimensionDoor extends Spell {
 				public void run() {
 					mT++;
 
-					//move portal center to ground, stop above bedrock so it doesn't replace bedrock
-					Location locdown = mLoc.clone().subtract(0, 1, 0);
+					//move portal center to ground, stop above bedrock so that it doesn't replace bedrock
+					Location locDown = mLoc.clone().subtract(0, 1, 0);
 					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
-						        || mLoc.getBlock().isEmpty()) && locdown.getBlock().getType() != Material.BEDROCK
+						        || mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
 						       && mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
-						locdown = mLoc.clone().subtract(0, 1, 0);
+						locDown = mLoc.clone().subtract(0, 1, 0);
 					}
 
 					if (mT <= 25) {
@@ -204,51 +204,51 @@ public class SpellDimensionDoor extends Spell {
 
 					//get blocks and replace
 					Location portalCenterLoc = mLoc.clone();
-					Location testloc = portalCenterLoc.clone();
-					List<Block> replace = new ArrayList<Block>();
+					Location testLoc = portalCenterLoc.clone();
+					List<Block> replace = new ArrayList<>();
 					if (mT == 25) {
 						mPortalLoc.add(portalCenterLoc);
 						mTeleport = Lich.playersInRange(mSpawnLoc, mRange, true);
 						world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 1.0f, 1.0f);
 						//get blocks 5x5
 						for (int x = -2; x <= 2; x++) {
-							testloc.setX(portalCenterLoc.getX() + x);
+							testLoc.setX(portalCenterLoc.getX() + x);
 							for (int z = -2; z <= 2; z++) {
-								testloc.setZ(portalCenterLoc.getZ() + z);
+								testLoc.setZ(portalCenterLoc.getZ() + z);
 
-								//check if testloc is already in set or is end portal
-								if (!mIgnoredMats.contains(testloc.getBlock().getType()) && !mReplaceLoc.contains(testloc.getBlock().getLocation())) {
-									toRestore.add(testloc.getBlock().getState());
-									replace.add(testloc.getBlock());
-									mReplaceLoc.add(testloc.getBlock().getLocation());
+								//check if testLoc is already in set or is end portal
+								if (!mIgnoredMats.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
+									toRestore.add(testLoc.getBlock().getState());
+									replace.add(testLoc.getBlock());
+									mReplaceLoc.add(testLoc.getBlock().getLocation());
 								}
 							}
 						}
 						//repeat for 7x3
 						for (int x = -3; x <= 3; x++) {
-							testloc.setX(portalCenterLoc.getX() + x);
+							testLoc.setX(portalCenterLoc.getX() + x);
 							for (int z = -1; z <= 1; z++) {
-								testloc.setZ(portalCenterLoc.getZ() + z);
+								testLoc.setZ(portalCenterLoc.getZ() + z);
 
-								//check if testloc is already in set or is end portal
-								if (!mIgnoredMats.contains(testloc.getBlock().getType()) && !mReplaceLoc.contains(testloc.getBlock().getLocation())) {
-									toRestore.add(testloc.getBlock().getState());
-									replace.add(testloc.getBlock());
-									mReplaceLoc.add(testloc.getBlock().getLocation());
+								//check if testLoc is already in set or is end portal
+								if (!mIgnoredMats.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
+									toRestore.add(testLoc.getBlock().getState());
+									replace.add(testLoc.getBlock());
+									mReplaceLoc.add(testLoc.getBlock().getLocation());
 								}
 							}
 						}
 						//repeat for 3x7
 						for (int x = -1; x <= 1; x++) {
-							testloc.setX(portalCenterLoc.getX() + x);
+							testLoc.setX(portalCenterLoc.getX() + x);
 							for (int z = -3; z <= 3; z++) {
-								testloc.setZ(portalCenterLoc.getZ() + z);
+								testLoc.setZ(portalCenterLoc.getZ() + z);
 
-								//check if testloc is already in set or is end portal
-								if (!mIgnoredMats.contains(testloc.getBlock().getType()) && !mReplaceLoc.contains(testloc.getBlock().getLocation())) {
-									toRestore.add(testloc.getBlock().getState());
-									replace.add(testloc.getBlock());
-									mReplaceLoc.add(testloc.getBlock().getLocation());
+								//check if testLoc is already in set or is end portal
+								if (!mIgnoredMats.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
+									toRestore.add(testLoc.getBlock().getState());
+									replace.add(testLoc.getBlock());
+									mReplaceLoc.add(testLoc.getBlock().getLocation());
 								}
 							}
 						}
@@ -259,20 +259,20 @@ public class SpellDimensionDoor extends Spell {
 							}
 						}
 						for (int x = -2; x <= 2; x++) {
-							testloc.setX(portalCenterLoc.getX() + x);
+							testLoc.setX(portalCenterLoc.getX() + x);
 							for (int z = -1; z <= 1; z++) {
-								testloc.setZ(portalCenterLoc.getZ() + z);
-								if (testloc.getBlock().getType() == Material.BLACK_CONCRETE) {
-									testloc.getBlock().setType(Material.END_PORTAL);
+								testLoc.setZ(portalCenterLoc.getZ() + z);
+								if (testLoc.getBlock().getType() == Material.BLACK_CONCRETE) {
+									testLoc.getBlock().setType(Material.END_PORTAL);
 								}
 							}
 						}
 						for (int x = -1; x <= 1; x++) {
-							testloc.setX(portalCenterLoc.getX() + x);
+							testLoc.setX(portalCenterLoc.getX() + x);
 							for (int z = -2; z <= 2; z++) {
-								testloc.setZ(portalCenterLoc.getZ() + z);
-								if (testloc.getBlock().getType() == Material.BLACK_CONCRETE) {
-									testloc.getBlock().setType(Material.END_PORTAL);
+								testLoc.setZ(portalCenterLoc.getZ() + z);
+								if (testLoc.getBlock().getType() == Material.BLACK_CONCRETE) {
+									testLoc.getBlock().setType(Material.END_PORTAL);
 								}
 							}
 						}
@@ -332,9 +332,9 @@ public class SpellDimensionDoor extends Spell {
 		int t = 20 * 20;
 		if (byPortal) {
 			if (mWarned.contains(p)) {
-				p.sendMessage(ChatColor.AQUA + "" + dio[FastUtils.RANDOM.nextInt(3)]);
+				p.sendMessage(ChatColor.AQUA + dio[FastUtils.RANDOM.nextInt(3)]);
 			} else {
-				p.sendMessage(ChatColor.AQUA + "" + dio[0]);
+				p.sendMessage(ChatColor.AQUA + dio[0]);
 				mWarned.add(p);
 			}
 			//remove curse only through portal
@@ -397,7 +397,7 @@ public class SpellDimensionDoor extends Spell {
 				if (spectre.isDead() || !spectre.isValid() || Lich.phase3over() || mBoss.isDead() || !mBoss.isValid()) {
 					// Death Report Advancement. If player escapes with less than 1 second.
 					if (mT <= 20) {
-						CommandUtils.runCommandViaConsole("advancement grant " + p.getName() + " only monumenta:challenges/r2/lich/death_report");
+						AdvancementUtils.grantAdvancement(p, "monumenta:challenges/r2/lich/death_report");
 					}
 
 					bar.setVisible(false);
