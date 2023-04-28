@@ -123,6 +123,8 @@ public interface VersionAdapter {
 	 */
 	Object createDimensionTypeResourceKey(String namespace, String key);
 
+	@Nullable World getWorldByResourceKey(Object currentWorldKey);
+
 	/**
 	 * Executes a command as a block. The block does not need to be a command block.
 	 */

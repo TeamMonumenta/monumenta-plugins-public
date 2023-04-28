@@ -2043,6 +2043,13 @@ public class ItemStatUtils {
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
 
+	public static void cleanIfNecessary(final @Nullable ItemStack item) {
+		if (item != null && !isClean(item)) {
+			generateItemStats(item);
+			markClean(item);
+		}
+	}
+
 	public static int getShulkerSlots(@Nullable ItemStack item) {
 		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(SHULKER_SLOTS_KEY)).orElse(27);
 	}

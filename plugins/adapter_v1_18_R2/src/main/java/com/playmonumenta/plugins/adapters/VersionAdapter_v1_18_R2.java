@@ -19,6 +19,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
@@ -38,6 +39,7 @@ import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -401,6 +403,17 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public Object createDimensionTypeResourceKey(String namespace, String key) {
 		return ResourceKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(namespace, key));
+	}
+
+	@Override
+	// Cannot check resource key type, but this should only ever be called with the proper type anyway
+	@SuppressWarnings("unchecked")
+	public @Nullable World getWorldByResourceKey(Object key) {
+		if (!(key instanceof ResourceKey<?> resourceKey)) {
+			return null;
+		}
+		ServerLevel level = MinecraftServer.getServer().getLevel(((ResourceKey<Level>) resourceKey));
+		return level == null ? null : level.getWorld();
 	}
 
 	@Override

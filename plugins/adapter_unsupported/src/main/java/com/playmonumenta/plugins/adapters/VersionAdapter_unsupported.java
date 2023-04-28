@@ -116,6 +116,11 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
+	public @Nullable World getWorldByResourceKey(Object currentWorldKey) {
+		return null;
+	}
+
+	@Override
 	public void executeCommandAsBlock(Block block, String command) {
 
 	}

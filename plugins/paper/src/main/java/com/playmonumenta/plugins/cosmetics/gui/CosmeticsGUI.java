@@ -288,7 +288,7 @@ public class CosmeticsGUI extends CustomInventory {
 
 			if (mDisplayPage.isEquippable()) {
 				List<Component> lore = new ArrayList<>();
-				List<Cosmetic> activeCosmetics = CosmeticsManager.getInstance().getActiveCosmetics(targetPlayer, mDisplayPage);
+				List<Cosmetic> activeCosmetics = CosmeticsManager.getInstance().getActiveCosmetics(targetPlayer, mDisplayPage, mCurrentAbility == null ? null : mCurrentAbility.getLinkedSpell());
 				if (activeCosmetics.size() > 1) {
 					lore.add(Component.text("Equipped Cosmetics: multiple (" + activeCosmetics.size() + ")", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 				} else if (!activeCosmetics.isEmpty()) {

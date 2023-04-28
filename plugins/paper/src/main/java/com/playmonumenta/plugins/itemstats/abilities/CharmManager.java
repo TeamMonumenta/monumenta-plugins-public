@@ -1164,10 +1164,7 @@ public class CharmManager {
 					if (data.has(KEY_ITEM) && data.get(KEY_ITEM).isJsonPrimitive() && data.getAsJsonPrimitive(KEY_ITEM).isString()) {
 						ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(data.getAsJsonPrimitive(KEY_ITEM).getAsString()));
 						if (item != null) {
-							if (!ItemStatUtils.isClean(item)) {
-								ItemStatUtils.generateItemStats(item);
-								ItemStatUtils.markClean(item);
-							}
+							ItemStatUtils.cleanIfNecessary(item);
 							playerCharms.add(item);
 						}
 					}

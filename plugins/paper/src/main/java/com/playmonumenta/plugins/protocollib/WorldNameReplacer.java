@@ -10,12 +10,18 @@ import com.comphenix.protocol.wrappers.Converters;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.WorldNameCommand;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.persistence.PersistentDataType;
 
 public class WorldNameReplacer extends PacketAdapter {
+
+	private static final NamespacedKey WORLD_NAME_KEY = NamespacedKeyUtils.fromString("monumenta:world-name");
 
 	public WorldNameReplacer(Plugin plugin) {
 		super(plugin, PacketType.Play.Server.LOGIN, PacketType.Play.Server.RESPAWN);
@@ -40,12 +46,15 @@ public class WorldNameReplacer extends PacketAdapter {
 
 		Class resourceKeyClass = NmsUtils.getVersionAdapter().getResourceKeyClass();
 
-		Object shardWorldNameKey = NmsUtils.getVersionAdapter().createDimensionTypeResourceKey("monumenta", ServerProperties.getShardName());
-
 		// first identifier (in both packets): world name
-		StructureModifier worldName = packet.getSpecificModifier(resourceKeyClass);
-		Object currentWorldKey = worldName.read(0);
-		worldName.write(0, shardWorldNameKey);
+		StructureModifier worldNameMod = packet.getSpecificModifier(resourceKeyClass);
+		Object currentWorldKey = worldNameMod.read(0);
+
+		World world = NmsUtils.getVersionAdapter().getWorldByResourceKey(currentWorldKey);
+		String worldName = world == null ? null : world.getPersistentDataContainer().get(WORLD_NAME_KEY, PersistentDataType.STRING);
+		Object shardWorldNameKey = NmsUtils.getVersionAdapter().createDimensionTypeResourceKey("monumenta", worldName != null ? worldName : ServerProperties.getShardName());
+
+		worldNameMod.write(0, shardWorldNameKey);
 
 		// login packets also have a set of possible world names - replace the changed name in that set
 		if (event.getPacketType().equals(PacketType.Play.Server.LOGIN)) {

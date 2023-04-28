@@ -318,10 +318,7 @@ public class ShulkerEquipmentListener implements Listener {
 	private void swapItem(PlayerInventory from, Inventory to, int fromSlot, int toSlot) {
 		ItemStack fromItem = from.getItem(fromSlot);
 		ItemStack toItem = to.getItem(toSlot);
-		if (!ItemStatUtils.isClean(toItem)) {
-			ItemStatUtils.generateItemStats(toItem);
-			ItemStatUtils.markClean(toItem);
-		}
+		ItemStatUtils.cleanIfNecessary(toItem);
 		from.setItem(fromSlot, toItem);
 		to.setItem(toSlot, fromItem);
 	}

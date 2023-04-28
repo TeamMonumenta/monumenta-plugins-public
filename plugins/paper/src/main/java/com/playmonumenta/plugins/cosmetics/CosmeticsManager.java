@@ -258,6 +258,14 @@ public class CosmeticsManager implements Listener {
 		return Collections.emptyList();
 	}
 
+	public List<Cosmetic> getActiveCosmetics(Player player, CosmeticType type, @Nullable ClassAbility ability) {
+		List<Cosmetic> cosmetics = mPlayerCosmetics.get(player.getUniqueId());
+		if (cosmetics != null) {
+			return cosmetics.stream().filter(c -> c.getType() == type && c.isEquipped() && c.getAbility() == ability).toList();
+		}
+		return Collections.emptyList();
+	}
+
 	public @Nullable Cosmetic getRandomActiveCosmetic(Player player, CosmeticType type) {
 		List<Cosmetic> activeCosmetics = getActiveCosmetics(player, type);
 		if (!activeCosmetics.isEmpty()) {

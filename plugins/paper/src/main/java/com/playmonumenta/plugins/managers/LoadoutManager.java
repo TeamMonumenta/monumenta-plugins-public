@@ -170,6 +170,8 @@ public class LoadoutManager implements Listener {
 								if (newItem != null && isLoadoutItem(loadoutItem, matchInfusion, newItem)) {
 									swappedEquipment.set(true);
 
+									ItemStatUtils.cleanIfNecessary(newItem);
+
 									ItemStack newItemClone = ItemUtils.clone(newItem);
 									if (loadoutItem.mSlot > 9) { // armor/offhand: take only one
 										newItemClone.setAmount(1);
@@ -266,6 +268,7 @@ public class LoadoutManager implements Listener {
 							for (int invI = 0; invI < inventory.mInventory.getSize(); invI++) {
 								ItemStack newItem = inventory.mInventory.getItem(invI);
 								if (newItem != null && charmIdentifier.isIdentifierFor(newItem, false)) {
+									ItemStatUtils.cleanIfNecessary(newItem);
 									ItemStack newItemClone = ItemUtils.clone(newItem);
 									newItemClone.setAmount(1);
 									if (!Plugin.getInstance().mCharmManager.validateCharm(player, newItemClone)) {
