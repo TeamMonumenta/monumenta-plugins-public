@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -16,7 +17,8 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 
@@ -60,22 +62,28 @@ public class GlowingCommand {
 				return entity instanceof Mob;
 			}
 		},
+		ELITES("elite mobs", 5) {
+			@Override
+			boolean appliesTo(Player player, Entity entity) {
+				return EntityUtils.isElite(entity);
+			}
+		},
 		BOSSES("bosses", 3) {
 			@Override
 			boolean appliesTo(Player player, Entity entity) {
-				return entity.getScoreboardTags().contains("Boss");
+				return EntityUtils.isBoss(entity);
 			}
 		},
-		INVISIBLE("invisible mobs", 4) {
+		INVISIBLE("invisible entities", 4) {
 			@Override
 			boolean appliesTo(Player player, Entity entity) {
-				return entity instanceof Mob && ((Mob) entity).isInvisible();
+				return entity instanceof LivingEntity && ((LivingEntity) entity).isInvisible();
 			}
 		},
-		EXPERIENCE_ORBS("experience orbs", 5) {
+		ITEMS("items", 7) {
 			@Override
 			boolean appliesTo(Player player, Entity entity) {
-				return entity instanceof ExperienceOrb;
+				return entity instanceof Item;
 			}
 		},
 
