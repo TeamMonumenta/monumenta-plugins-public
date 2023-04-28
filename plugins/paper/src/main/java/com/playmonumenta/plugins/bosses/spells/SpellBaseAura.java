@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -25,6 +26,7 @@ public class SpellBaseAura extends Spell {
 	}
 
 	private final Entity mBoss;
+	private final boolean mCancelable;
 	private final double mDX;
 	private final double mDY;
 	private final double mDZ;
@@ -36,6 +38,7 @@ public class SpellBaseAura extends Spell {
 	private final @Nullable Object mParticleArg;
 	private final @Nullable ApplyAuraEffect mAuraEffect;
 	private final @Nullable SummonParticles mParticlesSummoner;
+
 
 	private final int mRadius; // Computed maximum of mDX, mDY, mDZ
 	private int mEffectIter; // Number of effect iterations - rolls around between 0 and 2
@@ -55,12 +58,13 @@ public class SpellBaseAura extends Spell {
 		mParticleArg = particleArg;
 		mAuraEffect = auraEffect;
 		mParticlesSummoner = null;
+		mCancelable = false;
 
 		mRadius = (int) Math.max(mDX, Math.max(mDY, mDZ));
 		mEffectIter = 0;
 	}
 
-	public SpellBaseAura(Entity boss, double dx, double dy, double dz, SummonParticles particlesSummoner, @Nullable ApplyAuraEffect auraEffect) {
+	public SpellBaseAura(Entity boss, double dx, double dy, double dz, SummonParticles particlesSummoner, @Nullable ApplyAuraEffect auraEffect, boolean stunAffected) {
 		mBoss = boss;
 		// The "radius" thing is just... a mystery. Dividing by 2 is slightly better?
 		mDX = dx;
@@ -74,6 +78,7 @@ public class SpellBaseAura extends Spell {
 		mParticleArg = null;
 		mAuraEffect = auraEffect;
 		mParticlesSummoner = particlesSummoner;
+		mCancelable = stunAffected;
 
 		mRadius = (int) Math.max(mDX, Math.max(mDY, mDZ));
 		mEffectIter = 0;
@@ -86,42 +91,44 @@ public class SpellBaseAura extends Spell {
 	 */
 	@Override
 	public void run() {
-		Location bossLoc = mBoss.getLocation();
+		if (!mCancelable || (!EntityUtils.isSilenced(mBoss) && !EntityUtils.isStunned(mBoss))) {
+			Location bossLoc = mBoss.getLocation();
 
-		if (mParticle != null) {
-			if (mParticleArg != null) {
-				// Generate particles in area
-				new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg)
-					.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
-					.spawnAsEntityActive(mBoss);
-				// Generate particles immediately around boss
-				new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg).spawnAsEntityActive(mBoss);
-			} else {
-				// Generate particles in area
-				new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ)
-					.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
-					.spawnAsEntityActive(mBoss);
-				// Generate particles immediately around boss
-				new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1).spawnAsEntityActive(mBoss);
+			if (mParticle != null) {
+				if (mParticleArg != null) {
+					// Generate particles in area
+					new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ, mParticleArg)
+						.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
+						.spawnAsEntityActive(mBoss);
+					// Generate particles immediately around boss
+					new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1, mParticleArg).spawnAsEntityActive(mBoss);
+				} else {
+					// Generate particles in area
+					new PartialParticle(mParticle, bossLoc, mNumParticles, mParticleDX, mParticleDY, mParticleDZ)
+						.conditional(p -> !p.getScoreboardTags().contains("noAuraParticles"))
+						.spawnAsEntityActive(mBoss);
+					// Generate particles immediately around boss
+					new PartialParticle(mParticle, bossLoc.clone().add(0, 1, 0), 2, 1, 1, 1).spawnAsEntityActive(mBoss);
+				}
+			} else if (mParticlesSummoner != null) {
+				//new version using particlesSummoner
+				mParticlesSummoner.run(mBoss);
 			}
-		} else if (mParticlesSummoner != null) {
-			//new version using particlesSummoner
-			mParticlesSummoner.run(mBoss);
-		}
 
-		// Apply effects every other pulse (2 Hz)
-		if (mAuraEffect != null) {
-			mEffectIter++;
-			if (mEffectIter >= 2) {
-				mEffectIter = 0;
+			// Apply effects every other pulse (2 Hz)
+			if (mAuraEffect != null) {
+				mEffectIter++;
+				if (mEffectIter >= 2) {
+					mEffectIter = 0;
 
-				for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
-					Location playerLoc = player.getLocation();
-					if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
-						    Math.abs(playerLoc.getY() - bossLoc.getY()) < mDY &&
-						    Math.abs(playerLoc.getZ() - bossLoc.getZ()) < mDZ) {
-						// Player is within range
-						mAuraEffect.run(player);
+					for (Player player : PlayerUtils.playersInRange(bossLoc, mRadius, true)) {
+						Location playerLoc = player.getLocation();
+						if (Math.abs(playerLoc.getX() - bossLoc.getX()) < mDX &&
+							    Math.abs(playerLoc.getY() - bossLoc.getY()) < mDY &&
+							    Math.abs(playerLoc.getZ() - bossLoc.getZ()) < mDZ) {
+							// Player is within range
+							mAuraEffect.run(player);
+						}
 					}
 				}
 			}

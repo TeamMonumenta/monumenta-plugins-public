@@ -41,6 +41,9 @@ public class AuraEffectBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Effects applied to the player when inside the range")
 		public EffectsList EFFECTS = EffectsList.EMPTY;
+
+		@BossParam(help = "If the aura is turned off by stunts and silences")
+		public boolean CANCELABLE = false;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -61,7 +64,7 @@ public class AuraEffectBoss extends BossAbilityGroup {
 					 (Player player) -> {
 						 p.EFFECTS.apply(player, mBoss);
 					 }
-				)
+				), p.CANCELABLE
 			)
 		);
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null, p.DELAY, p.PASSIVE_RATE);

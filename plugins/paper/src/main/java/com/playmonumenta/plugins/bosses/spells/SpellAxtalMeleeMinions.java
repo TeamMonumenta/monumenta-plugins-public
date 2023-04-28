@@ -60,7 +60,7 @@ public class SpellAxtalMeleeMinions extends Spell {
 			@Override
 			public void run() {
 				int numberToSpawn = mCount + (FastUtils.RANDOM.nextInt(2 * mScope) - mScope);
-				for (int j = 0; j < numberToSpawn; j++) {
+				for (int j = 0; j < numberToSpawn && !mLauncher.isDead(); j++) {
 					LibraryOfSoulsIntegration.summon(loc, "Soul");
 				}
 				for (Entity skelly : mLauncher.getNearbyEntities(0.2, 0.2, 0.2)) {
@@ -70,6 +70,7 @@ public class SpellAxtalMeleeMinions extends Spell {
 						skelly.setVelocity(new Vector(x, 0.5, z));
 					}
 				}
+
 			}
 		};
 		for (int i = 0; i < mRepeats; i++) {
@@ -83,10 +84,12 @@ public class SpellAxtalMeleeMinions extends Spell {
 		Runnable animLoop = new Runnable() {
 			@Override
 			public void run() {
-				Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
-				mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
-				centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
-				new PartialParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
+				if (!mLauncher.isDead()) {
+					Location centerLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ());
+					mLauncher.teleport(new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()));
+					centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
+					new PartialParticle(Particle.EXPLOSION_NORMAL, centerLoc, 20, 1, 1, 1, 0.01).spawnAsEntityActive(mLauncher);
+				}
 			}
 		};
 		for (int i = 0; i < (40 + mRepeats * 15) / 3; i++) {
