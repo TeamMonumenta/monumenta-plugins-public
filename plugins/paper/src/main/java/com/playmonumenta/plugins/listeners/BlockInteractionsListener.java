@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -22,6 +23,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockInteractionsListener implements Listener {
@@ -46,6 +48,7 @@ public final class BlockInteractionsListener implements Listener {
 		Material.LECTERN
 	);
 
+	// Armor stands are handled using PlayerArmorStandManipulateEvent instead of the interact event, and are thus not part of this set.
 	private static final EnumSet<EntityType> INTERACTABLE_ENTITIES = EnumSet.of(
 		EntityType.ITEM_FRAME,
 		EntityType.GLOW_ITEM_FRAME
@@ -65,9 +68,9 @@ public final class BlockInteractionsListener implements Listener {
 
 	private void playerToggle(Player player) {
 		if (ScoreboardUtils.toggleTag(player, DISABLE_TAG)) {
-			player.sendMessage(Component.text("Interactions with blocks have been disabled.", NamedTextColor.GOLD, TextDecoration.BOLD));
+			player.sendMessage(Component.text("Interactions with blocks, item frames, and armor stands have been disabled.", NamedTextColor.GOLD, TextDecoration.BOLD));
 		} else {
-			player.sendMessage(Component.text("Interactions with blocks have been enabled.", NamedTextColor.GOLD, TextDecoration.BOLD));
+			player.sendMessage(Component.text("Interactions with blocks, item frames, and armor stands have been enabled.", NamedTextColor.GOLD, TextDecoration.BOLD));
 		}
 	}
 
@@ -84,7 +87,7 @@ public final class BlockInteractionsListener implements Listener {
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
 		Entity entity = event.getRightClicked();
 		Player player = event.getPlayer();
-		if (checkEntityAction(entity, player) && INTERACTABLE_ENTITIES.contains(entity.getType())) {
+		if (checkEntityAction(entity, player.getInventory().getItem(event.getHand()), player) && INTERACTABLE_ENTITIES.contains(entity.getType())) {
 			event.setCancelled(true);
 		}
 	}
@@ -98,16 +101,27 @@ public final class BlockInteractionsListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public static void playerArmorStandManipulateEvent(PlayerArmorStandManipulateEvent event) {
-		if (checkEntityAction(event.getRightClicked(), event.getPlayer())) {
+		if (checkEntityAction(event.getRightClicked(), event.getPlayerItem(), event.getPlayer())) {
 			event.setCancelled(true);
 		}
 	}
 
-	private static boolean checkEntityAction(@Nullable Entity entity, Player player) {
-		return entity != null && player.getGameMode() == GameMode.SURVIVAL && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG);
+	private static boolean checkEntityAction(@Nullable Entity entity, @Nullable ItemStack playerItem, Player player) {
+		return entity != null
+			       && player.getGameMode() == GameMode.SURVIVAL
+			       && !ServerProperties.getIsTownWorld() // allow using item frames/armor stands in plots without having to disable this feature
+			       && playerItem != null // null/empty hand: takes an item from an armor stand and is allowed
+			       && !playerItem.getType().isAir()
+			       && ItemStatUtils.getTier(playerItem) != ItemStatUtils.Tier.KEYTIER // allow placing key items in item frames and on armor stands
+			       && player.getScoreboardTags().contains(DISABLE_TAG);
 	}
 
 	private static boolean checkAction(@Nullable Block block, Player player) {
-		return block != null && !player.isSneaking() && player.getGameMode() == GameMode.SURVIVAL && !ServerProperties.getIsTownWorld() && !player.getInventory().getItemInMainHand().getType().isAir() && player.getScoreboardTags().contains(DISABLE_TAG);
+		return block != null
+			       && !player.isSneaking()
+			       && player.getGameMode() == GameMode.SURVIVAL
+			       && !ServerProperties.getIsTownWorld() // allow using blocks in plots without having to disable this feature
+			       && !player.getInventory().getItemInMainHand().getType().isAir() // allow interactions with an empty hand as an alternative to turning this feature off
+			       && player.getScoreboardTags().contains(DISABLE_TAG);
 	}
 }
