@@ -626,6 +626,12 @@ public class EntityUtils {
 		return mobsInLine;
 	}
 
+	public static List<LivingEntity> getMobsInLine(Location startLocation, Location endLocation, double halfHitboxLength) {
+		Vector dir = LocationUtils.getDirectionTo(endLocation, startLocation);
+		double distance = startLocation.distance(endLocation);
+		return getMobsInLine(startLocation, dir, distance, halfHitboxLength);
+	}
+
 	public static List<Player> getPlayersInLine(Location loc, Vector direction, double range, double halfHitboxLength, Player self) {
 		Set<Player> nearbyPlayers = new HashSet<>(PlayerUtils.playersInRange(loc, range, true));
 		List<Player> playersInLine = new ArrayList<>();

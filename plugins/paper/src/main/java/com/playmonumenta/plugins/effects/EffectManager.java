@@ -328,6 +328,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(SanguineHarvestBlight.effectID, SanguineHarvestBlight::deserialize);
 		mEffectDeserializer.put(SanguineMark.effectID, SanguineMark::deserialize);
 		mEffectDeserializer.put(ScorchedEarthDamage.effectID, ScorchedEarthDamage::deserialize);
+		mEffectDeserializer.put(ShamanCooldownDecreasePerSecond.effectID, ShamanCooldownDecreasePerSecond::deserialize);
 		mEffectDeserializer.put(SilverPrayer.effectID, SilverPrayer::deserialize);
 		mEffectDeserializer.put(SpellShockExplosion.effectID, SpellShockExplosion::deserialize);
 		mEffectDeserializer.put(SpellShockStatic.effectID, SpellShockStatic::deserialize);

@@ -18,6 +18,7 @@ public abstract class PlayerClass {
 	public TextColor mClassColor;
 	public ItemStack mDisplayItem;
 	public @Nullable String mQuestReq = null;
+	public @Nullable String mPermissionString = null;
 	public int mQuestReqMin;
 	public String mClassDescription;
 	public String mClassPassiveDescription;

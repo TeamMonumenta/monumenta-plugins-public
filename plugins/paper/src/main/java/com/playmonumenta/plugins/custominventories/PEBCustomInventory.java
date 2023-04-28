@@ -214,6 +214,16 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(30, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
+			new PebItem(30, "Earthen Tremor",
+				"Click to enable or disable the self-knockup on earthen tremor.", NamedTextColor.LIGHT_PURPLE,
+				Material.HANGING_ROOTS, false)
+				.action((gui, event) -> {
+					if (ScoreboardUtils.toggleTag(gui.mPlayer, "NoTremorKnockup")) {
+						gui.mPlayer.sendMessage("Earthen Tremor self knockup disabled!");
+					} else {
+						gui.mPlayer.sendMessage("Earthen Tremor self knockup enabled!");
+					}
+				}),
 			new PebItem(32, "Auto-abandon completed dungeons",
 				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", NamedTextColor.LIGHT_PURPLE,
 				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),

@@ -157,8 +157,27 @@ public enum ClassAbility {
 	TABOO("Taboo"),
 	SCORCHED_EARTH("Scorched Earth"),
 
-	// [DEPTHS ABILITIES]
+	// [Shaman]
+	CLEANSING_TOTEM("Cleansing Totem"),
+	EARTHEN_TREMOR("Earthen Tremor"),
+	FLAME_TOTEM("Flame Totem"),
+	INTERCONNECTED_HAVOC("Interconnected Havoc"),
+	LIGHTNING_CRASH("Lightning Crash"),
+	LIGHTNING_TOTEM("Lightning Totem"),
+	ADHESIVE_TOTEMS("Adhesive Totems"),
+	TOTEMIC_PROJECTION("Totemic Projection"),
 
+	// Soothsayer
+	GRAVITY_RING("Gravity Ring"),
+	SHARED_EMPOWERMENT("Shared Empowerment"),
+	WHIRLWIND_TOTEM("Whirlwind Totem"),
+
+	// Hexbreaker
+	DECAYED_TOTEM("Decayed Totem"),
+	DESECRATING_SHOT("Desecrating Shot"),
+	DEVASTATION("Devastation"),
+
+	// [DEPTHS ABILITIES]
 	// FLAMECALLER
 	APOCALYPSE("Apocalypse"),
 	FIREBALL("Fireball"),

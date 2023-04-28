@@ -94,9 +94,9 @@ public class LightningFinisher implements EliteFinisher {
 				stormClouds.spawnAsBoss();
 
 				// Count of the tick this run, last being 1
-				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
+				if (mCountdownTicks == Constants.TICKS_PER_SECOND) {
 					// P: Lightning starts
-					PPLightning lightning = new PPLightning(Particle.END_ROD, strikeLocation).init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
+					PPLightning lightning = new PPLightning(Particle.END_ROD, strikeLocation).init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15).duration(Constants.TICKS_PER_SECOND);
 					lightning.spawnAsPlayerActive(p);
 					mInternalParticleRunnable = lightning.runnable();
 

@@ -12,8 +12,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class PPLightning extends AbstractPartialParticle<PPLightning> {
-	public static final int ANIMATION_TICKS = Constants.TICKS_PER_SECOND;
-
 	/*
 	 * Height above mLocation to start the lightning bolt.
 	 */
@@ -31,6 +29,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 	 */
 	protected double mHopXZ;
 	protected double mHopY;
+	protected int mDuration = Constants.TICKS_PER_SECOND;
 
 	protected @Nullable BukkitRunnable mRunnable;
 
@@ -116,6 +115,11 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 		return mHopY;
 	}
 
+	public PPLightning duration(int duration) {
+		mDuration = duration;
+		return this;
+	}
+
 	public @Nullable BukkitRunnable runnable() {
 		return mRunnable;
 	}
@@ -130,7 +134,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 
 		int hopParticleCount = Math.max(HOP_MINIMUM_PARTICLES, packagedValues.count());
 		ArrayList<Location> hopParticleLocations = generateParticleLocationsOnce(hopParticleCount);
-		double particlesPerTick = hopParticleLocations.size() / (double) ANIMATION_TICKS;
+		double particlesPerTick = hopParticleLocations.size() / (double) mDuration;
 
 		packagedValues.count(1);
 
@@ -152,7 +156,7 @@ public class PPLightning extends AbstractPartialParticle<PPLightning> {
 				}
 
 				// If this was the last frame of animation
-				if (mAnimationProgress >= ANIMATION_TICKS) {
+				if (mAnimationProgress >= mDuration) {
 					cancel();
 					mRunnable = null;
 				} else {

@@ -91,6 +91,23 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
+import com.playmonumenta.plugins.abilities.shaman.AdhesiveTotems;
+import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
+import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
+import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
+import com.playmonumenta.plugins.abilities.shaman.LightningCrash;
+import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
+import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.EyeOfTheStorm;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
 import com.playmonumenta.plugins.abilities.warlock.Culling;
@@ -321,7 +338,18 @@ public class AbilityManager {
 			GruesomeAlchemy.INFO,
 			BrutalAlchemy.INFO,
 			EnergizingElixir.INFO,
-			AlchemistPotions.INFO
+			AlchemistPotions.INFO,
+
+			//********** SHAMAN **************//
+			CleansingTotem.INFO,
+			EarthenTremor.INFO,
+			FlameTotem.INFO,
+			InterconnectedHavoc.INFO,
+			LightningCrash.INFO,
+			LightningTotem.INFO,
+			AdhesiveTotems.INFO,
+			TotemicEmpowerment.INFO,
+			TotemicProjection.INFO
 		);
 
 		List<AbilityInfo<?>> specAbilities = Arrays.asList(
@@ -405,7 +433,20 @@ public class AbilityManager {
 			// APOTHECARY
 			Panacea.INFO,
 			TransmutationRing.INFO,
-			WardingRemedy.INFO
+			WardingRemedy.INFO,
+
+			//*********** SHAMAN ***********//
+			//Soothsayer
+			EyeOfTheStorm.INFO,
+			SharedEmpowerment.INFO,
+			SoothsayerPassive.INFO,
+			WhirlwindTotem.INFO,
+
+			//Hexbreaker
+			DecayedTotem.INFO,
+			DesecratingShot.INFO,
+			Devastation.INFO,
+			HexbreakerPassive.INFO
 		);
 
 		if (ServerProperties.getDepthsEnabled()) {

@@ -4,16 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.Alchemist;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.classes.Cleric;
-import com.playmonumenta.plugins.classes.Mage;
-import com.playmonumenta.plugins.classes.MonumentaClasses;
-import com.playmonumenta.plugins.classes.PlayerClass;
-import com.playmonumenta.plugins.classes.Rogue;
-import com.playmonumenta.plugins.classes.Scout;
-import com.playmonumenta.plugins.classes.Warlock;
-import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.classes.*;
 import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.AbilitySilence;
@@ -44,10 +35,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -293,6 +281,7 @@ public class AbilityUtils {
 			case Alchemist.CLASS_ID -> "Alchemist";
 			case Scout.CLASS_ID -> "Scout";
 			case Warlock.CLASS_ID -> "Warlock";
+			case Shaman.CLASS_ID -> "Shaman";
 			default -> "No Class";
 		};
 	}
@@ -306,6 +295,7 @@ public class AbilityUtils {
 			case "Alchemist" -> Alchemist.CLASS_ID;
 			case "Scout" -> Scout.CLASS_ID;
 			case "Warlock" -> Warlock.CLASS_ID;
+			case "Shaman" -> Shaman.CLASS_ID;
 			default -> 0;
 		};
 	}
@@ -330,6 +320,8 @@ public class AbilityUtils {
 			case Scout.HUNTER_SPEC_ID -> "Hunter";
 			case Warlock.REAPER_SPEC_ID -> "Reaper";
 			case Warlock.TENEBRIST_SPEC_ID -> "Tenebrist";
+			case Shaman.SOOTHSAYER_ID -> "Soothsayer";
+			case Shaman.HEXBREAKER_ID -> "Hexbreaker";
 			default -> "No Spec";
 		};
 	}
@@ -350,6 +342,9 @@ public class AbilityUtils {
 			case "Hunter" -> Scout.HUNTER_SPEC_ID;
 			case "Reaper" -> Warlock.REAPER_SPEC_ID;
 			case "Tenebrist" -> Warlock.TENEBRIST_SPEC_ID;
+			case "Soothsayer" -> Shaman.SOOTHSAYER_ID;
+			case "Soulbreaker" -> Shaman.HEXBREAKER_ID;
+			case "Hexbreaker" -> Shaman.HEXBREAKER_ID;
 			default -> 0;
 		};
 	}
@@ -446,6 +441,7 @@ public class AbilityUtils {
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_CLASS_NAME, 0);
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_SPEC_NAME, 0);
+		AbilityManager.getManager().resetPlayerAbilities(player);
 		updateAbilityScores(player);
 		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 0.7f);
 		player.sendMessage(Component.text("Your skill points have been reset. You can pick a new class now.", NamedTextColor.WHITE).decoration(TextDecoration.BOLD, true));
@@ -502,7 +498,9 @@ public class AbilityUtils {
 					}
 				}
 			}
-			if (playerClass == mClass.mClass && mClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, mClass.mQuestReq).orElse(0) < mClass.mQuestReqMin && !getEffectiveSpecs(player))) {
+			if (playerClass == mClass.mClass &&
+				(mClass.mQuestReq != null && (ScoreboardUtils.getScoreboardValue(player, mClass.mQuestReq).orElse(0) < mClass.mQuestReqMin && !getEffectiveSpecs(player))) &&
+				(mClass.mPermissionString != null && !player.hasPermission(mClass.mPermissionString))) {
 				player.sendMessage(Component.text("You have not unlocked this class yet.", NamedTextColor.RED).decoration(TextDecoration.BOLD, true));
 				AbilityManager.getManager().resetPlayerAbilities(player);
 				player.sendMessage(Component.text("Your class has been reset!", NamedTextColor.RED));
@@ -588,6 +586,35 @@ public class AbilityUtils {
 		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || TRIGGERS_ASPECTS.contains(event.getAbility());
 	}
 
+	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration) {
+		Component indicatorName = Component.empty().append(Component.text("[", NamedTextColor.WHITE));
+
+		int greenIndicator = (int) (20 * ((double) currentDuration / (double) totalDuration));
+		for (int i = 0; i < greenIndicator; i++) {
+			indicatorName = indicatorName.append(Component.text("|", NamedTextColor.GREEN));
+		}
+		int redIndicator = 20 - greenIndicator;
+		for (int i = 0; i < redIndicator; i++) {
+			indicatorName = indicatorName.append(Component.text("|", NamedTextColor.RED));
+		}
+		indicatorName = indicatorName.append(Component.text("]", NamedTextColor.WHITE));
+
+		target.customName(indicatorName);
+		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
+	}
+
+	public static Snowball spawnAbilitySnowball(Plugin plugin, Player player, World world, double velocity, String name, @Nullable Particle particle) {
+		Location loc = player.getEyeLocation();
+		Snowball proj = world.spawn(loc, Snowball.class);
+		proj.setVelocity(loc.getDirection().normalize().multiply(velocity));
+		proj.setShooter(player);
+		if (particle != null) {
+			plugin.mProjectileEffectTimers.addEntity(proj, particle);
+		}
+		proj.customName(Component.text(name));
+		return proj;
+	}
+
 	public static void playPassiveAbilitySound(Location location, Sound sound, float volume, float pitch) {
 		for (Player player : PlayerUtils.playersInRange(location, 50, true)) {
 			playPassiveAbilitySound(player, location, sound, volume, pitch);
@@ -603,5 +630,4 @@ public class AbilityUtils {
 	public static boolean hasPassiveAbilitySoundsEnabled(Player player) {
 		return !player.getScoreboardTags().contains(PASSIVE_SOUNDS_DISABLED_TAG);
 	}
-
 }

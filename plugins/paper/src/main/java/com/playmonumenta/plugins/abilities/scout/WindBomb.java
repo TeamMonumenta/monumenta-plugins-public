@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -20,7 +21,6 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
-import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -108,11 +108,7 @@ public class WindBomb extends Ability {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
 		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.25f);
-		Snowball proj = world.spawn(mPlayer.getEyeLocation(), Snowball.class);
-		proj.setVelocity(loc.getDirection().normalize().multiply(VELOCITY));
-		proj.setShooter(mPlayer);
-		mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.CLOUD);
-		proj.customName(Component.text("Wind Bomb"));
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Wind Bomb", Particle.CLOUD);
 
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		double damage = ItemStatUtils.getAttributeAmount(mainhand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);

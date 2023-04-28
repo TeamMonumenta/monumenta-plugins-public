@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -21,8 +22,8 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -90,13 +91,12 @@ public class GraspingClaws extends Ability {
 
 	private final double mAmplifier;
 	private final double mDamage;
-	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	private final Map<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 
 	public GraspingClaws(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mAmplifier = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mPlayerItemStatsMap = new WeakHashMap<>();
 	}
 
 	public void cast() {
@@ -104,14 +104,8 @@ public class GraspingClaws extends Ability {
 			return;
 		}
 		World world = mPlayer.getWorld();
-		Location eyeLoc = mPlayer.getEyeLocation();
-		Vector direction = mPlayer.getLocation().getDirection();
-		float speed = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
-		Snowball proj = world.spawn(eyeLoc, Snowball.class);
-		proj.setVelocity(direction.normalize().multiply(speed));
-		proj.setShooter(mPlayer);
-		proj.customName(Component.text("Grasping Claws Projectile"));
-		mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SPELL_WITCH);
+		double speed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, speed, "Grasping Claws Projectile", Particle.SPELL_WITCH);
 		mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		putOnCooldown();
 	}

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
+import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.guis.AbilityTriggersGui;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
@@ -36,7 +37,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	private static final int COMMON_REMAINING_SKILL_LOC = 8;
 	private static final int COMMON_REMAINING_SPEC_LOC = 7;
 	private static final int COMMON_REMAINING_ENHANCEMENTS_LOC = 6;
-	private static final int P1_CLASS_START_LOC = 19;
+	public static final ArrayList<Integer> P1_CLASS_LOCS = new ArrayList<>(Arrays.asList(19, 20, 21, 29, 23, 24, 25, 33));
 	private static final int P1_RESET_CLASS_LOC = 38;
 	private static final int P1_RESET_SPEC_LOC = 39;
 	private static final int P1_CHANGE_TRIGGERS_LOC = 42;
@@ -95,7 +96,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		switch (mCurrentPage) {
 			case 1: //pick a class page
 				//clicked a class location
-				if (chosenSlot >= P1_CLASS_START_LOC && chosenSlot <= P1_CLASS_START_LOC + 6) {
+				if (P1_CLASS_LOCS.contains(chosenSlot)) {
 					for (PlayerClass oneClass : mClasses.mClasses) {
 						if (oneClass.mDisplayItem != null && clickedItem.getType() == oneClass.mDisplayItem.getType()) {
 							ScoreboardUtils.setScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME, oneClass.mClass);
@@ -227,16 +228,21 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				break;
 			}
 		}
-		int currentSlot = P1_CLASS_START_LOC;
+		int currentIndex = 0;
 		//if classless, show all as the items. otherwise, barrier the choices but keep names
 		for (PlayerClass oneClass : mClasses.mClasses) {
 			boolean lockedClass = false;
+			boolean permLock = false;
 			//get effective specs does the same thing as if i made a function to check if they had r3 access and are in an ability enhancement area.
 			if (oneClass.mQuestReq != null && !AbilityUtils.getEffectiveSpecs(player)) {
 				lockedClass = (ScoreboardUtils.getScoreboardValue(player, oneClass.mQuestReq) < oneClass.mQuestReqMin);
 			}
-			ItemStack createItem = createClassItem(oneClass, (playerClass != null && playerClass != oneClass), lockedClass);
-			mInventory.setItem(currentSlot++, createItem);
+			if (oneClass.mPermissionString != null) {
+				lockedClass = !player.hasPermission(oneClass.mPermissionString);
+				permLock = !player.hasPermission(oneClass.mPermissionString);
+			}
+			ItemStack createItem = createClassItem(oneClass, (playerClass != null && playerClass != oneClass), lockedClass, permLock);
+			mInventory.setItem(P1_CLASS_LOCS.get(currentIndex++), createItem);
 		}
 
 		ItemStack summaryItem = GUIUtils.createBasicItem(Material.SCUTE, "Main Menu", NamedTextColor.WHITE, false,
@@ -273,7 +279,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	}
 
 	public void makeSkillSelectPage(PlayerClass userClass, Player player) {
-		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE) {
+		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE && userClass.mClass != Shaman.CLASS_ID) {
 			makeRegionThreeSkillPage(userClass, player);
 		} else {
 			makeRegionOneSkillPage(userClass, player);
@@ -404,7 +410,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public void applyAbilityChosen(int chosenSlot, Player player, int level) {
 		ArrayList<Integer> currentLocations;
 		int skillOffset;
-		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE) {
+		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE && ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != Shaman.CLASS_ID) {
 			currentLocations = P3_ABILITY_LOCS;
 		} else {
 			currentLocations = P2_ABILITY_LOCS;
@@ -560,6 +566,11 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			//unlocked and already using this spec
 			ItemStack specItem = GUIUtils.createBasicItem(spec.mDisplayItem.getType(), spec.mSpecName, playerClass.mClassColor, false,
 				"Click to view your specialization skills.", NamedTextColor.WHITE);
+			ItemMeta newMeta = specItem.getItemMeta();
+			if (spec.mPassiveName != null) {
+				GUIUtils.splitLoreLine(newMeta, spec.mPassiveName + " (Passive): " + spec.mPassiveDescription, NamedTextColor.GREEN, 30, false);
+			}
+			specItem.setItemMeta(newMeta);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 		} else if (ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME) == 0) {
 			//unlocked and no spec selected
@@ -567,6 +578,9 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				"Click to choose this specialization!", NamedTextColor.GRAY);
 			ItemMeta newMeta = specItem.getItemMeta();
 			GUIUtils.splitLoreLine(newMeta, "Description: " + spec.mDescription, NamedTextColor.YELLOW, 30, false);
+			if (spec.mPassiveName != null) {
+				GUIUtils.splitLoreLine(newMeta, spec.mPassiveName + " (Passive): " + spec.mPassiveDescription, NamedTextColor.GREEN, 30, false);
+			}
 			specItem.setItemMeta(newMeta);
 			mInventory.setItem(SKILL_PAGE_SPEC_LOCS.get(specNumber - 1), specItem);
 		}
@@ -620,8 +634,12 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			theClass.mClassColor, true, lore, 30, true);
 	}
 
-	public ItemStack createClassItem(PlayerClass classToItemize, boolean otherChosen, boolean locked) {
+	public ItemStack createClassItem(PlayerClass classToItemize, boolean otherChosen, boolean locked, boolean permissionLock) {
 		if (locked) {
+			if (permissionLock) {
+				return GUIUtils.createBasicItem(Material.BARRIER, classToItemize.mClassName,
+					classToItemize.mClassColor, true, "This class is currently unavailable to you.", NamedTextColor.RED);
+			}
 			return GUIUtils.createBasicItem(Material.BARRIER, classToItemize.mClassName,
 				classToItemize.mClassColor, true, "You don't have the requirements to choose this class.", NamedTextColor.RED);
 		}

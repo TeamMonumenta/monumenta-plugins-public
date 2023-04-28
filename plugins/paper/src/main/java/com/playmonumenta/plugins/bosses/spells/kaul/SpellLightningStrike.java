@@ -198,10 +198,10 @@ public class SpellLightningStrike extends Spell {
 				electricRingMarker.spawnAsBoss();
 
 				// Count of the tick this run, last being 1
-				if (mCountdownTicks == PPLightning.ANIMATION_TICKS) {
+				if (mCountdownTicks == Constants.TICKS_PER_SECOND) {
 					// P: Lightning starts
 					PPLightning lightning = new PPLightning(Particle.END_ROD, strikeLocation)
-						                        .count(8);
+						                        .count(8).duration(Constants.TICKS_PER_SECOND);
 					lightning.init(SHOCK_VERTICAL_RANGE, 2.5, 0.3, 0.15);
 					lightning.spawnAsBoss();
 					mInternalParticleRunnable = lightning.runnable();

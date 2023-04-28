@@ -18,6 +18,8 @@ public class PlayerSpec {
 	public int mSpecialization;
 	public ItemStack mDisplayItem;
 	public String mDescription;
+	public String mPassiveName;
+	public String mPassiveDescription;
 
 	public JsonObject toJson() {
 		JsonArray abilities = new JsonArray();
