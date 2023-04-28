@@ -12,10 +12,13 @@ import com.playmonumenta.plugins.utils.TOVUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -76,7 +79,7 @@ public class ChestOverride extends BaseOverride {
 			if (state instanceof Chest chest) {
 				LootTable table = chest.getLootTable();
 				if (table != null) {
-					player.sendMessage(ChatColor.GOLD + "This chest has loot table: " + table.getKey());
+					player.sendMessage(Component.text("This chest has loot table: " + table.getKey(), NamedTextColor.GOLD));
 					return false;
 				}
 			}
@@ -93,6 +96,11 @@ public class ChestOverride extends BaseOverride {
 			if (itemMeta == null
 				    || itemMeta.displayName() == null
 				    || !chest.getLock().equals(MessagingUtils.plainText(itemMeta.displayName()))) {
+				// Cancel clicks on locked chests. This prevents any custom code from running on it, e.g. purple tesseract.
+				// Since the event is cancelled, we need to manually send the locked message and sound though.
+				Component name = chest.customName();
+				player.sendActionBar(Component.translatable("container.isLocked", name != null ? name : Component.translatable("container.chest")));
+				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1, 1);
 				return false;
 			}
 		}
@@ -216,7 +224,7 @@ public class ChestOverride extends BaseOverride {
 
 				if (name.equalsIgnoreCase("trap")) {
 					// This was a trapped chest - clear its name and still let the player open it
-					chest.setCustomName(null);
+					chest.customName(null);
 					chest.update();
 					return false;
 				} else {

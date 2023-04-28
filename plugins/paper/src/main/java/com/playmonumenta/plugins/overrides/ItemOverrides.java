@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -394,41 +395,43 @@ public final class ItemOverrides {
 		mItems.put(Material.GLASS_BOTTLE, glassBottleOverride);
 	}
 
-	public boolean rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
+	public void rightClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, @Nullable Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
 		BaseOverride blockOverride = mItems.get(blockType);
-		boolean notCancelled = true;
 
-		if (item != null && itemOverride != null) {
-			notCancelled = itemOverride.rightClickItemInteraction(plugin, player, action, item, block);
+		if (item != null && itemOverride != null && event.useItemInHand() != Event.Result.DENY) {
+			if (!itemOverride.rightClickItemInteraction(plugin, player, action, item, block)) {
+				event.setUseItemInHand(Event.Result.DENY);
+			}
 		}
 
-		if (notCancelled && block != null && blockOverride != null) {
-			notCancelled = blockOverride.rightClickBlockInteraction(plugin, player, action, item, block, event);
+		if (block != null && blockOverride != null && event.useInteractedBlock() != Event.Result.DENY) {
+			if (!blockOverride.rightClickBlockInteraction(plugin, player, action, item, block, event)) {
+				event.setUseInteractedBlock(Event.Result.DENY);
+			}
 		}
-
-		return notCancelled;
 	}
 
-	public boolean leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
-										@Nullable Block block) {
+	public void leftClickInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item,
+	                                 @Nullable Block block, PlayerInteractEvent event) {
 		Material itemType = (item != null) ? item.getType() : Material.AIR;
 		Material blockType = (block != null) ? block.getType() : Material.AIR;
 		BaseOverride itemOverride = mItems.get(itemType);
 		BaseOverride blockOverride = mItems.get(blockType);
-		boolean notCancelled = true;
 
-		if (item != null && itemOverride != null) {
-			notCancelled = itemOverride.leftClickItemInteraction(plugin, player, action, item, block);
+		if (item != null && itemOverride != null && event.useItemInHand() != Event.Result.DENY) {
+			if (!itemOverride.leftClickItemInteraction(plugin, player, action, item, block)) {
+				event.setUseItemInHand(Event.Result.DENY);
+			}
 		}
 
-		if (notCancelled && block != null && blockOverride != null) {
-			notCancelled = blockOverride.leftClickBlockInteraction(plugin, player, action, item, block);
+		if (block != null && blockOverride != null && event.useInteractedBlock() != Event.Result.DENY) {
+			if (!blockOverride.leftClickBlockInteraction(plugin, player, action, item, block)) {
+				event.setUseInteractedBlock(Event.Result.DENY);
+			}
 		}
-
-		return notCancelled;
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,

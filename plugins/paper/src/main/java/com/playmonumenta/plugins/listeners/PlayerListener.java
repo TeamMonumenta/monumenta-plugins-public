@@ -293,15 +293,16 @@ public class PlayerListener implements Listener {
 		mPlugin.mItemStatManager.onPlayerInteract(mPlugin, player, event);
 
 		// Overrides
-		// TODO: Rewrite overrides system to handle item/block interactions separately
 		if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-			if (item != null && !mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block)) {
-				event.setCancelled(true);
-				return;
+			if (item != null) {
+				mPlugin.mItemOverrides.leftClickInteraction(mPlugin, player, action, item, block, event);
+				if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
+					return;
+				}
 			}
 		} else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			if (!mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block, event)) {
-				event.setCancelled(true);
+			mPlugin.mItemOverrides.rightClickInteraction(mPlugin, player, action, item, block, event);
+			if (event.useInteractedBlock() == Event.Result.DENY && event.useItemInHand() == Event.Result.DENY) {
 				return;
 			}
 		}
