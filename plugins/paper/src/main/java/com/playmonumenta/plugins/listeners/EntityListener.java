@@ -194,7 +194,7 @@ public class EntityListener implements Listener {
 	);
 
 	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 80;
-
+	public static final String INVULNERABLE_ITEM_TAG = "MonumentaInvulnerableItem";
 	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
 	public static final String BEES_BLOCK_HIVE_ENTER_EVENT = "BeeNoHive";
 	private static final NamespacedKey INVISIBLE_ITEM_FRAME_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/invisible_item_frame");
@@ -413,6 +413,10 @@ public class EntityListener implements Listener {
 			}
 		} else if (damagee instanceof Item) {
 			if (damagee.getTicksLived() <= 100 && (source.equals(DamageCause.ENTITY_EXPLOSION) || source.equals(DamageCause.BLOCK_EXPLOSION))) {
+				event.setCancelled(true);
+				return;
+			}
+			if (damagee.getScoreboardTags().contains(INVULNERABLE_ITEM_TAG) && !source.equals(DamageCause.LAVA) && !source.equals(DamageCause.VOID)) {
 				event.setCancelled(true);
 				return;
 			}

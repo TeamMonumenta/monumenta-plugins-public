@@ -129,7 +129,7 @@ public class IronTincture extends Ability {
 
 		tincture.setVelocity(vel);
 		tincture.setGlowing(true);
-		tincture.setInvulnerable(true);
+		EntityUtils.makeItemInvulnereable(tincture);
 
 		// Full duration cooldown - is shortened if not picked up
 		putOnCooldown();

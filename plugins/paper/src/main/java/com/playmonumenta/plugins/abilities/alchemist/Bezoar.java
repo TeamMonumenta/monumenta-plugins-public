@@ -130,7 +130,7 @@ public class Bezoar extends Ability {
 		Item item = world.dropItemNaturally(loc, itemBezoar);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
-		item.setInvulnerable(true);
+		EntityUtils.makeItemInvulnereable(item);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -203,7 +203,7 @@ public class Bezoar extends Ability {
 		Item item = world.dropItemNaturally(loc, itemStone);
 		item.setGlowing(true);
 		item.setPickupDelay(Integer.MAX_VALUE);
-		item.setInvulnerable(true);
+		EntityUtils.makeItemInvulnereable(item);
 
 		new BukkitRunnable() {
 			int mT = 0;

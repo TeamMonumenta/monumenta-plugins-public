@@ -222,6 +222,7 @@ public class DivineJustice extends Ability {
 		Item item = loc.getWorld().dropItemNaturally(loc, itemStack);
 		item.setGlowing(true); // glowing is conditionally disabled for non-clerics in GlowingReplacer
 		item.setPickupDelay(Integer.MAX_VALUE);
+		EntityUtils.makeItemInvulnereable(item);
 
 		new BukkitRunnable() {
 			int mT = 0;

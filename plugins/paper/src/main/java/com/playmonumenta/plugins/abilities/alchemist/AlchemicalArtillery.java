@@ -137,7 +137,7 @@ public class AlchemicalArtillery extends Ability {
 			physicsItem.setCanMobPickup(false);
 			physicsItem.setVelocity(vel);
 			physicsItem.addPassenger(grenade);
-			physicsItem.setInvulnerable(true);
+			EntityUtils.makeItemInvulnereable(physicsItem);
 
 			new BukkitRunnable() {
 				int mTicks = 0;

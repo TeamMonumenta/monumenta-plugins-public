@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.listeners.DamageListener;
+import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -1548,6 +1549,14 @@ public class EntityUtils {
 			return phantom.getSize();
 		}
 		return 0;
+	}
+
+	/**
+	 * Makes an item entity invulnerable by adding the appropriate tag,
+	 * so that EntityListener can cancel the appropriate hurt events.
+	 */
+	public static void makeItemInvulnereable(Item item) {
+		item.addScoreboardTag(EntityListener.INVULNERABLE_ITEM_TAG);
 	}
 
 }
