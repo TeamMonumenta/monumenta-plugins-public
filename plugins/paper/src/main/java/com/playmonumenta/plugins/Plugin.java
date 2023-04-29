@@ -93,6 +93,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Plugin extends JavaPlugin {
 	public static final boolean IS_PLAY_SERVER;
+	public static final boolean ENABLE_TIME_WARP;
 
 	static {
 		/*
@@ -100,17 +101,34 @@ public class Plugin extends JavaPlugin {
 		 * If environment variable is not set or 0, build server. If set and nonzero, play server.
 		 * This is stored into the scoreboard '$IsPlay const' in the onEnable() event
 		 */
-		String shardName = System.getenv("MONUMENTA_IS_PLAY");
-		if (shardName == null || shardName.isEmpty()) {
+		String envIsPlay = System.getenv("MONUMENTA_IS_PLAY");
+		if (envIsPlay == null || envIsPlay.isEmpty()) {
 			IS_PLAY_SERVER = false;
 		} else {
 			boolean val;
 			try {
-				val = Integer.parseInt(shardName) != 0;
+				val = Integer.parseInt(envIsPlay) != 0;
 			} catch (Exception ex) {
 				val = false;
 			}
 			IS_PLAY_SERVER = val;
+		}
+
+		/*
+		 * Reads the environment variable MONUMENTA_ENABLE_TIME_WARP to determine if /timewarp is allowed
+		 * If environment variable is not set or 0, disabled. If set and nonzero, enabled.
+		 */
+		String envEnableTimeWarp = System.getenv("MONUMENTA_ENABLE_TIME_WARP");
+		if (envEnableTimeWarp == null || envEnableTimeWarp.isEmpty()) {
+			ENABLE_TIME_WARP = false;
+		} else {
+			boolean val;
+			try {
+				val = Integer.parseInt(envEnableTimeWarp) != 0;
+			} catch (Exception ex) {
+				val = false;
+			}
+			ENABLE_TIME_WARP = val;
 		}
 	}
 

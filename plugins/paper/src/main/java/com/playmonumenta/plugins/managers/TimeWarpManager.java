@@ -47,7 +47,7 @@ public class TimeWarpManager {
 	}
 
 	public static void load() {
-		if (!ServerProperties.getTimeTestingEnabled()) {
+		if (!Plugin.ENABLE_TIME_WARP) {
 			reset();
 			return;
 		}

@@ -51,7 +51,6 @@ public class ServerProperties {
 	private boolean mInfusionsEnabled = true;
 	private boolean mMasterworkRefundEnabled = false;
 	private boolean mLootBoxEnabled = true;
-	private boolean mTimeTestingEnabled = false;
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
@@ -156,10 +155,6 @@ public class ServerProperties {
 		return INSTANCE.mLootBoxEnabled;
 	}
 
-	public static boolean getTimeTestingEnabled() {
-		return INSTANCE.mTimeTestingEnabled;
-	}
-
 	public static int getHTTPStatusPort() {
 		return INSTANCE.mHTTPStatusPort;
 	}
@@ -245,7 +240,6 @@ public class ServerProperties {
 			mInfusionsEnabled = getPropertyValueBool(object, "infusionsEnabled", mInfusionsEnabled);
 			mMasterworkRefundEnabled = getPropertyValueBool(object, "masterworkRefundEnabled", mMasterworkRefundEnabled);
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
-			mTimeTestingEnabled = getPropertyValueBool(object, "timeTestingEnabled", mTimeTestingEnabled);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
 			mShardName = getPropertyValueString(object, "shardName", mShardName);
@@ -305,7 +299,6 @@ public class ServerProperties {
 		out.add("infusionsEnabled = " + mInfusionsEnabled);
 		out.add("masterworkRefundEnabled = " + mMasterworkRefundEnabled);
 		out.add("lootBoxEnabled = " + mLootBoxEnabled);
-		out.add("timeTestingEnabled = " + mTimeTestingEnabled);
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
 		out.add("shardName = " + mShardName);

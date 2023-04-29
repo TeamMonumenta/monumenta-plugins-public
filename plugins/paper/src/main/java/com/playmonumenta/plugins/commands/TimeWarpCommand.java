@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
@@ -147,7 +148,7 @@ public class TimeWarpCommand {
 	}
 
 	public static void runReset(CommandSender sender, Object[] args) throws WrapperCommandSyntaxException {
-		if (!ServerProperties.getTimeTestingEnabled()) {
+		if (!Plugin.ENABLE_TIME_WARP) {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
@@ -156,7 +157,7 @@ public class TimeWarpCommand {
 	}
 
 	public static void runTime(CommandSender sender, Object[] args) throws WrapperCommandSyntaxException {
-		if (!ServerProperties.getTimeTestingEnabled()) {
+		if (!Plugin.ENABLE_TIME_WARP) {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
@@ -190,7 +191,7 @@ public class TimeWarpCommand {
 	}
 
 	public static void runDateTime(CommandSender sender, Object[] args) throws WrapperCommandSyntaxException {
-		if (!ServerProperties.getTimeTestingEnabled()) {
+		if (!Plugin.ENABLE_TIME_WARP) {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
@@ -245,7 +246,7 @@ public class TimeWarpCommand {
 	}
 
 	public static void runAdd(CommandSender sender, Object[] args) throws WrapperCommandSyntaxException {
-		if (!ServerProperties.getTimeTestingEnabled()) {
+		if (!Plugin.ENABLE_TIME_WARP) {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
@@ -265,7 +266,7 @@ public class TimeWarpCommand {
 	}
 
 	public static void runRemove(CommandSender sender, Object[] args) throws WrapperCommandSyntaxException {
-		if (!ServerProperties.getTimeTestingEnabled()) {
+		if (!Plugin.ENABLE_TIME_WARP) {
 			throw CommandAPI.failWithString("Time testing is not enabled");
 		}
 
