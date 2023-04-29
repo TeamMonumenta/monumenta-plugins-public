@@ -343,13 +343,8 @@ public class CosmeticsGUI extends CustomInventory {
 		}
 
 		// Display go back button
-		{
-			ItemStack pageItem = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = pageItem.getItemMeta();
-			meta.displayName(Component.text("Back to Overview", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			pageItem.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, pageItem);
-		}
+		ItemStack pageItem = GUIUtils.createBasicItem(Material.REDSTONE_BLOCK, "Back to Overview", NamedTextColor.RED, true);
+		mInventory.setItem(BACK_LOC, pageItem);
 	}
 
 	/**
@@ -360,54 +355,21 @@ public class CosmeticsGUI extends CustomInventory {
 		mCurrentClass = null;
 		mCurrentSpec = null;
 		mCurrentAbility = null;
-		{
-			ItemStack titleItem = new ItemStack(CosmeticType.TITLE.getDisplayItem(null), 1);
-			ItemMeta meta = titleItem.getItemMeta();
-			meta.displayName(Component.text("Titles", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Select a title to be displayed", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-				Component.text("above your head to other players.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-			titleItem.setItemMeta(meta);
-			mInventory.setItem(TITLE_LOC, titleItem);
-		}
-		{
-			ItemStack eliteItem = new ItemStack(CosmeticType.ELITE_FINISHER.getDisplayItem(null), 1);
-			ItemMeta meta = eliteItem.getItemMeta();
-			meta.displayName(Component.text("Elite Finishers", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Select an effect to play", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-				Component.text("when you kill an elite mob.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			eliteItem.setItemMeta(meta);
-			mInventory.setItem(ELITE_FINISHER_LOC, eliteItem);
-		}
-		{
-			ItemStack cosmeticSkillItem = new ItemStack(CosmeticType.COSMETIC_SKILL.getDisplayItem(null), 1);
-			ItemMeta meta = cosmeticSkillItem.getItemMeta();
-			meta.displayName(Component.text("Cosmetic Skills", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Select one skill to modify", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-				Component.text("cosmetic effects when cast.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			cosmeticSkillItem.setItemMeta(meta);
-			mInventory.setItem(COSMETIC_SKILL_LOC, cosmeticSkillItem);
-		}
-		{
-			ItemStack vanityItem = new ItemStack(CosmeticType.VANITY.getDisplayItem(null), 1);
-			ItemMeta meta = vanityItem.getItemMeta();
-			meta.displayName(Component.text("Vanity Manager", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Control your equipped vanity items.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			vanityItem.setItemMeta(meta);
-			mInventory.setItem(VANITY_LOC, vanityItem);
-		}
-		{
-			ItemStack unlockedVanityItem = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
-			ItemMeta meta = unlockedVanityItem.getItemMeta();
-			meta.displayName(Component.text("Show Unlocked Vanity", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			meta.lore(List.of(Component.text("Shows all unlocked vanity items.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			unlockedVanityItem.setItemMeta(meta);
-			mInventory.setItem(UNLOCKED_VANITY_LOC, unlockedVanityItem);
-		}
 
+		ItemStack titleItem = GUIUtils.createBasicItem(CosmeticType.TITLE.getDisplayItem(null), "Titles", NamedTextColor.GOLD, true, "Select a title to be displayed above your head for other players", NamedTextColor.GRAY);
+		mInventory.setItem(TITLE_LOC, titleItem);
+
+		ItemStack eliteItem = GUIUtils.createBasicItem(CosmeticType.ELITE_FINISHER.getDisplayItem(null), "Elite Finishers", NamedTextColor.GOLD, true, "Select an effect to play when you kill an elite mob.", NamedTextColor.GRAY);
+		mInventory.setItem(ELITE_FINISHER_LOC, eliteItem);
+
+		ItemStack cosmeticSkillItem = GUIUtils.createBasicItem(CosmeticType.COSMETIC_SKILL.getDisplayItem(null), "Cosmetic Skills", NamedTextColor.GOLD, true, "Select cosmetic effects for ability casts.", NamedTextColor.GRAY);
+		mInventory.setItem(COSMETIC_SKILL_LOC, cosmeticSkillItem);
+
+		ItemStack vanityItem = GUIUtils.createBasicItem(CosmeticType.VANITY.getDisplayItem(null), "Vanity Manager", NamedTextColor.GOLD, true, "Control your equipped vanity items.", NamedTextColor.GRAY);
+		mInventory.setItem(VANITY_LOC, vanityItem);
+
+		ItemStack unlockedVanityItem = GUIUtils.createBasicItem(Material.LEATHER_CHESTPLATE, "Show Unlocked Vanity", NamedTextColor.GOLD, true, "Shows all unlocked vanity items.", NamedTextColor.GRAY);
+		mInventory.setItem(UNLOCKED_VANITY_LOC, unlockedVanityItem);
 	}
 
 	/**
@@ -444,25 +406,12 @@ public class CosmeticsGUI extends CustomInventory {
 		}
 
 		// Display shop item
-		{
-			ItemStack pageItem = new ItemStack(Material.RED_GLAZED_TERRACOTTA, 1);
-			ItemMeta meta = pageItem.getItemMeta();
-			meta.displayName(Component.text("Cosmetic Skill Shop", NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			List<Component> lore = new ArrayList<>();
-			lore.add(Component.text("View cosmetic skills for sale!", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-			meta.lore(lore);
-			pageItem.setItemMeta(meta);
-			mInventory.setItem(CosmeticSkillGUIConfig.SHOP_LOC, pageItem);
-		}
+		ItemStack shopItem = GUIUtils.createBasicItem(Material.EMERALD, "Cosmetic Skill Shop", NamedTextColor.LIGHT_PURPLE, true, "View cosmetic skills for sale!", NamedTextColor.GOLD);
+		mInventory.setItem(CosmeticSkillGUIConfig.SHOP_LOC, shopItem);
 
 		// Display go back button
-		{
-			ItemStack pageItem = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = pageItem.getItemMeta();
-			meta.displayName(Component.text("Back to Overview", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			pageItem.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, pageItem);
-		}
+		ItemStack pageItem = GUIUtils.createBasicItem(Material.REDSTONE_BLOCK, "Back to Overview", NamedTextColor.RED, true);
+		mInventory.setItem(BACK_LOC, pageItem);
 	}
 
 	/**
@@ -479,7 +428,7 @@ public class CosmeticsGUI extends CustomInventory {
 
 		//Display intro items
 		{
-			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mDisplayItem.getType(), mCurrentClass.mClassName, mCurrentClass.mClassColor,
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mDisplayItem, mCurrentClass.mClassName, mCurrentClass.mClassColor,
 				true, "Click to edit cosmetics for a skill!", NamedTextColor.YELLOW);
 			mInventory.setItem(CosmeticSkillGUIConfig.INTRO_LOC, pageItem);
 		}
@@ -492,26 +441,20 @@ public class CosmeticsGUI extends CustomInventory {
 
 		// Display spec items
 		{
-			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mSpecOne.mDisplayItem.getType(), mCurrentClass.mSpecOne.mSpecName, NamedTextColor.RED,
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mSpecOne.mDisplayItem, mCurrentClass.mSpecOne.mSpecName, mCurrentClass.mClassColor,
 				true, "Click to edit cosmetics for " + mCurrentClass.mSpecOne.mSpecName + "!", NamedTextColor.GRAY);
 			mInventory.setItem(CosmeticSkillGUIConfig.SPEC_ONE_LOC, pageItem);
 		}
 
 		{
-			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mSpecTwo.mDisplayItem.getType(), mCurrentClass.mSpecTwo.mSpecName, NamedTextColor.RED,
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentClass.mSpecTwo.mDisplayItem, mCurrentClass.mSpecTwo.mSpecName, mCurrentClass.mClassColor,
 				true, "Click to edit cosmetics for " + mCurrentClass.mSpecTwo.mSpecName + "!", NamedTextColor.GRAY);
 			mInventory.setItem(CosmeticSkillGUIConfig.SPEC_TWO_LOC, pageItem);
 		}
 
 		// Display go back button
-		{
-			ItemStack pageItem = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = pageItem.getItemMeta();
-			meta.displayName(Component.text("Back to class selection", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			pageItem.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, pageItem);
-		}
-
+		ItemStack pageItem = GUIUtils.createBasicItem(Material.REDSTONE_BLOCK, "Back to Class Selection", NamedTextColor.RED, true);
+		mInventory.setItem(BACK_LOC, pageItem);
 	}
 
 	/**
@@ -524,10 +467,11 @@ public class CosmeticsGUI extends CustomInventory {
 		GUIUtils.fillWithFiller(mInventory, FILLER);
 
 		Objects.requireNonNull(mCurrentSpec);
+		Objects.requireNonNull(mCurrentClass);
 
 		//Display intro items
 		{
-			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentSpec.mDisplayItem.getType(), mCurrentSpec.mSpecName, NamedTextColor.RED,
+			ItemStack pageItem = GUIUtils.createBasicItem(mCurrentSpec.mDisplayItem, mCurrentSpec.mSpecName, mCurrentClass.mClassColor,
 				true, "Click to edit cosmetics for a skill!", NamedTextColor.YELLOW);
 			mInventory.setItem(CosmeticSkillGUIConfig.INTRO_LOC, pageItem);
 		}
@@ -539,13 +483,8 @@ public class CosmeticsGUI extends CustomInventory {
 		}
 
 		// Display go back button
-		{
-			ItemStack pageItem = new ItemStack(Material.REDSTONE_BLOCK, 1);
-			ItemMeta meta = pageItem.getItemMeta();
-			meta.displayName(Component.text("Back to class page", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
-			pageItem.setItemMeta(meta);
-			mInventory.setItem(BACK_LOC, pageItem);
-		}
+		ItemStack pageItem = GUIUtils.createBasicItem(Material.REDSTONE_BLOCK, "Back to Class Page", NamedTextColor.RED, true);
+		mInventory.setItem(BACK_LOC, pageItem);
 	}
 
 	@Override
@@ -560,7 +499,7 @@ public class CosmeticsGUI extends CustomInventory {
 	}
 
 	private ItemStack createClassItem(PlayerClass classToItemize) {
-		return GUIUtils.createBasicItem(classToItemize.mDisplayItem.getType(), classToItemize.mClassName, classToItemize.mClassColor,
+		return GUIUtils.createBasicItem(classToItemize.mDisplayItem, classToItemize.mClassName, classToItemize.mClassColor,
 			true, "Click to choose cosmetics for " + classToItemize.mClassName + "!", NamedTextColor.GRAY);
 	}
 

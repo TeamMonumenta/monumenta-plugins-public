@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 public class Mage extends PlayerClass {
 
@@ -38,7 +37,7 @@ public class Mage extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Mage";
 		mClassColor = TextColor.fromHexString("#A31ECE");
-		mDisplayItem = new ItemStack(Material.BLAZE_ROD, 1);
+		mDisplayItem = Material.BLAZE_ROD;
 		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
 		mClassPassiveDescription = String.format("After casting a spell, your next melee attack with a wand deals %s%% more damage.", (int) (Channeling.PERCENT_MELEE_INCREASE * 100));
 		mClassPassiveName = "Channeling";
@@ -49,7 +48,7 @@ public class Mage extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103i";
 		mSpecOne.mSpecialization = ARCANIST_SPEC_ID;
 		mSpecOne.mSpecName = "Arcanist";
-		mSpecOne.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
+		mSpecOne.mDisplayItem = Material.DRAGON_BREATH;
 		mSpecOne.mDescription = "Arcanists are mages that specialize at controlling their skill cooldowns and getting up close.";
 
 		mSpecTwo.mAbilities.add(Blizzard.INFO);
@@ -58,7 +57,7 @@ public class Mage extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103b";
 		mSpecTwo.mSpecialization = ELEMENTALIST_SPEC_ID;
 		mSpecTwo.mSpecName = "Elementalist";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.BLAZE_POWDER, 1);
+		mSpecTwo.mDisplayItem = Material.BLAZE_POWDER;
 		mSpecTwo.mDescription = "Elementalists are the undisputed masters of the elements. They excel at zoning and crowd control.";
 
 		mTriggerOrder = ImmutableList.of(

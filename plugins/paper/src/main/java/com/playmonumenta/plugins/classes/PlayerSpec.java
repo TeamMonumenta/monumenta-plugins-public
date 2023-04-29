@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -16,7 +16,7 @@ public class PlayerSpec {
 
 	public String mSpecName;
 	public int mSpecialization;
-	public ItemStack mDisplayItem;
+	public Material mDisplayItem;
 	public String mDescription;
 	public String mPassiveName;
 	public String mPassiveDescription;

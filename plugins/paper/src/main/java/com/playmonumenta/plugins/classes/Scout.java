@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 
 public class Scout extends PlayerClass {
@@ -39,7 +38,7 @@ public class Scout extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Scout";
 		mClassColor = TextColor.fromHexString("#248AC8");
-		mDisplayItem = new ItemStack(Material.BOW, 1);
+		mDisplayItem = Material.BOW;
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
 		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.",
 			(int) (Versatile.DAMAGE_MULTIPLY_MELEE * 100), (int) (Versatile.DAMAGE_MULTIPLY_PROJ * 100));
@@ -51,7 +50,7 @@ public class Scout extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103e";
 		mSpecOne.mSpecialization = RANGER_SPEC_ID;
 		mSpecOne.mSpecName = "Ranger";
-		mSpecOne.mDisplayItem = new ItemStack(Material.LARGE_FERN, 1);
+		mSpecOne.mDisplayItem = Material.LARGE_FERN;
 		mSpecOne.mDescription = "Rangers are agile masters of archery and that have unparalleled mastery of movement.";
 
 		mSpecTwo.mAbilities.add(PinningShot.INFO);
@@ -60,7 +59,7 @@ public class Scout extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103l";
 		mSpecTwo.mSpecialization = HUNTER_SPEC_ID;
 		mSpecTwo.mSpecName = "Hunter";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.LEATHER, 1);
+		mSpecTwo.mDisplayItem = Material.LEATHER;
 		mSpecTwo.mDescription = "Hunters are agile masters of exploration that have dedicated their lives to archery.";
 
 		mTriggerOrder = ImmutableList.of(

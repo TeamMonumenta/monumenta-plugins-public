@@ -512,7 +512,7 @@ public class LoadoutManagerGui extends Gui {
 						}
 					});
 				}
-				setItem(5, 2, GUIUtils.createBasicItem(playerClass == null ? Material.WOODEN_SWORD : playerClass.mDisplayItem.getType(),
+				setItem(5, 2, GUIUtils.createBasicItem(playerClass == null ? Material.WOODEN_SWORD : playerClass.mDisplayItem,
 					(playerClass == null ? "No Class" : playerClass.mClassName + " (" + (playerSpec == null ? "No Specialization" : playerSpec.mSpecName) + ")"),
 					playerClass == null ? NamedTextColor.WHITE : playerClass.mClassColor, true,
 					lore.toString().trim()));

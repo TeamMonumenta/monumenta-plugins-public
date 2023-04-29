@@ -45,6 +45,9 @@ public class GUIUtils {
 
 	private static List<Component> splitLoreLine(TextComponent lore, int maxLength) {
 		String content = lore.content();
+		if (content.isEmpty()) {
+			return new ArrayList<>();
+		}
 		if (lore.content().length() <= maxLength && !content.contains("\n")) {
 			return List.of(fixLoreFormatting(lore));
 		}
@@ -104,6 +107,14 @@ public class GUIUtils {
 		}
 		c = c.colorIfAbsent(NamedTextColor.WHITE);
 		return c;
+	}
+
+	public static ItemStack createBasicItem(Material mat, String name, TextColor nameColor) {
+		return createBasicItem(mat, name, nameColor, false);
+	}
+
+	public static ItemStack createBasicItem(Material mat, String name, TextColor nameColor, boolean nameBold) {
+		return createBasicItem(mat, name, nameColor, nameBold, "");
 	}
 
 	public static ItemStack createBasicItem(Material mat, String name, TextColor nameColor, String desc) {

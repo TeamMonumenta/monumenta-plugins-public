@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
@@ -16,7 +16,7 @@ public abstract class PlayerClass {
 	public int mClass;
 	public String mClassName;
 	public TextColor mClassColor;
-	public ItemStack mDisplayItem;
+	public Material mDisplayItem;
 	public @Nullable String mQuestReq = null;
 	public @Nullable String mPermissionString = null;
 	public int mQuestReqMin;

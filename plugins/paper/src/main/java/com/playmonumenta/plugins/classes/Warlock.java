@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.abilities.warlock.tenebrist.RestlessSouls;
 import com.playmonumenta.plugins.abilities.warlock.tenebrist.WitheringGaze;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 
 public class Warlock extends PlayerClass {
@@ -38,7 +37,7 @@ public class Warlock extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Warlock";
 		mClassColor = TextColor.fromHexString("#C724B9");
-		mDisplayItem = new ItemStack(Material.STONE_HOE, 1);
+		mDisplayItem = Material.STONE_HOE;
 		mQuestReq = "Quest13";
 		mQuestReqMin = 1;
 		mClassDescription = "Warlocks use scythes in combination with dark magic to bring suffering and death to their enemies.";
@@ -51,7 +50,7 @@ public class Warlock extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103n";
 		mSpecOne.mSpecialization = REAPER_SPEC_ID;
 		mSpecOne.mSpecName = "Reaper";
-		mSpecOne.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
+		mSpecOne.mDisplayItem = Material.WITHER_SKELETON_SKULL;
 		mSpecOne.mDescription = "Reapers use scythes in combination with dark magic to bring death to their enemies. They specialize in melee combat.";
 
 		mSpecTwo.mAbilities.add(HauntingShades.INFO);
@@ -60,7 +59,7 @@ public class Warlock extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103g";
 		mSpecTwo.mSpecialization = TENEBRIST_SPEC_ID;
 		mSpecTwo.mSpecName = "Tenebrist";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.CRIMSON_NYLIUM, 1);
+		mSpecTwo.mDisplayItem = Material.CRIMSON_NYLIUM;
 		mSpecTwo.mDescription = "Tenebrists use scythes in combination with dark magic to bring suffering to their enemies. They specialize in curses and status effects.";
 
 		mTriggerOrder = ImmutableList.of(

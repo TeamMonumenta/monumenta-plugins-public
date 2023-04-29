@@ -17,11 +17,11 @@ public class MonumentaClasses {
 		mClasses.add(new Alchemist());
 		mClasses.add(new Cleric());
 		mClasses.add(new Mage());
-		mClasses.add(new Shaman());
+		mClasses.add(new Rogue());
 		mClasses.add(new Scout());
+		mClasses.add(new Shaman());
 		mClasses.add(new Warlock());
 		mClasses.add(new Warrior());
-		mClasses.add(new Rogue());
 
 		mTriggerOrder = mClasses.stream()
 			                .flatMap(c -> c.mTriggerOrder.stream())

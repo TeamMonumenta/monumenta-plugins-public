@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.abilities.alchemist.harbinger.Taboo;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 
 public class Alchemist extends PlayerClass {
@@ -40,7 +39,7 @@ public class Alchemist extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Alchemist";
 		mClassColor = TextColor.fromHexString("#5FAA19");
-		mDisplayItem = new ItemStack(Material.POTION, 1);
+		mDisplayItem = Material.POTION;
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
 		mClassPassiveDescription = ("Allows using Alchemical Utensils. " +
 			"You gain 1 potion every %s seconds, up to a maximum of %s.")
@@ -53,7 +52,7 @@ public class Alchemist extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103m";
 		mSpecOne.mSpecialization = HARBINGER_SPEC_ID;
 		mSpecOne.mSpecName = "Harbinger";
-		mSpecOne.mDisplayItem = new ItemStack(Material.DEAD_BUSH, 1);
+		mSpecOne.mDisplayItem = Material.DEAD_BUSH;
 		mSpecOne.mDescription = "Harbingers use special potions to weaken and destroy their enemies. Harbingers prefer slinging deadly potions and using strategy.";
 
 		mSpecTwo.mAbilities.add(Panacea.INFO);
@@ -62,7 +61,7 @@ public class Alchemist extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103f";
 		mSpecTwo.mSpecialization = APOTHECARY_SPEC_ID;
 		mSpecTwo.mSpecName = "Apothecary";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.BLUE_ORCHID, 1);
+		mSpecTwo.mDisplayItem = Material.BLUE_ORCHID;
 		mSpecTwo.mDescription = "Apothecaries employ magic potions to weaken enemies and support friends.";
 
 		mTriggerOrder = ImmutableList.of(

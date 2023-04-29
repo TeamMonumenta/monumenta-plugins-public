@@ -211,7 +211,7 @@ public class PEBCustomInventory extends CustomInventory {
 					.append(Component.text("Patreon ", NamedTextColor.GOLD))
 					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
 				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
-			new PebItem(30, "Rocket Jump",
+			new PebItem(29, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
 			new PebItem(30, "Earthen Tremor",

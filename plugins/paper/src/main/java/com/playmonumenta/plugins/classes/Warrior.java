@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 
 public class Warrior extends PlayerClass {
@@ -38,7 +37,7 @@ public class Warrior extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Warrior";
 		mClassColor = TextColor.fromHexString("#DE2446");
-		mDisplayItem = new ItemStack(Material.STONE_AXE, 1);
+		mDisplayItem = Material.STONE_AXE;
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";
 		mClassPassiveName = "Formidable";
@@ -49,7 +48,7 @@ public class Warrior extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103a";
 		mSpecOne.mSpecialization = BERSERKER_SPEC_ID;
 		mSpecOne.mSpecName = "Berserker";
-		mSpecOne.mDisplayItem = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
+		mSpecOne.mDisplayItem = Material.WITHER_SKELETON_SKULL;
 		mSpecOne.mDescription = "Berserkers specialize in melee combat. They thrive in the heart of battle taking heavy risks for great rewards.";
 
 		mSpecTwo.mAbilities.add(Bodyguard.INFO);
@@ -58,7 +57,7 @@ public class Warrior extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103h";
 		mSpecTwo.mSpecialization = GUARDIAN_SPEC_ID;
 		mSpecTwo.mSpecName = "Guardian";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.SHIELD, 1);
+		mSpecTwo.mDisplayItem = Material.SHIELD;
 		mSpecTwo.mDescription = "Guardians specialize in melee combat. Their skills are focused on taking heavy damage and drawing enemy attacks to themselves.";
 
 		mTriggerOrder = ImmutableList.of(

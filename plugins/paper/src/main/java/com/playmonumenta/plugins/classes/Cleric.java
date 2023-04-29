@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.abilities.cleric.paladin.HolyJavelin;
 import com.playmonumenta.plugins.abilities.cleric.paladin.LuminousInfusion;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 
 public class Cleric extends PlayerClass {
@@ -38,7 +37,7 @@ public class Cleric extends PlayerClass {
 		mClass = CLASS_ID;
 		mClassName = "Cleric";
 		mClassColor = TextColor.fromHexString("#FFC644");
-		mDisplayItem = new ItemStack(Material.POPPY, 1);
+		mDisplayItem = Material.POPPY;
 		mClassDescription = "Clerics are mighty healers and specialize in fighting the undead.";
 		mClassPassiveDescription = "You and all allies in a 12 block radius heal 5% of max health every 5s while under 50% health.";
 		mClassPassiveName = "Rejuvenation";
@@ -49,7 +48,7 @@ public class Cleric extends PlayerClass {
 		mSpecOne.mSpecQuestScoreboard = "Quest103d";
 		mSpecOne.mSpecialization = PALADIN_SPEC_ID;
 		mSpecOne.mSpecName = "Paladin";
-		mSpecOne.mDisplayItem = new ItemStack(Material.GHAST_TEAR, 1);
+		mSpecOne.mDisplayItem = Material.GHAST_TEAR;
 		mSpecOne.mDescription = "Paladins are mighty healers that have mastered combating undead foes. They will make sure the dead stay dead.";
 
 		mSpecTwo.mAbilities.add(EnchantedPrayer.INFO);
@@ -58,7 +57,7 @@ public class Cleric extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103k";
 		mSpecTwo.mSpecialization = HIEROPHANT_SPEC_ID;
 		mSpecTwo.mSpecName = "Hierophant";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.DRAGON_BREATH, 1);
+		mSpecTwo.mDisplayItem = Material.DRAGON_BREATH;
 		mSpecTwo.mDescription = "Hierophants specialize in support and have mastered healing. They will make sure the living stay living.";
 
 		mTriggerOrder = ImmutableList.of(

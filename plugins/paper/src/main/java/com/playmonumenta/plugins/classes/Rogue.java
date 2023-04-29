@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 public class Rogue extends PlayerClass {
 
@@ -38,7 +37,7 @@ public class Rogue extends PlayerClass {
 		mAbilities.add(ViciousCombos.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Rogue";
-		mDisplayItem = new ItemStack(Material.STONE_SWORD, 1);
+		mDisplayItem = Material.STONE_SWORD;
 		mClassDescription = "Rogues excel in one-on-one battles, using precise strikes to bring down dangerous elite enemies.";
 		mClassPassiveDescription = String.format("While holding two swords, deal %s%% more melee damage to elite enemies, and %s%% more to bosses.",
 			StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_ELITE_MODIFIER - 1), StringUtils.multiplierToPercentage(Dethroner.PASSIVE_DAMAGE_BOSS_MODIFIER - 1));
@@ -51,7 +50,7 @@ public class Rogue extends PlayerClass {
 		mSpecOne.mSpecialization = SWORDSAGE_SPEC_ID;
 		mClassColor = TextColor.fromHexString("#36393D");
 		mSpecOne.mSpecName = "Swordsage";
-		mSpecOne.mDisplayItem = new ItemStack(Material.IRON_HELMET, 1);
+		mSpecOne.mDisplayItem = Material.IRON_HELMET;
 		mSpecOne.mDescription = "Swordsages specialize in tackling multiple enemies through dexterous movement.";
 
 		mSpecTwo.mAbilities.add(BodkinBlitz.INFO);
@@ -60,7 +59,7 @@ public class Rogue extends PlayerClass {
 		mSpecTwo.mSpecQuestScoreboard = "Quest103j";
 		mSpecTwo.mSpecialization = ASSASSIN_SPEC_ID;
 		mSpecTwo.mSpecName = "Assassin";
-		mSpecTwo.mDisplayItem = new ItemStack(Material.WITHER_ROSE, 1);
+		mSpecTwo.mDisplayItem = Material.WITHER_ROSE;
 		mSpecTwo.mDescription = "Assassins excel in precise strikes and deception to devastate their enemies.";
 
 		mTriggerOrder = ImmutableList.of(
