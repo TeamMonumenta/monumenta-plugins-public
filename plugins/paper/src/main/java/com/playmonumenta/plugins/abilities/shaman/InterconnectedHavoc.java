@@ -66,18 +66,20 @@ public class InterconnectedHavoc extends Ability {
 		if (activeList.isEmpty() || mPlayer.isDead()) {
 			return;
 		}
-		for (int i = 0; i < activeList.size(); i++) {
+		for (int i = 0; i < activeList.size() - 1; i++) {
 			Location startPoint = activeList.get(i);
-			Location endPoint = activeList.get((i + 1) % activeList.size());
-			if (startPoint.distance(endPoint) >= mRange) {
-				continue;
-			}
-			new PPLine(Particle.ENCHANTMENT_TABLE, startPoint, endPoint).countPerMeter(10).spawnAsPlayerActive(mPlayer);
-			List<LivingEntity> targetMobs = EntityUtils.getMobsInLine(startPoint, endPoint, 0.75);
-			targetMobs.removeIf(mHitMobs::contains);
-			for (LivingEntity mob : targetMobs) {
-				mHitMobs.add(mob);
-				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, ClassAbility.INTERCONNECTED_HAVOC, false, false);
+			for (int j = i; j < activeList.size(); j++) {
+				Location endPoint = activeList.get(j);
+				if (!startPoint.getWorld().equals(endPoint.getWorld()) || startPoint.distance(endPoint) >= mRange) {
+					continue;
+				}
+				new PPLine(Particle.ENCHANTMENT_TABLE, startPoint, endPoint).countPerMeter(10).spawnAsPlayerActive(mPlayer);
+				List<LivingEntity> targetMobs = EntityUtils.getMobsInLine(startPoint, endPoint, 0.75);
+				targetMobs.removeIf(mHitMobs::contains);
+				for (LivingEntity mob : targetMobs) {
+					mHitMobs.add(mob);
+					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, ClassAbility.INTERCONNECTED_HAVOC, false, false);
+				}
 			}
 		}
 		if (oneSecond) {

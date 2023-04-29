@@ -85,6 +85,9 @@ public abstract class TotemAbility extends Ability {
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
 		if (proj instanceof Snowball && proj.getTicksLived() <= 160) {
 			ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
+			if (!mPlayer.getWorld().equals(proj.getWorld())) {
+				return;
+			}
 			if (stats != null) {
 				Entity hitMob = event.getHitEntity();
 				Ability stickyTotems = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AdhesiveTotems.class);
@@ -159,7 +162,7 @@ public abstract class TotemAbility extends Ability {
 
 				AbilityUtils.produceDurationString(stand, durationStand, duration, mT);
 
-				if (mT >= duration || mPlayer.isDead() || !mPlayer.isValid()) {
+				if (mT >= duration || mPlayer.isDead() || !mPlayer.isValid() || !mPlayer.getWorld().equals(standLocation.getWorld())) {
 					durationStand.remove();
 					TotemicEmpowerment.removeTotem(mPlayer, stand);
 					onTotemExpire(world, standLocation);

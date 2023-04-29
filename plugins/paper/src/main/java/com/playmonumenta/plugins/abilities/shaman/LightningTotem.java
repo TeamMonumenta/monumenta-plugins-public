@@ -89,15 +89,18 @@ public class LightningTotem extends TotemAbility {
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		new PPCircle(Particle.REDSTONE, standLocation, AOE_RANGE).data(YELLOW).ringMode(true).count(15).spawnAsPlayerActive(mPlayer);
 		if (ticks % INTERVAL == 0) {
-			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) >= AOE_RANGE) {
-				List<LivingEntity> affectedMobs = new ArrayList<>(EntityUtils.getNearbyMobs(standLocation, AOE_RANGE));
+			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > AOE_RANGE) {
+				List<LivingEntity> affectedMobs = new ArrayList<>(EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null));
+				affectedMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
 				if (!affectedMobs.isEmpty()) {
 					if (affectedMobs.size() > 1) {
 						affectedMobs.remove(mMobStuckWithEffect);
 					}
 					Collections.shuffle(affectedMobs);
-					mTarget = affectedMobs.get(0);
 					for (LivingEntity mob : affectedMobs) {
+						if (mTarget == null) {
+							mTarget = mob;
+						}
 						if (EntityUtils.isBoss(mob) || EntityUtils.isElite(mob)) {
 							mTarget = mob;
 							break;
@@ -105,7 +108,7 @@ public class LightningTotem extends TotemAbility {
 					}
 				}
 			}
-			if (mTarget != null && !mTarget.isDead()) {
+			if (mTarget != null && !mTarget.isDead() && mTarget.getLocation().distance(standLocation) <= AOE_RANGE) {
 				DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 				PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
 					.count(8).duration(3);
@@ -118,7 +121,7 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
-		new PartialParticle(Particle.FLASH, standLocation, 40, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLASH, standLocation, 3, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
 		world.playSound(standLocation, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);
 		mTarget = null;
 	}

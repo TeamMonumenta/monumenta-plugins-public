@@ -95,7 +95,7 @@ public class DecayedTotem extends TotemAbility {
 		}
 		mTargets.removeIf(mob -> standLocation.distance(mob.getLocation()) >= AOE_RANGE || mob.isDead());
 		if (mTargets.size() < TARGETS) {
-			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(standLocation, AOE_RANGE);
+			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null);
 			Collections.shuffle(affectedMobs);
 
 			for (LivingEntity mob : affectedMobs) {

@@ -135,7 +135,7 @@ public class TotemicProjection extends Ability {
 				}
 			}
 			if (isLevelTwo()) {
-				Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobs(dropCenter, RADIUS));
+				Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobsInSphere(dropCenter, RADIUS, null));
 				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, RADIUS).ringMode(false).count(100).spawnAsPlayerActive(mPlayer);
 
 				for (LivingEntity mob : affectedMobs) {

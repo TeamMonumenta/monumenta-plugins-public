@@ -32,7 +32,7 @@ public class AdhesiveTotems extends Ability {
 				"\nCleansing Totem: Apply a 40% slow for 8 seconds to the stuck mob.\nLightning Totem: Attacks mobs excluding the stuck mob unless it is the only one." +
 				"\nWhirlwind Totem: Apply a 8 second silence to the stuck mob.\nDecayed Totem: Apply Decay 5 to the stuck mob for 5 seconds.")
 			.simpleDescription("Makes totems stick to mobs that are hit by the summoning projectile and apply an effect to them at level 2.")
-			.displayItem(Material.SNOWBALL);
+			.displayItem(Material.SLIME_BALL);
 
 	public AdhesiveTotems(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

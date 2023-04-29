@@ -75,11 +75,13 @@ public class LightningCrash extends Ability {
 		}
 		putOnCooldown();
 
-		for (LivingEntity mob : EntityUtils.getNearbyMobs(mPlayer.getLocation(), RANGE, mPlayer)) {
+		for (LivingEntity mob : EntityUtils.getNearbyMobsInSphere(mPlayer.getLocation(), RANGE, null)) {
 			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
-			MovementUtils.knockAway(mPlayer, mob, 0.8f);
-			if (isLevelTwo()) {
-				EntityUtils.applyStun(mPlugin, (int) STUN_DURATION, mob);
+			if (!EntityUtils.isCCImmuneMob(mob)) {
+				MovementUtils.knockAway(mPlayer, mob, 0.8f);
+				if (isLevelTwo()) {
+					EntityUtils.applyStun(mPlugin, (int) STUN_DURATION, mob);
+				}
 			}
 		}
 

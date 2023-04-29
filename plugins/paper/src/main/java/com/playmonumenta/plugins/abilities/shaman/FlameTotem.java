@@ -96,7 +96,7 @@ public class FlameTotem extends TotemAbility {
 	}
 
 	private void pulse(Location standLocation, World world, ItemStatManager.PlayerItemStats stats) {
-		Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobs(standLocation, AOE_RANGE));
+		Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null));
 
 		for (LivingEntity mob : affectedMobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);

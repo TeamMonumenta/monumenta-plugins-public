@@ -72,13 +72,13 @@ public class DesecratingShot extends Ability {
 		if (!isOnCooldown() && event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			putOnCooldown();
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
-			enemy.getWorld().playSound(enemy, Sound.ENTITY_VEX_DEATH, 2.0f, 0.4f);
-			enemy.getWorld().playSound(enemy, Sound.ENTITY_ARROW_HIT, 2.0f, 0.6f);
-			enemy.getWorld().playSound(enemy, Sound.ENTITY_ARROW_HIT, 2.0f, 1.4f);
-			enemy.getWorld().playSound(enemy, Sound.ENTITY_ARROW_HIT, 2.0f, 1.8f);
-			enemy.getWorld().playSound(enemy, Sound.ITEM_TRIDENT_THROW, 2.0f, 0.0f);
-			enemy.getWorld().playSound(enemy, Sound.ENTITY_VEX_HURT, 2.0f, 1.2f);
-			enemy.getWorld().playSound(enemy, Sound.ENTITY_PHANTOM_DEATH, 0.7f, 0.1f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_VEX_DEATH, 2.0f, 0.4f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT, 2.0f, 0.6f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT, 2.0f, 1.4f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT, 2.0f, 1.8f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ITEM_TRIDENT_THROW, 2.0f, 0.0f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_VEX_HURT, 2.0f, 1.2f);
+			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 0.7f, 0.1f);
 
 			Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobs(enemy.getLocation(), RADIUS));
 			for (LivingEntity mob : affectedMobs) {
