@@ -51,6 +51,6 @@ public class ParticleRingBoss extends BossAbilityGroup {
 			.toArray(SpellBaseParticleAura.ParticleEffect[]::new);
 		List<Spell> passiveSpells = List.of(new SpellBaseParticleAura(boss, p.FREQUENCY, particleEffects));
 
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null, 0, 1);
 	}
 }
