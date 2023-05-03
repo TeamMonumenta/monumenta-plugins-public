@@ -706,13 +706,13 @@ public class EntityTargets implements Cloneable {
 				List<String> options = new ArrayList<>();
 				options.add("]");
 				if (limit == null) {
-					options.add(LIMIT_STRING);
+					options.add("," + LIMIT_STRING);
 				}
 				if (filters == null) {
-					options.add(FILTERS_STRING);
+					options.add("," + FILTERS_STRING);
 				}
 				if (tags == null) {
-					options.add(TAGS_FILTER_STRING + "[");
+					options.add("," + TAGS_FILTER_STRING + "[");
 				}
 				if (options.size() > 1) {
 					options.add(0, ",");

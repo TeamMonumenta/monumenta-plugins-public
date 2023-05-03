@@ -201,7 +201,8 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 
 					@Override
 					public void run() {
-						if (mFuryTarget == null || !mFuryTarget.isOnline() || mFuryTarget.isDead() || mFuryTarget.getLocation().distance(mBoss.getLocation()) > detectionRange) {
+						if (mFuryTarget == null || !mFuryTarget.isOnline() || mFuryTarget.isDead() || !mFuryTarget.getWorld().equals(mBoss.getWorld())
+							    || mFuryTarget.getLocation().distance(mBoss.getLocation()) > detectionRange) {
 							mFuryTarget = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
 							if (mFuryTarget == null) {
 								return;
