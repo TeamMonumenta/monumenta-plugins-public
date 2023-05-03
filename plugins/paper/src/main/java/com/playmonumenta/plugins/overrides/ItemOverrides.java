@@ -2,12 +2,14 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
+import de.tr7zw.nbtapi.NBTItem;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Objects;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -90,14 +92,6 @@ public final class ItemOverrides {
 		Material.WARPED_SIGN,
 		Material.WARPED_WALL_SIGN
 	);
-
-	public static final EnumMap<Material, String> EXCEPTION_PRECISE_LORED_MATERIALS = new EnumMap<>(Material.class);
-
-	static {
-		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.MAGMA_BLOCK, "Crystallized Lava");
-		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.PACKED_ICE, "Crystallized Water");
-		EXCEPTION_PRECISE_LORED_MATERIALS.put(Material.BARREL, "Potion Barrel");
-	}
 
 	public ItemOverrides() {
 		registerOverrides();
@@ -507,11 +501,9 @@ public final class ItemOverrides {
 
 		//  Don't allow placing of certain items with Lore.
 		if (item.hasItemMeta()
-			    && item.getItemMeta().hasLore()
-			    && player.getGameMode() != GameMode.CREATIVE
-			    && !(EXCEPTION_LORED_MATERIALS.contains(item.getType())
-				         || (EXCEPTION_PRECISE_LORED_MATERIALS.containsKey(item.getType())
-					             && InventoryUtils.testForItemWithName(item, EXCEPTION_PRECISE_LORED_MATERIALS.get(item.getType()), true)))) {
+			&& item.getItemMeta().hasLore()
+			&& player.getGameMode() != GameMode.CREATIVE
+			&& !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
 			eventCancelled |= true;
 		}
 
