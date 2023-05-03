@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,42 +162,38 @@ public class SpellSlashAttack extends Spell {
 		mCurrAngleProgress = 0;
 		mSwitchedColor = false;
 
+		List<Player> hitPlayers = new ArrayList<>();
+
 		ParticleUtils.drawHalfArc(startLoc, mRadius, selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
 			(Location l, int ring) -> {
-				Location finalLoc = l.clone();
-				if (mFollowCaster) {
-					finalLoc.add(mBoss.getLocation().toVector().subtract(startLoc.toVector()));
-				}
-				Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
-				new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
-					.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
-				Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
-				List<Player> targets = hitbox.getHitPlayers(true);
-				for (Player target : targets) {
-					DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, false, false, mAttackName);
-					applyKnockback(target);
-				}
+				doSlash(l, ring, startLoc, maxAngleProgress, hitPlayers);
 				mCurrAngleProgress += 5 / (double) mRings;
 			}
 		);
 		if (mXSlash) {
 			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
 					(Location l, int ring) -> {
-						Location finalLoc = l.clone();
-						if (mFollowCaster) {
-							finalLoc.add(mBoss.getLocation().toVector().subtract(startLoc.toVector()));
-						}
-						Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
-						new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
-							.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
-						Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
-						List<Player> targets = hitbox.getHitPlayers(true);
-						for (Player target : targets) {
-							DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, false, false, mAttackName);
-							applyKnockback(target);
-						}
+						doSlash(l, ring, startLoc, maxAngleProgress, hitPlayers);
 					}
 			);
+		}
+	}
+
+	private void doSlash(Location l, int ring, Location startLoc, double maxAngleProgress, List<Player> hitPlayers) {
+		Location finalLoc = l.clone();
+		if (mFollowCaster) {
+			finalLoc.add(mBoss.getLocation().toVector().subtract(startLoc.toVector()));
+		}
+		Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
+		new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
+			.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
+		Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
+		List<Player> targets = hitbox.getHitPlayers(true);
+		targets.removeAll(hitPlayers);
+		for (Player target : targets) {
+			DamageUtils.damage(mBoss, target, mDamageType, mDamage, null, false, false, mAttackName);
+			applyKnockback(target);
+			hitPlayers.add(target);
 		}
 	}
 
