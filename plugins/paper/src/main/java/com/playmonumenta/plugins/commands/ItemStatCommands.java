@@ -18,6 +18,7 @@ import dev.jorel.commandapi.arguments.DoubleArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemStatCommands {
 
@@ -72,19 +74,14 @@ public class ItemStatCommands {
 		arguments.add(new StringArgument("masterwork").replaceSuggestions(ArgumentSuggestions.strings(ms)));
 
 		new CommandAPICommand("editinfo").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			ItemStatUtils.Region region = ItemStatUtils.Region.getRegion((String) args[0]);
 			ItemStatUtils.Tier tier = ItemStatUtils.Tier.getTier((String) args[1]);
 			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[2]);
 			ItemStatUtils.Masterwork m = ItemStatUtils.Masterwork.getMasterwork((String) args[3]);
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			// For R3 items, set tier to match masterwork level
 			if (region == ItemStatUtils.Region.RING) {
@@ -132,16 +129,11 @@ public class ItemStatCommands {
 		arguments.add(new IntegerArgument("index", 0));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			Integer index = (Integer) args[1];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemStatUtils.addLore(item, index, Component.empty());
 
@@ -151,17 +143,12 @@ public class ItemStatCommands {
 		arguments.add(new GreedyStringArgument("lore"));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			Integer index = (Integer) args[1];
 			String lore = (String) args[2];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
 
@@ -173,16 +160,11 @@ public class ItemStatCommands {
 		arguments.add(new IntegerArgument("index", 0));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			Integer index = (Integer) args[1];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemStatUtils.removeLore(item, index);
 
@@ -194,17 +176,12 @@ public class ItemStatCommands {
 		arguments.add(new IntegerArgument("index", 0));
 		arguments.add(new GreedyStringArgument("lore"));
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			Integer index = (Integer) args[1];
 			String lore = (String) args[2];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemStatUtils.removeLore(item, index);
 			ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
@@ -216,14 +193,8 @@ public class ItemStatCommands {
 		arguments.add(new MultiLiteralArgument("list"));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
-				return;
-			}
-
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 
@@ -238,13 +209,8 @@ public class ItemStatCommands {
 		arguments.add(new MultiLiteralArgument("register"));
 
 		new CommandAPICommand("editlore").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
-				return;
-			}
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 
@@ -287,16 +253,11 @@ public class ItemStatCommands {
 				new CommandAPICommand("add")
 					.withArguments(new IntegerArgument("index", 0))
 					.executesPlayer((player, args) -> {
-						if (player.getGameMode() != GameMode.CREATIVE) {
-							player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
 							return;
 						}
 						Integer index = (Integer) args[0];
-						ItemStack item = player.getInventory().getItemInMainHand();
-						if (item.getType() == Material.AIR) {
-							player.sendMessage(ChatColor.RED + "Must be holding an item!");
-							return;
-						}
 
 						ItemStatUtils.addCharmEffect(item, index, Component.empty());
 
@@ -308,17 +269,12 @@ public class ItemStatCommands {
 						new IntegerArgument("index", 0),
 						charmEffectArgument)
 					.executesPlayer((player, args) -> {
-						if (player.getGameMode() != GameMode.CREATIVE) {
-							player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
 							return;
 						}
 						Integer index = (Integer) args[0];
 						String lore = (String) args[1];
-						ItemStack item = player.getInventory().getItemInMainHand();
-						if (item.getType() == Material.AIR) {
-							player.sendMessage(ChatColor.RED + "Must be holding an item!");
-							return;
-						}
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {
@@ -341,16 +297,11 @@ public class ItemStatCommands {
 				new CommandAPICommand("del")
 					.withArguments(new IntegerArgument("index", 0))
 					.executesPlayer((player, args) -> {
-						if (player.getGameMode() != GameMode.CREATIVE) {
-							player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
 							return;
 						}
 						Integer index = (Integer) args[0];
-						ItemStack item = player.getInventory().getItemInMainHand();
-						if (item.getType() == Material.AIR) {
-							player.sendMessage(ChatColor.RED + "Must be holding an item!");
-							return;
-						}
 
 						ItemStatUtils.removeCharmEffect(item, index);
 
@@ -361,16 +312,11 @@ public class ItemStatCommands {
 				new CommandAPICommand("power")
 					.withArguments(new IntegerArgument("amount", 0))
 					.executesPlayer((player, args) -> {
-						if (player.getGameMode() != GameMode.CREATIVE) {
-							player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
 							return;
 						}
 						Integer power = (Integer) args[0];
-						ItemStack item = player.getInventory().getItemInMainHand();
-						if (item.getType() == Material.AIR) {
-							player.sendMessage(ChatColor.RED + "Must be holding an item!");
-							return;
-						}
 
 						if (power > 0) {
 							ItemStatUtils.setCharmPower(item, power);
@@ -387,17 +333,12 @@ public class ItemStatCommands {
 						new IntegerArgument("index", 0),
 						charmEffectArgument
 					).executesPlayer((player, args) -> {
-						if (player.getGameMode() != GameMode.CREATIVE) {
-							player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
 							return;
 						}
 						Integer index = (Integer) args[0];
 						String lore = (String) args[1];
-						ItemStack item = player.getInventory().getItemInMainHand();
-						if (item.getType() == Material.AIR) {
-							player.sendMessage(ChatColor.RED + "Must be holding an item!");
-							return;
-						}
 
 						CharmManager.CharmParsedInfo parsedInfo = CharmManager.readCharmLine(lore);
 						if (parsedInfo == null) {
@@ -429,30 +370,84 @@ public class ItemStatCommands {
 
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new StringArgument("location").replaceSuggestions(ArgumentSuggestions.strings(info -> locations)));
+
+		new CommandAPICommand("editname").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+
+			ItemMeta itemMeta = item.getItemMeta();
+			Component displayName = itemMeta.displayName();
+			if (displayName != null) {
+				itemMeta.displayName(displayName.color(location.getDisplay().color()));
+				item.setItemMeta(itemMeta);
+				ItemUtils.setPlainName(item);
+			}
+		}).register();
+
 		arguments.add(new BooleanArgument("bold"));
 		arguments.add(new BooleanArgument("underline"));
+
+		new CommandAPICommand("editname").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+			Boolean bold = (Boolean) args[1];
+			Boolean underline = (Boolean) args[2];
+
+			ItemMeta itemMeta = item.getItemMeta();
+			Component displayName = itemMeta.displayName();
+			if (displayName != null) {
+				itemMeta.displayName(displayName.color(location.getDisplay().color()).decoration(TextDecoration.BOLD, bold).decoration(TextDecoration.UNDERLINED, underline).decoration(TextDecoration.ITALIC, false));
+				item.setItemMeta(itemMeta);
+				ItemUtils.setPlainName(item);
+			}
+		}).register();
+
 		arguments.add(new GreedyStringArgument("name"));
 
 		new CommandAPICommand("editname").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
 			Boolean bold = (Boolean) args[1];
 			Boolean underline = (Boolean) args[2];
 			String name = (String) args[3];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemMeta itemMeta = item.getItemMeta();
-			itemMeta.displayName(Component.text(name, TextColor.fromHexString(location.getDisplay().color().asHexString())).decoration(TextDecoration.BOLD, bold).decoration(TextDecoration.UNDERLINED, underline).decoration(TextDecoration.ITALIC, false));
+			itemMeta.displayName(Component.text(name, location.getDisplay().color()).decoration(TextDecoration.BOLD, bold).decoration(TextDecoration.UNDERLINED, underline).decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(itemMeta);
 			ItemUtils.setPlainName(item, name);
 
+		}).register();
+
+		arguments.clear();
+		arguments.add(new LiteralArgument("replace"));
+		arguments.add(new GreedyStringArgument("name"));
+
+		new CommandAPICommand("editname").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+
+			String name = (String) args[0];
+
+			ItemMeta itemMeta = item.getItemMeta();
+			Component displayName = itemMeta.displayName();
+			if (displayName != null) {
+				itemMeta.displayName(Component.text(name, displayName.color()).decorations(displayName.decorations()));
+			} else {
+				itemMeta.displayName(Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+			}
+			item.setItemMeta(itemMeta);
+			ItemUtils.setPlainName(item, name);
 		}).register();
 	}
 
@@ -471,8 +466,8 @@ public class ItemStatCommands {
 		arguments.add(new DoubleArgument("strength", 0));
 
 		new CommandAPICommand("editconsume").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			EffectType type = EffectType.fromType((String) args[0]);
@@ -481,11 +476,6 @@ public class ItemStatCommands {
 			}
 			int duration = (int) args[1];
 			double strength = (double) args[2];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemStatUtils.addConsumeEffect(item, type, strength, duration, null);
 		}).register();
@@ -495,16 +485,12 @@ public class ItemStatCommands {
 		arguments.add(new IntegerArgument("index", 0));
 
 		new CommandAPICommand("editconsume").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
+
 			Integer index = (Integer) args[1];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			ItemStatUtils.removeConsumeEffect(item, index);
 
@@ -537,17 +523,12 @@ public class ItemStatCommands {
 		arguments.add(new IntegerArgument("level", 0));
 
 		new CommandAPICommand("editench").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			String enchantment = (String) args[0];
 			Integer level = (Integer) args[1];
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
-			}
 
 			addEnchantmentOrInfusion(item, player, enchantment, level);
 		}).register();
@@ -615,8 +596,8 @@ public class ItemStatCommands {
 		arguments.add(new MultiLiteralArgument(ItemStatUtils.Slot.MAINHAND.getName(), ItemStatUtils.Slot.OFFHAND.getName(), ItemStatUtils.Slot.HEAD.getName(), ItemStatUtils.Slot.CHEST.getName(), ItemStatUtils.Slot.LEGS.getName(), ItemStatUtils.Slot.FEET.getName(), ItemStatUtils.Slot.PROJECTILE.getName()));
 
 		new CommandAPICommand("editattr").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 			String attribute = (String) args[0];
@@ -628,11 +609,6 @@ public class ItemStatCommands {
 			ItemStatUtils.Slot slot = ItemStatUtils.Slot.getSlot((String) args[3]);
 			if (slot == null) {
 				throw CommandAPI.failWithString("Invalid slot " + args[3]);
-			}
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
-				return;
 			}
 
 			if ((args[3] == "add" && attribute.contains("Multiply")) || (args[3] == "multiply" && attribute.contains("Add"))) {
@@ -665,13 +641,8 @@ public class ItemStatCommands {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.removestats");
 
 		new CommandAPICommand("removestats").withPermission(perms).executesPlayer((player, args) -> {
-			if (player.getGameMode() != GameMode.CREATIVE) {
-				player.sendMessage(ChatColor.RED + "Must be in creative mode to use this command!");
-				return;
-			}
-			ItemStack item = player.getInventory().getItemInMainHand();
-			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
 				return;
 			}
 
@@ -698,6 +669,19 @@ public class ItemStatCommands {
 				playerItemStats.updateStats(player, true, true);
 			}
 		}).register();
+	}
+
+	private static @Nullable ItemStack getHeldItemAndSendErrors(Player player) {
+		if (player.getGameMode() != GameMode.CREATIVE) {
+			player.sendMessage(Component.text("Must be in creative mode to use this command!", NamedTextColor.RED));
+			return null;
+		}
+		ItemStack item = player.getInventory().getItemInMainHand();
+		if (item.getType() == Material.AIR) {
+			player.sendMessage(Component.text("Must be holding an item!", NamedTextColor.RED));
+			return null;
+		}
+		return item;
 	}
 
 }
