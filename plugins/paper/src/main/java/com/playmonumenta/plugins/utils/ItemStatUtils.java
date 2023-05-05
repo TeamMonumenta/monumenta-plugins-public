@@ -360,6 +360,7 @@ public class ItemStatUtils {
 		DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
 		INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
 		MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
+		STARPOINT("starpoint", "new expansion :pog:", TextColor.fromHexString("#342768")),
 		ALCHEMIST(new Alchemist()),
 		CLERIC(new Cleric()),
 		MAGE(new Mage()),
