@@ -30,8 +30,8 @@ public class CurseOfCrippling implements Enchantment {
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		double health = player.getHealth() / EntityUtils.getMaxHealth(player);
 		if (health <= MIN_HEALTH_PERCENT) {
-			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(EFFECT_DURATION, value * PERCENT_SPEED_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME));
-			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(EFFECT_DURATION, value * PERCENT_DAMAGE_PER_LEVEL));
+			plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME, new PercentSpeed(EFFECT_DURATION, value * PERCENT_SPEED_PER_LEVEL, PERCENT_SPEED_EFFECT_NAME).displaysTime(false));
+			plugin.mEffectManager.addEffect(player, PERCENT_DAMAGE_EFFECT_NAME, new PercentDamageDealt(EFFECT_DURATION, value * PERCENT_DAMAGE_PER_LEVEL).displaysTime(false));
 		} else {
 			plugin.mEffectManager.clearEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			plugin.mEffectManager.clearEffects(player, PERCENT_DAMAGE_EFFECT_NAME);
