@@ -10,7 +10,14 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,6 +44,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -98,13 +106,12 @@ public class ShulkerShortcutListener implements Listener {
 				return;
 			}
 
-			boolean quiver = ItemStatUtils.isQuiver(shulkerInventory.getShulkerItem());
-			if (quiver || shulkerInventory.getInventory().getType() != InventoryType.SHULKER_BOX) {
+			if (shulkerInventory.getInventory().getType() != InventoryType.SHULKER_BOX) {
 				// Disallow sorting partial inventories to prevent it duping the filler items and moving items into slots where they shouldn't be
 				if (shulkerInventory.getSlots() % 9 != 0
-						&& event.getClick().isRightClick()
-						&& ItemUtils.isNullOrAir(event.getCursor())
-						&& ItemUtils.isNullOrAir(event.getCurrentItem())) {
+					    && event.getClick().isRightClick()
+					    && ItemUtils.isNullOrAir(event.getCursor())
+					    && ItemUtils.isNullOrAir(event.getCurrentItem())) {
 					event.setCancelled(true);
 					return;
 				}
@@ -147,38 +154,35 @@ public class ShulkerShortcutListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					if (quiver && !ItemUtils.isArrow(deposited)) {
-						player.sendMessage(ChatColor.RED + "Only arrows can be put into a quiver");
-						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						event.setCancelled(true);
-						return;
-					}
 				}
 			}
 		}
 		if (itemClicked != null
-				&& click == ClickType.RIGHT
-				&& ItemUtils.isShulkerBox(itemClicked.getType())
-				&& !portableStorageAllowed) {
+			    && (click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
+			    && ItemUtils.isShulkerBox(itemClicked.getType())
+			    && !portableStorageAllowed) {
 			// Cancel all right clicks on Shulkers if portable storage is not allowed
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "You can't use this here");
 			event.setCancelled(true);
-		} else if (click == ClickType.RIGHT
-			&& isEnderExpansion(itemClicked)
-			&& !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
+		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
+			           && isEnderExpansion(itemClicked)
+			           && !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
 			// Right clicked an Ender Chest Expansion shulker outside an ender chest
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
 			event.setCancelled(true);
-		} else if (click == ClickType.RIGHT
-			&& isPurpleTesseractContainer(itemClicked)) {
+		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
+			           && isPurpleTesseractContainer(itemClicked)) {
 			// Right-clicked a purple tesseract shulker that can't be opened
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
 			event.setCancelled(true);
-		} else if (click == ClickType.RIGHT
-			&& ChestUtils.isLootBox(itemClicked)) {
+		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
+			           && ChestUtils.isLootBox(itemClicked)) {
+			if (click == ClickType.SWAP_OFFHAND) {
+				return;
+			}
 			// Right-clicked a lootbox - dump contents into player's inventory
 			List<ItemStack> items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
 			if (items == null) {
@@ -199,7 +203,7 @@ public class ShulkerShortcutListener implements Listener {
 			           && !ShulkerEquipmentListener.isAnyEquipmentBox(itemClicked)
 			           && !PortableEnderListener.isPortableEnder(itemClicked)) {
 			// Player clicked a non-equipment shulker box in an inventory.
-			if (clickedInventory == topInventory && shulkerInventory != null && click == ClickType.RIGHT) {
+			if (clickedInventory == topInventory && shulkerInventory != null && (click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)) {
 				// A shulker inside another shulker was right-clicked, cancel.
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "Cannot open nested shulkers");
@@ -247,6 +251,10 @@ public class ShulkerShortcutListener implements Listener {
 							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						}
 						event.setCancelled(true);
+					} else if (click == ClickType.SWAP_OFFHAND && ItemUtils.isNullOrAir(itemHeld)) {
+						// Pressed swap on a shulker with empty cursor: Deposit matching items from the inventory
+						event.setCancelled(true);
+						depositAllMatching(player, itemClicked);
 					} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
 						player.sendMessage(ChatColor.RED + "Too fast! Please try again");
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -461,4 +469,56 @@ public class ShulkerShortcutListener implements Listener {
 	private static boolean acceptsItem(ShulkerInventory shulkerInventory, ItemStack item) {
 		return !ItemStatUtils.isQuiver(shulkerInventory.getShulkerItem()) || ItemUtils.isArrow(item);
 	}
+
+	/**
+	 * Deposits all items in the player's inventory into the shulker if there's a matching item inside already.
+	 */
+	private static void depositAllMatching(Player player, ItemStack shulker) {
+		if (shulker.getItemMeta() instanceof BlockStateMeta blockStateMeta
+			    && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+			Inventory shulkerInventory = shulkerBox.getInventory();
+			PlayerInventory playerInventory = player.getInventory();
+
+			Map<String, Integer> depositedItems = new TreeMap<>();
+			int totalDeposited = 0;
+
+			// first clean items in the shulker in case that hasn't been done yet
+			for (ItemStack item : shulkerInventory) {
+				ItemStatUtils.cleanIfNecessary(item);
+			}
+
+			for (ItemStack playerItem : playerInventory) {
+				if (playerItem == null
+					    || playerItem.getType() == Material.AIR
+					    || ItemUtils.isShulkerBox(playerItem.getType())
+					    || !shulkerInventory.containsAtLeast(playerItem, 1)) {
+					continue;
+				}
+				int originalAmount = playerItem.getAmount();
+				String name = ItemUtils.getPlainNameOrDefault(playerItem);
+				HashMap<Integer, ItemStack> remaining = shulkerInventory.addItem(playerItem);
+				if (!remaining.containsKey(0)) {
+					playerItem.setAmount(0);
+					totalDeposited += originalAmount;
+				} else {
+					int remainingAmount = remaining.get(0).getAmount();
+					playerItem.setAmount(remainingAmount);
+					totalDeposited += originalAmount - remainingAmount;
+				}
+				depositedItems.merge(name, originalAmount - playerItem.getAmount(), Integer::sum);
+			}
+
+			blockStateMeta.setBlockState(shulkerBox);
+			shulker.setItemMeta(blockStateMeta);
+
+			if (totalDeposited > 0) {
+				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				player.sendMessage(Component.text(totalDeposited + " item" + (totalDeposited == 1 ? "" : "s") + " deposited into shulker.", NamedTextColor.GOLD)
+					                   .hoverEvent(HoverEvent.showText(Component.text(
+						                   depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
+							                   .collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
+			}
+		}
+	}
+
 }

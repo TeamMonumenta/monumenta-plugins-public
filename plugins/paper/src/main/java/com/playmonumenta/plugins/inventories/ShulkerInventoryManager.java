@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ public class ShulkerInventoryManager {
 	private static final String ERROR_SHULKER_ALREADY_OPEN = ChatColor.RED + "This shulker is already open";
 	private static final String ERROR_SHULKER_ZONE_BLOCKED = ChatColor.RED + "Shulkers can not be opened here";
 	private static final String ERROR_SHULKER_RATE_LIMITED = ChatColor.RED + "Too fast! Please try again";
-	private static final String ERROR_ONLY_ARROWS_IN_QUIVER = ChatColor.RED + "Only arrows can be put into a quiver";
 	private static final String ERROR_NOT_A_SHULKER = ChatColor.RED + "How did you...? That isn't a shulker. Please report this";
 	private static @Nullable ShulkerInventoryManager INSTANCE = null;
 	private final Plugin mPlugin;
@@ -150,7 +148,7 @@ public class ShulkerInventoryManager {
 			public void run() {
 				mRateLimited.remove(player.getUniqueId());
 			}
-		}.runTaskLater(mPlugin, 10);
+		}.runTaskLater(mPlugin, 5);
 
 		ItemStack shulkerItem = parentInventory.getItem(parentSlot);
 		if (shulkerItem != null && ItemUtils.isShulkerBox(shulkerItem.getType())) {
@@ -195,10 +193,6 @@ public class ShulkerInventoryManager {
 			}
 			if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
 				player.sendMessage(ERROR_SHULKER_ZONE_BLOCKED);
-			}
-			if (ItemStatUtils.isQuiver(shulkerItem) && !ItemUtils.isArrow(item)) {
-				player.sendMessage(ERROR_ONLY_ARROWS_IN_QUIVER);
-				return -1;
 			}
 			shulkerBox.setLock("ShulkerDeposit:" + player.getUniqueId());
 			shulkerMeta.setBlockState(shulkerBox);
