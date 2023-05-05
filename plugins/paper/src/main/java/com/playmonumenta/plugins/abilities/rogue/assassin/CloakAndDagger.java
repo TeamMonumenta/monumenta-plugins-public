@@ -82,8 +82,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	}
 
 	public void cast() {
-		if (!AbilityUtils.isStealthed(mPlayer)
-			    && mCloak >= CLOAK_MIN_STACKS) {
+		if (mCloak >= CLOAK_MIN_STACKS) {
 			mCloakOnActivation = mCloak;
 			mCloak = 0;
 			mActive = true;

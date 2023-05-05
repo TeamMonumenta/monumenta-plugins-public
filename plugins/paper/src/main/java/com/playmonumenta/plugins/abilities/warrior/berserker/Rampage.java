@@ -26,10 +26,8 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 
@@ -60,7 +58,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			.scoreboardId("Rampage")
 			.shorthandName("Rmp")
 			.descriptions(
-				("Gain a stack of rage for each %s melee damage dealt (50%% more in region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
+				("Gain a stack of rage for each %s melee damage dealt (50%% more in Region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
 					 "Passively gain %s%% damage resistance for each stack. " +
 					 "When at %s or more stacks, right click while looking down to consume all stacks and damage mobs " +
 					 "in a %s block radius by %s times the number of stacks consumed. For the next (stacks consumed / 2) seconds, " +
@@ -76,6 +74,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			.displayItem(Material.BLAZE_POWDER);
 
 	private final double mDamagePerStack;
+	private final double mResistancePerStack;
 	private final int mStackLimit;
 
 	private int mStacks = 0;
@@ -85,6 +84,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	public Rampage(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamagePerStack = ((isLevelOne() ? RAMPAGE_1_DAMAGE_PER_STACK : RAMPAGE_2_DAMAGE_PER_STACK) + CharmManager.getLevel(mPlayer, CHARM_THRESHOLD)) * (ServerProperties.getAbilityEnhancementsEnabled(mPlayer) ? R3_DAMAGE_PER_STACK_MULTIPLIER : 1);
+		mResistancePerStack = -(RAMPAGE_DAMAGE_RESISTANCE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION_PER_STACK));
 		mStackLimit = (isLevelOne() ? RAMPAGE_1_STACK_LIMIT : RAMPAGE_2_STACK_LIMIT) + (int) CharmManager.getLevel(mPlayer, CHARM_STACKS);
 	}
 
@@ -94,12 +94,12 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mStacks * RAMPAGE_STACK_PERCENTAGE);
 			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, RAMPAGE_RADIUS));
 			for (LivingEntity mob : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell());
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell(), true);
 				new PartialParticle(Particle.VILLAGER_ANGRY, mob.getLocation(), 5, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer);
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, CUSTOM_REGENERATION_EFFECT_NAME, new CustomRegeneration(mStacks * 10, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT * EntityUtils.getMaxHealth(mPlayer)), mPlugin));
-			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(mStacks * 10, getDamageResistanceRatio() - 1));
+			addDamageReductionEffect(false);
 
 			Location loc = mPlayer.getLocation();
 			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 3, 0.2, 0.2, 0.2, 0).spawnAsPlayerActive(mPlayer);
@@ -152,23 +152,25 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
+
+		if (mStacks > 0) {
+			addDamageReductionEffect(true);
+		}
 	}
 
-	@Override
-	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
-			return;
+	private void addDamageReductionEffect(boolean passive) {
+		int duration = passive ? RAMPAGE_STACK_DECAY_TIME : mStacks * 10;
+		double resistance = mStacks * mResistancePerStack;
+		if (!passive) {
+			// Clear old effects so the .displaysTime(false) isn't carried over
+			mPlugin.mEffectManager.clearEffects(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME);
 		}
-		event.setDamage(event.getDamage() * getDamageResistanceRatio());
+		mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(duration, resistance).displaysTime(!passive));
 	}
 
 	@Override
 	public void showChargesMessage() {
 		sendActionBarMessage("Rage: " + mStacks);
-	}
-
-	private double getDamageResistanceRatio() {
-		return 1 - mStacks * (RAMPAGE_DAMAGE_RESISTANCE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION_PER_STACK));
 	}
 
 	@Override
