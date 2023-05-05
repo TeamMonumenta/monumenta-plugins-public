@@ -116,12 +116,13 @@ public class AbilityUtils {
 			cosmetic.removeStealthCosmetic(player);
 		}
 
+		int currentDuration = INVISIBLE_PLAYERS.getOrDefault(player, 0);
 		plugin.mPotionManager.removePotion(player, PotionID.ABILITY_SELF, PotionEffectType.INVISIBILITY);
 
 		INVISIBLE_PLAYERS.remove(player);
 
 		if (inflictPenalty) {
-			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SLOW_DIGGING, 20 * 3, 1));
+			plugin.mPotionManager.addPotion(player, PotionID.ABILITY_SELF, new PotionEffect(PotionEffectType.SLOW_DIGGING, currentDuration, 1));
 		}
 	}
 
