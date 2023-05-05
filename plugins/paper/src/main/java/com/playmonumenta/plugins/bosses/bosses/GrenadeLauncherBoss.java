@@ -89,10 +89,10 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		public EffectsList LINGERING_EFFECTS = EffectsList.EMPTY;
 
 		@BossParam(help = "Particle used for the ring border")
-		public ParticlesList PARTICLE_LINGERING_RING = ParticlesList.fromString("[(REDSTONE,40,0.15,0.3,0.15,0.2,GRAY,1.5)]");
+		public ParticlesList PARTICLE_LINGERING_RING = ParticlesList.fromString("[(REDSTONE,5,0.15,0.3,0.15,0.2,GRAY,1.5)]");
 
 		@BossParam(help = "Particle used for the ring center")
-		public ParticlesList PARTICLE_LINGERING_CENTER = ParticlesList.fromString("[(LAVA,10,0,0,0,1.5)]");
+		public ParticlesList PARTICLE_LINGERING_CENTER = ParticlesList.fromString("[(LAVA,2,0,0,0,1.5)]");
 
 		@BossParam(help = "Sound played at the ring center each second ")
 		public SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");

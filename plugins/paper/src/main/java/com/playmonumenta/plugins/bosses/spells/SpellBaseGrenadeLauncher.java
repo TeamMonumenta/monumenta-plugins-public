@@ -173,12 +173,26 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			EntityUtils.disableBlockPlacement(fallingBlock);
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
-			Vector vect = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ());
-			vect.normalize().multiply(pLoc.distance(tLoc) / 20).setY(0.7f);
-			if (!Double.isFinite(vect.getX())) {
-				vect = new Vector(0, 1, 0);
+
+			// h = 0.5 * g * t^2
+			// t^2 = 0.5 * g / h
+			// t = sqrt(0.5 * g / h)
+			// h = 5.8 blocks with a 0.7 y velocity component
+			double timeOfFlight = Math.sqrt(0.5 * 16 / 5.8);
+			Location endPoint = pLoc.clone();
+			endPoint.setY(tLoc.getY());
+			double distance = endPoint.distance(tLoc);
+			double velocity = distance * timeOfFlight;
+
+			// Divide the actual velocity by 32 (speed at which things fall in minecraft; don't ask me why, but it works)
+			Vector vel = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ()).normalize().multiply(velocity / 32);
+			vel.setY(0.7f);
+
+			if (!Double.isFinite(vel.getX())) {
+				vel = new Vector(0, 1, 0);
 			}
-			fallingBlock.setVelocity(vect);
+			fallingBlock.setVelocity(vel);
+			fallingBlock.addScoreboardTag("DisableBlockPlacement");
 
 			BukkitRunnable runn = new BukkitRunnable() {
 				final FallingBlock mFallingBlock = fallingBlock;
@@ -269,11 +283,15 @@ public class SpellBaseGrenadeLauncher extends Spell {
 							@Override
 							public void run() {
 								mCurrentDegrees += mDegreeSpeed;
-								double offsetX = FastUtils.sinDeg(mCurrentDegrees) * mRadius;
-								double offsetZ = FastUtils.cosDeg(mCurrentDegrees) * mRadius;
-								Location spawningLoc = mCenter.clone();
-								spawningLoc.add(offsetX, 0, offsetZ);
-								mLingeringRingAesthetics.launch(spawningLoc);
+								Vector offset1 = new Vector(FastUtils.sinDeg(mCurrentDegrees) * mRadius, 0, FastUtils.cosDeg(mCurrentDegrees) * mRadius);
+								Vector offset2 = new Vector(FastUtils.sinDeg(mCurrentDegrees + 90) * mRadius, 0, FastUtils.cosDeg(mCurrentDegrees + 90) * mRadius);
+								Vector offset3 = new Vector(FastUtils.sinDeg(mCurrentDegrees + 180) * mRadius, 0, FastUtils.cosDeg(mCurrentDegrees + 180) * mRadius);
+								Vector offset4 = new Vector(FastUtils.sinDeg(mCurrentDegrees + 270) * mRadius, 0, FastUtils.cosDeg(mCurrentDegrees + 270) * mRadius);
+
+								mLingeringRingAesthetics.launch(mCenter.clone().add(offset1));
+								mLingeringRingAesthetics.launch(mCenter.clone().add(offset2));
+								mLingeringRingAesthetics.launch(mCenter.clone().add(offset3));
+								mLingeringRingAesthetics.launch(mCenter.clone().add(offset4));
 								mLingeringCenterAesthetics.launch(mCenter, mTimer);
 
 								//each 10 ticks run damage on players
