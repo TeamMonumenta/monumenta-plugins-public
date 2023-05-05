@@ -58,9 +58,9 @@ public class Eruption implements Enchantment {
 			int thunder = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.THUNDER_ASPECT);
 			int decay = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.DECAY);
 			int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
-			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
-			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
-			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
+			int sapper = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SAPPER) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.SAPPER) : 0;
+			int adrenaline = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ADRENALINE) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ADRENALINE) : 0;
+			int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT) > 0 ? plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT) : 0;
 
 			double damage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_PER_LEVEL * level);
 			//Damage any mobs in the area

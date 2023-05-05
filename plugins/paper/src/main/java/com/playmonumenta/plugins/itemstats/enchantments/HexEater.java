@@ -45,11 +45,11 @@ public class HexEater implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		double level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HEX_EATER);
+		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.HEX_EATER);
 		if (event.getType() == DamageType.MELEE) {
-			applyHexDamage(plugin, false, player, (int) level, enemy, event);
+			applyHexDamage(plugin, false, player, level, enemy, event);
 		} else if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Trident) {
-			applyHexDamage(plugin, true, player, (int) level, enemy, event);
+			applyHexDamage(plugin, true, player, level, enemy, event);
 		}
 	}
 

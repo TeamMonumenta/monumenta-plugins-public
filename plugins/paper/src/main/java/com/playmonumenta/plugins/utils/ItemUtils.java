@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -1390,9 +1391,8 @@ public class ItemUtils {
 			if (isShulkerBox(mType)) {
 				return new ItemIdentifier(Material.SHULKER_BOX, mName);
 			}
-			if ((Materials.PICKAXES.contains(mType) || Materials.AXES.contains(mType) || Materials.SHOVELS.contains(mType)) && isMultitool.getAsBoolean()) {
-				Material axeType = Material.valueOf(mType.toString().split("_")[0] + "_AXE");
-				return new ItemIdentifier(axeType, mName);
+			if (Multitool.isValidMultitoolMaterial(mType) && isMultitool.getAsBoolean()) {
+				return new ItemIdentifier(Multitool.getBaseMaterial(mType), mName);
 			}
 			return this;
 		}

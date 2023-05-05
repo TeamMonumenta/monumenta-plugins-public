@@ -36,6 +36,7 @@ public class DropKeyPacketListener extends PacketAdapter {
 			Plugin.getInstance().mAbilityManager.preDropKey(player);
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				Plugin.getInstance().mAbilityManager.checkTrigger(player, AbilityTrigger.Key.DROP);
+				Plugin.getInstance().mItemStatManager.onPlayerDropItem(Plugin.getInstance(), player);
 				player.updateInventory();
 			});
 		}

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -242,9 +243,31 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(39, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
-			new PebItem(41, "Block Interactions",
+			new PebItem(40, "Block Interactions",
 				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", NamedTextColor.LIGHT_PURPLE,
 				Material.LOOM, false).playerCommand("blockinteractions"),
+			new PebItem(41, "Multitool Trigger",
+				"""
+					Click to change the trigger of swapping a held Multitool item between one of the following possible values:
+					- Right Click
+					- Swap Hands
+					- Drop
+					- Disabled
+
+					Note that you can always swap Multitool items via the swap key in your inventory.""", NamedTextColor.LIGHT_PURPLE,
+				Material.IRON_PICKAXE, false)
+				.action((peb, event) -> {
+					int value = ScoreboardUtils.getScoreboardValue(peb.mPlayer, Multitool.MULTITOOL_TRIGGER_OPTION_SCORE).orElse(0);
+					int newValue = (value + 1) % 4;
+					ScoreboardUtils.setScoreboardValue(peb.mPlayer, Multitool.MULTITOOL_TRIGGER_OPTION_SCORE, newValue);
+					String key = switch (newValue) {
+						case Multitool.TRIGGER_OPTION_RIGHT_CLICK -> "right click";
+						case Multitool.TRIGGER_OPTION_SWAP -> "swap";
+						case Multitool.TRIGGER_OPTION_DROP -> "drop";
+						default -> null;
+					};
+					event.getWhoClicked().sendMessage(Component.text(key != null ? "Multitool now swaps when pressing " + key : "Multitool swapping is now disabled in the main hand", NamedTextColor.GOLD, TextDecoration.BOLD));
+				}),
 			new PebItem(42, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", NamedTextColor.LIGHT_PURPLE,
 				Material.SHIELD, false).playerCommand("toggleswap"),

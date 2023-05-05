@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerRiptideEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.jetbrains.annotations.Nullable;
 
 public interface ItemStat {
@@ -192,6 +193,20 @@ public interface ItemStat {
 	 * @param event  the associated PlayerInteractEvent
 	 */
 	default void onPlayerInteract(Plugin plugin, Player player, double value, PlayerInteractEvent event) {
+
+	}
+
+	/**
+	 * Player pressed the swap offhand button.
+	 */
+	default void onPlayerSwapHands(Plugin plugin, Player player, double value, PlayerSwapHandItemsEvent event) {
+
+	}
+
+	/**
+	 * Player pressed the drop button
+	 */
+	default void onPlayerDropItem(Plugin plugin, Player player, double value) {
 
 	}
 

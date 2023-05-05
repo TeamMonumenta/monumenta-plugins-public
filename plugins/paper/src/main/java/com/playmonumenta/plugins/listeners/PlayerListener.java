@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -642,6 +643,12 @@ public class PlayerListener implements Listener {
 			new CharmsGUI(player).open();
 		}
 
+		if (event.getClick() == ClickType.SWAP_OFFHAND
+			    && event.getClickedInventory() == player.getInventory()
+			    && ItemUtils.isNullOrAir(event.getCursor())
+			    && ItemStatUtils.hasEnchantment(item, ItemStatUtils.EnchantmentType.MULTITOOL)) {
+			Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item);
+		}
 
 	}
 
@@ -765,6 +772,7 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 		} else {
 			mPlugin.mAbilityManager.playerSwapHandItemsEvent(event.getPlayer(), event);
+			mPlugin.mItemStatManager.onPlayerSwapHands(mPlugin, event.getPlayer(), event);
 		}
 		if (event.getPlayer().getScoreboardTags().contains(ToggleSwap.SWAP_TAG)) {
 			event.setCancelled(true);

@@ -75,12 +75,12 @@ public class Quake implements Enchantment {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(target.getLocation(), radius);
 
 			//Get enchant levels on weapon
-			int fire = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
-			int ice = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ICE_ASPECT);
-			int thunder = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
-			int decay = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
-			int bleed = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
-			int wind = (int) plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
+			int fire = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.FIRE_ASPECT);
+			int ice = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ICE_ASPECT);
+			int thunder = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.THUNDER_ASPECT);
+			int decay = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DECAY);
+			int bleed = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.BLEEDING);
+			int wind = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.WIND_ASPECT);
 
 			double finalDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, damage * DAMAGE_MODIFIER_PER_LEVEL * level);
 			for (LivingEntity mob : mobs) {

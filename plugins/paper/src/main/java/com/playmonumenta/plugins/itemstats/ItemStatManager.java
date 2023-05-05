@@ -541,7 +541,7 @@ public class ItemStatManager implements Listener {
 		return playerItemStats;
 	}
 
-	public double getEnchantmentLevel(Player player, EnchantmentType type) {
+	public int getEnchantmentLevel(Player player, EnchantmentType type) {
 		return getEnchantmentLevel(getPlayerItemStats(player), type);
 	}
 
@@ -691,6 +691,22 @@ public class ItemStatManager implements Listener {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onPlayerInteract(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onPlayerSwapHands(Plugin plugin, Player player, PlayerSwapHandItemsEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onPlayerSwapHands(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onPlayerDropItem(Plugin plugin, Player player) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onPlayerDropItem(plugin, player, entry.getValue());
 			}
 		}
 	}
