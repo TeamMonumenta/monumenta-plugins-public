@@ -33,7 +33,7 @@ public class Shaman extends PlayerClass {
 	public static final double SOOTH_PASSIVE_HEAL_PERCENT = 0.02;
 	public static final double HEX_PASSIVE_DAMAGE_BOOST = 0.15;
 
-	Shaman() {
+	public Shaman() {
 		mAbilities.add(CleansingTotem.INFO);
 		mAbilities.add(TotemicProjection.INFO);
 		mAbilities.add(FlameTotem.INFO);

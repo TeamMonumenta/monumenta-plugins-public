@@ -25,7 +25,7 @@ public class Warrior extends PlayerClass {
 	public static final int BERSERKER_SPEC_ID = 3;
 	public static final int GUARDIAN_SPEC_ID = 4;
 
-	Warrior() {
+	public Warrior() {
 		mAbilities.add(BruteForce.INFO);
 		mAbilities.add(CounterStrike.INFO);
 		mAbilities.add(DefensiveLine.INFO);
@@ -36,7 +36,7 @@ public class Warrior extends PlayerClass {
 		mAbilities.add(WeaponMastery.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Warrior";
-		mClassColor = TextColor.fromHexString("#DE2446");
+		mClassColor = TextColor.fromHexString("#D32818");
 		mDisplayItem = Material.STONE_AXE;
 		mClassDescription = "Warriors specialize in melee combat, being able to both deal and survive heavy damage.";
 		mClassPassiveDescription = "Gain a base of 20% Knockback Resistance. This stacks with other skills and items.";

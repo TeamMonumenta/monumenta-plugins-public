@@ -38,7 +38,7 @@ public class Alchemist extends PlayerClass {
 		mAbilities.add(Bezoar.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Alchemist";
-		mClassColor = TextColor.fromHexString("#5FAA19");
+		mClassColor = TextColor.fromHexString("#81D434");
 		mDisplayItem = Material.POTION;
 		mClassDescription = "Alchemists employ magic potions to weaken and destroy their enemies.";
 		mClassPassiveDescription = ("Allows using Alchemical Utensils. " +

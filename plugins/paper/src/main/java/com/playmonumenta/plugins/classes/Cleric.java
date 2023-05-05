@@ -25,7 +25,7 @@ public class Cleric extends PlayerClass {
 	public static final int PALADIN_SPEC_ID = 5;
 	public static final int HIEROPHANT_SPEC_ID = 6;
 
-	Cleric() {
+	public Cleric() {
 		mAbilities.add(CelestialBlessing.INFO);
 		mAbilities.add(CleansingRain.INFO);
 		mAbilities.add(DivineJustice.INFO);

@@ -25,7 +25,7 @@ public class Warlock extends PlayerClass {
 	public static final int REAPER_SPEC_ID = 13;
 	public static final int TENEBRIST_SPEC_ID = 14;
 
-	Warlock() {
+	public Warlock() {
 		mAbilities.add(AmplifyingHex.INFO);
 		mAbilities.add(PhlegmaticResolve.INFO);
 		mAbilities.add(CholericFlames.INFO);
@@ -36,7 +36,7 @@ public class Warlock extends PlayerClass {
 		mAbilities.add(SoulRend.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Warlock";
-		mClassColor = TextColor.fromHexString("#C724B9");
+		mClassColor = TextColor.fromHexString("#F0489E");
 		mDisplayItem = Material.STONE_HOE;
 		mQuestReq = "Quest13";
 		mQuestReqMin = 1;

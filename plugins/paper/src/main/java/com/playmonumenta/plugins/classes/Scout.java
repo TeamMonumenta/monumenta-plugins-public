@@ -26,7 +26,7 @@ public class Scout extends PlayerClass {
 	public static final int RANGER_SPEC_ID = 11;
 	public static final int HUNTER_SPEC_ID = 12;
 
-	Scout() {
+	public Scout() {
 		mAbilities.add(Agility.INFO);
 		mAbilities.add(HuntingCompanion.INFO);
 		mAbilities.add(EagleEye.INFO);
@@ -37,7 +37,7 @@ public class Scout extends PlayerClass {
 		mAbilities.add(Volley.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Scout";
-		mClassColor = TextColor.fromHexString("#248AC8");
+		mClassColor = TextColor.fromHexString("#59B4EB");
 		mDisplayItem = Material.BOW;
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
 		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.",

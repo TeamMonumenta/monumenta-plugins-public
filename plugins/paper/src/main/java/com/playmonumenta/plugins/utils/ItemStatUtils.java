@@ -5,8 +5,16 @@ import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Alchemist;
+import com.playmonumenta.plugins.classes.Cleric;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.classes.Rogue;
+import com.playmonumenta.plugins.classes.Scout;
+import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.classes.Warlock;
+import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
@@ -351,7 +359,23 @@ public class ItemStatUtils {
 		TRUENORTH("truenorth", "True North", TextColor.fromHexString("#FFD700")),
 		DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
 		INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
-		MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8"));
+		MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
+		ALCHEMIST(new Alchemist()),
+		CLERIC(new Cleric()),
+		MAGE(new Mage()),
+		ROGUE(new Rogue()),
+		SCOUT(new Scout()),
+		SHAMAN(new Shaman()),
+		WARLOCK(new Warlock()),
+		WARRIOR(new Warrior()),
+		DAWNBRINGER(DepthsTree.DAWNBRINGER),
+		EARTHBOUND(DepthsTree.EARTHBOUND),
+		FLAMECALLER(DepthsTree.FLAMECALLER),
+		FROSTBORN(DepthsTree.FROSTBORN),
+		SHADOWDANCER(DepthsTree.SHADOWDANCER),
+		STEELSAGE(DepthsTree.STEELSAGE),
+		WINDWALKER(DepthsTree.WINDWALKER),
+		;
 
 		static final String KEY = "Location";
 
@@ -372,6 +396,14 @@ public class ItemStatUtils {
 			mDisplayName = MessagingUtils.plainText(display);
 			mDisplay = display;
 			mColor = display.color();
+		}
+
+		Location(PlayerClass cls) {
+			this(cls.mClassName.toLowerCase(), cls.mClassName, cls.mClassColor);
+		}
+
+		Location(DepthsTree tree) {
+			this(tree.getDisplayName().toLowerCase(), tree.getDisplayName(), tree.getColor());
 		}
 
 		public String getName() {

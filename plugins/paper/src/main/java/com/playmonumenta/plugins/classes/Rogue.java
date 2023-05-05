@@ -26,7 +26,7 @@ public class Rogue extends PlayerClass {
 	public static final int SWORDSAGE_SPEC_ID = 7;
 	public static final int ASSASSIN_SPEC_ID = 8;
 
-	Rogue() {
+	public Rogue() {
 		mAbilities.add(AdvancingShadows.INFO);
 		mAbilities.add(ByMyBlade.INFO);
 		mAbilities.add(DaggerThrow.INFO);

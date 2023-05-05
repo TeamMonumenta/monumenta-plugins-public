@@ -25,7 +25,7 @@ public class Mage extends PlayerClass {
 	public static final int ARCANIST_SPEC_ID = 1;
 	public static final int ELEMENTALIST_SPEC_ID = 2;
 
-	Mage() {
+	public Mage() {
 		mAbilities.add(ArcaneStrike.INFO);
 		mAbilities.add(ElementalArrows.INFO);
 		mAbilities.add(FrostNova.INFO);
@@ -36,7 +36,7 @@ public class Mage extends PlayerClass {
 		mAbilities.add(PrismaticShield.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Mage";
-		mClassColor = TextColor.fromHexString("#A31ECE");
+		mClassColor = TextColor.fromHexString("#A129D3");
 		mDisplayItem = Material.BLAZE_ROD;
 		mClassDescription = "Mages are masters of area control, freezing, wounding, and igniting enemies with their strikes.";
 		mClassPassiveDescription = String.format("After casting a spell, your next melee attack with a wand deals %s%% more damage.", (int) (Channeling.PERCENT_MELEE_INCREASE * 100));
