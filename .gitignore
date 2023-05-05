@@ -20,3 +20,6 @@ release.properties
 .factorypath
 .project
 /bin/
+
+# MacOS
+.DS_Store

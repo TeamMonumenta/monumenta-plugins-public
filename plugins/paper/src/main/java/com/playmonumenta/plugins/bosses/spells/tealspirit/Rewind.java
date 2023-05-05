@@ -166,6 +166,9 @@ public class Rewind extends Spell {
 								}
 
 								for (Player player : players) {
+									if (player.isDead() || player.getLocation().distance(mCenter) > TealSpirit.detectionRange) {
+										continue;
+									}
 									Location origin = Objects.requireNonNull(origins.get(player));
 									player.teleport(origin);
 									HashMap<LivingEntity, Vector> relative = relatives.get(player);
