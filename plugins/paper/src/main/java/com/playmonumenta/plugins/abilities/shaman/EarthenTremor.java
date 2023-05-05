@@ -142,7 +142,7 @@ public class EarthenTremor extends Ability {
 						this.cancel();
 					} else {
 						for (Material mat : List.of(Material.PODZOL, Material.GRANITE, Material.IRON_ORE)) {
-							new PartialParticle(Particle.BLOCK_CRACK, loc, (int) (30 * particleScale), mRadius / 2, 0.25, mRadius / 2, 0.1, mat).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.BLOCK_CRACK, loc, (int) (30 * particleScale), mRadius / 2, 0.25, mRadius / 2, 0.1, mat.createBlockData()).spawnAsPlayerActive(mPlayer);
 						}
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.75f, 0.5f);
