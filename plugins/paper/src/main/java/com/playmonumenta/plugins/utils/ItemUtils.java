@@ -337,6 +337,7 @@ public class ItemUtils {
 		Material.BLACK_STAINED_GLASS,
 		Material.WHITE_STAINED_GLASS,
 		Material.GLASS,
+		Material.TINTED_GLASS,
 		Material.SPRUCE_LEAVES,
 		Material.OAK_LEAVES,
 		Material.DARK_OAK_LEAVES,

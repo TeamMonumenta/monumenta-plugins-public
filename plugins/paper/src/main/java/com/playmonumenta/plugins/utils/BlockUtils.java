@@ -1,14 +1,19 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 public class BlockUtils {
 	private static final Set<Material> ALT_WATER_SOURCES = Set.of(
@@ -160,5 +165,16 @@ public class BlockUtils {
 	public static boolean isRail(BlockState block) {
 		BlockData data = block.getBlockData();
 		return data instanceof Rail;
+	}
+
+	public static BlockFace getCardinalBlockFace(Entity entity) {
+		return getCardinalBlockFace(entity.getLocation().getDirection());
+	}
+
+	// Returns NORTH, EAST, SOUTH, or WEST closest to the direction given
+	public static BlockFace getCardinalBlockFace(Vector direction) {
+		Vector dir = direction.clone().setY(0).normalize();
+		return Stream.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
+			.min(Comparator.comparingDouble(bf -> bf.getDirection().distance(dir))).orElse(BlockFace.NORTH);
 	}
 }
