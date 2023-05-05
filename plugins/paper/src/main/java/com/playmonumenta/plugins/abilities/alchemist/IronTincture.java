@@ -171,7 +171,7 @@ public class IronTincture extends Ability {
 				}
 
 				mTinctureDecay += IRON_TINCTURE_TICK_PERIOD;
-				if (mTinctureDecay >= CharmManager.getCooldown(mPlayer, CHARM_COOLDOWN, IRON_TINCTURE_THROW_COOLDOWN) || !tincture.isValid() || tincture.isDead()) {
+				if (mTinctureDecay >= IRON_TINCTURE_THROW_COOLDOWN || !tincture.isValid() || tincture.isDead()) {
 					mCosmetic.tinctureExpireEffects(tincture.getLocation(), mPlayer);
 					tincture.remove();
 					this.cancel();
@@ -190,13 +190,7 @@ public class IronTincture extends Ability {
 
 		if (isEnhanced()) {
 			Hitbox hitbox = new Hitbox.SphereHitbox(player.getLocation(), IRON_TINCTURE_ENHANCEMENT_STUN_RADIUS);
-			hitbox.getHitMobs().forEach(
-				mob -> {
-					if (!EntityUtils.isBoss(mob)) {
-						EntityUtils.applyStun(mPlugin, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION, mob);
-					}
-				}
-			);
+			hitbox.getHitMobs().forEach(mob -> EntityUtils.applyStun(mPlugin, IRON_TINCTURE_ENHANCEMENT_STUN_DURATION, mob));
 
 			double resistance = IRON_TINCTURE_ENHANCEMENT_RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
 			mPlugin.mEffectManager.addEffect(player, "IronTinctureEnhancementResistanceEffect", new PercentDamageReceived(duration, -resistance) {
