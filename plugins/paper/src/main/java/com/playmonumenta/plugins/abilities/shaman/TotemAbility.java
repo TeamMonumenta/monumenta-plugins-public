@@ -121,6 +121,7 @@ public abstract class TotemAbility extends Ability {
 		stand.setMarker(false);
 		stand.setGravity(mAttachedMob == null);
 		stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
+		stand.addScoreboardTag("REMOVE_ON_UNLOAD");
 
 		TotemicEmpowerment.addTotem(mPlayer, stand);
 

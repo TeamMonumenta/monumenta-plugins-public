@@ -90,6 +90,7 @@ public class LightningTotem extends TotemAbility {
 		new PPCircle(Particle.REDSTONE, standLocation, AOE_RANGE).data(YELLOW).ringMode(true).count(15).spawnAsPlayerActive(mPlayer);
 		if (ticks % INTERVAL == 0) {
 			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > AOE_RANGE) {
+				mTarget = null;
 				List<LivingEntity> affectedMobs = new ArrayList<>(EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null));
 				affectedMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
 				if (!affectedMobs.isEmpty()) {
