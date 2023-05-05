@@ -897,6 +897,7 @@ public final class Lich extends BossAbilityGroup {
 			    || player.getLocation().getY() - mSpawnLoc.getY() > mCeiling) {
 			return;
 		}
+		removeCursed(player);
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		World world = player.getWorld();
@@ -1256,7 +1257,7 @@ public final class Lich extends BossAbilityGroup {
 			public void run() {
 				mT += 10;
 				new PartialParticle(Particle.SOUL, p.getLocation().add(0, 0.75, 0), 6, 0.3, 0.3, 0.3, 0.01).spawnAsBoss();
-				if ((mT > 20 * time || p.isDead()) && mCursed.contains(p)) {
+				if ((mT > 20 * time) && mCursed.contains(p)) {
 					this.cancel();
 					mCursed.remove(p);
 				} else if (!mCursed.contains(p)) {
