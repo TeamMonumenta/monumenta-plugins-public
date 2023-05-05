@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class RegionScalingDamageDealt implements Enchantment {
 
-	public static final double[] DAMAGE_DEALT_MULTIPLIER = {1, 0.5, 0.25};
+	public static final double[] DAMAGE_DEALT_MULTIPLIER = {1, 0.33, 0.165};
 
 	public static final int MINING_FATIGUE_AMPLIFIER = 0;
 

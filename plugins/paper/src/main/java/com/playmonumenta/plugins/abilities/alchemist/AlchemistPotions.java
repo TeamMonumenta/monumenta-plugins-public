@@ -247,7 +247,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 
 	public void apply(LivingEntity mob, ThrownPotion potion, boolean isGruesome, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (MetadataUtils.checkOnceThisTick(mPlugin, mob, "AlchemistPotionApplying") && !mob.isDead()) {
-			double damage = getDamage(playerItemStats);
+			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, getDamage(playerItemStats));
 
 			if (isGruesome) {
 				damage *= GruesomeAlchemy.GRUESOME_POTION_DAMAGE_MULTIPLIER + CharmManager.getLevelPercentDecimal(mPlayer, GruesomeAlchemy.CHARM_DAMAGE);
@@ -429,7 +429,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getDamage(ItemStatManager.PlayerItemStats playerItemStats) {
-		return CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.POTION_DAMAGE.getItemStat()));
+		return playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.POTION_DAMAGE.getItemStat());
 	}
 
 	public double getRadius() {

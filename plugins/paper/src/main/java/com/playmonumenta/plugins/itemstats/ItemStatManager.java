@@ -248,7 +248,7 @@ public class ItemStatManager implements Listener {
 					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-					double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.5, 0.25);
+					double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.33, 0.165);
 					boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
 
 					for (ItemStat stat : ITEM_STATS) {
@@ -284,33 +284,36 @@ public class ItemStatManager implements Listener {
 				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
 
-				double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.5, 0.25);
+				double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.33, 0.165);
 
-				for (ItemStat stat : ITEM_STATS) {
-					if (stat instanceof Attribute attribute) {
-						double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
-						if (attribute instanceof ProjectileSpeed) {
-							// Hack for mainhands using projectile speed multiply instead of add
-							newMainhandAddStats.add(stat, (ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND)
-								                               + ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
-						} else {
-							newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
-							newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
+				if (!ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) ||
+						(ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) && PlayerUtils.isAlchemist(player))) {
+					for (ItemStat stat : ITEM_STATS) {
+						if (stat instanceof Attribute attribute) {
+							double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
+							if (attribute instanceof ProjectileSpeed) {
+								// Hack for mainhands using projectile speed multiply instead of add
+								newMainhandAddStats.add(stat, (ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND)
+																   + ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
+							} else {
+								newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
+								newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
+							}
+						} else if (stat instanceof Enchantment enchantment) {
+							double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
+							if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
+								break;
+							}
+							if (enchantment.getSlots().contains(Slot.MAINHAND)) {
+								newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
+							}
+							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
+								newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
+							}
+						} else if (stat instanceof Infusion infusion) {
+							double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
+							newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 						}
-					} else if (stat instanceof Enchantment enchantment) {
-						double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
-						if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
-							break;
-						}
-						if (enchantment.getSlots().contains(Slot.MAINHAND)) {
-							newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
-						}
-						if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
-							newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
-						}
-					} else if (stat instanceof Infusion infusion) {
-						double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
-						newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
 					}
 				}
 			}
