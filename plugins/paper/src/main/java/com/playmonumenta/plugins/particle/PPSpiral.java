@@ -31,17 +31,11 @@ public class PPSpiral extends AbstractPartialParticle<PPSpiral> {
 	 * Parameter getters and setters
 	 */
 
-	/**
-	 * Sets particles to spawn in a ring around the circle (true) or the circle's area (false)
-	 */
 	public PPSpiral distancePerParticle(double distancePerParticle) {
 		mDistancePerParticle = distancePerParticle;
 		return this;
 	}
 
-	/**
-	 * Gets whether particles spawn in a ring around the circle (true) or the circle's area (false)
-	 */
 	public double distancePerParticle() {
 		return mDistancePerParticle;
 	}

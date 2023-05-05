@@ -3,23 +3,35 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.List;
 import java.util.WeakHashMap;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -27,13 +39,22 @@ import org.bukkit.util.Vector;
 public class EarthenTremor extends Ability {
 	public static final String ABILITY_NAME = "Earthen Tremor";
 	public static final int COOLDOWN = 24 * 20;
-	public static final int EARTHQUAKE_TIME = 20;
+	public static final int DELAY = 20;
 	public static final int RADIUS = 6;
 	public static final double KNOCKBACK = 0.8;
 	public static final int DAMAGE_1 = 6;
 	public static final int DAMAGE_2 = 10;
 
+	public static String CHARM_COOLDOWN = "Earthen Tremor Cooldown";
+	public static String CHARM_DAMAGE = "Earthen Tremor Damage";
+	public static String CHARM_RADIUS = "Earthen Tremor Radius";
+	public static String CHARM_DELAY = "Earthen Tremor Delay";
+	public static String CHARM_KNOCKBACK = "Earthen Tremor Knockback";
+
 	public double mDamage;
+	public int mDelay;
+	public double mRadius;
+	public double mKnockback;
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
 	public static final AbilityInfo<EarthenTremor> INFO =
@@ -46,14 +67,14 @@ public class EarthenTremor extends Ability {
 						"after %s second and throwing them and yourself (if within range) into the air. Cooldown: %ss.",
 					DAMAGE_1,
 					RADIUS,
-					EARTHQUAKE_TIME / 20,
-					COOLDOWN / 20
+					StringUtils.ticksToSeconds(DELAY),
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Magic damage dealt is boosted to %s.",
 					DAMAGE_2)
 			)
 			.simpleDescription("Fires an arrow that will cause a tremor where it lands, dealing damage and knocking up yourself and mobs.")
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.DIRT);
 
 	public EarthenTremor(Plugin plugin, Player player) {
@@ -63,9 +84,13 @@ public class EarthenTremor extends Ability {
 			AbilityUtils.resetClass(player);
 		}
 		mPlayerItemStatsMap = new WeakHashMap<>();
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mDamage *= HexbreakerPassive.damageBuff(mPlayer);
-		mDamage *= SoothsayerPassive.damageBuff(mPlayer);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
+		mDamage *= SupportExpertise.damageBuff(mPlayer);
+
+		mDelay = CharmManager.getDuration(mPlayer, CHARM_DELAY, DELAY);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
 	}
 
 	@Override
@@ -88,6 +113,8 @@ public class EarthenTremor extends Ability {
 	private void quake(Projectile projectile, Location loc) {
 		World world = mPlayer.getWorld();
 
+		double particleScale = (mRadius * mRadius) / (RADIUS * RADIUS);
+
 		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(projectile);
 		if (playerItemStats != null) {
 			new BukkitRunnable() {
@@ -95,29 +122,28 @@ public class EarthenTremor extends Ability {
 
 				@Override
 				public void run() {
-					if (mTicks >= EARTHQUAKE_TIME) {
+					if (mTicks >= mDelay) {
 						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
 							if (!EntityUtils.isCCImmuneMob(mob) && !EntityUtils.isBoss(mob)) {
 								knockup(mob);
 							}
 							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
 						}
-						for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
-							if (player == mPlayer && player.getGameMode() == GameMode.SURVIVAL && !player.getScoreboardTags().contains("NoTremorKnockup")) {
-								knockup(player);
-							}
+
+						if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !mPlayer.getScoreboardTags().contains("NoTremorKnockup")) {
+							knockup(mPlayer);
 						}
 
-						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 30, RADIUS / 2.0, 0.1, RADIUS / 2.0, 0.1).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.LAVA, loc, 20, RADIUS / 2.0, 0.3, RADIUS / 2.0, 0.1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, (int) (6 * particleScale), mRadius / 2, 0.1, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.LAVA, loc, (int) (20 * particleScale), mRadius / 2, 0.3, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer);
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 3, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1, 1.0f);
 						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.75f, 1.0f);
 						this.cancel();
 					} else {
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2.0, 0.25, RADIUS / 2.0, 0.1, Bukkit.createBlockData(Material.PODZOL)).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2.0, 0.25, RADIUS / 2.0, 0.1, Bukkit.createBlockData(Material.GRANITE)).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.BLOCK_CRACK, loc, 30, RADIUS / 2.0, 0.25, RADIUS / 2.0, 0.1, Bukkit.createBlockData(Material.IRON_ORE)).spawnAsPlayerActive(mPlayer);
+						for (Material mat : List.of(Material.PODZOL, Material.GRANITE, Material.IRON_ORE)) {
+							new PartialParticle(Particle.BLOCK_CRACK, loc, (int) (30 * particleScale), mRadius / 2, 0.25, mRadius / 2, 0.1, mat).spawnAsPlayerActive(mPlayer);
+						}
 						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.75f, 0.5f);
 					}
@@ -131,7 +157,7 @@ public class EarthenTremor extends Ability {
 	}
 
 	private void knockup(LivingEntity le) {
-		le.setVelocity(le.getVelocity().add(new Vector(0.0, KNOCKBACK, 0.0)));
+		le.setVelocity(le.getVelocity().add(new Vector(0.0, mKnockback, 0.0)));
 	}
 
 	@Override

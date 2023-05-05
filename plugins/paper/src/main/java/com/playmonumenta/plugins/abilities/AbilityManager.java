@@ -102,11 +102,11 @@ import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.EyeOfTheStorm;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
@@ -439,14 +439,14 @@ public class AbilityManager {
 			//Soothsayer
 			EyeOfTheStorm.INFO,
 			SharedEmpowerment.INFO,
-			SoothsayerPassive.INFO,
+			SupportExpertise.INFO,
 			WhirlwindTotem.INFO,
 
 			//Hexbreaker
 			DecayedTotem.INFO,
 			DesecratingShot.INFO,
 			Devastation.INFO,
-			HexbreakerPassive.INFO
+			DestructiveExpertise.INFO
 		);
 
 		if (ServerProperties.getDepthsEnabled()) {

@@ -4,12 +4,13 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLightning;
@@ -17,7 +18,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.ArrayList;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Color;
@@ -42,8 +44,10 @@ public class LightningTotem extends TotemAbility {
 	public static String TOTEM_NAME = "Lightning Totem";
 	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
 
-	private double mDamage;
-	private @Nullable LivingEntity mTarget = null;
+	public static final String CHARM_DURATION = "Lightning Totem Duration";
+	public static final String CHARM_RADIUS = "Lightning Totem Radius";
+	public static final String CHARM_COOLDOWN = "Lightning Totem Cooldown";
+	public static final String CHARM_DAMAGE = "Lightning Totem Damage";
 
 	public static final AbilityInfo<LightningTotem> INFO =
 		new AbilityInfo<>(LightningTotem.class, "Lightning Totem", LightningTotem::new)
@@ -55,19 +59,24 @@ public class LightningTotem extends TotemAbility {
 					"mob within %s blocks with priority towards boss and elite mobs and deal %s magic damage every %s seconds. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE,
 					DAMAGE_1,
-					INTERVAL / 20,
-					TOTEM_DURATION / 20,
-					COOLDOWN / 20
+					StringUtils.ticksToSeconds(INTERVAL),
+					StringUtils.ticksToSeconds(TOTEM_DURATION),
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("The totem deals %s magic damage per hit.",
 					DAMAGE_2)
 			)
 			.simpleDescription("Summon a totem which will strike a mob within range for high damage throughout its duration.")
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LightningTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.YELLOW_WOOL);
+
+	private double mDamage;
+	private final int mDuration;
+	private final double mRadius;
+	private @Nullable LivingEntity mTarget = null;
 
 	public LightningTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Lightning Totem Projectile", "LightningTotem");
@@ -75,23 +84,26 @@ public class LightningTotem extends TotemAbility {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mDamage *= HexbreakerPassive.damageBuff(mPlayer);
-		mDamage *= SoothsayerPassive.damageBuff(mPlayer);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
+		mDamage *= SupportExpertise.damageBuff(mPlayer);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TOTEM_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 	}
 
 	@Override
 	public int getTotemDuration() {
-		return TOTEM_DURATION;
+		return mDuration;
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		new PPCircle(Particle.REDSTONE, standLocation, AOE_RANGE).data(YELLOW).ringMode(true).count(15).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, standLocation, mRadius).data(YELLOW).ringMode(true).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
 		if (ticks % INTERVAL == 0) {
-			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > AOE_RANGE) {
+			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > mRadius) {
 				mTarget = null;
-				List<LivingEntity> affectedMobs = new ArrayList<>(EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null));
+				List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
+				affectedMobs.removeIf(mob -> ScoreboardUtils.checkTag(mob, AbilityUtils.IGNORE_TAG));
 				affectedMobs.removeIf(mob -> DamageUtils.isImmuneToDamage(mob, DamageEvent.DamageType.MAGIC));
 				if (!affectedMobs.isEmpty()) {
 					if (affectedMobs.size() > 1) {
@@ -109,7 +121,7 @@ public class LightningTotem extends TotemAbility {
 					}
 				}
 			}
-			if (mTarget != null && !mTarget.isDead() && mTarget.getLocation().distance(standLocation) <= AOE_RANGE) {
+			if (mTarget != null) {
 				DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 				PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
 					.count(8).duration(3);

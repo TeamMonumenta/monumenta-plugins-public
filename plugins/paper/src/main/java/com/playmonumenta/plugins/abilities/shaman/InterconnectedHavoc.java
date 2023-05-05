@@ -3,11 +3,12 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -26,6 +27,9 @@ public class InterconnectedHavoc extends Ability {
 	private static final int DAMAGE_2 = 8;
 	private static final int RANGE_1 = 8;
 	private static final int RANGE_2 = 14;
+
+	public static final String CHARM_DAMAGE = "Interconnected Havoc Damage";
+	public static final String CHARM_RANGE = "Interconnected Havoc Range";
 
 	private final double mRange;
 	private double mDamage;
@@ -54,10 +58,10 @@ public class InterconnectedHavoc extends Ability {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mRange = isLevelOne() ? RANGE_1 : RANGE_2;
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mDamage *= HexbreakerPassive.damageBuff(mPlayer);
-		mDamage *= SoothsayerPassive.damageBuff(mPlayer);
+		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, isLevelOne() ? RANGE_1 : RANGE_2);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
+		mDamage *= SupportExpertise.damageBuff(mPlayer);
 	}
 
 	@Override

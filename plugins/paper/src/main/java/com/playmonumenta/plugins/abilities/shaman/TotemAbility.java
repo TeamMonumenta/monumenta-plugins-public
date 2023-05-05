@@ -98,16 +98,14 @@ public abstract class TotemAbility extends Ability {
 				Entity hitMob = event.getHitEntity();
 				Ability stickyTotems = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(mPlayer, AdhesiveTotems.class);
 				if (stickyTotems != null) {
-					if (hitMob instanceof LivingEntity &&
+					if (hitMob instanceof LivingEntity mob &&
 							!EntityUtils.isBoss(hitMob) &&
 							!(hitMob instanceof Player || hitMob instanceof ArmorStand)) {
-						mAttachedMob = (LivingEntity) hitMob;
+						mAttachedMob = mob;
 
 						if (stickyTotems.isLevelTwo()) {
-							mMobStuckWithEffect = (LivingEntity) hitMob;
-							if (getInfo().getLinkedSpell() != null) {
-								AdhesiveTotems.onTotemHitMob(mPlugin, mPlayer, (LivingEntity) hitMob, getInfo().getLinkedSpell());
-							}
+							mMobStuckWithEffect = mob;
+							onAdhereToMob(mMobStuckWithEffect);
 						}
 					}
 				}
@@ -186,4 +184,8 @@ public abstract class TotemAbility extends Ability {
 	public abstract void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats);
 
 	public abstract void onTotemExpire(World world, Location standLocation);
+
+	public void onAdhereToMob(LivingEntity hitMob) {
+
+	}
 }

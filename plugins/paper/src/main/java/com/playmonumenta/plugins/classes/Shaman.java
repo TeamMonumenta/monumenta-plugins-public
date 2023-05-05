@@ -9,13 +9,17 @@ import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
 import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
 import com.playmonumenta.plugins.abilities.shaman.LightningCrash;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
+import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.EyeOfTheStorm;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 
@@ -42,38 +46,38 @@ public class Shaman extends PlayerClass {
 		mAbilities.add(EarthenTremor.INFO);
 		mAbilities.add(LightningCrash.INFO);
 		mAbilities.add(AdhesiveTotems.INFO);
-		mClass = 8;
+		mClass = CLASS_ID;
 		mClassName = "Shaman";
 		mPermissionString = PERMISSION_STRING;
 		mDisplayItem = Material.TOTEM_OF_UNDYING;
 		mClassDescription = "Shamans excel in strategic positioning and location defense, using their stationary totems to control the battle.";
-		mClassPassiveDescription = String.format("Gain %s%% speed and take %s%% less damage while standing within 8 blocks of your totems.",
-			PASSIVE_SPEED * 100, PASSIVE_DR * 100);
+		mClassPassiveDescription = String.format("Gain %s%% speed and take %s%% less damage while standing within %s blocks of your totems.",
+			StringUtils.multiplierToPercentage(TotemicEmpowerment.SPEED), StringUtils.multiplierToPercentage(TotemicEmpowerment.RESISTANCE), TotemicEmpowerment.RADIUS);
 		mClassPassiveName = "Totemic Empowerment";
 
 		mSpecOne.mAbilities.add(SharedEmpowerment.INFO);
 		mSpecOne.mAbilities.add(WhirlwindTotem.INFO);
 		mSpecOne.mAbilities.add(EyeOfTheStorm.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103o";
-		mSpecOne.mSpecialization = 15;
+		mSpecOne.mSpecialization = SOOTHSAYER_ID;
 		mClassColor = TextColor.fromHexString("#009900");
 		mSpecOne.mSpecName = "Soothsayer";
 		mSpecOne.mDisplayItem = Material.OAK_SAPLING;
 		mSpecOne.mDescription = "Focuses on using your tools to support your team and turn the tide of battle.";
 		mSpecOne.mPassiveName = "Support Expertise";
 		mSpecOne.mPassiveDescription = String.format("Boosts the max health healed done by your Cleansing Totem by %s%% and magic damage done by your class skills by %s%%",
-			SOOTH_PASSIVE_HEAL_PERCENT * 100, SOOTH_PASSIVE_DAMAGE_BOOST * 100);
+			StringUtils.multiplierToPercentage(SupportExpertise.HEAL_BOOST), StringUtils.multiplierToPercentage(SupportExpertise.DAMAGE_BOOST));
 
 		mSpecTwo.mAbilities.add(DesecratingShot.INFO);
 		mSpecTwo.mAbilities.add(DecayedTotem.INFO);
 		mSpecTwo.mAbilities.add(Devastation.INFO);
 		mSpecTwo.mSpecQuestScoreboard = "Quest103p";
-		mSpecTwo.mSpecialization = 16;
+		mSpecTwo.mSpecialization = HEXBREAKER_ID;
 		mSpecTwo.mSpecName = "Hexbreaker";
 		mSpecTwo.mDisplayItem = Material.MAGMA_BLOCK;
 		mSpecTwo.mDescription = "Deals in dark magics, focusing on harming enemies at the cost of totems.";
 		mSpecTwo.mPassiveName = "Destructive Expertise";
-		mSpecTwo.mPassiveDescription = String.format("Increases the magic damage done by your class skills by %s%%", HEX_PASSIVE_DAMAGE_BOOST * 100);
+		mSpecTwo.mPassiveDescription = String.format("Increases the magic damage done by your class skills by %s%%", StringUtils.multiplierToPercentage(DestructiveExpertise.DAMAGE_BOOST));
 
 		mTriggerOrder = ImmutableList.of(
 			InterconnectedHavoc.INFO,

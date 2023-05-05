@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.UUID;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -15,18 +14,12 @@ public class ShamanCooldownDecreasePerSecond extends Effect {
 
 	private final double mPercent;
 	private final int mMaxDecrease;
-	private final @Nullable Player mSourcePlayer;
 	private final Plugin mPlugin;
 
-	public ShamanCooldownDecreasePerSecond(int duration, double amount, int maxDecrease, Plugin plugin) {
-		this(duration, amount, maxDecrease, null, plugin);
-	}
-
-	public ShamanCooldownDecreasePerSecond(int duration, double percent, int maxDecrease, @Nullable Player sourcePlayer, Plugin plugin) {
+	public ShamanCooldownDecreasePerSecond(int duration, double percent, int maxDecrease, Plugin plugin) {
 		super(duration, effectID);
 		mPercent = percent;
 		mMaxDecrease = maxDecrease;
-		mSourcePlayer = sourcePlayer;
 		mPlugin = plugin;
 	}
 
@@ -56,10 +49,6 @@ public class ShamanCooldownDecreasePerSecond extends Effect {
 		object.addProperty("percent", mPercent);
 		object.addProperty("maxdecrease", mMaxDecrease);
 
-		if (mSourcePlayer != null) {
-			object.addProperty("sourcePlayer", mSourcePlayer.getUniqueId().toString());
-		}
-
 		return object;
 	}
 
@@ -68,12 +57,7 @@ public class ShamanCooldownDecreasePerSecond extends Effect {
 		double amount = object.get("percent").getAsDouble();
 		int maxDecrease = object.get("maxdecrease").getAsInt();
 
-		@Nullable Player sourcePlayer = null;
-		if (object.has("sourcePlayer")) {
-			sourcePlayer = plugin.getPlayer(UUID.fromString(object.get("sourcePlayer").getAsString()));
-		}
-
-		return new ShamanCooldownDecreasePerSecond(duration, amount, maxDecrease, sourcePlayer, plugin);
+		return new ShamanCooldownDecreasePerSecond(duration, amount, maxDecrease, plugin);
 	}
 
 	@Override

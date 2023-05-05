@@ -10,13 +10,14 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.Player;
 
-public class HexbreakerPassive extends Ability {
+public class DestructiveExpertise extends Ability {
+	public static final double DAMAGE_BOOST = 0.15;
 
-	public static final AbilityInfo<HexbreakerPassive> INFO =
-		new AbilityInfo<>(HexbreakerPassive.class, null, HexbreakerPassive::new)
+	public static final AbilityInfo<DestructiveExpertise> INFO =
+		new AbilityInfo<>(DestructiveExpertise.class, null, DestructiveExpertise::new)
 			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_SPEC_NAME).orElse(0) == Shaman.HEXBREAKER_ID);
 
-	public HexbreakerPassive(Plugin plugin, Player player) {
+	public DestructiveExpertise(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
@@ -26,6 +27,6 @@ public class HexbreakerPassive extends Ability {
 
 	public static double damageBuff(Player player) {
 		return (ServerProperties.getAbilityEnhancementsEnabled(player) &&
-			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.HEXBREAKER_ID) ? 1 + Shaman.HEX_PASSIVE_DAMAGE_BOOST : 1;
+			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.HEXBREAKER_ID) ? 1 + DAMAGE_BOOST : 1;
 	}
 }

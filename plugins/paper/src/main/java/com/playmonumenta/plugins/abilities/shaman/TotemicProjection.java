@@ -6,23 +6,23 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.HashSet;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,7 +34,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.util.Vector;
 
 public class TotemicProjection extends Ability {
 
@@ -45,8 +44,10 @@ public class TotemicProjection extends Ability {
 	private static final double VELOCITY = 2;
 	private static final int DISTRIBUTION_RADIUS = 2;
 
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
-	private double mDamage;
+	public static final String CHARM_DAMAGE = "Totemic Projection Damage";
+	public static final String CHARM_COOLDOWN = "Totemic Projection Cooldown";
+	public static final String CHARM_DAMAGE_RADIUS = "Totemic Projection Damage Radius";
+	public static final String CHARM_DISTANCE = "Totemic Projection Distance";
 
 	public static final AbilityInfo<TotemicProjection> INFO =
 		new AbilityInfo<>(TotemicProjection.class, "Totemic Projection", TotemicProjection::new)
@@ -56,19 +57,22 @@ public class TotemicProjection extends Ability {
 			.descriptions(
 				String.format("Press drop with a weapon to fire a projectile that, on landing, moves all active totems to within %s blocks of it. %ss cooldown.",
 					DISTRIBUTION_RADIUS,
-					COOLDOWN_1 / 20
+					StringUtils.ticksToSeconds(COOLDOWN_1)
 				),
 				String.format("Deals %s magic damage within a %s block radius on hit. %ss cooldown.",
 					DAMAGE_2,
 					RADIUS,
-					COOLDOWN_2 / 20)
+					StringUtils.ticksToSeconds(COOLDOWN_2))
 			)
 			.simpleDescription("Fires a projectile that summons all of your active totems around the landing location.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2)
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemicProjection::cast, new AbilityTrigger(AbilityTrigger.Key.DROP)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
 			.displayItem(Material.ENDER_PEARL);
+
+	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
+	private double mDamage;
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -76,9 +80,9 @@ public class TotemicProjection extends Ability {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = isLevelOne() ? 0 : DAMAGE_2;
-		mDamage *= HexbreakerPassive.damageBuff(mPlayer);
-		mDamage *= SoothsayerPassive.damageBuff(mPlayer);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? 0 : DAMAGE_2);
+		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
+		mDamage *= SupportExpertise.damageBuff(mPlayer);
 	}
 
 	public void cast() {
@@ -121,10 +125,11 @@ public class TotemicProjection extends Ability {
 			}
 
 
+			double dist = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, DISTRIBUTION_RADIUS);
 			for (LivingEntity totem : theTotems) {
 				for (TotemType t : TotemType.values()) {
 					if (t.mName.equals(totem.getName())) {
-						Location loc = dropCenter.clone().add(t.mRelative);
+						Location loc = dropCenter.clone().add(t.mX * dist, 0.5, t.mZ * dist);
 						if (loc.getBlock().isPassable()) {
 							totem.teleport(loc);
 						} else {
@@ -135,8 +140,9 @@ public class TotemicProjection extends Ability {
 				}
 			}
 			if (isLevelTwo()) {
-				Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobsInSphere(dropCenter, RADIUS, null));
-				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, RADIUS).ringMode(false).count(100).spawnAsPlayerActive(mPlayer);
+				double radius = CharmManager.getRadius(mPlayer, CHARM_DAMAGE_RADIUS, RADIUS);
+				List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(dropCenter, radius, null);
+				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, radius).ringMode(false).countPerMeter(4).spawnAsPlayerActive(mPlayer);
 
 				for (LivingEntity mob : affectedMobs) {
 					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
@@ -146,17 +152,20 @@ public class TotemicProjection extends Ability {
 	}
 
 	private enum TotemType {
-		FLAME(FlameTotem.TOTEM_NAME, DISTRIBUTION_RADIUS, DISTRIBUTION_RADIUS),
-		CLEANSING(CleansingTotem.TOTEM_NAME, DISTRIBUTION_RADIUS, -DISTRIBUTION_RADIUS),
-		LIGHTNING(LightningTotem.TOTEM_NAME, -DISTRIBUTION_RADIUS, -DISTRIBUTION_RADIUS),
-		WHIRLWIND(WhirlwindTotem.TOTEM_NAME, -DISTRIBUTION_RADIUS, DISTRIBUTION_RADIUS),
-		DECAYED(DecayedTotem.TOTEM_NAME, -DISTRIBUTION_RADIUS, DISTRIBUTION_RADIUS);
+		FLAME(FlameTotem.TOTEM_NAME, 1, 1),
+		CLEANSING(CleansingTotem.TOTEM_NAME, 1, -1),
+		LIGHTNING(LightningTotem.TOTEM_NAME, -1, -1),
+		WHIRLWIND(WhirlwindTotem.TOTEM_NAME, -1, 1),
+		DECAYED(DecayedTotem.TOTEM_NAME, -1, 1);
 
 		private final String mName;
-		private final Vector mRelative;
+		private final int mX;
+		private final int mZ;
+
 		TotemType(String name, int x, int z) {
 			mName = name;
-			mRelative = new Vector(x, 0.5, z);
+			mX = x;
+			mZ = z;
 		}
 	}
 }

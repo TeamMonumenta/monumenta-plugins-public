@@ -7,16 +7,19 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.HashSet;
-import java.util.Set;
+import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.List;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -31,9 +34,11 @@ public class DesecratingShot extends Ability {
 	private static final int WEAKNESS_DURATION = 6 * 20;
 	private static final int RADIUS = 3;
 
-	private double mDamagePercent;
-	private final double mWeaknessPercent;
-
+	public static final String CHARM_COOLDOWN = "Desecrating Shot Cooldown";
+	public static final String CHARM_DAMAGE = "Desecrating Shot Damage";
+	public static final String CHARM_WEAKNESS = "Desecrating Shot Weakness";
+	public static final String CHARM_DURATION = "Desecrating Shot Duration";
+	public static final String CHARM_RADIUS = "Desecrating Shot Radius";
 
 	public static final AbilityInfo<DesecratingShot> INFO =
 		new AbilityInfo<>(DesecratingShot.class, "Desecrating Shot", DesecratingShot::new)
@@ -42,19 +47,24 @@ public class DesecratingShot extends Ability {
 			.shorthandName("DS")
 			.descriptions(
 				String.format("Your projectiles now deal an extra %s%% of your projectile damage as magic damage to the target, and apply %s%% weaken in a %s block radius for %ss. %ss cooldown.",
-					(int) (DAMAGE_1 * 100),
-					(int) (WEAKNESS_1 * 100),
+					StringUtils.multiplierToPercentage(DAMAGE_1),
+					StringUtils.multiplierToPercentage(WEAKNESS_1),
 					RADIUS,
-					WEAKNESS_DURATION / 20,
-					COOLDOWN / 20
+					StringUtils.ticksToSeconds(WEAKNESS_DURATION),
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Damage is increased to %s%% of your bow shot and weaken increased to %s%%.",
-					(int) (DAMAGE_2 * 100),
-					(int) (WEAKNESS_2 * 100))
+					StringUtils.multiplierToPercentage(DAMAGE_2),
+					StringUtils.multiplierToPercentage(WEAKNESS_2))
 			)
 			.simpleDescription("Deal extra magic damage to mobs hit with your projectiles and apply a weakness debuff to mobs within a short range.")
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.displayItem(Material.TNT);
+
+	private double mDamagePercent;
+	private final double mWeaknessPercent;
+	private final int mDuration;
+	private final double mRadius;
 
 	public DesecratingShot(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -62,9 +72,11 @@ public class DesecratingShot extends Ability {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mDamagePercent = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mWeaknessPercent = isLevelOne() ? WEAKNESS_1 : WEAKNESS_2;
-		mDamagePercent *= HexbreakerPassive.damageBuff(mPlayer);
+		mDamagePercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamagePercent *= DestructiveExpertise.damageBuff(mPlayer);
+		mWeaknessPercent = (isLevelOne() ? WEAKNESS_1 : WEAKNESS_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, WEAKNESS_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 	}
 
 	@Override
@@ -72,17 +84,20 @@ public class DesecratingShot extends Ability {
 		if (!isOnCooldown() && event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			putOnCooldown();
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_VEX_DEATH, 2.0f, 0.4f);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT, 2.0f, 0.6f);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT, 2.0f, 1.4f);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_ARROW_HIT, 2.0f, 1.8f);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ITEM_TRIDENT_THROW, 2.0f, 0.0f);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_VEX_HURT, 2.0f, 1.2f);
-			enemy.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_PHANTOM_DEATH, 0.7f, 0.1f);
 
-			Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobs(enemy.getLocation(), RADIUS));
+			World world = enemy.getWorld();
+			Location loc = enemy.getLocation();
+			world.playSound(loc, Sound.ENTITY_VEX_DEATH, 2.0f, 0.4f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT, 2.0f, 0.6f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT, 2.0f, 1.4f);
+			world.playSound(loc, Sound.ENTITY_ARROW_HIT, 2.0f, 1.8f);
+			world.playSound(loc, Sound.ITEM_TRIDENT_THROW, 2.0f, 0.0f);
+			world.playSound(loc, Sound.ENTITY_VEX_HURT, 2.0f, 1.2f);
+			world.playSound(loc, Sound.ENTITY_PHANTOM_DEATH, 0.7f, 0.1f);
+
+			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
 			for (LivingEntity mob : affectedMobs) {
-				EntityUtils.applyWeaken(mPlugin, WEAKNESS_DURATION, mWeaknessPercent, mob);
+				EntityUtils.applyWeaken(mPlugin, mDuration, mWeaknessPercent, mob);
 				new BukkitRunnable() {
 					int mTicks = 0;
 

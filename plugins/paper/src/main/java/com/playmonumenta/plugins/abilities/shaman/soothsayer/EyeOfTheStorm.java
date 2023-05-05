@@ -9,15 +9,16 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import java.util.HashSet;
+import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,10 +39,14 @@ public class EyeOfTheStorm extends Ability {
 	public static final int RADIUS = 6;
 	public static final int DAMAGE_1 = 4;
 	public static final int DAMAGE_2 = 6;
+	public static final double PULL_STRENGTH = 0.2;
 	private static final double VELOCITY = 2;
 
-	public double mDamage;
-	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
+	public static final String CHARM_COOLDOWN = "Eye of the Storm Cooldown";
+	public static final String CHARM_DAMAGE = "Eye of the Storm Damage";
+	public static final String CHARM_RADIUS = "Eye of the Storm Radius";
+	public static final String CHARM_DURATION = "Eye of the Storm Duration";
+	public static final String CHARM_PULL = "Eye of the Storm Pull";
 
 	public static final AbilityInfo<EyeOfTheStorm> INFO =
 		new AbilityInfo<>(EyeOfTheStorm.class, "Eye of the Storm", EyeOfTheStorm::new)
@@ -52,19 +57,25 @@ public class EyeOfTheStorm extends Ability {
 				String.format("Punch while sneaking with a projectile weapon to summon a %s block radius circle that lasts %ss and deals %s magic damage to all mobs " +
 						"in it every second (goes through iframes), pulling them towards the center (%ss cooldown)",
 					RADIUS,
-					RING_DURATION / 20,
+					StringUtils.ticksToSeconds(RING_DURATION),
 					DAMAGE_1,
-					COOLDOWN_1 / 20
+					StringUtils.ticksToSeconds(COOLDOWN_1)
 				),
 				String.format("Magic damage increased to %s and cooldown reduced to %ss.",
 					DAMAGE_2,
-					COOLDOWN_2 / 20)
+					StringUtils.ticksToSeconds(COOLDOWN_2 / 20))
 			)
 			.simpleDescription("Summon a medium sized ring which deals damage to mobs within and pulls them towards its center.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2)
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EyeOfTheStorm::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.WHITE_CANDLE);
+
+	public double mDamage;
+	public final double mRadius;
+	public final int mDuration;
+	public final float mPullStrength;
+	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 
 	public EyeOfTheStorm(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -72,8 +83,11 @@ public class EyeOfTheStorm extends Ability {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mDamage *= SoothsayerPassive.damageBuff(mPlayer);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamage *= SupportExpertise.damageBuff(mPlayer);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, RING_DURATION);
+		mPullStrength = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_STRENGTH);
 	}
 
 	public void cast() {
@@ -113,23 +127,23 @@ public class EyeOfTheStorm extends Ability {
 			@Override
 			public void run() {
 
-				PPCircle lowerRing = new PPCircle(Particle.DRAGON_BREATH, loc.clone().add(0, 0.5, 0), RADIUS).ringMode(true).count(10).delta(0).extra(0);
+				PPCircle lowerRing = new PPCircle(Particle.DRAGON_BREATH, loc.clone().add(0, 0.5, 0), mRadius).ringMode(true).countPerMeter(0.25).delta(0).extra(0);
 				lowerRing.spawnAsPlayerActive(mPlayer);
-				PPCircle higherRing = new PPCircle(Particle.GLOW, loc.clone().add(0, 1, 0), RADIUS).ringMode(true).count(10).delta(0).extra(0);
+				PPCircle higherRing = new PPCircle(Particle.GLOW, loc.clone().add(0, 1, 0), mRadius).ringMode(true).countPerMeter(0.25).delta(0).extra(0);
 				higherRing.spawnAsPlayerActive(mPlayer);
 
 				if (mTicks % 20 == 0) {
-					Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, RADIUS));
+					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
 					if (!affectedMobs.isEmpty()) {
 						loc.getWorld().playSound(loc, Sound.ENTITY_CAT_HISS, 2.0f, 1.0f);
 						for (LivingEntity mob : affectedMobs) {
 							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 							mob.getWorld().playSound(mob.getLocation(), Sound.ENTITY_CAT_HISS, 2.0f, 1.0f);
-							MovementUtils.pullTowards(loc, mob, 0.2f);
+							MovementUtils.pullTowards(loc, mob, mPullStrength);
 						}
 					}
 				}
-				if (mTicks >= RING_DURATION) {
+				if (mTicks >= mDuration) {
 					this.cancel();
 				}
 

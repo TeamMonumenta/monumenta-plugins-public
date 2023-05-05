@@ -9,12 +9,15 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enchantments.Decay;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,15 +39,22 @@ public class DecayedTotem extends TotemAbility {
 	private static final int DURATION_2 = 12 * 20;
 	private static final int DAMAGE = 4;
 	private static final double SLOWNESS_PERCENT = 0.4;
+	public static final int DECAY_LEVEL = 5;
+	public static final int DECAY_DURATION = 5 * 20;
 	public static final String TOTEM_NAME = "Decayed Totem";
 	private static final int TARGETS = 3;
 
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 	private static final Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(5, 120, 5), 1.0f);
 
-	private final int mDuration;
-	private final int mTickSpeed;
-	private final List<LivingEntity> mTargets = new ArrayList<>();
+	public static final String CHARM_DURATION = "Decayed Totem Duration";
+	public static final String CHARM_RADIUS = "Decayed Totem Radius";
+	public static final String CHARM_COOLDOWN = "Decayed Totem Cooldown";
+	public static final String CHARM_TARGETS = "Decayed Totem Targets";
+	public static final String CHARM_DAMAGE = "Decayed Totem Damage";
+	public static final String CHARM_SLOWNESS = "Decayed Totem Slowness";
+	public static final String CHARM_DECAY = "Decayed Totem Adhesion Decay Level";
+	public static final String CHARM_DECAY_DURATION = "Decayed Totem Adhesion Decay Duration";
 
 	public static final AbilityInfo<DecayedTotem> INFO =
 		new AbilityInfo<>(DecayedTotem.class, "Decayed Totem", DecayedTotem::new)
@@ -57,19 +67,27 @@ public class DecayedTotem extends TotemAbility {
 					TARGETS,
 					AOE_RANGE,
 					DAMAGE,
-					(int) (SLOWNESS_PERCENT * 100),
-					DURATION_1 / 20,
-					COOLDOWN / 20
+					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
+					StringUtils.ticksToSeconds(DURATION_1),
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Damage now ticks every half second, and duration is increased to %ss.",
-					DURATION_2 / 20)
+					StringUtils.ticksToSeconds(DURATION_2))
 			)
 			.simpleDescription("Summons a totem, dealing damage and heavily slowing 3 mobs within range.")
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", DecayedTotem::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.WITHER_ROSE);
+
+	private final double mDamage;
+	private final int mDuration;
+	private final double mRadius;
+	private final int mTickSpeed;
+	private final double mSlowness;
+	private final int mTargetCount;
+	private final List<LivingEntity> mTargets = new ArrayList<>();
 
 	public DecayedTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem");
@@ -77,8 +95,12 @@ public class DecayedTotem extends TotemAbility {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mDuration = isLevelOne() ? DURATION_1 : DURATION_2;
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE) * DestructiveExpertise.damageBuff(mPlayer);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mTickSpeed = isLevelOne() ? 20 : 10;
+		mSlowness = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
+		mTargetCount = TARGETS + (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS);
 	}
 
 	@Override
@@ -93,18 +115,18 @@ public class DecayedTotem extends TotemAbility {
 			stand.getWorld().playSound(stand, Sound.ENTITY_SKELETON_HURT, 0.6f, 0.3f);
 			stand.getWorld().playSound(stand, Sound.ENTITY_PHANTOM_DEATH, 0.5f, 0.2f);
 		}
-		mTargets.removeIf(mob -> standLocation.distance(mob.getLocation()) >= AOE_RANGE || mob.isDead());
-		if (mTargets.size() < TARGETS) {
-			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null);
+		mTargets.removeIf(mob -> standLocation.distance(mob.getLocation()) >= mRadius || mob.isDead());
+		if (mTargets.size() < mTargetCount) {
+			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
 			Collections.shuffle(affectedMobs);
 
 			for (LivingEntity mob : affectedMobs) {
-				if (mTargets.contains(mob) || standLocation.distance(mob.getLocation()) >= AOE_RANGE) {
+				if (mTargets.contains(mob) || standLocation.distance(mob.getLocation()) >= mRadius) {
 					continue;
 				}
 				impactMob(mob, mTickSpeed + 5, false);
 				mTargets.add(mob);
-				if (mTargets.size() >= TARGETS) {
+				if (mTargets.size() >= mTargetCount) {
 					break;
 				}
 			}
@@ -125,14 +147,20 @@ public class DecayedTotem extends TotemAbility {
 
 	private void impactMob(LivingEntity target, int duration, boolean dealDamage) {
 		if (dealDamage) {
-			DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, DAMAGE, ClassAbility.DECAYED_TOTEM, true);
+			DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, mDamage, ClassAbility.DECAYED_TOTEM, true);
 		}
-		EntityUtils.applySlow(mPlugin, duration, SLOWNESS_PERCENT, target);
+		EntityUtils.applySlow(mPlugin, duration, mSlowness, target);
 	}
 
 	@Override
 	public void onTotemExpire(World world, Location standLocation) {
 		new PartialParticle(Particle.SQUID_INK, standLocation, 5, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK, 0.7f, 0.5f);
+		mTargets.clear();
+	}
+
+	@Override
+	public void onAdhereToMob(LivingEntity hitMob) {
+		Decay.apply(mPlugin, hitMob, CharmManager.getDuration(mPlayer, CHARM_DECAY_DURATION, DECAY_DURATION), DECAY_LEVEL + (int) CharmManager.getLevel(mPlayer, CHARM_DECAY), mPlayer);
 	}
 }

@@ -4,20 +4,21 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.HexbreakerPassive;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SoothsayerPassive;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.HashSet;
-import java.util.Set;
+import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +41,16 @@ public class FlameTotem extends TotemAbility {
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 
+	public static final String CHARM_DURATION = "Flame Totem Duration";
+	public static final String CHARM_RADIUS = "Flame Totem Radius";
+	public static final String CHARM_COOLDOWN = "Flame Totem Cooldown";
+	public static final String CHARM_DAMAGE = "Flame Totem Damage";
+	public static final String CHARM_FIRE_DURATION = "Flame Totem Fire Duration";
+
 	private double mDamage;
+	private final int mDuration;
+	private final double mRadius;
+	private final int mFireDuration;
 
 	public static final AbilityInfo<FlameTotem> INFO =
 		new AbilityInfo<>(FlameTotem.class, "Flame Totem", FlameTotem::new)
@@ -52,15 +62,15 @@ public class FlameTotem extends TotemAbility {
 						"fire, without inferno damage, for %s seconds every second. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE,
 					DAMAGE_1,
-					FIRE_DURATION / 20,
-					TOTEM_DURATION / 20,
-					COOLDOWN / 20
+					StringUtils.ticksToSeconds(FIRE_DURATION),
+					StringUtils.ticksToSeconds(TOTEM_DURATION),
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("The totem deals %s magic damage per hit.",
 					DAMAGE_2)
 			)
 			.simpleDescription("Summon a totem that deals damage and sets mobs on fire within its range.")
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", FlameTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
@@ -72,19 +82,23 @@ public class FlameTotem extends TotemAbility {
 			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mDamage *= HexbreakerPassive.damageBuff(mPlayer);
-		mDamage *= SoothsayerPassive.damageBuff(mPlayer);
+		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
+		mDamage *= SupportExpertise.damageBuff(mPlayer);
+
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TOTEM_DURATION);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
+		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION);
 	}
 
 	@Override
 	public int getTotemDuration() {
-		return TOTEM_DURATION;
+		return mDuration;
 	}
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		PPCircle fireRing = new PPCircle(Particle.FLAME, standLocation, AOE_RANGE).ringMode(true).count(50).delta(0);
+		PPCircle fireRing = new PPCircle(Particle.FLAME, standLocation, mRadius).ringMode(true).countPerMeter(1.3).delta(0);
 		fireRing.spawnAsPlayerActive(mPlayer);
 		if (ticks % 20 == 0) {
 			pulse(standLocation, world, stats);
@@ -96,14 +110,14 @@ public class FlameTotem extends TotemAbility {
 	}
 
 	private void pulse(Location standLocation, World world, ItemStatManager.PlayerItemStats stats) {
-		Set<LivingEntity> affectedMobs = new HashSet<>(EntityUtils.getNearbyMobsInSphere(standLocation, AOE_RANGE, null));
+		List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null);
 
 		for (LivingEntity mob : affectedMobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
-			EntityUtils.applyFire(mPlugin, FIRE_DURATION, mob, null);
+			EntityUtils.applyFire(mPlugin, mFireDuration, mob, null);
 		}
 
-		PPCircle fireArea = new PPCircle(Particle.FLAME, standLocation, AOE_RANGE).ringMode(false).count(50).delta(0.01).extra(0.05);
+		PPCircle fireArea = new PPCircle(Particle.FLAME, standLocation, mRadius).ringMode(false).countPerMeter(1.3).delta(0.01).extra(0.05);
 		fireArea.spawnAsPlayerActive(mPlayer);
 
 		world.playSound(standLocation, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 0.5f);

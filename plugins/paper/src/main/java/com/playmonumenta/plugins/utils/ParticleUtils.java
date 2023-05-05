@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.particle.PartialParticle;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -68,6 +69,10 @@ public class ParticleUtils {
 	@FunctionalInterface
 	public interface ParametricParticle {
 		void run(Location loc, int t);
+	}
+
+	public static void explodingRingEffect(Plugin plugin, Location loc, double radius, double height, int ticks, double chance, SpawnParticleAction spawnParticleAction) {
+		explodingRingEffect(plugin, loc, radius, height, ticks, List.of(new AbstractMap.SimpleEntry<>(chance, spawnParticleAction)));
 	}
 
 	public static void explodingRingEffect(Plugin plugin, Location loc, double radius, double height, int ticks, Collection<Map.Entry<Double, SpawnParticleAction>> particles) {
