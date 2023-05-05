@@ -4,11 +4,11 @@ public class Entropy {
 
 	private static final int DEPTH_POINTS_ASSIGNED_PER_LEVEL = 2;
 
-	public static final String DESCRIPTION = "Additional Depth Points are randomly assigned.";
+	public static final String[] DESCRIPTION = {"Additional Delve Points are randomly assigned.", "Points in this modifier also count towards the total."};
 
 	public static String[] rankDescription(int level) {
 			return new String[]{
-				DEPTH_POINTS_ASSIGNED_PER_LEVEL * level + " Depth Points are randomly assigned."
+				DEPTH_POINTS_ASSIGNED_PER_LEVEL * level + " Delve Points are randomly assigned."
 			};
 	}
 

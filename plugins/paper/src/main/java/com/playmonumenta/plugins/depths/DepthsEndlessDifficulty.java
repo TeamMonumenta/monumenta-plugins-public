@@ -23,7 +23,7 @@ public class DepthsEndlessDifficulty {
 				continue;
 			}
 			playerToUse = p;
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Assigning your party " + pointsToAssign + " delve points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.");
+			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.");
 			break;
 		}
 
@@ -62,7 +62,7 @@ public class DepthsEndlessDifficulty {
 			}
 
 			if (pointsToAssign > 0) {
-				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Assigning your party " + pointsToAssign + " delve points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.");
+				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.");
 			}
 
 			DelvesUtils.copyDelvePoint(null, playerToUse, p, shard);

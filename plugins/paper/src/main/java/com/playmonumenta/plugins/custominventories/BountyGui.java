@@ -151,7 +151,7 @@ public class BountyGui extends Gui {
 				setItem(PRESET_L1_LOCATIONS.get(i), GUIUtils.createBasicItem(
 					Material.SOUL_LANTERN, i, "Level " + i, NamedTextColor.AQUA,
 					false, "Delve presets will be rolled from level " + i + ".\n" +
-						       "Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " delve points.", NamedTextColor.WHITE, 30, true))
+						       "Presets of this level will assign " + (minPoints == maxPoints ? minPoints : minPoints + " to " + maxPoints) + " Delve Points.", NamedTextColor.WHITE, 30, true))
 					.onLeftClick(() -> {
 						mPresetLevel = level;
 						update();

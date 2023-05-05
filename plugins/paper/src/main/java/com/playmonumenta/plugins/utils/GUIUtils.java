@@ -157,13 +157,24 @@ public class GUIUtils {
 		return createBasicItem(mat, amount, formatName(name, nameColor, nameBold), desc, setPlainTag);
 	}
 
+	public static ItemStack createBasicItem(Material mat, Component name, List<String> desc, TextColor loreColor) {
+		return createBasicItem(mat, 1, name, desc, loreColor);
+	}
+
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<String> desc, TextColor loreColor) {
+		return createBasicItem(mat, amount, name, desc, loreColor, true);
+	}
+
+	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<String> desc, TextColor loreColor, boolean setPlainTag) {
+		return createBasicItem(mat, amount, name, desc.stream().map(s -> (Component) Component.text(s, loreColor)).toList(), setPlainTag);
+	}
+
 	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag) {
 		ItemStack item = new ItemStack(mat, amount);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(name);
 		meta.lore(desc.stream().map(GUIUtils::fixLoreFormatting).toList());
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		meta.addItemFlags(ItemFlag.values());
 		item.setItemMeta(meta);
 		if (setPlainTag) {
 			ItemUtils.setPlainTag(item);

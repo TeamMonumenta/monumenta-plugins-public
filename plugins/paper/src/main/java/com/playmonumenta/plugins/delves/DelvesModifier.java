@@ -21,7 +21,9 @@ import com.playmonumenta.plugins.delves.abilities.Transcendent;
 import com.playmonumenta.plugins.delves.abilities.Twisted;
 import com.playmonumenta.plugins.delves.abilities.Unyielding;
 import com.playmonumenta.plugins.delves.abilities.Vengeance;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -163,18 +165,6 @@ public enum DelvesModifier {
 	}
 
 	public static ItemStack createIcon(Material material, Component name, String[] description) {
-		ItemStack stack = new ItemStack(material);
-
-		ItemMeta meta = stack.getItemMeta();
-		meta.addItemFlags(ItemFlag.values());
-		meta.displayName(name);
-		List<Component> lore = new ArrayList<>();
-		for (String descp : description) {
-			lore.add(Component.text(descp, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
-		}
-		meta.lore(lore);
-		stack.setItemMeta(meta);
-
-		return stack;
+		return GUIUtils.createBasicItem(material, 1, name, Arrays.asList(description), NamedTextColor.WHITE);
 	}
 }
