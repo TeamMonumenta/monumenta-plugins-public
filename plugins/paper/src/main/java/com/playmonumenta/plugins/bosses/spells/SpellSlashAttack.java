@@ -186,7 +186,7 @@ public class SpellSlashAttack extends Spell {
 		}
 		Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
 		new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
-			.data(data).minimumCount(0).spawnAsEntityActive(mBoss);
+			.data(data).spawnAsEntityActive(mBoss);
 		Hitbox hitbox = new Hitbox.AABBHitbox(mBoss.getWorld(), BoundingBox.of(finalLoc, mHitboxSize, mHitboxSize, mHitboxSize));
 		List<Player> targets = hitbox.getHitPlayers(true);
 		targets.removeAll(hitPlayers);
@@ -225,7 +225,7 @@ public class SpellSlashAttack extends Spell {
 				(Location l, int ring) -> {
 					new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
 						.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
-						.minimumCount(0).spawnAsEntityActive(mBoss);
+						.spawnAsEntityActive(mBoss);
 				}
 		);
 		if (mXSlash) {
@@ -233,7 +233,7 @@ public class SpellSlashAttack extends Spell {
 					(Location l, int ring) -> {
 						new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
 							.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
-							.minimumCount(0).spawnAsEntityActive(mBoss);
+							.spawnAsEntityActive(mBoss);
 					}
 			);
 		}

@@ -38,9 +38,9 @@ public class CholericFlamesCS implements CosmeticSkill {
 			@Override
 			public void run() {
 				mRadius += 1.25;
-				new PPCircle(Particle.FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(player);
-				new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(40).extra(0.125).spawnAsPlayerActive(player);
-				new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(20).extra(0.15).spawnAsPlayerActive(player);
+				new PPCircle(Particle.FLAME, mLoc, mRadius).count(40).extra(0.125).spawnAsPlayerActive(player);
+				new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).count(40).extra(0.125).spawnAsPlayerActive(player);
+				new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).count(20).extra(0.15).spawnAsPlayerActive(player);
 				if (mRadius >= range + 1) {
 					this.cancel();
 				}

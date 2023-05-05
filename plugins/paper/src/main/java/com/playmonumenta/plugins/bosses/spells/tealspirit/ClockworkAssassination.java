@@ -116,8 +116,8 @@ public class ClockworkAssassination extends Spell {
 		location.setY(location.getBlockY());
 		world.playSound(location, Sound.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.HOSTILE, 2.0f, 0.3f);
 		world.playSound(location, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 1.5f, 0.7f);
-		PPCircle indicator = new PPCircle(Particle.REDSTONE, location, 0).ringMode(true).count(25).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(214, 58, 166), 1.65f));
-		PPCircle indicator2 = new PPCircle(Particle.DRAGON_BREATH, location, 0).ringMode(true).count(15).delta(0.25, 0.1, 0.25).extra(0.03);
+		PPCircle indicator = new PPCircle(Particle.REDSTONE, location, 0).count(25).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(214, 58, 166), 1.65f));
+		PPCircle indicator2 = new PPCircle(Particle.DRAGON_BREATH, location, 0).count(15).delta(0.25, 0.1, 0.25).extra(0.03);
 
 		Location tpLoc = player.getLocation();
 		tpLoc.setY(tpLoc.getY() + 0.1f);

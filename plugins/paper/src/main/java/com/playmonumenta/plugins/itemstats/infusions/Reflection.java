@@ -63,8 +63,8 @@ public class Reflection implements Infusion {
 							@Override
 							public void run() {
 								mRadius += 0.5;
-								new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(6).extra(0.125).spawnAsPlayerActive(player);
-								new PPCircle(Particle.END_ROD, mLoc, mRadius).ringMode(true).count(6).extra(0.15).spawnAsPlayerActive(player);
+								new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).count(6).extra(0.125).spawnAsPlayerActive(player);
+								new PPCircle(Particle.END_ROD, mLoc, mRadius).count(6).extra(0.15).spawnAsPlayerActive(player);
 								if (mRadius >= RADIUS + 1) {
 									this.cancel();
 								}

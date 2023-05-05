@@ -197,7 +197,8 @@ public class ThunderStep extends Ability {
 		double ratio = radius / SIZE;
 		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, location, (int) (100 * ratio * ratio), 2.5 * ratio, 2.5 * ratio, 2.5 * ratio, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10)
+			.minimumCount(1).spawnAsPlayerActive(mPlayer);
 		Hitbox hitbox = new Hitbox.SphereHitbox(location.clone().add(0, 0.9, 0), radius);
 		List<LivingEntity> enemies = hitbox.getHitMobs();
 

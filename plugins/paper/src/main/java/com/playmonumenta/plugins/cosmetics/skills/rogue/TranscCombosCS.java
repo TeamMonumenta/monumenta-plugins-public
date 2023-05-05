@@ -199,7 +199,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.5f + (0.3f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustOptions(color, size)).minimumCount(0).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(color, size)).spawnAsPlayerActive(mPlayer);
 			});
 
 		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 0.75f);
@@ -213,7 +213,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 				(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 					float size = (float) (0.5f + (0.3f * middleProgress));
 					new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-						new Particle.DustOptions(color, size)).minimumCount(0).spawnAsPlayerActive(mPlayer);
+						new Particle.DustOptions(color, size)).spawnAsPlayerActive(mPlayer);
 				});
 
 			ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, -35, 1, 0, 0, 75, 2.25f,
@@ -250,12 +250,12 @@ public class TranscCombosCS extends ViciousCombosCS {
 			(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 				float size = (float) (0.3f + (0.35f * middleProgress));
 				new PartialParticle(Particle.REDSTONE, lineLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustOptions(TRANSC_LINE_COLOR, size)).minimumCount(0).spawnAsPlayerActive(mPlayer);
+					new Particle.DustOptions(TRANSC_LINE_COLOR, size)).spawnAsPlayerActive(mPlayer);
 				if (middle) {
 
 					ParticleUtils.drawParticleCircleExplosion(mPlayer, lineLoc.clone().setDirection(dir), 0, 1, 0, 90, 60, 1.75f,
 						true, 0, 0, Particle.CRIT_MAGIC);
-					new PartialParticle(Particle.END_ROD, lineLoc, 3, 0, 0, 0, 0.15f).minimumCount(0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.END_ROD, lineLoc, 3, 0, 0, 0, 0.15f).spawnAsPlayerActive(mPlayer);
 				}
 
 			});

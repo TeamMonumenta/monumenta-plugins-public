@@ -71,7 +71,7 @@ public class ArcaneRemedyCS extends WardingRemedyCS {
 	public void remedyApplyEffect(Player caster, Player p) {
 		// small circle under affected players (includes caster)
 		new PPCircle(Particle.ENCHANTMENT_TABLE, p.getLocation().add(0, 0.75, 0), 0.5)
-			.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 			.directionalMode(true).delta(0, -0.5, 0).extra(1)
 			.spawnAsPlayerActive(caster);
 	}

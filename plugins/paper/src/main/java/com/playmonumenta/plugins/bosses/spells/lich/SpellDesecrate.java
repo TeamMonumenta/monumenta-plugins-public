@@ -63,11 +63,11 @@ public class SpellDesecrate extends Spell {
 		mChargeUp.setTime(0);
 		World world = mBoss.getWorld();
 
-		PPCircle indicator = new PPCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 0).ringMode(true).count(12).delta(0.2, 0, 0.2);
-		PPCircle indicator2 = new PPCircle(Particle.SPELL_WITCH, mBoss.getLocation(), 0).ringMode(true).count(12).delta(0.2, 0, 0.2);
+		PPCircle indicator = new PPCircle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 0).count(12).delta(0.2, 0, 0.2);
+		PPCircle indicator2 = new PPCircle(Particle.SPELL_WITCH, mBoss.getLocation(), 0).count(12).delta(0.2, 0, 0.2);
 
-		PPCircle indicator3 = new PPCircle(Particle.SMOKE_LARGE, mBoss.getLocation(), 0).ringMode(true).count(15).delta(0.2, 0, 0.2);
-		PPCircle indicator4 = new PPCircle(Particle.DRAGON_BREATH, mBoss.getLocation(), 0).ringMode(true).count(15).delta(0.2, 0.2, 0.2);
+		PPCircle indicator3 = new PPCircle(Particle.SMOKE_LARGE, mBoss.getLocation(), 0).count(15).delta(0.2, 0, 0.2);
+		PPCircle indicator4 = new PPCircle(Particle.DRAGON_BREATH, mBoss.getLocation(), 0).count(15).delta(0.2, 0.2, 0.2);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mRadius = 12;

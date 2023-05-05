@@ -61,7 +61,7 @@ public class SpellFinalCrystal extends Spell {
 		mRange = range;
 		mCrystalLoc = crystalLoc;
 		mSoul = new PartialParticle(Particle.SOUL, mBoss.getLocation(), 8, 3, 0.15, 3, 0);
-		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0.1);
+		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0.1).minimumCount(1);
 	}
 
 	@Override
@@ -202,7 +202,7 @@ public class SpellFinalCrystal extends Spell {
 				EntityUtils.disableBlockPlacement(block);
 				block.setVelocity(new Vector(FastUtils.randomDoubleInRange(-0.55, 0.55), FastUtils.randomDoubleInRange(0.25, 1), FastUtils.randomDoubleInRange(-0.55, 0.55)));
 
-				PPCircle indicator = new PPCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 4).ringMode(true).count(12).delta(0.2, 0, 0.2);
+				PPCircle indicator = new PPCircle(Particle.SOUL_FIRE_FLAME, block.getLocation(), 4).count(12).delta(0.2, 0, 0.2);
 
 				BukkitRunnable runB = new BukkitRunnable() {
 

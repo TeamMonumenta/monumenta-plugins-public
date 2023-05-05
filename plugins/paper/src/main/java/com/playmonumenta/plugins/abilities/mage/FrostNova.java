@@ -156,8 +156,8 @@ public class FrostNova extends Ability {
 			public void run() {
 				mRadius += 1.25;
 
-				new PPCircle(Particle.CLOUD, mLoc, mRadius).ringMode(true).count(20).extra(0.1).spawnAsPlayerActive(mPlayer);
-				new PPCircle(Particle.CRIT_MAGIC, mLoc, mRadius).ringMode(true).count(160).extra(0.65).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.CLOUD, mLoc, mRadius).count(20).extra(0.1).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.CRIT_MAGIC, mLoc, mRadius).count(160).extra(0.65).spawnAsPlayerActive(mPlayer);
 
 				if (mRadius >= size + 1) {
 					this.cancel();

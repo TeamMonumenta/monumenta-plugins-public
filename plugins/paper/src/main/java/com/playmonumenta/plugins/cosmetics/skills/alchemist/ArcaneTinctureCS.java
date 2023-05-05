@@ -95,7 +95,7 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 		new PartialParticle(Particle.SPELL_INSTANT, tinctureLocation, 20, 0.25, 0.1, 0.25, 1).spawnAsPlayerActive(player);
 		double radius = 1.15;
 		new PPCircle(Particle.ENCHANTMENT_TABLE, player.getLocation().add(0, 0.2, 0), radius)
-				.ringMode(true).countPerMeter(8)
+			.countPerMeter(8)
 				.spawnAsPlayerActive(player);
 		new BukkitRunnable() {
 			int mT = 0;

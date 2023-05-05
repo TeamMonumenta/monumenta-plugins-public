@@ -111,24 +111,28 @@ public class GalacticRainCS extends CoupDeGraceCS {
 
 	private void drawCosmic(Player player, Location loc) {
 		switch (FastUtils.randomIntInRange(0, 5)) {
-			case 0 -> new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
-			case 1 -> new PartialParticle(Particle.SPELL_WITCH, loc, 5, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
-			case 2 -> new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 5, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
-			default -> new PartialParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, 0, new Particle.DustOptions(rollCosmicColor(), 1.5f)).minimumCount(0).spawnAsPlayerActive(player);
+			case 0 -> new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(player);
+			case 1 -> new PartialParticle(Particle.SPELL_WITCH, loc, 5, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(player);
+			case 2 ->
+				new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 5, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(player);
+			default ->
+				new PartialParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, 0, new Particle.DustOptions(rollCosmicColor(), 1.5f)).spawnAsPlayerActive(player);
 		}
 	}
 
 	private void drawSolar(Player player, Location loc) {
 		switch (FastUtils.randomIntInRange(0, 5)) {
-			case 0 -> new PartialParticle(Particle.CRIT, loc, 5, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
-			case 1 -> new PartialParticle(Particle.ELECTRIC_SPARK, loc, 5, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
-			case 2 -> new PartialParticle(Particle.SMALL_FLAME, loc, 5, 0.1, 0.1, 0.1, 0).minimumCount(0).spawnAsPlayerActive(player);
-			default -> new PartialParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, 0, new Particle.DustOptions(rollSolarColor(), 1.5f)).minimumCount(0).spawnAsPlayerActive(player);
+			case 0 -> new PartialParticle(Particle.CRIT, loc, 5, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(player);
+			case 1 ->
+				new PartialParticle(Particle.ELECTRIC_SPARK, loc, 5, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(player);
+			case 2 -> new PartialParticle(Particle.SMALL_FLAME, loc, 5, 0.1, 0.1, 0.1, 0).spawnAsPlayerActive(player);
+			default ->
+				new PartialParticle(Particle.REDSTONE, loc, 3, 0.1, 0.1, 0.1, 0, new Particle.DustOptions(rollSolarColor(), 1.5f)).spawnAsPlayerActive(player);
 		}
 	}
 
 	private void drawStar(Player player, Location location) {
-		new PartialParticle(Particle.END_ROD, location, 1, 0, 0, 0, 0).minimumCount(0)
+		new PartialParticle(Particle.END_ROD, location, 1, 0, 0, 0, 0)
 			.spawnAsPlayerActive(player);
 	}
 

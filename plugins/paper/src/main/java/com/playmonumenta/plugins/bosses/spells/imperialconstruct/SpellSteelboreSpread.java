@@ -101,8 +101,8 @@ public class SpellSteelboreSpread extends Spell {
 										n.playSound(n.getLocation(), Sound.BLOCK_ANVIL_LAND, SoundCategory.HOSTILE, 1, 0);
 										this.cancel();
 									}
-									new PPCircle(Particle.REDSTONE, p.getLocation().add(0, MAX_HEIGHT - (mT / 2f), 0), mRadius * 0.5).ringMode(true).count(25).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(195, 37, 37), 1.65f)).spawnAsBoss();
-									new PPCircle(Particle.SQUID_INK, p.getLocation().add(0, MAX_HEIGHT - (mT / 2f), 0), mRadius * 0.5).ringMode(true).count(25).delta(0.1, 0.05, 0.1).spawnAsBoss();
+									new PPCircle(Particle.REDSTONE, p.getLocation().add(0, MAX_HEIGHT - (mT / 2f), 0), mRadius * 0.5).count(25).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(195, 37, 37), 1.65f)).spawnAsBoss();
+									new PPCircle(Particle.SQUID_INK, p.getLocation().add(0, MAX_HEIGHT - (mT / 2f), 0), mRadius * 0.5).count(25).delta(0.1, 0.05, 0.1).spawnAsBoss();
 									PPCircle indicator2 = new PPCircle(Particle.REDSTONE, p.getLocation(), 0).ringMode(true).count(2).delta(0.25, 0.1, 0.25).data(new Particle.DustOptions(Color.fromRGB(255, 63, 63), 1.65f));
 									for (double r = 1; r < mRadius; r++) {
 										indicator2.radius(r).location(p.getLocation()).spawnAsBoss();
@@ -136,11 +136,11 @@ public class SpellSteelboreSpread extends Spell {
 						}
 						*/
 						if (notifyPlayer) {
-							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(225, 55, 55), 1.65f)).spawnAsBoss();
-							new PPCircle(Particle.FLAME, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();
+							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(225, 55, 55), 1.65f)).spawnAsBoss();
+							new PPCircle(Particle.FLAME, p.getLocation().add(0, 0.25, 0), mRadius).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();
 						} else {
-							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(252, 3, 3), 1.65f)).spawnAsBoss();
-							new PPCircle(Particle.ELECTRIC_SPARK, p.getLocation().add(0, 0.25, 0), mRadius).ringMode(true).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();
+							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(252, 3, 3), 1.65f)).spawnAsBoss();
+							new PPCircle(Particle.ELECTRIC_SPARK, p.getLocation().add(0, 0.25, 0), mRadius).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();
 						}
 					}
 				}

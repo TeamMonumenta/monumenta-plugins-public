@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells.rkitxet;
 import com.playmonumenta.plugins.bosses.bosses.RKitxet;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -42,10 +43,10 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
+	protected void chargeCircleAction(Location loc, double radius) {
+		new PPCircle(Particle.REDSTONE, loc, radius).count(12).delta(0.25).data(VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 2, 0), radius).count(12).delta(0.25).data(VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.COMPOSTER, loc, radius).count(12).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -55,9 +56,9 @@ public class SpellVerdantProtection extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, 0.1, VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
+	protected void circleOutburstAction(Location loc, double radius) {
+		new PPCircle(Particle.COMPOSTER, loc, radius).count(24).delta(0.1).extra(0.3).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.REDSTONE, loc, radius).count(24).delta(0.25).extra(0.1).data(VERDANT_PROTECTION_COLOR).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

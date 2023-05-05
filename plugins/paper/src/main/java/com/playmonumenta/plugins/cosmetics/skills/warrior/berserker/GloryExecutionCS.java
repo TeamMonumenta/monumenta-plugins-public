@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior.berserker;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.GalleryCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -79,11 +76,12 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 		world.playSound(location, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.2f, 2f);
 		world.playSound(location, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.55f, 0.65f);
 
-		PPCircle ring1 = new PPCircle(Particle.CRIT_MAGIC, location.clone().add(0, 0.5, 0), 0).count(13).ringMode(true);
-		PPCircle ring2 = new PPCircle(Particle.REDSTONE, location.clone().add(0, 0.5, 0), 0).count(13).ringMode(true).data(BLOODY_COLOR1);
+		PPCircle ring1 = new PPCircle(Particle.CRIT_MAGIC, location.clone().add(0, 0.5, 0), 0).count(13);
+		PPCircle ring2 = new PPCircle(Particle.REDSTONE, location.clone().add(0, 0.5, 0), 0).count(13).data(BLOODY_COLOR1);
 
 		new BukkitRunnable() {
 			int mTimes = duration / 2;
+
 			@Override
 			public void run() {
 				if (mTimes-- <= 0) {
@@ -271,8 +269,8 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				new PPCircle(Particle.CRIT_MAGIC, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 11)).ringMode(true).spawnAsPlayerActive(mPlayer);
-				new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 7)).ringMode(true).data(BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.CRIT_MAGIC, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 11)).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 7)).data(BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
 				new PartialParticle(Particle.SWEEP_ATTACK, loc, (int) Math.ceil(radius * 3), radius / 3, 0, radius / 3, 0).spawnAsPlayerActive(mPlayer);
 			}
 		}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES);

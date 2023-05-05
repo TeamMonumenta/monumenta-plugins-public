@@ -56,7 +56,7 @@ public class SpellPrimordialBolt extends SpellBaseBolt {
 				}
 				new PartialParticle(Particle.BLOCK_DUST, loc, 6, 0.45, 0.45, 0.45, 0.25,
 					Material.STONE.createBlockData()).spawnAsEntityActive(boss);
-				new PartialParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.EXPLOSION_LARGE, loc, 2, 0.2, 0.2, 0.2, 0.25).minimumCount(1).spawnAsEntityActive(boss);
 				for (Block block : LocationUtils.getNearbyBlocks(loc.getBlock(), 1)) {
 					if (block.getType().isSolid()) {
 						Material material = block.getType();

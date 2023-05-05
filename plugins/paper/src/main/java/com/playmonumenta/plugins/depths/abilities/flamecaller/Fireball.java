@@ -74,7 +74,7 @@ public class Fireball extends DepthsAbility {
 	private void explode(Location loc) {
 		World world = loc.getWorld();
 
-		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 25, 1.5, 1.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, loc, 25, 1.5, 1.5, 1.5, 0).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1);

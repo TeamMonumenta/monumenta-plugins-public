@@ -83,7 +83,7 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
 
 		// explosion effect
-		new PartialParticle(Particle.FLASH, loc).spawnAsPlayerActive(caster);
+		new PartialParticle(Particle.FLASH, loc).minimumCount(1).spawnAsPlayerActive(caster);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.02, 0.02, 0.02, 0.1 * radius).spawnAsPlayerActive(caster);
 		new PartialParticle(Particle.FLAME, loc, 100, radius / 4, 0, radius / 4, 0.04 * radius).spawnAsPlayerActive(caster);
 
@@ -97,7 +97,7 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 			public void run() {
 				new PartialParticle(Particle.ELECTRIC_SPARK, loc)
 					.count(20 - mT)
-					.minimumCount(0)
+
 					.delta(0.4 * radius, 0.5, 0.4 * radius)
 					.spawnAsPlayerActive(caster);
 

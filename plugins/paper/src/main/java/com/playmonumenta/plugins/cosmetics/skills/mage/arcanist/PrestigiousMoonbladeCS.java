@@ -87,7 +87,7 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 
 		Location mCenter = origin.clone().add(0, 0.125, 0);
 		new PPCircle(Particle.REDSTONE, mCenter, 0.8 * range).data(LIGHT_COLOR)
-			.count((int) Math.ceil(4.8 * 3.1416 * range)).ringMode(true).spawnAsPlayerActive(mPlayer);
+			.count((int) Math.ceil(4.8 * 3.1416 * range)).spawnAsPlayerActive(mPlayer);
 		new PPCircle(Particle.REDSTONE, mCenter, 0.7 * range).data(GOLD_COLOR3)
 			.count((int) Math.ceil(3 * 3.1416 * range * range)).ringMode(false).spawnAsPlayerActive(mPlayer);
 		if (mSwings <= 1) {

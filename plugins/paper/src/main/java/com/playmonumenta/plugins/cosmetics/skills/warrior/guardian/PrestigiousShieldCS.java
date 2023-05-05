@@ -70,7 +70,7 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 		world.playSound(loc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 0.4f);
 
 		Location mCenter = loc.clone().add(0, 0.125, 0);
-		PPCircle ppc = new PPCircle(Particle.REDSTONE, mCenter, 0).data(LIGHT_COLOR).ringMode(true);
+		PPCircle ppc = new PPCircle(Particle.REDSTONE, mCenter, 0).data(LIGHT_COLOR);
 		int rings = (int) Math.ceil(radius * 1.25);
 		for (int i = 1; i <= rings; i++) {
 			ppc.count(i * 15).radius(radius * i / rings).spawnAsPlayerActive(mPlayer);
@@ -101,9 +101,9 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	@Override
 	public void shieldWallDot(Player mPlayer, Location l, double degree, double angle, int y, int height) {
 		if (goldCheck(degree / angle, 1.0 * y / height)) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
 		} else {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 		}
 		if (FastUtils.RANDOM.nextDouble() < 0.3) {
 			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);

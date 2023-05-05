@@ -69,10 +69,10 @@ public class SpellDiesIrae extends Spell {
 		mCrystalLoc = crystalLoc;
 		mCrystalNBT = crystalnbt;
 		mCloud = new PartialParticle(Particle.CLOUD, mBoss.getLocation(), 50, 0.1, 0.1, 0.1, 0.1);
-		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0.1);
+		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0.1).minimumCount(1);
 		mSoul = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 2, 0, 0, 0, 0.03);
 		mBreath1 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 2, 0.1, 0.1, 0.1, 0);
-		mExpL1 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 0, 0, 0, 0);
+		mExpL1 = new PartialParticle(Particle.EXPLOSION_LARGE, mBoss.getLocation(), 1, 0, 0, 0, 0).minimumCount(1);
 		mBreath2 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 15, 0.4, 0.4, 0.4, 0.01);
 		mHeart = new PartialParticle(Particle.HEART, mBoss.getLocation(), 20, 0.5, 0.5, 0.5, 0.1);
 		mBreath3 = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), mCrystal.size() * 1000 + 7000, 42, 0, 42, 0.01);

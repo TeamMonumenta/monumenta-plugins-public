@@ -56,10 +56,10 @@ public class SpellIvyGarden extends Spell {
 			if (le != null && !le.isDead()) {
 				runForce(mPlugin, le, mRadius, mTime, mCooldownTicks, false, false, Sound.ENTITY_IRON_GOLEM_ATTACK, 1f, 1,
 						(Location loc) -> {
-							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, ((double) mRadius) / 2, ((double) mRadius) / 2, ((double) mRadius) / 2, 0.05).minimumCount(0).spawnAsEntityActive(le);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, ((double) mRadius) / 2, ((double) mRadius) / 2, ((double) mRadius) / 2, 0.05).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
-							new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsEntityActive(le);
+							new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
 							World world = loc.getWorld();
@@ -69,8 +69,8 @@ public class SpellIvyGarden extends Spell {
 							new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 0.5, 0), 100, 0.5, 0, 0.5, 0.8f).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
-							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).minimumCount(0).spawnAsEntityActive(le);
-							new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsEntityActive(le);
+							new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(le);
+							new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(le);
 						},
 						(Location loc) -> {
 							for (Player player : PlayerUtils.playersInRange(le.getLocation(), mRadius, true)) {

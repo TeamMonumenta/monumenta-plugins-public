@@ -334,7 +334,7 @@ public class ParticleUtils {
 
 			for (Particle effect : effects) {
 				new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
-					.minimumCount(0).spawnAsPlayerActive(player);
+					.spawnAsPlayerActive(player);
 			}
 		}
 	}

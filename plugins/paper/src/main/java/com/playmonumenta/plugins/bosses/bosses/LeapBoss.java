@@ -66,7 +66,7 @@ public class LeapBoss extends BossAbilityGroup {
 							})
 						)
 					);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 0.5f);
 					for (Player p : PlayerUtils.playersInRange(loc, DAMAGE_RADIUS, true)) {
 						BossUtils.blockableDamage(boss, p, DamageType.MELEE, DAMAGE);

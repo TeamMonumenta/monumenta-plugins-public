@@ -46,10 +46,10 @@ public class RingOfFrost extends Spell {
 		mRadius = radius;
 		mStartLoc = loc;
 
-		mInnerCircle = new PPCircle(Particle.REDSTONE, loc, radius).ringMode(true).count(40).delta(0.05).extra(0.05).data(GREEN_COLOR);
-		mOuterCircle1 = new PPCircle(Particle.DAMAGE_INDICATOR, loc, radius).ringMode(true).count(20).delta(1, 0.1, 1).extra(0.05);
-		mOuterCircle2 = new PPCircle(Particle.DRAGON_BREATH, loc, radius).ringMode(true).count(20).delta(1, 0.1, 1).extra(0.05);
-		mExplodeCircle = new PPCircle(Particle.EXPLOSION_NORMAL, loc, radius).ringMode(true).count(150).delta(1, 3, 1).extra(0.45);
+		mInnerCircle = new PPCircle(Particle.REDSTONE, loc, radius).count(40).delta(0.05).extra(0.05).data(GREEN_COLOR);
+		mOuterCircle1 = new PPCircle(Particle.DAMAGE_INDICATOR, loc, radius).count(20).delta(1, 0.1, 1).extra(0.05);
+		mOuterCircle2 = new PPCircle(Particle.DRAGON_BREATH, loc, radius).count(20).delta(1, 0.1, 1).extra(0.05);
+		mExplodeCircle = new PPCircle(Particle.EXPLOSION_NORMAL, loc, radius).count(150).delta(1, 3, 1).extra(0.45);
 	}
 
 	private static final Particle.DustOptions GREEN_COLOR = new Particle.DustOptions(Color.fromRGB(0, 255, 0), 1.0f);

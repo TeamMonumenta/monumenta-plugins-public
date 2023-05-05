@@ -70,7 +70,7 @@ public class TemporalFlux extends Effect {
 			if (getDuration() % (20 * 10) == 0) {
 				entity.sendMessage(ChatColor.RED + "Paradox has " + ChatColor.BOLD + getDuration()/20 + ChatColor.RESET + ChatColor.RED + " seconds remaining!");
 			}
-			new PPCircle(Particle.SOUL_FIRE_FLAME, entity.getLocation(), 1).ringMode(true)
+			new PPCircle(Particle.SOUL_FIRE_FLAME, entity.getLocation(), 1)
 				.count(20).delta(0.25, 0.1, 0.25).spawnAsBoss();
 		}
 	}

@@ -120,15 +120,13 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 			},
 			// Hit Action
 			(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {
-				loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1, 0);
-				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsEntityActive(boss);
+				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
+				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1, 0);
+				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 2, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 				if (le instanceof Player player) {
 					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Silver Bolts", prevLoc);
 					cage(player);
 				}
-
-				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 1, 1, 1).spawnAsEntityActive(boss);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
 			});
 
 		mPlugin = plugin;

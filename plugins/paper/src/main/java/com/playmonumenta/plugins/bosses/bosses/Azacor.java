@@ -102,7 +102,7 @@ public final class Azacor extends BossAbilityGroup {
 				// Damage generated at the end of the attack
 				(LivingEntity target, Location loc, boolean blocked) -> {
 					loc.getWorld().playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1f, 1.5f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 30, 0, 0, 0, 0.3).minimumCount(1).spawnAsEntityActive(boss);
 					if (!blocked) {
 						BossUtils.bossDamagePercent(mBoss, target, 0.75, mBoss.getLocation());
 						if (target instanceof Player player && BossUtils.bossDamageBlocked(player, mBoss.getLocation())) {

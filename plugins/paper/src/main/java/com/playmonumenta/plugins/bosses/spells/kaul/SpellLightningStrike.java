@@ -176,7 +176,6 @@ public class SpellLightningStrike extends Spell {
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
 		int electricRingMarkerCount = 8;
 		PPCircle electricRingMarker = new PPCircle(Particle.REDSTONE, strikeLocation, SHOCK_RADIUS)
-			                              .ringMode(true)
 			                              .count(5 * electricRingMarkerCount)
 			                              .delta(0, 0.25, 0)
 			                              .data(DUST_YELLOW_LARGE);
@@ -367,13 +366,13 @@ public class SpellLightningStrike extends Spell {
 
 		// /particle dust 1 1 0.25 1 ~ ~ ~ 0.75 0.25 0.75 0 5
 		PPCircle fireRingMarker = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS)
-			                          .ringMode(true)
 			                          .count(5)
 			                          .delta(0, 0.25, 0);
 
 		// /particle flame ~ ~ ~ 0.1 1 0.1 0.1 0
 		int risingFlamesCount = 5;
 		PPCircle risingFlames = new PPCircle(Particle.FLAME, fireLocation, FIRE_RADIUS)
+			                        .ringMode(false)
 			                        .count(3 * risingFlamesCount)
 			                        .delta(0.1, 1, 0.1)
 			                        .extraRange(0.05, 0.1)
@@ -386,6 +385,7 @@ public class SpellLightningStrike extends Spell {
 		int smallSmokeCount = 4;
 		int largeSmokeCount = 2;
 		PPCircle smoke = new PPCircle(Particle.SMOKE_NORMAL, fireLocation, FIRE_RADIUS)
+			                 .ringMode(false)
 			                 .count(5)
 			                 .extraRange(0, 0.01);
 

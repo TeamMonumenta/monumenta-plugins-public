@@ -65,7 +65,7 @@ public class FireBombTossBoss extends BossAbilityGroup {
 			new SpellBombToss(plugin, boss, p.DETECTION, p.LOBS, p.FUSE_TIME, p.COOLDOWN,
 				(World world, TNTPrimed tnt, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 					new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4).spawnAsEntityActive(boss);
 
 					for (Player player : PlayerUtils.playersInRange(loc, p.RADIUS, true)) {

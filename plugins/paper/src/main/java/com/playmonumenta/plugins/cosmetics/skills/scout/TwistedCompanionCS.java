@@ -94,14 +94,14 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 					FastUtils.sin(rotation));
 				Location l = loc.clone().add(vec);
 				new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0.05, 0.05, 0,
-					new Particle.DustOptions(TWIST_COLOR_TIP, 1)).minimumCount(0).spawnAsPlayerActive(player);
+					new Particle.DustOptions(TWIST_COLOR_TIP, 1)).spawnAsPlayerActive(player);
 			}
 		}
 	}
 
 	@Override
 	public void onAggroParticles(Player mPlayer, LivingEntity summon) {
-		new PartialParticle(Particle.SOUL, summon.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SOUL, summon.getEyeLocation(), 15, 0.25, 0.25, 0.25, 0.005).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -109,8 +109,8 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.NEUTRAL, 1.5f, 0.8f);
 		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.NEUTRAL, 1.5f, 1.5f);
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.NEUTRAL, 1.5f, 0.7f);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).minimumCount(0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).minimumCount(0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0.15, 0.15, 0.15, 0.125F).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, loc, 30, 0, 0, 0, 0.6F).spawnAsPlayerActive(player);
 
 		spawnRing(loc, player, 2);
 		if (player.isOnline() && player.getWorld() == summon.getWorld()) {
@@ -142,7 +142,7 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 							new Particle.DustOptions(
 								ParticleUtils.getTransition(TWIST_COLOR_BASE, TWIST_COLOR_TIP, mRadius / RADIUS),
 								0.75f
-							)).minimumCount(0).spawnAsPlayerActive(mPlayer);
+							)).spawnAsPlayerActive(mPlayer);
 					}
 				}
 
@@ -188,19 +188,19 @@ public class TwistedCompanionCS extends HuntingCompanionCS {
 					mL.add(mD);
 
 					new PartialParticle(Particle.REDSTONE, mL, 3, 0.15, 0.15, 0.15, 0, new Particle.DustOptions(TWIST_COLOR_TIP, 1.5f))
-						.minimumCount(0)
+
 						.spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.SMOKE_NORMAL, mL, 2, 0.15, 0.15, 0.15, 0.05F)
-						.minimumCount(0)
+
 						.spawnAsPlayerActive(mPlayer);
 
 					if (mT > 5 && mL.distance(to) < 0.35) {
 						world.playSound(mL, Sound.ENTITY_FOX_AGGRO, SoundCategory.NEUTRAL, 1.25f, 0);
 						world.playSound(mL, Sound.ENTITY_FOX_BITE, SoundCategory.NEUTRAL, 1.25f, 0.5f);
 						new PartialParticle(Particle.CRIT, mL, 20, 0, 0, 0, 0.6F)
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.SMOKE_NORMAL, mL, 25, 0, 0, 0, 0.1F)
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

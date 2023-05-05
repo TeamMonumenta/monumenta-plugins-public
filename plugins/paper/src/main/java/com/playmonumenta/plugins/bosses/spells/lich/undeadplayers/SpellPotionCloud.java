@@ -39,7 +39,7 @@ public class SpellPotionCloud extends Spell {
 		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 5, 0.3, 0.3, 0.3, 0.1);
 		mBreath = new PartialParticle(Particle.DRAGON_BREATH, mBoss.getLocation(), 8, 1.5, 0.1, 1.5, 0.01);
 		mLava = new PartialParticle(Particle.LAVA, mBoss.getLocation(), 20, 3, 0, 3, 0);
-		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0);
+		mExpH = new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 1, 0, 0, 0, 0).minimumCount(1);
 	}
 
 	@Override

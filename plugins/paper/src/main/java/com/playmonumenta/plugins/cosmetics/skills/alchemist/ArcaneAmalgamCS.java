@@ -64,7 +64,6 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 
 		// big circle
 		new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 0.25, 0), radius)
-			.ringMode(true)
 			.countPerMeter(0.4)
 			.arcDegree(loc.getYaw(), loc.getYaw() + 360)
 			.offset((ticks % 20) / 20.0)
@@ -129,7 +128,7 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 2, 0.5f);
 
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 30, 0.02, 0.02, 0.02, 0.35).spawnAsPlayerActive(caster);
-		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1).spawnAsPlayerActive(caster);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1).minimumCount(1).spawnAsPlayerActive(caster);
 
 		// exploding enchantment particles
 		new PPParametric(Particle.ENCHANTMENT_TABLE, loc,
@@ -206,7 +205,6 @@ public class ArcaneAmalgamCS extends UnstableAmalgamCS {
 	@Override
 	public void unstablePotionSplash(Player caster, Location loc, double radius) {
 		new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 0.25, 0), radius)
-			.ringMode(true)
 			.countPerMeter(6)
 			.directionalMode(true).delta(0, -0.25, 0).extra(1)
 			.spawnAsPlayerActive(caster);

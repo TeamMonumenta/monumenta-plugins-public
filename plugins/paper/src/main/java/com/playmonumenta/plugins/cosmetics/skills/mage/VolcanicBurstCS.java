@@ -90,12 +90,12 @@ public class VolcanicBurstCS extends MagmaShieldCS implements DepthsCS {
 					for (int i = 0; i < mHeight; i++) {
 						Location hLoc = l.clone().add(0, i * 0.85, 0);
 						new PartialParticle(flame, hLoc, 5, 0.15, 0.15, 0.15, 0.1)
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 					}
 					new PartialParticle(Particle.LAVA, l, 3, 0.2, 0.05, 0.2, 0.075)
-						.minimumCount(0).spawnAsPlayerActive(mPlayer);
+						.spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.SMOKE_NORMAL, l, 25, 0.1, 0.05, 0.1, 0.1)
-						.minimumCount(0).spawnAsPlayerActive(mPlayer);
+						.spawnAsPlayerActive(mPlayer);
 
 					ParticleUtils.drawParticleCircleExplosion(mPlayer, l, 0, 1, 0, 0, 30, 0.25f,
 						true, 0, 0, flame);

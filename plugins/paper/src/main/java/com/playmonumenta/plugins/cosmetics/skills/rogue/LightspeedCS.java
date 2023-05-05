@@ -99,17 +99,17 @@ public class LightspeedCS extends AdvancingShadowsCS {
 	}
 
 	private void drawCrit(Location location, Player player) {
-		new PartialParticle(Particle.CRIT, location, 6, 0, 0, 0, 0).minimumCount(0)
+		new PartialParticle(Particle.CRIT, location, 6, 0, 0, 0, 0)
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawGold(Location location, Player player) {
-		new PartialParticle(Particle.REDSTONE, location, 10, 0.04, 0, 0.04, 0, new Particle.DustOptions(Color.fromRGB(255, 200, 70), 0.9f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 10, 0.04, 0, 0.04, 0, new Particle.DustOptions(Color.fromRGB(255, 200, 70), 0.9f))
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawSpark(Location location, Player player) {
-		new PartialParticle(Particle.ELECTRIC_SPARK, location, 8, 0.03, 0, 0.03, 0).minimumCount(0)
+		new PartialParticle(Particle.ELECTRIC_SPARK, location, 8, 0.03, 0, 0.03, 0)
 			.spawnAsPlayerActive(player);
 	}
 }

@@ -1,11 +1,13 @@
 package com.playmonumenta.plugins.bosses.parameters;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.AbstractPartialParticle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Function;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -88,6 +90,24 @@ public class ParticlesList {
 			spawnNow(boss, loc, fdx, fdy, fdz, fVelocity, mExtra2);
 		}
 
+		public <T extends AbstractPartialParticle<T>> T toPartialParticle(T particle) {
+			particle.count(mCount);
+			if (mDx != 0) {
+				particle.mDeltaX = mDx;
+			}
+			if (mDy != 0) {
+				particle.mDeltaX = mDy;
+			}
+			if (mDz != 0) {
+				particle.mDeltaX = mDz;
+			}
+			if (mVelocity != 0) {
+				particle.extra(mVelocity);
+			}
+			particle.data(mExtra2);
+			return particle;
+		}
+
 		private void spawnNow(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1, @Nullable Object extra2) {
 			try {
 				new PartialParticle(mParticle, loc, mCount, dx, dy, dz, extra1, extra2).spawnAsEntityActive(boss);
@@ -127,6 +147,12 @@ public class ParticlesList {
 	public void spawn(LivingEntity boss, Location loc, double dx, double dy, double dz, double extra1) {
 		for (CParticle particle : mParticleList) {
 			particle.spawn(boss, loc, dx, dy, dz, extra1);
+		}
+	}
+
+	public <T extends AbstractPartialParticle<T>> void spawn(LivingEntity boss, Function<Particle, T> particleSupplier) {
+		for (CParticle particle : mParticleList) {
+			particle.toPartialParticle(particleSupplier.apply(particle.mParticle)).spawnAsEntityActive(boss);
 		}
 	}
 

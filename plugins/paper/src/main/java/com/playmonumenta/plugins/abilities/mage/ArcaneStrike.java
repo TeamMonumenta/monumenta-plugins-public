@@ -186,8 +186,8 @@ public class ArcaneStrike extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1).minimumCount(0).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2).minimumCount(0).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2).spawnAsPlayerActive(mPlayer);
 						}
 					}
 					mD += 30;

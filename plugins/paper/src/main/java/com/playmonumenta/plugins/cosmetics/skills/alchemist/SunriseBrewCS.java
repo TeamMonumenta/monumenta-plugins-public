@@ -103,9 +103,9 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 
 		loc.setPitch(0);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, 60, 0, 0, 0, 0.75F)
-			.minimumCount(0).spawnAsPlayerActive(player);
+			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.END_ROD, loc, 45, 0, 0, 0, 0.2F)
-			.minimumCount(0).spawnAsPlayerActive(player);
+			.spawnAsPlayerActive(player);
 		ParticleUtils.drawParticleCircleExplosion(player, loc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 50, 0.3f,
 			true, 0, Particle.END_ROD);
 	}
@@ -129,7 +129,7 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 							FastUtils.sin(radian) * mRadius);
 						Location loc = mL.clone().add(vec);
 						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, SUNDROP_RING_COLOR)
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 					}
 				}
 
@@ -186,9 +186,9 @@ public class SunriseBrewCS extends BezoarCS implements DepthsCS {
 						world.playSound(mL, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, SoundCategory.PLAYERS, 1, 0.75f);
 						world.playSound(mL, Sound.BLOCK_POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON, SoundCategory.PLAYERS, 1, 0.5f);
 						new PartialParticle(Particle.CRIT_MAGIC, mL, 15, 0, 0, 0, 0.6F)
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.END_ROD, mL, 3, 0, 0, 0, 0.125F)
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 						this.cancel();
 						return;
 					}

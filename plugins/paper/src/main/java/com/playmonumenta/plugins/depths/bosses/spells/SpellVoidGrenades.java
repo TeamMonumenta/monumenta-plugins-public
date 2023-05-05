@@ -110,7 +110,7 @@ public class SpellVoidGrenades extends Spell {
 
 						new PartialParticle(Particle.SOUL, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 						new PartialParticle(Particle.SPELL_WITCH, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
-						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
+						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsBoss();
 						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 3, true)) {
@@ -121,7 +121,7 @@ public class SpellVoidGrenades extends Spell {
 						alternateHeight.setY(loc.getY() + 0.5);
 						PartialParticle marker1 = new PartialParticle(Particle.SOUL, alternateHeight, 4, 1, 0.15, 1, 0.025);
 						PartialParticle marker2 = new PartialParticle(Particle.REDSTONE, alternateHeight, 10, 1, 1, 1, 0.15, BLACK_COLOR);
-						PPCircle circle = new PPCircle(Particle.REDSTONE, alternateHeight, 3).ringMode(true).count(15).data(DARK_PURPLE_COLOR);
+						PPCircle circle = new PPCircle(Particle.REDSTONE, alternateHeight, 3).count(15).data(DARK_PURPLE_COLOR);
 
 						new BukkitRunnable() {
 							int mTicks = 0;

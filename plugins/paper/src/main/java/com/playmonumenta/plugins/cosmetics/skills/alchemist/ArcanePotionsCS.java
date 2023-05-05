@@ -137,7 +137,6 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
 			// big circle
 			new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, enchantParticleDelta, 0), radius)
-				.ringMode(true)
 				.arcDegree(currentAngle + arcCut, currentAngle + 360.0 / numCircles - arcCut)
 				.countPerMeter(ENCHANT_PARTICLE_PER_METER)
 				.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
@@ -157,7 +156,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
 			// smaller circles
 			new PPCircle(Particle.ENCHANTMENT_TABLE, lineStartLoc.clone().add(0, enchantParticleDelta, 0), smallRadius)
-				.ringMode(true).countPerMeter(ENCHANT_PARTICLE_PER_METER)
+				.countPerMeter(ENCHANT_PARTICLE_PER_METER)
 				.directionalMode(true).delta(0, -enchantParticleDelta, 0).extra(1)
 				.spawnAsPlayerActive(player);
 
@@ -211,7 +210,6 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
 	private static void drawArc(Particle particle, Player player, Transform transform, double x, double y, double radius, double arcStartDeg, double arcEndDeg, boolean includeStart) {
 		drawParticle(new PPCircle(particle, transform.apply(x, y), radius * transform.mScale)
-			             .ringMode(true)
 			             .arcDegree(transform.mRotation - arcStartDeg, transform.mRotation - arcEndDeg)
 			             .countPerMeter(SYMBOL_PARTICLES_PER_METER)
 			             .directionalMode(true)

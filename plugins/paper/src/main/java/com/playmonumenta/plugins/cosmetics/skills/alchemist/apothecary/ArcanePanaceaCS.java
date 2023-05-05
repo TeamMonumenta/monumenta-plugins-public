@@ -66,22 +66,22 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		double smallRadius = RING_RADIUS * 0.4;
 		double arcCut = Math.toDegrees(2 * Math.asin(smallRadius / RING_RADIUS / 2));
 		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, RING_RADIUS)
-			.ringMode(true).axes(right, up).arcDegree(180 + arcCut, 360 - arcCut)
+			.axes(right, up).arcDegree(180 + arcCut, 360 - arcCut)
 			.includeStart(false).includeEnd(false)
 			.countPerMeter(6).spawnAsPlayerActive(player);
 		new PPCircle(Particle.ENCHANTMENT_TABLE, centerLocation, RING_RADIUS)
-			.ringMode(true).axes(right, up).arcDegree(arcCut, 180 - arcCut)
+			.axes(right, up).arcDegree(arcCut, 180 - arcCut)
 			.includeStart(false).includeEnd(false)
 			.countPerMeter(6).spawnAsPlayerActive(player);
 
 		// small circles
 		Location fireRingLoc = centerLocation.clone().subtract(right.clone().multiply(RING_RADIUS));
 		new PPCircle(Particle.ENCHANTMENT_TABLE, fireRingLoc, smallRadius)
-			.ringMode(true).axes(right, up)
+			.axes(right, up)
 			.countPerMeter(6).spawnAsPlayerActive(player);
 		Location waterRingLoc = centerLocation.clone().add(right.clone().multiply(RING_RADIUS));
 		new PPCircle(Particle.ENCHANTMENT_TABLE, waterRingLoc, smallRadius)
-			.ringMode(true).axes(right, up)
+			.axes(right, up)
 			.countPerMeter(6).spawnAsPlayerActive(player);
 
 		// fire/water symbols in the small circles
@@ -136,7 +136,6 @@ public class ArcanePanaceaCS extends PanaceaCS {
 		Vector vec1 = VectorUtils.rotateYAxis(new Vector(1, 0, 0), loc.getYaw());
 		Vector vec2 = vec1.getCrossProduct(loc.getDirection());
 		new PPCircle(Particle.ENCHANTMENT_TABLE, loc, radius)
-			.ringMode(true)
 			.axes(vec1, vec2)
 			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 			.spawnAsPlayerActive(player);

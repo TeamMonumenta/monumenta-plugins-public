@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.effects.CCImmuneEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.effects.PercentSpeed;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
@@ -51,8 +52,8 @@ public class SpellRage extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
+	protected void chargeCircleAction(Location loc, double radius) {
+		new PPCircle(Particle.CRIT_MAGIC, loc, radius).count(12).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -64,9 +65,9 @@ public class SpellRage extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.BUBBLE_POP, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
+	protected void circleOutburstAction(Location loc, double radius) {
+		new PPCircle(Particle.SPELL_WITCH, loc, radius).count(24).delta(0.1).extra(0.3).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.BUBBLE_POP, loc, radius).count(48).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

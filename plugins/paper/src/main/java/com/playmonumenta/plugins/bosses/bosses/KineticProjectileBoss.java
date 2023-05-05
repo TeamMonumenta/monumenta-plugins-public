@@ -67,7 +67,7 @@ public class KineticProjectileBoss extends BossAbilityGroup {
 				// Hit Action
 				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
 					world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 
 					BoundingBox hitbox = new BoundingBox();
 					hitbox.shift(loc);

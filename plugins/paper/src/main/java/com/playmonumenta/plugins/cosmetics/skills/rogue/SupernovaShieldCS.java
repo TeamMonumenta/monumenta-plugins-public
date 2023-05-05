@@ -82,7 +82,7 @@ public class SupernovaShieldCS extends EscapeDeathCS {
 	}
 
 	private void drawParticle(Location location, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, location, 4, 0.04, 0.02, 0.04, 0, new Particle.DustOptions(color, 1.5f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 4, 0.04, 0.02, 0.04, 0, new Particle.DustOptions(color, 1.5f))
 			.spawnAsPlayerActive(player);
 	}
 

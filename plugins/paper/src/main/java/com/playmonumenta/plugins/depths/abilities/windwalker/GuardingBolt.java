@@ -113,7 +113,7 @@ public class GuardingBolt extends DepthsAbility {
 		world.playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.75f, 1.5f);
 		new PartialParticle(Particle.REDSTONE, location, 125, RADIUS, RADIUS, RADIUS, 3, COLOR_YELLOW).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, location, 125, RADIUS, RADIUS, RADIUS, 3, COLOR_AQUA).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLASH, location.clone().add(location.getDirection()), 1, 0, 0, 0, 10).minimumCount(1).spawnAsPlayerActive(mPlayer);
 
 		List<LivingEntity> enemies = EntityUtils.getNearbyMobs(location, RADIUS);
 		// The more enemies, the less particles for each one

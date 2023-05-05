@@ -109,7 +109,7 @@ public class CleansingTotem extends TotemAbility {
 				mPlugin.mEffectManager.addEffect(p, HEAL_EFFECT_NAME, new CustomRegeneration(EFFECT_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * mHealPercent), mPlayer, mPlugin));
 			}
 
-			PPCircle cleansingRing = new PPCircle(Particle.REDSTONE, standLocation, mRadius).ringMode(true).countPerMeter(1.05).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
+			PPCircle cleansingRing = new PPCircle(Particle.REDSTONE, standLocation, mRadius).countPerMeter(1.05).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
 			PPSpiral cleansingSpiral = new PPSpiral(Particle.REDSTONE, standLocation, mRadius).distancePerParticle(0.075).ticks(5).count(1).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
 			cleansingRing.spawnAsPlayerActive(mPlayer);
 			cleansingSpiral.spawnAsPlayerActive(mPlayer);

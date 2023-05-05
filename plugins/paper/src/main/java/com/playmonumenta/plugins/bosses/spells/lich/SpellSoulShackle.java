@@ -135,7 +135,7 @@ public class SpellSoulShackle extends Spell {
 		bar.setVisible(true);
 		bar.addPlayer(p);
 
-		PPCircle indicator = new PPCircle(Particle.END_ROD, pLoc, 3).ringMode(true).count(36);
+		PPCircle indicator = new PPCircle(Particle.END_ROD, pLoc, 3).count(36);
 
 		BukkitRunnable run = new BukkitRunnable() {
 

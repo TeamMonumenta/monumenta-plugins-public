@@ -36,7 +36,7 @@ public class TemporalInstability extends Spell {
 		mVulnerableTeam = team;
 		mInvulnerableTeam = ScoreboardUtils.getExistingTeamOrCreate(INVULNERABLE_TEAM, NamedTextColor.WHITE);
 
-		mCircle = new PPCircle(Particle.REDSTONE, mCenter, RADIUS).data(new Particle.DustOptions(Color.AQUA, 2)).count(50).ringMode(true);
+		mCircle = new PPCircle(Particle.REDSTONE, mCenter, RADIUS).data(new Particle.DustOptions(Color.AQUA, 2)).count(50);
 	}
 
 	@Override

@@ -20,7 +20,7 @@ public class PPCircle extends AbstractPartialParticle<PPCircle> {
 	 */
 	protected double mRadius;
 
-	protected double mInnerRadiusFactor;
+	protected double mInnerRadiusFactor = 1;
 
 	private double mParticlesPerMeter = -1;
 	private double mMinParticlesPerMeter = 0;

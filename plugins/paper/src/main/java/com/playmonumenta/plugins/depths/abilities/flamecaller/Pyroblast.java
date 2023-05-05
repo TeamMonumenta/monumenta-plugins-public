@@ -83,7 +83,7 @@ public class Pyroblast extends DepthsAbility {
 				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
 			}
 			World world = proj.getWorld();
-			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.FLAME, loc, 40, 2, 2, 2, 0).spawnAsPlayerActive(mPlayer);
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1);

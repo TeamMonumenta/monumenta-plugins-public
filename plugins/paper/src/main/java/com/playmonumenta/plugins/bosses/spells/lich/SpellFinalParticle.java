@@ -49,7 +49,7 @@ public class SpellFinalParticle extends Spell {
 		mRange = range;
 		mBlock = block;
 		mBlack = new PartialParticle(Particle.REDSTONE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0, BLACK);
-		mIndicator = new PPCircle(Particle.REDSTONE, mCenter, mCylRadius).ringMode(true).count(20).delta(0.1).data(BLACK);
+		mIndicator = new PPCircle(Particle.REDSTONE, mCenter, mCylRadius).count(20).delta(0.1).data(BLACK);
 	}
 
 	@Override

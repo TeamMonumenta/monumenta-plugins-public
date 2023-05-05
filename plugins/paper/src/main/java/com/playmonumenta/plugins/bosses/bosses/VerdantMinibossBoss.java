@@ -384,7 +384,7 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 			new SpellBombToss(mPlugin, mBoss, detectionRange, 2, 50, 160,
 				(World world, TNTPrimed tnt, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsBoss();
 					new PartialParticle(Particle.FLAME, loc, 100, 0, 0, 0, 0.4).spawnAsBoss();
 
 					for (Player player : PlayerUtils.playersInRange(loc, 8, true)) {

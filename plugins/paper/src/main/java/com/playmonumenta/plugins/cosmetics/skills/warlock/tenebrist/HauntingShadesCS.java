@@ -54,8 +54,8 @@ public class HauntingShadesCS implements CosmeticSkill {
 				@Override
 				public void run() {
 					mRadius += 1.25;
-					new PPCircle(Particle.REDSTONE, mLoc, mRadius).ringMode(true).count(36).delta(0.2).extra(0.1).data(COLOR).spawnAsPlayerActive(mPlayer);
-					new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).ringMode(true).count(12).extra(0.15).spawnAsPlayerActive(mPlayer);
+					new PPCircle(Particle.REDSTONE, mLoc, mRadius).count(36).delta(0.2).extra(0.1).data(COLOR).spawnAsPlayerActive(mPlayer);
+					new PPCircle(Particle.SMOKE_NORMAL, mLoc, mRadius).count(12).extra(0.15).spawnAsPlayerActive(mPlayer);
 					if (mRadius >= mAoeRadius + 1) {
 						this.cancel();
 					}

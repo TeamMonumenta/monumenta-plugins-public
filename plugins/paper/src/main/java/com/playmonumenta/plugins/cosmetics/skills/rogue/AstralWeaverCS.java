@@ -66,7 +66,7 @@ public class AstralWeaverCS extends DodgingCS {
 
 	@Override
 	public void dodgeEffectLv2(Player player, World world, Location loc) {
-		new PartialParticle(Particle.VILLAGER_HAPPY, loc, 3, 0.25, 0.25, 0.25, 0).minimumCount(0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.VILLAGER_HAPPY, loc, 3, 0.25, 0.25, 0.25, 0).spawnAsPlayerActive(player);
 	}
 
 	@Override
@@ -76,10 +76,14 @@ public class AstralWeaverCS extends DodgingCS {
 
 	private void drawParticle(Player player, Location loc, int countMultiplier) {
 		switch (FastUtils.randomIntInRange(0, 5)) {
-			case 0 -> new PartialParticle(Particle.CRIT_MAGIC, loc, 2 * countMultiplier, 0.03, 0.03, 0.03, 0).minimumCount(0).spawnAsPlayerActive(player);
-			case 1 -> new PartialParticle(Particle.SPELL_WITCH, loc, 2 * countMultiplier, 0.03, 0.03, 0.03, 0).minimumCount(0).spawnAsPlayerActive(player);
-			case 2 -> new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 2 * countMultiplier, 0.03, 0.03, 0.03, 0).minimumCount(0).spawnAsPlayerActive(player);
-			default -> new PartialParticle(Particle.REDSTONE, loc, countMultiplier, 0.03, 0.03, 0.03, 0, new Particle.DustOptions(rollColor(), 1.2f)).minimumCount(0).spawnAsPlayerActive(player);
+			case 0 ->
+				new PartialParticle(Particle.CRIT_MAGIC, loc, 2 * countMultiplier, 0.03, 0.03, 0.03, 0).spawnAsPlayerActive(player);
+			case 1 ->
+				new PartialParticle(Particle.SPELL_WITCH, loc, 2 * countMultiplier, 0.03, 0.03, 0.03, 0).spawnAsPlayerActive(player);
+			case 2 ->
+				new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 2 * countMultiplier, 0.03, 0.03, 0.03, 0).spawnAsPlayerActive(player);
+			default ->
+				new PartialParticle(Particle.REDSTONE, loc, countMultiplier, 0.03, 0.03, 0.03, 0, new Particle.DustOptions(rollColor(), 1.2f)).spawnAsPlayerActive(player);
 		}
 	}
 

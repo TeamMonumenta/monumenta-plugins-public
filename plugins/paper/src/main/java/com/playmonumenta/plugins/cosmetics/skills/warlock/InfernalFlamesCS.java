@@ -73,11 +73,11 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 						vec = new Vector(FastUtils.cos(degree) * mRadius, 2 * FastMath.pow(mRadius / (range + 1), 3), FastUtils.sin(degree) * mRadius);
 						l = loc.clone().add(vec);
 						new PartialParticle(Particle.SOUL_FIRE_FLAME, l, 1, 0.1, 0.1, 0.1, 0.04)
-							.minimumCount(0).spawnAsPlayerActive(player);
+							.spawnAsPlayerActive(player);
 						new PartialParticle(Particle.SOUL, l, 1, 0.15, 0.15, 0.15, 0.01)
-							.minimumCount(0).spawnAsPlayerActive(player);
+							.spawnAsPlayerActive(player);
 						new PartialParticle(Particle.SMOKE_NORMAL, l, 5, 0.1, 0.1, 0.1, 0.075)
-							.minimumCount(0).spawnAsPlayerActive(player);
+							.spawnAsPlayerActive(player);
 					}
 				}
 
@@ -122,7 +122,7 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 
 					new PartialParticle(Particle.REDSTONE, tendrilLoc, 3, offset, offset, offset, 0, new Particle.DustOptions(
 						ParticleUtils.getTransition(TWIST_COLOR_TIP, TWIST_COLOR_BASE, transition), size))
-						.minimumCount(0)
+
 						.spawnAsPlayerActive(mPlayer);
 
 					mL.add(0, 0.25, 0);

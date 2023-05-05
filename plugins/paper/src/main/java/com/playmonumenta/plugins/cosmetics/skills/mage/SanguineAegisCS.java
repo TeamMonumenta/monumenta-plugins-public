@@ -82,7 +82,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 		world.playSound(location, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 4f, 2f);
 		world.playSound(location, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.75f, 2f);
 
-		PPCircle flame = new PPCircle(Particle.SOUL_FIRE_FLAME, location.clone().add(0, 0.125, 0), radius).ringMode(true);
+		PPCircle flame = new PPCircle(Particle.SOUL_FIRE_FLAME, location.clone().add(0, 0.125, 0), radius);
 		flame.delta(0.05).extra(0.01);
 		flame.count((int) Math.ceil(20 * radius)).spawnAsPlayerActive(mPlayer);
 		flame.count((int) Math.ceil(16 * radius)).radius(0.8 * radius).spawnAsPlayerActive(mPlayer);

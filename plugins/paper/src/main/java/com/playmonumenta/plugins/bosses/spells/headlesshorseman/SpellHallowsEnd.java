@@ -73,7 +73,7 @@ public class SpellHallowsEnd extends Spell {
 					new PartialParticle(Particle.FLAME, loc, 75, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 3.5, true)) {
 						if (mHorseman.getSpawnLocation().distance(player.getLocation()) < HeadlessHorsemanBoss.detectionRange) {
 							int mNDT = player.getNoDamageTicks();

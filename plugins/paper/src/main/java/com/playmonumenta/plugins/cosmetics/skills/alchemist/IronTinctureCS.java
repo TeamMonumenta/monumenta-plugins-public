@@ -59,8 +59,8 @@ public class IronTinctureCS implements CosmeticSkill {
 				for (int i = 0; i < 3; i++) {
 					double degree = mRotation + (i * 120);
 					Location loc = player.getLocation().add(FastUtils.cos(degree) * mRadius, mY, FastUtils.sinDeg(degree) * mRadius);
-					new PartialParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05).minimumCount(0).spawnAsPlayerActive(player);
-					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0).minimumCount(0).spawnAsPlayerActive(player);
+					new PartialParticle(Particle.FLAME, loc, 1, 0.05, 0.05, 0.05, 0.05).spawnAsPlayerActive(player);
+					new PartialParticle(Particle.SPELL_INSTANT, loc, 2, 0.05, 0.05, 0.05, 0).spawnAsPlayerActive(player);
 				}
 
 				if (mY >= 1.8) {

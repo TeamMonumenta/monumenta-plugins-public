@@ -277,7 +277,7 @@ public class ParticleUtilsCommand {
 			@Override
 			public void run() {
 				// Ring around it
-				PPCircle circle = new PPCircle(particle, center, radius).count(count).distanceFalloff(distanceFalloff).ringMode(true);
+				PPCircle circle = new PPCircle(particle, center, radius).count(count).distanceFalloff(distanceFalloff);
 				// Pulse Ring
 				PPParametric pulse = new PPParametric(particle, center, (t, builder) -> {
 					Location particleLoc = center.clone().add(radius * FastUtils.cos(t * Math.PI * 2), 0, radius * FastUtils.sin(t * Math.PI * 2));

@@ -74,7 +74,7 @@ public class SpellShuraPassiveSummon extends Spell {
 				String summonName = mSummons.get(0);
 				World world = spawnLoc.getWorld();
 
-				PPCircle indicator = new PPCircle(Particle.SMOKE_NORMAL, spawnLoc.add(0, 1, 0), 0).count(4).ringMode(true).delta(0.2, 0, 0.2);
+				PPCircle indicator = new PPCircle(Particle.SMOKE_NORMAL, spawnLoc.add(0, 1, 0), 0).count(4).delta(0.2, 0, 0.2);
 				BukkitRunnable a = new BukkitRunnable() {
 					int mT = 0;
 

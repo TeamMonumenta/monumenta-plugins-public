@@ -113,9 +113,9 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 
 	private void drawCosmic(Player player, Location loc) {
 		if (FastUtils.randomIntInRange(0, 3) == 0) {
-			new PartialParticle(Particle.CRIT_MAGIC, loc, 10, 0.06, 0.06, 0.06, 0).minimumCount(0).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.CRIT_MAGIC, loc, 10, 0.06, 0.06, 0.06, 0).spawnAsPlayerActive(player);
 		} else {
-			new PartialParticle(Particle.REDSTONE, loc, 15, 0.06, 0.06, 0.06, 0, new Particle.DustOptions(rollCosmicColor(), 0.4f)).minimumCount(0).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, loc, 15, 0.06, 0.06, 0.06, 0, new Particle.DustOptions(rollCosmicColor(), 0.4f)).spawnAsPlayerActive(player);
 		}
 	}
 

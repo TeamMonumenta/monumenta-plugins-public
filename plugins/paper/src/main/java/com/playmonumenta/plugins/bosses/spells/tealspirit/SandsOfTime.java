@@ -185,7 +185,7 @@ public class SandsOfTime extends Spell {
 						double length = move.length();
 						for (double r = 0; r <= length; r += 0.3 + 0.2 * length) {
 							new PartialParticle(Particle.REDSTONE, current.clone().add(move.clone().normalize().multiply(r)), 1, new Particle.DustOptions(sandsColor.mColor, 2.5f))
-								.minimumCount(0)
+
 								.spawnAsEntityActive(mBoss);
 						}
 						current.add(move);

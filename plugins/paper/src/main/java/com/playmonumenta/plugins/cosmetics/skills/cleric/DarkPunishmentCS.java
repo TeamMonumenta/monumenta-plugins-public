@@ -97,7 +97,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 		).spawnAsPlayerActive(mPlayer);
 		partialParticle.mParticle = Particle.SPELL_WITCH;
 		partialParticle
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 
 		Location loc = mPlayer.getLocation().add(0, 1, 0);
 		ParticleUtils.drawHalfArc(loc, 2.1, ANGLE[combo], -20, 140, 7, 0.2,
@@ -108,7 +108,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 						ParticleUtils.getTransition(BASE_COLOR_TRANSITION, TIP_COLOR_TRANSITION, ring / 7D),
 						0.6f + (ring * 0.1f)
 					))
-					.minimumCount(0).spawnAsPlayerActive(mPlayer);
+					.spawnAsPlayerActive(mPlayer);
 		});
 	}
 
@@ -118,7 +118,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 1.65f);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.175)
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 
 		new BukkitRunnable() {
 
@@ -140,7 +140,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 								ParticleUtils.getTransition(BASE_COLOR, TIP_COLOR, mRadius / RADIUS),
 								ParticleUtils.getTransition(BASE_COLOR_TRANSITION, TIP_COLOR_TRANSITION, mRadius / RADIUS),
 								0.65f
-							)).minimumCount(0).spawnAsPlayerActive(mPlayer);
+							)).spawnAsPlayerActive(mPlayer);
 					}
 				}
 

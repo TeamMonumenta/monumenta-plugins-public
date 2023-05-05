@@ -79,7 +79,6 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 
 		// big circle on the ground
 		new PPCircle(Particle.ENCHANTMENT_TABLE, raisedLoc.clone().add(0, 0.5, 0), radius)
-			.ringMode(true)
 			.arcDegree(mIncreasedRotation, mIncreasedRotation + 360)
 			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER / 6)
 			.directionalMode(true).delta(0, -0.5, 0).extra(1)
@@ -88,7 +87,6 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 
 		// raised ring effect (big circle, but in the air)
 		new PPCircle(Particle.ENCHANTMENT_TABLE, raisedLoc.clone().add(0, 2, 0), radius)
-			.ringMode(true)
 			.arcDegree(mIncreasedRotation, mIncreasedRotation + 360)
 			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER / 8)
 			.directionalMode(true).delta(0, -2, 0).extra(1)
@@ -114,7 +112,7 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 
 			// smaller circles, rotating at increased speed
 			new PPCircle(Particle.ENCHANTMENT_TABLE, lineStartLoc.clone().add(0, 0.5, 0), smallRadius)
-				.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER / 4)
+				.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER / 4)
 				.arcDegree(mIncreasedRotation, mIncreasedRotation + 360)
 				.directionalMode(true).delta(0, -0.5, 0).extra(1)
 				.spawnAsPlayerActive(player);
@@ -140,7 +138,6 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 		// rays
 		double centerSymbolSizeRingRadius = centerSymbolSize * 1.05;
 		PPCircle rayCircle = new PPCircle(Particle.END_ROD, raisedLoc, centerSymbolSizeRingRadius)
-			                     .ringMode(true)
 			                     .count(8).minimumCount(3).maximumMultiplier(1) // 3 to 8 rays
 			                     .arcDegree(mRotation, mRotation + 360)
 			                     .directionalMode(true)

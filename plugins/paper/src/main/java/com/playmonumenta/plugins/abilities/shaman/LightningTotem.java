@@ -98,7 +98,7 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		new PPCircle(Particle.REDSTONE, standLocation, mRadius).data(YELLOW).ringMode(true).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, standLocation, mRadius).data(YELLOW).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
 		if (ticks % INTERVAL == 0) {
 			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > mRadius) {
 				mTarget = null;

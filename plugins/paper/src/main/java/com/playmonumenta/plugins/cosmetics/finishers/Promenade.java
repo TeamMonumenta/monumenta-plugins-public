@@ -161,7 +161,7 @@ public class Promenade implements EliteFinisher {
 					0.0,
 					1.0,
 					null,
-					true).spawnAsPlayerActive(p);
+					true).minimumCount(1).spawnAsPlayerActive(p);
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}

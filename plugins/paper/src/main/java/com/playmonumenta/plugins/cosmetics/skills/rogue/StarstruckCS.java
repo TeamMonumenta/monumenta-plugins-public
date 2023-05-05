@@ -84,12 +84,12 @@ public class StarstruckCS extends ByMyBladeCS {
 	}
 
 	private void drawYellow(Location location, Player player) {
-		new PartialParticle(Particle.REDSTONE, location, 3, 0.3, 0.3, 0.3, 1f, new Particle.DustOptions(Color.fromRGB(255, 210, 30), 1f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 3, 0.3, 0.3, 0.3, 1f, new Particle.DustOptions(Color.fromRGB(255, 210, 30), 1f))
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawGold(Location location, Player player) {
-		new PartialParticle(Particle.REDSTONE, location, 3, 0.03, 0, 0.03, 1f, new Particle.DustOptions(Color.fromRGB(255, 180, 22), 1f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 3, 0.03, 0, 0.03, 1f, new Particle.DustOptions(Color.fromRGB(255, 180, 22), 1f))
 			.spawnAsPlayerActive(player);
 	}
 }

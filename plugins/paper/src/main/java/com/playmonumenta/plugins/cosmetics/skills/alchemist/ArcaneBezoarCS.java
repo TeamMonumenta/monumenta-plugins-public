@@ -99,7 +99,7 @@ public class ArcaneBezoarCS extends BezoarCS {
 		Vector right = VectorUtils.rotationToVector(forwardYaw - 90, 0).multiply(bigRadius - smallRadius);
 		// small circles
 		new PPCircle(Particle.ENCHANTMENT_TABLE, center.clone().add(right), smallRadius)
-			.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 			.directionalMode(true).delta(0, -0.2, 0).extra(1)
 			.spawnAsPlayerActive(player)
 			.location(center.clone().subtract(right))
@@ -112,7 +112,7 @@ public class ArcaneBezoarCS extends BezoarCS {
 
 		// tails/big circle parts
 		new PPCircle(Particle.ENCHANTMENT_TABLE, center, bigRadius)
-			.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 			.directionalMode(true).delta(0, -0.2, 0).extra(1)
 			.arcDegree(forwardYaw, forwardYaw + 120)
 			.spawnAsPlayerActive(player)

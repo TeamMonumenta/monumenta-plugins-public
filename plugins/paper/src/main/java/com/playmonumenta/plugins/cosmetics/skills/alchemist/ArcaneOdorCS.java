@@ -34,7 +34,7 @@ public class ArcaneOdorCS extends EmpoweringOdorCS {
 	@Override
 	public void applyEffects(Player caster, Player target, int duration) {
 		new PPCircle(Particle.ENCHANTMENT_TABLE, target.getLocation().add(0, 0.75, 0), 0.5)
-			.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 			.directionalMode(true).delta(0, -0.5, 0).extra(1)
 			.spawnAsPlayerActive(caster);
 		// no sound

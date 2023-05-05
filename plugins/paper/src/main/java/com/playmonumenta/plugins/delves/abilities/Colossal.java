@@ -47,7 +47,7 @@ public class Colossal {
 			}
 		}
 
-		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsEnemy();
+		new PartialParticle(Particle.FLASH, loc).minimumCount(1).spawnAsEnemy();
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 100, 0.2, 0.2, 0.2, 0.2).spawnAsEnemy();
 
 		final int mAir = airBlocks;

@@ -75,7 +75,7 @@ public class SpellTemporalFlux extends Spell {
 							mSecondaryRate = (double) mTicks / mBurstTime;
 							double radius = mMaxRadius * mSecondaryRate;
 							new PPCircle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), radius)
-								.ringMode(true).count(36).spawnAsEntityActive(mBoss);
+								.count(36).spawnAsEntityActive(mBoss);
 
 							if (mTicks >= mBurstTime) {
 								this.cancel();

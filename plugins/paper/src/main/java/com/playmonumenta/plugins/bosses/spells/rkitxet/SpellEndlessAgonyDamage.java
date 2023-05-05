@@ -45,9 +45,9 @@ public class SpellEndlessAgonyDamage extends Spell {
 				}
 			}
 
-			PPCircle indicator = new PPCircle(Particle.REDSTONE, loc, RADIUS).ringMode(true).count(20).delta(0.1, 0.05, 0.1).data(SpellEndlessAgony.ENDLESS_AGONY_COLOR);
-			PPCircle indicator2 = new PPCircle(Particle.DRAGON_BREATH, loc, 0).ringMode(true).count(2).delta(0.25, 0.1, 0.25).extra(mRand.nextDouble(0.01, 0.05));
-			PPCircle indicator3 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), RADIUS).ringMode(true).count(8).delta(0.1, 0.05, 0.1).data(SpellEndlessAgony.ENDLESS_AGONY_COLOR);
+			PPCircle indicator = new PPCircle(Particle.REDSTONE, loc, RADIUS).count(20).delta(0.1, 0.05, 0.1).data(SpellEndlessAgony.ENDLESS_AGONY_COLOR);
+			PPCircle indicator2 = new PPCircle(Particle.DRAGON_BREATH, loc, 0).count(2).delta(0.25, 0.1, 0.25).extra(mRand.nextDouble(0.01, 0.05));
+			PPCircle indicator3 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), RADIUS).count(8).delta(0.1, 0.05, 0.1).data(SpellEndlessAgony.ENDLESS_AGONY_COLOR);
 
 			indicator.spawnAsBoss();
 			indicator3.spawnAsBoss();

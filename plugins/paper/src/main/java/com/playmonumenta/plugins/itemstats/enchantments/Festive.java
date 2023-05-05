@@ -38,13 +38,10 @@ public class Festive implements Infusion {
 		int level = (int) value;
 		final Location loc = player.getLocation().add(0, 1, 0);
 		new PartialParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, 0, FESTIVE_RED_COLOR)
-			.minimumCount(0)
 			.spawnAsPlayerPassive(player);
 		new PartialParticle(Particle.REDSTONE, loc, Math.max(6, 2 + level), 0.4, 0.4, 0.4, 0, FESTIVE_GREEN_COLOR)
-			.minimumCount(0)
 			.spawnAsPlayerPassive(player);
 		new PartialParticle(Particle.SNOWBALL, loc, Math.max(3, level), 0.4, 0.4, 0.4, 0)
-			.minimumCount(0)
 			.spawnAsPlayerPassive(player);
 	}
 

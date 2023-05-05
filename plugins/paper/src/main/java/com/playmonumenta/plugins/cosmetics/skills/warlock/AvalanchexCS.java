@@ -47,9 +47,9 @@ public class AvalanchexCS extends AmplifyingHexCS implements DepthsCS {
 
 	@Override
 	public void amplifyingParticle(Player mPlayer, Location l) {
-		new PartialParticle(Particle.REDSTONE, l, 10, 0.25, 0.25, 0.25, 0.1, ICE_PARTICLE_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, l, 1, 0.05, 0.05, 0.05, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SNOWFLAKE, l, 3, 0.25, 0.25, 0.25, 0.05).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, l, 10, 0.25, 0.25, 0.25, 0.1, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.CLOUD, l, 1, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SNOWFLAKE, l, 3, 0.25, 0.25, 0.25, 0.05).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override

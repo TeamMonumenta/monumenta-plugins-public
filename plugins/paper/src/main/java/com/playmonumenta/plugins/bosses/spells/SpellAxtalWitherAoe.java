@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -32,8 +33,8 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.25, 0.25, 0.25, 0, null, true).spawnAsEntityActive(mLauncher);
+	protected void chargeCircleAction(Location loc, double radius) {
+		new PPCircle(Particle.SMOKE_LARGE, loc, radius).count(12).delta(0.25).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -42,12 +43,12 @@ public class SpellAxtalWitherAoe extends SpellBaseAoE {
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.6f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.6f, 1f);
 		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 0.6f, 1.5f);
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 125, 0, 0, 0, 0.5, null, true).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 125, 0, 0, 0, 0.5).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
-	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.35, null, true).spawnAsEntityActive(mLauncher);
+	protected void circleOutburstAction(Location loc, double radius) {
+		new PPCircle(Particle.SMOKE_NORMAL, loc, radius).count(96).delta(0.25).extra(0.35).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

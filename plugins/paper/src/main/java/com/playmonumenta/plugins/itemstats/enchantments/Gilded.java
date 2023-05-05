@@ -44,7 +44,6 @@ public class Gilded implements Infusion {
 			.delta(doubleWidthDelta, PartialParticle.getHeightDelta(player), doubleWidthDelta)
 			.extra(1)
 			.data(COLOUR_GOLD)
-			.minimumCount(0)
 			.spawnAsPlayerPassive(player);
 	}
 

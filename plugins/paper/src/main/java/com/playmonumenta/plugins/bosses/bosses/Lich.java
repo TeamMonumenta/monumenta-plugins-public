@@ -1597,7 +1597,7 @@ public final class Lich extends BossAbilityGroup {
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		//warning smoke ring
-		PPCircle indicator = new PPCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 8).ringMode(true).count(20).delta(0.1);
+		PPCircle indicator = new PPCircle(Particle.SMOKE_LARGE, mStart.getLocation(), 8).count(20).delta(0.1);
 		new BukkitRunnable() {
 			int mT = 0;
 
@@ -1891,7 +1891,7 @@ public final class Lich extends BossAbilityGroup {
 								e.remove();
 							}
 							block.remove();
-							new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 2, 0.5, 0.5, 0.5, 0).spawnAsBoss();
+							new PartialParticle(Particle.EXPLOSION_HUGE, mBoss.getLocation(), 2, 0.5, 0.5, 0.5, 0).minimumCount(1).spawnAsBoss();
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE,
 								15, 0.8f);
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.HOSTILE, 15, 0.75f);

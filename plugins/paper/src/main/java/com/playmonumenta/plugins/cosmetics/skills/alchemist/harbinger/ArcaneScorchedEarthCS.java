@@ -97,7 +97,6 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 
 		// rotating ring
 		new PPCircle(Particle.FLAME, raisedLoc, radius)
-			.ringMode(true)
 			.arcDegree(initialRotation + rotation, initialRotation + rotation + 360)
 			.countPerMeter(0.5)
 			.directionalMode(true)
@@ -106,7 +105,6 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 			.extra(Math.toRadians(currentRotPerTick) * radius * 1.4)
 			.spawnAsPlayerActive(player);
 		new PPCircle(Particle.ENCHANTMENT_TABLE, raisedLoc.clone().add(0, 0.5, 0), radius)
-			.ringMode(true)
 			.arcDegree(initialRotation + rotation, initialRotation + rotation + 360)
 			.countPerMeter(0.5)
 			.directionalMode(true)
@@ -138,7 +136,7 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 
 			// smaller circles
 			new PPCircle(Particle.ENCHANTMENT_TABLE, lineStartLoc.clone().add(0, 0.5, 0), smallRadius)
-				.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER / 4)
+				.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER / 4)
 				.offset((timeRemaining % 20) / 20.0)
 				.directionalMode(true).delta(0, -0.5, 0).extra(1)
 				.spawnAsPlayerActive(player);
@@ -163,6 +161,7 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 
 		// rotating fire within
 		new PPCircle(Particle.SMALL_FLAME, loc.clone().add(0, height / 2, 0), radius - 0.1)
+			.ringMode(false)
 			.count((int) Math.ceil(5 * radius))
 			.directionalMode(true)
 			.rotateDelta(true)
@@ -172,8 +171,8 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 
 		// other particles
 		double delta = (radius - 1) / 2;
-		new PartialParticle(Particle.SMOKE_LARGE, raisedLoc, 3, delta, height / 2, delta, 0).minimumCount(0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.LAVA, raisedLoc, 3, delta, height / 2, delta, 0).minimumCount(0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, raisedLoc, 3, delta, height / 2, delta, 0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.LAVA, raisedLoc, 3, delta, height / 2, delta, 0).spawnAsPlayerActive(player);
 
 	}
 

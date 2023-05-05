@@ -60,7 +60,7 @@ public class CluckingPotions extends Ability {
 							ItemStatUtils.addEnchantment(item, ItemStatUtils.EnchantmentType.CLUCKING, 1);
 							ItemStatUtils.generateItemStats(item);
 							mPlugin.mItemStatManager.updateStats(player);
-							new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+							new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(mPlayer);
 						}
 					}
 				}

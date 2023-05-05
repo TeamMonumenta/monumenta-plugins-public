@@ -59,7 +59,7 @@ public class SpellBurningVengence extends Spell {
 
 		if (mBoss.getVehicle() != null) {
 			if (mBoss.getVehicle() instanceof LivingEntity horse) {
-				PPCircle outerFlameCircle = new PPCircle(Particle.FLAME, horse.getLocation(), 0).ringMode(true).count(48).delta(0.07).extra(0.01);
+				PPCircle outerFlameCircle = new PPCircle(Particle.FLAME, horse.getLocation(), 0).count(48).delta(0.07).extra(0.01);
 
 				BukkitRunnable run = new BukkitRunnable() {
 					double mRadius = 16;

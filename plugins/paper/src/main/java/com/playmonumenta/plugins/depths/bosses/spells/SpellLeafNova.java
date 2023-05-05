@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -37,15 +38,15 @@ public class SpellLeafNova extends SpellBaseAoE {
 
 	@Override
 	protected void chargeAuraAction(Location loc) {
-		new PartialParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR).minimumCount(0).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).minimumCount(0).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.REDSTONE, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, LEAF_COLOR).spawnAsEntityActive(mLauncher);
+		new PartialParticle(Particle.COMPOSTER, loc, 1, mRadius / 2.0, mRadius / 2.0, mRadius / 2.0, 0.05).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
-	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.REDSTONE, loc, 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumCount(0).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 2, 0), 1, 0.25, 0.25, 0.25, LEAF_COLOR).minimumCount(0).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsEntityActive(mLauncher);
+	protected void chargeCircleAction(Location loc, double radius) {
+		new PPCircle(Particle.REDSTONE, loc, radius).count(12).delta(0.25).data(LEAF_COLOR).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 2, 0), radius).count(12).delta(0.25).data(LEAF_COLOR).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.COMPOSTER, loc, radius).count(12).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -55,9 +56,9 @@ public class SpellLeafNova extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.COMPOSTER, loc, 1, 0.1, 0.1, 0.1, 0.3).minimumCount(0).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.SLIME, loc, 2, 0.25, 0.25, 0.25, 0.1).minimumCount(0).spawnAsEntityActive(mLauncher);
+	protected void circleOutburstAction(Location loc, double radius) {
+		new PPCircle(Particle.COMPOSTER, loc, radius).count(24).delta(0.1).extra(0.3).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.SLIME, loc, radius).count(48).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

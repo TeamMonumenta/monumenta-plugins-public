@@ -37,49 +37,49 @@ public class VictoryThemeFinisher implements EliteFinisher {
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS21);
-						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 					}
 					case 19 -> {
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.FS12);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.B17);
-						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 					}
 					case 28 -> {
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.CS19);
-						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 					}
 					case 37 -> {
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS21);
-						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 					}
 					case 43 -> {
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.CS19);
-						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 					}
 					case 46 -> {
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
 						world.playSound(loc1, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS21);
-						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc1, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 					}
 					default -> {
 					}

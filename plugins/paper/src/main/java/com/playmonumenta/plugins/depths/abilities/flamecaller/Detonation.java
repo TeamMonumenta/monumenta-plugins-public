@@ -54,7 +54,7 @@ public class Detonation extends DepthsAbility {
 			new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, mob.getLocation().add(0, 1, 0), 2).spawnAsPlayerActive(mPlayer);
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, DAMAGE[mRarity - 1], mInfo.getLinkedSpell(), true, false);
 		}
-		new PartialParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_LARGE, location.add(0, 0.5, 0), 1).minimumCount(1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, location.add(0, 1, 0), 3).spawnAsPlayerActive(mPlayer);
 		world.playSound(location, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 1);
 	}

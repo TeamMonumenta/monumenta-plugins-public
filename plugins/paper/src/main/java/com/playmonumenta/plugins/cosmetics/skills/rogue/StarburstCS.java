@@ -102,7 +102,7 @@ public class StarburstCS extends ViciousCombosCS {
 	}
 
 	private void drawParticle(Location location, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, location, 4, 0.02, 0.02, 0.02, 0.4, new Particle.DustOptions(color, 0.5f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 4, 0.02, 0.02, 0.02, 0.4, new Particle.DustOptions(color, 0.5f))
 			.spawnAsPlayerActive(player);
 	}
 

@@ -142,8 +142,8 @@ public class SpellAirGolemStrike extends Spell {
 					//Creates line of particles
 					for (int y = loc.getBlockY(); y < loc.getBlockY() + 10; y += 1) {
 						particleLoc.setY(y);
-						new PPCircle(Particle.FLAME, loc, 2).ringMode(true).count(36).delta(0.15).extra(0.25).spawnAsEntityActive(mBoss);
-						new PPCircle(Particle.DRAGON_BREATH, loc, 3).ringMode(true).count(36).delta(0.15).extra(0.1).spawnAsEntityActive(mBoss);
+						new PPCircle(Particle.FLAME, loc, 2).count(36).delta(0.15).extra(0.25).spawnAsEntityActive(mBoss);
+						new PPCircle(Particle.DRAGON_BREATH, loc, 3).count(36).delta(0.15).extra(0.1).spawnAsEntityActive(mBoss);
 					}
 
 					golem.teleport(loc);
@@ -158,7 +158,7 @@ public class SpellAirGolemStrike extends Spell {
 				}
 				mPitch += 0.05f;
 
-				new PPCircle(Particle.FLAME, loc, 2).ringMode(true).count(22).delta(0.25).spawnAsEntityActive(mBoss);
+				new PPCircle(Particle.FLAME, loc, 2).count(22).delta(0.25).spawnAsEntityActive(mBoss);
 				new PartialParticle(Particle.VILLAGER_ANGRY, loc, 1, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
 
 				mT += 5;

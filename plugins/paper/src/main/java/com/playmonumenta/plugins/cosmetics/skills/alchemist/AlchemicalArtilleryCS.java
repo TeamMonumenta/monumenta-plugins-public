@@ -43,7 +43,6 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 	public void explosionEffect(Player caster, Location loc, double radius) {
 		// radius indicator
 		new PPCircle(Particle.REDSTONE, loc, radius)
-			.ringMode(true)
 			.count(45)
 			.extra(0.0025)
 			.data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f))
@@ -51,7 +50,7 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 
 		// explosion effect
 		new PartialParticle(Particle.FLAME, loc, 100, radius / 4, 0, radius / 4, 0.04 * radius).spawnAsPlayerActive(caster);
-		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(caster);
+		new PartialParticle(Particle.FLASH, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(caster);
 
 		int effectDuration = 5;
 		new BukkitRunnable() {

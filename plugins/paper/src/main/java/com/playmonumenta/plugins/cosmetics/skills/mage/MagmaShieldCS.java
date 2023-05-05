@@ -60,8 +60,8 @@ public class MagmaShieldCS implements CosmeticSkill {
 					vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 					Location l = mLoc.clone().add(0, 0.1, 0).add(vec);
-					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).minimumCount(0).spawnAsPlayerActive(mPlayer);
-					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.FLAME, l, 2, 0.15, 0.15, 0.15, 0.15).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.15, 0.15, 0.15, 0.1).spawnAsPlayerActive(mPlayer);
 				}
 
 				if (mRadius >= radius) {

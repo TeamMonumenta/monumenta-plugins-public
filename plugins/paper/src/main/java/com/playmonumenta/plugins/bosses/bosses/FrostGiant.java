@@ -850,7 +850,7 @@ public class FrostGiant extends BossAbilityGroup {
 						world.playSound(mStartLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0);
 					}
 
-					new PartialParticle(Particle.EXPLOSION_LARGE, mStartLoc.clone().add(0, 5, 0), 1, 1, 5, 1).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, mStartLoc.clone().add(0, 5, 0), 1, 1, 5, 1).minimumCount(1).spawnAsEntityActive(mBoss);
 				}
 
 				if (mTicks >= 20 * 4 && mTicks <= 20 * 10 && mTicks % 2 == 0) {

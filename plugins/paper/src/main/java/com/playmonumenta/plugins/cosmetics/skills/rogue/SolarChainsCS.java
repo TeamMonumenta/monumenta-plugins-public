@@ -45,7 +45,7 @@ public class SolarChainsCS extends SkirmisherCS {
 		world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.6f, 0.8f);
 
 		if (FastUtils.randomIntInRange(1, 5) <= 4) {
-			new PPCircle(Particle.CRIT, loc, halfWidth * 2).ringMode(true).delta(0.02).count(40).spawnAsPlayerActive(mPlayer);
+			new PPCircle(Particle.CRIT, loc, halfWidth * 2).delta(0.02).count(40).spawnAsPlayerActive(mPlayer);
 		} else {
 			double starSize = halfWidth * 4;
 			int starVertices = FastUtils.randomIntInRange(3, 7);
@@ -53,7 +53,7 @@ public class SolarChainsCS extends SkirmisherCS {
 			ArrayList<Vector> starFull = StarCosmeticsFunctions.interpolatePolygon(StarCosmeticsFunctions.generateStarVertices(starVertices, starSize, 0.35, true, true), 2);
 
 			for (Vector v : starFull) {
-				new PartialParticle(Particle.CRIT, loc.clone().add(v), 3).delta(0.02).minimumCount(0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CRIT, loc.clone().add(v), 3).delta(0.02).spawnAsPlayerActive(mPlayer);
 			}
 		}
 		loc.add(0, halfHeight, 0);

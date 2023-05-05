@@ -49,7 +49,7 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
-		new PPCircle(Particle.END_ROD, loc.clone().add(0, 0.2, 0), 2).ringMode(true).count(10).spawnAsPlayerActive(player);
+		new PPCircle(Particle.END_ROD, loc.clone().add(0, 0.2, 0), 2).count(10).spawnAsPlayerActive(player);
 
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.6f, 1.4f);
 		new BukkitRunnable() {
@@ -67,7 +67,7 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 15, 0.25, 0.5, 0.25, 0.1f).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
-		new PPCircle(Particle.END_ROD, loc.clone().add(0, 0.2, 0), 2).ringMode(true).count(10).spawnAsPlayerActive(player);
+		new PPCircle(Particle.END_ROD, loc.clone().add(0, 0.2, 0), 2).count(10).spawnAsPlayerActive(player);
 
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1f, 2f);
 		new BukkitRunnable() {
@@ -84,7 +84,7 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 		double widthMultiplier = enemy.getWidth() + 0.7;
 		double heightMultiplier = enemy.getEyeHeight() + 0.6 * widthMultiplier;
 
-		new PPCircle(Particle.CRIT_MAGIC, enemyLocation.clone().add(0, 0.2, 0), widthMultiplier).delta(0.03).count(40).ringMode(true).spawnAsPlayerActive(player);
+		new PPCircle(Particle.CRIT_MAGIC, enemyLocation.clone().add(0, 0.2, 0), widthMultiplier).delta(0.03).count(40).spawnAsPlayerActive(player);
 
 		double randomHaloAngle = FastUtils.randomDoubleInRange(0, 2 * Math.PI / 5);
 		for (int i = 0; i < 5; i++) {
@@ -95,7 +95,7 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 			double mAngle = Math.PI / 4;
 			@Override
 			public void run() {
-				new PPCircle(Particle.CRIT_MAGIC, enemyLocation.clone().add(0, 0.2, 0), 4 * (Math.PI - mAngle) * widthMultiplier / (3 * Math.PI)).delta(0.03).count(20).ringMode(true).spawnAsPlayerActive(player);
+				new PPCircle(Particle.CRIT_MAGIC, enemyLocation.clone().add(0, 0.2, 0), 4 * (Math.PI - mAngle) * widthMultiplier / (3 * Math.PI)).delta(0.03).count(20).spawnAsPlayerActive(player);
 				for (int i = 0; i < 5; i++) {
 					for (int j = 0; j < 4; j++) {
 						Vector rotatedPoint = new Vector(0.5858 * widthMultiplier * (1 + FastUtils.cos(mAngle)), 1.4142 * heightMultiplier * FastUtils.sin(mAngle), 0).rotateAroundY(randomHaloAngle + 2 * i * Math.PI / 5);

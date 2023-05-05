@@ -69,7 +69,7 @@ public class SeekingProjectileBoss extends BossAbilityGroup {
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 0.5f, 0.5f);
 				},
 				// Projectile Aesthetic

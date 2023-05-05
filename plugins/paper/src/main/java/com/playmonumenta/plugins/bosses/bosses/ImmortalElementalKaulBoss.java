@@ -86,7 +86,7 @@ public class ImmortalElementalKaulBoss extends BossAbilityGroup {
 				},
 				// Attack particles
 				(Location loc) -> {
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).minimumCount(1).spawnAsEntityActive(boss);
 				},
 				// Ending particles on boss
 				() -> {

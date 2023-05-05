@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.falsespirit;
 
 import com.playmonumenta.plugins.bosses.bosses.FalseSpirit;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -28,8 +29,8 @@ public class SpellForceTwo extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.CRIT_MAGIC, loc, 1, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
+	protected void chargeCircleAction(Location loc, double radius) {
+		new PPCircle(Particle.CRIT_MAGIC, loc, radius).count(12).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -42,9 +43,9 @@ public class SpellForceTwo extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc, 2, 0.25, 0.25, 0.25, 0.1).spawnAsEntityActive(mLauncher);
+	protected void circleOutburstAction(Location loc, double radius) {
+		new PPCircle(Particle.SMOKE_LARGE, loc, radius).count(24).delta(0.1).extra(0.3).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.SMOKE_NORMAL, loc, radius).count(48).delta(0.25).extra(0.1).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

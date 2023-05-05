@@ -72,14 +72,14 @@ public class StarShurikenCS extends DaggerThrowCS {
 
 	@Override
 	public void daggerHitEffect(World world, Location loc, Location bLoc, Player mPlayer) {
-		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer).minimumCount(0);
-		new PartialParticle(Particle.FLAME, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer).minimumCount(0);
+		new PartialParticle(Particle.SWEEP_ATTACK, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, bLoc, 3, 0.3, 0.3, 0.3, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 1f, 2f);
 		world.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.8f, 1.6f);
 	}
 
 	private void drawParticle(Location location, Player player) {
-		new PartialParticle(Particle.REDSTONE, location, 2, 0.01, 0.01, 0.01, 0, new Particle.DustOptions(Color.fromRGB(255, 200, 50), 0.4f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 2, 0.01, 0.01, 0.01, 0, new Particle.DustOptions(Color.fromRGB(255, 200, 50), 0.4f))
 			.spawnAsPlayerActive(player);
 	}
 }

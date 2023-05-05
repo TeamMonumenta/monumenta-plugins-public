@@ -409,7 +409,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 				}
 			}
 			World world = mBoss.getWorld();
-			new PartialParticle(Particle.EXPLOSION_HUGE, as.getLocation(), 1, 0, 0, 0).spawnAsEntityActive(mBoss);
+			new PartialParticle(Particle.EXPLOSION_HUGE, as.getLocation(), 1, 0, 0, 0).minimumCount(1).spawnAsEntityActive(mBoss);
 			world.playSound(as.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 3, 1);
 
 			BoundingBox box = BoundingBox.of(as.getLocation(), 3, 3, 3);

@@ -40,8 +40,8 @@ public class DragonsBreathFinisher implements EliteFinisher {
 			public void run() {
 				mRadius += 0.25;
 				if (mTicks < 10) {
-					new PPCircle(Particle.SMALL_FLAME, mLoc, mRadius).ringMode(true).count(36).delta(0.15).spawnAsPlayerActive(p);
-					new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).ringMode(true).count(36).delta(0.15).spawnAsPlayerActive(p);
+					new PPCircle(Particle.SMALL_FLAME, mLoc, mRadius).count(36).delta(0.15).spawnAsPlayerActive(p);
+					new PPCircle(Particle.SOUL_FIRE_FLAME, mLoc, mRadius).count(36).delta(0.15).spawnAsPlayerActive(p);
 				}
 				if (mTicks >= 50) {
 					mDragon.remove();

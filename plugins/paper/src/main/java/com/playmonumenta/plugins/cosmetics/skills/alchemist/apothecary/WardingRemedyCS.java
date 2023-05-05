@@ -50,7 +50,7 @@ public class WardingRemedyCS implements CosmeticSkill {
 	public void remedyPulseEffect(World world, Location playerLoc, Player mPlayer, int pulse, int maxPulse, double radius) {
 		AbilityUtils.playPassiveAbilitySound(playerLoc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, 0.7f, 2f);
 
-		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.15, 0), 6).ringMode(true).count(1).data(APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.15, 0), 6).count(1).data(APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPELL_INSTANT, playerLoc.clone().add(0, 0.15, 0), 15, 2.8, 0, 2.8, 0).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, playerLoc, 40, 2.8, 2.8, 2.8, new Particle.DustOptions(APOTHECARY_LIGHT_COLOR, 1.5f)).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, playerLoc, 20, 2.8, 2.8, 2.8, 0).spawnAsPlayerActive(mPlayer);

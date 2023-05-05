@@ -58,8 +58,8 @@ public class SpellHailstorm extends Spell {
 		mStartLoc = start;
 
 		Location loc = boss.getLocation();
-		mInnerCircle = new PPCircle(Particle.REDSTONE, loc, radius - 0.75).ringMode(true).count(60).delta(0.1).extra(1).data(LIGHT_BLUE_COLOR);
-		mOuterCircle = new PPCircle(Particle.CLOUD, loc, radius + 5).ringMode(true).count(30).delta(2).extra(0.075);
+		mInnerCircle = new PPCircle(Particle.REDSTONE, loc, radius - 0.75).count(60).delta(0.1).extra(1).data(LIGHT_BLUE_COLOR);
+		mOuterCircle = new PPCircle(Particle.CLOUD, loc, radius + 5).count(30).delta(2).extra(0.075);
 
 		new BukkitRunnable() {
 			@Override

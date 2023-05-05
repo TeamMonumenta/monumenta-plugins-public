@@ -44,7 +44,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 	@Override
 	public void lanceHitBlock(Player player, Location bLoc, World world) {
 		new PartialParticle(Particle.SMOKE_LARGE, bLoc, 25, 0, 0, 0, 0.1)
-			.minimumCount(0).spawnAsPlayerActive(player);
+			.spawnAsPlayerActive(player);
 		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
 		world.playSound(bLoc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1, 0.75f);
 	}
@@ -71,7 +71,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 				Location helixLoc = l.clone().add(vec);
 				new PartialParticle(Particle.DUST_COLOR_TRANSITION, helixLoc, 3, 0.05, 0.05, 0.05, 0.25,
 					new Particle.DustTransition(DARK_COLOR, TWISTED_COLOR, 1f))
-					.minimumCount(0).spawnAsPlayerActive(player);
+					.spawnAsPlayerActive(player);
 			}
 		}
 	}
@@ -91,7 +91,7 @@ public class TwistedLanceCS extends ManaLanceCS {
 		world.playSound(loc, Sound.ENTITY_PLAYER_BIG_FALL, SoundCategory.PLAYERS, 1.3f, 0);
 		world.playSound(loc, Sound.ENTITY_BEE_STING, SoundCategory.PLAYERS, 1.3f, 0);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 30, 0, 0, 0, 0.15)
-			.minimumCount(0).spawnAsPlayerActive(player);
+			.spawnAsPlayerActive(player);
 
 	}
 }

@@ -76,7 +76,7 @@ public class SpellBeeBombs extends Spell {
 								new PartialParticle(Particle.FLAME, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1).spawnAsEntityActive(mBoss);
 								new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.15).spawnAsEntityActive(mBoss);
-								new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
+								new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(mBoss);
 								world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.65f, 1);
 
 								for (Player player : PlayerUtils.playersInRange(loc, 5.5, true)) {

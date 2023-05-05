@@ -127,9 +127,9 @@ public class EyeOfTheStorm extends Ability {
 			@Override
 			public void run() {
 
-				PPCircle lowerRing = new PPCircle(Particle.DRAGON_BREATH, loc.clone().add(0, 0.5, 0), mRadius).ringMode(true).countPerMeter(0.25).delta(0).extra(0);
+				PPCircle lowerRing = new PPCircle(Particle.DRAGON_BREATH, loc.clone().add(0, 0.5, 0), mRadius).countPerMeter(0.25).delta(0).extra(0);
 				lowerRing.spawnAsPlayerActive(mPlayer);
-				PPCircle higherRing = new PPCircle(Particle.GLOW, loc.clone().add(0, 1, 0), mRadius).ringMode(true).countPerMeter(0.25).delta(0).extra(0);
+				PPCircle higherRing = new PPCircle(Particle.GLOW, loc.clone().add(0, 1, 0), mRadius).countPerMeter(0.25).delta(0).extra(0);
 				higherRing.spawnAsPlayerActive(mPlayer);
 
 				if (mTicks % 20 == 0) {

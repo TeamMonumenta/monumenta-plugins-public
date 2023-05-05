@@ -66,9 +66,9 @@ public class Rewind extends Spell {
 		World world = mCenter.getWorld();
 		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 0.7f));
 
-		PPCircle back = new PPCircle(Particle.TOTEM, mCenter, 1.5).ringMode(true).count(12);
-		PPCircle surround = new PPCircle(Particle.REDSTONE, mCenter, RADIUS).data(new Particle.DustOptions(Color.WHITE, 1)).ringMode(true);
-		PPCircle inside = new PPCircle(Particle.SPELL_WITCH, mCenter, RADIUS).delta(0, 0.2, 0).extra(0.1);
+		PPCircle back = new PPCircle(Particle.TOTEM, mCenter, 1.5).count(12);
+		PPCircle surround = new PPCircle(Particle.REDSTONE, mCenter, RADIUS).data(new Particle.DustOptions(Color.WHITE, 1));
+		PPCircle inside = new PPCircle(Particle.SPELL_WITCH, mCenter, RADIUS).ringMode(false).delta(0, 0.2, 0).extra(0.1);
 		Plugin plugin = Plugin.getInstance();
 
 		int maxDir = 270 + (45 * mToggle);

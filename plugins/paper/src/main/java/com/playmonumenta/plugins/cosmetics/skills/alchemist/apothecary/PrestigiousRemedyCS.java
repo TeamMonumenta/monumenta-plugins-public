@@ -117,8 +117,8 @@ public class PrestigiousRemedyCS extends WardingRemedyCS implements PrestigeCS {
 		float delta = (float) (radius / 2.1);
 		double radiusShrink = radius * (maxPulse - pulse + 1) / (maxPulse + 1);
 		int countShrink = (int) Math.ceil(radiusShrink * radiusShrink * 3.1416 * 1.6);
-		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.15, 0), radius).ringMode(true).count((int) Math.ceil(radius * 9.6)).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.45, 0), 0.85 * radius).ringMode(true).count((int) Math.ceil(radius * 7.2)).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.15, 0), radius).count((int) Math.ceil(radius * 9.6)).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.45, 0), 0.85 * radius).count((int) Math.ceil(radius * 7.2)).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 		new PPCircle(Particle.REDSTONE, playerLoc.clone().add(0, 0.15, 0), radiusShrink).ringMode(false).count(countShrink).data(GOLD_COLOR1).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.REDSTONE, playerLoc, (int) Math.ceil(radius * 3.6), delta, delta, delta, 0, GOLD_COLOR2).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, playerLoc, (int) Math.ceil(radius * 6.4), delta, delta, delta, 0.05).spawnAsPlayerActive(mPlayer);

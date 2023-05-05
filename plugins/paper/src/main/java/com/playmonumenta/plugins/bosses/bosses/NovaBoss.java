@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.Collections;
@@ -65,14 +66,14 @@ public final class NovaBoss extends BossAbilityGroup {
 		@BossParam(help = "Frequency for sound charge")
 		public int SOUND_CHARGE_FREQUENCY = 1;
 
-		@BossParam(help = "Particle summon arround the boss when loading the spell")
-		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(CRIT,1)]");
+		@BossParam(help = "Particle summon around the boss when loading the spell")
+		public ParticlesList PARTICLE_LOAD = ParticlesList.fromString("[(CRIT,12)]");
 
 		@BossParam(help = "Sound used when the spell is casted (when explode)")
 		public SoundsList SOUND_CAST = SoundsList.fromString("[(ENTITY_WITCH_DRINK,1.5,0.65),(ENTITY_WITCH_DRINK,1.5,0.55)]");
 
 		@BossParam(help = "Particle summoned when the spell explode")
-		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,1,0.1,0.1,0.1,0.3),(CRIT_MAGIC,1,0.25,0.25,0.25,0.1)]");
+		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(CRIT,24,0.1,0.1,0.1,0.3),(CRIT_MAGIC,24,0.25,0.25,0.25,0.1)]");
 
 	}
 
@@ -102,8 +103,8 @@ public final class NovaBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void chargeCircleAction(Location loc) {
-					p.PARTICLE_LOAD.spawn(boss, loc, 0.25d, 0.25d, 0.25d, 0.0d);
+				protected void chargeCircleAction(Location loc, double radius) {
+					p.PARTICLE_LOAD.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25));
 				}
 
 				@Override
@@ -112,8 +113,8 @@ public final class NovaBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void circleOutburstAction(Location loc) {
-					p.PARTICLE_EXPLODE.spawn(boss, loc, 0.2, 0.2, 0.2, 0.2);
+				protected void circleOutburstAction(Location loc, double radius) {
+					p.PARTICLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
 				}
 
 				@Override

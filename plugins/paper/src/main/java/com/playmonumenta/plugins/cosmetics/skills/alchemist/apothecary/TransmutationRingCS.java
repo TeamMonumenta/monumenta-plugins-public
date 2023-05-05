@@ -30,9 +30,7 @@ public class TransmutationRingCS implements CosmeticSkill {
 	}
 
 	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks) {
-		PPCircle particles = new PPCircle(Particle.REDSTONE, center, radius)
-			                     .data(GOLD_COLOR)
-			                     .ringMode(true);
+		PPCircle particles = new PPCircle(Particle.REDSTONE, center, radius).data(GOLD_COLOR);
 		particles.count((int) Math.floor(120 * radius / 5)).location(center.clone().add(0, 0.25, 0)).spawnAsPlayerActive(player);
 		particles.count((int) Math.floor(30 * radius / 5)).location(center.clone().add(0, 0.75, 0)).spawnAsPlayerActive(player);
 		particles.count((int) Math.floor(15 * radius / 5)).location(center.clone().add(0, 1.25, 0)).spawnAsPlayerActive(player);

@@ -590,7 +590,7 @@ public class Samwell extends BossAbilityGroup {
 				if (mT % 20 == 0) {
 					world.playSound(mSpawnLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 10, 1);
 				}
-				new PartialParticle(Particle.EXPLOSION_LARGE, mSpawnLoc.clone().add(0, 5, 0), 1, 10, 10, 10).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_LARGE, mSpawnLoc.clone().add(0, 5, 0), 1, 10, 10, 10).minimumCount(1).spawnAsEntityActive(mBoss);
 
 				if (mBoss.isDead() || !mBoss.isValid()) {
 					this.cancel();

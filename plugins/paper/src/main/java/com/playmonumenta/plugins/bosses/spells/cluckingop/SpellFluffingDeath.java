@@ -98,8 +98,10 @@ public class SpellFluffingDeath extends Spell {
 			public void run() {
 				mY -= 1;
 				Location particle = loc.clone().add(0, mY, 0);
-				new PartialParticle(Particle.EXPLOSION_NORMAL, particle, 1, 0.2f, 0.2f, 0.2f, 0.05, null, true).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.CLOUD, particle, 1, 0, 0, 0, 0, null, true).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.EXPLOSION_NORMAL, particle, 1, 0.2f, 0.2f, 0.2f, 0.05, null, true)
+					.minimumCount(1).spawnAsEntityActive(mBoss);
+				new PartialParticle(Particle.CLOUD, particle, 1, 0, 0, 0, 0, null, true)
+					.minimumCount(1).spawnAsEntityActive(mBoss);
 				world.playSound(particle, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 				if (mY <= 0) {
 					this.cancel();

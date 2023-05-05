@@ -24,8 +24,8 @@ public class AmplifyingHexCS implements CosmeticSkill {
 	}
 
 	public void amplifyingParticle(Player mPlayer, Location l) {
-		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void amplifyingEffects(Player mPlayer, World world, Location soundLoc) {

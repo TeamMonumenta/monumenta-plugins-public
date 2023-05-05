@@ -87,7 +87,7 @@ public final class TCalin extends BossAbilityGroup {
 				MovementUtils.knockAway(mBoss.getLocation(), player, 0.25f, 0.4f);
 			},
 			// Attack particles
-			(Location loc) -> new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).spawnAsEntityActive(boss),
+			(Location loc) -> new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0.02, 0.02, 0.02, 0).minimumCount(1).spawnAsEntityActive(boss),
 			// Ending particles on boss
 			() -> new PartialParticle(Particle.SMOKE_LARGE, boss.getLocation(), 150, 2, 2, 2, 0).spawnAsEntityActive(boss)
 		);

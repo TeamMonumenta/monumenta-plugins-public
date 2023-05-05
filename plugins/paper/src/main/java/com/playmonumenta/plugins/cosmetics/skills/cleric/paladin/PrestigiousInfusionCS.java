@@ -123,13 +123,13 @@ public class PrestigiousInfusionCS extends LuminousInfusionCS implements Prestig
 	public void infusionTickEffect(Player mPlayer, int tick) {
 		Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 		Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-		new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.05, 0.05, 0.05, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
 		if (FastUtils.RANDOM.nextDouble() < 0.75) {
-			new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, leftHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
 		}
 		if (FastUtils.RANDOM.nextDouble() < 0.75) {
-			new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).minimumCount(0).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, rightHand, 1, 0.1, 0.1, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
 		}
 	}
 

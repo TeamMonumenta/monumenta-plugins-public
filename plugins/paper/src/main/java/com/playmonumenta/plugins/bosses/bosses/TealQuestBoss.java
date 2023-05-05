@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.bosses.spells.SpellCrowdControlClear;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -119,8 +120,8 @@ public class TealQuestBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void chargeCircleAction(Location loc) {
-					new PartialParticle(Particle.CRIT, loc, 1, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(boss);
+				protected void chargeCircleAction(Location loc, double radius) {
+					new PPCircle(Particle.CRIT, loc, radius).count(12).delta(0.25).extra(0.05).spawnAsEntityActive(boss);
 				}
 
 				@Override
@@ -130,9 +131,9 @@ public class TealQuestBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void circleOutburstAction(Location loc) {
-					new PartialParticle(Particle.SWEEP_ATTACK, loc, 1, 0.1, 0.1, 0.1, 0.3).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.25, 0.25, 0.25, 0.1, REDSTONE_COLOR_SWING).spawnAsEntityActive(boss);
+				protected void circleOutburstAction(Location loc, double radius) {
+					new PPCircle(Particle.SWEEP_ATTACK, loc, radius).count(24).delta(0.1).extra(0.3).spawnAsEntityActive(boss);
+					new PPCircle(Particle.REDSTONE, loc, radius).count(48).delta(0.25).extra(0.1).data(REDSTONE_COLOR_SWING).spawnAsEntityActive(boss);
 				}
 
 				@Override

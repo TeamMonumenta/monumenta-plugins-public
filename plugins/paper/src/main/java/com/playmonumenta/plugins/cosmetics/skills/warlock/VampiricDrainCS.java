@@ -98,15 +98,15 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 		new PartialParticle(Particle.BLOCK_CRACK, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOOD_BLOCK).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 4, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(mPlayer);
 
-		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).count(16).ringMode(true).data(BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).count(16).data(BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
 	public void rendHitParticle2(Player mPlayer, Location loc, double radius) {
 		rendHitParticle1(mPlayer, loc);
 
-		PPCircle ring1 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).ringMode(true).data(BLOODY_COLOR1);
-		PPCircle ring2 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.55, 0), 1.25).ringMode(true).data(BLOODY_COLOR1);
+		PPCircle ring1 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).data(BLOODY_COLOR1);
+		PPCircle ring2 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.55, 0), 1.25).data(BLOODY_COLOR1);
 
 		new BukkitRunnable() {
 			int mTicks = 0;

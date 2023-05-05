@@ -135,7 +135,7 @@ public class SpellRush extends Spell {
 					mBoss.setVelocity(dir);
 					if (mTicks % 10 == 0) {
 						world.playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
-						new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 2, 2, 2).spawnAsEntityActive(mBoss);
+						new PartialParticle(Particle.EXPLOSION_HUGE, loc, 1, 2, 2, 2).minimumCount(1).spawnAsEntityActive(mBoss);
 					}
 
 				}

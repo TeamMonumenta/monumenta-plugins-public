@@ -28,8 +28,8 @@ public class SpellShockStatic extends Effect {
 	@Override
 	public void entityTickEffect(Entity entity, boolean fourHertz, boolean twoHertz, boolean oneHertz) {
 		Location loc = entity.getLocation();
-		new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1).minimumCount(0).spawnAsEnemyBuff();
-		new PartialParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, COLOR).minimumCount(0).spawnAsEnemyBuff();
+		new PartialParticle(Particle.SPELL_WITCH, loc, 3, 0.2, 0.6, 0.2, 1).spawnAsEnemyBuff();
+		new PartialParticle(Particle.REDSTONE, loc, 3, 0.3, 0.6, 0.3, COLOR).spawnAsEnemyBuff();
 	}
 
 	@Override

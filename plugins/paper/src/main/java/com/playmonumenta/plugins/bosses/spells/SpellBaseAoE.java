@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.Location;
@@ -11,8 +10,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 
@@ -60,11 +57,11 @@ public abstract class SpellBaseAoE extends Spell {
 
 	protected abstract void chargeAuraAction(Location loc);
 
-	protected abstract void chargeCircleAction(Location loc);
+	protected abstract void chargeCircleAction(Location loc, double radius);
 
 	protected abstract void outburstAction(Location loc);
 
-	protected abstract void circleOutburstAction(Location loc);
+	protected abstract void circleOutburstAction(Location loc, double radius);
 
 	protected abstract void dealDamageAction(Location loc);
 
@@ -109,12 +106,7 @@ public abstract class SpellBaseAoE extends Spell {
 				if (mTicks <= (mDuration - 5) && mTicks % mSoundDensity == 0) {
 					mWorld.playSound(mLauncher.getLocation(), mChargeSound, SoundCategory.HOSTILE, mSoundVolume, 0.25f + (mTicks / 100));
 				}
-				for (double i = 0; i < 360; i += 30) {
-					double radian1 = Math.toRadians(i);
-					loc.add(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
-					chargeCircleAction(loc);
-					loc.subtract(FastUtils.cos(radian1) * mCurrentRadius, 0, FastUtils.sin(radian1) * mCurrentRadius);
-				}
+				chargeCircleAction(loc, mCurrentRadius);
 				mCurrentRadius -= (mRadius / ((double) mDuration));
 				if (mCurrentRadius <= 0) {
 					this.cancel();
@@ -129,12 +121,7 @@ public abstract class SpellBaseAoE extends Spell {
 						public void run() {
 							for (int j = 0; j < 2; j++) {
 								mBurstRadius += 1.5;
-								for (double i = 0; i < 360; i += 15) {
-									double radian1 = Math.toRadians(i);
-									mLoc.add(FastUtils.cos(radian1) * mBurstRadius, 0, FastUtils.sin(radian1) * mBurstRadius);
-									circleOutburstAction(mLoc);
-									mLoc.subtract(FastUtils.cos(radian1) * mBurstRadius, 0, FastUtils.sin(radian1) * mBurstRadius);
-								}
+								circleOutburstAction(mLoc, mBurstRadius);
 							}
 							if (mBurstRadius >= mRadius) {
 								this.cancel();

@@ -73,7 +73,7 @@ public class SpellEndlessAgony extends Spell {
 		target.playSound(target.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.HOSTILE, 3, 1);
 		target.sendMessage(Component.text("Pain and suffering haunt you with every step you take.", NamedTextColor.LIGHT_PURPLE));
 
-		PPCircle indicator = new PPCircle(Particle.REDSTONE, target.getLocation(), RADIUS).ringMode(true).count(30).delta(0.1, 0.05, 0.1).data(ENDLESS_AGONY_COLOR);
+		PPCircle indicator = new PPCircle(Particle.REDSTONE, target.getLocation(), RADIUS).count(30).delta(0.1, 0.05, 0.1).data(ENDLESS_AGONY_COLOR);
 
 		mChargeUp.setTitle(ChatColor.DARK_PURPLE + "Forming Endless Agony...");
 		mChargeUp.setColor(BarColor.PURPLE);

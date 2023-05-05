@@ -87,7 +87,7 @@ public class SpellSwitcheroo extends Spell {
 				mLauncher.getWorld().playSound(mLauncher.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 3f, 0.7f);
 
 				new PartialParticle(Particle.SMOKE_LARGE, targetLoc, 65, 0, 0, 0, 0.1).spawnAsEntityActive(mLauncher);
-				new PartialParticle(Particle.EXPLOSION_LARGE, targetLoc, 4, 0, 0, 0, 0).spawnAsEntityActive(mLauncher);
+				new PartialParticle(Particle.EXPLOSION_LARGE, targetLoc, 4, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(mLauncher);
 				world.playSound(targetLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 

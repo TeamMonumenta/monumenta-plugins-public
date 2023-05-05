@@ -152,7 +152,7 @@ public class WindBomb extends Ability {
 					for (double j = 0; j < 360; j += 6) {
 						double radian1 = Math.toRadians(j);
 						loc.add(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
-						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).minimumCount(0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
 						loc.subtract(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
 					}
 					this.cancel();
@@ -179,8 +179,8 @@ public class WindBomb extends Ability {
 
 			if (isEnhanced()) {
 				loc.add(0, 2, 0);
-				new PartialParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125).minimumCount(0).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125).minimumCount(0).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125).spawnAsPlayerActive(mPlayer);
 				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1f);
 				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
 
@@ -209,9 +209,9 @@ public class WindBomb extends Ability {
 								}
 							}
 						}
-						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1).minimumCount(0).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).minimumCount(0).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).minimumCount(0).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
 						if (mTicks >= pullDuration) {
 							this.cancel();
 						}

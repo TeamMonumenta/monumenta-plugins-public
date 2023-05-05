@@ -38,7 +38,7 @@ public class TinyBombTossBoss extends BossAbilityGroup {
 			new SpellBombToss(plugin, boss, detectionRange, LOBS, FUSE,
 				(World world, TNTPrimed tnt, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1f, 1f);
-					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 
 					for (Player player : PlayerUtils.playersInRange(loc, RADIUS, true)) {
 						if (player.hasLineOfSight(tnt)) {

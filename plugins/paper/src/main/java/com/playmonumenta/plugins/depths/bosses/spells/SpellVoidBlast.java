@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.depths.bosses.spells;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -42,8 +43,8 @@ public class SpellVoidBlast extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void chargeCircleAction(Location loc) {
-		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.25, 0.25, 0.25, 0).minimumCount(0).spawnAsEntityActive(mLauncher);
+	protected void chargeCircleAction(Location loc, double radius) {
+		new PPCircle(Particle.SPELL_WITCH, loc, radius).count(12).delta(0.250).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override
@@ -53,9 +54,9 @@ public class SpellVoidBlast extends SpellBaseAoE {
 	}
 
 	@Override
-	protected void circleOutburstAction(Location loc) {
-		new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.2).minimumCount(0).spawnAsEntityActive(mLauncher);
-		new PartialParticle(Particle.SPELL_WITCH, loc, 1, 0.25, 0.25, 0.25, 0).minimumCount(0).spawnAsEntityActive(mLauncher);
+	protected void circleOutburstAction(Location loc, double radius) {
+		new PPCircle(Particle.CLOUD, loc, radius).count(24).delta(0.1).extra(0.2).spawnAsEntityActive(mLauncher);
+		new PPCircle(Particle.SPELL_WITCH, loc, radius).count(24).delta(0.25).spawnAsEntityActive(mLauncher);
 	}
 
 	@Override

@@ -122,7 +122,7 @@ public class SpellHellzoneGrenade extends Spell {
 
 						new PartialParticle(Particle.FLAME, loc, 150, 0, 0, 0, 0.165).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, loc, 65, 0, 0, 0, 0.1).spawnAsBoss();
-						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).spawnAsBoss();
+						new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1, 0, 0, 0, 0).minimumCount(1).spawnAsBoss();
 						mWorld.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 0.85f);
 
 						for (Player player : PlayerUtils.playersInRange(loc, 4, true)) {
@@ -134,7 +134,7 @@ public class SpellHellzoneGrenade extends Spell {
 						}
 
 						PartialParticle smokeMarker = new PartialParticle(Particle.SMOKE_LARGE, loc, 4, 1.5, 0.15, 1.5, 0.025);
-						PPCircle flameMarker = new PPCircle(Particle.FLAME, loc, RADIUS).ringMode(true).count(12).delta(0.15);
+						PPCircle flameMarker = new PPCircle(Particle.FLAME, loc, RADIUS).count(12).delta(0.15);
 
 						new BukkitRunnable() {
 							int mTicks = 0;

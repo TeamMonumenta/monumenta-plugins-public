@@ -175,8 +175,8 @@ public class SpellDimensionDoor extends Spell {
 			world.playSound(pLoc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.HOSTILE, 1f, 2.0f);
 			world.playSound(pLoc, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1f, 1.0f);
 
-			PPCircle indicator = new PPCircle(Particle.SPELL_WITCH, pLoc, 3).ringMode(true).count(3).delta(0.2, 0, 0.2);
-			PPCircle indicator2 = new PPCircle(Particle.SMOKE_NORMAL, pLoc, 3).ringMode(true).count(2).delta(0.2, 0, 0.2);
+			PPCircle indicator = new PPCircle(Particle.SPELL_WITCH, pLoc, 3).count(3).delta(0.2, 0, 0.2);
+			PPCircle indicator2 = new PPCircle(Particle.SMOKE_NORMAL, pLoc, 3).count(2).delta(0.2, 0, 0.2);
 
 			List<BlockState> toRestore = new ArrayList<>();
 			BukkitRunnable runB = new BukkitRunnable() {

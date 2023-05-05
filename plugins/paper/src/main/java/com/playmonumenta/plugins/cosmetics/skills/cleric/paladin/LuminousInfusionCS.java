@@ -43,8 +43,8 @@ public class LuminousInfusionCS implements CosmeticSkill {
 	public void infusionTickEffect(Player mPlayer, int tick) {
 		Location rightHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), 0.45).subtract(0, .8, 0);
 		Location leftHand = PlayerUtils.getRightSide(mPlayer.getEyeLocation(), -0.45).subtract(0, .8, 0);
-		new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumCount(0).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, leftHand, 1, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, rightHand, 1, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void infusionHitEffect(World world, Player mPlayer, LivingEntity damagee) {

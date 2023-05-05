@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellForce;
+import com.playmonumenta.plugins.particle.PPCircle;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
@@ -49,8 +50,8 @@ public class ForceBoss extends BossAbilityGroup {
 		@BossParam(help = "Particle summon in the air while the ability is charging")
 		public ParticlesList PARTICLE_AIR = ParticlesList.fromString("[(SMOKE_LARGE,1)]");
 
-		@BossParam(help = "Particle summon int the ground while the ability is charging")
-		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT_MAGIC,1)]");
+		@BossParam(help = "Particle summon in the ground while the ability is charging")
+		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT_MAGIC,12)]");
 
 		@BossParam(help = "Particle when the ability explode")
 		public ParticlesList PARTICLE_EXPLODE = ParticlesList.fromString("[(SMOKE_LARGE,100)]");
@@ -59,7 +60,7 @@ public class ForceBoss extends BossAbilityGroup {
 		public SoundsList SOUND_EXPLODE = SoundsList.fromString("[(ENTITY_WITHER_SHOOT,1.5,0.65),(ENTITY_GHAST_SHOOT,1.0,0.5),(ENTITY_GUARDIAN_HURT,1,0.8)]");
 
 		@BossParam(help = "Particle when the ability explode")
-		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SMOKE_LARGE,1,0.1,0.1,0.1,0.3),(SMOKE_NORMAL,2,0.25,0.25,0.25,0.1)]");
+		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SMOKE_LARGE,24,0.1,0.1,0.1,0.3),(SMOKE_NORMAL,48,0.25,0.25,0.25,0.1)]");
 
 		@BossParam(help = "Particle summon at player position when he got hit by the ability")
 		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(VILLAGER_ANGRY,4,0.25,0.5,0.25)]");
@@ -89,8 +90,8 @@ public class ForceBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void chargeCircleAction(Location loc) {
-					p.PARTICLE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25, 0.1);
+				protected void chargeCircleAction(Location loc, double radius) {
+					p.PARTICLE_CIRCLE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25).extra(0.1));
 				}
 
 				@Override
@@ -100,8 +101,8 @@ public class ForceBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void circleOutburstAction(Location loc) {
-					p.PARTICLE_CIRCLE_EXPLODE.spawn(boss, loc, 0.2, 0.2, 0.2, 0.2);
+				protected void circleOutburstAction(Location loc, double radius) {
+					p.PARTICLE_CIRCLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
 				}
 
 				@Override

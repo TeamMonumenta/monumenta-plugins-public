@@ -27,13 +27,13 @@ public class ImplosionFinisher implements EliteFinisher {
 		world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 3F, 1.5F);
 
 		// Particle Magic
-		new PartialParticle(Particle.FLASH, centered, 1).spawnAsPlayerActive(p);
+		new PartialParticle(Particle.FLASH, centered, 1).minimumCount(1).spawnAsPlayerActive(p);
 		ParticleUtils.drawSphere(centered, 75, 1.5,
-				(l, t) -> {
-					Vector vel = centered.clone().subtract(l).toVector().normalize();
-					new PartialParticle(Particle.FLAME, l, 1).directionalMode(true)
-							.delta(vel.getX(), vel.getY(), vel.getZ()).extra(0.5).spawnAsPlayerActive(p);
-				}
+			(l, t) -> {
+				Vector vel = centered.clone().subtract(l).toVector().normalize();
+				new PartialParticle(Particle.FLAME, l, 1).directionalMode(true)
+					.delta(vel.getX(), vel.getY(), vel.getZ()).extra(0.5).spawnAsPlayerActive(p);
+			}
 		);
 		ParticleUtils.drawSphere(centered, 30, 0.1,
 				(l, t) -> {

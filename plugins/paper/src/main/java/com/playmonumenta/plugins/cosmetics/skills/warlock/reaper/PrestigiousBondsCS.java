@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -72,7 +69,7 @@ public class PrestigiousBondsCS extends VoodooBondsCS implements PrestigeCS {
 		world.playSound(mCenter, Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 1f, 0.6f);
 
 		new BukkitRunnable() {
-			PPCircle mRing = new PPCircle(Particle.REDSTONE, mCenter, 0).ringMode(true).data(LIGHT_COLOR);
+			PPCircle mRing = new PPCircle(Particle.REDSTONE, mCenter, 0).data(LIGHT_COLOR);
 			int mFrame = 0;
 			double mRadius = 0.2;
 			final Vector mFront = mPlayer.getLocation().getDirection().clone().setY(0).normalize().multiply(maxRadius);

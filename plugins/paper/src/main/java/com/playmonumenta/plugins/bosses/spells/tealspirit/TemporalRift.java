@@ -71,8 +71,8 @@ public class TemporalRift extends Spell {
 		Plugin plugin = Plugin.getInstance();
 		World world = mBoss.getWorld();
 
-		PPCircle indicator = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), RADIUS).ringMode(true).count(25).delta(0.01).data(YELLOW);
-		PPCircle indicator2 = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), RADIUS).ringMode(true).count(25).delta(0.01).data(RED);
+		PPCircle indicator = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), RADIUS).count(25).delta(0.01).data(YELLOW);
+		PPCircle indicator2 = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), RADIUS).count(25).delta(0.01).data(RED);
 
 		List<Location> locs = new ArrayList<>();
 		for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {

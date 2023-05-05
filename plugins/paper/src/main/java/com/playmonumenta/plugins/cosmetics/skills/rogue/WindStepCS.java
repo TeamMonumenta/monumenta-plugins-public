@@ -54,9 +54,9 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 		ParticleUtils.drawParticleCircleExplosion(mPlayer, loc, 0, 1, 0, 0, 40, 0.3f,
 			false, 0, -1.25, Particle.CLOUD);
 		new PartialParticle(Particle.CLOUD, mPlayer.getLocation().add(0, 1.1, 0), 25, 0.35, 0.5, 0.35, 0.1)
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.EXPLOSION_NORMAL, mPlayer.getLocation().add(0, 1.1, 0), 7, 0.3, 0.5, 0.3, 0.025)
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 			ParticleUtils.drawParticleLineSlash(l, l.getDirection(), 0, 1.75, 0.1, FastUtils.RANDOM.nextInt(5, 8),
 				(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
 					new PartialParticle(Particle.ELECTRIC_SPARK, lineLoc, 1, 0, 0, 0, 0.05)
-						.minimumCount(0).spawnAsPlayerActive(mPlayer);
+						.spawnAsPlayerActive(mPlayer);
 			});
 		}
 
@@ -79,7 +79,7 @@ public class WindStepCS extends AdvancingShadowsCS implements DepthsCS {
 			Location l = loc.clone().add(0, 1.15, 0).add(vec);
 			new PartialParticle(Particle.REDSTONE, l, 5, 0.125f, 0.125f, 0.125f, 0,
 				new Particle.DustOptions(TRAIL_COLOR_BRIGHT, 1.7f))
-				.minimumCount(0).spawnAsPlayerActive(mPlayer);
+				.spawnAsPlayerActive(mPlayer);
 		}
 
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc.clone().add(0, 1, 0), 1, 0.25, 0.5, 0.25, 0.2).spawnAsPlayerActive(mPlayer);

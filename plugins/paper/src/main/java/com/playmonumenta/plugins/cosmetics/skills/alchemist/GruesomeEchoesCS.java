@@ -55,7 +55,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 1, 0.75f);
 		}
 		new PartialParticle(Particle.SOUL, mPlayer.getLocation().clone().add(0, 1, 0), 10, 0.4, 0.4, 0.4, 0.02)
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 		mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 0.9f, 0.7f);
 		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PHANTOM_AMBIENT, SoundCategory.PLAYERS, 2f, 0.5f);
 	}
@@ -67,9 +67,9 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
 		world.playSound(loc, Sound.ENTITY_HUSK_STEP, SoundCategory.PLAYERS, 1f, 0.5f);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 35, 0, 0, 0, 0.125)
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL, loc, 15, 0, 0, 0, 0.075)
-			.minimumCount(0).spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(mPlayer);
 
 		Vector colorValues = isGruesome ? new Vector(ECHO_COLOR.getRed(), ECHO_COLOR.getGreen(), ECHO_COLOR.getBlue()).normalize() :
 			new Vector(TWISTED_COLOR.getRed(), TWISTED_COLOR.getGreen(), TWISTED_COLOR.getBlue()).normalize();
@@ -108,7 +108,7 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 						Location loc = l.clone().add(vec);
 						new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
 							new Particle.DustOptions(color, 0.75f))
-							.minimumCount(0).spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(mPlayer);
 					}
 					if (mRadius <= 0) {
 						this.cancel();

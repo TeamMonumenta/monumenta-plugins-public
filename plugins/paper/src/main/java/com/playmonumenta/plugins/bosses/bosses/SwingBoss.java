@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
@@ -50,13 +51,13 @@ public class SwingBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_CHARGE = ParticlesList.fromString("[(SWEEP_ATTACK,1)]");
 
 		@BossParam(help = "Particle summon around the boss on the terrain")
-		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT,1)]");
+		public ParticlesList PARTICLE_CIRCLE = ParticlesList.fromString("[(CRIT,12)]");
 
 		@BossParam(help = "Sound played when the ability explode")
 		public SoundsList SOUND_EXPLODE = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_STRONG,1.5,0.65)]");
 
 		@BossParam(help = "Particle summon when the ability explode")
-		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SWEEP_ATTACK,1,0.1,0.1,0.1,0.3),(REDSTONE,2,0.25,0.25,0.25,0,#ffffff,2)]");
+		public ParticlesList PARTICLE_CIRCLE_EXPLODE = ParticlesList.fromString("[(SWEEP_ATTACK,24,0.1,0.1,0.1,0.3),(REDSTONE,48,0.25,0.25,0.25,0,#ffffff,2)]");
 
 	}
 
@@ -78,8 +79,8 @@ public class SwingBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void chargeCircleAction(Location loc) {
-					p.PARTICLE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25, 0.05);
+				protected void chargeCircleAction(Location loc, double radius) {
+					p.PARTICLE_CIRCLE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.25).extra(0.05));
 				}
 
 				@Override
@@ -88,8 +89,8 @@ public class SwingBoss extends BossAbilityGroup {
 				}
 
 				@Override
-				protected void circleOutburstAction(Location loc) {
-					p.PARTICLE_CIRCLE_EXPLODE.spawn(boss, loc, 0.2, 0.2, 0.2, 0.2);
+				protected void circleOutburstAction(Location loc, double radius) {
+					p.PARTICLE_CIRCLE_EXPLODE.spawn(boss, particle -> new PPCircle(particle, loc, radius).delta(0.2).extra(0.2));
 				}
 
 				@Override

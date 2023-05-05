@@ -194,8 +194,8 @@ public class ElementalSpiritFire extends Ability {
 										                                  .count(4)
 										                                  .delta(PartialParticle.getWidthDelta(HITBOX))
 										                                  .extra(0.05)
-										                                  .minimumCount(0)
-										.spawnAsPlayerActive(mPlayer);
+
+										                                  .spawnAsPlayerActive(mPlayer);
 									partialParticle
 										.particle(Particle.SMOKE_LARGE)
 										.spawnAsPlayerActive(mPlayer);

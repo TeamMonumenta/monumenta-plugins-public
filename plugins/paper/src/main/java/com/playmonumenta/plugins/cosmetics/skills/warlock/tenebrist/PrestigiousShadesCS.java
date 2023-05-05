@@ -100,8 +100,8 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 				@Override
 				public void run() {
 					mRadius += 1.05;
-					new PPCircle(Particle.REDSTONE, mLoc, mRadius).ringMode(true).count(40).delta(0.2).extra(0.1).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-					new PPCircle(Particle.CLOUD, mLoc, mRadius + 0.15).ringMode(true).count(10).delta(0.05).extra(0.01).spawnAsPlayerActive(mPlayer);
+					new PPCircle(Particle.REDSTONE, mLoc, mRadius).count(40).delta(0.2).extra(0.1).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+					new PPCircle(Particle.CLOUD, mLoc, mRadius + 0.15).count(10).delta(0.05).extra(0.01).spawnAsPlayerActive(mPlayer);
 					if (mRadius >= mAoeRadius + 1) {
 						this.cancel();
 					}

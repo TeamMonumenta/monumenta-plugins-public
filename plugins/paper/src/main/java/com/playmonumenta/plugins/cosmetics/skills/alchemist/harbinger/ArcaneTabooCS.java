@@ -41,11 +41,11 @@ public class ArcaneTabooCS extends TabooCS {
 			AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
 
 			new PPCircle(Particle.ENCHANTMENT_TABLE, player.getLocation().add(0, -0.25, 0), 0.5)
-				.ringMode(true).countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+				.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 				.directionalMode(true).delta(0, 1, 0).extra(1)
 				.spawnAsPlayerActive(player);
 			new PPCircle(Particle.FALLING_OBSIDIAN_TEAR, player.getLocation().add(0, 0.75, 0), 0.5)
-				.ringMode(true).count(3)
+				.count(3)
 				.spawnAsPlayerActive(player);
 		}
 	}

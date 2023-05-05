@@ -156,7 +156,7 @@ public class SpellPutridPlague extends Spell {
 					new PartialParticle(Particle.SPELL_INSTANT, mPoint4, 30, 0.45, 6, 0.45).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.SPELL_INSTANT, point.getLocation(), 65, 7, 3, 7).spawnAsEntityActive(mBoss);
 
-					new PPCircle(Particle.SPELL_INSTANT, point.getLocation(), 7).count(60).ringMode(true).spawnAsEntityActive(mBoss);
+					new PPCircle(Particle.SPELL_INSTANT, point.getLocation(), 7).count(60).spawnAsEntityActive(mBoss);
 
 					if (mChargeUp.nextTick(2)) {
 						this.cancel();

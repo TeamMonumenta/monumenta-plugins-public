@@ -100,18 +100,19 @@ public class StarfireSpinCS extends BladeDanceCS {
 	@Override
 	public void danceHit(Player player, LivingEntity mob) {
 		Location mobLoc = mob.getLocation().add(0, 1, 0);
-		new PartialParticle(Particle.END_ROD, mobLoc, 5, 0.35, 0.5, 0.35, 0).minimumCount(0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.END_ROD, mobLoc, 5, 0.35, 0.5, 0.35, 0).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, mobLoc, 10, 0.25, 0.5, 0.25, 0.3).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, FIRE_COLOR).spawnAsPlayerActive(player);
 	}
 
 	private void drawFlame(Location location, Player player, Vector direction) {
-		new PartialParticle(Particle.SMALL_FLAME, location, 1, 0, 0, 0, 0.015, null, true).delta(direction.getX(), direction.getY(), direction.getZ()).minimumCount(0)
+		new PartialParticle(Particle.SMALL_FLAME, location, 1, 0, 0, 0, 0.015, null, true)
+			.delta(direction.getX(), direction.getY(), direction.getZ())
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawTrail(Location location, Player player) {
-		new PartialParticle(Particle.REDSTONE, location, 2, 0.03, 0, 0.03, 0, FIRE_COLOR_SMALL).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 2, 0.03, 0, 0.03, 0, FIRE_COLOR_SMALL)
 			.spawnAsPlayerActive(player);
 	}
 

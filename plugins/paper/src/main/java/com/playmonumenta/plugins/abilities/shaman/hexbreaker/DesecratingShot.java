@@ -104,7 +104,7 @@ public class DesecratingShot extends Ability {
 					@Override
 					public void run() {
 
-						PPCircle lowerRing = new PPCircle(Particle.SPELL_WITCH, mob.getLocation().clone().add(0, 0.5, 0), 1).ringMode(true).count(10).delta(0).extra(0.03);
+						PPCircle lowerRing = new PPCircle(Particle.SPELL_WITCH, mob.getLocation().clone().add(0, 0.5, 0), 1).count(10).delta(0).extra(0.03);
 						lowerRing.spawnAsPlayerActive(mPlayer);
 
 						if (mTicks >= 4 * 20 || mob.isDead()) {

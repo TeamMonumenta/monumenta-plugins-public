@@ -49,7 +49,7 @@ public class MegalovaniaFinisher implements EliteFinisher {
 					mSans.setHeadPose(new EulerAngle(0, EntityUtils.getCounterclockwiseAngle(mSans, p), 0));
 					// But rotating a vector takes a clockwise angle
 					// Why, Bukkit, why?
-					new PartialParticle(Particle.SOUL_FIRE_FLAME, mSansLoc.clone().add(new Vector(-0.15, 1.75, 0.32).rotateAroundY(-EntityUtils.getCounterclockwiseAngle(mSans, p))), 1, 0, 0, 0, 0.0).spawnAsPlayerActive(p);
+					new PartialParticle(Particle.SOUL_FIRE_FLAME, mSansLoc.clone().add(new Vector(-0.15, 1.75, 0.32).rotateAroundY(-EntityUtils.getCounterclockwiseAngle(mSans, p))), 1, 0, 0, 0, 0.0).minimumCount(1).spawnAsPlayerActive(p);
 				} else if (mTicks == 46) {
 					mSans.remove();
 				} else if (mTicks >= 46) {
@@ -66,63 +66,63 @@ public class MegalovaniaFinisher implements EliteFinisher {
 				switch (mTicks) {
 					case 0:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 3:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 6:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D20);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 12:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.A15);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 21:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 27:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 33:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 39:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 42:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 45:
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
-						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
-						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
+						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						break;
 					case 46:
 						this.cancel();

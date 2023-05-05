@@ -92,12 +92,12 @@ public class GalacticCloakCS extends SmokescreenCS {
 	}
 
 	private void drawParticle(Location location, Player player, Color color) {
-		new PartialParticle(Particle.REDSTONE, location, 5, 0.03, 0, 0.03, 0, new Particle.DustOptions(color, 2.0f)).minimumCount(0)
+		new PartialParticle(Particle.REDSTONE, location, 5, 0.03, 0, 0.03, 0, new Particle.DustOptions(color, 2.0f))
 			.spawnAsPlayerActive(player);
 	}
 
 	private void drawCrit(Location location, Player player) {
-		new PartialParticle(Particle.CRIT_MAGIC, location, 5, 0.3, 0.05, 0.3, 0.075).minimumCount(0)
+		new PartialParticle(Particle.CRIT_MAGIC, location, 5, 0.3, 0.05, 0.3, 0.075)
 			.spawnAsPlayerActive(player);
 	}
 }

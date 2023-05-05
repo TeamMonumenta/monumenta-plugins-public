@@ -30,7 +30,7 @@ public class ShieldWallCS implements CosmeticSkill {
 	}
 
 	public void shieldWallDot(Player mPlayer, Location l, double degree, double angle, int y, int height) {
-		new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).minimumCount(0).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsPlayerActive(mPlayer);
 	}
 
 	public void shieldOnBlock(World world, Location eLoc, Player mPlayer) {
