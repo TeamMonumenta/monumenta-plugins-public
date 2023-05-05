@@ -148,6 +148,15 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r3/exalteds/lightblue/delves/delve_academy", "r3/exalteds/lightblue/delves/dmat_academy", "r3/exalteds/lightblue/delves/cmat_academy", "r3/exalteds/lightblue/chest_academy").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/exalteds/lightblue/delves/delve_bastion", "r3/exalteds/lightblue/delves/dmat_bastion", "r3/exalteds/lightblue/delves/cmat_bastion", "r3/exalteds/lightblue/chest_bastion").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/exalteds/lightblue/delves/lootroom_delve_chest", "r3/exalteds/lightblue/delves/lootroom_dmat_chest", "r3/exalteds/lightblue/delves/lootroom_cmat_chest", "r3/exalteds/lightblue/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		// yellow
+		new DelveLootTableGroup("r3/exalteds/yellow/delves/delve_seasons", "r3/exalteds/yellow/delves/dmat_seasons", "r3/exalteds/yellow/delves/cmat_seasons", "r3/exalteds/yellow/chest_aquiren", "r3/exalteds/yellow/chest_hellshire", "r3/exalteds/yellow/chest_city", "r3/exalteds/yellow/chest_exien").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/yellow/delves/delve_ender", "r3/exalteds/yellow/delves/dmat_ender", "r3/exalteds/yellow/delves/cmat_ender", "r3/exalteds/yellow/chest_ender").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/yellow/delves/lootroom_delve_chest", "r3/exalteds/yellow/delves/lootroom_dmat_chest", "r3/exalteds/yellow/delves/lootroom_cmat_chest", "r3/exalteds/yellow/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+		// willows
+		new DelveLootTableGroup("r3/exalteds/willows/delves/delve_chest", "r3/exalteds/willows/delves/dmat_chest", "r3/exalteds/willows/delves/cmat_chest", "r3/exalteds/willows/chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		new DelveLootTableGroup("r3/exalteds/willows/delves/lootroom_delve_chest", "r3/exalteds/willows/delves/lootroom_dmat_chest", "r3/exalteds/willows/delves/lootroom_cmat_chest", "r3/exalteds/willows/lootroom_chest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 	}
 
 
