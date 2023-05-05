@@ -185,6 +185,7 @@ public class EntityUtils {
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
 	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
+	private static final String SILENCE_IMMUNE_TAG = "boss_silenceimmune";
 	private static final Map<LivingEntity, Integer> COOLING_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
@@ -330,7 +331,7 @@ public class EntityUtils {
 		return ScoreboardUtils.checkTag(entity, "Boss");
 	}
 
-	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, cannot be silenced, etc.
+	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, etc.
 	public static boolean isCCImmuneMob(Entity entity) {
 		return isBoss(entity)
 			|| ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
@@ -1184,7 +1185,7 @@ public class EntityUtils {
 	}
 
 	public static void applySilence(Plugin plugin, int ticks, LivingEntity mob) {
-		if (isBoss(mob)) {
+		if (isBoss(mob) || ScoreboardUtils.checkTag(mob, SILENCE_IMMUNE_TAG)) {
 			return;
 		}
 
