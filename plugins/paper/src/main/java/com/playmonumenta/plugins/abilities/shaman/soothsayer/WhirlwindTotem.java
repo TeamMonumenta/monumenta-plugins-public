@@ -102,6 +102,11 @@ public class WhirlwindTotem extends TotemAbility {
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
+		if (ticks == 0) {
+			world.playSound(standLocation, Sound.ENTITY_ENDER_EYE_LAUNCH, 2.0f, 0.1f);
+			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 2.0f, 0.7f);
+			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 2.0f, 1.3f);
+		}
 		if (ticks % INTERVAL == 0) {
 			List<Player> affectedPlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 

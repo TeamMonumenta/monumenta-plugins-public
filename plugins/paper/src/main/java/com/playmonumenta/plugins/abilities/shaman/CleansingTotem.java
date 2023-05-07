@@ -100,6 +100,10 @@ public class CleansingTotem extends TotemAbility {
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
+		if (ticks == 0) {
+			world.playSound(standLocation, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 2.0f, 1.3f);
+			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.8f, 2.0f);
+		}
 		if (ticks % 20 == 0) {
 			List<Player> affectedPlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 
@@ -114,7 +118,6 @@ public class CleansingTotem extends TotemAbility {
 			cleansingRing.spawnAsPlayerActive(mPlayer);
 			cleansingSpiral.spawnAsPlayerActive(mPlayer);
 
-			world.playSound(standLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, 0.3f, 0.5f);
 		}
 		if (isLevelTwo() && ticks == mDuration / (CLEANSES + (int) CharmManager.getLevel(mPlayer, CHARM_CLEANSES)) - 1) {
 			List<Player> cleansePlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);

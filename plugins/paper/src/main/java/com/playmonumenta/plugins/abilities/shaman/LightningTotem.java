@@ -98,7 +98,7 @@ public class LightningTotem extends TotemAbility {
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		new PPCircle(Particle.REDSTONE, standLocation, mRadius).data(YELLOW).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.CRIT, standLocation.clone().add(0, 0.3, 0), mRadius).countPerMeter(0.4).spawnAsPlayerActive(mPlayer);
 		if (ticks % INTERVAL == 0) {
 			if (mTarget == null || mTarget.isDead() || !mTarget.isValid() || mTarget.getLocation().distance(standLocation) > mRadius) {
 				mTarget = null;
@@ -126,7 +126,7 @@ public class LightningTotem extends TotemAbility {
 				PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
 					.count(8).duration(3);
 				mPlayer.getWorld().playSound(mTarget.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
-				lightning.init(6, 2.5, 0.3, 0.3);
+				lightning.init(4, 2.5, 0.3, 0.3);
 				lightning.spawnAsPlayerActive(mPlayer);
 			}
 		}

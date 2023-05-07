@@ -36,6 +36,8 @@ public abstract class TotemAbility extends Ability {
 	public @Nullable LivingEntity mAttachedMob = null;
 	public @Nullable LivingEntity mMobStuckWithEffect = null;
 
+	private @Nullable BukkitRunnable mTotemTickingRunnable;
+
 	public TotemAbility(Plugin plugin, Player player, AbilityInfo<?> info, String projectileName, String totemName) {
 		super(plugin, player, info);
 		mProjectileName = projectileName;
@@ -102,6 +104,7 @@ public abstract class TotemAbility extends Ability {
 							!EntityUtils.isBoss(hitMob) &&
 							!(hitMob instanceof Player || hitMob instanceof ArmorStand)) {
 						mAttachedMob = mob;
+						mAttachedMob.getWorld().playSound(mAttachedMob, Sound.BLOCK_HONEY_BLOCK_PLACE, 2.0f, 0.7f);
 
 						if (stickyTotems.isLevelTwo()) {
 							mMobStuckWithEffect = mob;
@@ -140,14 +143,12 @@ public abstract class TotemAbility extends Ability {
 		durationStand.setCollidable(false);
 
 		int duration = getTotemDuration();
-		new BukkitRunnable() {
+		mTotemTickingRunnable = new BukkitRunnable() {
 			int mT = 0;
 			@Override
 			public void run() {
 				Location standLocation = stand.getLocation();
 				if (stand.isDead() || !stand.isValid()) {
-					durationStand.remove();
-					TotemicEmpowerment.removeTotem(mPlayer, stand);
 					this.cancel();
 					return;
 				}
@@ -168,15 +169,20 @@ public abstract class TotemAbility extends Ability {
 				AbilityUtils.produceDurationString(stand, durationStand, duration, mT);
 
 				if (mT >= duration || mPlayer.isDead() || !mPlayer.isValid() || !mPlayer.getWorld().equals(standLocation.getWorld())) {
-					durationStand.remove();
-					TotemicEmpowerment.removeTotem(mPlayer, stand);
 					onTotemExpire(world, standLocation);
 					this.cancel();
 				}
 				mT++;
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+			@Override
+			public synchronized void cancel() {
+				durationStand.remove();
+				TotemicEmpowerment.removeTotem(mPlayer, stand);
+				super.cancel();
+			}
+		};
+		mTotemTickingRunnable.runTaskTimer(mPlugin, 0, 1);
 	}
 
 	public abstract int getTotemDuration();
@@ -187,5 +193,13 @@ public abstract class TotemAbility extends Ability {
 
 	public void onAdhereToMob(LivingEntity hitMob) {
 
+	}
+
+	@Override
+	public void invalidate() {
+		if (mTotemTickingRunnable != null) {
+			mTotemTickingRunnable.cancel();
+		}
+		super.invalidate();
 	}
 }

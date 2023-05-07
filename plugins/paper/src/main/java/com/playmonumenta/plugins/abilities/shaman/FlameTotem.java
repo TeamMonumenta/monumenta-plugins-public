@@ -32,11 +32,12 @@ import org.bukkit.entity.Player;
 public class FlameTotem extends TotemAbility {
 
 	private static final int COOLDOWN = 20 * 20;
-	private static final int TOTEM_DURATION = 10 * 20;
+	private static final int DURATION_1 = 10 * 20;
+	private static final int DURATION_2 = 12 * 20;
 	private static final int AOE_RANGE = 6;
 	private static final int FIRE_DURATION = 2 * 20;
 	private static final int DAMAGE_1 = 3;
-	private static final int DAMAGE_2 = 5;
+	private static final int DAMAGE_2 = 4;
 	public static final String TOTEM_NAME = "Flame Totem";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
@@ -63,11 +64,12 @@ public class FlameTotem extends TotemAbility {
 					AOE_RANGE,
 					DAMAGE_1,
 					StringUtils.ticksToSeconds(FIRE_DURATION),
-					StringUtils.ticksToSeconds(TOTEM_DURATION),
+					StringUtils.ticksToSeconds(DURATION_1),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),
-				String.format("The totem deals %s magic damage per hit.",
-					DAMAGE_2)
+				String.format("The totem deals %s magic damage per hit and duration is extended to %ss.",
+					DAMAGE_2,
+					StringUtils.ticksToSeconds(DURATION_2))
 			)
 			.simpleDescription("Summon a totem that deals damage and sets mobs on fire within its range.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -86,7 +88,7 @@ public class FlameTotem extends TotemAbility {
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
 
-		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, TOTEM_DURATION);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 		mFireDuration = CharmManager.getDuration(mPlayer, CHARM_FIRE_DURATION, FIRE_DURATION);
 	}
@@ -98,7 +100,7 @@ public class FlameTotem extends TotemAbility {
 
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
-		PPCircle fireRing = new PPCircle(Particle.FLAME, standLocation, mRadius).ringMode(true).countPerMeter(1.3).delta(0);
+		PPCircle fireRing = new PPCircle(Particle.FLAME, standLocation, mRadius).ringMode(true).countPerMeter(0.6).delta(0);
 		fireRing.spawnAsPlayerActive(mPlayer);
 		if (ticks % 20 == 0) {
 			pulse(standLocation, world, stats);

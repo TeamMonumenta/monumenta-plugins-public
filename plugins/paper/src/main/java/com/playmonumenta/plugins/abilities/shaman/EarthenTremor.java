@@ -130,7 +130,7 @@ public class EarthenTremor extends Ability {
 							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
 						}
 
-						if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !mPlayer.getScoreboardTags().contains("NoTremorKnockup")) {
+						if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !mPlayer.getScoreboardTags().contains("NoTremorKnockup") && mPlayer.getLocation().distance(loc) <= RADIUS) {
 							knockup(mPlayer);
 						}
 

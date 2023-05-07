@@ -63,7 +63,7 @@ public class EyeOfTheStorm extends Ability {
 				),
 				String.format("Magic damage increased to %s and cooldown reduced to %ss.",
 					DAMAGE_2,
-					StringUtils.ticksToSeconds(COOLDOWN_2 / 20))
+					StringUtils.ticksToSeconds(COOLDOWN_2))
 			)
 			.simpleDescription("Summon a medium sized ring which deals damage to mobs within and pulls them towards its center.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
@@ -121,6 +121,8 @@ public class EyeOfTheStorm extends Ability {
 	}
 
 	private void ring(Location loc, ItemStatManager.PlayerItemStats stats) {
+		loc.getWorld().playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, 0.2f, 1.4f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_PORTAL_AMBIENT, 0.4f, 0.3f);
 		new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -135,7 +137,8 @@ public class EyeOfTheStorm extends Ability {
 				if (mTicks % 20 == 0) {
 					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
 					if (!affectedMobs.isEmpty()) {
-						loc.getWorld().playSound(loc, Sound.ENTITY_CAT_HISS, 2.0f, 1.0f);
+						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, 0.6f, 0.1f);
+						loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_AMBIENT, 0.3f, 0.6f);
 						for (LivingEntity mob : affectedMobs) {
 							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 							mob.getWorld().playSound(mob.getLocation(), Sound.ENTITY_CAT_HISS, 2.0f, 1.0f);

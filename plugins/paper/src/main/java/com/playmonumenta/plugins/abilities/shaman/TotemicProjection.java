@@ -116,6 +116,7 @@ public class TotemicProjection extends Ability {
 			List<LivingEntity> theTotems = TotemicEmpowerment.getTotemList(mPlayer);
 			mPlayer.playSound(dropCenter, Sound.BLOCK_VINE_BREAK, 2.0f, 1.0f);
 			new PartialParticle(Particle.REVERSE_PORTAL, dropCenter, 20).spawnAsPlayerActive(mPlayer);
+			mPlayer.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.7f);
 
 			for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
 				if (abil instanceof TotemAbility totemAbility) {
