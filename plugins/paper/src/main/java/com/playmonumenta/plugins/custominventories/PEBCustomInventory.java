@@ -198,6 +198,13 @@ public class PEBCustomInventory extends CustomInventory {
 					.append(Component.text("Patreon ", NamedTextColor.GOLD))
 					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
 				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
+			new PebItem(22, gui -> "Toggle display other player's gear (" +
+				(ScoreboardUtils.getScoreboardValue(gui.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1) == 1 ? "Enabled)" : "Disabled)"),
+				gui -> Component.text("Toggles if you want to see the gear on other players, which may improve performance ", NamedTextColor.LIGHT_PURPLE),
+				Material.LEATHER_HELMET, false).action((inventory, action) -> {
+					int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1);
+					ScoreboardUtils.setScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear", oldValue == 0 ? 1 : 0);
+				}),
 			new PebItem(23, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, false).playerCommand("clickable peb_tid"),

@@ -11,6 +11,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.List;
+
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -33,14 +35,23 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 	@Override
 	public void onPacketSending(PacketEvent event) {
 
-		// doc: https://wiki.vg/Protocol#Entity_Equipment
+		// doc: https://wiki.vg/Protocol#Set_Equipment
 
 		PacketContainer packet = event.getPacket();
 		Entity entity = packet.getEntityModifier(event).read(0);
 		VanityManager.VanityData vanityData = entity instanceof Player player && mPlugin.mVanityManager.getData(event.getPlayer()).mOtherVanityEnabled ? mPlugin.mVanityManager.getData(player) : null;
+
 		List<Pair<EnumWrappers.ItemSlot, ItemStack>> items = packet.getSlotStackPairLists().read(0);
 		for (Pair<EnumWrappers.ItemSlot, ItemStack> pair : items) {
-			if (vanityData != null && pair.getSecond() != null && pair.getSecond().getType() != Material.AIR) {
+			// we replace the item if the player that the packet is sent to has gear disabled...
+			if(ScoreboardUtils.getScoreboardValue(event.getPlayer(), "ShouldDisplayOtherPlayerGear").orElse(1) == 0 &&
+				// and if the entity whose gear we are modifying is a player
+				entity instanceof Player &&
+				// and it is not the current player, since they need to see their own gear
+				!entity.getUniqueId().equals(event.getPlayer().getUniqueId())) {
+				pair.setSecond(new ItemStack(Material.AIR));
+			}
+			else if (vanityData != null && pair.getSecond() != null && pair.getSecond().getType() != Material.AIR) {
 				ItemStack vanity = vanityData.getEquipped(itemSlotToEquipmentSlot(pair.getFirst()));
 				if (vanity != null && vanity.getType() != Material.AIR) {
 					if (VanityManager.isInvisibleVanityItem(vanity)) {
