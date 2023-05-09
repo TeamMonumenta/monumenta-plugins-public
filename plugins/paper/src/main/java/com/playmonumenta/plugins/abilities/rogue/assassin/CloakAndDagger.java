@@ -48,7 +48,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 			.descriptions(
 				String.format("When you kill an enemy you gain a stack of cloak. Elite kills and Boss \"kills\" give you %s stacks (every %s damage to them in R2; every %s damage to them in R3). Stacks are capped at %s. " +
 					              "When you press the drop key with dual wielded swords, you lose your cloak stacks and gain %s seconds of Stealth " +
-					              "and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. You must have at least %s stacks to activate this.",
+					              "and (%s * X) extra damage on your next stealth attack, where X is the number of stacks you had at activation. This attack ends stealth. You must have at least %s stacks to activate this.",
 					CLOAK_STACKS_ON_ELITE_KILL,
 					BOSS_DAMAGE_THRESHOLD_R2,
 					BOSS_DAMAGE_THRESHOLD_R3,
