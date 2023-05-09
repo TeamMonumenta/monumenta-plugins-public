@@ -1,10 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -242,11 +239,15 @@ public class SpellBaseSeekingProjectile extends Spell {
 					if (!mLaunchTracking) {
 						for (Map.Entry<LivingEntity, Location> entry : mLocations.entrySet()) {
 							LivingEntity target = entry.getKey();
-							launchDX(target, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+							if (!(target instanceof Player) || !AbilityUtils.isStealthed((Player) target)) {
+								launchDX(target, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+							}
 						}
 					} else {
 						for (LivingEntity target : mTargets) {
-							launchDX(target, target.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+							if (!(target instanceof Player) || !AbilityUtils.isStealthed((Player) target)) {
+								launchDX(target, target.getEyeLocation(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
+							}
 						}
 					}
 
@@ -281,7 +282,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 						// Single target chooses a random player within range
 						Collections.shuffle(mPlayers);
 						for (Player player : mPlayers) {
-							if (LocationUtils.hasLineOfSight(mBoss, player)) {
+							if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
 								if (!mLaunchTracking) {
 									launchDX(player, Objects.requireNonNull(mLocations.get(player)), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								} else {
@@ -295,7 +296,7 @@ public class SpellBaseSeekingProjectile extends Spell {
 						if (!mLaunchTracking) {
 							for (Map.Entry<Player, Location> entry : mLocations.entrySet()) {
 								Player player = entry.getKey();
-								if (LocationUtils.hasLineOfSight(mBoss, player)) {
+								if (LocationUtils.hasLineOfSight(mBoss, player) && !AbilityUtils.isStealthed(player)) {
 									launchDX(player, entry.getValue(), mOffsetLeft, mOffsetUp, mOffsetFront, mSplit, mSplitAngle, mMirror, mFixYaw, mFixPitch);
 								}
 							}
