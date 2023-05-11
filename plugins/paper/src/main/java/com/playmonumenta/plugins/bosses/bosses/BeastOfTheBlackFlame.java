@@ -13,9 +13,11 @@ import com.playmonumenta.plugins.bosses.spells.sealedremorse.BlackflameOrb;
 import com.playmonumenta.plugins.bosses.spells.sealedremorse.PassiveVoidRift;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.SerializationUtils;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +50,8 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	public static final String identityTag = "boss_beast_blackflame";
 	public static final int detectionRange = 75;
 	public static final String losName = "BeastOfTheBlackFlame";
+	public static final String MUSIC_TITLE = "epic:music.srbeast";
+	public static final double MUSIC_DURATION = 152.8; // seconds
 
 	private static final int BASE_HEALTH = 3333;
 
@@ -288,13 +292,14 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 	@Override
 	public void init() {
-		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true).size();
+		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		int playerCount = players.size();
 		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(bossTargetHp);
-		mBoss.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(detectionRange);
-		mBoss.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
-		mBoss.setHealth(bossTargetHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, bossTargetHp);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
+		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
 
 		mBoss.setPersistent(true);
 

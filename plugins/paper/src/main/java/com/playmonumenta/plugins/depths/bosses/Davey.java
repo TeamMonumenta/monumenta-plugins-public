@@ -62,8 +62,8 @@ public class Davey extends BossAbilityGroup {
 	public static final String VEX_LOS = "AbyssalSpawn";
 	public static final int SWAP_TARGET_SECONDS = 15;
 
-	public static final String MUSIC_TITLE = "epic:music.varcosa";
-	private static final int MUSIC_DURATION = 196; //seconds
+	public static final String MUSIC_TITLE = "epic:music.davey";
+	private static final int MUSIC_DURATION = 191; //seconds
 
 	private final Location mSpawnLoc;
 	private final Location mEndLoc;
