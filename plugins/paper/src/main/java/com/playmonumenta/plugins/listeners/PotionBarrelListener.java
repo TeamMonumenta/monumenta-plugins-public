@@ -37,6 +37,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
@@ -271,7 +272,8 @@ public class PotionBarrelListener implements Listener {
 			Inventory barrelInventory = barrel.getInventory();
 			if (ShulkerShortcutListener.isPurpleTesseract(playerInventory.getItemInMainHand())) {
 				if (!player.hasPermission(PERMISSION_PURPLE_TESSERACT)) {
-					player.sendMessage(Component.text("Carrier of Emotion has been disabled due to a bug", NamedTextColor.RED));
+					player.sendMessage(ItemUtils.getDisplayName(playerInventory.getItemInMainHand())
+						.append(Component.text(" has been disabled due to a bug", NamedTextColor.RED)));
 					errorSound(player);
 					event.setCancelled(true);
 					return;
@@ -296,6 +298,9 @@ public class PotionBarrelListener implements Listener {
 					if (!ItemUtils.isNullOrAir(item)) {
 						if (barrelPotion == null) {
 							barrelPotion = ItemUtils.clone(item);
+						}
+						if (!barrelPotion.isSimilar(item)) {
+							continue;
 						}
 						while (carryOver + item.getAmount() >= 27) {
 							playerInventory.removeItem(new ItemStack(Material.CHEST));
@@ -397,6 +402,18 @@ public class PotionBarrelListener implements Listener {
 				}
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void inventoryMoveItemEvent(InventoryMoveItemEvent event) {
+		Inventory barrelInventory = event.getDestination();
+		if (!(barrelInventory.getType() == InventoryType.BARREL
+			&& barrelInventory.getHolder() instanceof BlockInventoryHolder blockInventoryHolder
+			&& isPotionBarrel(blockInventoryHolder.getBlock()))) {
+			return;
+		}
+		// Cancel dropper item transfer events
+		event.setCancelled(true);
 	}
 
 	private @Nullable ItemStack getBarrelPotion(Inventory barrelInventory) {
