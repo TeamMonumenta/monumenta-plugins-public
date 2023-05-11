@@ -503,6 +503,7 @@ public final class ItemOverrides {
 		if (item.hasItemMeta()
 			&& item.getItemMeta().hasLore()
 			&& player.getGameMode() != GameMode.CREATIVE
+			&& !EXCEPTION_LORED_MATERIALS.contains(item.getType())
 			&& !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
 			eventCancelled |= true;
 		}
