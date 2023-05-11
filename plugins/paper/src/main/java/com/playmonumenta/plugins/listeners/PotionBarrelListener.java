@@ -44,12 +44,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.Nullable;
 
 public class PotionBarrelListener implements Listener {
 
 	public static final String POTION_BARREL_NAME = "Potion Barrel";
 	public static final NamespacedKey POTION_BARREL_LOOT_TABLE = NamespacedKeyUtils.fromString("epic:items/potion_barrel");
+	public static final Permission PERMISSION_PURPLE_TESSERACT = new Permission("monumenta.tesseract.purple");
 
 	// inventory handling
 
@@ -268,6 +270,12 @@ public class PotionBarrelListener implements Listener {
 			PlayerInventory playerInventory = player.getInventory();
 			Inventory barrelInventory = barrel.getInventory();
 			if (ShulkerShortcutListener.isPurpleTesseract(playerInventory.getItemInMainHand())) {
+				if (!player.hasPermission(PERMISSION_PURPLE_TESSERACT)) {
+					player.sendMessage(Component.text("Carrier of Emotion has been disabled due to a bug", NamedTextColor.RED));
+					errorSound(player);
+					event.setCancelled(true);
+					return;
+				}
 				// Take out carriers (sneaking = as many as possible, not sneaking = only one)
 				int numChests = InventoryUtils.numInInventory(playerInventory, new ItemStack(Material.CHEST));
 				if (numChests == 0) {
