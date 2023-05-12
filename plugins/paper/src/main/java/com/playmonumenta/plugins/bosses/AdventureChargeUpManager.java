@@ -15,6 +15,7 @@ public class AdventureChargeUpManager {
 	private Component mTitle;
 	private final @Nullable Entity mBoss;
 	private Location mLoc;
+	private final boolean mRequireBoss; //If this is true then boss bar is hidden if mBoss = null;
 	private @Nullable BukkitRunnable mRunnable;
 	private int mRefresh;
 
@@ -29,6 +30,7 @@ public class AdventureChargeUpManager {
 		mLoc = loc;
 		mChargeTime = chargeTime;
 		mBoss = boss;
+		mRequireBoss = boss != null;
 		mTitle = title;
 		mTime = 0;
 		mRange = range;
@@ -69,9 +71,6 @@ public class AdventureChargeUpManager {
 	public void update() {
 		if (mBoss != null) {
 			mLoc = mBoss.getLocation();
-			if (!mBoss.isValid()) {
-				mBoss.getWorld().hideBossBar(mBar);
-			}
 		}
 
 		mRefresh = 0;
@@ -94,7 +93,7 @@ public class AdventureChargeUpManager {
 		}
 
 		for (Player player : mLoc.getWorld().getPlayers()) {
-			if (mBoss != null && mBoss.isValid() && player.getLocation().distance(mLoc) < mRange) {
+			if ((!mRequireBoss || (mBoss != null && mBoss.isValid())) && player.getLocation().distance(mLoc) < mRange) {
 				player.showBossBar(mBar);
 			} else {
 				player.hideBossBar(mBar);

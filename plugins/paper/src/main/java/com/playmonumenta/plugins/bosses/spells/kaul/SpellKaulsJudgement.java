@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.bosses.spells.kaul;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
-import com.playmonumenta.plugins.effects.*;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentHealthBoost;
+import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -14,7 +16,6 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,13 +37,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 /*
@@ -64,66 +64,47 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final String KAULS_JUDGEMENT_TAG = "KaulsJudgementTag";
 	private static final String KAULS_JUDGEMENT_MOB_SPAWN_TAG = "KaulsJudgementMobSpawn";
 	private static final String KAULS_JUDGEMENT_MOB_TAG = "deleteelite";
-	private static final int KAULS_JUDGEMENT_TIME = 20 * 55;
+	private static final int KAULS_JUDGEMENT_TOTAL_TIME = 20 * 55;
+	private static final int KAULS_JUDGEMENT_CHARGE_TIME = 20 * 2;
+	private static final int KAULS_JUDGEMENT_MIN_TIME_BETWEEN = 20 * 90;
 	private static final String NEGATIVE_HEALTH_EFFECT_NAME = "KaulsJudgementNegativeHealthBoost";
 	private static final String SLOWNESS_EFFECT_NAME = "KaulsJudgementSlowness";
 	private static final String STRENGTH_EFFECT_NAME = "KaulsJudgementStrength";
 	private static final String SPEED_EFFECT_NAME = "KaulsJudgementSpeed";
 
-	private static @Nullable SpellKaulsJudgement INSTANCE = null;
-
 	private final Plugin mPlugin = Plugin.getInstance();
 	private final Location mBossLoc;
+	private final LivingEntity mBoss;
 	private @Nullable LivingEntity mTp = null;
 	private boolean mOnCooldown = false;
 
-	private final List<Player> mJudgedPlayers = new ArrayList<Player>();
-	private final HashMap<Player, Location> mOrigPlayerLocs = new HashMap<Player, Location>();
+	private final HashMap<Player, Location> mJudgedPlayersAndOrigins = new HashMap<Player, Location>();
 
 	private final ChargeUpManager mChargeUp;
 
-	private SpellKaulsJudgement(Location bossLoc) {
-		mBossLoc = bossLoc;
-		for (Entity e : bossLoc.getWorld().getEntities()) {
-			if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_TP_TAG) && e instanceof LivingEntity) {
-				mTp = (LivingEntity) e;
-				break;
-			}
-		}
 
-		mChargeUp = new ChargeUpManager(mBossLoc, null, 20 * 2, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement...",
+	public SpellKaulsJudgement(LivingEntity boss) {
+		mBoss = boss;
+		mBossLoc = boss.getLocation();
+		mChargeUp = new ChargeUpManager(boss, KAULS_JUDGEMENT_CHARGE_TIME, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement...",
 			BarColor.GREEN, BarStyle.SEGMENTED_10, 75);
 		/* Register this instance as an event handler so it can catch player events */
 		mPlugin.getServer().getPluginManager().registerEvents(this, mPlugin);
-	}
-
-	/*
-	 * If a boss is specified, overwrites the current boss entity
-	 * If no boss is specified (null), does not create an instance
-	 */
-	@Contract("!null -> !null")
-	public static @Nullable SpellKaulsJudgement getInstance(Location bossLoc) {
-		if (INSTANCE == null) {
-			if (bossLoc == null) {
-				return null;
-			} else {
-				return INSTANCE = new SpellKaulsJudgement(bossLoc);
-			}
-		}
-		return INSTANCE;
 	}
 
 	@Override
 	public void run() {
 		mOnCooldown = true;
 		World world = mBossLoc.getWorld();
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, 20 * 90);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, KAULS_JUDGEMENT_MIN_TIME_BETWEEN);
 
+		/* Clear lingering Judgement mobs; shouldn't be necessary */
 		for (Entity e : world.getEntities()) {
 			if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_MOB_TAG)) {
 				e.remove();
 			}
 		}
+
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			for (Entity e : world.getEntities()) {
@@ -135,101 +116,123 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			}
 		}, 50);
 
+		/* Clear Judgement mobs at end of cast */
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			world.getEntities().stream()
 				.filter(e -> ScoreboardUtils.checkTag(e, KAULS_JUDGEMENT_MOB_TAG))
 				.forEach(Entity::remove);
-		}, KAULS_JUDGEMENT_TIME);
+		}, KAULS_JUDGEMENT_TOTAL_TIME);
 
 		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE, true);
-		players.removeIf(p -> p.getLocation().getY() >= 61);
+		players.removeIf(p -> p.getLocation().getY() >= 61); //Get rid of spectators
 		for (Player player : players) {
 			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");
 		}
 		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
 		new PartialParticle(Particle.SMOKE_LARGE, mBossLoc, 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
-		double amount = Math.ceil(players.size() / 2);
-		if (amount < 2) {
-			amount++;
-		}
 
+		int amount = Math.max(2, (players.size() + 1)/2);
 		Collections.shuffle(players);
 		while (players.size() > amount) {
 			players.remove(0);
 		}
 
-		mOrigPlayerLocs.clear();
+		mJudgedPlayersAndOrigins.clear();
 		for (Player player : players) {
-			mOrigPlayerLocs.put(player, player.getLocation());
+			mJudgedPlayersAndOrigins.put(player, player.getLocation());
 		}
-		mJudgedPlayers.addAll(players);
 
 		// This is in a separate function to ensure it doesn't use local variables from this function
 		judge();
 	}
 
 	private void judge() {
+		if (mTp == null) {
+			return;
+		}
 		new BukkitRunnable() {
-			final World mWorld = mBossLoc.getWorld();
 			int mTicks = 0;
+			final ChargeUpManager mRaceTimer = new ChargeUpManager(mTp.getLocation(), null, KAULS_JUDGEMENT_TOTAL_TIME - KAULS_JUDGEMENT_CHARGE_TIME, ChatColor.RED + "Escape " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement",
+				BarColor.GREEN, BarStyle.SEGMENTED_10, 75);;
 
 			@Override
 			public void run() {
+				// Shouldn't be possible, canRun fails if mTp is null
 				if (mTp == null) {
 					cancel();
 					return;
 				}
 				mTicks++;
 
-				if (mTicks < 20 * 2) {
+				if (mTicks < KAULS_JUDGEMENT_CHARGE_TIME) {
+					if (mBoss.isDead()) {
+						this.cancel();
+						return;
+					}
 					mChargeUp.nextTick();
 					/* pre-judgement particles */
-					for (Player player : mJudgedPlayers) {
+					mJudgedPlayersAndOrigins.keySet().forEach((player) -> {
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 2, 0.4, 0.4, 0.4, 0).spawnAsBoss();
 						new PartialParticle(Particle.SPELL_MOB, player.getLocation().add(0, 1.5, 0), 3, 0.4, 0.4, 0.4, 0).spawnAsBoss();
-					}
-				} else if (mTicks == 20 * 2) {
+					});
+				} else if (mTicks == KAULS_JUDGEMENT_CHARGE_TIME) {
 					mChargeUp.reset();
+					mRaceTimer.nextTick(KAULS_JUDGEMENT_TOTAL_TIME - KAULS_JUDGEMENT_CHARGE_TIME);
 					/* Start judgement */
-					for (Player player : mJudgedPlayers) {
+					mJudgedPlayersAndOrigins.keySet().forEach((player) -> {
 						player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
-						mWorld.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
+						/* Spawn a copy of particles and sounds at departure location */
+						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
+
 						Location tpLoc = mTp.getLocation();
 						tpLoc.add(FastUtils.randomDoubleInRange(-6, 6), 0, FastUtils.randomDoubleInRange(-6, 6));
 						tpLoc.setYaw(tpLoc.getYaw() + FastUtils.randomFloatInRange(-30, 30));
 						tpLoc.setPitch(tpLoc.getPitch() + FastUtils.randomFloatInRange(-10, 10));
 						player.teleport(tpLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
+
+						/* Spawn a copy of particles and sounds at arrival location */
 						player.playSound(tpLoc, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
+
 						player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
 						MessagingUtils.sendTitle(player, Component.text("ESCAPE", NamedTextColor.RED, TextDecoration.BOLD), Component.empty(), 1, 20 * 3, 1);
+					});
+				} else if (mTicks < KAULS_JUDGEMENT_TOTAL_TIME) {
+					if (mBoss.isDead()) {
+						this.cancel();
+						return;
 					}
-				} else if (mTicks < KAULS_JUDGEMENT_TIME) {
+					mRaceTimer.previousTick();
 					/* Judgement ticks - anyone who loses the tag early must have succeeded */
-					Iterator<Player> iter = mJudgedPlayers.iterator();
-					while (iter.hasNext()) {
-						Player player = iter.next();
-
+					new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach((player) -> {
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0).spawnAsBoss();
 						if (!player.getScoreboardTags().contains(KAULS_JUDGEMENT_TAG)) {
-							iter.remove();
 							succeed(player);
 						}
-					}
+					});
 				} else {
+					mRaceTimer.reset();
 					/* Judgement ends - anyone left in judgement fails
 					 * Make a copy to avoid concurrent modification exceptions
 					 */
-					for (Player player : new ArrayList<Player>(mJudgedPlayers)) {
+					new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach((player) -> {
 						fail(player);
-					}
-					mOrigPlayerLocs.clear();
-					mJudgedPlayers.clear();
+					});
+					//This shouldn't do anything, fail already clears players
+					mJudgedPlayersAndOrigins.clear();
 					this.cancel();
 				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				mRaceTimer.reset();
+				mChargeUp.reset();
+				new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach(p -> endCommon(p));
+				super.cancel();
 			}
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
@@ -264,18 +267,26 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		if (player.getFireTicks() > 0) {
 			player.setFireTicks(1);
 		}
-		Location loc = mOrigPlayerLocs.get(player);
+		Location loc = mJudgedPlayersAndOrigins.get(player);
 		if (loc != null) {
 			player.teleport(loc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
-			mOrigPlayerLocs.remove(player);
 		}
 		new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 		new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
-		mJudgedPlayers.remove(player);
+		mJudgedPlayersAndOrigins.remove(player);
 	}
 
 	@Override
 	public boolean canRun() {
+		for (Entity e : mBossLoc.getWorld().getEntities()) {
+			if (e.getScoreboardTags().contains(KAULS_JUDGEMENT_TP_TAG) && e instanceof LivingEntity) {
+				mTp = (LivingEntity) e;
+				break;
+			}
+		}
+		if (mTp == null) {
+			mPlugin.getLogger().severe("Failed to find Kaul's Judgement teleport marker entity. Is it loaded?");
+		}
 		return mTp != null && !mOnCooldown;
 	}
 
@@ -289,21 +300,17 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		return 20 * 4;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void entityDamageEvent(EntityDamageEvent event) {
-		Entity damagee = event.getEntity();
-
-		if (damagee instanceof Player player) {
-			if (mOrigPlayerLocs.containsKey(player)) {
-				/* A player currently in judgement took damage */
-				if (event.getFinalDamage() >= player.getHealth()) {
-					/* This would kill the player */
-					// note that this check is correct like this, as getFinalDamage returns only health damage done (damage - absorption)
-
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void playerDeath(PlayerDeathEvent event) {
+		Player player = event.getEntity();
+		if (mJudgedPlayersAndOrigins.containsKey(player)) {
+			event.setCancelled(true);
+			new BukkitRunnable() {
+				@Override
+				public void run() {
 					fail(player);
-					event.setDamage(0.1);
 				}
-			}
+			}.runTaskLater(mPlugin, 1);
 		}
 	}
 
@@ -311,7 +318,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 
-		if (mOrigPlayerLocs.containsKey(player)) {
+		if (mJudgedPlayersAndOrigins.containsKey(player)) {
 			/* A player currently in judgement logged out */
 
 			fail(player);

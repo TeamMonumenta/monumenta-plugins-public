@@ -213,27 +213,28 @@ public class Kaul extends BossAbilityGroup {
 			}
 
 		}.runTaskTimer(mPlugin, 0, 5);
+
 		SpellManager phase1Spells = new SpellManager(
 			Arrays.asList(new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 9, 20 * 10, mShrineMarker.getLocation().getY()),
 				new SpellPutridPlague(mPlugin, mBoss, this, false),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
 
-		Spell judgement = SpellKaulsJudgement.getInstance(mSpawnLoc);
+
 
 		SpellManager phase2Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, false),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
-				judgement));
+				new SpellKaulsJudgement(mBoss)));
 
 		SpellManager phase3Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
 				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-				judgement));
+				new SpellKaulsJudgement(mBoss)));
 
 		SpellManager phase4Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
