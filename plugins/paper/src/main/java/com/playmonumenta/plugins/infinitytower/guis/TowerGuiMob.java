@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.infinitytower.TowerGame;
 import com.playmonumenta.plugins.infinitytower.TowerGameUtils;
 import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
@@ -98,6 +99,7 @@ public class TowerGuiMob extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (!mInventory.equals(event.getClickedInventory())) {
 			return;

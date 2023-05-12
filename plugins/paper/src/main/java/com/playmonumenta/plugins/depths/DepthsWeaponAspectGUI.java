@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.depths;
 
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -38,6 +39,7 @@ public final class DepthsWeaponAspectGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		ItemStack clickedItem = event.getCurrentItem();
 		if (event.getClickedInventory() != mInventory ||
 			    clickedItem == null ||

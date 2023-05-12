@@ -173,6 +173,7 @@ public final class ExperiencinatorSelectiveConvertGui extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		if (event.getClick() != ClickType.RIGHT
 			    && event.getClick() != ClickType.LEFT) {
 			return;

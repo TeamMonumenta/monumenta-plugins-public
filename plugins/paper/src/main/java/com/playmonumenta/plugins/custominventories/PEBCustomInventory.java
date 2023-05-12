@@ -533,6 +533,7 @@ public class PEBCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		if (event.getWhoClicked() != mPlayer
 			    || event.getClickedInventory() != mInventory) {
 			return;

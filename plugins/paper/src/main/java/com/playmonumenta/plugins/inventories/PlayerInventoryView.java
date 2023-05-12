@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.inventories;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.gui.PlayerItemStatsGUI;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -29,7 +31,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class PlayerInventoryView implements Listener {
 	private static final String PERMISSION = "monumenta.peb.inventoryview";
-	private static final List<Player> mPlayers = new ArrayList<>(10);
+	private static final List<HumanEntity> mPlayers = new ArrayList<>(10);
 	private static final List<Inventory> mInventories = new ArrayList<>(10);
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
@@ -60,6 +62,7 @@ public class PlayerInventoryView implements Listener {
 		    || mInventories.contains(event.getClickedInventory())
 		    || mInventories.contains(event.getInventory())) {
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		}
 	}
 

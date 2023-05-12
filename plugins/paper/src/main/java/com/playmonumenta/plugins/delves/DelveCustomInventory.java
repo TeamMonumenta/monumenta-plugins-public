@@ -370,6 +370,7 @@ public class DelveCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		if (!mInventory.equals(event.getClickedInventory())) {
 			return;
 		}

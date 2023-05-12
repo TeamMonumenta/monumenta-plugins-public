@@ -65,6 +65,7 @@ public class PlotAccessCustomInventory extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		//Always cancel at the start if you want to avoid item removal
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		//Check to make sure they clicked the GUI, didn't shift click, and
 		//did not click the filler item
 		if (event.getClickedInventory() != mInventory ||

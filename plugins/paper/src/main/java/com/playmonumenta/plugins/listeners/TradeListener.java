@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.listeners;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -402,6 +403,7 @@ public class TradeListener implements Listener {
 			    && event.getSlot() == 2 // result slot
 			    && (isShulkerBoxWithContents(merchantInventory, 0) || isShulkerBoxWithContents(merchantInventory, 1))) {
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		}
 	}
 

@@ -222,6 +222,7 @@ public class OrinCustomInventory extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		Player player;
 		if (event.getWhoClicked() instanceof Player) {
 			player = (Player) event.getWhoClicked();

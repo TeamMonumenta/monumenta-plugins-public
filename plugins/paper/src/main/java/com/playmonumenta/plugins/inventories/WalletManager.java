@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.CommandUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -750,6 +751,7 @@ public class WalletManager implements Listener {
 				} else if (event.getClick() == ClickType.SWAP_OFFHAND) {
 					// quick-fill wallet
 					event.setCancelled(true);
+					GUIUtils.refreshOffhand(event);
 					if (checkNotSoulbound(player, walletItem)) {
 						return;
 					}

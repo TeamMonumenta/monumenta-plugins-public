@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.custominventories;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
@@ -615,6 +616,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 		int slot = event.getSlot();
 
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (event.isShiftClick()) {
 			return;

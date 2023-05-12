@@ -95,6 +95,7 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		if (event.getClickedInventory() != mInventory) {
 			return;
 		}

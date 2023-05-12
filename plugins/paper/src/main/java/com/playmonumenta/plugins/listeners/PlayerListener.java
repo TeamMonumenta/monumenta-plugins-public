@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.server.reset.DailyReset;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
@@ -614,6 +615,7 @@ public class PlayerListener implements Listener {
 			)
 		) {
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 			return;
 		}
 
@@ -627,11 +629,13 @@ public class PlayerListener implements Listener {
 			    && (player.getLocation().getY() < player.getWorld().getMinHeight() || EntityUtils.touchesLava(player))) {
 			player.sendMessage(Component.text("Unequipping gear in lava or void is not allowed!", NamedTextColor.RED));
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 			return;
 		}
 
 		if (!mPlugin.mItemOverrides.inventoryClickInteraction(mPlugin, player, event) || !mPlugin.mItemOverrides.inventoryClickEvent(mPlugin, player, event)) {
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		}
 
 		// If right-clicking charm, open GUI
@@ -648,6 +652,7 @@ public class PlayerListener implements Listener {
 			    && ItemUtils.isNullOrAir(event.getCursor())
 			    && ItemStatUtils.hasEnchantment(item, ItemStatUtils.EnchantmentType.MULTITOOL)) {
 			Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item);
+			GUIUtils.refreshOffhand(event);
 		}
 
 	}
@@ -657,6 +662,7 @@ public class PlayerListener implements Listener {
 		if (event.getClick() == ClickType.SWAP_OFFHAND
 			    && event.getWhoClicked().getScoreboardTags().contains(ToggleSwap.SWAP_INVENTORY_TAG)) {
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		}
 	}
 

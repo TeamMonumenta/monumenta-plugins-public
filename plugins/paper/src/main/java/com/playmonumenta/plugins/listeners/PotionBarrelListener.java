@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -68,6 +69,7 @@ public class PotionBarrelListener implements Listener {
 		if (event.getClick() == ClickType.UNKNOWN) {
 			// disable all unknown/modded clicks
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 			return;
 		}
 		ItemStack cursorItem = event.getCursor();
@@ -212,6 +214,7 @@ public class PotionBarrelListener implements Listener {
 				}
 				default -> {
 					event.setCancelled(true);
+					GUIUtils.refreshOffhand(event);
 				}
 			}
 		}

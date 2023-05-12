@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.infinitytower.TowerManager;
 import com.playmonumenta.plugins.infinitytower.TowerMob;
 import com.playmonumenta.plugins.infinitytower.TowerTeam;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -179,6 +180,7 @@ public class TowerGuiFloorDesignMob extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (!mInventory.equals(event.getClickedInventory())) {
 			return;

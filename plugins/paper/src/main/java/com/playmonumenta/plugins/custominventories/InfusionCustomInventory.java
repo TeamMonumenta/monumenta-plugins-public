@@ -343,6 +343,7 @@ public class InfusionCustomInventory extends CustomInventory {
 		int slot = event.getSlot();
 
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (event.isShiftClick()) {
 			return;

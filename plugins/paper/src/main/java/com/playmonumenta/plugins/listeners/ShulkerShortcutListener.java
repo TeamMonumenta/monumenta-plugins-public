@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.inventories.ShulkerInventory;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -165,6 +166,7 @@ public class ShulkerShortcutListener implements Listener {
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "You can't use this here");
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
 			           && isEnderExpansion(itemClicked)
 			           && !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
@@ -172,12 +174,14 @@ public class ShulkerShortcutListener implements Listener {
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
 			           && isPurpleTesseractContainer(itemClicked)) {
 			// Right-clicked a purple tesseract shulker that can't be opened
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
 			           && ChestUtils.isLootBox(itemClicked)) {
 			if (click == ClickType.SWAP_OFFHAND) {
@@ -208,11 +212,13 @@ public class ShulkerShortcutListener implements Listener {
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "Cannot open nested shulkers");
 				event.setCancelled(true);
+				GUIUtils.refreshOffhand(event);
 			} else if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 				// A currently open shulker box was clicked, cancel.
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 				player.sendMessage(ChatColor.RED + "That shulker is open");
 				event.setCancelled(true);
+				GUIUtils.refreshOffhand(event);
 			} else {
 				// A shulker box that isn't currently open was clicked.
 				if (player.hasPermission(PERMISSION)) {
@@ -254,11 +260,13 @@ public class ShulkerShortcutListener implements Listener {
 					} else if (click == ClickType.SWAP_OFFHAND && ItemUtils.isNullOrAir(itemHeld)) {
 						// Pressed swap on a shulker with empty cursor: Deposit matching items from the inventory
 						event.setCancelled(true);
+						GUIUtils.refreshOffhand(event);
 						depositAllMatching(player, itemClicked);
 					} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
 						player.sendMessage(ChatColor.RED + "Too fast! Please try again");
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						event.setCancelled(true);
+						GUIUtils.refreshOffhand(event);
 					}
 				}
 			}

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.infinitytower.guis;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.infinitytower.mobs.TowerMobInfo;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -78,6 +79,7 @@ public class TowerGuiMobInfo extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (!mInventory.equals(event.getClickedInventory())) {
 			return;

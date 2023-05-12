@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.parrots.ParrotManager.ParrotVariant;
 import com.playmonumenta.plugins.parrots.ParrotManager.PlayerShoulder;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -723,6 +724,7 @@ public final class ParrotCustomInventory extends CustomInventory {
 	@Override
 	public void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (event.isShiftClick()) {
 			return;

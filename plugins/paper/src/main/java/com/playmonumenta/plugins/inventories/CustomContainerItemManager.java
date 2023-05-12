@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.listeners.QuiverListener;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -124,6 +125,7 @@ public class CustomContainerItemManager implements Listener {
 				} else if (event.getClick() == ClickType.SWAP_OFFHAND && config.canQuickDeposit()) {
 					// quick-fill container
 					event.setCancelled(true);
+					GUIUtils.refreshOffhand(event);
 					if (!checkSoulbound(player, container) || !config.checkCanUse(player)) {
 						return;
 					}

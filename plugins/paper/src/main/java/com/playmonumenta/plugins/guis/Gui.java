@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.guis;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
@@ -222,6 +223,7 @@ public abstract class Gui {
 		@Override
 		protected void inventoryClick(InventoryClickEvent event) {
 			event.setCancelled(true);
+			GUIUtils.refreshOffhand(event);
 			if (mDiscarded) {
 				MMLog.warning("GuiCustomInventory received click event after being discarded (GUI class=" + Gui.this.getClass() + ")");
 				return;

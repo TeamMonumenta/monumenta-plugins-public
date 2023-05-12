@@ -70,6 +70,7 @@ public class CosmeticsGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		ItemStack item = event.getCurrentItem();
 		if (item == null || item.getType() == Material.AIR) {
 			return;

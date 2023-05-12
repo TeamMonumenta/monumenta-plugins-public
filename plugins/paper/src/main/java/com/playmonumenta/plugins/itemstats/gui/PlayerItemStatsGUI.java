@@ -244,6 +244,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		if (event.getClick() == ClickType.DOUBLE_CLICK) {
 			return;
 		}

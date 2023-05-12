@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.minigames.chess.ChessBoard.BoardState;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPiece;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessPieceType;
 import com.playmonumenta.plugins.minigames.chess.ChessBoard.ChessTeam;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -87,8 +89,9 @@ public class ChessPromotingCustomInventory extends CustomInventory {
 	}
 
 	@Override
-	protected void inventoryClick(org.bukkit.event.inventory.InventoryClickEvent event) {
+	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 
 		if (event.getClickedInventory() != mInventory) {
 			return;

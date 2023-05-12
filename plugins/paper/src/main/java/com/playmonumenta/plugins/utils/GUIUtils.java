@@ -11,9 +11,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
@@ -212,6 +216,16 @@ public class GUIUtils {
 		new NBTItem(item, true)
 			.addCompound("GUI")
 			.setString(tagName, value);
+	}
+
+	public static void refreshOffhand(InventoryClickEvent event) {
+		if (event.isCancelled()
+			&& ClickType.SWAP_OFFHAND.equals(event.getClick())
+			&& event.getWhoClicked() instanceof Player player) {
+			PlayerInventory inventory = player.getInventory();
+			ItemStack offhandItem = inventory.getItemInOffHand();
+			inventory.setItemInOffHand(offhandItem);
+		}
 	}
 
 }

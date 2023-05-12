@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ public class ExampleCustomInventory extends CustomInventory {
 	protected void inventoryClick(InventoryClickEvent event) {
 		//Always cancel at the start if you want to avoid item removal
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		//Check to make sure they clicked the GUI, didn't shift click, and
 		//did not click the filler item
 		if (event.getClickedInventory() != mInventory

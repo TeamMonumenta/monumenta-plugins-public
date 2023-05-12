@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.depths;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.List;
 import org.bukkit.Material;
@@ -37,6 +38,7 @@ public class DepthsAbilitiesGUI extends CustomInventory {
 	@Override
 	protected void inventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);
+		GUIUtils.refreshOffhand(event);
 		if (event.getClickedInventory() != mInventory ||
 			    event.getCurrentItem() == null ||
 			    event.getCurrentItem().getType() == FILLER ||
