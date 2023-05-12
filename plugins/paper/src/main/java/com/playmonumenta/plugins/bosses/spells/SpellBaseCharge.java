@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.spells;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
@@ -267,6 +268,7 @@ public class SpellBaseCharge extends Spell {
 		boolean chargeHitsPlayer = false;
 		boolean cancel = false;
 		BoundingBox box = charger.getBoundingBox();
+		List<LivingEntity> hitEntities = new ArrayList<>();
 		for (int i = 0; i < 200; i++) {
 			box.shift(baseVect);
 			endLoc.add(baseVect);
@@ -302,6 +304,9 @@ public class SpellBaseCharge extends Spell {
 			}
 
 			for (LivingEntity player : validTargets) {
+				if (hitEntities.contains(player)) {
+					continue;
+				}
 				if (player.getWorld() == charger.getWorld() && player.getLocation().distance(endLoc) < 1.8F) {
 					// Hit player - mark this and continue
 					chargeHitsPlayer = true;
@@ -309,6 +314,7 @@ public class SpellBaseCharge extends Spell {
 
 					if (hitPlayer != null) {
 						hitPlayer.run(player);
+						hitEntities.add(player);
 					}
 					if (stopOnFirstHit) {
 						cancel = true;
@@ -335,98 +341,6 @@ public class SpellBaseCharge extends Spell {
 		}
 
 		return chargeHitsPlayer;
-	}
-
-	private void launch(Player target, List<Player> players, int charges, int rate) {
-		BukkitRunnable runnable = new BukkitRunnable() {
-			private int mTicks = 0;
-			private int mChargesDone = 0;
-			@Nullable Location mTargetLoc;
-			List<Player> mBystanders = players;
-			Player mTarget = target;
-
-			@Override
-			public void run() {
-				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
-					if (mBoss != null) {
-						mBoss.setAI(true);
-					}
-					this.cancel();
-					return;
-				}
-				if (mTicks == 0 || mTargetLoc == null) {
-					mTargetLoc = mTarget.getEyeLocation();
-					if (mWarningAction != null) {
-						mWarningAction.run(target);
-					}
-				} else if (mTicks > 0 && mTicks < mChargeTicks) {
-					// This runs once every other tick while charging
-					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, null, mWarnParticleAction, null, null, false, mStopOnFirstHit, mYStartAdd);
-				} else if (mTicks >= mChargeTicks) {
-					// Do the "real" charge attack
-					doCharge(mTarget, mBoss, mTargetLoc, mBystanders, mStartAction, mParticleAction, mHitPlayerAction,
-						mEndAction, true, mStopOnFirstHit, mYStartAdd);
-					mChargesDone++;
-					if (mChargesDone >= charges) {
-						this.cancel();
-						mActiveRunnables.remove(this);
-					} else {
-						// Get list of all nearby players who could be hit by the attack
-						mBystanders = PlayerUtils.playersInRange(mBoss.getLocation(), mRange * 2, true);
-
-						// Choose random player within range that has line of sight to boss
-						List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
-						Collections.shuffle(players);
-						for (Player player : players) {
-							if (LocationUtils.hasLineOfSight(mBoss, player)) {
-								mTarget = player;
-								mTargetLoc = mTarget.getLocation().add(0, 1.0f, 0);
-								break;
-							}
-						}
-						mTicks -= rate;
-					}
-				}
-
-				mTicks += 2;
-			}
-		};
-		runnable.runTaskTimer(mPlugin, 0, 2);
-		mActiveRunnables.add(runnable);
-	}
-
-	private void launch(Player target, List<Player> players) {
-		BukkitRunnable runnable = new BukkitRunnable() {
-			private int mTicks = 0;
-			@Nullable Location mTargetLoc;
-
-			@Override
-			public void run() {
-				if (mBoss == null || !mBoss.isValid() || mBoss.isDead() || EntityUtils.isStunned(mBoss)) {
-					this.cancel();
-					return;
-				}
-				if (mTicks == 0 || mTargetLoc == null) {
-					mTargetLoc = target.getLocation().add(0, 1.0f, 0);
-					if (mWarningAction != null) {
-						mWarningAction.run(target);
-					}
-				} else if (mTicks > 0 && mTicks < mChargeTicks) {
-					// This runs once every other tick while charging
-					doCharge(target, mBoss, mTargetLoc, players, null, mWarnParticleAction, null, null, false, mStopOnFirstHit, mYStartAdd);
-				} else if (mTicks >= mChargeTicks) {
-					// Do the "real" charge attack
-					doCharge(target, mBoss, mTargetLoc, players, mStartAction, mParticleAction, mHitPlayerAction,
-						mEndAction, true, mStopOnFirstHit, mYStartAdd);
-					this.cancel();
-					mActiveRunnables.remove(this);
-				}
-
-				mTicks += 2;
-			}
-		};
-		runnable.runTaskTimer(mPlugin, 0, 2);
-		mActiveRunnables.add(runnable);
 	}
 
 	private void launch(LivingEntity target, List<? extends LivingEntity> targets) {
