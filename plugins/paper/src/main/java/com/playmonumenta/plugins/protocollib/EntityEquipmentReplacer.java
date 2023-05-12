@@ -41,14 +41,17 @@ public class EntityEquipmentReplacer extends PacketAdapter {
 		Entity entity = packet.getEntityModifier(event).read(0);
 		VanityManager.VanityData vanityData = entity instanceof Player player && mPlugin.mVanityManager.getData(event.getPlayer()).mOtherVanityEnabled ? mPlugin.mVanityManager.getData(player) : null;
 
+		boolean shouldClear =
+			// we can only clear items for players
+			entity instanceof Player &&
+			// and for a player that is not the current player
+			!entity.getUniqueId().equals(event.getPlayer().getUniqueId()) &&
+			// and if the player that the packet is sent to has gear disabled
+			ScoreboardUtils.getScoreboardValue(event.getPlayer(), "ShouldDisplayOtherPlayerGear").orElse(1) == 0;
+
 		List<Pair<EnumWrappers.ItemSlot, ItemStack>> items = packet.getSlotStackPairLists().read(0);
 		for (Pair<EnumWrappers.ItemSlot, ItemStack> pair : items) {
-			// we replace the item if the player that the packet is sent to has gear disabled...
-			if(ScoreboardUtils.getScoreboardValue(event.getPlayer(), "ShouldDisplayOtherPlayerGear").orElse(1) == 0 &&
-				// and if the entity whose gear we are modifying is a player
-				entity instanceof Player &&
-				// and it is not the current player, since they need to see their own gear
-				!entity.getUniqueId().equals(event.getPlayer().getUniqueId())) {
+			if(shouldClear) {
 				pair.setSecond(new ItemStack(Material.AIR));
 			}
 			else if (vanityData != null && pair.getSecond() != null && pair.getSecond().getType() != Material.AIR) {
