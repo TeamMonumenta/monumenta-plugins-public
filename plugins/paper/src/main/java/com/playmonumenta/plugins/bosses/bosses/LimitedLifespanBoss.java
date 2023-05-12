@@ -19,6 +19,9 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 		@BossParam(help = "Lifetime of the boss, in seconds")
 		public int LIFETIME = 60;
 
+		@BossParam(help = "if true, then lifetime is measured in ticks instead of seconds")
+		public boolean TICKS = false;
+
 		@BossParam(help = "If true, the boss will be deleted instead of killed when time runs out, skipping the death animation, drops, etc.")
 		public boolean DELETE = false;
 
@@ -39,6 +42,7 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 	public LimitedLifespanBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
+		long lifetime = p.TICKS ? p.LIFETIME : p.LIFETIME * 20L;
 		mTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			if (boss.isValid()) {
 				p.PARTICLES.spawn(boss, boss.getLocation());
@@ -49,7 +53,7 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 					boss.setHealth(0);
 				}
 			}
-		}, Math.max(0, p.LIFETIME * 20L - boss.getTicksLived()));
+		}, Math.max(0, lifetime - boss.getTicksLived()));
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), 0, null);
 	}
 
