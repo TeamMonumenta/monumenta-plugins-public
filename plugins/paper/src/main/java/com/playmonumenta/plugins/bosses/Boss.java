@@ -3,14 +3,12 @@ package com.playmonumenta.plugins.bosses;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
-import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -24,7 +22,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class Boss {
@@ -34,7 +31,7 @@ public class Boss {
 
 	public Boss(Plugin plugin, BossAbilityGroup ability) {
 		mPlugin = plugin;
-		mAbilities = new ArrayList<BossAbilityGroup>(5);
+		mAbilities = new ArrayList<>(5);
 		mAbilities.add(ability);
 	}
 
@@ -46,14 +43,7 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.onHurt(event);
-
-				for (Spell passive : ability.getPassives()) {
-					passive.onHurt(event);
-				}
-
-				for (Spell active : ability.getActiveSpells()) {
-					active.onHurt(event);
-				}
+				ability.triggerOnSpells(spell -> spell.onHurt(event));
 			}
 		}
 	}
@@ -62,14 +52,7 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntity(event, damager);
-
-				for (Spell passive : ability.getPassives()) {
-					passive.onHurtByEntity(event, damager);
-				}
-
-				for (Spell active : ability.getActiveSpells()) {
-					active.onHurtByEntity(event, damager);
-				}
+				ability.triggerOnSpells(spell -> spell.onHurtByEntity(event, damager));
 			}
 		}
 	}
@@ -78,14 +61,7 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.onHurtByEntityWithSource(event, damager, source);
-
-				for (Spell passive : ability.getPassives()) {
-					passive.onHurtByEntityWithSource(event, damager, source);
-				}
-
-				for (Spell active : ability.getActiveSpells()) {
-					active.onHurtByEntityWithSource(event, damager, source);
-				}
+				ability.triggerOnSpells(spell -> spell.onHurtByEntityWithSource(event, damager, source));
 			}
 		}
 	}
@@ -94,14 +70,7 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.onDamage(event, damagee);
-
-				for (Spell passive : ability.getPassives()) {
-					passive.onDamage(event, damagee);
-				}
-
-				for (Spell active : ability.getActiveSpells()) {
-					active.onDamage(event, damagee);
-				}
+				ability.triggerOnSpells(spell -> spell.onDamage(event, damagee));
 			}
 		}
 	}
@@ -110,14 +79,7 @@ public class Boss {
 		for (BossAbilityGroup ability : mAbilities) {
 			if (!event.isCancelled()) {
 				ability.bossLaunchedProjectile(event);
-
-				for (Spell passive : ability.getPassives()) {
-					passive.bossLaunchedProjectile(event);
-				}
-
-				for (Spell active : ability.getActiveSpells()) {
-					active.bossLaunchedProjectile(event);
-				}
+				ability.triggerOnSpells(spell -> spell.bossLaunchedProjectile(event));
 			}
 		}
 	}
@@ -125,69 +87,35 @@ public class Boss {
 	public void bossProjectileHit(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossProjectileHit(event);
-
-			for (Spell passive : ability.getPassives()) {
-				passive.bossProjectileHit(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.bossProjectileHit(event);
-			}
+			ability.triggerOnSpells(spell -> spell.bossProjectileHit(event));
 		}
 	}
 
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossHitByProjectile(event);
-			for (Spell passive : ability.getPassives()) {
-				passive.bossHitByProjectile(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.bossHitByProjectile(event);
-			}
+			ability.triggerOnSpells(spell -> spell.bossHitByProjectile(event));
 		}
 	}
 
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.areaEffectAppliedToBoss(event);
-
-			for (Spell passive : ability.getPassives()) {
-				passive.areaEffectAppliedToBoss(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.areaEffectAppliedToBoss(event);
-			}
+			ability.triggerOnSpells(spell -> spell.areaEffectAppliedToBoss(event));
 		}
 	}
 
 	public void splashPotionAppliedToBoss(PotionSplashEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.splashPotionAppliedToBoss(event);
-
-			for (Spell passive : ability.getPassives()) {
-				passive.splashPotionAppliedToBoss(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.splashPotionAppliedToBoss(event);
-			}
+			ability.triggerOnSpells(spell -> spell.splashPotionAppliedToBoss(event));
 		}
 	}
 
 	public void bossSplashPotion(PotionSplashEvent event) {
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossSplashPotion(event);
-
-			for (Spell passive : ability.getPassives()) {
-				passive.bossSplashPotion(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.bossSplashPotion(event);
-			}
+			ability.triggerOnSpells(spell -> spell.bossSplashPotion(event));
 		}
 	}
 
@@ -197,13 +125,7 @@ public class Boss {
 		}
 		for (BossAbilityGroup ability : mAbilities) {
 			ability.bossCastAbility(event);
-			for (Spell passive : ability.getPassives()) {
-				passive.bossCastAbility(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.bossCastAbility(event);
-			}
+			ability.triggerOnSpells(spell -> spell.bossCastAbility(event));
 		}
 	}
 
@@ -291,12 +213,7 @@ public class Boss {
 			 * Clear mAbilities the next available chance - this prevents ConcurrentModificationException's
 			 * when the boss dies or is unloaded as a result of abilities
 			 */
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mAbilities.clear();
-				}
-			}.runTaskLater(mPlugin, 0);
+			Bukkit.getScheduler().runTask(mPlugin, mAbilities::clear);
 		}
 	}
 
@@ -318,13 +235,7 @@ public class Boss {
 			ability.mDead = true;
 			ability.death(event);
 
-			for (Spell passive : ability.getPassives()) {
-				passive.onDeath(event);
-			}
-
-			for (Spell active : ability.getActiveSpells()) {
-				active.onDeath(event);
-			}
+			ability.triggerOnSpells(spell -> spell.onDeath(event));
 		}
 	}
 
@@ -388,8 +299,7 @@ public class Boss {
 	}
 
 	public List<String> getIdentityTags() {
-		List<String> tags = mAbilities.stream().map(ability -> ability.getIdentityTag()).collect(Collectors.toList());
-		Collections.sort(tags);
+		List<String> tags = mAbilities.stream().map(BossAbilityGroup::getIdentityTag).sorted().toList();
 		return tags;
 	}
 }

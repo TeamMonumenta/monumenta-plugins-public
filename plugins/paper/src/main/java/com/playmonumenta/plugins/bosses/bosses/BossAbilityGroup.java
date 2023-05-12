@@ -76,6 +76,13 @@ public abstract class BossAbilityGroup {
 		mPassiveSpells = passiveSpells;
 	}
 
+	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+		constructBoss(List.of(activeSpell), Collections.emptyList(), detectionRange, bossBar, spellDelay);
+	}
+
+	public void constructBoss(BossAbilityGroup this, List<Spell> activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+		constructBoss(new SpellManager(activeSpells), passiveSpells, detectionRange, bossBar, spellDelay);
+	}
 
 	public void constructBoss(BossAbilityGroup this,
 	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange, @Nullable BossBarManager bossBar) {
@@ -487,6 +494,11 @@ public abstract class BossAbilityGroup {
 	public final boolean hasRunningSpellOfType(Class<?>... spellTypes) {
 		Predicate<Spell> isOfArgumentType = s -> Arrays.stream(spellTypes).anyMatch(type -> type.isInstance(s));
 		return !mActiveSpells.isEmpty() && mActiveSpells.getSpells().stream().anyMatch(s -> s.isRunning() && isOfArgumentType.test(s));
+	}
+
+	public final void triggerOnSpells(Consumer<Spell> action) {
+		mActiveSpells.getSpells().forEach(action);
+		mPassiveSpells.forEach(action);
 	}
 
 }

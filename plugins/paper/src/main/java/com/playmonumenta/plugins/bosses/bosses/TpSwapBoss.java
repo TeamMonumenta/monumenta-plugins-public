@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.spells.SpellTpSwapPlaces;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 public class TpSwapBoss extends BossAbilityGroup {
@@ -29,15 +27,25 @@ public class TpSwapBoss extends BossAbilityGroup {
 		return new TpSwapBoss(plugin, boss);
 	}
 
+	private final SpellTpSwapPlaces mSpell;
+
 	public TpSwapBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpSwapPlaces(plugin, boss, p.COOLDOWN, p.TARGET_RANGE, p.TELEPORT_RANGE, p.DURATION, p.PARTICLE)));
+		mSpell = new SpellTpSwapPlaces(plugin, boss, p.COOLDOWN, p.TARGET_RANGE, p.TELEPORT_RANGE, p.DURATION, p.PARTICLE);
 
+		super.constructBoss(mSpell, p.DETECTION, null, p.DELAY);
+	}
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+	@Override
+	public boolean hasNearbyPlayerDeathTrigger() {
+		return true;
+	}
+
+	@Override
+	public void nearbyPlayerDeath(PlayerDeathEvent event) {
+		mSpell.cancelIfTarget(event.getPlayer());
 	}
 }

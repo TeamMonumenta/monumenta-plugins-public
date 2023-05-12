@@ -17,6 +17,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SpellTpSwapPlaces extends Spell {
 
@@ -27,6 +28,9 @@ public class SpellTpSwapPlaces extends Spell {
 	private final int mTeleportRange;
 	private final int mDuration;
 	private final ParticlesList mParticles;
+
+	public @Nullable BukkitRunnable mRunnable = null;
+	public @Nullable Player mTarget = null;
 
 	public SpellTpSwapPlaces(Plugin plugin, LivingEntity launcher, int cooldown) {
 		this(plugin, launcher, cooldown, 16, 50);
@@ -57,7 +61,7 @@ public class SpellTpSwapPlaces extends Spell {
 				/* This player is in a safe area - don't tp to them */
 				players.remove(target);
 			} else {
-
+				mTarget = target;
 				animation(target);
 				break;
 			}
@@ -98,13 +102,13 @@ public class SpellTpSwapPlaces extends Spell {
 	private void animation(Player target) {
 		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 1.4f, 0.5f);
 
-		new BukkitRunnable() {
+		mRunnable = new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
 			public void run() {
 				mTicks++;
-				Location particleLoc = mLauncher.getLocation().add(new Location(mLauncher.getWorld(), -0.5f, 0f, 0.5f));
+				Location particleLoc = mLauncher.getLocation().add(-0.5, 0, 0.5);
 				mParticles.spawn(mLauncher, particleLoc);
 				mParticles.spawn(mLauncher, target.getLocation());
 
@@ -117,7 +121,21 @@ public class SpellTpSwapPlaces extends Spell {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1);
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mTarget = null;
+				mRunnable = null;
+			}
+		};
+		mRunnable.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	public void cancelIfTarget(Player player) {
+		if (player == mTarget && mRunnable != null) {
+			mRunnable.cancel();
+		}
 	}
 
 }
