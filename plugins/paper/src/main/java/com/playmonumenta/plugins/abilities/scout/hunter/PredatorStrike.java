@@ -52,7 +52,6 @@ public class PredatorStrike extends Ability {
 	private static final int MAX_RANGE = 30;
 	private static final int MAX_DAMAGE_RANGE = 12;
 	private static final double EXPLODE_RADIUS = 1.25;
-	private static final double HITBOX_LENGTH = 0.5;
 
 	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
@@ -131,6 +130,7 @@ public class PredatorStrike extends Ability {
 		Location loc = mPlayer.getEyeLocation();
 		Vector direction = loc.getDirection();
 		World world = loc.getWorld();
+		mCosmetic.strikeLaunch(world, mPlayer);
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
 		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
@@ -147,6 +147,7 @@ public class PredatorStrike extends Ability {
 		Location endLoc = result.getHitPosition().toLocation(world);
 		mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
 		explode(endLoc);
+		mCosmetic.strikeParticleLine(mPlayer, loc, endLoc);
 
 		return true;
 	}
