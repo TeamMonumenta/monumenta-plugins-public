@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.LivingEntity;
@@ -26,9 +25,8 @@ public class Aura implements Infusion {
 
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(player.getLocation(), RADIUS)) {
-			EntityUtils.applySlow(plugin, DURATION, SLOW_PER_LEVEL * modifiedLevel, mob);
+			EntityUtils.applySlow(plugin, DURATION, SLOW_PER_LEVEL * value, mob);
 		}
 	}
 }

@@ -37,12 +37,11 @@ public class Unyielding implements Infusion {
 				}
 			}
 		}
-		if (plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.UNYIELDING) > 0) {
-			double level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNYIELDING);
-			double finalLvl = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) level);
+		double level = plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.UNYIELDING);
+		if (level > 0) {
 			AttributeInstance knockBack = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 			if (knockBack != null) {
-				AttributeModifier mod = new AttributeModifier(MODIFIER, getKnockbackResistance(finalLvl),
+				AttributeModifier mod = new AttributeModifier(MODIFIER, getKnockbackResistance(level),
 					AttributeModifier.Operation.ADD_SCALAR);
 				knockBack.addModifier(mod);
 			}

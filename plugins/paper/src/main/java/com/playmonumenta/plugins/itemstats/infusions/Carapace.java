@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -30,10 +29,9 @@ public class Carapace implements Infusion {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		if (source != null) {
 			// Runs one tick later so that it does not affect this attack
-			Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(modifiedLevel) - 1)), 1);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.mEffectManager.addEffect(player, DAMAGE_REDUCTION_EFFECT_NAME, new PercentDamageReceived(DURATION, getDamageTakenMultiplier(value) - 1)), 1);
 		}
 	}
 

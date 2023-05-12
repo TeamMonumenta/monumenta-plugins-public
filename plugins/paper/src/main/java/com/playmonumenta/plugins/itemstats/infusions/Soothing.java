@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.entity.Player;
@@ -24,8 +23,7 @@ public class Soothing implements Infusion {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (oneHz) {
-			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			PlayerUtils.healPlayer(plugin, player, modifiedLevel * HEAL_PER_LEVEL);
+			PlayerUtils.healPlayer(plugin, player, value * HEAL_PER_LEVEL);
 		}
 	}
 }

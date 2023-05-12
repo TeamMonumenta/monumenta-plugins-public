@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.effects.VengefulTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.NavigableSet;
@@ -45,9 +44,8 @@ public class Vengeful implements Infusion {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		if (checkLastDamage(player, enemy)) {
-			event.setDamage(event.getDamage() * getDamageDealtMultiplier(modifiedLevel));
+			event.setDamage(event.getDamage() * getDamageDealtMultiplier(value));
 			Location halfHeightLocation = LocationUtils.getHalfHeightLocation(enemy);
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
 			PartialParticle partialParticle = new PartialParticle(

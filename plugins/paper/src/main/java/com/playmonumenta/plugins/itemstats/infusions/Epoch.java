@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.Player;
 
@@ -20,8 +19,8 @@ public class Epoch implements Infusion {
 	}
 
 	public static double getCooldownPercentage(Plugin plugin, Player player) {
-		int level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.EPOCH);
-		return getCooldownPercentage(DelveInfusionUtils.getModifiedLevel(plugin, player, level));
+		double level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.EPOCH);
+		return getCooldownPercentage(level);
 	}
 
 	public static double getCooldownPercentage(double level) {

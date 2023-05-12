@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
-import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import java.util.ArrayList;
@@ -284,18 +282,6 @@ public class DelveInfusionUtils {
 		depthMats.setAmount(MAT_DEPTHS_COST_PER_INFUSION[level] * item.getAmount());
 		cost.add(depthMats);
 		return cost;
-	}
-
-	public static double getModifiedLevel(Plugin plugin, Player player, int level) {
-		return getModifiedLevel(level, plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNDERSTANDING));
-	}
-
-	// Caps level at MAX_LEVEL, and then adds the forum infusion bonus
-	public static double getModifiedLevel(int level, int understanding) {
-		if (level == 0) {
-			return 0;
-		}
-		return Math.min(MAX_LEVEL, level) + Math.min(understanding, MAX_LEVEL) * Understanding.POINTS_PER_LEVEL;
 	}
 
 	public static @Nullable DelveInfusionSelection getCurrentInfusion(ItemStack item) {

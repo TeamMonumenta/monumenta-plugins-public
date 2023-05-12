@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import org.bukkit.Material;
@@ -34,15 +33,14 @@ public class Ardor implements Infusion {
 	public void onBlockBreak(Plugin plugin, Player player, double value, BlockBreakEvent event) {
 		//If we break a spawner with a pickaxe
 		ItemStack item = player.getInventory().getItemInMainHand();
-		int level = (int) value;
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
 			player.playSound(player.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 0.8f);
 		    if (player.isInWaterOrBubbleColumn()) {
 		        int currAir = player.getRemainingAir();
-		        player.setRemainingAir(Math.min(300, currAir + (AIR_INCREASE * (int) DelveInfusionUtils.getModifiedLevel(plugin, player, level))));
+		        player.setRemainingAir(Math.min(300, currAir + (int) (AIR_INCREASE * value)));
 		    } else {
 				plugin.mEffectManager.addEffect(player, PERCENT_SPEED_EFFECT_NAME,
-					new PercentSpeed(DURATION, getMovementSpeedBonus(DelveInfusionUtils.getModifiedLevel(plugin, player, level)),
+					new PercentSpeed(DURATION, getMovementSpeedBonus(value),
 						PERCENT_SPEED_EFFECT_NAME));
 		    }
 		}

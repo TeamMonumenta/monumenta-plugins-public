@@ -29,7 +29,7 @@ public class Quench implements Infusion {
 	}
 
 	public static double getDurationScaling(Plugin plugin, Player player) {
-		int level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.QUENCH);
+		double level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.QUENCH);
 		return 1 + DURATION_BONUS_PER_LVL * level;
 	}
 }

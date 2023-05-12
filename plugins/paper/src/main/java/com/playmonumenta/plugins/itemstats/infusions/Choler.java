@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.InfernoDamage;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.LivingEntity;
@@ -37,7 +36,7 @@ public class Choler implements Infusion {
 		}
 		if (EntityUtils.isStunned(enemy) || EntityUtils.isSlowed(plugin, enemy) || enemy.hasPotionEffect(PotionEffectType.SLOW)
 			    || enemy.getFireTicks() > 0 || plugin.mEffectManager.hasEffect(enemy, InfernoDamage.class)) {
-			event.setDamage(event.getDamage() * getDamageDealtMultiplier(DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value)));
+			event.setDamage(event.getDamage() * getDamageDealtMultiplier(value));
 		}
 	}
 

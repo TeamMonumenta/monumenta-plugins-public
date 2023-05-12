@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import java.util.NavigableSet;
@@ -39,8 +38,7 @@ public class Expedite implements Infusion {
 		}
 
 		if (MetadataUtils.checkOnceThisTick(plugin, player, CHECK_ONCE_THIS_TICK_METAKEY)) {
-			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			double percentSpeed = PERCENT_SPEED_PER_LEVEL * modifiedLevel;
+			double percentSpeed = PERCENT_SPEED_PER_LEVEL * value;
 			NavigableSet<Effect> oldEffects = plugin.mEffectManager.getEffects(player, PERCENT_SPEED_EFFECT_NAME);
 			if (oldEffects != null && !oldEffects.isEmpty()) {
 				Effect oldEffect = oldEffects.last();

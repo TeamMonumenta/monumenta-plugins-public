@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -27,7 +26,7 @@ public class Usurper implements Infusion {
 	@Override
 	public void onKill(Plugin plugin, Player player, double value, EntityDeathEvent event, LivingEntity enemy) {
 		if (EntityUtils.isBoss(enemy) || EntityUtils.isElite(enemy)) {
-			double healAmount = EntityUtils.getMaxHealth(player) * HEAL_PCT_PER_LVL * DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
+			double healAmount = EntityUtils.getMaxHealth(player) * HEAL_PCT_PER_LVL * value;
 			PlayerUtils.healPlayer(plugin, player, healAmount);
 		}
 	}

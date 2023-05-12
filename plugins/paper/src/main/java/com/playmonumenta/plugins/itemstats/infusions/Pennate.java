@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -28,8 +27,7 @@ public class Pennate implements Infusion {
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageType.FALL) {
-			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			event.setDamage(event.getDamage() * getFallDamageResistance(modifiedLevel));
+			event.setDamage(event.getDamage() * getFallDamageResistance(value));
 		}
 	}
 

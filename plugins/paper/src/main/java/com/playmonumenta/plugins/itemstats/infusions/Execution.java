@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import java.util.EnumSet;
 import org.bukkit.Material;
@@ -41,8 +40,7 @@ public class Execution implements Infusion {
 
 	@Override
 	public void onKill(Plugin plugin, Player player, double value, EntityDeathEvent event, LivingEntity enemy) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-		double percentDamage = getDamageDealtMultiplier(modifiedLevel) - 1;
+		double percentDamage = getDamageDealtMultiplier(value) - 1;
 
 		BlockData fallingDustData = Material.ANVIL.createBlockData();
 		new PartialParticle(Particle.FALLING_DUST, enemy.getLocation().add(0, enemy.getHeight() / 2, 0), 3,

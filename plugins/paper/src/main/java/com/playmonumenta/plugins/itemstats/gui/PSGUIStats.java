@@ -15,6 +15,7 @@ import com.playmonumenta.plugins.itemstats.infusions.Execution;
 import com.playmonumenta.plugins.itemstats.infusions.Fueled;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.Tenacity;
+import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.itemstats.infusions.Vengeful;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -79,8 +80,8 @@ class PSGUIStats {
 				return 0;
 			}
 			double value = mPlayerItemStats.getItemStats().get(infusion.getItemStat());
-			if (ItemStatUtils.InfusionType.DELVE_INFUSIONS.contains(infusion) && infusion != ItemStatUtils.InfusionType.UNDERSTANDING) {
-				return DelveInfusionUtils.getModifiedLevel((int) value, (int) mPlayerItemStats.getItemStats().get(ItemStatUtils.InfusionType.UNDERSTANDING.getItemStat()));
+			if (infusion.isDelveInfusion() && value > 0) {
+				return Math.min(value, DelveInfusionUtils.MAX_LEVEL) + Math.min(DelveInfusionUtils.MAX_LEVEL, mPlayerItemStats.getItemStats().get(ItemStatUtils.InfusionType.UNDERSTANDING.getItemStat())) * Understanding.POINTS_PER_LEVEL;
 			}
 			return value;
 		} else if (setting.mInfusionType == infusion) {

@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
@@ -50,7 +49,7 @@ public class Empowered implements Infusion {
 		}
 
 		int xpAmount = (int) (event.getAmount() * intuitionBonus * acumenBonus);
-		int repairs = binomialDistributionRoll(xpAmount, PERCENT_CHANCE * DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value));
+		int repairs = binomialDistributionRoll(xpAmount, PERCENT_CHANCE * value);
 		if (repairs > 0) {
 			for (int i : slotList) {
 				ItemStack item = inv.getItem(i);

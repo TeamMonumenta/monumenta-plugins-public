@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.InfernoDamage;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import java.util.List;
@@ -32,8 +31,6 @@ public class Fueled implements Infusion {
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-
 		if (event.getType() != DamageEvent.DamageType.TRUE) {
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(player.getLocation(), RADIUS);
 
@@ -48,7 +45,7 @@ public class Fueled implements Infusion {
 				}
 			}
 
-			double multiplier = 1 - (DR_PER_MOB * count * modifiedLevel);
+			double multiplier = 1 - (DR_PER_MOB * count * value);
 			event.setDamage(event.getDamage() * multiplier);
 		}
 	}

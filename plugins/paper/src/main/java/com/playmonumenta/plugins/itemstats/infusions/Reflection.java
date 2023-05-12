@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.Location;
@@ -39,8 +38,7 @@ public class Reflection implements Infusion {
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		DamageType type = event.getType();
 		if ((type == DamageType.MAGIC || type == DamageType.BLAST) && !event.isBlocked()) {
-			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			double reflectedDamage = modifiedLevel * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();
+			double reflectedDamage = value * REFLECT_PCT_PER_LEVEL * event.getOriginalDamage();
 			World world = player.getWorld();
 			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.6f);
 			world.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.4f);

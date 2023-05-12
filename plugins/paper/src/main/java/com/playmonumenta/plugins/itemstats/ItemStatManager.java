@@ -12,8 +12,10 @@ import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
+import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
@@ -98,10 +100,11 @@ public class ItemStatManager implements Listener {
 					if (old == null) {
 						mMap.put(stat, value);
 					} else {
-						if (old + value == 0) {
+						double newValue = old + value;
+						if (newValue == 0) {
 							mMap.remove(stat);
 						} else {
-							mMap.put(stat, old + value);
+							mMap.put(stat, newValue);
 						}
 					}
 				}
@@ -268,8 +271,9 @@ public class ItemStatManager implements Listener {
 								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getEffectiveRegionScaling(player, item, mRegion, 0, 1, 2)));
 							}
 						} else if (stat instanceof Infusion infusion) {
-							double multiplier = infusion.getInfusionType().isRegionScaled() ? (shattered ? 0 : regionScaling) : 1.0;
-							newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
+							if (!(infusion.getInfusionType().isDisabledByShatter() && shattered)) {
+								newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+							}
 						}
 					}
 				}
@@ -311,12 +315,13 @@ public class ItemStatManager implements Listener {
 								newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
 							}
 						} else if (stat instanceof Infusion infusion) {
-							double multiplier = infusion.getInfusionType().isRegionScaled() ? regionScaling : 1.0;
-							newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()) * multiplier);
+							newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
 						}
 					}
 				}
 			}
+
+			int understanding = Math.min(DelveInfusionUtils.MAX_LEVEL, (int) (newArmorAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) + newMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat())));
 
 			for (ItemStat stat : ITEM_STATS) {
 				double newAdd = newArmorAddStats.mMap.getOrDefault(stat, 0.0) + newMainhandAddStats.mMap.getOrDefault(stat, 0.0);
@@ -325,6 +330,8 @@ public class ItemStatManager implements Listener {
 					newStats.set(stat, 1 + newMultiply);
 				} else if (stat instanceof Phylactery) {
 					newStats.set(stat, newAdd * (1 + newMultiply) + Phylactery.BASE_POTION_KEEP_LEVEL);
+				} else if (stat instanceof Infusion infusion && infusion.getInfusionType().isDelveInfusion() && newAdd > 0) {
+					newStats.set(stat, Math.min(newAdd, DelveInfusionUtils.MAX_LEVEL) + understanding * Understanding.POINTS_PER_LEVEL);
 				} else {
 					newStats.set(stat, newAdd * (1 + newMultiply));
 				}
@@ -552,15 +559,15 @@ public class ItemStatManager implements Listener {
 		return (int) playerItemStats.getItemStats().get(type.getItemStat());
 	}
 
-	public int getInfusionLevel(Player player, InfusionType type) {
+	public double getInfusionLevel(Player player, InfusionType type) {
 		return getInfusionLevel(getPlayerItemStats(player), type);
 	}
 
-	public int getInfusionLevel(@Nullable PlayerItemStats playerItemStats, InfusionType type) {
+	public double getInfusionLevel(@Nullable PlayerItemStats playerItemStats, InfusionType type) {
 		if (playerItemStats == null) {
 			return 0;
 		}
-		return (int) playerItemStats.getItemStats().get(type.getItemStat());
+		return playerItemStats.getItemStats().get(type.getItemStat());
 	}
 
 	public double getAttributeAmount(Player player, AttributeType type) {

@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.Player;
 
@@ -26,8 +25,7 @@ public class Grace implements Infusion {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (twoHz) {
-			double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-			plugin.mEffectManager.addEffect(player, EFFECT_NAME, new PercentAttackSpeed(DURATION, ATKS_BONUS * modifiedLevel, EFFECT_NAME).displaysTime(false));
+			plugin.mEffectManager.addEffect(player, EFFECT_NAME, new PercentAttackSpeed(DURATION, ATKS_BONUS * value, EFFECT_NAME).displaysTime(false));
 		}
 	}
 }

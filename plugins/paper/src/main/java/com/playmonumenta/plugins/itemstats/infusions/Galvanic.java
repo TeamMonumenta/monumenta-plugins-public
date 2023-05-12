@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
@@ -48,7 +47,6 @@ public class Galvanic implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		DamageType type = event.getType();
 
 		// Only apply infusion to basic melee and projectile attacks.
@@ -61,12 +59,11 @@ public class Galvanic implements Infusion {
 			return;
 		}
 
-		apply(plugin, player, modifiedLevel, enemy, type == DamageType.MELEE);
+		apply(plugin, player, value, enemy, type == DamageType.MELEE);
 	}
 
 	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity enemy) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
 		DamageType type = event.getType();
 
 		if (!(type == DamageType.MELEE || type == DamageType.PROJECTILE) || event.isBlocked() || event.isCancelled()) {
@@ -74,12 +71,12 @@ public class Galvanic implements Infusion {
 		}
 
 		if (enemy != null) {
-			apply(plugin, player, modifiedLevel, enemy, false);
+			apply(plugin, player, value, enemy, false);
 		}
 	}
 
-	public static void apply(Plugin plugin, Player player, double level, LivingEntity enemy, boolean isMelee) {
-		double chance = STUN_CHANCE_PER_LVL * level * (isMelee ? player.getCooledAttackStrength(0) : 1);
+	public static void apply(Plugin plugin, Player player, double value, LivingEntity enemy, boolean isMelee) {
+		double chance = STUN_CHANCE_PER_LVL * value * (isMelee ? player.getCooledAttackStrength(0) : 1);
 		if (FastUtils.RANDOM.nextDouble() < chance) {
 			if (EntityUtils.isElite(enemy)) {
 				EntityUtils.applyStun(plugin, DURATION_ELITE, enemy);

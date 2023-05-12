@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -23,8 +22,7 @@ public class Nutriment implements Infusion {
 
 	@Override
 	public void onRegain(Plugin plugin, Player player, double value, EntityRegainHealthEvent event) {
-		double modifiedLevel = DelveInfusionUtils.getModifiedLevel(plugin, player, (int) value);
-		event.setAmount(event.getAmount() * getHealingMultiplier(modifiedLevel));
+		event.setAmount(event.getAmount() * getHealingMultiplier(value));
 	}
 
 	public static double getHealingMultiplier(double level) {
