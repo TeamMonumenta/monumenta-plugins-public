@@ -345,6 +345,8 @@ public class ItemUtils {
 		Material.JUNGLE_LEAVES,
 		Material.BIRCH_LEAVES,
 		Material.ACACIA_LEAVES,
+		Material.AZALEA_LEAVES,
+		Material.FLOWERING_AZALEA_LEAVES,
 		Material.SEA_LANTERN,
 		Material.GLOWSTONE
 	);
