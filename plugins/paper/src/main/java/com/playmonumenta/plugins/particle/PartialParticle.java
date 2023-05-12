@@ -12,11 +12,13 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 	 */
 	public PartialParticle(Particle particle, Location location) {
 		super(particle, location);
+		mMinimumCount = 0;
 	}
 
 	public PartialParticle(Particle particle, Location location, int count) {
 		super(particle, location);
 		mCount = count;
+		mMinimumCount = 0;
 	}
 
 	/*
@@ -88,6 +90,7 @@ public class PartialParticle extends AbstractPartialParticle<PartialParticle> {
 		mData = data;
 		mDirectionalMode = directionalMode;
 		mExtraVariance = extraVariance;
+		mMinimumCount = 0;
 	}
 
 }
