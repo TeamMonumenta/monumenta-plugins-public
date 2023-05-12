@@ -30,7 +30,6 @@ import com.playmonumenta.plugins.effects.Stasis;
 import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
-import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -57,136 +56,142 @@ public enum EffectType {
 	// isPositive: if the display should be blue (positive) or red (negative)
 	// isFlat: not a percentage (true) or percentage (false)
 	// isConstant: does it have a number associated?
-	// isVanilla: is it a vanilla effect?
-	VANILLA_SPEED("VanillaSpeed", "Speed", true, true, false, true),
-	VANILLA_SLOW("VanillaSlow", "Slowness", false, true, false, false),
-	VANILLA_HASTE("Haste", "Haste", true, true, false, true),
-	VANILLA_FATIGUE("MiningFatigue", "Mining Fatigue", false, true, false, true),
-	VANILLA_JUMP("JumpBoost", "Jump Boost", true, true, false, true),
-	VANILLA_FIRE_RESISTANCE("VanillaFireRes", "Fire Immunity", true, true, true, true),
-	VANILLA_WATER_BREATH("WaterBreath", "Water Breathing", true, true, true, true),
-	VANILLA_BLINDNESS("Blindness", "Blindness", false, true, true, true),
-	VANILLA_NIGHT_VISION("NightVision", "Night Vision", true, true, true, true),
-	VANILLA_POISON("Poison", "Poison", false, true, false, true),
-	VANILLA_WITHER("Wither", "Wither", false, true, false, true),
-	VANILLA_REGEN("Regeneration", "Regeneration", true, true, false, true),
-	VANILLA_HEAL("InstantHealth", "Instant Health", true, false, false, true),
-	VANILLA_DAMAGE("InstantDamage", "Instant Damage", false, false, false, true),
-	VANILLA_SATURATION("Saturation", "Saturation", true, true, false, true),
-	VANILLA_GLOW("Glowing", "Glowing", true, true, true, true),
-	VANILLA_SLOWFALL("SlowFalling", "Slow Falling", true, true, false, true),
-	VANILLA_CONDUIT("ConduitPower", "Conduit Power", true, true, true, true),
-	VANILLA_HUNGER("Hunger", "Hunger", false, true, false, true),
-	VANILLA_NAUSEA("Nausea", "Nausea", false, true, true, true),
-	VANILLA_BADLUCK("BadLuck", "Bad Luck", false, true, false, true),
+	// vanillaPotionEffectType: the vanilla potion effect applied by this effect type
+	VANILLA_SPEED("VanillaSpeed", "Speed", true, false, PotionEffectType.SPEED),
+	VANILLA_SLOW("VanillaSlow", "Slowness", false, false, PotionEffectType.SLOW),
+	VANILLA_HASTE("Haste", "Haste", true, false, PotionEffectType.FAST_DIGGING),
+	VANILLA_FATIGUE("MiningFatigue", "Mining Fatigue", false, false, PotionEffectType.SLOW_DIGGING),
+	VANILLA_JUMP("JumpBoost", "Jump Boost", true, false, PotionEffectType.JUMP),
+	VANILLA_FIRE_RESISTANCE("VanillaFireRes", "Fire Immunity", true, true, PotionEffectType.FIRE_RESISTANCE),
+	VANILLA_WATER_BREATH("WaterBreath", "Water Breathing", true, true, PotionEffectType.WATER_BREATHING),
+	VANILLA_BLINDNESS("Blindness", "Blindness", false, true, PotionEffectType.BLINDNESS),
+	VANILLA_NIGHT_VISION("NightVision", "Night Vision", true, true, PotionEffectType.NIGHT_VISION),
+	VANILLA_POISON("Poison", "Poison", false, false, PotionEffectType.POISON),
+	VANILLA_WITHER("Wither", "Wither", false, false, PotionEffectType.WITHER),
+	VANILLA_REGEN("Regeneration", "Regeneration", true, false, PotionEffectType.REGENERATION),
+	VANILLA_SATURATION("Saturation", "Saturation", true, false, PotionEffectType.SATURATION),
+	VANILLA_GLOW("Glowing", "Glowing", true, true, PotionEffectType.GLOWING),
+	VANILLA_SLOWFALL("SlowFalling", "Slow Falling", true, false, PotionEffectType.SLOW_FALLING),
+	VANILLA_CONDUIT("ConduitPower", "Conduit Power", true, true, PotionEffectType.CONDUIT_POWER),
+	VANILLA_HUNGER("Hunger", "Hunger", false, false, PotionEffectType.HUNGER),
+	VANILLA_NAUSEA("Nausea", "Nausea", false, true, PotionEffectType.CONFUSION),
+	VANILLA_BADLUCK("BadLuck", "Bad Luck", false, false, PotionEffectType.UNLUCK),
 
-	SPEED("Speed", "Speed", true, false, false, false),
-	SLOW("Slow", "Speed", false, false, false, false),
+	SPEED("Speed", "Speed", true, false, false),
+	SLOW("Slow", "Speed", false, false, false),
 
-	ATTACK_SPEED("AttackSpeed", "Attack Speed", true, false, false, false),
-	NEGATIVE_ATTACK_SPEED("NegativeAttackSpeed", "Attack Speed", false, false, false, false),
+	ATTACK_SPEED("AttackSpeed", "Attack Speed", true, false, false),
+	NEGATIVE_ATTACK_SPEED("NegativeAttackSpeed", "Attack Speed", false, false, false),
 
-	KNOCKBACK_RESIST("KnockbackResist", "Knockback Resistance", true, false, false, false),
-	NEGATIVE_KNOCKBACK_RESIST("NegativeKnockbackResist", "Knockback Resistance", false, false, false, false),
+	KNOCKBACK_RESIST("KnockbackResist", "Knockback Resistance", true, false, false),
+	NEGATIVE_KNOCKBACK_RESIST("NegativeKnockbackResist", "Knockback Resistance", false, false, false),
 
-	MAX_HEALTH_INCREASE("MaxHealthIncrease", "Max Health", true, false, false, false),
-	MAX_HEALTH_DECREASE("MaxHealthDecrease", "Max Health", false, false, false, false),
+	MAX_HEALTH_INCREASE("MaxHealthIncrease", "Max Health", true, false, false),
+	MAX_HEALTH_DECREASE("MaxHealthDecrease", "Max Health", false, false, false),
 
-	ABSORPTION("Absorption", "Absorption Health", true, false, false, false),
-	SATURATION("Saturation", "Saturation", true, true, false, false),
-	STARVATION("Starvation", "Starvation", false, true, false, false),
+	ABSORPTION("Absorption", "Absorption Health", true, false, false),
+	SATURATION("Saturation", "Saturation", true, true, false),
+	STARVATION("Starvation", "Starvation", false, true, false),
 
 	//Resistance type of effects
-	RESISTANCE("Resistance", "Resistance", true, false, false, false),
-	MELEE_RESISTANCE("MeleeResistance", "Melee Resistance", true, false, false, false),
-	PROJECTILE_RESISTANCE("ProjectileResistance", "Projectile Resistance", true, false, false, false),
-	MAGIC_RESISTANCE("MagicResistance", "Magic Resistance", true, false, false, false),
-	BLAST_RESISTANCE("BlastResistance", "Blast Resistance", true, false, false, false),
-	FIRE_RESISTANCE("FireResistance", "Fire Resistance", true, false, false, false),
-	FALL_RESISTANCE("FallResistance", "Fall Resistance", true, false, false, false),
+	RESISTANCE("Resistance", "Resistance", true, false, false),
+	MELEE_RESISTANCE("MeleeResistance", "Melee Resistance", true, false, false),
+	PROJECTILE_RESISTANCE("ProjectileResistance", "Projectile Resistance", true, false, false),
+	MAGIC_RESISTANCE("MagicResistance", "Magic Resistance", true, false, false),
+	BLAST_RESISTANCE("BlastResistance", "Blast Resistance", true, false, false),
+	FIRE_RESISTANCE("FireResistance", "Fire Resistance", true, false, false),
+	FALL_RESISTANCE("FallResistance", "Fall Resistance", true, false, false),
 
 	//Damage Negation
-	DAMAGE_NEGATE("DamageNegate", "Hits Blocked", true, true, false, false),
-	MELEE_DAMAGE_NEGATE("MeleeDamageNegate", "Melee Hits Blocked", true, true, false, false),
-	PROJECTILE_DAMAGE_NEGATE("ProjectileDamageNegate", "Projectile Hits Blocked", true, true, false, false),
-	MAGIC_DAMAGE_NEGATE("MagicDamageNegate", "Magic Hits Blocked", true, true, false, false),
-	BLAST_DAMAGE_NEGATE("BlastDamageNegate", "Blast Hits Blocked", true, true, false, false),
-	FIRE_DAMAGE_NEGATE("FireDamageNegate", "Fire Hits Blocked", true, true, false, false),
-	FALL_DAMAGE_NEGATE("FallDamageNegate", "Falling Hits Blocked", true, true, false, false),
+	DAMAGE_NEGATE("DamageNegate", "Hits Blocked", true, true, false),
+	MELEE_DAMAGE_NEGATE("MeleeDamageNegate", "Melee Hits Blocked", true, true, false),
+	PROJECTILE_DAMAGE_NEGATE("ProjectileDamageNegate", "Projectile Hits Blocked", true, true, false),
+	MAGIC_DAMAGE_NEGATE("MagicDamageNegate", "Magic Hits Blocked", true, true, false),
+	BLAST_DAMAGE_NEGATE("BlastDamageNegate", "Blast Hits Blocked", true, true, false),
+	FIRE_DAMAGE_NEGATE("FireDamageNegate", "Fire Hits Blocked", true, true, false),
+	FALL_DAMAGE_NEGATE("FallDamageNegate", "Falling Hits Blocked", true, true, false),
 
 	//Vulnerability type of effects
-	VULNERABILITY("Vulnerability", "Resistance", false, false, false, false),
-	MELEE_VULNERABILITY("MeleeVulnerability", "Melee Resistance", false, false, false, false),
-	PROJECTILE_VULNERABILITY("ProjectileVulnerability", "Projectile Resistance", false, false, false, false),
-	MAGIC_VULNERABILITY("MagicVulnerability", "Magic Resistance", false, false, false, false),
-	BLAST_VULNERABILITY("BlastVulnerability", "Blast Resistance", false, false, false, false),
-	FIRE_VULNERABILITY("FireVulnerability", "Fire Resistance", false, false, false, false),
-	FALL_VULNERABILITY("FallVulnerability", "Fall Resistance", false, false, false, false),
+	VULNERABILITY("Vulnerability", "Resistance", false, false, false),
+	MELEE_VULNERABILITY("MeleeVulnerability", "Melee Resistance", false, false, false),
+	PROJECTILE_VULNERABILITY("ProjectileVulnerability", "Projectile Resistance", false, false, false),
+	MAGIC_VULNERABILITY("MagicVulnerability", "Magic Resistance", false, false, false),
+	BLAST_VULNERABILITY("BlastVulnerability", "Blast Resistance", false, false, false),
+	FIRE_VULNERABILITY("FireVulnerability", "Fire Resistance", false, false, false),
+	FALL_VULNERABILITY("FallVulnerability", "Fall Resistance", false, false, false),
 
 	//Damage type of effects
-	DAMAGE("damage", "Strength", true, false, false, false),
-	MAGIC_DAMAGE("MagicDamage", "Magic Damage", true, false, false, false),
-	MELEE_DAMAGE("MeleeDamage", "Melee Damage", true, false, false, false),
-	PROJECTILE_DAMAGE("ProjectileDamage", "Projectile Damage", true, false, false, false),
+	DAMAGE("damage", "Strength", true, false, false),
+	MAGIC_DAMAGE("MagicDamage", "Magic Damage", true, false, false),
+	MELEE_DAMAGE("MeleeDamage", "Melee Damage", true, false, false),
+	PROJECTILE_DAMAGE("ProjectileDamage", "Projectile Damage", true, false, false),
 
 	//Weakness type of effects
-	WEAKNESS("Weakness", "Weakness", false, false, false, false),
-	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false, false),
-	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false, false),
-	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false, false),
+	WEAKNESS("Weakness", "Weakness", false, false, false),
+	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false),
+	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false),
+	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false),
 
-	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false, false),
-	INSTANT_DAMAGE("InstantDamagePercent", "Instant Damage", false, false, false, false),
+	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false),
+	INSTANT_DAMAGE("InstantDamagePercent", "Instant Damage", false, false, false),
 
-	HEAL("Heal", "Healing Rate", true, false, false, false),
-	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false, false),
+	HEAL("Heal", "Healing Rate", true, false, false),
+	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false),
 
-	ARROW_SAVING("ArrowSaving", "Arrow Save Chance", true, false, false, false),
-	ARROW_LOSS("ArrowSaving", "Arrow Save Chance", false, false, false, false),
+	ARROW_SAVING("ArrowSaving", "Arrow Save Chance", true, false, false),
+	ARROW_LOSS("ArrowSaving", "Arrow Save Chance", false, false, false),
 
-	SOUL_THREAD_BONUS("SoulThreadBonus", "Soul Thread Chance", true, false, false, false),
-	SOUL_THREAD_REDUCTION("SoulThreadReduction", "Soul Thread Chance", false, false, false, false),
+	SOUL_THREAD_BONUS("SoulThreadBonus", "Soul Thread Chance", true, false, false),
+	SOUL_THREAD_REDUCTION("SoulThreadReduction", "Soul Thread Chance", false, false, false),
 
-	DURABILITY_SAVE("DurabilitySave", "Durability", true, false, false, false),
-	DURABILITY_LOSS("DurabilityLoss", "Durability", false, false, false, false),
+	DURABILITY_SAVE("DurabilitySave", "Durability", true, false, false),
+	DURABILITY_LOSS("DurabilityLoss", "Durability", false, false, false),
 
-	EXP_BONUS("ExpBonus", "Experience", true, false, false, false),
-	EXP_LOSS("ExpLoss", "Experience", false, false, false, false),
+	EXP_BONUS("ExpBonus", "Experience", true, false, false),
+	EXP_LOSS("ExpLoss", "Experience", false, false, false),
 
-	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false, false),
-	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false, false),
+	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false),
+	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false),
 
-	BLEED("Bleed", "Bleed", false, false, false, false),
+	BLEED("Bleed", "Bleed", false, false, false),
 
-	STASIS("Stasis", "Stasis", true, false, true, false),
+	STASIS("Stasis", "Stasis", true, false, true),
 
-	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true, false),
-	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true, false),
-	BOON_OF_KNIGHTLY_PRAYER("BoonOfKnightlyPrayer", "Boon of Knightly Prayer", true, false, true, false),
-	CRYSTALLINE_BLESSING("CrystallineBlessing", "Crystalline Blessing", true, false, true, false),
-	CURSE_OF_THE_DARK_SOUL("DarkSoul", "Curse of the Dark Soul", false, false, true, false),
-	DEEP_GODS_ENDOWMENT("DeepGodsEndowment", "Deep God's Endowment", true, false, true, false),
-	HARRAKFARS_BLESSING("HarrakfarsBlessing", "Harrakfar's Blessing", true, false, true, false),
-	SILVER_PRAYER("SilverPrayer", "Silver Prayer", true, false, true, false),
-	STAR_COMMUNION("StarCommunion", "Star Communion", true, false, true, false),
-	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true, false);
+	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true),
+	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true),
+	BOON_OF_KNIGHTLY_PRAYER("BoonOfKnightlyPrayer", "Boon of Knightly Prayer", true, false, true),
+	CRYSTALLINE_BLESSING("CrystallineBlessing", "Crystalline Blessing", true, false, true),
+	CURSE_OF_THE_DARK_SOUL("DarkSoul", "Curse of the Dark Soul", false, false, true),
+	DEEP_GODS_ENDOWMENT("DeepGodsEndowment", "Deep God's Endowment", true, false, true),
+	HARRAKFARS_BLESSING("HarrakfarsBlessing", "Harrakfar's Blessing", true, false, true),
+	SILVER_PRAYER("SilverPrayer", "Silver Prayer", true, false, true),
+	STAR_COMMUNION("StarCommunion", "Star Communion", true, false, true),
+	TUATHAN_BLESSING("TuathanBlessing", "Tuathan Blessing", true, false, true);
 
 	public static final String KEY = "Effects";
 
 	private final String mType;
 	private final String mName;
-	private final Boolean mIsPositive;
-	private final Boolean mIsFlat;
-	private final Boolean mIsConstant;
-	private final Boolean mIsVanilla;
+	private final boolean mIsPositive;
+	private final boolean mIsFlat;
+	private final boolean mIsConstant;
+	private final @Nullable PotionEffectType mVanillaPotionEffectType;
 
-	EffectType(String type, String name, Boolean isPositive, Boolean isFlat, Boolean isConstant, Boolean isVanilla) {
+	EffectType(String type, String name, boolean isPositive, boolean isFlat, boolean isConstant) {
+		this(type, name, isPositive, isFlat, isConstant, null);
+	}
+
+	EffectType(String type, String name, boolean isPositive, boolean isConstant, PotionEffectType vanillaPotionEffectType) {
+		this(type, name, isPositive, true, isConstant, vanillaPotionEffectType);
+	}
+
+	EffectType(String type, String name, boolean isPositive, boolean isFlat, boolean isConstant, @Nullable PotionEffectType vanillaPotionEffectType) {
 		mType = type;
 		mName = name;
 		mIsPositive = isPositive;
 		mIsFlat = isFlat;
 		mIsConstant = isConstant;
-		mIsVanilla = isVanilla;
+		mVanillaPotionEffectType = vanillaPotionEffectType;
 	}
 
 	public String getType() {
@@ -197,23 +202,23 @@ public enum EffectType {
 		return mName;
 	}
 
-	public Boolean isPositive() {
+	public boolean isPositive() {
 		return mIsPositive;
 	}
 
-	public Boolean isFlat() {
+	public boolean isFlat() {
 		return mIsFlat;
 	}
 
-	public Boolean isConstant() {
+	public boolean isConstant() {
 		return mIsConstant;
 	}
 
-	public Boolean isVanilla() {
-		return mIsVanilla;
+	public @Nullable PotionEffectType getPotionEffectType() {
+		return mVanillaPotionEffectType;
 	}
 
-	public static Boolean isEffectTypeAppliedEffect(@Nullable String source) {
+	public static boolean isEffectTypeAppliedEffect(@Nullable String source) {
 		// Inputs a source, and looks up through all the EffectTypes to check if their source starts with mName.
 		// Since Source is registered as:
 		// mName + <Source> or
@@ -245,12 +250,6 @@ public enum EffectType {
 			return Component.empty();
 		}
 
-		int minutes = duration / 1200;
-		int seconds = (duration / 20) % 60;
-		String timeString = "(" + minutes + ":" + (seconds > 9 ? seconds : "0" + seconds) + ")";
-		if (minutes > 999) {
-			timeString = "(∞)";
-		}
 		String color;
 		String add;
 
@@ -270,133 +269,59 @@ public enum EffectType {
 			}
 		}
 
+		String text;
+		boolean includeTime = true;
+
 		if (effectType == EffectType.STARVATION) {
-			return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength), TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
+			text = effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength);
+			includeTime = false;
+		} else if (effectType.getPotionEffectType() != null) {
+			text = effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength);
+		} else if (effectType.getType().contains("Instant")) {
+			text = (int) (strength * 100) + "% " + effectType.mName;
+			includeTime = false;
+		} else if (effectType.isConstant()) {
+			text = effectType.mName;
+		} else if (effectType.isFlat()) {
+			text = add + ((int) strength) + " " + effectType.mName;
+		} else {
+			text = add + (int) (strength * 100) + "% " + effectType.mName;
 		}
 
-		if (effectType.isVanilla()) {
-			if (effectType.getType().contains("Instant")) {
-				return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength), TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
-			} else if (effectType.isConstant()) {
-				return Component.text(effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-					Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-				);
+		Component component = Component.text(text, TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
+		if (includeTime) {
+			int minutes = duration / 1200;
+			int seconds = (duration / 20) % 60;
+			String timeString = "(" + minutes + ":" + (seconds > 9 ? seconds : "0" + seconds) + ")";
+			if (minutes > 999) {
+				timeString = "(∞)";
 			}
-			return Component.text(effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength) + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-				Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-			);
-		} else {
-			if (effectType.getType().contains("Instant")) {
-				return Component.text((int) (strength * 100) + "% " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false);
-			}
-			if (effectType.isConstant()) {
-				return Component.text(effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-					Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-				);
-			}
-			if (effectType.isFlat()) {
-				return Component.text(add + ((int) strength) + " " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-					Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-				);
-			}
-			return Component.text(add + (int) (strength * 100) + "% " + effectType.mName + " ", TextColor.fromHexString(color)).decoration(TextDecoration.ITALIC, false).append(
-				Component.text(timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false)
-			);
+			component = component.append(Component.text(" " + timeString, TextColor.fromHexString("#55555")).decoration(TextDecoration.ITALIC, false));
 		}
+		return component;
 	}
 
-	public static void applyEffect(@Nullable EffectType effectType, Entity entity, int duration, double strength, @Nullable String source, boolean applySickness) {
+	public static void applyEffect(@Nullable EffectType effectType, LivingEntity entity, int duration, double strength, @Nullable String source, boolean applySickness) {
 		if (effectType == null) {
 			return;
 		}
 
-		String sourceString = (source != null ? effectType.mName + source : effectType.mName);
-		Player player = (Player) entity;
 		Plugin plugin = Plugin.getInstance();
 
-		switch (effectType) {
-			case VANILLA_SPEED -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SPEED, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SPEED, duration, (int) (strength - 1), true));
+		PotionEffectType potionEffectType = effectType.getPotionEffectType();
+		if (potionEffectType != null) {
+			PotionEffect potionEffect = new PotionEffect(potionEffectType, duration, (int) strength - 1, true);
+			if (entity instanceof Player player) {
+				PotionUtils.applyPotion(plugin, player, potionEffect);
+			} else {
+				entity.addPotionEffect(potionEffect);
 			}
-			case VANILLA_SLOW -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SLOW, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_HASTE -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.FAST_DIGGING, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.FAST_DIGGING, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_FATIGUE -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_DIGGING, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SLOW_DIGGING, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_JUMP -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.JUMP, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.JUMP, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_FIRE_RESISTANCE -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_WATER_BREATH -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WATER_BREATHING, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.WATER_BREATHING, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_BLINDNESS -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.BLINDNESS, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.BLINDNESS, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_NIGHT_VISION -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.NIGHT_VISION, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.NIGHT_VISION, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_POISON -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.POISON, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.POISON, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_WITHER -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.WITHER, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.WITHER, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_REGEN -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.REGENERATION, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_HEAL -> {
-				PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(player) * 0.2 * strength);
-				applyHealingSickness(entity, applySickness, player, plugin);
-			}
-			case VANILLA_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(player) * 0.2 * strength);
-			case VANILLA_SATURATION -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SATURATION, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_GLOW -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.GLOWING, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_SLOWFALL -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_CONDUIT -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONDUIT_POWER, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.CONDUIT_POWER, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_HUNGER -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.HUNGER, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.HUNGER, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_NAUSEA -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.CONFUSION, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.CONFUSION, duration, (int) (strength - 1), true));
-			}
-			case VANILLA_BADLUCK -> {
-				PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.UNLUCK, duration, (int) (strength - 1), true));
-				plugin.mPotionManager.addPotion(player, PotionManager.PotionID.APPLIED_POTION, new PotionEffect(PotionEffectType.UNLUCK, duration, (int) (strength - 1), true));
-			}
+			return;
+		}
 
+		String sourceString = (source != null ? effectType.mName + source : effectType.mName);
+
+		switch (effectType) {
 			case SPEED -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, strength, sourceString));
 			case SLOW -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, -strength, sourceString));
 
@@ -410,21 +335,15 @@ public enum EffectType {
 			case MAX_HEALTH_DECREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHealthBoost(duration, -strength, sourceString));
 
 			case ABSORPTION -> {
-				if (entity instanceof LivingEntity livingEntity) {
-					double amount = strength * EntityUtils.getMaxHealth(livingEntity);
-					AbsorptionUtils.addAbsorption(livingEntity, amount, amount, duration);
-					if (applySickness) {
-						double sicknessPenalty = 0;
-						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
-						if (sicks != null) {
-							Effect sick = sicks.last();
-							sicknessPenalty = sick.getMagnitude();
-						}
-						plugin.mEffectManager.addEffect(entity, "AbsorptionSickness", new AbsorptionSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "AbsorptionSickness"));
-					}
+				double amount = strength * EntityUtils.getMaxHealth(entity);
+				AbsorptionUtils.addAbsorption(entity, amount, amount, duration);
+				applyAbsorptionSickness(entity, applySickness, plugin);
+			}
+			case STARVATION -> {
+				if (entity instanceof Player player) {
+					Starvation.apply(player, (int) strength);
 				}
 			}
-			case STARVATION -> Starvation.apply(player, (int) strength);
 
 			case RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength));
 			case MELEE_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE)));
@@ -464,10 +383,12 @@ public enum EffectType {
 			case ANTI_HEAL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, -strength));
 
 			case INSTANT_HEALTH -> {
-				PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(player) * strength);
-				applyHealingSickness(entity, applySickness, player, plugin);
+				if (entity instanceof Player player) {
+					PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(entity) * strength);
+					applyHealingSickness(entity, applySickness, plugin);
+				}
 			}
-			case INSTANT_DAMAGE -> DamageUtils.damage(null, player, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(player) * strength);
+			case INSTANT_DAMAGE -> DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
 
 			case ARROW_SAVING -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, strength));
 			case ARROW_LOSS -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, -strength));
@@ -504,15 +425,27 @@ public enum EffectType {
 		}
 	}
 
-	private static void applyHealingSickness(Entity entity, boolean applySickness, Player player, Plugin plugin) {
+	private static void applyHealingSickness(Entity entity, boolean applySickness, Plugin plugin) {
 		if (applySickness) {
 			double sicknessPenalty = 0;
-			NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
+			NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, "HealingSickness");
 			if (sicks != null) {
 				Effect sick = sicks.last();
 				sicknessPenalty = sick.getMagnitude();
 			}
 			plugin.mEffectManager.addEffect(entity, "HealingSickness", new HealingSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "HealingSickness"));
+		}
+	}
+
+	private static void applyAbsorptionSickness(Entity entity, boolean applySickness, Plugin plugin) {
+		if (applySickness) {
+			double sicknessPenalty = 0;
+			NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(entity, "AbsorptionSickness");
+			if (sicks != null) {
+				Effect sick = sicks.last();
+				sicknessPenalty = sick.getMagnitude();
+			}
+			plugin.mEffectManager.addEffect(entity, "AbsorptionSickness", new AbsorptionSickness(20 * 15, Math.min(sicknessPenalty + 0.2, 0.8), "AbsorptionSickness"));
 		}
 	}
 }

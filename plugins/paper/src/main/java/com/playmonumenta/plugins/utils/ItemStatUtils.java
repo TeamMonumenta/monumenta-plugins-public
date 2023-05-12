@@ -1105,7 +1105,7 @@ public class ItemStatUtils {
 						sicknessPenalty = sick.getMagnitude();
 					}
 					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), source, applySickness);
-				} else if (effectType == EffectType.INSTANT_HEALTH || effectType == EffectType.VANILLA_HEAL) {
+				} else if (effectType == EffectType.INSTANT_HEALTH) {
 					double sicknessPenalty = 0;
 					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
 					if (sicks != null) {
