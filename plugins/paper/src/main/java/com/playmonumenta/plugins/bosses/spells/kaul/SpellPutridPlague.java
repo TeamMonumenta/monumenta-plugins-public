@@ -134,7 +134,7 @@ public class SpellPutridPlague extends Spell {
 			Component message = Component.text(pillar.mMessage, mPhase3 ? pillar.mDarkTextColor : pillar.mTextColor);
 			players.forEach(p -> p.sendMessage(message));
 
-			new BukkitRunnable() {
+			BukkitRunnable runnable = new BukkitRunnable() {
 				final Location mPoint1 = point.getLocation().add(4, 6, 4);
 				final Location mPoint2 = point.getLocation().add(-4, 6, -4);
 				final Location mPoint3 = point.getLocation().add(4, 6, -4);
@@ -213,7 +213,14 @@ public class SpellPutridPlague extends Spell {
 					}
 				}
 
-			}.runTaskTimer(mPlugin, 0, 2);
+				@Override
+				public synchronized void cancel() {
+					mActiveRunnables.remove(this);
+					super.cancel();
+				}
+			};
+			runnable.runTaskTimer(mPlugin, 0, 2);
+			mActiveRunnables.add(runnable);
 		}
 	}
 

@@ -45,7 +45,7 @@ public class SpellEarthenRupture extends Spell {
 		World world = mBoss.getWorld();
 		mBoss.removePotionEffect(PotionEffectType.SLOW);
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 50, 1));
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 
 			@Override
 			public void run() {
@@ -75,7 +75,14 @@ public class SpellEarthenRupture extends Spell {
 				}
 			}
 
-		}.runTaskTimer(mPlugin, 0, 1);
+			@Override
+			public synchronized void cancel() {
+				mActiveRunnables.remove(this);
+				super.cancel();
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 1);
+		mActiveRunnables.add(runnable);
 	}
 
 	@Override

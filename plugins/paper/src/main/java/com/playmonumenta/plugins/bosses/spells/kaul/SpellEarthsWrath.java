@@ -50,7 +50,6 @@ public class SpellEarthsWrath extends Spell {
 
 			@Override
 			public void run() {
-
 				if (mChargeUp.getTime() % 2 == 0) {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 2, 1);
 				}
@@ -90,6 +89,11 @@ public class SpellEarthsWrath extends Spell {
 								}
 							}
 
+							@Override
+							public synchronized void cancel() {
+								mActiveRunnables.remove(this);
+								super.cancel();
+							}
 						};
 						runnable.runTaskTimer(mPlugin, 5, 1);
 						mActiveRunnables.add(runnable);
@@ -98,6 +102,11 @@ public class SpellEarthsWrath extends Spell {
 				}
 			}
 
+			@Override
+			public synchronized void cancel() {
+				mActiveRunnables.remove(this);
+				super.cancel();
+			}
 		};
 		runnable.runTaskTimer(mPlugin, 1, 1);
 		mActiveRunnables.add(runnable);

@@ -63,7 +63,7 @@ public class SpellArachnopocolypse extends Spell {
 
 		//30 ticks charge time
 		mChargeUp.setTime(15);
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (mChargeUp.nextTick()) {
@@ -89,8 +89,15 @@ public class SpellArachnopocolypse extends Spell {
 					return;
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 2);
 
+			@Override
+			public synchronized void cancel() {
+				mActiveRunnables.remove(this);
+				super.cancel();
+			}
+		};
+		runnable.runTaskTimer(mPlugin, 0, 2);
+		mActiveRunnables.add(runnable);
 	}
 
 	private void riseSpider(Location loc, String los, int health) {
