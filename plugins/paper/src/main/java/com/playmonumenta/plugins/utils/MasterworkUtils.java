@@ -67,6 +67,9 @@ public class MasterworkUtils {
 	private static final String ORANGE_MAT = "epic:r1/delves/orange/auxiliary/delve_material";
 	private static final String MAGENTA_MAT = "epic:r1/delves/magenta/auxiliary/delve_material";
 	private static final String LIGHTBLUE_MAT = "epic:r1/delves/lightblue/auxiliary/delve_material";
+	private static final String YELLOW_MAT = "epic:r1/delves/yellow/auxiliary/delve_material";
+	private static final String WILLOWS_MAT = "epic:r1/delves/willows/auxiliary/echoes_of_the_veil";
+	private static final String REVERIE_MAT = "epic:r1/delves/reverie/auxiliary/delve_material";
 
 	public enum MasterworkCost {
 		FOREST_ONE("forest_1", FOREST_FRAG, 1, HYPER_ARCHOS_RING, 1),
@@ -220,7 +223,37 @@ public class MasterworkUtils {
 		LIGHTBLUE_SIX("lightblue_6", LIGHTBLUE_MAT, 16, HYPER_ARCHOS_RING, 4),
 		LIGHTBLUE_SEVENA("lightblue_7a", LIGHTBLUE_MAT, 32, FORTITUDE_AUGMENT, 16),
 		LIGHTBLUE_SEVENB("lightblue_7b", LIGHTBLUE_MAT, 32, POTENCY_AUGMENT, 16),
-		LIGHTBLUE_SEVENC("lightblue_7c", LIGHTBLUE_MAT, 32, ALACRITY_AUGMENT, 16);
+		LIGHTBLUE_SEVENC("lightblue_7c", LIGHTBLUE_MAT, 32, ALACRITY_AUGMENT, 16),
+
+		YELLOW_ONE("yellow_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		YELLOW_TWO("yellow_2", YELLOW_MAT, 3, HYPER_ARCHOS_RING, 3),
+		YELLOW_THREE("yellow_3", YELLOW_MAT, 6, HYPER_ARCHOS_RING, 4),
+		YELLOW_FOUR("yellow_4", PULSATING_DIAMOND, 3, HYPER_ARCHOS_RING, 4),
+		YELLOW_FIVE("yellow_5", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
+		YELLOW_SIX("yellow_6", YELLOW_MAT, 16, HYPER_ARCHOS_RING, 4),
+		YELLOW_SEVENA("yellow_7a", YELLOW_MAT, 32, FORTITUDE_AUGMENT, 16),
+		YELLOW_SEVENB("yellow_7b", YELLOW_MAT, 32, POTENCY_AUGMENT, 16),
+		YELLOW_SEVENC("yellow_7c", YELLOW_MAT, 32, ALACRITY_AUGMENT, 16),
+
+		WILLOWS_ONE("willows_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		WILLOWS_TWO("willows_2", WILLOWS_MAT, 3, HYPER_ARCHOS_RING, 3),
+		WILLOWS_THREE("willows_3", WILLOWS_MAT, 6, HYPER_ARCHOS_RING, 4),
+		WILLOWS_FOUR("willows_4", PULSATING_DIAMOND, 3, HYPER_ARCHOS_RING, 4),
+		WILLOWS_FIVE("willows_5", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
+		WILLOWS_SIX("willows_6", WILLOWS_MAT, 16, HYPER_ARCHOS_RING, 4),
+		WILLOWS_SEVENA("willows_7a", WILLOWS_MAT, 32, FORTITUDE_AUGMENT, 16),
+		WILLOWS_SEVENB("willows_7b", WILLOWS_MAT, 32, POTENCY_AUGMENT, 16),
+		WILLOWS_SEVENC("willows_7c", WILLOWS_MAT, 32, ALACRITY_AUGMENT, 16),
+
+		REVERIE_ONE("reverie_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		REVERIE_TWO("reverie_2", REVERIE_MAT, 3, HYPER_ARCHOS_RING, 3),
+		REVERIE_THREE("reverie_3", REVERIE_MAT, 6, HYPER_ARCHOS_RING, 4),
+		REVERIE_FOUR("reverie_4", PULSATING_DIAMOND, 3, HYPER_ARCHOS_RING, 4),
+		REVERIE_FIVE("reverie_5", PULSATING_DIAMOND, 6, HYPER_ARCHOS_RING, 4),
+		REVERIE_SIX("reverie_6", REVERIE_MAT, 16, HYPER_ARCHOS_RING, 4),
+		REVERIE_SEVENA("reverie_7a", REVERIE_MAT, 32, FORTITUDE_AUGMENT, 16),
+		REVERIE_SEVENB("reverie_7b", REVERIE_MAT, 32, POTENCY_AUGMENT, 16),
+		REVERIE_SEVENC("reverie_7c", REVERIE_MAT, 32, ALACRITY_AUGMENT, 16);
 
 		private final String mLabel;
 		private final String mPathA;
