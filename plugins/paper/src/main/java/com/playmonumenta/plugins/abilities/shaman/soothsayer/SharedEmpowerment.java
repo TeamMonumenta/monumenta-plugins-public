@@ -14,9 +14,9 @@ import org.bukkit.entity.Player;
 
 public class SharedEmpowerment extends Ability {
 
-	public static final int RADIUS = 10;
-	public static final double SELF_BOOST_1 = 0.03;
-	public static final double ALL_BOOST_2 = 0.05;
+	public static final int RADIUS = 12;
+	public static final double SELF_BOOST_1 = 0.05;
+	public static final double ALL_BOOST_2 = 0.07;
 
 	public static final String CHARM_RADIUS = "Shared Empowerment Radius";
 	public static final String CHARM_OTHER_SPEED = "Shared Empowerment Ally Speed";

@@ -36,10 +36,10 @@ public class EyeOfTheStorm extends Ability {
 	public static final int COOLDOWN_1 = 18 * 20;
 	public static final int COOLDOWN_2 = 15 * 20;
 	public static final int RING_DURATION = 6 * 20;
-	public static final int RADIUS = 6;
-	public static final int DAMAGE_1 = 4;
-	public static final int DAMAGE_2 = 6;
-	public static final double PULL_STRENGTH = 0.2;
+	public static final int RADIUS = 5;
+	public static final int DAMAGE_1 = 3;
+	public static final int DAMAGE_2 = 5;
+	public static final double PULL_STRENGTH = 0.1;
 	private static final double VELOCITY = 2;
 
 	public static final String CHARM_COOLDOWN = "Eye of the Storm Cooldown";
@@ -135,14 +135,16 @@ public class EyeOfTheStorm extends Ability {
 				higherRing.spawnAsPlayerActive(mPlayer);
 
 				if (mTicks % 20 == 0) {
-					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
+					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInCylinder(loc, mRadius, 3, null);
 					if (!affectedMobs.isEmpty()) {
 						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, 0.6f, 0.1f);
 						loc.getWorld().playSound(loc, Sound.ENTITY_ENDERMAN_AMBIENT, 0.3f, 0.6f);
 						for (LivingEntity mob : affectedMobs) {
 							DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 							mob.getWorld().playSound(mob.getLocation(), Sound.ENTITY_CAT_HISS, 2.0f, 1.0f);
-							MovementUtils.pullTowards(loc, mob, mPullStrength);
+							Location pullTarget = loc.clone();
+							pullTarget.setY(mob.getLocation().getY());
+							MovementUtils.pullTowards(pullTarget, mob, mPullStrength);
 						}
 					}
 				}

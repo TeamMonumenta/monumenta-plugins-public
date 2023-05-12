@@ -1131,6 +1131,7 @@ public final class Lich extends BossAbilityGroup {
 			case "Warrior" -> "WarriorUndead";
 			case "Rogue" -> "RogueUndead";
 			case "Scout" -> "ScoutUndead";
+			case "Shaman" -> "ShamanUndead";
 			default -> "AdventurerUndead";
 		};
 

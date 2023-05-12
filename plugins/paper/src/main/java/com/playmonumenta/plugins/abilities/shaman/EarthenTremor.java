@@ -38,12 +38,13 @@ import org.bukkit.util.Vector;
 
 public class EarthenTremor extends Ability {
 	public static final String ABILITY_NAME = "Earthen Tremor";
-	public static final int COOLDOWN = 24 * 20;
+	public static final int COOLDOWN_1 = 24 * 20;
+	public static final int COOLDOWN_2 = 16 * 20;
 	public static final int DELAY = 20;
 	public static final int RADIUS = 6;
 	public static final double KNOCKBACK = 0.8;
-	public static final int DAMAGE_1 = 6;
-	public static final int DAMAGE_2 = 10;
+	public static final int DAMAGE_1 = 9;
+	public static final int DAMAGE_2 = 12;
 
 	public static String CHARM_COOLDOWN = "Earthen Tremor Cooldown";
 	public static String CHARM_DAMAGE = "Earthen Tremor Damage";
@@ -51,6 +52,7 @@ public class EarthenTremor extends Ability {
 	public static String CHARM_DELAY = "Earthen Tremor Delay";
 	public static String CHARM_KNOCKBACK = "Earthen Tremor Knockback";
 
+	public int mCooldown;
 	public double mDamage;
 	public int mDelay;
 	public double mRadius;
@@ -68,13 +70,14 @@ public class EarthenTremor extends Ability {
 					DAMAGE_1,
 					RADIUS,
 					StringUtils.ticksToSeconds(DELAY),
-					StringUtils.ticksToSeconds(COOLDOWN)
+					StringUtils.ticksToSeconds(COOLDOWN_1)
 				),
-				String.format("Magic damage dealt is boosted to %s.",
-					DAMAGE_2)
+				String.format("Magic damage dealt is boosted to %s and cooldown is reduced to %ss.",
+					DAMAGE_2,
+					StringUtils.ticksToSeconds(COOLDOWN_2))
 			)
 			.simpleDescription("Fires an arrow that will cause a tremor where it lands, dealing damage and knocking up yourself and mobs.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.displayItem(Material.DIRT);
 
 	public EarthenTremor(Plugin plugin, Player player) {
@@ -87,6 +90,7 @@ public class EarthenTremor extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
+		mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
 
 		mDelay = CharmManager.getDuration(mPlayer, CHARM_DELAY, DELAY);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
@@ -123,7 +127,7 @@ public class EarthenTremor extends Ability {
 				@Override
 				public void run() {
 					if (mTicks >= mDelay) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, RADIUS)) {
+						for (LivingEntity mob : EntityUtils.getNearbyMobsInSphere(loc, RADIUS, null)) {
 							if (!EntityUtils.isCCImmuneMob(mob) && !EntityUtils.isBoss(mob)) {
 								knockup(mob);
 							}
@@ -187,7 +191,7 @@ public class EarthenTremor extends Ability {
 
 			@Override
 			public void run() {
-				if (mT > COOLDOWN || !mPlayerItemStatsMap.containsKey(projectile)) {
+				if (mT > mCooldown || !mPlayerItemStatsMap.containsKey(projectile)) {
 					projectile.remove();
 
 					this.cancel();
