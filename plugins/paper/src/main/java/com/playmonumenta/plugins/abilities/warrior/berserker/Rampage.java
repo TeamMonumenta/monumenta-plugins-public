@@ -122,6 +122,9 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			if (mTimeToStackDecay >= RAMPAGE_STACK_DECAY_TIME) {
 				mTimeToStackDecay = 0;
 				mStacks--;
+				if (mStacks > 0) {
+					addDamageReductionEffect(true);
+				}
 				showChargesMessage();
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
