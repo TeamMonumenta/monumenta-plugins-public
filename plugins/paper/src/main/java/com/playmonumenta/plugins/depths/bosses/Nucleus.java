@@ -34,15 +34,16 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -246,6 +247,8 @@ public final class Nucleus extends BossAbilityGroup {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
 				.sendMessage(Component.text("The nucleus is exposed!", NamedTextColor.RED));
 			expose();
+			mEyes.values().forEach(Entity::remove);
+			mEyes.clear();
 		} else {
 			PlayerUtils.nearbyPlayersAudience(mBoss.getLocation(), detectionRange)
 				.sendMessage(Component.text("You killed an eye! You need to take down " + (EYE_KILL_COUNT - mEyesKilled) + " more!", NamedTextColor.RED));
@@ -258,14 +261,7 @@ public final class Nucleus extends BossAbilityGroup {
 		mBoss.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 		mIsHidden = false;
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				hide();
-			}
-
-		}.runTaskLater(mPlugin, 20 * 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, this::hide, 20 * 20);
 	}
 
 	public void hide() {
@@ -320,16 +316,11 @@ public final class Nucleus extends BossAbilityGroup {
 				mBoss.getWorld().playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 20.0f, 1.0f);
 				mBoss.getWorld().playSound(loc, Sound.BLOCK_GRASS_PLACE, SoundCategory.HOSTILE, 20.0f, 1.0f);
 
-				new BukkitRunnable() {
-
-					@Override
-					public void run() {
-						mEyes.remove(loc, newEye);
-						newEye.remove();
-						loc.getBlock().getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.AIR);
-					}
-
-				}.runTaskLater(mPlugin, 20 * 9);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					mEyes.remove(loc, newEye);
+					newEye.remove();
+					loc.getBlock().getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.AIR);
+				}, 20 * 9);
 
 				break;
 			}
@@ -344,8 +335,7 @@ public final class Nucleus extends BossAbilityGroup {
 		// Health is scaled by 1.15 times each time you fight the boss
 		DepthsParty party = DepthsUtils.getPartyFromNearbyPlayers(mSpawnLoc);
 		int modifiedHealth = (int) (NUCLEUS_HEALTH * Math.pow(1.15, party == null ? 0 : (party.getFloor() - 1) / 3.0));
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, modifiedHealth);
-		mBoss.setHealth(modifiedHealth);
+		EntityUtils.setMaxHealthAndHealth(mBoss, modifiedHealth);
 
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 
@@ -383,7 +373,6 @@ public final class Nucleus extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			player.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
 			player.sendMessage(Component.text("", NamedTextColor.RED)
 				.append(Component.text("[Gyrhaeddant Nucleus]", NamedTextColor.GOLD))
 				.append(Component.text(" B"))
@@ -408,16 +397,11 @@ public final class Nucleus extends BossAbilityGroup {
 
 		EntityUtils.fireworkAnimation(mBoss);
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
-				if (nearestPlayer != null) {
-					DepthsManager.getInstance().goToNextFloor(nearestPlayer);
-				}
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
+			if (nearestPlayer != null) {
+				DepthsManager.getInstance().goToNextFloor(nearestPlayer);
 			}
-
-		}.runTaskLater(mPlugin, 20);
+		}, 20);
 	}
 }

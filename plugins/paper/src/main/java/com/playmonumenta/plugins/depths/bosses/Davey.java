@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -241,7 +242,6 @@ public class Davey extends BossAbilityGroup {
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
 			player.sendMessage(Component.text("", NamedTextColor.BLUE)
 				.append(Component.text("[Davey]", NamedTextColor.GOLD))
 				.append(Component.text(" Nay... I'll sink to ye, God of the Deep. I become a great part of ye ferever...")));
@@ -263,17 +263,12 @@ public class Davey extends BossAbilityGroup {
 
 		EntityUtils.fireworkAnimation(mBoss);
 
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
-				if (nearestPlayer != null) {
-					DepthsManager.getInstance().goToNextFloor(nearestPlayer);
-				}
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			Player nearestPlayer = EntityUtils.getNearestPlayer(mBoss.getLocation(), detectionRange);
+			if (nearestPlayer != null) {
+				DepthsManager.getInstance().goToNextFloor(nearestPlayer);
 			}
-
-		}.runTaskLater(mPlugin, 20);
+		}, 20);
 	}
 
 	@Override
