@@ -168,7 +168,7 @@ public enum ClassAbility {
 	TOTEMIC_PROJECTION("Totemic Projection"),
 
 	// Soothsayer
-	GRAVITY_RING("Gravity Ring"),
+	EYE_OF_THE_STORM("Eye of the Storm"),
 	SHARED_EMPOWERMENT("Shared Empowerment"),
 	WHIRLWIND_TOTEM("Whirlwind Totem"),
 

@@ -50,7 +50,7 @@ public class EyeOfTheStorm extends Ability {
 
 	public static final AbilityInfo<EyeOfTheStorm> INFO =
 		new AbilityInfo<>(EyeOfTheStorm.class, "Eye of the Storm", EyeOfTheStorm::new)
-			.linkedSpell(ClassAbility.GRAVITY_RING)
+			.linkedSpell(ClassAbility.EYE_OF_THE_STORM)
 			.scoreboardId("EyeoftheStorm")
 			.shorthandName("EOTS")
 			.descriptions(
