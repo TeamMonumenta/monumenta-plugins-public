@@ -81,7 +81,6 @@ public class LightningTotem extends TotemAbility {
 	public LightningTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Lightning Totem Projectile", "LightningTotem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);

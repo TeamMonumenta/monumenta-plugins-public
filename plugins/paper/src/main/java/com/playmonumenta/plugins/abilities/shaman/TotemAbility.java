@@ -93,7 +93,7 @@ public abstract class TotemAbility extends Ability {
 	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
 		if (proj instanceof Snowball && proj.getTicksLived() <= 160) {
 			ItemStatManager.PlayerItemStats stats = mProjectiles.remove(proj);
-			if (!mPlayer.getWorld().equals(proj.getWorld())) {
+			if (!mPlayer.getWorld().equals(proj.getWorld()) || mPlayer.getLocation().distance(proj.getLocation()) >= 50) {
 				return;
 			}
 			if (stats != null) {

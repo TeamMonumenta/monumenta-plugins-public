@@ -55,7 +55,6 @@ public class InterconnectedHavoc extends Ability {
 	public InterconnectedHavoc(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mRange = CharmManager.getRadius(mPlayer, CHARM_RANGE, isLevelOne() ? RANGE_1 : RANGE_2);

@@ -77,7 +77,6 @@ public class TotemicProjection extends Ability {
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? 0 : DAMAGE_2);

@@ -48,7 +48,6 @@ public class SharedEmpowerment extends Ability {
 	public SharedEmpowerment(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);

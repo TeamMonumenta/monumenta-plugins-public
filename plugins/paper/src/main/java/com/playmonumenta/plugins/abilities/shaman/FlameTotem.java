@@ -81,7 +81,6 @@ public class FlameTotem extends TotemAbility {
 	public FlameTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Flame Totem Projectile", "FlameTotem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);

@@ -92,7 +92,6 @@ public class DecayedTotem extends TotemAbility {
 	public DecayedTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE) * DestructiveExpertise.damageBuff(mPlayer);

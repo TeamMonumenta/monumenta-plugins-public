@@ -43,7 +43,6 @@ public class TotemicEmpowerment extends Ability {
 	public TotemicEmpowerment(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		Bukkit.getScheduler().runTask(plugin, () -> mSharedEmpowerment = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SharedEmpowerment.class));
@@ -57,7 +56,6 @@ public class TotemicEmpowerment extends Ability {
 	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
 		if (oneSecond && mPlayer != null && !mPlayer.isDead()) {
 			if (!mPlayer.hasPermission(Shaman.PERMISSION_STRING)) {
-				AuditListener.logSevere(mPlayer.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 				AbilityUtils.resetClass(mPlayer);
 			}
 			List<LivingEntity> activeList = TOTEM_LIST.get(mPlayer.getUniqueId());

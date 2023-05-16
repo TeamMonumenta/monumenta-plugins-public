@@ -85,7 +85,6 @@ public class WhirlwindTotem extends TotemAbility {
 	public WhirlwindTotem(Plugin plugin, Player player) {
 		super(plugin, player, INFO, "Whirlwind Totem Projectile", "WhirlwindTotem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);

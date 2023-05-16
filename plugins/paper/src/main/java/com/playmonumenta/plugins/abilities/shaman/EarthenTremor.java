@@ -83,7 +83,6 @@ public class EarthenTremor extends Ability {
 	public EarthenTremor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
-			AuditListener.logSevere(player.getName() + " has accessed shaman abilities incorrectly, class has been reset, please report to developers.");
 			AbilityUtils.resetClass(player);
 		}
 		mPlayerItemStatsMap = new WeakHashMap<>();
