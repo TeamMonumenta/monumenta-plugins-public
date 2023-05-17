@@ -405,15 +405,24 @@ public class DelvesUtils {
 				}
 
 				if (mob instanceof Shulker) {
-					//can't summon to the same location, so summoning it at one block higher
-					int iteration = 0;
-					Location finalLoc;
-					while (iteration < 100) {
-						iteration++;
-						finalLoc = loc.clone().add(FastUtils.randomIntInRange(-2, 2), FastUtils.randomIntInRange(-2, 2), FastUtils.randomIntInRange(-2, 2));
-						if (finalLoc.getBlock().getType() == Material.AIR && !loc.equals(finalLoc) && finalLoc.clone().add(0, -1, 0).getBlock().isSolid()) {
-							iteration = 1000;
-							loc = finalLoc;
+					// Can't summon to the same location, so attempt to summon it randomly nearby
+					List<Location> locationsToTest = new ArrayList<>();
+
+					for (int i = -2; i <= 2; i++) {
+						for (int j = -2; j <= 2; j++) {
+							for (int k = -2; k <= 2; k++) {
+								if ((i != 0) || (j != 0) || (k != 0)) {
+									locationsToTest.add(loc.clone().add(i, j, k));
+								}
+							}
+						}
+					}
+
+					Collections.shuffle(locationsToTest);
+					for (Location l: locationsToTest) {
+						if (l.getBlock().getType() == Material.AIR && l.clone().add(0, -1, 0).getBlock().isSolid()) {
+							loc = l;
+							break;
 						}
 					}
 				}
