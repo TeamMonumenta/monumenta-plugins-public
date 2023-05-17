@@ -105,11 +105,21 @@ public class ParticleUtils {
 		}.runTaskTimer(plugin, 0, 1);
 	}
 
-	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
-		explodingConeEffect(plugin, entity, entity.getEyeLocation().getDirection().setY(0).normalize(), radius, type1, percent1, type2, percent2, dotAngle);
+	public static void explodingConeEffectSkill(Plugin plugin, LivingEntity entity, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle, Player player) {
+		explodingConeEffect(plugin, entity, entity.getEyeLocation().getDirection().setY(0).normalize(), radius,
+			(loc) -> {
+				if (FastUtils.randomDoubleInRange(0, 1) < percent1) {
+					new PartialParticle(type1, loc).spawnAsPlayerActive(player);
+				}
+			},
+			(loc) -> {
+				if (FastUtils.randomDoubleInRange(0, 1) < percent2) {
+					new PartialParticle(type2, loc).spawnAsPlayerActive(player);
+				}
+			}, dotAngle);
 	}
 
-	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, Vector dir, float radius, Particle type1, double percent1, Particle type2, double percent2, double dotAngle) {
+	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, Vector dir, float radius, SpawnParticleAction spawnParticleAction1, SpawnParticleAction spawnParticleAction2, double dotAngle) {
 		new BukkitRunnable() {
 			double mCurrentRadius = Math.PI / 4;
 			Location mLoc = entity.getLocation();
@@ -127,8 +137,8 @@ public class ParticleUtils {
 
 					Vector toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
 
-					if (mDirection.dot(toParticle) > dotAngle && FastUtils.RANDOM.nextDouble() < percent1) {
-						mWorld.spawnParticle(type1, mLoc, 1);
+					if (mDirection.dot(toParticle) > dotAngle) {
+						spawnParticleAction1.run(mLoc);
 					}
 
 					mLoc.subtract(x, y, z);
@@ -142,8 +152,8 @@ public class ParticleUtils {
 
 					toParticle = mLoc.toVector().subtract(entity.getLocation().toVector()).setY(0).normalize();
 
-					if (mDirection.dot(toParticle) > dotAngle && FastUtils.RANDOM.nextDouble() < percent2) {
-						mWorld.spawnParticle(type2, mLoc, 1);
+					if (mDirection.dot(toParticle) > dotAngle) {
+						spawnParticleAction2.run(mLoc);
 					}
 
 					mLoc.subtract(x, y, z);

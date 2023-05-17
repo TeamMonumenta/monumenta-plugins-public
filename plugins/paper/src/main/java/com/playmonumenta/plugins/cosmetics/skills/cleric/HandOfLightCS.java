@@ -39,7 +39,7 @@ public class HandOfLightCS implements CosmeticSkill {
 	public void lightHealCastEffect(World world, Location userLoc, Plugin mPlugin, Player mPlayer, float radius, double angle) {
 		world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		world.playSound(userLoc, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.05f, 1.0f);
-		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, radius, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, angle);
+		ParticleUtils.explodingConeEffectSkill(mPlugin, mPlayer, radius, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, angle, mPlayer);
 	}
 
 	public void lightDamageEffect(Player mPlayer, Location loc, LivingEntity target) {
@@ -50,6 +50,6 @@ public class HandOfLightCS implements CosmeticSkill {
 
 	public void lightDamageCastEffect(World world, Location userLoc, Plugin mPlugin, Player mPlayer, float radius, double angle) {
 		world.playSound(userLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.5f, 0.8f);
-		ParticleUtils.explodingConeEffect(mPlugin, mPlayer, radius, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, angle);
+		ParticleUtils.explodingConeEffectSkill(mPlugin, mPlayer, radius, Particle.SPIT, 0.35f, Particle.PORTAL, 3.0f, angle, mPlayer);
 	}
 }
