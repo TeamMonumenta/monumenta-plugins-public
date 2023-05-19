@@ -67,6 +67,7 @@ public final class PortalBoss extends BossAbilityGroup {
 	public boolean mIsHidden;
 	public int mCubesDropped;
 	public int mPhase = 1;
+	public @Nullable BukkitRunnable mHideRunnable = null;
 	public List<Location> mReplaceBlocks;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -185,12 +186,27 @@ public final class PortalBoss extends BossAbilityGroup {
 		mBoss.removePotionEffect(PotionEffectType.INVISIBILITY);
 		mIsHidden = false;
 
-		Bukkit.getScheduler().runTaskLater(mPlugin, this::hide, 20 * 20);
+		// Cancel any existing hide task
+		if (mHideRunnable != null) {
+			mHideRunnable.cancel();
+		}
+		mHideRunnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				hide();
+			}
+		};
+		mHideRunnable.runTaskLater(mPlugin, 20 * 20);
 	}
 
 	public void hide() {
 		if (mBoss.isDead() || mIsHidden) {
 			return;
+		}
+
+		// Cancel any existing hide task
+		if (mHideRunnable != null) {
+			mHideRunnable.cancel();
 		}
 
 		// Kill any active cubes
