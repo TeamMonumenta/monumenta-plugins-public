@@ -5,14 +5,13 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import java.util.ArrayList;
 import org.bukkit.Material;
-import org.jetbrains.annotations.Nullable;
 
 
 @SuppressWarnings("NullAway.Init") // fields are initialised in subclasses
 public class PlayerSpec {
 	public ArrayList<AbilityInfo<?>> mAbilities = new ArrayList<>();
 
-	public @Nullable String mSpecQuestScoreboard;
+	public String mSpecQuestScoreboard;
 
 	public String mSpecName;
 	public int mSpecialization;

@@ -212,7 +212,10 @@ public class GUIUtils {
 	 * Sets a tag in the "GUI" tag on the item. This allows resource packs to style icons differently even if the name is the same
 	 * without having to rely on lore that may change often.
 	 */
-	public static void setGuiNbtTag(ItemStack item, String tagName, String value) {
+	public static void setGuiNbtTag(ItemStack item, String tagName, @Nullable String value) {
+		if (value == null) {
+			return;
+		}
 		new NBTItem(item, true)
 			.addCompound("GUI")
 			.setString(tagName, value);

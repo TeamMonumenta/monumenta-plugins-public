@@ -18,6 +18,7 @@ import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,7 +28,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-@SuppressWarnings("NullAway") // this class requires some massive refactor
 public class ClassSelectionCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
 	private static final String UNLOCK_SPECS = "Quest103";
@@ -404,7 +404,6 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 
 	public void applyAbilityChosen(int chosenSlot, Player player, int level) {
 		ArrayList<Integer> currentLocations;
-		int skillOffset;
 		if (ScoreboardUtils.getScoreboardValue(player, R3_UNLOCK_SCOREBOARD) >= R3_UNLOCK_SCORE && ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME) != Shaman.CLASS_ID) {
 			currentLocations = P3_ABILITY_LOCS;
 		} else {
@@ -415,8 +414,12 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				//found class, find ability
 				int abilityIndex = currentLocations.indexOf(chosenSlot);
 				AbilityInfo<?> selectedAbility = oneClass.mAbilities.get(abilityIndex);
-				int currentLevel = ScoreboardUtils.getScoreboardValue(player, selectedAbility.getScoreboard());
-				skillOffset = currentLevel > 2 ? 2 : 0;
+				String scoreboard = selectedAbility.getScoreboard();
+				if (scoreboard == null) {
+					return;
+				}
+				int currentLevel = ScoreboardUtils.getScoreboardValue(player, scoreboard);
+				int skillOffset = currentLevel > 2 ? 2 : 0;
 				// actualCurrentLevel is 0, 1, or 2 - the actual level of the ability before any changes
 				int actualCurrentLevel = currentLevel - skillOffset;
 				if (level == 0) {
@@ -426,12 +429,12 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 						int currentEnhancement = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentEnhancement + 1);
 					}
-					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), 0);
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, 0);
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
 					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, currentCount + (actualCurrentLevel - level));
 				} else if (level < actualCurrentLevel) {
 					//level clicked is lower than level existing - remove levels down to clicked level
-					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), skillOffset + level);
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, skillOffset + level);
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SKILL);
 					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, currentCount + (actualCurrentLevel - level));
 				} else if (level > actualCurrentLevel) {
@@ -440,7 +443,7 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 					if (currentCount >= level - actualCurrentLevel) {
 						// can upgrade
 						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SKILL, currentCount - (level - actualCurrentLevel));
-						ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), skillOffset + level);
+						ScoreboardUtils.setScoreboardValue(player, scoreboard, skillOffset + level);
 					} else {
 						player.sendMessage("You don't have enough skill points to select this skill!");
 					}
@@ -470,10 +473,14 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 			//found class, find ability
 			int abilityIndex = P4_SPEC_LOCS.indexOf(chosenSlot);
 			AbilityInfo<?> selectedAbility = spec.mAbilities.get(abilityIndex);
-			int currentLevel = ScoreboardUtils.getScoreboardValue(player, selectedAbility.getScoreboard());
+			String scoreboard = selectedAbility.getScoreboard();
+			if (scoreboard == null) {
+				return;
+			}
+			int currentLevel = ScoreboardUtils.getScoreboardValue(player, scoreboard);
 			if (level - currentLevel < 0) {
 				//level clicked is lower than level existing
-				ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), level);
+				ScoreboardUtils.setScoreboardValue(player, scoreboard, level);
 				int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
 				ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, currentCount + (currentLevel - level));
 			} else if (level - currentLevel > 0) {
@@ -481,12 +488,12 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_SPEC);
 				if (currentCount >= level - currentLevel) {
 					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_SPEC, currentCount - (level - currentLevel));
-					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), level);
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, level);
 				} else {
 					player.sendMessage("You don't have enough specialization points to select this skill!");
 				}
 			}
-			makeSpecPage(theClass, spec, player);
+			makeSpecPage(Objects.requireNonNull(theClass), spec, player);
 		}
 		updatePlayerAbilities(player);
 	}
@@ -497,20 +504,24 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 				//found class, find ability
 				int abilityIndex = P3_ABILITY_LOCS.indexOf(chosenSlot);
 				AbilityInfo<?> selectedAbility = oneClass.mAbilities.get(abilityIndex);
-				int currentLevel = ScoreboardUtils.getScoreboardValue(player, selectedAbility.getScoreboard());
+				String scoreboard = selectedAbility.getScoreboard();
+				if (scoreboard == null) {
+					return;
+				}
+				int currentLevel = ScoreboardUtils.getScoreboardValue(player, scoreboard);
 				if (add) {
 					//clear ability data
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 					// don't want to assign ability if we don't have points
 					if (currentCount > 0) {
 						ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentCount - 1);
-						ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), currentLevel + 2);
+						ScoreboardUtils.setScoreboardValue(player, scoreboard, currentLevel + 2);
 					} else {
 						player.sendMessage("You don't have enough enhancement points to select this enhancement!");
 					}
 				} else {
 					//level clicked is lower than level existing
-					ScoreboardUtils.setScoreboardValue(player, selectedAbility.getScoreboard(), currentLevel - 2);
+					ScoreboardUtils.setScoreboardValue(player, scoreboard, currentLevel - 2);
 					int currentCount = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE);
 					ScoreboardUtils.setScoreboardValue(player, AbilityUtils.REMAINING_ENHANCE, currentCount + 1);
 				}
@@ -579,12 +590,17 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	}
 
 	public ItemStack createLevelItem(PlayerClass theClass, AbilityInfo<?> ability, int level, Player player) {
-		int getScore = ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard());
-		if (getScore > 2) {
-			getScore -= 2;
+		int getScore;
+		String scoreboard = ability.getScoreboard();
+		if (scoreboard == null) {
+			getScore = 0;
+		} else {
+			getScore = ScoreboardUtils.getScoreboardValue(player, scoreboard);
+			if (getScore > 2) {
+				getScore -= 2;
+			}
 		}
-		Material newMat = getScore >= level ?
-			                  Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+		Material newMat = getScore >= level ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
 		return GUIUtils.createBasicItem(newMat, 1,
 			"Level " + level, theClass.mClassColor, true,
 			ability.getDescription(level).color(NamedTextColor.WHITE), 30, true);
@@ -593,7 +609,8 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 	public ItemStack createEnhanceItem(PlayerClass theClass, AbilityInfo<?> ability, Player player) {
 		if (ability.getDescriptions().size() == 3) {
 			Material newMat;
-			switch (ScoreboardUtils.getScoreboardValue(player, ability.getScoreboard())) {
+			String scoreboard = ability.getScoreboard();
+			switch (scoreboard == null ? 0 : ScoreboardUtils.getScoreboardValue(player, scoreboard)) {
 				case 0 -> {
 					newMat = Material.BARRIER;
 					return GUIUtils.createBasicItem(newMat, 1,
@@ -622,7 +639,15 @@ public class ClassSelectionCustomInventory extends CustomInventory {
 		String desc = ability.getSimpleDescription();
 		TextComponent clickHere = Component.text("Click here to remove your levels in this skill, and click the panes to the right to pick a level in this skill.", NamedTextColor.GRAY);
 		TextComponent lore = (desc == null ? clickHere : Component.text(desc + "\n", NamedTextColor.WHITE).append(clickHere));
-		return GUIUtils.createBasicItem(ability.getDisplayItem(), 1, ability.getDisplayName(),
+		Material item = ability.getDisplayItem();
+		if (item == null) {
+			item = theClass.mDisplayItem;
+		}
+		String name = ability.getDisplayName();
+		if (name == null) {
+			name = "";
+		}
+		return GUIUtils.createBasicItem(item, 1, name,
 			theClass.mClassColor, true, lore, 30, true);
 	}
 
