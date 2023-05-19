@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.custominventories;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -92,7 +93,7 @@ public class EmojiCustomInventory extends CustomInventory {
 		}
 
 		if (clickedItem != null && clickedItem.getType() != FILLER && clickedItem.getItemMeta().hasDisplayName() && !event.isShiftClick()) {
-			String chosenName = clickedItem.getItemMeta().getDisplayName();
+			String chosenName = MessagingUtils.plainText(clickedItem.getItemMeta().displayName());
 			for (Emoji item : EMOJI_LIST) {
 				if (chosenName.contains(item.mName) && !chosenName.contains("(Locked)")) {
 					if (event.isLeftClick()) {

@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -33,7 +36,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,21 +49,12 @@ import org.bukkit.util.Vector;
 
 public class SpellDimensionDoor extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mSpawnLoc;
-	private ThreadLocalRandom mRand = ThreadLocalRandom.current();
-	private static List<Player> mShadowed = new ArrayList<>();
-	private static List<Player> mWarned = new ArrayList<>();
-	private List<Player> mByPortal = new ArrayList<>();
-	private List<Location> mPortalLoc = new ArrayList<>();
-	private List<Location> mReplaceLoc = new ArrayList<>();
-	private double mRange;
-	private int mCoolDown = 20 * 45;
-	private int mT = 20 * 10;
-	private int mCap = 15;
-	private boolean mCanRun = true;
-	private final EnumSet<Material> mIgnoredMats = EnumSet.of(
+	private static final String SPELL_NAME = "Dimension Door";
+	private static final int COOLDOWN = 20 * 45;
+	private static final int PLAYER_CAP = 15;
+	private static final List<Player> mShadowed = new ArrayList<>();
+	private static final List<Player> mWarned = new ArrayList<>();
+	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
 		Material.REPEATING_COMMAND_BLOCK,
@@ -69,14 +62,25 @@ public class SpellDimensionDoor extends Spell {
 		Material.BARRIER,
 		Material.END_PORTAL
 	);
-	private ChargeUpManager mChargeUp;
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mSpawnLoc;
+	private final ThreadLocalRandom mRand = ThreadLocalRandom.current();
+	private final List<Player> mByPortal = new ArrayList<>();
+	private final List<Location> mPortalLoc = new ArrayList<>();
+	private final List<Location> mReplaceLoc = new ArrayList<>();
+	private final double mRange;
+	private int mT = 20 * 10;
+	private boolean mCanRun = true;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellDimensionDoor(Plugin plugin, LivingEntity boss, Location spawnLoc, double range) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mSpawnLoc = spawnLoc;
 		mRange = range;
-		mChargeUp = new ChargeUpManager(mBoss, 25, ChatColor.YELLOW + "Channeling Dimensional Door...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mChargeUp = Lich.defaultChargeUp(mBoss, 25, "Channeling " + SPELL_NAME + "...");
 	}
 
 	public static List<Player> getShadowed() {
@@ -91,7 +95,7 @@ public class SpellDimensionDoor extends Spell {
 	public void run() {
 		mT -= 5;
 		if (mT <= 0 && mCanRun) {
-			mT = mCoolDown;
+			mT = COOLDOWN;
 			spawnPortal();
 		}
 	}
@@ -104,14 +108,14 @@ public class SpellDimensionDoor extends Spell {
 		mByPortal.clear();
 		List<Player> players = Lich.playersInRange(mSpawnLoc, mRange, true);
 
-		if (mShadowed != null && mShadowed.size() > 0) {
+		if (!mShadowed.isEmpty()) {
 			players.removeAll(mShadowed);
 		}
 		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
-			p.sendMessage(ChatColor.LIGHT_PURPLE + "THE SHADOWS HOLD MANY SECRETS.");
+			p.sendMessage(Component.text("THE SHADOWS HOLD MANY SECRETS.", NamedTextColor.LIGHT_PURPLE));
 			if (Lich.getCursed().contains(p) || PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
-				p.sendMessage(ChatColor.AQUA + "I can cleanse the curse on me if I enter the shadows.");
+				p.sendMessage(Component.text("I can cleanse the curse on me if I enter the shadows.", NamedTextColor.AQUA));
 			}
 			if (p.getLocation().getY() < mSpawnLoc.getY() - 8) {
 				toRemove.add(p);
@@ -123,7 +127,7 @@ public class SpellDimensionDoor extends Spell {
 		if (players.size() <= 2) {
 			targets = players;
 		} else {
-			int cap = (int) Math.min(mCap, Math.ceil(players.size() / 2));
+			int cap = (int) Math.min(PLAYER_CAP, Math.ceil(players.size() / 2));
 			for (int i = 0; i < cap; i++) {
 				Player player = players.get(mRand.nextInt(players.size()));
 				if (targets.contains(player)) {
@@ -141,8 +145,8 @@ public class SpellDimensionDoor extends Spell {
 				mCanRun = false;
 				if (mChargeUp.nextTick()) {
 					this.cancel();
-					mChargeUp.setTitle(ChatColor.YELLOW + "Dimensional Door Remaining Time");
-					mChargeUp.setColor(BarColor.RED);
+					mChargeUp.setTitle(Component.text(SPELL_NAME + " Remaining Time", NamedTextColor.YELLOW));
+					mChargeUp.setColor(net.kyori.adventure.bossbar.BossBar.Color.RED);
 					new BukkitRunnable() {
 						int mT = 0;
 
@@ -152,13 +156,13 @@ public class SpellDimensionDoor extends Spell {
 							double progress = 1.0d - mT / (20.0d * 30.0d);
 							if (progress >= 0 && !Lich.phase3over()) {
 								mChargeUp.setProgress(progress);
-								mChargeUp.setColor(BarColor.RED);
+								mChargeUp.setColor(BossBar.Color.RED);
 							} else {
 								this.cancel();
 								mCanRun = true;
 								mChargeUp.reset();
-								mChargeUp.setTitle(ChatColor.YELLOW + "Casting Dimension Door...");
-								mChargeUp.setColor(BarColor.YELLOW);
+								mChargeUp.setTitle(Component.text("Casting " + SPELL_NAME + "...", NamedTextColor.YELLOW));
+								mChargeUp.setColor(BossBar.Color.YELLOW);
 							}
 						}
 
@@ -217,7 +221,7 @@ public class SpellDimensionDoor extends Spell {
 								testLoc.setZ(portalCenterLoc.getZ() + z);
 
 								//check if testLoc is already in set or is end portal
-								if (!mIgnoredMats.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
+								if (!IGNORED_MATS.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
 									toRestore.add(testLoc.getBlock().getState());
 									replace.add(testLoc.getBlock());
 									mReplaceLoc.add(testLoc.getBlock().getLocation());
@@ -231,7 +235,7 @@ public class SpellDimensionDoor extends Spell {
 								testLoc.setZ(portalCenterLoc.getZ() + z);
 
 								//check if testLoc is already in set or is end portal
-								if (!mIgnoredMats.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
+								if (!IGNORED_MATS.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
 									toRestore.add(testLoc.getBlock().getState());
 									replace.add(testLoc.getBlock());
 									mReplaceLoc.add(testLoc.getBlock().getLocation());
@@ -245,7 +249,7 @@ public class SpellDimensionDoor extends Spell {
 								testLoc.setZ(portalCenterLoc.getZ() + z);
 
 								//check if testLoc is already in set or is end portal
-								if (!mIgnoredMats.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
+								if (!IGNORED_MATS.contains(testLoc.getBlock().getType()) && !mReplaceLoc.contains(testLoc.getBlock().getLocation())) {
 									toRestore.add(testLoc.getBlock().getState());
 									replace.add(testLoc.getBlock());
 									mReplaceLoc.add(testLoc.getBlock().getLocation());
@@ -283,7 +287,7 @@ public class SpellDimensionDoor extends Spell {
 					 * players who got in are immune to teleport until the portal closes
 					 */
 
-					mTeleport.removeIf(p -> mByPortal.contains(p));
+					mTeleport.removeAll(mByPortal);
 					for (Player p : mTeleport) {
 						Location tLoc = p.getLocation();
 						for (Location loc : mPortalLoc) {
@@ -332,19 +336,17 @@ public class SpellDimensionDoor extends Spell {
 		int t = 20 * 20;
 		if (byPortal) {
 			if (mWarned.contains(p)) {
-				p.sendMessage(ChatColor.AQUA + dio[FastUtils.RANDOM.nextInt(3)]);
+				p.sendMessage(Component.text(dio[FastUtils.RANDOM.nextInt(3)], NamedTextColor.AQUA));
 			} else {
-				p.sendMessage(ChatColor.AQUA + dio[0]);
+				p.sendMessage(Component.text(dio[0], NamedTextColor.AQUA));
 				mWarned.add(p);
 			}
 			//remove curse only through portal
 			if (PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
 				PlayerUtils.removeCursed(com.playmonumenta.plugins.Plugin.getInstance(), p);
-				p.sendMessage(ChatColor.AQUA + "You felt a curse being lifted.");
+				p.sendMessage(Component.text("You felt a curse being lifted.", NamedTextColor.AQUA));
 			}
-			if (Lich.getCursed().contains(p)) {
-				Lich.getCursed().remove(p);
-			}
+			Lich.getCursed().remove(p);
 		} else {
 			t = 20 * 10;
 			DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);
@@ -364,7 +366,7 @@ public class SpellDimensionDoor extends Spell {
 		ScoreboardUtils.addEntityToTeam(spectre, "Hekawt");
 		((Creature) spectre).setTarget(p);
 
-		BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+		org.bukkit.boss.BossBar bar = Bukkit.getServer().createBossBar(null, BarColor.PURPLE, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setTitle(ChatColor.YELLOW + "Soul dissipating in " + tick / 20 + " seconds!");
 		bar.setVisible(true);
 		bar.addPlayer(p);
@@ -411,7 +413,7 @@ public class SpellDimensionDoor extends Spell {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 10));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 5, 0));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 1));
-						p.sendMessage(ChatColor.AQUA + "Something feels different. The shadows aren't clinging to me anymore.");
+						p.sendMessage(Component.text("Something feels different. The shadows aren't clinging to me anymore.", NamedTextColor.AQUA));
 					} else {
 						p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);

@@ -8,10 +8,10 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,8 +19,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -47,7 +45,7 @@ public class PairedUnnaturalForce extends Spell {
 	private final int mOuterRadius;
 	private final int mMidRadius;
 	private final int mMinRadius;
-	private int mDamage;
+	private final int mDamage;
 
 
 	public PairedUnnaturalForce(Plugin plugin, LivingEntity boss, Location spawnLoc, int minRadius, int midRadius, int outerRadius, int damage) {
@@ -58,19 +56,24 @@ public class PairedUnnaturalForce extends Spell {
 		mMidRadius = midRadius;
 		mOuterRadius = outerRadius;
 		mDamage = damage;
-		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + ABILITY_NAME,
-			BarColor.YELLOW, BarStyle.SOLID, RANGE);
+		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, Component.text("Channeling ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)),
+			BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, RANGE);
 	}
 
 	@Override
 	public void run() {
 		World world = mSpawnLoc.getWorld();
 		mChargeUp.setTime(0);
-		mChargeUp.setColor(BarColor.YELLOW);
-		List<String> options = new ArrayList<>();
-		options.add("Inner ");
-		options.add("Outer ");
-		Collections.shuffle(options);
+		mChargeUp.setColor(BossBar.Color.YELLOW);
+		String first;
+		String second;
+		if (FastUtils.RANDOM.nextBoolean()) {
+			first = "Inner ";
+			second = "Outer ";
+		} else {
+			first = "Outer ";
+			second = "Inner ";
+		}
 
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mMaxRad1 = 0;
@@ -82,15 +85,14 @@ public class PairedUnnaturalForce extends Spell {
 
 			@Override
 			public void run() {
-				if (options.get(0).equals("Inner ")) {
+				if (first.equals("Inner ")) {
 					mMaxRad1 = mMidRadius;
 					mMinRad1 = mMinRadius;
 					mMaxRad2 = mOuterRadius;
 					mMinRad2 = mMidRadius;
 					mYOffset1 = 0;
 					mYOffset2 = 1;
-				}
-				if (options.get(0).equals("Outer ")) {
+				} else {
 					mMaxRad1 = mOuterRadius;
 					mMinRad1 = mMidRadius;
 					mMaxRad2 = mMidRadius;
@@ -99,7 +101,7 @@ public class PairedUnnaturalForce extends Spell {
 					mYOffset2 = 0;
 				}
 
-				mChargeUp.setTitle(ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + options.get(0) + ABILITY_NAME);
+				mChargeUp.setTitle(Component.text("Channeling ", NamedTextColor.GOLD).append(Component.text(first + ABILITY_NAME, NamedTextColor.YELLOW)));
 				if (mChargeUp.getTime() % 5 == 0 && mChargeUp.getTime() <= DISPLAY_TIME) {
 					if (mChargeUp.getTime() % 10 == 0) {
 						world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, SoundCategory.HOSTILE, 10.5f, 2f);
@@ -117,7 +119,7 @@ public class PairedUnnaturalForce extends Spell {
 				}
 
 				if (mChargeUp.nextTick()) {
-					mChargeUp.setTitle(ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + options.get(1) + ABILITY_NAME);
+					mChargeUp.setTitle(Component.text("Channeling ", NamedTextColor.GOLD).append(Component.text(second + ABILITY_NAME, NamedTextColor.YELLOW)));
 					world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 10.5f, 2);
 					world.playSound(mSpawnLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 10.5f, 1);
 
@@ -140,11 +142,12 @@ public class PairedUnnaturalForce extends Spell {
 							}
 						}
 					}
-					for (Player p : PlayerUtils.playersInRange(mSpawnLoc, mMaxRad1, true)) {
-						if (!PlayerUtils.playersInRange(mSpawnLoc, mMinRad1, true).contains(p)) {
-							DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, "Unnatural Force");
-							MovementUtils.knockAway(mSpawnLoc, p, 0, .75f, false);
-						}
+
+					List<Player> hitPlayers = PlayerUtils.playersInRange(mSpawnLoc, mMaxRad1, true);
+					hitPlayers.removeAll(PlayerUtils.playersInRange(mSpawnLoc, mMinRad1, true));
+					for (Player p : hitPlayers) {
+						DamageUtils.damage(mBoss, p, DamageEvent.DamageType.MAGIC, mDamage, null, false, true, "Unnatural Force");
+						MovementUtils.knockAway(mSpawnLoc, p, 0, .75f, false);
 					}
 
 					BukkitRunnable runnable = new BukkitRunnable() {
@@ -154,7 +157,7 @@ public class PairedUnnaturalForce extends Spell {
 						public void run() {
 							double progress = 1 - ((double) mT / (double) EXECUTION_TIME);
 							mChargeUp.setProgress(progress);
-							mChargeUp.setColor(BarColor.RED);
+							mChargeUp.setColor(BossBar.Color.RED);
 
 							if (progress % 0.1 == 0) {
 								if (progress % 0.2 == 0) {

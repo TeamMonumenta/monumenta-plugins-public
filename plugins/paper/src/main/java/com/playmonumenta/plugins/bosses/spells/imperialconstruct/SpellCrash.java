@@ -19,8 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellCrash extends Spell {
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
 
 	private Location mCurrentLoc;
 

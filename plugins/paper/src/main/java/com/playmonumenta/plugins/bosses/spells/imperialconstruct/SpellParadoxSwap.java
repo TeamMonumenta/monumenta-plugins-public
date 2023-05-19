@@ -24,8 +24,8 @@ public class SpellParadoxSwap extends Spell {
 	private static final EnumSet<DamageEvent.DamageType> AFFECTED_TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_SKILL, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL, DamageEvent.DamageType.MAGIC);
 	private static final int mCoolDown = 20 * 5;
 	private final int mRange;
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private boolean mOnCooldown;
 
 	public SpellParadoxSwap(Plugin mPlugin, int mRange, LivingEntity boss) {
@@ -75,7 +75,7 @@ public class SpellParadoxSwap extends Spell {
 				new PartialParticle(Particle.SOUL, mBoss.getLocation(), 20, 1, 1, 1).spawnAsEntityActive(mBoss);
 				mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_EYE_DEATH, SoundCategory.HOSTILE, 30, 1);
 				com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, TemporalFlux.GENERIC_NAME, new TemporalFlux(20 * 30));
-				//
+
 				mOnCooldown = true;
 				BukkitRunnable runnable = new BukkitRunnable() {
 					int mT = 0;

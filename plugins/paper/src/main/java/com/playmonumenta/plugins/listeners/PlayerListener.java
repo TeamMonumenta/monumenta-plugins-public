@@ -226,7 +226,7 @@ public class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
 		if (!ServerProperties.getJoinMessagesEnabled()) {
-			event.setQuitMessage("");
+			event.quitMessage(Component.empty());
 		}
 
 		Player player = event.getPlayer();

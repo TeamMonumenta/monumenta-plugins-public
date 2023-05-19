@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -14,14 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,15 +35,14 @@ public class SpellEchoCharge extends Spell {
 	private static final String MARKER_TAG = "EchoChargeSpawn";
 	private static final String TARGET_TAG = "EchoChargeTarget";
 	private static final int LINE_LENGTH = 150;
-	private final int mRange = 50;
 	private static final int BOX_SIZE = 8;
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
 	private final int mCooldown = 20 * 10;
-	private int mDamage;
-	private ChargeUpManager mChargeUp;
-	private int mCastTime = (int) (20 * 7.5);
-	private int mExecutionTime = (int) (20 * 3.5);
+	private final int mDamage;
+	private final ChargeUpManager mChargeUp;
+	private final int mCastTime;
+	private final int mExecutionTime;
 	private final Location[] mSpawnLocations = new Location[3];
 	private final Location[] mTargetLocations = new Location[3];
 
@@ -53,15 +52,14 @@ public class SpellEchoCharge extends Spell {
 		mCastTime = castTime;
 		mExecutionTime = executionTime;
 		mDamage = damage;
-		mChargeUp = new ChargeUpManager(mBoss, mCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
+		mChargeUp = ImperialConstruct.defaultChargeUp(mBoss, mCastTime, ABILITY_NAME);
 	}
 
 	@Override
 	public void run() {
 		mChargeUp.setTime(0);
 
-		for (Entity e : mBoss.getNearbyEntities(mRange, 10, mRange)) {
+		for (Entity e : mBoss.getNearbyEntities(ImperialConstruct.detectionRange, 10, ImperialConstruct.detectionRange)) {
 			Set<String> tags = e.getScoreboardTags();
 			if (tags.contains(MARKER_TAG + "1")) {
 				mSpawnLocations[0] = e.getLocation();
@@ -85,7 +83,7 @@ public class SpellEchoCharge extends Spell {
 		List<Location> lineKeysArray = new ArrayList<>(lines.keySet());
 		Collections.shuffle(lineKeysArray);
 
-		List<Player> nearbyPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
+		List<Player> nearbyPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), ImperialConstruct.detectionRange, true);
 		BukkitRunnable runnable = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -106,7 +104,7 @@ public class SpellEchoCharge extends Spell {
 					rush(Objects.requireNonNull(lines.get(lineKeysArray.get(1))), lineKeysArray.get(1));
 					rush(Objects.requireNonNull(lines.get(lineKeysArray.get(2))), lineKeysArray.get(2));
 					this.cancel();
-					mChargeUp.setTitle(ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME);
+					mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)));
 					// Execute ability after charging
 					BukkitRunnable runnable = new BukkitRunnable() {
 						int mT = 0;
@@ -115,7 +113,7 @@ public class SpellEchoCharge extends Spell {
 						public synchronized void cancel() {
 							super.cancel();
 							mChargeUp.reset();
-							mChargeUp.setTitle(ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + ABILITY_NAME);
+							mChargeUp.setTitle(Component.text("Channeling ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)));
 						}
 
 						@Override

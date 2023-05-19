@@ -5,28 +5,28 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class RewriteHistory extends Spell {
 	private static final String ABILITY_NAME = "Rewrite History";
-	private int mHealthCastTime;
-	private Plugin mPlugin;
+	private final int mHealthCastTime;
+	private final Plugin mPlugin;
 	private int mStack = 1;
-	private int mRange;
-	private Location mSpawnLoc;
-	private LivingEntity mBoss;
-	private ChargeUpManager mChargeHealth;
+	private final int mRange;
+	private final Location mSpawnLoc;
+	private final LivingEntity mBoss;
+	private final ChargeUpManager mChargeHealth;
 
 	public RewriteHistory(Plugin mPlugin, LivingEntity mBoss, int mHealthCastTime, int mRange, Location mSpawnLoc) {
 		this.mHealthCastTime = mHealthCastTime;
@@ -34,8 +34,8 @@ public class RewriteHistory extends Spell {
 		this.mRange = mRange;
 		this.mSpawnLoc = mSpawnLoc;
 		this.mBoss = mBoss;
-		this.mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
+		this.mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, Component.text("Casting ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)),
+			BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange);
 	}
 
 	@Override

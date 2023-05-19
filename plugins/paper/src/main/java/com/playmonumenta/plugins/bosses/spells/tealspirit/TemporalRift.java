@@ -13,15 +13,15 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -34,6 +34,7 @@ public class TemporalRift extends Spell {
 	private static final double DAMAGE_INNER = 60;
 	private static final double RADIUS = 6;
 	private static final double RADIUS_INNER = 3;
+	private static final String SPELL_NAME = "Temporal Rift";
 
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
 	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(185, 185, 0), 1.0f);
@@ -56,7 +57,7 @@ public class TemporalRift extends Spell {
 		mCenter = center;
 		mCooldownTicks = cooldownTicks;
 
-		mChargeUp = new ChargeUpManager(mBoss, CHARGE_TIME, ChatColor.YELLOW + "Channeling Temporal Rift...", BarColor.YELLOW, BarStyle.SOLID, 70);
+		mChargeUp = new ChargeUpManager(mBoss, CHARGE_TIME, Component.text("Channeling " + SPELL_NAME + "...", NamedTextColor.YELLOW), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, 70);
 		mPortal2 = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 2, 0.15, 0.15, 0.15, 0.1);
 		mSmokeN = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 1, 0.15, 0.15, 0.15, 0);
 		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 1, 0.15, 0.15, 0.15, 0);
@@ -108,8 +109,8 @@ public class TemporalRift extends Spell {
 
 				if (mChargeUp.nextTick()) {
 					this.cancel();
-					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Temporal Rift...");
-					mChargeUp.setColor(BarColor.RED);
+					mChargeUp.setTitle(Component.text("Casting " + SPELL_NAME + "...", NamedTextColor.YELLOW));
+					mChargeUp.setColor(BossBar.Color.RED);
 					locs.forEach(loc -> world.playSound(loc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 0.6f, 2.0f));
 					mSmokeL.location(mBoss.getLocation()).spawnAsBoss();
 					mBreath.location(mBoss.getLocation()).spawnAsBoss();
@@ -172,7 +173,7 @@ public class TemporalRift extends Spell {
 						public synchronized void cancel() {
 							super.cancel();
 							mChargeUp.reset();
-							mChargeUp.setColor(BarColor.YELLOW);
+							mChargeUp.setColor(BossBar.Color.YELLOW);
 						}
 
 					};

@@ -15,11 +15,11 @@ import org.bukkit.entity.Player;
 
 public class SpellRecover extends Spell {
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private Location mTeleLoc;
 
 	private int mTimer = 0;
-	private int mDuration = 20;
+	private final int mDuration = 20;
 
 	public SpellRecover(LivingEntity boss, Location currentLoc) {
 		mBoss = boss;

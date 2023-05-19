@@ -666,7 +666,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	}
 
 	private ItemStack createPageIcon(Material icon, String name, TextColor color, List<String> desc) {
-		return createBasicItem(icon, name, color, true, desc);
+		return createBasicItem(icon, name, color, desc);
 	}
 
 	private ItemStack createSkillIcon(String skin, TextColor color, Player player, List<String> price) {
@@ -676,9 +676,9 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 		}
 		List<String> desc = new ArrayList<>();
 		desc.add("Cosmetic " + skill.getAbility().getName());
-		if (skill instanceof LockableCS && !((LockableCS) skill).isUnlocked(player)) {
+		if (skill instanceof LockableCS lockable && !lockable.isUnlocked(player)) {
 			// Locked skin, show lock description to give info
-			return createBasicItem(LOCKED, skin, color, true, NamedTextColor.YELLOW, desc, NamedTextColor.RED, ((LockableCS) skill).getLockDesc());
+			return createBasicItem(LOCKED, skin, color, desc, NamedTextColor.RED, lockable.getLockDesc());
 		}
 
 		Cosmetic cosmetic = CosmeticSkills.getCosmeticByName(skin);
@@ -694,22 +694,22 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			// attach price
 			desc.addAll(price);
 		}
-		return createBasicItem(skill.getDisplayItem(), skin, color, true, desc, extraLore);
+		return createBasicItem(skill.getDisplayItem(), skin, color, desc, extraLore);
 	}
 
-	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, boolean nameBold, List<String> desc, String... extraLore) {
-		return createBasicItem(mat, name, nameColor, nameBold, NamedTextColor.YELLOW, desc, NamedTextColor.DARK_GRAY, extraLore);
+	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, List<String> desc, String... extraLore) {
+		return createBasicItem(mat, name, nameColor, desc, NamedTextColor.DARK_GRAY, extraLore);
 	}
 
-	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, boolean nameBold, TextColor descColor, List<String> desc, TextColor extraColor, String... extraLore) {
+	private ItemStack createBasicItem(Material mat, String name, TextColor nameColor, List<String> desc, TextColor extraColor, String... extraLore) {
 		ItemStack item = new ItemStack(mat, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(Component.text(name, nameColor)
 			.decoration(TextDecoration.ITALIC, false)
-			.decoration(TextDecoration.BOLD, nameBold));
+			.decoration(TextDecoration.BOLD, true));
 		List<Component> lore = new ArrayList<>();
 		for (String s : desc) {
-			lore.add(Component.text(s, descColor).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text(s, NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		}
 		for (String s : extraLore) {
 			lore.add(Component.text(s, extraColor).decoration(TextDecoration.ITALIC, false));

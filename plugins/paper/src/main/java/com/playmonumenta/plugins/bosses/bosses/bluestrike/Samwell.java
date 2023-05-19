@@ -296,15 +296,15 @@ public class Samwell extends BossAbilityGroup {
 			BossManager.getInstance().manuallyRegisterBoss(mIzzy, mIzzyAbility);
 			BossManager.getInstance().manuallyRegisterBoss(mLevyn, mLevynAbility);
 
-			mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("Well, I wasn't sure if you guys would make it this far. How do you like my new place?", NamedTextColor.RED)));
+			mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("Well, I wasn't sure if you guys would make it this far. How do you like my new place?", NamedTextColor.RED)));
 
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("It'll be the last thing you see... I've got the Blue Wool on my side!", NamedTextColor.RED)));
+				mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("It'll be the last thing you see... I've got the Blue Wool on my side!", NamedTextColor.RED)));
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					mBoss.setAI(true);
 					changePhaseNormal();
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> {
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> {
 						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, ChatColor.DARK_RED + "Samwell", ChatColor.RED + "Usurper Of Life");
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
 					});
@@ -337,7 +337,7 @@ public class Samwell extends BossAbilityGroup {
 				switch (mPhase) {
 					case 1 -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (3.0 / 4.0));
-						mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("Ugh, what! How did you do that? It... burns!", NamedTextColor.RED)));
+						mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("Ugh, what! How did you do that? It... burns!", NamedTextColor.RED)));
 						mPhase = 2;
 						changePhaseNormal();
 						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
@@ -346,14 +346,14 @@ public class Samwell extends BossAbilityGroup {
 					}
 					case 2 -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (2.0 / 4.0));
-						mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("No, what?! Why can't it heal? What are you using?", NamedTextColor.RED)));
+						mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("No, what?! Why can't it heal? What are you using?", NamedTextColor.RED)));
 						mPhase = 3;
 						changePhaseNormal();
 						forceCastSpell(SpellSummonLavaTitan.class);
 					}
 					default -> {
 						mBoss.setHealth(EntityUtils.getMaxHealth(mBoss) * (1.0 / 4.0));
-						mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!", NamedTextColor.RED)));
+						mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("I'm done with you! That dagger is too much. I don't get why Blue can't heal from it? Is it another wool?!", NamedTextColor.RED)));
 						mPhase = 4;
 						Team blackTeam = ScoreboardUtils.getExistingTeamOrCreate("Black", NamedTextColor.BLACK);
 						blackTeam.addEntry(mBoss.getUniqueId().toString());
@@ -372,10 +372,10 @@ public class Samwell extends BossAbilityGroup {
 			event.setDamage(event.getDamage() * 0.1);
 		} else if (!mPhase4Damaged) {
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("It can't be... I can't feel the Blue Wool anymore... Has it run out? Or... has it turned its back on me??", NamedTextColor.RED)));
+				mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text("It can't be... I can't feel the Blue Wool anymore... Has it run out? Or... has it turned its back on me??", NamedTextColor.RED)));
 
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", "&c&oPlease&c! &4&lHarrakfar&c! Heal me!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", "&c&oPlease&c! &4&lHarrakfar&c! Heal me!"));
 					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 1.2f);
 				}, 70);
 			}, 20);

@@ -1,21 +1,19 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -28,6 +26,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 spans out 6 blocks, knocking back all players, dealing 18 damage, and applying Slowness II for 10 seconds.
  */
 public class SpellEarthenRupture extends Spell {
+	private static final String SPELL_NAME = "Earthen Rupture";
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 
@@ -36,8 +36,7 @@ public class SpellEarthenRupture extends Spell {
 	public SpellEarthenRupture(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mChargeUp = new ChargeUpManager(mBoss, 45, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Earthen Rupture...",
-			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
+		mChargeUp = Kaul.defaultChargeUp(mBoss, 45, SPELL_NAME);
 	}
 
 	@Override
@@ -68,7 +67,7 @@ public class SpellEarthenRupture extends Spell {
 					new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsEntityActive(mBoss);
 					for (Player player : PlayerUtils.playersInRange(loc, 6, true)) {
-						DamageUtils.damage(mBoss, player, DamageType.BLAST, 20, null, false, true, "Earthen Rupture");
+						DamageUtils.damage(mBoss, player, DamageType.BLAST, 20, null, false, true, SPELL_NAME);
 						MovementUtils.knockAway(loc, player, 0.50f, 1.5f);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 					}

@@ -25,8 +25,8 @@ public class TOVUtils {
 
 	public static boolean canBreak(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		BlockState blockState = block.getState();
-		if (blockState instanceof Chest) {
-			String name = ((Chest) blockState).getCustomName();
+		if (blockState instanceof Chest chest) {
+			String name = MessagingUtils.plainText(chest.customName());
 			if (UNOPENED_CACHE_NAME.equals(name) || OPENED_CACHE_NAME.equals(name)) {
 				MessagingUtils.sendActionBarMessage(player, "You cannot break Treasures of Viridia Caches.");
 
@@ -38,20 +38,20 @@ public class TOVUtils {
 	}
 
 	public static boolean isUnopenedTovLootCache(Block block) {
-		return block.getState() instanceof Chest chest && UNOPENED_CACHE_NAME.equals(chest.getCustomName());
+		return block.getState() instanceof Chest chest && isUnopenedCache(chest);
 	}
 
 	public static boolean isOpenedTovLootCache(Block block) {
-		return block.getState() instanceof Chest chest && OPENED_CACHE_NAME.equals(chest.getCustomName());
+		return block.getState() instanceof Chest chest && isUnopenedCache(chest);
 	}
 
 	public static boolean setTOVLootTable(Plugin plugin, Player player, Block block) {
-		if (block.getState() instanceof Chest chest && UNOPENED_CACHE_NAME.equals(chest.getCustomName())) {
+		if (block.getState() instanceof Chest chest && isUnopenedCache(chest)) {
 			if (!canOpen(plugin, player)) {
 				return false;
 			}
 
-			chest.setCustomName(OPENED_CACHE_NAME);
+			chest.customName(Component.text(OPENED_CACHE_NAME));
 			chest.setLootTable(Bukkit.getLootTable(NamespacedKeyUtils.fromString("epic:" + CACHE_LOOT_TABLE)));
 			chest.update();
 			return true;
@@ -90,6 +90,10 @@ public class TOVUtils {
 		}
 
 		return false;
+	}
+
+	public static boolean isUnopenedCache(Chest chest) {
+		return UNOPENED_CACHE_NAME.equals(MessagingUtils.plainText(chest.customName()));
 	}
 
 }

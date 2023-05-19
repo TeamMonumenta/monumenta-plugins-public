@@ -7,29 +7,29 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellRaiseDead extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private double mRange;
-	private int mCeiling;
+	private static final String SPELL_NAME = "Raise Dead";
+	private static final int DELAY = 20 * 40;
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
+	private final int mCeiling;
 	private boolean mCanRun = true;
-	private int mDelay = 20 * 40;
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellRaiseDead(Plugin plugin, LivingEntity boss, Location loc, double detectRange, int ceil) {
 		mPlugin = plugin;
@@ -37,7 +37,7 @@ public class SpellRaiseDead extends Spell {
 		mCenter = loc;
 		mRange = detectRange;
 		mCeiling = ceil;
-		mChargeUp = new ChargeUpManager(mBoss, 100, ChatColor.YELLOW + "Channeling Raise Dead...", BarColor.RED, BarStyle.SOLID, 200);
+		mChargeUp = Lich.defaultChargeUp(mBoss, 100, "Channeling " + SPELL_NAME + "...", 200);
 	}
 
 	@Override
@@ -49,14 +49,7 @@ public class SpellRaiseDead extends Spell {
 	public void run() {
 		//prevents recasts within 40 seconds
 		mCanRun = false;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mCanRun = true;
-			}
-
-		}.runTaskLater(mPlugin, mDelay);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCanRun = true, DELAY);
 
 		World world = mBoss.getWorld();
 		BukkitRunnable runA = new BukkitRunnable() {
@@ -104,7 +97,7 @@ public class SpellRaiseDead extends Spell {
 
 	public static void riseUndead(Location loc, Plugin plugin) {
 		// mob stats are rebalanced versions of gray/fred mobs. With NEW NAMES!
-		String summon = null;
+		String summon;
 		int x = FastUtils.RANDOM.nextInt(8);
 		if (x == 0) {
 			summon = "FireImpTroop";
@@ -124,7 +117,6 @@ public class SpellRaiseDead extends Spell {
 			summon = "DrownedDraugr";
 		}
 
-		String s = summon;
 		PartialParticle dust1 = new PartialParticle(Particle.BLOCK_DUST, loc, 1, 0.4, 0.1, 0.4, 0.25, Material.DIRT.createBlockData());
 		PartialParticle dust2 = new PartialParticle(Particle.BLOCK_DUST, loc, 16, 0.25, 0.1, 0.25, 0.25, Material.DIRT.createBlockData());
 		new BukkitRunnable() {
@@ -137,7 +129,7 @@ public class SpellRaiseDead extends Spell {
 				if (mINC >= 20) {
 					loc.getWorld().playSound(loc, Sound.BLOCK_GRAVEL_BREAK, SoundCategory.HOSTILE, 1, 1f);
 					dust2.spawnAsBoss();
-					LibraryOfSoulsIntegration.summon(loc, s);
+					LibraryOfSoulsIntegration.summon(loc, summon);
 					this.cancel();
 				}
 			}

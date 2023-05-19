@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -684,6 +686,14 @@ public class ImperialConstruct extends BossAbilityGroup {
 			mParadox.deleteExchangers();
 		}
 
+	}
+
+	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String abilityName) {
+		return defaultChargeUp(boss, chargeTime, abilityName, detectionRange);
+	}
+
+	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String abilityName, int range) {
+		return new ChargeUpManager(boss, chargeTime, Component.text("Charging ", NamedTextColor.GOLD).append(Component.text(abilityName, NamedTextColor.YELLOW)), BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, range);
 	}
 
 }

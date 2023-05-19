@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class SpellConstructAggro extends Spell {
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 
 	public SpellConstructAggro(LivingEntity boss) {
 		mBoss = boss;
@@ -18,8 +18,7 @@ public class SpellConstructAggro extends Spell {
 
 	@Override
 	public void run() {
-		Creature creature = (Creature) mBoss;
-		if (!(creature.getTarget() instanceof Player)) {
+		if (mBoss instanceof Creature creature && !(creature.getTarget() instanceof Player)) {
 			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 30, true);
 			Collections.shuffle(players);
 			if (!players.isEmpty()) {

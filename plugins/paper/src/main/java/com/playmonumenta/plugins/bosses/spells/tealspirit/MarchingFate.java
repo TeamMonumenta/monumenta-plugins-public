@@ -17,14 +17,18 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.bukkit.ChatColor;
+import java.util.stream.IntStream;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,11 +41,13 @@ public class MarchingFate extends Spell {
 	private static final double HEIGHT = 2;
 	private static final double PROXIMITY = 4;
 	private static final String LOS = "MarchingFate";
+	private static final String SPELL_NAME = "Marching Fates";
+
+
 	private final LivingEntity mBoss;
 	private final Location mCenter;
 	private final TealSpirit mTealSpirit;
 	private final List<Entity> mMarchers = new ArrayList<>();
-
 	private final ChargeUpManager mBossBar;
 	private boolean mSentMessage = false;
 	private final HashMap<Entity, Location> mSpawnIndex = new HashMap<>();
@@ -67,7 +73,7 @@ public class MarchingFate extends Spell {
 
 		tealSpirit.setMarchers(mMarchers);
 
-		mBossBar = new ChargeUpManager(mCenter, mBoss, 10000, ChatColor.DARK_AQUA + "Marching Fates", BarColor.PURPLE, BarStyle.SOLID, TealSpirit.detectionRange);
+		mBossBar = new ChargeUpManager(mCenter, mBoss, 10000, Component.text(SPELL_NAME, NamedTextColor.DARK_AQUA), BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS, TealSpirit.detectionRange);
 	}
 
 	@Override
@@ -109,7 +115,7 @@ public class MarchingFate extends Spell {
 					}
 					player.setInvulnerable(false);
 					player.setHealth(0);
-					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 10000, null, true, false, "Marching Fates");
+					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.TRUE, 10000, null, true, false, SPELL_NAME);
 				}
 
 				mTealSpirit.killMarchers();
@@ -143,7 +149,7 @@ public class MarchingFate extends Spell {
 						}
 
 						if (!mSentMessage) {
-							players.forEach(player -> player.sendMessage(ChatColor.RED + "The Fates are too close to each other!"));
+							players.forEach(player -> player.sendMessage(Component.text("The Fates are too close to each other!", NamedTextColor.RED)));
 							mSentMessage = true;
 						}
 
@@ -167,7 +173,7 @@ public class MarchingFate extends Spell {
 					}
 				}
 				mBossBar.setTime((int) (10000 * Math.min(minDistance / DISTANCE, 1)));
-				mBossBar.setTitle(obfuscate("Marching Fates", obfuscation, ChatColor.DARK_AQUA));
+				mBossBar.setTitle(obfuscate(obfuscation, NamedTextColor.DARK_AQUA));
 				mBossBar.update();
 			} else {
 				mBossBar.remove();
@@ -176,23 +182,17 @@ public class MarchingFate extends Spell {
 		mT += 5;
 	}
 
-	private String obfuscate(String s, int num, ChatColor color) {
-		StringBuilder result = new StringBuilder();
-		result.append(color);
-		char[] chars = s.toCharArray();
-		int length = chars.length;
-		List<Integer> places = new ArrayList<>();
+	private Component obfuscate(int num, TextColor color) {
+		List<TextComponent> comps = IntStream.range(0, SPELL_NAME.length()).mapToObj(i -> SPELL_NAME.toCharArray()[i]).map(c -> Component.text(c, color)).toList();
 		for (int i = 0; i < num; i++) {
-			places.add(FastUtils.RANDOM.nextInt(length));
+			int index = FastUtils.RANDOM.nextInt(SPELL_NAME.length());
+			comps.set(index, comps.get(index).decorate(TextDecoration.OBFUSCATED));
 		}
-		for (int i = 0; i < length; i++) {
-			if (chars[i] != ' ' && places.contains(i)) {
-				result.append(ChatColor.MAGIC).append(chars[i]).append(ChatColor.RESET).append(color);
-			} else {
-				result.append(chars[i]);
-			}
+		Component title = Component.empty();
+		for (Component comp : comps) {
+			title = title.append(comp);
 		}
-		return result.toString();
+		return title;
 	}
 
 	public void removeMarchers() {

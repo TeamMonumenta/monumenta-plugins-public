@@ -16,15 +16,15 @@ import org.bukkit.util.Vector;
 
 public class SpellSlice extends Spell {
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
 	private Location mCurrentLoc;
 
 	//Each ring layer removed, increment to keep track of location
 	private int mRingIncrement = 0;
 
 	//Keeps track of which quadrants have already been destroyed
-	private List<Integer> mDirs = new ArrayList<>();
+	private final List<Integer> mDirs = new ArrayList<>();
 
 	//True to destroy in rings, false for quadrants
 	private boolean mRingMode = false;
@@ -63,21 +63,11 @@ public class SpellSlice extends Spell {
 									Block b = tempL.getBlock();
 									if (mTicks == 20) {
 										if (b.getType() == Material.COBBLESTONE && FastUtils.RANDOM.nextInt(3) == 0) {
-											int temp = FastUtils.RANDOM.nextInt(1);
-											if (temp == 0) {
-												b.setType(Material.MAGMA_BLOCK);
-											} else if (temp == 1) {
-												b.setType(Material.COBBLESTONE);
-											}
+											b.setType(Material.MAGMA_BLOCK);
 										}
 									} else if (mTicks >= 20 * 3) {
 										if (b.getType() == Material.COBBLESTONE || b.getType() == Material.MAGMA_BLOCK || b.getType() == Material.TUFF) {
-											int temp = FastUtils.RANDOM.nextInt(1);
-											if (temp == 0) {
-												b.setType(Material.MAGMA_BLOCK);
-											} else if (temp == 1) {
-												b.setType(Material.COBBLESTONE);
-											}
+											b.setType(Material.MAGMA_BLOCK);
 										}
 									}
 								}

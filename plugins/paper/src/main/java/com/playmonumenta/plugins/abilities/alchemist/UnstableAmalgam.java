@@ -288,11 +288,13 @@ public class UnstableAmalgam extends Ability {
 
 		new BukkitRunnable() {
 			int mTimes = 0;
-			@Override public void run() {
+			@Override
+			public void run() {
 				mTimes++;
 				if (mPlayerItemStats == null) {
 					mobs.clear();
 					cancel();
+					return;
 				}
 
 				for (Iterator<LivingEntity> iterator = mobs.iterator(); iterator.hasNext(); ) {

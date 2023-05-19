@@ -120,8 +120,8 @@ public class GalleryPlayer {
 
 	protected void printPlayerInfo() {
 		Player player = getPlayer();
-		if (player != null) {
-			GalleryGame game = getGame();
+		GalleryGame game = getGame();
+		if (player != null && game != null) {
 			player.sendMessage(Component.text("Mobs this round: " + game.mMobsToSpawnThisRound, NamedTextColor.GRAY));
 			player.sendMessage(Component.text("Mobs spawned this round: " + game.mMobsSpawnedThisRound, NamedTextColor.GRAY));
 			player.sendMessage(Component.text("Mobs killed this round: " + game.mMobsKilledThisRound, NamedTextColor.GRAY));
@@ -137,7 +137,6 @@ public class GalleryPlayer {
 		}
 	}
 
-	// TODO Add sound category argument
 	public void playSound(Sound sound, float pitch, float volume) {
 		Player player = getPlayer();
 		if (player != null) {
@@ -149,7 +148,11 @@ public class GalleryPlayer {
 		if (isOnline()) {
 			if (mShouldTeleportToSpawn) {
 				Bukkit.getScheduler().runTaskLater(GalleryManager.mPlugin, () -> {
-					Location loc = getGame().getSpawnLocation();
+					GalleryGame game = getGame();
+					if (game == null) {
+						return;
+					}
+					Location loc = game.getSpawnLocation();
 					Player player = getPlayer();
 					if (loc != null) {
 						if (player != null && player.isOnline() && player.isValid()) {

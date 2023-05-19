@@ -11,15 +11,16 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -33,31 +34,32 @@ well they take 20 damage every 0.75 seconds. Lasts 9 seconds.
 if the player is within 4 blocks of the singularity they take 35 damage per 10 ticks -new
  */
 public class SpellGravityWell extends Spell {
+	private static final String SPELL_NAME = "Gravity Well";
+	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
+	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(185, 185, 0), 1.0f);
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private double mRange;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
 	private boolean mCooldown = false;
 	private int mRadius = 10;
 	private double mRad = 10;
 	private double mRotation = 0;
-	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
-	private static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(185, 185, 0), 1.0f);
-	private ChargeUpManager mChargeUp;
-	private PartialParticle mPortal1;
-	private PartialParticle mPortal2;
-	private PartialParticle mSmokeN;
-	private PartialParticle mWitch;
-	private PartialParticle mSmokeL;
-	private PartialParticle mBreath;
+	private final ChargeUpManager mChargeUp;
+	private final PartialParticle mPortal1;
+	private final PartialParticle mPortal2;
+	private final PartialParticle mSmokeN;
+	private final PartialParticle mWitch;
+	private final PartialParticle mSmokeL;
+	private final PartialParticle mBreath;
 
 	public SpellGravityWell(Plugin plugin, LivingEntity boss, Location center, double range) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCenter = center;
 		mRange = range;
-		mChargeUp = new ChargeUpManager(mBoss, 40, ChatColor.YELLOW + "Channeling Gravity Well...", BarColor.YELLOW, BarStyle.SOLID, 70);
+		mChargeUp = Lich.defaultChargeUp(mBoss, 40, "Channeling " + SPELL_NAME + "...", 70);
 		mPortal1 = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.1);
 		mPortal2 = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 2, 0.15, 0.15, 0.15, 0.1);
 		mSmokeN = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 1, 0.15, 0.15, 0.15, 0);
@@ -69,14 +71,7 @@ public class SpellGravityWell extends Spell {
 	@Override
 	public void run() {
 		mCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, 20 * 30);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, 20 * 30);
 		World world = mBoss.getWorld();
 		mPortal1.location(mBoss.getLocation()).spawnAsBoss();
 
@@ -84,7 +79,7 @@ public class SpellGravityWell extends Spell {
 		PPCircle indicator2 = new PPCircle(Particle.REDSTONE, mBoss.getLocation(), mRadius).count(36).delta(0.01).data(RED);
 
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
-		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p));
+		players.removeAll(SpellDimensionDoor.getShadowed());
 		if (players.size() < 1) {
 			return;
 		}
@@ -116,8 +111,8 @@ public class SpellGravityWell extends Spell {
 
 				if (mChargeUp.nextTick() || Lich.phase3over()) {
 					this.cancel();
-					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Gravity Well...");
-					mChargeUp.setColor(BarColor.RED);
+					mChargeUp.setTitle(Component.text("Casting " + SPELL_NAME + "...", NamedTextColor.YELLOW));
+					mChargeUp.setColor(BossBar.Color.RED);
 					world.playSound(mLoc, Sound.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 2.0f, 2.0f);
 					mSmokeL.location(mBoss.getLocation()).spawnAsBoss();
 					mBreath.location(mBoss.getLocation()).spawnAsBoss();
@@ -127,7 +122,7 @@ public class SpellGravityWell extends Spell {
 						@Override
 						public void run() {
 							mT++;
-							mChargeUp.setProgress(1.0d - (mT / (20 * 9.0d)));
+							mChargeUp.setProgress(1 - (mT / (20 * 9.0d)));
 							List<Player> players = Lich.playersInRange(mLoc, mRadius, true);
 							if (mT % 15 == 0) {
 								world.playSound(mLoc, Sound.BLOCK_PORTAL_AMBIENT, SoundCategory.HOSTILE, 2.0f, 0.5f);
@@ -140,14 +135,14 @@ public class SpellGravityWell extends Spell {
 									Vector dir = LocationUtils.getDirectionTo(player.getLocation(), clone);
 
 									if (player.getLocation().distance(mLoc) > 4) {
-										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, "Gravity Well");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 18, null, false, true, SPELL_NAME);
 									}
 									player.setVelocity(dir.multiply(-0.65));
 								}
 
 								if (mT % 10 == 0) {
 									if (player.getLocation().distance(mLoc) <= 4) {
-										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, "Gravity Well");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, SPELL_NAME);
 									}
 								}
 							}
@@ -171,7 +166,7 @@ public class SpellGravityWell extends Spell {
 							if (mT >= 20 * 9 || Lich.phase3over()) {
 								this.cancel();
 								mChargeUp.reset();
-								mChargeUp.setColor(BarColor.YELLOW);
+								mChargeUp.setColor(BossBar.Color.YELLOW);
 							}
 						}
 

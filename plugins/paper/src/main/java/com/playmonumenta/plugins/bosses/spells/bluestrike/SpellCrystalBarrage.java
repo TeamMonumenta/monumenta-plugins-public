@@ -14,14 +14,16 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -33,12 +35,12 @@ import org.bukkit.util.Vector;
 
 public class SpellCrystalBarrage extends Spell {
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Samwell mSamwell;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Samwell mSamwell;
 
-	private Location mCenter;
-	private int mPhase;
+	private final Location mCenter;
+	private final int mPhase;
 
 	private static final int NUM_BULLETS = 60;
 	private final double ARMOR_STAND_HEAD_OFFSET = 1.6875;
@@ -49,10 +51,10 @@ public class SpellCrystalBarrage extends Spell {
 	private static final double HITBOX = 0.3125;
 	private final String BULLET_TAG = "samwell_bullet";
 
-	private PartialParticle mPHit;
-	private List<Player> mHitPlayers;
+	private final PartialParticle mPHit;
+	private final List<Player> mHitPlayers;
 	private boolean mCooldown;
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 
 	// CrystalBarrage: Bullet Hell pattern which places crystals surrounding the arena, and send
 	// it flying to the middle and THROUGH the middle, forcing players to jump twice!
@@ -64,8 +66,8 @@ public class SpellCrystalBarrage extends Spell {
 		mCenter = mSamwell.mSpawnLoc;
 		mPhase = phase;
 		mHitPlayers = new ArrayList<>();
-		mChargeUp = new ChargeUpManager(mBoss, castTime(), ChatColor.GREEN + "Charging " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Crystal Barrage...",
-			BarColor.PINK, BarStyle.SEGMENTED_10, 100);
+		mChargeUp = new ChargeUpManager(mBoss, castTime(), chargeUpTitle("Charging"),
+			BossBar.Color.PINK, BossBar.Overlay.NOTCHED_10, 100);
 
 		mPHit = new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 20, 0.25, 0.25, 0.25, 0.25);
 	}
@@ -73,14 +75,7 @@ public class SpellCrystalBarrage extends Spell {
 	@Override
 	public void run() {
 		mCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, cooldownTicks() + 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, cooldownTicks() + 20);
 
 		mCenter.getWorld().playSound(mCenter, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 1);
 		mCenter.getWorld().playSound(mCenter, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 5, 1.4f);
@@ -93,7 +88,7 @@ public class SpellCrystalBarrage extends Spell {
 				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 
-					mChargeUp.setTitle(ChatColor.GREEN + "Unleashing " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Crystal Barrage...");
+					mChargeUp.setTitle(chargeUpTitle("Unleashing"));
 					new BukkitRunnable() {
 						int mT = 0;
 
@@ -101,7 +96,7 @@ public class SpellCrystalBarrage extends Spell {
 						public synchronized void cancel() {
 							super.cancel();
 							mChargeUp.reset();
-							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Crystal Barrage...");
+							mChargeUp.setTitle(chargeUpTitle("Charging"));
 						}
 
 						@Override
@@ -210,7 +205,7 @@ public class SpellCrystalBarrage extends Spell {
 				Location loc = mBox.getCenter().toLocation(mBoss.getWorld());
 				mTicks++;
 				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET, 0));
-				if (mTicks >= BULLET_DURATION + accelStart || mBoss == null || mBoss.isDead() || mPhase != mSamwell.mPhase) {
+				if (mTicks >= BULLET_DURATION + accelStart || mBoss.isDead() || mPhase != mSamwell.mPhase) {
 					bullet.remove();
 					this.cancel();
 				}
@@ -269,5 +264,9 @@ public class SpellCrystalBarrage extends Spell {
 			.stream()
 			.filter(e -> ScoreboardUtils.checkTag(e, BULLET_TAG))
 			.forEach(Entity::remove);
+	}
+
+	private static Component chargeUpTitle(String firstWord) {
+		return Component.text(firstWord + " ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD));
 	}
 }

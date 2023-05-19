@@ -7,17 +7,15 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,14 +26,15 @@ public class SpellEndlessAgony extends Spell {
 	private static final int MOVEMENT_TIME = 4 * 20;
 	private static final int WAIT_UNTIL_DAMAGE_TIME = (int) (1.5 * 20);
 	private static final int MAX_COUNT = 25;
+	public static final String SPELL_NAME = "Endless Agony";
 
-	private Plugin mPlugin;
-	private RKitxet mRKitxet;
-	private double mRange;
-	private Location mCenter;
+	private final Plugin mPlugin;
+	private final RKitxet mRKitxet;
+	private final double mRange;
+	private final Location mCenter;
 	private int mCount;
-	private ChargeUpManager mChargeUp;
-	private int mCooldown;
+	private final ChargeUpManager mChargeUp;
+	private final int mCooldown;
 
 	public SpellEndlessAgony(Plugin plugin, RKitxet rKitxet, Location center, double range, int cooldown) {
 		mPlugin = plugin;
@@ -45,13 +44,13 @@ public class SpellEndlessAgony extends Spell {
 		mCount = 0;
 		mCooldown = cooldown;
 
-		mChargeUp = new ChargeUpManager(mRKitxet.getEntity(), MOVEMENT_TIME + WAIT_UNTIL_DAMAGE_TIME, ChatColor.DARK_PURPLE + "Forming Endless Agony...",
-			BarColor.PURPLE, BarStyle.SEGMENTED_10, RKitxet.detectionRange);
+		mChargeUp = new ChargeUpManager(mRKitxet.getEntity(), MOVEMENT_TIME + WAIT_UNTIL_DAMAGE_TIME, Component.text("Forming " + SPELL_NAME + "...", NamedTextColor.DARK_PURPLE),
+			BossBar.Color.PURPLE, BossBar.Overlay.NOTCHED_10, RKitxet.detectionRange);
 	}
 
 	@Override
 	public void run() {
-		mRKitxet.useSpell("Endless Agony");
+		mRKitxet.useSpell(SPELL_NAME);
 
 		World world = mCenter.getWorld();
 
@@ -75,8 +74,8 @@ public class SpellEndlessAgony extends Spell {
 
 		PPCircle indicator = new PPCircle(Particle.REDSTONE, target.getLocation(), RADIUS).count(30).delta(0.1, 0.05, 0.1).data(ENDLESS_AGONY_COLOR);
 
-		mChargeUp.setTitle(ChatColor.DARK_PURPLE + "Forming Endless Agony...");
-		mChargeUp.setColor(BarColor.PURPLE);
+		mChargeUp.setTitle(Component.text("Forming " + SPELL_NAME + "...", NamedTextColor.DARK_PURPLE));
+		mChargeUp.setColor(BossBar.Color.PURPLE);
 
 		BukkitRunnable movementRunnable = new BukkitRunnable() {
 			Location mLoc = target.getLocation();
@@ -103,8 +102,8 @@ public class SpellEndlessAgony extends Spell {
 
 				if (mChargeUp.getTime() == MOVEMENT_TIME) {
 					world.playSound(targetLoc, Sound.BLOCK_BELL_RESONATE, SoundCategory.HOSTILE, 2f, 0.3f);
-					mChargeUp.setTitle(ChatColor.RED + "Channeling Endless Agony...");
-					mChargeUp.setColor(BarColor.RED);
+					mChargeUp.setTitle(Component.text("Channeling " + SPELL_NAME + "...", NamedTextColor.RED));
+					mChargeUp.setColor(BossBar.Color.RED);
 				}
 
 				if (mChargeUp.getTime() >= MOVEMENT_TIME + WAIT_UNTIL_DAMAGE_TIME) {
@@ -124,7 +123,7 @@ public class SpellEndlessAgony extends Spell {
 
 	@Override
 	public boolean canRun() {
-		return mCount < MAX_COUNT && PlayerUtils.playersInRange(mCenter, mRange, false).size() > 0 && mRKitxet.canUseSpell("Endless Agony");
+		return mCount < MAX_COUNT && PlayerUtils.playersInRange(mCenter, mRange, false).size() > 0 && mRKitxet.canUseSpell(SPELL_NAME);
 	}
 
 	@Override

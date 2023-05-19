@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -23,8 +24,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.type.Wall;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -48,6 +47,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 	private static final double HITBOX_LENGTH = 0.5;
 	private static final int DAMAGE = 80;
 	private static final int CAGE_DURATION = 10 * 20;
+	private static final String ABILITY_NAME = "Silver Bolts";
 	private static final HashMap<Vector, BlockData> CAGE_LOCATIONS = new HashMap<>();
 
 	static {
@@ -124,7 +124,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.HOSTILE, 1, 0);
 				new PartialParticle(Particle.EXPLOSION_HUGE, loc, 2, 0, 0, 0).minimumCount(1).spawnAsEntityActive(boss);
 				if (le instanceof Player player) {
-					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Silver Bolts", prevLoc);
+					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, ABILITY_NAME, prevLoc);
 					cage(player);
 				}
 			});
@@ -132,8 +132,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 		mPlugin = plugin;
 		mLauncher = boss;
 
-		mChargeUp = new ChargeUpManager(mLauncher, DELAY, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Silver Bolts",
-			BarColor.YELLOW, BarStyle.SOLID, 60);
+		mChargeUp = ImperialConstruct.defaultChargeUp(mLauncher, DELAY, ABILITY_NAME, 60);
 	}
 
 	@Override

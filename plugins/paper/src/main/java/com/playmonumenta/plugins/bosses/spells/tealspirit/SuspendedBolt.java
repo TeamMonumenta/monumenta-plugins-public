@@ -10,36 +10,36 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SuspendedBallistae extends Spell {
+public class SuspendedBolt extends Spell {
 
 	private static final String ABILITY_NAME = "Suspended Bolt";
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private int mRange;
-	private int mCastCount;
-	private int mDamage;
-	private int mCastTime;
-	private int mExecutionTime;
-	private int mCooldown;
-	private int mRadius;
-	private ChargeUpManager mChargeUp;
-	private Location mSpawnLoc;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final int mRange;
+	private final int mCastCount;
+	private final int mDamage;
+	private final int mCastTime;
+	private final int mExecutionTime;
+	private final int mCooldown;
+	private final int mRadius;
+	private final ChargeUpManager mChargeUp;
+	private final Location mSpawnLoc;
 
-	public SuspendedBallistae(LivingEntity boss, Plugin plugin, int range, int castCount, int damage, int castTime, int executionTime, int cooldown, Location spawnLoc, int radius) {
+	public SuspendedBolt(LivingEntity boss, Plugin plugin, int range, int castCount, int damage, int castTime, int executionTime, int cooldown, Location spawnLoc, int radius) {
 		this.mBoss = boss;
 		this.mPlugin = plugin;
 		this.mRange = range;
@@ -50,15 +50,14 @@ public class SuspendedBallistae extends Spell {
 		this.mCooldown = cooldown;
 		this.mSpawnLoc = spawnLoc;
 		this.mRadius = radius;
-		mChargeUp = this.mChargeUp = new ChargeUpManager(mBoss, mCastTime, ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + ABILITY_NAME,
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
+		mChargeUp = new ChargeUpManager(mBoss, mCastTime, Component.text("Casting ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)),
+			BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange);
 	}
 
 	@Override
 	public void run() {
 		mChargeUp.setTime(0);
-		mChargeUp.setColor(BarColor.YELLOW);
-		mChargeUp.setTitle(ChatColor.GOLD + "Channeling " + ChatColor.YELLOW + ABILITY_NAME);
+		mChargeUp.setTitle(Component.text("Channeling ", NamedTextColor.GOLD).append(Component.text(ABILITY_NAME, NamedTextColor.YELLOW)));
 
 		// Cast Runnable
 		BukkitRunnable runnable = new BukkitRunnable() {

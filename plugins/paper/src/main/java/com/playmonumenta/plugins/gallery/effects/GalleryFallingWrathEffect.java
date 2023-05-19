@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class GalleryFallingWrathEffect extends GalleryConsumableEffect {
 	/**
@@ -27,23 +28,29 @@ public class GalleryFallingWrathEffect extends GalleryConsumableEffect {
 		super(GalleryEffectType.FALLING_WRATH);
 	}
 
-	@Override public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
+	@Override
+	public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
 		super.tick(player, oneSecond, twoHertz, ticks);
 		mHasDoneDamageThisTick = false;
 	}
 
-	@Override public void onPlayerDamage(GalleryPlayer player, DamageEvent event, LivingEntity entity) {
+	@Override
+	public void onPlayerDamage(GalleryPlayer player, DamageEvent event, LivingEntity entity) {
 		if (event.getType() == DamageEvent.DamageType.PROJECTILE && !mHasDoneDamageThisTick) {
 			mHasDoneDamageThisTick = true;
 			summonExplosion(player, event, entity.getLocation());
 		}
 	}
 
-	protected void summonExplosion(GalleryPlayer player, DamageEvent event, Location loc) {
+	protected void summonExplosion(GalleryPlayer galleryPlayer, DamageEvent event, Location loc) {
+		Player player = galleryPlayer.getPlayer();
+		if (player == null) {
+			return;
+		}
 		new PartialParticle(Particle.EXPLOSION_NORMAL, loc).delta(EXPLOSION_RADIUS, EXPLOSION_RADIUS, EXPLOSION_RADIUS).count(10).spawnAsPlayer(player.getPlayer(), ParticleCategory.OWN_ACTIVE, ParticleCategory.OTHER_ACTIVE);
 		loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 2, 10);
 		for (LivingEntity entity : EntityUtils.getNearbyMobs(loc, EXPLOSION_RADIUS)) {
-			DamageUtils.damage(player.getPlayer(), entity, DamageEvent.DamageType.OTHER, event.getDamage() * DAMAGE);
+			DamageUtils.damage(player, entity, DamageEvent.DamageType.OTHER, event.getDamage() * DAMAGE);
 		}
 	}
 }

@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,7 +27,6 @@ import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -38,17 +39,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellSoulShackle extends Spell {
+	private static final String SPELL_NAME = "Soul Shackle";
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private double mRange;
-	private int mCeiling;
-	private ChargeUpManager mChargeUp;
-	private List<Player> mGotHit = new ArrayList<Player>();
-	private PartialParticle mPortal;
-	private PartialParticle mRod;
-	private PartialParticle mSpark;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
+	private final int mCeiling;
+	private final ChargeUpManager mChargeUp;
+	private final List<Player> mGotHit = new ArrayList<>();
+	private final PartialParticle mPortal;
+	private final PartialParticle mRod;
+	private final PartialParticle mSpark;
 
 	public SpellSoulShackle(Plugin plugin, LivingEntity boss, Location loc, double r, int ceil) {
 		mPlugin = plugin;
@@ -56,7 +58,7 @@ public class SpellSoulShackle extends Spell {
 		mCenter = loc;
 		mRange = r;
 		mCeiling = ceil;
-		mChargeUp = new ChargeUpManager(mBoss, 20, ChatColor.YELLOW + "Charging Soul Shackle...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mChargeUp = Lich.defaultChargeUp(mBoss, 20, "Charging " + SPELL_NAME + "...");
 		mPortal = new PartialParticle(Particle.PORTAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 1.5);
 		mRod = new PartialParticle(Particle.END_ROD, mBoss.getLocation(), 40, 1, 1, 1, 0);
 		mSpark = new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 1, 0, 0, 0, 0);
@@ -86,7 +88,7 @@ public class SpellSoulShackle extends Spell {
 					}
 
 					//grab all bullets summoned
-					List<Entity> bullets = new ArrayList<Entity>(mBoss.getLocation().add(0, 5, 0).getNearbyEntities(2f, 2f, 2f));
+					List<Entity> bullets = new ArrayList<>(mBoss.getLocation().add(0, 5, 0).getNearbyEntities(2f, 2f, 2f));
 					bullets.removeIf(e -> !e.getType().equals(EntityType.SHULKER_BULLET));
 
 					//set target of each bullet in list
@@ -124,14 +126,13 @@ public class SpellSoulShackle extends Spell {
 
 		World world = mBoss.getWorld();
 		Location pLoc = p.getLocation().add(0, 1.5, 0);
-		p.sendMessage(ChatColor.AQUA
-			              + "You got chained by Hekawt! Don't move outside of the ring!");
+		p.sendMessage(Component.text("You got chained by Hekawt! Don't move outside of the ring!", NamedTextColor.DARK_AQUA));
 
-		DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, "Soul Shackle");
+		DamageUtils.damage(mBoss, p, DamageType.MAGIC, 27, null, false, true, SPELL_NAME);
 		AbilityUtils.silencePlayer(p, 5 * 20);
 		mRod.location(pLoc).spawnAsBoss();
 		world.playSound(pLoc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.HOSTILE, 0.7f, 0.5f);
-		BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + "Soul Shackle Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
+		org.bukkit.boss.BossBar bar = Bukkit.getServer().createBossBar(ChatColor.RED + SPELL_NAME + " Duration", BarColor.RED, BarStyle.SOLID, BarFlag.PLAY_BOSS_MUSIC);
 		bar.setVisible(true);
 		bar.addPlayer(p);
 
@@ -165,9 +166,9 @@ public class SpellSoulShackle extends Spell {
 					pGroundLoc.setY(mCenter.getY());
 					pCheckLoc.setY(mCenter.getY());
 					if (pGroundLoc.distance(pCheckLoc) > 3) {
-						p.sendMessage(ChatColor.AQUA + "I shouldn't leave this ring.");
+						p.sendMessage(Component.text("I shouldn't leave this ring.", NamedTextColor.DARK_AQUA));
 						world.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 2.0f, 1.0f);
-						BossUtils.bossDamagePercent(mBoss, p, 0.15, "Soul Shackle");
+						BossUtils.bossDamagePercent(mBoss, p, 0.15, SPELL_NAME);
 						MovementUtils.knockAway(pCheckLoc, p, -0.75f, false);
 					}
 

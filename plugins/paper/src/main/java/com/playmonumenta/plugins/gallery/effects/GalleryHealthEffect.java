@@ -18,19 +18,30 @@ public class GalleryHealthEffect extends GalleryStackableEffect {
 	@Override
 	public void playerGainEffect(GalleryPlayer galleryPlayer) {
 		super.playerGainEffect(galleryPlayer);
-		EntityUtils.addAttribute(galleryPlayer.getPlayer(), Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		Player player = galleryPlayer.getPlayer();
+		if (player == null) {
+			return;
+		}
+		EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
-	@Override public void playerLoseEffect(GalleryPlayer player) {
-		super.playerLoseEffect(player);
-		EntityUtils.removeAttribute(player.getPlayer(), Attribute.GENERIC_MAX_HEALTH, "GalleryHealthEffect");
+	@Override
+	public void playerLoseEffect(GalleryPlayer galleryPlayer) {
+		super.playerLoseEffect(galleryPlayer);
+		Player player = galleryPlayer.getPlayer();
+		if (player == null) {
+			return;
+		}
+		EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "GalleryHealthEffect");
 	}
 
-	@Override public int getMaxStacks() {
+	@Override
+	public int getMaxStacks() {
 		return HEALTH_EFFECT_MAX_STACK;
 	}
 
-	@Override public void refresh(GalleryPlayer galleryPlayer) {
+	@Override
+	public void refresh(GalleryPlayer galleryPlayer) {
 		Player player = galleryPlayer.getPlayer();
 		if (galleryPlayer.isOnline() && player != null) {
 			EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "GalleryHealthEffect");

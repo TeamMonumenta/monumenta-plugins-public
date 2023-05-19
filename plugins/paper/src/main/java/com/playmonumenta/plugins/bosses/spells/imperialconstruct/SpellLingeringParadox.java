@@ -8,7 +8,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -18,9 +19,9 @@ import org.bukkit.entity.Player;
 
 public class SpellLingeringParadox extends Spell {
 
-	private LivingEntity mBoss;
-	private Location mStartLoc;
-	private int mRange;
+	private final LivingEntity mBoss;
+	private final Location mStartLoc;
+	private final int mRange;
 	private final List<Entity> mSpawnedMobs = new ArrayList<>();
 
 	public SpellLingeringParadox(LivingEntity boss, Location startLoc, int range) {
@@ -36,7 +37,7 @@ public class SpellLingeringParadox extends Spell {
 		Collections.shuffle(players);
 		for (Player player : players) {
 			if (!Plugin.getInstance().mEffectManager.hasEffect(player, TemporalFlux.class)) {
-				players.forEach(p -> p.sendMessage(ChatColor.GOLD + "[Imperial Construct]" + ChatColor.WHITE + " TEMPORAL SHIFT PROTOCOL INITIATED - PARADOX REDIRECTED TO TARGET:"));
+				players.forEach(p -> p.sendMessage(Component.text("[Imperial Construct]", NamedTextColor.GOLD).append(Component.text(" TEMPORAL SHIFT PROTOCOL INITIATED - PARADOX REDIRECTED TO TARGET:", NamedTextColor.WHITE))));
 				Plugin.getInstance().mEffectManager.addEffect(player, TemporalFlux.GENERIC_NAME, new TemporalFlux(20 * 30));
 				return;
 			}

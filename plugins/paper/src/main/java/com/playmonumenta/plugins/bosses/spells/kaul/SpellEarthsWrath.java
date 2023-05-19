@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells.kaul;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -9,14 +10,11 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -27,18 +25,19 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class SpellEarthsWrath extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mY;
-	private ChargeUpManager mChargeUp;
+	private static final String SPELL_NAME = "Earth's Wrath";
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mY;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellEarthsWrath(Plugin plugin, LivingEntity boss, double y) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mY = y;
 
-		mChargeUp = new ChargeUpManager(mBoss, (int) (20 * 2.15), ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Earths Wrath...",
-			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
+		mChargeUp = Kaul.defaultChargeUp(boss, (int) (20 * 2.15), SPELL_NAME);
 	}
 
 	@Override
@@ -78,7 +77,7 @@ public class SpellEarthsWrath extends Spell {
 								new PartialParticle(Particle.CLOUD, bLoc, 1, 0, 0, 0, 0).spawnAsEntityActive(mBoss);
 								for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), 40, true)) {
 									if (player.getBoundingBox().overlaps(mBox)) {
-										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, "Earth's Wrath");
+										DamageUtils.damage(mBoss, player, DamageType.MAGIC, 24, null, false, true, SPELL_NAME);
 										MovementUtils.knockAway(centerLoc, player, -0.6f, 0.8f);
 										player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 10, 2));
 										player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 10, -4));

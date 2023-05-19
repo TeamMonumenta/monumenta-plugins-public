@@ -234,7 +234,6 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(AntiMeleeBoss.identityTag, AntiMeleeBoss::new);
 		mStatelessBosses.put(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::new);
 		mStatelessBosses.put(DamageCapBoss.identityTag, DamageCapBoss::new);
-		mStatelessBosses.put(AntiRangeChivalrousBoss.identityTag, AntiRangeChivalrousBoss::new);
 		mStatelessBosses.put(ImmortalMountBoss.identityTag, ImmortalMountBoss::new);
 		mStatelessBosses.put(SilenceOnHitBoss.identityTag, SilenceOnHitBoss::new);
 		mStatelessBosses.put(FalseSpiritPortal.identityTag, FalseSpiritPortal::new);
@@ -497,7 +496,6 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(AntiMeleeBoss.identityTag, AntiMeleeBoss::deserialize);
 		mBossDeserializers.put(AntiSuffocationBoss.identityTag, AntiSuffocationBoss::deserialize);
 		mBossDeserializers.put(DamageCapBoss.identityTag, DamageCapBoss::deserialize);
-		mBossDeserializers.put(AntiRangeChivalrousBoss.identityTag, AntiRangeChivalrousBoss::deserialize);
 		mBossDeserializers.put(ImmortalMountBoss.identityTag, ImmortalMountBoss::deserialize);
 		mBossDeserializers.put(SilenceOnHitBoss.identityTag, SilenceOnHitBoss::deserialize);
 		mBossDeserializers.put(FalseSpirit.identityTag, FalseSpirit::deserialize);

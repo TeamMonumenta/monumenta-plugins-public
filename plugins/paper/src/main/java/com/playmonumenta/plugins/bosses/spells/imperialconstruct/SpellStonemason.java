@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -11,31 +12,28 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellStonemason extends Spell {
 
-	private final String ABILITY_NAME = "Stonemason";
-	private final int CAST_TIME = 20 * 3;
+	private static final String ABILITY_NAME = "Stonemason";
+	private static final int CAST_TIME = 20 * 3;
 
-	private LivingEntity mBoss;
-	private Plugin mPlugin;
-	private int mRadius = 6;
-	private int mDamage;
-	private ChargeUpManager mChargeUp;
-	private Location mStartLoc;
-	private int mRange;
+	private final LivingEntity mBoss;
+	private final Plugin mPlugin;
+	private final int mRadius = 6;
+	private final int mDamage;
+	private final ChargeUpManager mChargeUp;
+	private final Location mStartLoc;
+	private final int mRange;
 
 	public SpellStonemason(LivingEntity boss, Plugin plugin, Location startLoc, int range, int damage) {
 		mBoss = boss;
@@ -43,8 +41,7 @@ public class SpellStonemason extends Spell {
 		mStartLoc = startLoc;
 		mRange = range;
 		mDamage = damage;
-		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
+		mChargeUp = ImperialConstruct.defaultChargeUp(mBoss, CAST_TIME, ABILITY_NAME, mRange);
 	}
 
 	@Override

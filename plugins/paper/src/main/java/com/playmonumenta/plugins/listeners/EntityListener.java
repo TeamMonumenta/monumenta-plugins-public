@@ -46,7 +46,6 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -717,13 +716,8 @@ public class EntityListener implements Listener {
 				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
 					p.getGameMode().equals(GameMode.ADVENTURE)) {
 					//Remove Slow Falling effects in Adventure mode areas (#947)
-					p.sendMessage(ChatColor.RED + "You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.");
-					p.getServer().getScheduler().scheduleSyncDelayedTask(mPlugin, new Runnable() {
-						@Override
-						public void run() {
-							p.removePotionEffect(PotionEffectType.SLOW_FALLING);
-						}
-					}, 1);
+					p.sendMessage(Component.text("You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.", NamedTextColor.RED));
+					Bukkit.getScheduler().runTaskLater(mPlugin, () -> p.removePotionEffect(PotionEffectType.SLOW_FALLING), 1);
 				}
 			}
 		}

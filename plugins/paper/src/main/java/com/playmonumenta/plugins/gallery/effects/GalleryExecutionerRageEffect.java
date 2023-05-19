@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 public class GalleryExecutionerRageEffect extends GalleryConsumableEffect {
 	/**
@@ -19,15 +20,20 @@ public class GalleryExecutionerRageEffect extends GalleryConsumableEffect {
 		super(GalleryEffectType.EXECUTIONER_RAGE);
 	}
 
-	@Override public void onPlayerDamage(GalleryPlayer player, DamageEvent event, LivingEntity entity) {
+	@Override
+	public void onPlayerDamage(GalleryPlayer galleryPlayer, DamageEvent event, LivingEntity entity) {
 		if (event.getType() == DamageEvent.DamageType.MELEE || event.getType() == DamageEvent.DamageType.MELEE_ENCH || event.getType() == DamageEvent.DamageType.MELEE_SKILL) {
+			Player player = galleryPlayer.getPlayer();
+			if (player == null) {
+				return;
+			}
 			double maxHealth = EntityUtils.getMaxHealth(entity);
 			if (entity.getHealth() < maxHealth) {
 				event.setDamage(event.getDamage() * MELEE_DAMAGE_INCREASE);
 			}
 
 			if (entity.getHealth() + entity.getAbsorptionAmount() <= event.getFinalDamage(true)) {
-				EffectManager.getInstance().addEffect(player.getPlayer(), "EXECUTIONER_RAGE", new PercentDamageReceived(20 * 3, -0.2));
+				EffectManager.getInstance().addEffect(player, "EXECUTIONER_RAGE", new PercentDamageReceived(20 * 3, -0.2));
 			}
 
 		}

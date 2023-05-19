@@ -9,15 +9,15 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,21 +37,22 @@ while in a pool.
  */
 public class SpellGraspingHands extends Spell {
 
+	private static final String SPELL_NAME = "Grasping Hands";
 	private static final int CAP = 7;
+	private static final double DURATION = 20 * 7;
+	private static final int HEAL_CAP = 75;
+	private static final Particle.DustOptions GRASPING_HANDS_COLOR = new Particle.DustOptions(Color.fromRGB(0, 135, 96), 1.65f);
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final ThreadLocalRandom mRand = ThreadLocalRandom.current();
-	private static final Particle.DustOptions GRASPING_HANDS_COLOR = new Particle.DustOptions(Color.fromRGB(0, 135, 96), 1.65f);
 	private final ChargeUpManager mChargeUp;
 	private boolean mCanRun = true;
-	private double mDuration = 20 * 7.0d;
-	private int mHealCap = 75;
 
 	public SpellGraspingHands(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mChargeUp = new ChargeUpManager(mBoss, 110, ChatColor.YELLOW + "Channeling Grasping Hands...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mChargeUp = Lich.defaultChargeUp(mBoss, 110, "Channeling " + SPELL_NAME + "...");
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public class SpellGraspingHands extends Spell {
 		World world = mBoss.getWorld();
 		List<Player> players = Lich.playersInRange(mBoss.getLocation(), 50, true);
 		players.removeIf(p -> SpellDimensionDoor.getShadowed().contains(p));
-		List<Player> targets = new ArrayList<Player>();
+		List<Player> targets = new ArrayList<>();
 		if (players.size() <= 2) {
 			targets = players;
 		} else {
@@ -81,26 +82,22 @@ public class SpellGraspingHands extends Spell {
 			public void run() {
 				if (mChargeUp.nextTick()) {
 					this.cancel();
-					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Grasping Hands...");
-					mChargeUp.setColor(BarColor.RED);
+					mChargeUp.setTitle(Component.text("Casting " + SPELL_NAME + "...", NamedTextColor.YELLOW));
+					mChargeUp.setColor(BossBar.Color.RED);
 					BukkitRunnable runB = new BukkitRunnable() {
 						int mT = 0;
 
 						@Override
 						public void run() {
 							mT++;
-							double progress = 1.0d - mT / mDuration;
+							double progress = 1.0d - mT / DURATION;
 							if (progress >= 0) {
 								mChargeUp.setProgress(progress);
-							} else {
-								this.cancel();
-								mChargeUp.reset();
-								mChargeUp.setTitle(ChatColor.YELLOW + "Charging Grasping Hands...");
 							}
-							if (Lich.phase3over()) {
+							if (progress < 0 || Lich.phase3over()) {
 								this.cancel();
 								mChargeUp.reset();
-								mChargeUp.setTitle(ChatColor.YELLOW + "Charging Grasping Hands...");
+								mChargeUp.setTitle(Component.text("Charging " + SPELL_NAME + "...", NamedTextColor.YELLOW));
 							}
 						}
 
@@ -116,8 +113,7 @@ public class SpellGraspingHands extends Spell {
 
 		for (Player player : targets) {
 			player.playSound(player.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, SoundCategory.HOSTILE, 1, 0.75f);
-			player.sendMessage(ChatColor.AQUA
-				                   + "A pool forms under you.");
+			player.sendMessage(Component.text("A pool forms under you.", NamedTextColor.AQUA));
 			world.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, SoundCategory.HOSTILE, 1, 0.5f);
 			world.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_AMBIENT, SoundCategory.HOSTILE, 1, 0.75f);
 
@@ -153,7 +149,7 @@ public class SpellGraspingHands extends Spell {
 									//damage the player
 									for (Player p : Lich.playersInRange(mLoc, 5.0, true)) {
 										Vector v = p.getVelocity();
-										BossUtils.bossDamagePercent(mBoss, p, 0.15, "Grasping Hands");
+										BossUtils.bossDamagePercent(mBoss, p, 0.15, SPELL_NAME);
 										p.setVelocity(v);
 										p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 4, 2));
 										p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 4, -4));
@@ -164,15 +160,11 @@ public class SpellGraspingHands extends Spell {
 										if (!(e.getType() == EntityType.PLAYER) && !e.isDead()) {
 											double maxHealth = EntityUtils.getMaxHealth(e);
 											double restore = maxHealth * 0.005 + 3;
-											if (restore >= mHealCap) {
-												restore = mHealCap;
+											if (restore >= HEAL_CAP) {
+												restore = HEAL_CAP;
 											}
 											double newHealth = e.getHealth() + restore;
-											if (newHealth >= maxHealth) {
-												e.setHealth(maxHealth);
-											} else {
-												e.setHealth(newHealth);
-											}
+											e.setHealth(Math.min(newHealth, maxHealth));
 										}
 									}
 								}
@@ -185,7 +177,7 @@ public class SpellGraspingHands extends Spell {
 										indicator3.radius(r).location(mLoc).spawnAsBoss();
 									}
 								}
-								if (mT >= mDuration) {
+								if (mT >= DURATION) {
 									this.cancel();
 									mCanRun = true;
 								}

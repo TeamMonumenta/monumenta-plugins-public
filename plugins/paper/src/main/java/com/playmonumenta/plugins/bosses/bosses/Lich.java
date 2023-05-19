@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -2051,5 +2052,13 @@ public final class Lich extends BossAbilityGroup {
 		mBoss.setPersistent(true);
 
 		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song("epic:music.hekawt", SoundCategory.RECORDS, 355, true, 1, 1, true), true, mBoss, true, 0, 5);
+	}
+
+	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String text) {
+		return defaultChargeUp(boss, chargeTime, text, detectionRange);
+	}
+
+	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String text, int range) {
+		return new ChargeUpManager(boss, chargeTime, Component.text(text, NamedTextColor.YELLOW), net.kyori.adventure.bossbar.BossBar.Color.YELLOW, net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS, range);
 	}
 }

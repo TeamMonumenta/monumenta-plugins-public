@@ -49,9 +49,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -59,12 +57,6 @@ import org.jetbrains.annotations.Nullable;
  * Arrows are taken from them to shoot, and arrows being picked up are put in there before the inventory.
  */
 public class QuiverListener implements Listener {
-
-	// Refill if the used arrow stack has less than this many arrows left.
-	private static final int REFILL_LOWER_THAN = 16;
-
-	// Refill arrows up to this amount. This is less than max stack size to prevent using an infinity crossbow (or multiple in a row) starting a new stack.
-	private static final int REFILL_UP_TO = 48;
 
 	public enum ArrowTransformMode {
 		NONE("disabled", null),
@@ -201,14 +193,6 @@ public class QuiverListener implements Listener {
 				}
 			}
 		};
-	}
-
-	private static ItemStack makeTippedArrowStack(PotionType potionType) {
-		ItemStack result = new ItemStack(Material.TIPPED_ARROW);
-		PotionMeta meta = ((PotionMeta) result.getItemMeta());
-		meta.setBasePotionData(new PotionData(potionType));
-		result.setItemMeta(meta);
-		return result;
 	}
 
 	private boolean mCallProjectileLaunchEvent = false;

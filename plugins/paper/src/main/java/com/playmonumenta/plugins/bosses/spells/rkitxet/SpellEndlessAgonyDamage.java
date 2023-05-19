@@ -39,7 +39,7 @@ public class SpellEndlessAgonyDamage extends Spell {
 			if (mTicks % 10 == 0) {
 				for (Player p : PlayerUtils.playersInCylinder(loc, RADIUS, RADIUS)) {
 					if (!hitPlayers.contains(p)) {
-						DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, true, false, "Endless Agony");
+						DamageUtils.damage(mBoss, p, DamageType.MAGIC, DAMAGE, null, true, false, SpellEndlessAgony.SPELL_NAME);
 						hitPlayers.add(p);
 					}
 				}

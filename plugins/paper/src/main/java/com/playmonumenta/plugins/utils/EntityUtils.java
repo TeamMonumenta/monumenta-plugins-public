@@ -59,6 +59,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
@@ -1478,13 +1479,17 @@ public class EntityUtils {
 
 	public static LivingEntity copyMob(LivingEntity entity, Location location) {
 		LivingEntity newSpawn = (LivingEntity) entity.getWorld().spawnEntity(location, entity.getType());
-		newSpawn.getEquipment().setBoots(entity.getEquipment().getBoots());
-		newSpawn.getEquipment().setLeggings(entity.getEquipment().getLeggings());
-		newSpawn.getEquipment().setChestplate(entity.getEquipment().getChestplate());
-		newSpawn.getEquipment().setHelmet(entity.getEquipment().getHelmet());
-		newSpawn.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
-		newSpawn.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
-		newSpawn.setCustomName(entity.getCustomName());
+		EntityEquipment equipment = entity.getEquipment();
+		EntityEquipment newEquipment = newSpawn.getEquipment();
+		if (equipment != null && newEquipment != null) {
+			newSpawn.getEquipment().setBoots(entity.getEquipment().getBoots());
+			newSpawn.getEquipment().setLeggings(entity.getEquipment().getLeggings());
+			newSpawn.getEquipment().setChestplate(entity.getEquipment().getChestplate());
+			newSpawn.getEquipment().setHelmet(entity.getEquipment().getHelmet());
+			newSpawn.getEquipment().setItemInMainHand(entity.getEquipment().getItemInMainHand());
+			newSpawn.getEquipment().setItemInOffHand(entity.getEquipment().getItemInOffHand());
+		}
+		newSpawn.customName(entity.customName());
 		newSpawn.setInvisible(entity.isInvisible());
 		newSpawn.setGlowing(entity.isGlowing());
 		newSpawn.setRotation(entity.getLocation().getYaw(), entity.getLocation().getPitch());
@@ -1495,8 +1500,8 @@ public class EntityUtils {
 			newPhantom.setSize(phantom.getSize());
 		} else if (newSpawn instanceof Creeper newCreeper && entity instanceof Creeper creeper) {
 			newCreeper.setPowered(creeper.isPowered());
-		} else if (newSpawn instanceof Zombie newZombie && entity instanceof Zombie zombie) {
-			newZombie.setBaby(zombie.isBaby());
+		} else if (newSpawn instanceof Ageable newAgeable && entity instanceof Ageable ageable) {
+			newAgeable.setAge(ageable.getAge());
 			if (newSpawn instanceof ZombieVillager newVillager && entity instanceof ZombieVillager villager) {
 				newVillager.setVillagerType(villager.getVillagerType());
 			}

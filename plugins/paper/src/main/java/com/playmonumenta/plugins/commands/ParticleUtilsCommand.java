@@ -217,7 +217,7 @@ public class ParticleUtilsCommand {
 		}
 	}
 
-	private static void spawnAsActive(CommandSender callee, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle) {
+	private static void spawnAsActive(@Nullable CommandSender callee, AbstractPartialParticle<? extends AbstractPartialParticle<?>> particle) {
 		if (callee instanceof Player player) {
 			particle.spawnAsPlayerActive(player);
 		} else if (callee instanceof Entity entity) {

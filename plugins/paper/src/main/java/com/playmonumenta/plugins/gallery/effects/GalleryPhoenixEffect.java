@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GalleryPhoenixEffect extends GalleryEffect {
 	/**
@@ -26,14 +27,14 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 	}
 
 	@Override
-	public void playerGainEffect(GalleryPlayer player) {
-		super.playerGainEffect(player);
-		GalleryGame game = player.getGame();
-		Player player1 = player.getPlayer();
+	public void playerGainEffect(GalleryPlayer galleryPlayer) {
+		super.playerGainEffect(galleryPlayer);
+		GalleryGame game = galleryPlayer.getGame();
+		Player player = galleryPlayer.getPlayer();
 
-		if (player.isOnline() && game != null) {
-			ScoreboardUtils.setScoreboardValue(player1, SCOREBOARD_PHOENIX_BOUGHT_ROUND, game.getCurrentRound());
-			ScoreboardUtils.setScoreboardValue(player1, SCOREBOARD_PHOENIX_BOUGHT_COUNT, ScoreboardUtils.getScoreboardValue(player1, SCOREBOARD_PHOENIX_BOUGHT_COUNT).orElse(0) + 1);
+		if (player != null && player.isOnline() && game != null) {
+			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PHOENIX_BOUGHT_ROUND, game.getCurrentRound());
+			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PHOENIX_BOUGHT_COUNT, ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PHOENIX_BOUGHT_COUNT).orElse(0) + 1);
 		}
 	}
 
@@ -42,22 +43,28 @@ public class GalleryPhoenixEffect extends GalleryEffect {
 		return ChatColor.GOLD + mType.getRealName();
 	}
 
-	@Override public boolean canBuy(GalleryPlayer player) {
-		GalleryGame game = player.getGame();
-		Player player1 = player.getPlayer();
+	@Override
+	public boolean canBuy(GalleryPlayer galleryPlayer) {
+		GalleryGame game = galleryPlayer.getGame();
+		Player player = galleryPlayer.getPlayer();
 
-		if (player.isOnline() && game != null) {
-			int countBought = ScoreboardUtils.getScoreboardValue(player1, SCOREBOARD_PHOENIX_BOUGHT_COUNT).orElse(0);
+		if (player != null && player.isOnline() && game != null) {
+			int countBought = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PHOENIX_BOUGHT_COUNT).orElse(0);
 			return MAX_BOUGHT_COUNT > countBought;
 		}
 		return false;
 	}
 
-	@Override public void onPlayerFatalHurt(GalleryPlayer player, DamageEvent event, LivingEntity enemy) {
-		player.getPlayer().playEffect(EntityEffect.TOTEM_RESURRECT);
+	@Override
+	public void onPlayerFatalHurt(GalleryPlayer galleryPlayer, DamageEvent event, @Nullable LivingEntity enemy) {
+		Player player = galleryPlayer.getPlayer();
+		if (player == null) {
+			return;
+		}
+		player.playEffect(EntityEffect.TOTEM_RESURRECT);
 		event.setCancelled(true);
-		PlayerUtils.healPlayer(GalleryManager.mPlugin, player.getPlayer(), EntityUtils.getMaxHealth(player.getPlayer()));
-		GalleryManager.mPlugin.mTimers.updateCooldowns(player.getPlayer(), 0);
-		clear(player);
+		PlayerUtils.healPlayer(GalleryManager.mPlugin, player, EntityUtils.getMaxHealth(player));
+		GalleryManager.mPlugin.mTimers.updateCooldowns(player, 0);
+		clear(galleryPlayer);
 	}
 }

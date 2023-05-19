@@ -19,15 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,9 +47,9 @@ public class Rewind extends Spell {
 	private final Location mCenter;
 	private final ChargeUpManager mWindUp;
 	private final ChargeUpManager mWindDown;
-	private TealSpirit mTeal;
-	private SpellManager mActiveSpells;
-	private List<Spell> mPassiveSpells;
+	private final TealSpirit mTeal;
+	private final SpellManager mActiveSpells;
+	private final List<Spell> mPassiveSpells;
 
 	public Rewind(LivingEntity boss, Location center, TealSpirit tealSpirit, SpellManager activeSpells, List<Spell> passiveSpells) {
 		mBoss = boss;
@@ -57,8 +57,8 @@ public class Rewind extends Spell {
 		mTeal = tealSpirit;
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
-		mWindUp = new ChargeUpManager(mBoss, CHARGE_TIME, ChatColor.AQUA + "Winding Up...", BarColor.RED, BarStyle.SOLID, TealSpirit.detectionRange);
-		mWindDown = new ChargeUpManager(mBoss, REWIND_TIME, ChatColor.AQUA + "Turning Back Time...", BarColor.RED, BarStyle.SOLID, TealSpirit.detectionRange);
+		mWindUp = new ChargeUpManager(mBoss, CHARGE_TIME, Component.text("Winding Up...", NamedTextColor.AQUA), BossBar.Color.RED, BossBar.Overlay.PROGRESS, TealSpirit.detectionRange);
+		mWindDown = new ChargeUpManager(mBoss, REWIND_TIME, Component.text("Turning Back Time...", NamedTextColor.AQUA), BossBar.Color.RED, BossBar.Overlay.PROGRESS, TealSpirit.detectionRange);
 	}
 
 	@Override

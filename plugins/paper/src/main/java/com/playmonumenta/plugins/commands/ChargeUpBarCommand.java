@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.AdventureChargeUpManager;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.AdventureChatComponentArgument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
@@ -45,14 +45,14 @@ public class ChargeUpBarCommand {
 				int range = (int) args[6];
 				Component title = (Component) args[7];
 
-				AdventureChargeUpManager chargeUp = new AdventureChargeUpManager(entity, maxValue, title,
+				ChargeUpManager chargeUp = new ChargeUpManager(entity, maxValue, title,
 					BossBar.Color.valueOf(color), BossBar.Overlay.valueOf(style), range);
 
 				boolean descending = direction.equals("descending");
 				chargeUp.setTime(startValue);
 				new BukkitRunnable() {
 					final boolean mDescending = descending;
-					final AdventureChargeUpManager mChargeUp = chargeUp;
+					final ChargeUpManager mChargeUp = chargeUp;
 					@Override
 					public void run() {
 						if (mDescending) {

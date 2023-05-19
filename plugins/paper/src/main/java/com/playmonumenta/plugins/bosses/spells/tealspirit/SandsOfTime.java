@@ -16,17 +16,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -44,6 +44,7 @@ public class SandsOfTime extends Spell {
 	private static final String ROOT_EFFECT = "SandsOfTimePercentSpeedEffect";
 	private static final String RED_TEAM = "SandsOfTimeRed";
 	private static final String BLUE_TEAM = "SandsOfTimeBlue";
+	private static final String SPELL_NAME = "Sands of Time";
 
 	private final LivingEntity mBoss;
 	private final Location mCenter;
@@ -61,7 +62,7 @@ public class SandsOfTime extends Spell {
 		mDamage = damage;
 		mNormalTeam = team;
 		mBellTime = bellTime;
-		mChargeUp = new ChargeUpManager(mCenter, mBoss, 4 * mBellTime, ChatColor.BLUE + "Channeling Sands of Time...", BarColor.BLUE, BarStyle.SOLID, TealSpirit.detectionRange);
+		mChargeUp = new ChargeUpManager(mCenter, mBoss, 4 * mBellTime, Component.text("Channeling " + SPELL_NAME + "...", NamedTextColor.BLUE), BossBar.Color.BLUE, BossBar.Overlay.PROGRESS, TealSpirit.detectionRange);
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class SandsOfTime extends Spell {
 		mBoss.setAI(false);
 		mBoss.setGravity(false);
 
-		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "now the very sands of time will be unleashed!"));
+		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(Component.text("now the very sands of time will be unleashed!", NamedTextColor.DARK_AQUA)));
 
 		List<Location> locs = new ArrayList<>();
 		locs.add(mCenter.clone().add(RADIUS, HEIGHT, 0));
@@ -102,7 +103,7 @@ public class SandsOfTime extends Spell {
 					mBoss.teleport(loc);
 					SandsColor sandsColor = sandsColors.get(i);
 					mChargeUp.setColor(sandsColor.mBarColor);
-					mChargeUp.setTitle(sandsColor.mChatColor + "Channeling Sands of Time...");
+					mChargeUp.setTitle(Component.text("Channeling " + SPELL_NAME + "...", sandsColor.mTextColor));
 					sandsColor.mTeam.addEntity(mBoss);
 
 					for (Player player : PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true)) {
@@ -185,7 +186,6 @@ public class SandsOfTime extends Spell {
 						double length = move.length();
 						for (double r = 0; r <= length; r += 0.3 + 0.2 * length) {
 							new PartialParticle(Particle.REDSTONE, current.clone().add(move.clone().normalize().multiply(r)), 1, new Particle.DustOptions(sandsColor.mColor, 2.5f))
-
 								.spawnAsEntityActive(mBoss);
 						}
 						current.add(move);
@@ -235,7 +235,7 @@ public class SandsOfTime extends Spell {
 					// Within 2 blocks or 45 degrees in either direction
 					// 0.7071 = sqrt(2) / 2
 					if (playerLoc.distanceSquared(mCenter) < 2 * 2 || dir.clone().setY(0).normalize().dot(LocationUtils.getDirectionTo(playerLoc, mCenter).setY(0).normalize()) >= 0.7071) {
-						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mDamage, null, false, false, "Sands of Time");
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mDamage, null, false, false, SPELL_NAME);
 						sandsColor.applyEffects(player);
 					}
 				}
@@ -268,20 +268,20 @@ public class SandsOfTime extends Spell {
 	}
 
 	private enum SandsColor {
-		RED(Color.RED, ChatColor.RED, BarColor.RED, ScoreboardUtils.getExistingTeamOrCreate(RED_TEAM, NamedTextColor.DARK_RED), 0.5f, 0, null),
-		BLUE(Color.BLUE, ChatColor.BLUE, BarColor.BLUE, ScoreboardUtils.getExistingTeamOrCreate(BLUE_TEAM, NamedTextColor.BLUE), 0.354f, BLUE_DELAY, p -> Plugin.getInstance().mEffectManager.addEffect(p, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT)));
+		RED(Color.RED, NamedTextColor.RED, BossBar.Color.RED, ScoreboardUtils.getExistingTeamOrCreate(RED_TEAM, NamedTextColor.DARK_RED), 0.5f, 0, null),
+		BLUE(Color.BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, ScoreboardUtils.getExistingTeamOrCreate(BLUE_TEAM, NamedTextColor.BLUE), 0.354f, BLUE_DELAY, p -> Plugin.getInstance().mEffectManager.addEffect(p, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT)));
 
 		private final Color mColor;
-		private final ChatColor mChatColor;
-		private final BarColor mBarColor;
+		private final TextColor mTextColor;
+		private final BossBar.Color mBarColor;
 		private final Team mTeam;
 		private final float mPitch;
 		private final int mDelay;
 		private final @Nullable Consumer<Player> mOnHitEffect;
 
-		SandsColor(Color color, ChatColor chatColor, BarColor barColor, Team team, float pitch, int delay, @Nullable Consumer<Player> onHitEffect) {
+		SandsColor(Color color, TextColor chatColor, BossBar.Color barColor, Team team, float pitch, int delay, @Nullable Consumer<Player> onHitEffect) {
 			mColor = color;
-			mChatColor = chatColor;
+			mTextColor = chatColor;
 			mBarColor = barColor;
 			mTeam = team;
 			mPitch = pitch;

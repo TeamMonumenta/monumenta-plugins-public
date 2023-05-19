@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.imperialconstruct;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
+import com.playmonumenta.plugins.bosses.bosses.ImperialConstruct;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -9,14 +10,11 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,13 +23,13 @@ public class SpellSteelboreSpread extends Spell {
 
 	private final String ABILITY_NAME = "Steelbore Spread";
 	private final int CAST_TIME = 20 * 7;
-	private int mRadius;
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private ChargeUpManager mChargeUp;
-	private Location mStartLoc;
-	private int mRange;
-	private double mDamage;
+	private final int mRadius;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final ChargeUpManager mChargeUp;
+	private final Location mStartLoc;
+	private final int mRange;
+	private final double mDamage;
 
 	public SpellSteelboreSpread(Plugin plugin, LivingEntity boss, int radius, Location startLoc, int range, double damage) {
 		mPlugin = plugin;
@@ -40,8 +38,7 @@ public class SpellSteelboreSpread extends Spell {
 		mStartLoc = startLoc;
 		mRange = range;
 		mDamage = damage;
-		mChargeUp = new ChargeUpManager(mBoss, CAST_TIME, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + ABILITY_NAME,
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
+		mChargeUp = ImperialConstruct.defaultChargeUp(mBoss, CAST_TIME, ABILITY_NAME, mRange);
 	}
 
 	@Override
@@ -129,12 +126,6 @@ public class SpellSteelboreSpread extends Spell {
 							}
 						}
 						new PartialParticle(Particle.VILLAGER_ANGRY, p.getLocation().clone().add(0, 2, 0), 1, 0.35, 0, 0.35, 0.05).spawnAsEntityActive(mBoss);
-						/*
-						PPCircle indicator2 = new PPCircle(Particle.REDSTONE, p.getLocation(), 0).ringMode(true).count(2).delta(0.25, 0.1, 0.25).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.65f));
-						for (double r = 1; r < AOE_RADIUS; r++) {
-							indicator2.radius(r).location(p.getLocation()).spawnAsBoss();
-						}
-						*/
 						if (notifyPlayer) {
 							new PPCircle(Particle.REDSTONE, p.getLocation().add(0, 0.25, 0), mRadius).count(30).delta(0.1, 0.05, 0.1).data(new Particle.DustOptions(Color.fromRGB(225, 55, 55), 1.65f)).spawnAsBoss();
 							new PPCircle(Particle.FLAME, p.getLocation().add(0, 0.25, 0), mRadius).count(10).delta(0.1, 0.05, 0.1).spawnAsBoss();

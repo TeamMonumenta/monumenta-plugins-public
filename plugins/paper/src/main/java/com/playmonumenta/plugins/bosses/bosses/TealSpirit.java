@@ -14,7 +14,7 @@ import com.playmonumenta.plugins.bosses.spells.tealspirit.Rewind;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.RewriteHistory;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.SandsOfTime;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.SundialSlash;
-import com.playmonumenta.plugins.bosses.spells.tealspirit.SuspendedBallistae;
+import com.playmonumenta.plugins.bosses.spells.tealspirit.SuspendedBolt;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.TealAntiCheat;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.TealSpiritSummon;
 import com.playmonumenta.plugins.bosses.spells.tealspirit.TemporalRift;
@@ -109,7 +109,7 @@ public class TealSpirit extends BossAbilityGroup {
 			mHealth = 6000;
 
 			activeSpells = new SpellManager(Arrays.asList(
-				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 50,
+				new SuspendedBolt(mBoss, mPlugin, 25, 5, 50,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5),
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 90),
@@ -147,7 +147,7 @@ public class TealSpirit extends BossAbilityGroup {
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 5, 80,
+				new SuspendedBolt(mBoss, mPlugin, 25, 5, 80,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
@@ -164,7 +164,7 @@ public class TealSpirit extends BossAbilityGroup {
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 150),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 4, 80,
+				new SuspendedBolt(mBoss, mPlugin, 25, 4, 80,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 
@@ -241,7 +241,7 @@ public class TealSpirit extends BossAbilityGroup {
 				new TemporalRift(mBoss, mSpawnLoc, 15 * 20),
 				new PairedUnnaturalForce(mPlugin, mBoss, mSpawnLoc, 0, 15, 30, 80),
 				new SundialSlash(mBoss, 7 * 20),
-				new SuspendedBallistae(mBoss, mPlugin, 25, 3, 50,
+				new SuspendedBolt(mBoss, mPlugin, 25, 3, 50,
 					20 * 6, 20 * 2, 20 * 1, mSpawnLoc, 5)
 			));
 

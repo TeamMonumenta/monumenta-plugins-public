@@ -15,21 +15,33 @@ public class GallerySpeedEffect extends GalleryStackableEffect {
 		super(GalleryEffectType.SPEED);
 	}
 
-	@Override public void playerGainEffect(GalleryPlayer player) {
-		super.playerGainEffect(player);
-		EntityUtils.addAttribute(player.getPlayer(), Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+	@Override
+	public void playerGainEffect(GalleryPlayer galleryPlayer) {
+		super.playerGainEffect(galleryPlayer);
+		Player player = galleryPlayer.getPlayer();
+		if (player == null) {
+			return;
+		}
+		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
-	@Override public void playerLoseEffect(GalleryPlayer player) {
-		super.playerLoseEffect(player);
-		EntityUtils.removeAttribute(player.getPlayer(), Attribute.GENERIC_MOVEMENT_SPEED, "GallerySpeedEffect");
+	@Override
+	public void playerLoseEffect(GalleryPlayer galleryPlayer) {
+		super.playerLoseEffect(galleryPlayer);
+		Player player = galleryPlayer.getPlayer();
+		if (player == null) {
+			return;
+		}
+		EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, "GallerySpeedEffect");
 	}
 
-	@Override public int getMaxStacks() {
+	@Override
+	public int getMaxStacks() {
 		return SPEED_EFFECT_MAX_STACK;
 	}
 
-	@Override public void refresh(GalleryPlayer galleryPlayer) {
+	@Override
+	public void refresh(GalleryPlayer galleryPlayer) {
 		Player player = galleryPlayer.getPlayer();
 		if (galleryPlayer.isOnline() && player != null) {
 			EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, "GallerySpeedEffect");

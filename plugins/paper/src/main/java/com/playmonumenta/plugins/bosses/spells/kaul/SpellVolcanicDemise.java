@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,8 +29,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -46,7 +45,7 @@ import org.bukkit.util.Vector;
  * Kaul is immune to damage during the channel of this ability.
  */
 public class SpellVolcanicDemise extends Spell {
-
+	private static final String SPELL_NAME = "Volcanic Demise";
 	private static final int DAMAGE = 42;
 	private static final int METEOR_COUNT = 25;
 	private static final int METEOR_RATE = 10;
@@ -65,8 +64,8 @@ public class SpellVolcanicDemise extends Spell {
 		mRange = range;
 		mCenter = center;
 
-		mChargeUp = new ChargeUpManager(mBoss, 20 * 2, ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + ChatColor.BOLD + "Volcanic Demise...",
-			BarColor.RED, BarStyle.SEGMENTED_10, 60);
+		mChargeUp = new ChargeUpManager(mBoss, 20 * 2, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)),
+			BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 60);
 	}
 
 	@Override
@@ -97,7 +96,7 @@ public class SpellVolcanicDemise extends Spell {
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1, 0.7f);
 
 					mChargeUp.setTitle(Component.text("Unleashing ", NamedTextColor.GREEN)
-						.append(Component.text("Volcanic Demise...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
+						.append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 					BukkitRunnable runnable = new BukkitRunnable() {
 
 						@Override
@@ -105,7 +104,7 @@ public class SpellVolcanicDemise extends Spell {
 							super.cancel();
 							mChargeUp.reset();
 							mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN)
-								.append(Component.text("Volcanic Demise...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
+								.append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_RED, TextDecoration.BOLD)));
 						}
 
 						int mI = 0;
@@ -220,12 +219,12 @@ public class SpellVolcanicDemise extends Spell {
 					Hitbox hitBox = new Hitbox.UprightCylinderHitbox(mLoc, 15, HIT_RADIUS);
 					List<Player> hitPlayers = new ArrayList<>(hitBox.getHitPlayers(true));
 					for (Player player : deathBox.getHitPlayers(true)) {
-						DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, false, true, "Volcanic Demise");
+						DamageUtils.damage(mBoss, player, DamageType.BLAST, 1000, null, false, true, SPELL_NAME);
 						MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 						hitPlayers.remove(player);
 					}
 					for (Player player : hitPlayers) {
-						boolean didDamage = BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, "Volcanic Demise", mLoc);
+						boolean didDamage = BossUtils.blockableDamage(mBoss, player, DamageType.BLAST, DAMAGE, SPELL_NAME, mLoc);
 						if (didDamage) {
 							MovementUtils.knockAway(mLoc, player, 0.5f, 0.65f);
 						}

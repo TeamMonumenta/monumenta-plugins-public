@@ -10,7 +10,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -79,7 +80,7 @@ public class LootChestsInInventory implements Listener {
 			return;
 		}
 		if (!event.getCursor().getType().equals(Material.AIR)) {
-			player.sendMessage(ChatColor.DARK_RED + "You must have an empty cursor to open loot chests!");
+			player.sendMessage(Component.text("You must have an empty cursor to open loot chests!", NamedTextColor.DARK_RED));
 			event.setCancelled(true);
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return;

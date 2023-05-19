@@ -7,15 +7,15 @@ import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,15 +23,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class TealFinalStand extends Spell {
 
 	private static final String ABILITY_NAME = "Midnight Toll";
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private int mRange;
-	private int mDamage;
-	private int mHealthReduceInterval;
-	private int mHealthCastTime;
-	private int mDamageInterval;
-	private Location mSpawnLoc;
-	private ChargeUpManager mChargeHealth;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final int mRange;
+	private final int mDamage;
+	private final int mHealthReduceInterval;
+	private final int mHealthCastTime;
+	private final int mDamageInterval;
+	private final Location mSpawnLoc;
+	private final ChargeUpManager mChargeHealth;
 	private int mT = 0;
 	private int mStack = 1;
 
@@ -45,8 +45,8 @@ public class TealFinalStand extends Spell {
 		this.mDamageInterval = mDamageInterval;
 		this.mSpawnLoc = mSpawnLoc;
 
-		this.mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, ChatColor.GOLD + "Casting " + ChatColor.YELLOW + "Rewrite History",
-			BarColor.YELLOW, BarStyle.SOLID, mRange);
+		this.mChargeHealth = new ChargeUpManager(mBoss, mHealthCastTime, Component.text("Casting ", NamedTextColor.GOLD).append(Component.text("Rewrite History", NamedTextColor.YELLOW)),
+			BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange);
 	}
 
 	@Override

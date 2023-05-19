@@ -221,21 +221,17 @@ public class InventoryUtils {
 				if (item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(name)) {
 					items[i] = null;
 				} else {
-					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta) {
-						final BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
-						if (meta.getBlockState() instanceof ShulkerBox) {
-							final ShulkerBox shulker = (ShulkerBox) meta.getBlockState();
-							@Nullable ItemStack[] shulkerItems = shulker.getInventory().getContents();
-							for (int j = 0; j < shulkerItems.length; j++) {
-								if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().getDisplayName().equals(name)) {
-									shulkerItems[j] = null;
-								}
+					if (item.hasItemMeta() && item.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
+						@Nullable ItemStack[] shulkerItems = shulker.getInventory().getContents();
+						for (int j = 0; j < shulkerItems.length; j++) {
+							if (shulkerItems[j] != null && shulkerItems[j].hasItemMeta() && shulkerItems[j].getItemMeta().hasDisplayName() && MessagingUtils.plainText(shulkerItems[j].getItemMeta().displayName()).equals(name)) {
+								shulkerItems[j] = null;
 							}
-
-							shulker.getInventory().setContents(shulkerItems);
-							meta.setBlockState(shulker);
-							item.setItemMeta(meta);
 						}
+
+						shulker.getInventory().setContents(shulkerItems);
+						meta.setBlockState(shulker);
+						item.setItemMeta(meta);
 					}
 				}
 			}

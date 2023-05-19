@@ -17,18 +17,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -48,29 +47,29 @@ import org.bukkit.scoreboard.Team;
  */
 public class SpellPutridPlague extends Spell {
 	private enum Pillar {
-		RED("KaulPutridPlagueRed", NamedTextColor.RED, NamedTextColor.DARK_RED, ChatColor.RED, BarColor.RED, "Your blood begins to shiver slightly..."),
-		BLUE("KaulPutridPlagueBlue", NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, ChatColor.BLUE, BarColor.BLUE, "The water begins to ripple..."),
-		YELLOW("KaulPutridPlagueYellow", NamedTextColor.YELLOW, NamedTextColor.GOLD, ChatColor.YELLOW, BarColor.YELLOW, "You feel the temperature rise significantly..."),
-		GREEN("KaulPutridPlagueGreen", NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, ChatColor.DARK_GREEN, BarColor.GREEN, "The ground begins to vibrate...");
+		RED("KaulPutridPlagueRed", NamedTextColor.RED, NamedTextColor.DARK_RED, NamedTextColor.RED, BossBar.Color.RED, "Your blood begins to shiver slightly..."),
+		BLUE("KaulPutridPlagueBlue", NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, "The water begins to ripple..."),
+		YELLOW("KaulPutridPlagueYellow", NamedTextColor.YELLOW, NamedTextColor.GOLD, NamedTextColor.YELLOW, BossBar.Color.YELLOW, "You feel the temperature rise significantly..."),
+		GREEN("KaulPutridPlagueGreen", NamedTextColor.GREEN, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_GREEN, BossBar.Color.GREEN, "The ground begins to vibrate...");
 
 		final String mTag;
 		final NamedTextColor mTextColor;
-		final NamedTextColor mDarkTextColor;
-		final ChatColor mChatColor;
-		final BarColor mBarColor;
+		final TextColor mDarkTextColor;
+		final TextColor mTitleColor;
+		final BossBar.Color mBarColor;
 		final String mMessage;
 
-		Pillar(String tag, NamedTextColor textColor, NamedTextColor darkTextColor, ChatColor chatColor, BarColor barColor, String message) {
+		Pillar(String tag, NamedTextColor textColor, TextColor darkTextColor, TextColor titleColor, BossBar.Color barColor, String message) {
 			mTag = tag;
 			mTextColor = textColor;
 			mDarkTextColor = darkTextColor;
-			mChatColor = chatColor;
+			mTitleColor = titleColor;
 			mBarColor = barColor;
 			mMessage = message;
 		}
 	}
 
-
+	private static final String SPELL_NAME = "Putrid Plague";
 	private static final int DAMAGE = 30;
 
 	private static boolean mPlagueActive;
@@ -93,8 +92,7 @@ public class SpellPutridPlague extends Spell {
 		mPhase3 = phase3;
 		mTime = (int) (mPhase3 ? 20 * 7.5 : 20 * 9);
 
-		mChargeUp = new ChargeUpManager(mBoss, mTime, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "Putrid Plague...",
-			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
+		mChargeUp = Kaul.defaultChargeUp(mBoss, mTime, SPELL_NAME);
 	}
 
 	@Override
@@ -127,7 +125,7 @@ public class SpellPutridPlague extends Spell {
 
 			team.color(pillar.mTextColor);
 
-			mChargeUp.setTitle(ChatColor.GREEN + "Charging " + pillar.mChatColor + "Putrid Plague...");
+			mChargeUp.setTitle(Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", pillar.mDarkTextColor)));
 			mChargeUp.setColor(pillar.mBarColor);
 
 			Collection<Player> players = mKaul.getArenaParticipants();
@@ -178,7 +176,7 @@ public class SpellPutridPlague extends Spell {
 									player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20 * 30, 1));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, 1));
 									player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20 * 30, 1));
-									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, "Putrid Plague");
+									DamageUtils.damage(mBoss, player, DamageType.MAGIC, DAMAGE, null, false, true, SPELL_NAME);
 								}
 							} else {
 								new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 25, 0.25, 0.45, 0.25, 1).spawnAsEntityActive(mBoss);

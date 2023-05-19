@@ -93,7 +93,10 @@ public class GalleryGrave {
 					//Timer is out - player can no longer respawn
 					cancel();
 					removeGrave();
-					mGame.sendMessageToPlayers(mPlayer.getPlayer().getName() + " has fallen, they will be back next round.");
+					Player player = mPlayer.getPlayer();
+					if (player != null) {
+						mGame.sendMessageToPlayers(player.getName() + " has fallen, they will be back next round.");
+					}
 				}
 				mReanimationTimer -= 20;
 				mTimer += 10;

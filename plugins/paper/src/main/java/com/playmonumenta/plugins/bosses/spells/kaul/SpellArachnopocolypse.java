@@ -9,7 +9,9 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashMap;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -17,8 +19,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Spider;
@@ -27,20 +27,22 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellArachnopocolypse extends Spell {
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mDetectRange;
+	private static final String SPELL_NAME = "Arachnopocolypse";
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mDetectRange;
 	private boolean mCooldown = false;
-	private Location mSpawnLoc;
-	private ChargeUpManager mChargeUp;
+	private final Location mSpawnLoc;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellArachnopocolypse(Plugin plugin, LivingEntity boss, double detectRange, Location spawnLoc) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mDetectRange = detectRange;
 		mSpawnLoc = spawnLoc;
-		mChargeUp = new ChargeUpManager(mBoss, 45, ChatColor.GREEN + "Channeling " + ChatColor.DARK_GREEN + "Arachnopocalypse...",
-			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
+		mChargeUp = new ChargeUpManager(mBoss, 45, Component.text("Channeling ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_GREEN)),
+			BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, 50);
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public class SpellArachnopocolypse extends Spell {
 					List<Player> players = PlayerUtils.playersInRange(mSpawnLoc, mDetectRange, true);
 					players.removeIf(p -> p.getLocation().getY() >= 61);
 
-					HashMap<String, Vector> spiderLocations = new HashMap<String, Vector>();
+					HashMap<String, Vector> spiderLocations = new HashMap<>();
 					spiderLocations.put("EarthVassal", new Vector(-15, -8, -15));
 					spiderLocations.put("AirVassal", new Vector(-15, -8, 15));
 					spiderLocations.put("FireVassal", new Vector(15, -8, -15));

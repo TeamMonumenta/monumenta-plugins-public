@@ -9,15 +9,14 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -38,30 +37,32 @@ public class SpellDarkOmen extends Spell {
 	 * CURSE: the player receive double damage from all sources and -50% healing for 1 minute.
 	 */
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private Location mCenter;
-	private int mTell = 20 * 2;
-	private double mRange;
-	private double mMaxRange = 24;
-	private double mArenaRange = 42;
-	private double mVelocity = 20;
+	private static final String SPELL_NAME = "Dark Omen";
+	private static final int TELL = 20 * 2;
+	private static final double MAX_RANGE = 24;
+	private static final double ARENA_RANGE = 42;
+	private static final double VELOCITY = 20;
 	private static final Particle.DustOptions BLADE_COLOR1 = new Particle.DustOptions(Color.fromRGB(199, 0, 255), 1.0f);
 	private static final Particle.DustOptions RED = new Particle.DustOptions(Color.fromRGB(185, 0, 0), 1.0f);
-	private ChargeUpManager mChargeUp;
-	private List<Player> mDamaged = new ArrayList<Player>();
-	private PartialParticle mPSoul;
-	private PartialParticle mPSpark;
-	private PartialParticle mPSmoke;
-	private PartialParticle mPRed;
-	private PartialParticle mPBlade;
+
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final Location mCenter;
+	private final double mRange;
+	private final ChargeUpManager mChargeUp;
+	private final List<Player> mDamaged = new ArrayList<>();
+	private final PartialParticle mPSoul;
+	private final PartialParticle mPSpark;
+	private final PartialParticle mPSmoke;
+	private final PartialParticle mPRed;
+	private final PartialParticle mPBlade;
 
 	public SpellDarkOmen(Plugin plugin, LivingEntity boss, Location loc, int r) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCenter = loc;
 		mRange = r;
-		mChargeUp = new ChargeUpManager(mBoss, mTell, ChatColor.YELLOW + "Charging Dark Omen...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mChargeUp = Lich.defaultChargeUp(mBoss, TELL, "Charging " + SPELL_NAME + "...");
 		mPSoul = new PartialParticle(Particle.SOUL_FIRE_FLAME, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0);
 		mPSpark = new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.3);
 		mPSmoke = new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 100, 0.1, 0.1, 0.1, 0.2);
@@ -72,14 +73,14 @@ public class SpellDarkOmen extends Spell {
 	@Override
 	public void run() {
 		for (Player p : Lich.playersInRange(mCenter, mRange, true)) {
-			p.sendMessage(ChatColor.LIGHT_PURPLE + "THIS FLAME ETERNAL SHALL BE A PORTENT OF YOUR DEMISE!");
+			p.sendMessage(Component.text("THIS FLAME ETERNAL SHALL BE A PORTENT OF YOUR DEMISE!", NamedTextColor.LIGHT_PURPLE));
 		}
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 1.0f, 1.0f);
 
 		BukkitRunnable runA = new BukkitRunnable() {
 			double mT = 0.0;
-			List<Vector> mBasevec = new ArrayList<Vector>();
+			List<Vector> mBasevec = new ArrayList<>();
 
 			@Override
 			public void run() {
@@ -92,21 +93,21 @@ public class SpellDarkOmen extends Spell {
 				}
 				mT++;
 				//4 points swirl into center
-				if (mT < mTell) {
+				if (mT < TELL) {
 					Vector dir = new Vector(4, 0, 0);
 					float pitch = (float) (0.5 + mT / 20);
 					world.playSound(mBoss.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 5.0f, pitch);
 					for (int i = 0; i < 4; i++) {
 						Vector quad = VectorUtils.rotateYAxis(dir.clone(), 90 * i);
-						Vector qlength = quad.multiply(1 - mT / mTell);
-						Vector qdir = VectorUtils.rotateYAxis(qlength.clone(), 90 / (mT / mTell));
+						Vector qlength = quad.multiply(1 - mT / TELL);
+						Vector qdir = VectorUtils.rotateYAxis(qlength.clone(), 90 / (mT / TELL));
 						Location l = mBoss.getLocation().add(qdir).add(0, 0.5, 0);
 						mPSoul.location(l).spawnAsBoss();
 					}
 				}
 
 				//blade function
-				if (mT >= mTell || Lich.phase3over()) {
+				if (mT >= TELL || Lich.phase3over()) {
 					//clear all entries before launching blade
 					mDamaged.clear();
 
@@ -128,8 +129,7 @@ public class SpellDarkOmen extends Spell {
 	public void launchBlade(List<Vector> basevec, World world, boolean warning) {
 		//loop for each direction, starting +Z, clockwise
 		for (int i = 0; i <= 3; i++) {
-			List<Vector> vec = new ArrayList<Vector>();
-			vec.addAll(basevec);
+			List<Vector> vec = new ArrayList<>(basevec);
 
 			//rotate vectors
 			for (int j = 0; j < vec.size(); j++) {
@@ -151,15 +151,15 @@ public class SpellDarkOmen extends Spell {
 					Location anchor = startLoc.clone();
 					//iterate twice for higher accuracy
 					for (int x = 0; x < 2; x++) {
-						anchor = startLoc.clone().add(dir.clone().multiply(mVelocity / 20 * (mT + 0.5 * x)));
-						if (!warning && (anchor.distance(mCenter) > mArenaRange || anchor.distance(startLoc) > mMaxRange)) {
+						anchor = startLoc.clone().add(dir.clone().multiply(VELOCITY / 20 * (mT + 0.5 * x)));
+						if (!warning && (anchor.distance(mCenter) > ARENA_RANGE || anchor.distance(startLoc) > MAX_RANGE)) {
 							vex(anchor);
 							mPSpark.location(anchor).spawnAsBoss();
 							mPSmoke.location(anchor).spawnAsBoss();
 							world.playSound(anchor, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 3.0f, 1.5f);
 							world.playSound(anchor, Sound.ENTITY_VEX_AMBIENT, SoundCategory.HOSTILE, 5.0f, 0.75f);
 							this.cancel();
-						} else if (anchor.distance(mCenter) > mArenaRange || anchor.distance(startLoc) > mMaxRange || Lich.phase3over()) {
+						} else if (anchor.distance(mCenter) > ARENA_RANGE || anchor.distance(startLoc) > MAX_RANGE || Lich.phase3over()) {
 							this.cancel();
 						} else {
 							//construct blade
@@ -176,7 +176,7 @@ public class SpellDarkOmen extends Spell {
 
 	public void createBlade(Location startLoc, List<Vector> vec, boolean warning) {
 		World world = mBoss.getWorld();
-		List<Location> locAll = new ArrayList<Location>();
+		List<Location> locAll = new ArrayList<>();
 		//construct blade
 		for (int j = 1; j <= 2; j++) {
 			Vector v = vec.get(j);
@@ -191,7 +191,7 @@ public class SpellDarkOmen extends Spell {
 		}
 		//spawn particle + check loc
 		List<Player> players = Lich.playersInRange(mCenter, mRange, true);
-		List<Player> damage = new ArrayList<Player>();
+		List<Player> damage = new ArrayList<>();
 		for (Location l : locAll) {
 			if (warning) {
 				mPRed.location(l).spawnAsBoss();
@@ -213,7 +213,7 @@ public class SpellDarkOmen extends Spell {
 					mDamaged.add(p);
 					world.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1.0f, 1.5f);
 					world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.HOSTILE, 1.0f, 2.0f);
-					BossUtils.bossDamagePercent(mBoss, p, 0.75, "Dark Omen");
+					BossUtils.bossDamagePercent(mBoss, p, 0.75, SPELL_NAME);
 					Lich.cursePlayer(mPlugin, p, 120);
 				}
 			}

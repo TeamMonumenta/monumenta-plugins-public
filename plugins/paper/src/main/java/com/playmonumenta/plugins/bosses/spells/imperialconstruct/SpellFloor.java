@@ -8,6 +8,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -84,7 +86,7 @@ public class SpellFloor extends Spell {
 					Bukkit.getScheduler().runTask(mPlugin, () -> mDamaged.remove(p));
 				}
 				if (p.getLocation().getY() - mCurrentLoc.getY() < -6) {
-					p.sendMessage(ChatColor.GRAY + "The mechanical void sends you back up.");
+					p.sendMessage(Component.text("The mechanical void sends you back up.", NamedTextColor.GRAY));
 
 					p.playSound(p.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 1, 0);
 					new PartialParticle(Particle.FIREWORKS_SPARK, p.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);

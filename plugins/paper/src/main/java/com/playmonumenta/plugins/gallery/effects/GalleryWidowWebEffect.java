@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class GalleryWidowWebEffect extends GalleryConsumableEffect {
@@ -32,13 +33,14 @@ public class GalleryWidowWebEffect extends GalleryConsumableEffect {
 	}
 
 	@Override
-	public void onPlayerHurt(GalleryPlayer player, DamageEvent event, @Nullable LivingEntity enemy) {
-		if (mTimer <= 0 && enemy != null) {
-			new PartialParticle(Particle.SOUL, player.getPlayer().getEyeLocation()).delta(3, 1, 3).count(50).spawnAsPlayerBuff(player.getPlayer());
-			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 0.64f, 0.5f);
-			player.getPlayer().playSound(player.getPlayer().getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 2, 0.5f);
+	public void onPlayerHurt(GalleryPlayer galleryPlayer, DamageEvent event, @Nullable LivingEntity enemy) {
+		Player player = galleryPlayer.getPlayer();
+		if (mTimer <= 0 && enemy != null && player != null) {
+			new PartialParticle(Particle.SOUL, player.getEyeLocation()).delta(3, 1, 3).count(50).spawnAsPlayerBuff(player);
+			player.playSound(player.getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 0.64f, 0.5f);
+			player.playSound(player.getEyeLocation(), Sound.ENTITY_SPIDER_DEATH, SoundCategory.HOSTILE, 2, 0.5f);
 			mTimer = EFFECT_COOLDOWN;
-			for (LivingEntity le : EntityUtils.getNearbyMobs(player.getPlayer().getLocation(), EFFECT_STUN_RADIUS)) {
+			for (LivingEntity le : EntityUtils.getNearbyMobs(player.getLocation(), EFFECT_STUN_RADIUS)) {
 				EntityUtils.applyStun(GalleryManager.mPlugin, EFFECT_STUN_DURATION, le);
 			}
 		}

@@ -15,10 +15,10 @@ import org.bukkit.entity.LivingEntity;
 public class MinionSpawn extends Spell {
 
 	private int mTimer = 0;
-	private int mDuration = 20 * 8;
-	private int mMultiplier;
+	private final int mDuration;
+	private final int mMultiplier;
 
-	private LivingEntity mBoss;
+	private final LivingEntity mBoss;
 	private Location mCurrentLoc;
 
 	private final List<String> mMobs = Arrays.asList("AutomatedLyrata", "AutomatedVanguard");

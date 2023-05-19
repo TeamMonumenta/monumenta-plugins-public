@@ -178,10 +178,10 @@ public class GalleryCommands {
 				if (game == null) {
 					throw CommandAPI.failWithString("Could not detect game");
 				}
+				if (type == null) {
+					throw CommandAPI.failWithString("Invalid gallery effect type");
+				}
 				for (Player entity : (Collection<Player>) args[3]) {
-					if (game == null) {
-						game = getGameFromEntity(entity);
-					}
 					game.getGalleryPlayer(entity.getUniqueId()).giveEffect(type.newEffect());
 				}
 

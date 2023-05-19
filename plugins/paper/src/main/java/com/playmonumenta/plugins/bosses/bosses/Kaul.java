@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
@@ -42,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -1150,5 +1153,9 @@ public class Kaul extends BossAbilityGroup {
 
 	public LivingEntity getBoss() {
 		return mBoss;
+	}
+
+	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String spellName) {
+		return new ChargeUpManager(boss, chargeTime, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(spellName + "...", NamedTextColor.DARK_GREEN)), BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, detectionRange);
 	}
 }

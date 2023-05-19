@@ -8,32 +8,34 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Arrays;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class SpellSummonLavaTitan extends Spell {
 
-	private Plugin mPlugin;
-	private Location mCenter;
-	private int mPhase;
+	private final Plugin mPlugin;
+	private final Location mCenter;
+	private final int mPhase;
 
-	private List<Vector> mSummonSpots;
+	private final List<Vector> mSummonSpots;
 	private boolean mCooldown;
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellSummonLavaTitan(Plugin plugin, LivingEntity boss, Location center, int phase) {
 		mPlugin = plugin;
 		mCenter = center;
 		mPhase = phase;
-		mChargeUp = new ChargeUpManager(boss, LavaCannonBoss.chargeTime(mPhase), ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Lava Cannon...",
-			BarColor.RED, BarStyle.SEGMENTED_10, 100);
+		mChargeUp = new ChargeUpManager(boss, LavaCannonBoss.chargeTime(mPhase), chargeUpTitle("Charging"),
+			BossBar.Color.RED, BossBar.Overlay.NOTCHED_10, 100);
 
 		mSummonSpots = Arrays.asList(
 			new Vector(-3.5, 2, 28),
@@ -50,14 +52,7 @@ public class SpellSummonLavaTitan extends Spell {
 	@Override
 	public void run() {
 		mCooldown = true;
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				mCooldown = false;
-			}
-
-		}.runTaskLater(mPlugin, cooldownTicks() + 6 * 20);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> mCooldown = false, cooldownTicks() + 6 * 20);
 
 		new BukkitRunnable() {
 			int mT = 0;
@@ -99,7 +94,7 @@ public class SpellSummonLavaTitan extends Spell {
 				if (mChargeUp.nextTick(2)) {
 					this.cancel();
 
-					mChargeUp.setTitle(ChatColor.GREEN + "Unleashing " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Lava Cannon...");
+					mChargeUp.setTitle(chargeUpTitle("Unleashing"));
 					new BukkitRunnable() {
 						int mT = 0;
 
@@ -107,7 +102,7 @@ public class SpellSummonLavaTitan extends Spell {
 						public synchronized void cancel() {
 							super.cancel();
 							mChargeUp.reset();
-							mChargeUp.setTitle(ChatColor.GREEN + "Charging " + ChatColor.DARK_RED + "" + ChatColor.BOLD + "Lava Cannon...");
+							mChargeUp.setTitle(chargeUpTitle("Charging"));
 						}
 
 						@Override
@@ -142,5 +137,9 @@ public class SpellSummonLavaTitan extends Spell {
 				LibraryOfSoulsIntegration.summon(loc, "LavaTitan");
 			}
 		}.runTaskLater(mPlugin, 40);
+	}
+
+	private static Component chargeUpTitle(String firstWord) {
+		return Component.text(firstWord + " ", NamedTextColor.GREEN).append(Component.text("Lava Cannon...", NamedTextColor.DARK_RED, TextDecoration.BOLD));
 	}
 }

@@ -8,7 +8,9 @@ import com.playmonumenta.plugins.effects.PercentHealthBoost;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,9 +31,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -71,6 +71,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final String SLOWNESS_EFFECT_NAME = "KaulsJudgementSlowness";
 	private static final String STRENGTH_EFFECT_NAME = "KaulsJudgementStrength";
 	private static final String SPEED_EFFECT_NAME = "KaulsJudgementSpeed";
+	private static final String SPELL_NAME = "Kaul's Judgement";
 
 	private final Plugin mPlugin = Plugin.getInstance();
 	private final Location mBossLoc;
@@ -78,16 +79,15 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private @Nullable LivingEntity mTp = null;
 	private boolean mOnCooldown = false;
 
-	private final HashMap<Player, Location> mJudgedPlayersAndOrigins = new HashMap<Player, Location>();
+	private final HashMap<Player, Location> mJudgedPlayersAndOrigins = new HashMap<>();
 
 	private final ChargeUpManager mChargeUp;
-
 
 	public SpellKaulsJudgement(LivingEntity boss) {
 		mBoss = boss;
 		mBossLoc = boss.getLocation();
-		mChargeUp = new ChargeUpManager(boss, KAULS_JUDGEMENT_CHARGE_TIME, ChatColor.GREEN + "Charging " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement...",
-			BarColor.GREEN, BarStyle.SEGMENTED_10, 75);
+		mChargeUp = new ChargeUpManager(boss, KAULS_JUDGEMENT_CHARGE_TIME, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_GREEN, TextDecoration.BOLD)),
+			BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, 75);
 		/* Register this instance as an event handler so it can catch player events */
 		mPlugin.getServer().getPluginManager().registerEvents(this, mPlugin);
 	}
@@ -104,7 +104,6 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 				e.remove();
 			}
 		}
-
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			for (Entity e : world.getEntities()) {
@@ -150,10 +149,12 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		if (mTp == null) {
 			return;
 		}
+
+		ChargeUpManager raceTimer = new ChargeUpManager(mTp.getLocation(), null, KAULS_JUDGEMENT_TOTAL_TIME - KAULS_JUDGEMENT_CHARGE_TIME, Component.text("Escape ", NamedTextColor.RED).append(Component.text(SPELL_NAME, NamedTextColor.DARK_GREEN, TextDecoration.BOLD)),
+			BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, 75);
+
 		new BukkitRunnable() {
 			int mTicks = 0;
-			final ChargeUpManager mRaceTimer = new ChargeUpManager(mTp.getLocation(), null, KAULS_JUDGEMENT_TOTAL_TIME - KAULS_JUDGEMENT_CHARGE_TIME, ChatColor.RED + "Escape " + ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Kaul's Judgement",
-				BarColor.GREEN, BarStyle.SEGMENTED_10, 75);;
 
 			@Override
 			public void run() {
@@ -177,7 +178,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 					});
 				} else if (mTicks == KAULS_JUDGEMENT_CHARGE_TIME) {
 					mChargeUp.reset();
-					mRaceTimer.nextTick(KAULS_JUDGEMENT_TOTAL_TIME - KAULS_JUDGEMENT_CHARGE_TIME);
+					raceTimer.nextTick(KAULS_JUDGEMENT_TOTAL_TIME - KAULS_JUDGEMENT_CHARGE_TIME);
 					/* Start judgement */
 					mJudgedPlayersAndOrigins.keySet().forEach((player) -> {
 						player.addScoreboardTag(KAULS_JUDGEMENT_TAG);
@@ -205,7 +206,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						this.cancel();
 						return;
 					}
-					mRaceTimer.previousTick();
+					raceTimer.previousTick();
 					/* Judgement ticks - anyone who loses the tag early must have succeeded */
 					new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach((player) -> {
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1.5, 0), 1, 0.4, 0.4, 0.4, 0).spawnAsBoss();
@@ -214,13 +215,11 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						}
 					});
 				} else {
-					mRaceTimer.reset();
+					raceTimer.reset();
 					/* Judgement ends - anyone left in judgement fails
 					 * Make a copy to avoid concurrent modification exceptions
 					 */
-					new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach((player) -> {
-						fail(player);
-					});
+					new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach(SpellKaulsJudgement.this::fail);
 					//This shouldn't do anything, fail already clears players
 					mJudgedPlayersAndOrigins.clear();
 					this.cancel();
@@ -229,7 +228,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 
 			@Override
 			public synchronized void cancel() {
-				mRaceTimer.reset();
+				raceTimer.reset();
 				mChargeUp.reset();
 				new ArrayList<>(mJudgedPlayersAndOrigins.keySet()).forEach(p -> endCommon(p));
 				super.cancel();
@@ -244,7 +243,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 0);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.HOSTILE, 1, 0.2f);
 		new PartialParticle(Particle.FALLING_DUST, player.getLocation().add(0, 1, 0), 30, 0.3, 0.45, 0.3, 0, Material.ANVIL.createBlockData()).spawnAsBoss();
-		player.sendMessage(ChatColor.DARK_GREEN + "" + ChatColor.ITALIC + "SUCH FAILURE.");
+		player.sendMessage(Component.text("SUCH FAILURE.", NamedTextColor.DARK_GREEN, TextDecoration.ITALIC));
 
 		endCommon(player);
 	}
@@ -254,7 +253,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		mPlugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(60 * 20, 0.2, SPEED_EFFECT_NAME));
 
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 1, 1);
-		player.sendMessage(ChatColor.AQUA + "You escaped! You feel much more invigorated from your survival!");
+		player.sendMessage(Component.text("You escaped! You feel much more invigorated from your survival!", NamedTextColor.AQUA));
 
 		endCommon(player);
 	}
@@ -262,7 +261,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private void endCommon(Player player) {
 		player.removeScoreboardTag(KAULS_JUDGEMENT_TAG);
 
-		player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+		player.setHealth(EntityUtils.getMaxHealth(player));
 		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
 		if (player.getFireTicks() > 0) {
 			player.setFireTicks(1);
@@ -285,7 +284,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 			}
 		}
 		if (mTp == null) {
-			mPlugin.getLogger().severe("Failed to find Kaul's Judgement teleport marker entity. Is it loaded?");
+			MMLog.severe("Failed to find Kaul's Judgement teleport marker entity. Is it loaded?");
 		}
 		return mTp != null && !mOnCooldown;
 	}
@@ -305,12 +304,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		Player player = event.getEntity();
 		if (mJudgedPlayersAndOrigins.containsKey(player)) {
 			event.setCancelled(true);
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					fail(player);
-				}
-			}.runTaskLater(mPlugin, 1);
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> fail(player), 1);
 		}
 	}
 

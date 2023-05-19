@@ -11,7 +11,10 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -19,8 +22,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -39,20 +40,21 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 
 public class SpellRaiseJungle extends Spell {
+	private static final String SPELL_NAME = "Raise Jungle";
 	private static final BlockData PARTICLE_DATA = Material.COARSE_DIRT.createBlockData();
 	private static final int ARENA_FLOOR = 8;
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private double mSummonRange;
-	private double mDetectRange;
-	private int mSummonTime;
-	private double mY;
-	private List<UUID> mSummoned = new ArrayList<UUID>();
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final double mSummonRange;
+	private final double mDetectRange;
+	private final int mSummonTime;
+	private final double mY;
+	private final List<UUID> mSummoned = new ArrayList<>();
 
-	private int mCooldown;
+	private final int mCooldown;
 	private boolean mOnCooldown = false;
-	private ChargeUpManager mChargeUp;
+	private final ChargeUpManager mChargeUp;
 
 	public SpellRaiseJungle(Plugin plugin, LivingEntity boss, double summonRange, double detectRange, int summonTime, int cooldown) {
 		this(plugin, boss, summonRange, detectRange, summonTime, cooldown, -1);
@@ -67,8 +69,8 @@ public class SpellRaiseJungle extends Spell {
 		mCooldown = cooldown;
 		mY = y;
 
-		mChargeUp = new ChargeUpManager(mBoss, mSummonTime, ChatColor.GREEN + "Channeling " + ChatColor.DARK_GREEN + "Raise Jungle...",
-			BarColor.GREEN, BarStyle.SEGMENTED_10, 50);
+		mChargeUp = new ChargeUpManager(mBoss, mSummonTime, Component.text("Channeling ", NamedTextColor.GREEN).append(Component.text(SPELL_NAME + "...", NamedTextColor.DARK_GREEN)),
+			BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, 50);
 	}
 
 	@Override
@@ -146,18 +148,11 @@ public class SpellRaiseJungle extends Spell {
 									}
 								}
 
-								if (ele == null || ele.isDead() || !ele.isValid()) {
+								if (ele.isDead() || !ele.isValid()) {
 									this.cancel();
 									mSummoned.remove(ele.getUniqueId());
 									if (mSummoned.size() <= 0) {
-										new BukkitRunnable() {
-
-											@Override
-											public void run() {
-												mOnCooldown = false;
-											}
-
-										}.runTaskLater(mPlugin, mCooldown);
+										Bukkit.getScheduler().runTaskLater(mPlugin, () -> mOnCooldown = false, mCooldown);
 									}
 								}
 							}

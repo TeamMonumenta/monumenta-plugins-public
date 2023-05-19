@@ -13,14 +13,14 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -39,19 +39,20 @@ they are dealt an additional 50 damage and the boss is healed for 3% per marked 
 Players below 25% max health when the additional damage is dealt are instead killed instantly. -new
  */
 public class SpellDesecrate extends Spell {
+	private static final String SPELL_NAME = "Desecrate";
 
-	private Plugin mPlugin;
-	private LivingEntity mBoss;
-	private ChargeUpManager mChargeUp;
-	private PartialParticle mSmoke;
-	private PartialParticle mWitch;
-	private PartialParticle mEnch;
-	private PartialParticle mHeart;
+	private final Plugin mPlugin;
+	private final LivingEntity mBoss;
+	private final ChargeUpManager mChargeUp;
+	private final PartialParticle mSmoke;
+	private final PartialParticle mWitch;
+	private final PartialParticle mEnch;
+	private final PartialParticle mHeart;
 
 	public SpellDesecrate(Plugin plugin, LivingEntity boss) {
 		mPlugin = plugin;
 		mBoss = boss;
-		mChargeUp = new ChargeUpManager(mBoss, 50, ChatColor.YELLOW + "Channeling Desecrate...", BarColor.YELLOW, BarStyle.SOLID, 50);
+		mChargeUp = Lich.defaultChargeUp(mBoss, 50, "Channeling " + SPELL_NAME + "...");
 		mSmoke = new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation(), 2, 0.35, 0, 0.35, 0.005);
 		mWitch = new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation(), 3, 0.4, 0.4, 0.4, 0);
 		mEnch = new PartialParticle(Particle.ENCHANTMENT_TABLE, mBoss.getLocation(), 1, 0.1, 0.1, 0.1, 0.1);
@@ -89,8 +90,8 @@ public class SpellDesecrate extends Spell {
 				if (mRadius <= 0 || Lich.phase3over()) {
 					List<Player> players = Lich.playersInRange(loc, 12, true);
 					players.removeAll(SpellDimensionDoor.getShadowed());
-					mChargeUp.setTitle(ChatColor.YELLOW + "Casting Desecrate...");
-					mChargeUp.setColor(BarColor.RED);
+					mChargeUp.setTitle(Component.text("Casting " + SPELL_NAME + "...", NamedTextColor.YELLOW));
+					mChargeUp.setColor(BossBar.Color.RED);
 					for (Player player : players) {
 						mSmoke.location(player.getLocation()).spawnAsBoss();
 						mWitch.location(player.getLocation().add(0, 1, 0)).spawnAsBoss();
@@ -110,7 +111,7 @@ public class SpellDesecrate extends Spell {
 						@Override
 						public void run() {
 							mChargeUp.setProgress(1 - mRadius / 15.0d);
-							List<Player> toRemove = new ArrayList<Player>();
+							List<Player> toRemove = new ArrayList<>();
 							for (Player p : players) {
 								Location pLoc = p.getLocation().add(0, 1, 0);
 								Location shiftBossLoc = mBossLoc.clone().add(0, 1.6f, 0);
@@ -148,7 +149,7 @@ public class SpellDesecrate extends Spell {
 								}
 								//fail to escape
 								if (pHoriLoc.distance(mBossLoc) < mRadius) {
-									DamageUtils.damage(mBoss, p, DamageType.MAGIC, 65, null, false, true, "Desecrate");
+									DamageUtils.damage(mBoss, p, DamageType.MAGIC, 65, null, false, true, SPELL_NAME);
 									MovementUtils.knockAway(mBoss.getLocation(), p, 0.5f, false);
 									world.playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1.0f, 0.75f);
 									world.playSound(mBossLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 2.0f, 0.5f);
@@ -165,8 +166,8 @@ public class SpellDesecrate extends Spell {
 							if (mRadius >= 15 || Lich.phase3over()) {
 								this.cancel();
 								mChargeUp.reset();
-								mChargeUp.setTitle(ChatColor.YELLOW + "Charging Desecrate...");
-								mChargeUp.setColor(BarColor.YELLOW);
+								mChargeUp.setTitle(Component.text("Charging " + SPELL_NAME + "...", NamedTextColor.YELLOW));
+								mChargeUp.setColor(BossBar.Color.YELLOW);
 							}
 						}
 

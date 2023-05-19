@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.gallery.effects;
 import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.gallery.GalleryPlayer;
+import org.bukkit.entity.Player;
 
 public class GalleryEnlightenmentEffect extends GalleryConsumableEffect {
 
@@ -11,10 +12,14 @@ public class GalleryEnlightenmentEffect extends GalleryConsumableEffect {
 	}
 
 	@Override
-	public void tick(GalleryPlayer player, boolean oneSecond, boolean twoHertz, int ticks) {
-		super.tick(player, oneSecond, twoHertz, ticks);
+	public void tick(GalleryPlayer galleryPlayer, boolean oneSecond, boolean twoHertz, int ticks) {
+		super.tick(galleryPlayer, oneSecond, twoHertz, ticks);
 		if (twoHertz) {
-			EffectManager.getInstance().addEffect(player.getPlayer(), "GalleryEnlightenmentEffect", new AbilityCooldownDecrease(20, 0.2).displays(false));
+			Player player = galleryPlayer.getPlayer();
+			if (player == null) {
+				return;
+			}
+			EffectManager.getInstance().addEffect(player, "GalleryEnlightenmentEffect", new AbilityCooldownDecrease(20, 0.2).displays(false));
 		}
 	}
 }

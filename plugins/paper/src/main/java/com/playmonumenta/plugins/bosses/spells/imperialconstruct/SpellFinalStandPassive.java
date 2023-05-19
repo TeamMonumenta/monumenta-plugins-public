@@ -17,12 +17,12 @@ public class SpellFinalStandPassive extends Spell {
 
 	private static final int DAMAGE_PER_SECOND = 50;
 	private int mTimer = 0;
-	private int mInterval = 10;
-	private int mMaxRadius = 30;
+	private final int mInterval = 10;
+	private final int mMaxRadius = 30;
 
-	private LivingEntity mBoss;
-	private int mRadius;
-	private Location mCenter;
+	private final LivingEntity mBoss;
+	private final int mRadius;
+	private final Location mCenter;
 
 	public SpellFinalStandPassive(LivingEntity boss, int radius, Location center) {
 		mBoss = boss;

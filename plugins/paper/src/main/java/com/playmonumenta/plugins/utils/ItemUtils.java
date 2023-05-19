@@ -29,8 +29,6 @@ import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -46,10 +44,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -624,42 +619,10 @@ public class ItemUtils {
 		return ((BookMeta) itemMeta).getAuthor();
 	}
 
-	public static ItemStack createTippedArrows(PotionType type, int amount, PotionData data) {
-		ItemStack stack = new ItemStack(Material.TIPPED_ARROW, amount);
-
-		PotionMeta meta = (PotionMeta)stack.getItemMeta();
-		meta.setBasePotionData(data);
-		stack.setItemMeta(meta);
-
-		return stack;
-	}
-
-	public static ItemStack createStackedPotions(PotionEffectType type, int amount, int duration, int amplifier, String name) {
-		ItemStack stack = new ItemStack(Material.SPLASH_POTION, amount);
-
-		PotionMeta meta = (PotionMeta)stack.getItemMeta();
-
-		meta.setDisplayName(ChatColor.RESET + name);
-		meta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
-		meta.setColor(type.getColor());
-		stack.setItemMeta(meta);
-		ItemUtils.setPlainName(stack);
-
-		return stack;
-	}
-
 	public static void addPotionEffect(ItemStack potion, PotionInfo info) {
 		PotionMeta meta = (PotionMeta)potion.getItemMeta();
 		meta.addCustomEffect(new PotionEffect(info.mType, info.mDuration, info.mAmplifier, false, true), false);
 		potion.setItemMeta(meta);
-	}
-
-	public static void setPotionMeta(ItemStack potion, String name, Color color) {
-		PotionMeta meta = (PotionMeta)potion.getItemMeta();
-		meta.setDisplayName(ChatColor.RESET + name);
-		meta.setColor(color);
-		potion.setItemMeta(meta);
-		ItemUtils.setPlainName(potion);
 	}
 
 	public static boolean isShootableItem(ItemStack item, boolean excludeRiptide) {
