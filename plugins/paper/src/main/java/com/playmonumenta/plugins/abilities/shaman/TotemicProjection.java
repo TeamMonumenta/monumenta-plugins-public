@@ -5,22 +5,20 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -34,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.util.Vector;
 
 public class TotemicProjection extends Ability {
 
@@ -112,7 +111,6 @@ public class TotemicProjection extends Ability {
 
 		if (stats != null) {
 			Location dropCenter = proj.getLocation();
-			List<LivingEntity> theTotems = TotemicEmpowerment.getTotemList(mPlayer);
 			mPlayer.playSound(dropCenter, Sound.BLOCK_VINE_BREAK, 2.0f, 1.0f);
 			new PartialParticle(Particle.REVERSE_PORTAL, dropCenter, 20).spawnAsPlayerActive(mPlayer);
 			mPlayer.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 1.0f, 1.7f);
@@ -125,20 +123,40 @@ public class TotemicProjection extends Ability {
 			}
 
 
-			double dist = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, DISTRIBUTION_RADIUS);
-			for (LivingEntity totem : theTotems) {
-				for (TotemType t : TotemType.values()) {
-					if (t.mName.equals(totem.getName())) {
-						Location loc = dropCenter.clone().add(t.mX * dist, 0.5, t.mZ * dist);
-						if (loc.getBlock().isPassable()) {
-							totem.teleport(loc);
-						} else {
-							totem.teleport(dropCenter);
-						}
-						break;
+			List<LivingEntity> totems = TotemicEmpowerment.getTotemList(mPlayer);
+			if (totems.size() == 1) {
+				LivingEntity totem = totems.get(0);
+				Location loc = dropCenter.clone().add(0, 0.5, 0);
+				if (loc.getBlock().isPassable()) {
+					totem.teleport(loc);
+				} else {
+					totem.teleport(dropCenter);
+				}
+			} else if (totems.size() > 1) {
+				double dist = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, DISTRIBUTION_RADIUS);
+				Vector forward = dropCenter.getDirection().setY(0).normalize().multiply(dist);
+				int currentDeg;
+				switch (totems.size()) {
+					case 2 -> currentDeg = -90;
+					case 3 -> currentDeg = -60;
+					default -> currentDeg = -45;
+				}
+				int degIncrement = 360 / totems.size();
+				for (LivingEntity totem : totems) {
+					Vector dir = VectorUtils.rotateYAxis(forward, currentDeg);
+					Location locLower = dropCenter.clone().add(dir);
+					Location loc = locLower.clone().add(0, 0.5, 0);
+					if (loc.getBlock().isPassable()) {
+						totem.teleport(loc);
+					} else if (locLower.getBlock().isPassable()) {
+						totem.teleport(locLower);
+					} else {
+						totem.teleport(dropCenter);
 					}
+					currentDeg += degIncrement;
 				}
 			}
+
 			if (isLevelTwo()) {
 				double radius = CharmManager.getRadius(mPlayer, CHARM_DAMAGE_RADIUS, RADIUS);
 				List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobsInSphere(dropCenter, radius, null);
@@ -148,24 +166,6 @@ public class TotemicProjection extends Ability {
 					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 				}
 			}
-		}
-	}
-
-	private enum TotemType {
-		FLAME(FlameTotem.TOTEM_NAME, 1, 1),
-		CLEANSING(CleansingTotem.TOTEM_NAME, 1, -1),
-		LIGHTNING(LightningTotem.TOTEM_NAME, -1, -1),
-		WHIRLWIND(WhirlwindTotem.TOTEM_NAME, -1, 1),
-		DECAYED(DecayedTotem.TOTEM_NAME, -1, 1);
-
-		private final String mName;
-		private final int mX;
-		private final int mZ;
-
-		TotemType(String name, int x, int z) {
-			mName = name;
-			mX = x;
-			mZ = z;
 		}
 	}
 }
