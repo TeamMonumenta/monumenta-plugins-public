@@ -204,7 +204,11 @@ public class ChestOverride extends BaseOverride {
 	// If this returns true, the caller should return false and stop processing the chest
 	private boolean commandChest(Block block) {
 		if (block.getState() instanceof Chest chest) {
-			String name = MessagingUtils.plainText(chest.customName());
+			Component customName = chest.customName();
+			if (customName == null) {
+				return false;
+			}
+			String name = MessagingUtils.plainText(customName);
 			if (name.equalsIgnoreCase("trap") || name.equalsIgnoreCase("function")) {
 				// This is a function chest - run it!
 				// Run the first command block found in the 10 blocks under this block
