@@ -11,13 +11,13 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		return new TrainingDummyBoss(plugin, boss);
 	}
 
-	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellRunAction(() -> {
@@ -76,10 +76,9 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			return;
 		}
 
-		String damageString = damageToString(damage);
-
 		if (source instanceof Player player) {
-			player.sendMessage(ChatColor.GOLD + "Damage: " + ChatColor.RED + damageString);
+			String damageString = damageToString(damage);
+			player.sendMessage(Component.text("Damage: ", NamedTextColor.GOLD).append(Component.text(damageString, NamedTextColor.RED)));
 
 			if (mHologram == null) {
 				mHologram = (ArmorStand) mBoss.getWorld().spawnEntity(mBoss.getEyeLocation().add(0, 0.5, 0), EntityType.ARMOR_STAND);
@@ -186,5 +185,12 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 		mDPSDisp = -1;
 		mDPSDisp10s = -1;
 		mMaxDPS = -1;
+	}
+
+	@Override
+	public void death(@Nullable EntityDeathEvent event) {
+		if (event != null) {
+			event.setDroppedExp(0);
+		}
 	}
 }
