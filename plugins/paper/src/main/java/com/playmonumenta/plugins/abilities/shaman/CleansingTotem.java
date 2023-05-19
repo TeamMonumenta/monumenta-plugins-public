@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -72,8 +71,9 @@ public class CleansingTotem extends TotemAbility {
 					StringUtils.ticksToSeconds(DURATION_1),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),
-				String.format("Duration is increased to %ss and now cleanses debuffs for players twice during the duration.",
-					StringUtils.ticksToSeconds(DURATION_2))
+				String.format("Duration is increased to %ss and now cleanses debuffs for players %s times evenly throughout it's duration.",
+					StringUtils.ticksToSeconds(DURATION_2),
+					CLEANSES)
 			)
 			.simpleDescription("Summon a totem that heals and cleanses players over its duration.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)

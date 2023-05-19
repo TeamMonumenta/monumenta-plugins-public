@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -26,7 +25,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class DesecratingShot extends Ability {
-	private static final int COOLDOWN = 6 * 20;
+	private static final int COOLDOWN = 4 * 20;
 	private static final double DAMAGE_1 = 0.3;
 	private static final double DAMAGE_2 = 0.5;
 	private static final double WEAKNESS_1 = 0.15;
@@ -46,11 +45,11 @@ public class DesecratingShot extends Ability {
 			.scoreboardId("DesecratingShot")
 			.shorthandName("DS")
 			.descriptions(
-				String.format("Your projectiles now deal an extra %s%% of your projectile damage as magic damage to the target, and apply %s%% weaken in a %s block radius for %ss. %ss cooldown.",
-					StringUtils.multiplierToPercentage(DAMAGE_1),
+				String.format("Upon hitting a mob with a fully charge projectile, apply %s%% weakness for %ss and deal %s%% magic damage of the projectile's damage in a %s block radius. %ss cooldown.",
 					StringUtils.multiplierToPercentage(WEAKNESS_1),
-					RADIUS,
 					StringUtils.ticksToSeconds(WEAKNESS_DURATION),
+					StringUtils.multiplierToPercentage(DAMAGE_1),
+					RADIUS,
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Damage is increased to %s%% of your bow shot and weaken increased to %s%%.",
@@ -82,7 +81,6 @@ public class DesecratingShot extends Ability {
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (!isOnCooldown() && event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			putOnCooldown();
-			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
 
 			World world = enemy.getWorld();
 			Location loc = enemy.getLocation();
@@ -96,6 +94,7 @@ public class DesecratingShot extends Ability {
 
 			List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(loc, mRadius);
 			for (LivingEntity mob : affectedMobs) {
+				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, event.getDamage() * mDamagePercent, ClassAbility.DESECRATING_SHOT, false, true);
 				EntityUtils.applyWeaken(mPlugin, mDuration, mWeaknessPercent, mob);
 				new BukkitRunnable() {
 					int mTicks = 0;

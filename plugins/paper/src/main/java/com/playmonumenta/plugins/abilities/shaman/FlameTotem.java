@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -36,8 +35,8 @@ public class FlameTotem extends TotemAbility {
 	private static final int DURATION_2 = 12 * 20;
 	private static final int AOE_RANGE = 6;
 	private static final int FIRE_DURATION = 2 * 20;
-	private static final int DAMAGE_1 = 3;
-	private static final int DAMAGE_2 = 4;
+	private static final int DAMAGE_1 = 4;
+	private static final int DAMAGE_2 = 5;
 	public static final String TOTEM_NAME = "Flame Totem";
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);

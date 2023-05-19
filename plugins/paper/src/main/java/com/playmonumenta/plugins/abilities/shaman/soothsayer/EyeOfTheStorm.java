@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -39,7 +38,7 @@ public class EyeOfTheStorm extends Ability {
 	public static final int RADIUS = 5;
 	public static final int DAMAGE_1 = 3;
 	public static final int DAMAGE_2 = 5;
-	public static final double PULL_STRENGTH = 0.1;
+	public static final double PULL_STRENGTH = 0.15;
 	private static final double VELOCITY = 2;
 
 	public static final String CHARM_COOLDOWN = "Eye of the Storm Cooldown";

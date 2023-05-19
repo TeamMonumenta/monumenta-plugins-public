@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Material;
@@ -26,11 +25,12 @@ public class AdhesiveTotems extends Ability {
 					On hit, this now does special effects for each type of totem.
 					Flame Totem: Deal an extra pulse of damage if the stuck mob dies.
 					Cleansing Totem: Apply %s%% weaken for %s seconds to the stuck mob.
-					Lightning Totem: Attacks mobs excluding the stuck mob unless it is the only one.
+					Lightning Totem: Attacks mobs excluding the stuck mob unless it is the only one, and deals %s%% damage to the stuck mob if not attacking it.
 					Whirlwind Totem: Silence the stuck mob for %s seconds.
 					Decayed Totem: Apply Decay %s to the stuck mob for %s seconds.""",
 					StringUtils.multiplierToPercentage(CleansingTotem.WEAKNESS_PERCENT),
 					StringUtils.ticksToSeconds(CleansingTotem.WEAKNESS_DURATION),
+					StringUtils.multiplierToPercentage(LightningTotem.STUCK_DAMAGE_PERCENT),
 					StringUtils.ticksToSeconds(WhirlwindTotem.SILENCE_DURATION),
 					DecayedTotem.DECAY_LEVEL,
 					StringUtils.ticksToSeconds(DecayedTotem.DECAY_DURATION)

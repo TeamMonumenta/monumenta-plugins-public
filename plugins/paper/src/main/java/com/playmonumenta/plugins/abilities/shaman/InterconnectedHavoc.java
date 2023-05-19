@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -23,8 +22,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class InterconnectedHavoc extends Ability {
-	private static final int DAMAGE_1 = 6;
-	private static final int DAMAGE_2 = 8;
+	private static final int DAMAGE_1 = 4;
+	private static final int DAMAGE_2 = 6;
 	private static final int RANGE_1 = 8;
 	private static final int RANGE_2 = 14;
 
@@ -76,12 +75,16 @@ public class InterconnectedHavoc extends Ability {
 				if (!startPoint.getWorld().equals(endPoint.getWorld()) || startPoint.distance(endPoint) >= mRange) {
 					continue;
 				}
-				new PPLine(Particle.ENCHANTMENT_TABLE, startPoint, endPoint).countPerMeter(10).spawnAsPlayerActive(mPlayer);
-				List<LivingEntity> targetMobs = EntityUtils.getMobsInLine(startPoint, endPoint, 0.75);
+				List<LivingEntity> targetMobs = EntityUtils.getMobsInLine(startPoint, endPoint, 0.5);
 				targetMobs.removeIf(mHitMobs::contains);
 				for (LivingEntity mob : targetMobs) {
 					mHitMobs.add(mob);
 					DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, ClassAbility.INTERCONNECTED_HAVOC, false, false);
+				}
+				if (targetMobs.isEmpty()) {
+					new PPLine(Particle.ENCHANTMENT_TABLE, startPoint, endPoint).countPerMeter(10).spawnAsPlayerActive(mPlayer);
+				} else {
+					new PPLine(Particle.DAMAGE_INDICATOR, startPoint, endPoint).countPerMeter(4).spawnAsPlayerActive(mPlayer);
 				}
 			}
 		}

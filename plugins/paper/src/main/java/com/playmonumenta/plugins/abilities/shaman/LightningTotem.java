@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLightning;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -38,9 +37,10 @@ public class LightningTotem extends TotemAbility {
 	private static final int COOLDOWN = 20 * 20;
 	private static final int TOTEM_DURATION = 10 * 20;
 	private static final int INTERVAL = 2 * 20;
-	private static final int AOE_RANGE = 6;
-	private static final int DAMAGE_1 = 12;
-	private static final int DAMAGE_2 = 20;
+	private static final int AOE_RANGE = 7;
+	private static final int DAMAGE_1 = 14;
+	private static final int DAMAGE_2 = 23;
+	public static final double STUCK_DAMAGE_PERCENT = 0.5;
 	public static String TOTEM_NAME = "Lightning Totem";
 	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
 
@@ -124,6 +124,9 @@ public class LightningTotem extends TotemAbility {
 				DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 				PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
 					.count(8).duration(3);
+				if (!mTarget.equals(mMobStuckWithEffect)) {
+					DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage * STUCK_DAMAGE_PERCENT, true, false, false);
+				}
 				mPlayer.getWorld().playSound(mTarget.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
 				lightning.init(4, 2.5, 0.3, 0.3);
 				lightning.spawnAsPlayerActive(mPlayer);

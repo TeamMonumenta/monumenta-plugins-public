@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -27,11 +26,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class Devastation extends Ability {
-	public static final int COOLDOWN = 20 * 20;
-	public static final int RADIUS_1 = 5;
+	public static final int COOLDOWN = 15 * 20;
+	public static final int RADIUS_1 = 6;
 	public static final int RADIUS_2 = 8;
-	public static final int DAMAGE_1 = 24;
-	public static final int DAMAGE_2 = 30;
+	public static final int DAMAGE_1 = 23;
+	public static final int DAMAGE_2 = 28;
 
 	public static final String CHARM_DAMAGE = "Devastation Damage";
 	public static final String CHARM_RADIUS = "Devastation Radius";

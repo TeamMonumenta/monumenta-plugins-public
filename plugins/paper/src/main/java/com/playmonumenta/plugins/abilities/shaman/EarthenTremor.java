@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -38,13 +37,13 @@ import org.bukkit.util.Vector;
 
 public class EarthenTremor extends Ability {
 	public static final String ABILITY_NAME = "Earthen Tremor";
-	public static final int COOLDOWN_1 = 24 * 20;
-	public static final int COOLDOWN_2 = 16 * 20;
+	public static final int COOLDOWN_1 = 20 * 20;
+	public static final int COOLDOWN_2 = 14 * 20;
 	public static final int DELAY = 20;
 	public static final int RADIUS = 6;
 	public static final double KNOCKBACK = 0.8;
-	public static final int DAMAGE_1 = 9;
-	public static final int DAMAGE_2 = 12;
+	public static final int DAMAGE_1 = 10;
+	public static final int DAMAGE_2 = 14;
 
 	public static String CHARM_COOLDOWN = "Earthen Tremor Cooldown";
 	public static String CHARM_DAMAGE = "Earthen Tremor Damage";

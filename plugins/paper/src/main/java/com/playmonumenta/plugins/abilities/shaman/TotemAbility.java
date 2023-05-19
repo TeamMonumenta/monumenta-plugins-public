@@ -10,13 +10,13 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Map;
 import java.util.WeakHashMap;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -47,6 +47,9 @@ public abstract class TotemAbility extends Ability {
 	public void cast() {
 		if (isOnCooldown()) {
 			return;
+		}
+		if (mTotemTickingRunnable != null) {
+			mTotemTickingRunnable.cancel();
 		}
 
 		World world = mPlayer.getWorld();
@@ -132,15 +135,12 @@ public abstract class TotemAbility extends Ability {
 
 		TotemicEmpowerment.addTotem(mPlayer, stand);
 
-		ArmorStand durationStand = (ArmorStand) world.spawnEntity(bLoc, EntityType.ARMOR_STAND);
-		durationStand.setMarker(true);
-		durationStand.setInvisible(true);
-		durationStand.setInvulnerable(true);
-		durationStand.setCustomNameVisible(true);
-		durationStand.setGravity(false);
-		durationStand.setSmall(true);
-		durationStand.setBasePlate(false);
-		durationStand.setCollidable(false);
+		ArmorStand durationStand = (ArmorStand) LibraryOfSoulsIntegration.summon(bLoc, "TotemDurationStand");
+		if (durationStand != null) {
+			durationStand.setMarker(true);
+			durationStand.customName(Component.text(""));
+			durationStand.setCustomNameVisible(true);
+		}
 
 		int duration = getTotemDuration();
 		mTotemTickingRunnable = new BukkitRunnable() {
