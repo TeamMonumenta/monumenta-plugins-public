@@ -144,6 +144,10 @@ public class Shattered implements Infusion {
 	 * @return Whether the item now has more Shattered levels than before
 	 */
 	public static boolean shatter(ItemStack item, int numLevels) {
+		if (ItemStatUtils.hasEnchantment(item, ItemStatUtils.EnchantmentType.DELETE_ON_SHATTER)) {
+			item.setAmount(0);
+			return false;
+		}
 		int oldLevel = ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED);
 		if (oldLevel >= MAX_LEVEL) {
 			return false;

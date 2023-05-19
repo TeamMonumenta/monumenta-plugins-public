@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Alchemist;
@@ -580,6 +579,7 @@ public class ItemStatUtils {
 		HIDE_ENCHANTS(new HideEnchants(), false, false, false, false),
 		HIDE_INFO(new HideInfo(), false, false, false, false),
 		NO_GLINT(new NoGlint(), false, false, false, false),
+		DELETE_ON_SHATTER(null, "DeleteOnShatter", false, false, false, false),
 		// Crit Calcs (defaults to value of 1, always active. DO NOT GIVE TO PLAYERS VIA ENCHANT)
 		ANTI_CRIT_SCALING(new AntiCritScaling(), false, false, false, false),
 		CRIT_SCALING(new CritScaling(), false, false, false, false),
@@ -654,7 +654,8 @@ public class ItemStatUtils {
 				       || this == HIDE_ATTRIBUTES
 				       || this == HIDE_ENCHANTS
 				       || this == HIDE_INFO
-				       || this == NO_GLINT;
+				       || this == NO_GLINT
+				       || this == DELETE_ON_SHATTER;
 		}
 
 		public Component getDisplay(int level) {

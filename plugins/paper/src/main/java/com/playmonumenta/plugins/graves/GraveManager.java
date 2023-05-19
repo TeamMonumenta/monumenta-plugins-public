@@ -261,13 +261,15 @@ public class GraveManager {
 				if (ItemStatUtils.getInfusionLevel(item.mItem, ItemStatUtils.InfusionType.HOPE) <= 0) {
 					Shattered.shatter(item.mItem, Shattered.DROPPED_ITEM_DESTROYED);
 				}
-				item.mManager.mGraves.add(new Grave(item));
-				item.mManager.mPlayer.sendMessage(Component.text("An item you dropped at ", NamedTextColor.RED)
-					.append(Component.text(item.mLocation.getBlockX() + "," + item.mLocation.getBlockY() + "," + item.mLocation.getBlockZ()))
-					.append(Component.text(" was destroyed. A grave will keep it safe for you. "))
-					.append(Component.text("(/help death for more info)")
-						.clickEvent(ClickEvent.runCommand("/help death")))
-				);
+				if (item.mItem.getAmount() > 0) {
+					item.mManager.mGraves.add(new Grave(item));
+					item.mManager.mPlayer.sendMessage(Component.text("An item you dropped at ", NamedTextColor.RED)
+						.append(Component.text(item.mLocation.getBlockX() + "," + item.mLocation.getBlockY() + "," + item.mLocation.getBlockZ()))
+						.append(Component.text(" was destroyed. A grave will keep it safe for you. "))
+						.append(Component.text("(/help death for more info)")
+							.clickEvent(ClickEvent.runCommand("/help death")))
+					);
+				}
 			}
 			item.mManager.mThrownItems.remove(item);
 		}
