@@ -232,6 +232,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatCommands.registerCharmCommand();
 		ItemStatCommands.registerConsumeCommand();
 		ItemStatCommands.registerRemoveCommand();
+		ItemStatCommands.registerColorCommand();
 		UpdateChestItems.register();
 		PlayerItemStatsGUICommand.register(this);
 		AuditLogCommand.register();

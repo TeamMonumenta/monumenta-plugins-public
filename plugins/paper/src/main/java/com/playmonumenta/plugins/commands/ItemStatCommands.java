@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -61,16 +62,10 @@ public class ItemStatCommands {
 			ms[i] = masterworkRaw[i].getName();
 		}
 
-		ItemStatUtils.Location[] locationsRaw = ItemStatUtils.Location.values();
-		String[] locations = new String[locationsRaw.length];
-		for (int i = 0; i < locations.length; i++) {
-			locations[i] = locationsRaw[i].getName();
-		}
-
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new StringArgument("region").replaceSuggestions(ArgumentSuggestions.strings(regions)));
 		arguments.add(new StringArgument("tier").replaceSuggestions(ArgumentSuggestions.strings(tiers)));
-		arguments.add(new StringArgument("location").replaceSuggestions(ArgumentSuggestions.strings(locations)));
+		arguments.add(getLocationArgument());
 		arguments.add(new StringArgument("masterwork").replaceSuggestions(ArgumentSuggestions.strings(ms)));
 
 		new CommandAPICommand("editinfo").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
@@ -362,14 +357,8 @@ public class ItemStatCommands {
 	public static void registerNameCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editname");
 
-		ItemStatUtils.Location[] locationsRaw = ItemStatUtils.Location.values();
-		String[] locations = new String[locationsRaw.length];
-		for (int i = 0; i < locations.length; i++) {
-			locations[i] = locationsRaw[i].getName();
-		}
-
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("location").replaceSuggestions(ArgumentSuggestions.strings(info -> locations)));
+		arguments.add(getLocationArgument());
 
 		new CommandAPICommand("editname").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			ItemStack item = getHeldItemAndSendErrors(player);
@@ -671,6 +660,25 @@ public class ItemStatCommands {
 		}).register();
 	}
 
+	public static void registerColorCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.color");
+
+		new CommandAPICommand("color").withPermission(perms).withArguments(getLocationArgument()).executes((sender, args) -> {
+			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+			Component message = Component.empty().append(location.getDisplay()).append(Component.text(" (" + location.getColor().asHexString() + ")")).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString()));
+			sender.sendMessage(message);
+		}).register();
+
+		new CommandAPICommand("color").withPermission(perms).withArguments(new LiteralArgument("list")).executes((sender, args) -> {
+			Component message = Component.empty();
+			for (ItemStatUtils.Location location : ItemStatUtils.Location.values()) {
+				message = message.append(Component.text(location.getName(), location.getColor()).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString())));
+				message = message.append(Component.text(" "));
+			}
+			sender.sendMessage(message);
+		}).register();
+	}
+
 	private static @Nullable ItemStack getHeldItemAndSendErrors(Player player) {
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			player.sendMessage(Component.text("Must be in creative mode to use this command!", NamedTextColor.RED));
@@ -682,6 +690,16 @@ public class ItemStatCommands {
 			return null;
 		}
 		return item;
+	}
+
+	private static Argument<String> getLocationArgument() {
+		ItemStatUtils.Location[] locationsRaw = ItemStatUtils.Location.values();
+		String[] locations = new String[locationsRaw.length];
+		for (int i = 0; i < locations.length; i++) {
+			locations[i] = locationsRaw[i].getName();
+		}
+
+		return new StringArgument("location").replaceSuggestions(ArgumentSuggestions.strings(locations));
 	}
 
 }
