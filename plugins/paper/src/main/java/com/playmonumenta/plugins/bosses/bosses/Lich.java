@@ -1488,7 +1488,7 @@ public final class Lich extends BossAbilityGroup {
 
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 			List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
-			SongManager.playBossSong(players, new SongManager.Song("epic:music.hekawtp4", SoundCategory.RECORDS, 239, true, 1, 1, true), true, mBoss, true, 0, 5);
+			SongManager.playBossSong(players, new SongManager.Song("epic:music.hekawtp4", SoundCategory.MUSIC, 239, true, 1, 1, true), true, mBoss, true, 0, 5);
 		}, 20 * 3 + 15);
 
 		// haha surprise fuck you I'm not dead dialogues
@@ -2051,7 +2051,7 @@ public final class Lich extends BossAbilityGroup {
 		mBoss.setHealth(MAX_HEALTH);
 		mBoss.setPersistent(true);
 
-		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song("epic:music.hekawt", SoundCategory.RECORDS, 355, true, 1, 1, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(playersInRange(mStart.getLocation(), detectionRange, true), new SongManager.Song("epic:music.hekawt", SoundCategory.MUSIC, 355, true, 1, 1, true), true, mBoss, true, 0, 5);
 	}
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String text) {

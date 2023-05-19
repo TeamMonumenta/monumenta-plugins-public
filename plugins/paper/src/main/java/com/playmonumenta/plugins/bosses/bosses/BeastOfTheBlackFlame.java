@@ -293,7 +293,7 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 	@Override
 	public void init() {
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.MUSIC, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 		int playerCount = players.size();
 		double bossTargetHp = BASE_HEALTH * BossUtils.healthScalingCoef(playerCount, 0.5, 0.5);
 

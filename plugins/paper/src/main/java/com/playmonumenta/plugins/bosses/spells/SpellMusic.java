@@ -79,7 +79,7 @@ public class SpellMusic extends Spell {
 	}
 
 	private SongManager.Song getSong() {
-		return new SongManager.Song(mTrack, SoundCategory.RECORDS, mDuration / 20.0, true, mVolume, 1);
+		return new SongManager.Song(mTrack, SoundCategory.MUSIC, mDuration / 20.0, true, mVolume, 1);
 	}
 
 	private void play(Player player) {
