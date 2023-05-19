@@ -19,6 +19,8 @@ import com.playmonumenta.plugins.depths.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
 import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.fishing.FishingCombatManager;
+import com.playmonumenta.plugins.fishing.FishingManager;
 import com.playmonumenta.plugins.gallery.GalleryCommands;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.infinitytower.TowerCommands;
@@ -230,6 +232,7 @@ public class Plugin extends JavaPlugin {
 		ItemStatCommands.registerEnchCommand();
 		ItemStatCommands.registerAttrCommand();
 		ItemStatCommands.registerCharmCommand();
+		ItemStatCommands.registerFishCommand();
 		ItemStatCommands.registerConsumeCommand();
 		ItemStatCommands.registerRemoveCommand();
 		ItemStatCommands.registerColorCommand();
@@ -459,7 +462,13 @@ public class Plugin extends JavaPlugin {
 			    || ServerProperties.getShardName().startsWith("dev")) {
 			GalleryCommands.register();
 			manager.registerEvents(new GalleryManager(this), this);
+		}
 
+		if (ServerProperties.getShardName().contains("ring")
+			|| ServerProperties.getShardName().startsWith("dev")) {
+			FishingCombatManager fishingCombatManager = new FishingCombatManager();
+			manager.registerEvents(fishingCombatManager, this);
+			manager.registerEvents(new FishingManager(fishingCombatManager), this);
 		}
 
 		//TODO Move the logic out of Plugin and into it's own class that derives off Runnable, a Timer class of some type.

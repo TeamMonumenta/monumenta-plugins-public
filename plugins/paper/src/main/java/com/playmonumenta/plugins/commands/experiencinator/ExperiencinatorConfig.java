@@ -12,6 +12,9 @@ import com.playmonumenta.scriptedquests.Plugin;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import com.playmonumenta.scriptedquests.quests.components.QuestPrerequisites;
 import com.playmonumenta.scriptedquests.utils.JsonUtils;
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -396,41 +399,107 @@ public final class ExperiencinatorConfig {
 
 	public static class ConversionRates {
 
-		private final Map<String, Map<Tier, Integer>> mRates = new HashMap<>();
+		private final Map<String, Map<Tier, ConversionRate>> mRates = new HashMap<>();
 
 		private ConversionRates(JsonElement element) throws IllegalStateException {
 			JsonObject object = element.getAsJsonObject();
 			for (Entry<String, JsonElement> entry : object.entrySet()) {
 				String conversionName = entry.getKey();
-				Map<Tier, Integer> rates = new EnumMap<>(Tier.class);
+				Map<Tier, ConversionRate> rates = new EnumMap<>(Tier.class);
 				mRates.put(conversionName, rates);
 				JsonObject conversionRatesObject = entry.getValue().getAsJsonObject();
 				for (Entry<String, JsonElement> tierEntry : conversionRatesObject.entrySet()) {
 					Tier tier = parseItemTier(tierEntry.getKey());
-					int value = tierEntry.getValue().getAsInt();
+					ConversionRate value;
+					if (tierEntry.getValue().isJsonPrimitive()) {
+						value = new StaticConversionRate(tierEntry.getValue().getAsInt());
+					} else {
+						Entry<String, JsonElement> rate = tierEntry.getValue().getAsJsonObject().entrySet().iterator().next();
+						value = new DynamicConversionRate(rate.getKey(), rate.getValue().getAsJsonObject());
+					}
 					rates.put(tier, value);
 				}
 			}
 		}
 
-		public @Nullable Integer getRate(@Nullable String conversionRateName, Tier tier) {
+		public @Nullable ConversionRate getRate(@Nullable String conversionRateName, Tier tier) {
 			if (conversionRateName == null) {
 				return null;
 			}
-			Map<Tier, Integer> tierMap = mRates.get(conversionRateName);
+			Map<Tier, ConversionRate> tierMap = mRates.get(conversionRateName);
 			if (tierMap == null) {
 				return null;
 			}
 			return tierMap.get(tier);
 		}
 
-		public @Nullable Map<Tier, Integer> getRates(@Nullable String conversionRateName) {
+		public @Nullable Map<Tier, ConversionRate> getRates(@Nullable String conversionRateName) {
 			if (conversionRateName == null) {
 				return null;
 			}
 			return mRates.get(conversionRateName);
 		}
 
+	}
+
+	public interface ConversionRate {
+		String getDescription();
+
+		int getValue(ItemStack item);
+	}
+
+	public static class StaticConversionRate implements ConversionRate {
+		public final int mRate;
+
+		private StaticConversionRate(int rate) {
+			mRate = rate;
+		}
+
+		@Override
+		public String getDescription() {
+			return "" + mRate;
+		}
+
+		@Override
+		public int getValue(ItemStack item) {
+			return mRate;
+		}
+	}
+
+	public static class DynamicConversionRate implements ConversionRate {
+		private final String[] mTagPath;
+		private final Map<String, Integer> mRates = new HashMap<>();
+
+		private DynamicConversionRate(String tagPath, JsonObject json) {
+			mTagPath = tagPath.split("\\.");
+			for (Entry<String, JsonElement> e : json.entrySet()) {
+				mRates.put(e.getKey(), e.getValue().getAsInt());
+			}
+		}
+
+		@Override
+		public String getDescription() {
+			return mRates.values().stream().mapToInt(i -> i).min().orElse(0) + " to " + mRates.values().stream().mapToInt(i -> i).max().orElse(0);
+		}
+
+		@Override
+		public int getValue(ItemStack item) {
+			NBTCompound nbt = new NBTItem(item);
+			for (int i = 0; i < mTagPath.length - 1; i++) {
+				String tag = mTagPath[i];
+				nbt = nbt.getCompound(tag);
+				if (nbt == null) {
+					return 0;
+				}
+			}
+			String leaf = mTagPath[mTagPath.length - 1];
+			NBTType type = nbt.getType(leaf);
+			if (type == null) {
+				return 0;
+			}
+			String tagValue = type == NBTType.NBTTagString ? nbt.getString(leaf) : "" + nbt.getInteger(leaf);
+			return mRates.getOrDefault(tagValue, 0);
+		}
 	}
 
 	public static class ConversionResult {
@@ -468,7 +537,7 @@ public final class ExperiencinatorConfig {
 			if (lootTableElement != null) {
 				String lootTable = lootTableElement.getAsString();
 				ItemStack item = InventoryUtils.getItemFromLootTable(lootTableLocation, NamespacedKeyUtils.fromString(lootTable));
-				if (item == null) {
+				if (item == null || item.getType() == Material.AIR) {
 					throw new Exception("No items in loot table '" + lootTable + "'");
 				}
 				mItem = item;

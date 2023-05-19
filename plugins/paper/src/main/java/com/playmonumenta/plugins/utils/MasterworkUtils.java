@@ -62,6 +62,8 @@ public class MasterworkUtils {
 
 	private static final String GODSPORE_MAT = "epic:r3/godspore/items/fungal_remnants";
 
+	private static final String FISH_MAT = "epic:r3/items/fishing/sand_dollar";
+
 	// Exalted Dungeons
 	private static final String WHITE_MAT = "epic:r1/delves/white/auxiliary/delve_material";
 	private static final String ORANGE_MAT = "epic:r1/delves/orange/auxiliary/delve_material";
@@ -161,6 +163,16 @@ public class MasterworkUtils {
 		GODSPORE_SEVENA("godspore_7a", GODSPORE_MAT, 32, FORTITUDE_AUGMENT, 16),
 		GODSPORE_SEVENB("godspore_7b", GODSPORE_MAT, 32, POTENCY_AUGMENT, 16),
 		GODSPORE_SEVENC("godspore_7c", GODSPORE_MAT, 32, ALACRITY_AUGMENT, 16),
+
+		FISH_ONE("fishing_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		FISH_TWO("fishing_2", FISH_MAT, 4, HYPER_ARCHOS_RING, 3),
+		FISH_THREE("fishing_3", FISH_MAT, 4, HYPER_ARCHOS_RING, 4),
+		FISH_FOUR("fishing_4", FISH_MAT, 8, HYPER_ARCHOS_RING, 4),
+		FISH_FIVE("fishing_5", FISH_MAT, 8, HYPER_ARCHOS_RING, 4),
+		FISH_SIX("fishing_6", FISH_MAT, 12, HYPER_ARCHOS_RING, 4),
+		FISH_SEVENA("fishing_7a", FISH_MAT, 20, FORTITUDE_AUGMENT, 16),
+		FISH_SEVENB("fishing_7b", FISH_MAT, 20, POTENCY_AUGMENT, 16),
+		FISH_SEVENC("fishing_7c", FISH_MAT, 20, ALACRITY_AUGMENT, 16),
 
 		TRUENORTH_ONE("truenorth_1", "epic:r3/items/currency/godtree_carving", 4, HYPER_ARCHOS_RING, 1),
 		TRUENORTH_TWO("truenorth_2", PULSATING_DIAMOND, 2, HYPER_ARCHOS_RING, 3),

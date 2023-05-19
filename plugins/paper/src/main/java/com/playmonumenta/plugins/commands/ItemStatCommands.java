@@ -354,6 +354,33 @@ public class ItemStatCommands {
 			.register();
 	}
 
+	public static void registerFishCommand() {
+		CommandPermission perms = CommandPermission.fromString("monumenta.command.editfish");
+
+		new CommandAPICommand("editfish")
+			.withPermission(perms)
+			.withSubcommand(
+				new CommandAPICommand("quality")
+					.withArguments(new IntegerArgument("amount", 0, 5))
+					.executesPlayer((player, args) -> {
+						ItemStack item = getHeldItemAndSendErrors(player);
+						if (item == null) {
+							return;
+						}
+						Integer quality = (Integer) args[0];
+
+						if (quality > 0) {
+							ItemStatUtils.setFishQuality(item, quality);
+						} else {
+							ItemStatUtils.removeFishQuality(item);
+						}
+
+						ItemStatUtils.generateItemStats(item);
+					})
+			)
+		.register();
+	}
+
 	public static void registerNameCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editname");
 

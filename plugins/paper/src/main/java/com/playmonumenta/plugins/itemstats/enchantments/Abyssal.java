@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class Abyssal implements Enchantment {
 			return;
 		}
 		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ABYSSAL);
-		if (EntityUtils.isInWater(enemy) || EntityUtils.isInWater(player)) {
+		if (EntityUtils.isInWater(enemy) || EntityUtils.isInWater(player) || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ABYSSAL_FORCED)) {
 			double multiplier = 1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level);
 			event.setDamage(event.getDamage() * multiplier);
 		}

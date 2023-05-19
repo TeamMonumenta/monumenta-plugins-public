@@ -88,6 +88,7 @@ public class ItemStatUtils {
 	static final String ATTRIBUTE_NAME_KEY = "AttributeName";
 	static final String CHARM_KEY = "CharmText";
 	static final String CHARM_POWER_KEY = "CharmPower";
+	static final String FISH_QUALITY_KEY = "FishQuality";
 	static final String AMOUNT_KEY = "Amount";
 	public static final String EFFECT_TYPE_KEY = "EffectType";
 	static final String EFFECT_DURATION_KEY = "EffectDuration";
@@ -170,6 +171,7 @@ public class ItemStatUtils {
 		LEGACY("legacy", Component.text("Legacy", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
 		CURRENCY("currency", Component.text("Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
 		EVENT_CURRENCY("event_currency", Component.text("Event Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
+		FISH("fish", Component.text("Fish", TextColor.fromHexString("#1DCC9A")).decoration(TextDecoration.ITALIC, false)),
 		KEYTIER("key", Component.text("Key", TextColor.fromHexString("#47B6B5")).decoration(TextDecoration.ITALIC, false)),
 		TROPHY("trophy", Component.text("Trophy", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
@@ -360,6 +362,7 @@ public class ItemStatUtils {
 		INDIGO("indigo", "item name color", TextColor.fromHexString("#6F00FF")),
 		MIDBLUE("midblue", "itemnamecolor", TextColor.fromHexString("#366EF8")),
 		STARPOINT("starpoint", "new expansion :pog:", TextColor.fromHexString("#342768")),
+		FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 		ALCHEMIST(new Alchemist()),
 		CLERIC(new Cleric()),
 		MAGE(new Mage()),
@@ -1453,6 +1456,31 @@ public class ItemStatUtils {
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
 
+	public static void setFishQuality(final ItemStack item, final int level) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound fishQuality = nbt.addCompound(MONUMENTA_KEY);
+		fishQuality.setInteger(FISH_QUALITY_KEY, level);
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
+	public static void removeFishQuality(final ItemStack item) {
+		if (item.getType() == Material.AIR) {
+			return;
+		}
+		NBTItem nbt = new NBTItem(item);
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return;
+		}
+		monumenta.removeKey(FISH_QUALITY_KEY);
+
+		item.setItemMeta(nbt.getItem().getItemMeta());
+	}
+
 	public static int getCharmPower(final ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;
@@ -1466,6 +1494,21 @@ public class ItemStatUtils {
 			return 0;
 		}
 		return monumenta.getInteger(CHARM_POWER_KEY);
+	}
+
+	public static int getFishQuality(final ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return 0;
+		}
+		return getFishQuality(new NBTItem(item));
+	}
+
+	public static int getFishQuality(final NBTItem nbt) {
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (monumenta == null) {
+			return 0;
+		}
+		return monumenta.getInteger(FISH_QUALITY_KEY);
 	}
 
 	public static @Nullable PlayerClass getCharmClass(NBTList<String> charmLore) {
@@ -2320,6 +2363,15 @@ public class ItemStatUtils {
 					}
 				}
 
+				if (isFish(item)) {
+					int fishQuality = getFishQuality(item);
+					if (fishQuality > 0) {
+						String starString = "★".repeat(fishQuality) + "☆".repeat(5 - fishQuality);
+						TextColor color = fishQuality == 5 ? TextColor.fromHexString("#28FACC") : TextColor.fromHexString("#1DCC9A");
+						lore.add(Component.text("Fish Quality : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, color)).decoration(TextDecoration.ITALIC, false));
+					}
+				}
+
 				if (masterwork != null && masterwork != Masterwork.NONE) {
 					lore.add(Component.text("Masterwork : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(masterwork.getDisplay()));
 				}
@@ -2524,6 +2576,10 @@ public class ItemStatUtils {
 			return true;
 		}
 		return false;
+	}
+
+	public static boolean isFish(@Nullable ItemStack item) {
+		return getTier(item) == Tier.FISH;
 	}
 
 	// Returns true if the item has mainhand attack damage OR doesn't have mainhand projectile damage (i.e. any ranged weapon that is not also a melee weapon)

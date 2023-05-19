@@ -99,7 +99,7 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				if (conversionRates == null) {
 					continue;
 				}
-				Map<Tier, Integer> tierRates = conversionRates.getRates(conversionRateName);
+				Map<Tier, ExperiencinatorConfig.ConversionRate> tierRates = conversionRates.getRates(conversionRateName);
 				if (tierRates == null) {
 					continue;
 				}
@@ -184,8 +184,9 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 					continue;
 				}
 				String conversionRateName = mExperiencinator.getConversionRates().get(region);
-				Integer rawAmount = conversionRates.getRate(conversionRateName, tier);
-				if (rawAmount == null) { // current Experiencinator does not support this option: display it with an unspecified amount
+				ExperiencinatorConfig.ConversionRate conversionRate = conversionRates.getRate(conversionRateName, tier);
+				int rawAmount = conversionRate instanceof ExperiencinatorConfig.StaticConversionRate staticConversionRate ? staticConversionRate.mRate : 0;
+				if (conversionRate == null) { // current Experiencinator does not support this option: display it with an unspecified amount
 					rawAmount = -1;
 				}
 
@@ -203,13 +204,16 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 
 				List<Component> lore = new ArrayList<>();
 				lore.add(Component.text("Will convert ", NamedTextColor.AQUA).append(Component.text(region.getPlainDisplay() + tier.getPlainDisplay(), NamedTextColor.WHITE)));
-				lore.add(Component.text("items to ", NamedTextColor.AQUA).append(Component.text((rawAmount < 0 ? "" : amount + " ") + (rawAmount > 0 && amount == 1 ? conversionResult.getNameSingular() : conversionResult.getName()), NamedTextColor.GOLD)).append(Component.text(".", NamedTextColor.AQUA)));
+				lore.add(Component.text("items to ", NamedTextColor.AQUA)
+					         .append(Component.text((rawAmount < 0 ? "" : rawAmount == 0 && conversionRate != null ? conversionRate.getDescription() + " " : amount + " ")
+						                                + (rawAmount > 0 && amount == 1 ? conversionResult.getNameSingular() : conversionResult.getName()), NamedTextColor.GOLD))
+					         .append(Component.text(".", NamedTextColor.AQUA)));
 				if (rawAmount < 0) {
 					lore.add(Component.text("This conversion is not available", NamedTextColor.GRAY, TextDecoration.ITALIC));
 					lore.add(Component.text("for the " + mExperiencinator.getName() + ",", NamedTextColor.GRAY, TextDecoration.ITALIC));
 					lore.add(Component.text("thus it will not convert items of this type.", NamedTextColor.GRAY, TextDecoration.ITALIC));
 				}
-				ItemStack item = GUIUtils.createBasicItem(conversionResult.getItem().getType(), amount, Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)), lore, false);
+				ItemStack item = GUIUtils.createBasicItem(conversionResult.getItem().getType(), Math.max(1, amount), Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)), lore, false);
 
 				ItemUtils.setPlainName(item, ItemUtils.getPlainNameIfExists(conversionResult.getItem()));
 				ItemUtils.setPlainLore(item, List.of("This is a placeholder item."));

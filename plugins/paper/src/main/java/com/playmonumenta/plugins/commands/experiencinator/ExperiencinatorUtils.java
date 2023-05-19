@@ -128,8 +128,8 @@ public abstract class ExperiencinatorUtils {
 					continue;
 				}
 				String conversionRateName = conversionRateNames.get(region);
-				Integer sellValue = conversionRates.getRate(conversionRateName, tier);
-				if (sellValue == null) { // cannot convert items of this tier with this conversion
+				ExperiencinatorConfig.ConversionRate sellRate = conversionRates.getRate(conversionRateName, tier);
+				if (sellRate == null) { // cannot convert items of this tier with this conversion
 					continue;
 				}
 				if (!canConvert(item)) { // item is modified by player (infused etc.)
@@ -137,6 +137,10 @@ public abstract class ExperiencinatorUtils {
 				}
 				List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
 				if (conversionResults == null || conversionResults.stream().anyMatch(res -> res.getItem().isSimilar(item))) { // no result, or item is a result item itself
+					continue;
+				}
+				int sellValue = sellRate.getValue(item);
+				if (sellValue <= 0) {
 					continue;
 				}
 
@@ -325,12 +329,16 @@ public abstract class ExperiencinatorUtils {
 		if (conversionRates == null) {
 			return false;
 		}
-		Integer value = conversionRates.getRate(conversionRateName, tier);
-		if (value == null) {
+		ExperiencinatorConfig.ConversionRate rate = conversionRates.getRate(conversionRateName, tier);
+		if (rate == null) {
 			return false;
 		}
 		List<ExperiencinatorConfig.ConversionResult> conversionResults = conversion.getConversionResults(region);
 		if (conversionResults == null || conversionResults.stream().anyMatch(res -> res.getItem().isSimilar(item))) {
+			return false;
+		}
+		int value = rate.getValue(item);
+		if (value <= 0) {
 			return false;
 		}
 

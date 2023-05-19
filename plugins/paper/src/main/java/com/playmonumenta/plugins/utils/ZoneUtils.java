@@ -52,7 +52,8 @@ public class ZoneUtils {
 		LOOTROOM("Lootroom"),
 		MONUMENT("Monument"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
-		BLITZ("Blitz");
+		BLITZ("Blitz"),
+		ABYSSAL_FORCED("Abyssal Forced");
 
 		private final String mPropertyName;
 

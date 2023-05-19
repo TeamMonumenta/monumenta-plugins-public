@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.guis.FishingDifficultyGui;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -171,7 +172,20 @@ public class CustomInventoryCommands {
 				new TowerGuiShowMobs(player).openInventory(player, plugin);
 			})
 			.register();
-
+		new CommandAPICommand("openfishingdifficultygui")
+			.withPermission("monumenta.command.openfishingdifficultygui")
+			.executesPlayer((player, args) -> {
+				new FishingDifficultyGui(player).open();
+			})
+			.register();
+		new CommandAPICommand("openfishingdifficultygui")
+			.withPermission("monumenta.command.openfishingdifficultygui")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.executes((sender, args) -> {
+				Player player = (Player) args[0];
+				new FishingDifficultyGui(player).open();
+			})
+			.register();
 		new CommandAPICommand("openclassgui")
 			.withPermission("monumenta.command.openclassgui")
 			.executesPlayer((player, args) -> {
