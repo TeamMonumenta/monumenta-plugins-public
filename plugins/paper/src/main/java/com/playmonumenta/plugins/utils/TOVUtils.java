@@ -26,7 +26,11 @@ public class TOVUtils {
 	public static boolean canBreak(Plugin plugin, Player player, Block block, BlockBreakEvent event) {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Chest chest) {
-			String name = MessagingUtils.plainText(chest.customName());
+			Component customName = chest.customName();
+			if (customName == null) {
+				return true;
+			}
+			String name = MessagingUtils.plainText(customName);
 			if (UNOPENED_CACHE_NAME.equals(name) || OPENED_CACHE_NAME.equals(name)) {
 				MessagingUtils.sendActionBarMessage(player, "You cannot break Treasures of Viridia Caches.");
 
@@ -93,7 +97,11 @@ public class TOVUtils {
 	}
 
 	public static boolean isUnopenedCache(Chest chest) {
-		return UNOPENED_CACHE_NAME.equals(MessagingUtils.plainText(chest.customName()));
+		Component customName = chest.customName();
+		if (customName == null) {
+			return false;
+		}
+		return UNOPENED_CACHE_NAME.equals(MessagingUtils.plainText(customName));
 	}
 
 }
