@@ -134,11 +134,13 @@ public class FishingCombatManager implements Listener {
 							reward.setItemMeta(FishingManager.getGreaterChest().getItemMeta());
 						}
 						ScoreboardUtils.setScoreboardValue(player, COMBAT_LIMIT, combatLimit - 1);
-						ScoreboardUtils.addScore(player, COMBAT_TOTAL, 1);
-						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " " + COMBAT_TOTAL);
 					} else {
 						reward.setItemMeta(FishingManager.getLesserChest().getItemMeta());
 					}
+
+					int playerTotal = ScoreboardUtils.getScoreboardValue(player, COMBAT_TOTAL).orElse(0);
+					ScoreboardUtils.setScoreboardValue(player, COMBAT_TOTAL, playerTotal + 1);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " " + COMBAT_TOTAL);
 
 					InventoryUtils.giveItem(player, reward);
 				}

@@ -61,6 +61,7 @@ public class FishingManager implements Listener {
 	private static final String GREATER_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_greater";
 	private static final String ABYSSAL_LOOT_TABLE = "epic:r3/world/fishing/custom_fishing/cache_abyssal";
 	private static final String WEIGHTED_FISH_TABLE = "epic:r3/items/fishing/fish/ring_fish_greater_weighted";
+	private static final String FISH_COMBAT_PERMISSION = "monumenta.fishingcombat";
 
 	public FishingManager(FishingCombatManager combatManager) {
 		mCombatManager = combatManager;
@@ -208,7 +209,8 @@ public class FishingManager implements Listener {
 			mPlayerMinigameMap.put(player, rollMinigame());
 		} else if (eventProbability < minigameOdds + combatOdds &&
 			!ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE)) {
+			!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			player.hasPermission(FISH_COMBAT_PERMISSION)) {
 			mPlayerPrepCombatList.add(player);
 		}
 	}
@@ -245,7 +247,7 @@ public class FishingManager implements Listener {
 		player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1f, 1.5f);
 		fishingMinigame.previewMinigame(player, centre.clone());
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> fishingMinigame.previewMinigame(player, centre), 10);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> fishingMinigame.beginMinigame(this, player, centre), 10);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> fishingMinigame.beginMinigame(this, player, centre), 20);
 	}
 
 	public void minigameSuccess(Player player) {
