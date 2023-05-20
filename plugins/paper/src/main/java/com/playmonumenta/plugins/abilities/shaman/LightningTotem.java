@@ -124,8 +124,8 @@ public class LightningTotem extends TotemAbility {
 				DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
 				PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
 					.count(8).duration(3);
-				if (!mTarget.equals(mMobStuckWithEffect)) {
-					DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage * STUCK_DAMAGE_PERCENT, true, false, false);
+				if (mMobStuckWithEffect != null && mMobStuckWithEffect.isValid() && !mTarget.equals(mMobStuckWithEffect)) {
+					DamageUtils.damage(mPlayer, mMobStuckWithEffect, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage * STUCK_DAMAGE_PERCENT, true, false, false);
 				}
 				mPlayer.getWorld().playSound(mTarget.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1.25f);
 				lightning.init(4, 2.5, 0.3, 0.3);

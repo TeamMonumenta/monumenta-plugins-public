@@ -15,12 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -105,7 +100,7 @@ public abstract class TotemAbility extends Ability {
 				if (stickyTotems != null) {
 					if (hitMob instanceof LivingEntity mob &&
 							!EntityUtils.isBoss(hitMob) &&
-							!(hitMob instanceof Player || hitMob instanceof ArmorStand)) {
+							!(hitMob instanceof Player || hitMob instanceof ArmorStand || hitMob instanceof Villager)) {
 						mAttachedMob = mob;
 						mAttachedMob.getWorld().playSound(mAttachedMob, Sound.BLOCK_HONEY_BLOCK_PLACE, 2.0f, 0.7f);
 
@@ -177,6 +172,8 @@ public abstract class TotemAbility extends Ability {
 
 			@Override
 			public synchronized void cancel() {
+				mAttachedMob = null;
+				mMobStuckWithEffect = null;
 				durationStand.remove();
 				TotemicEmpowerment.removeTotem(mPlayer, stand);
 				super.cancel();
