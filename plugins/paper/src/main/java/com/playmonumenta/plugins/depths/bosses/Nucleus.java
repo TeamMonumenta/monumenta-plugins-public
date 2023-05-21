@@ -340,7 +340,7 @@ public final class Nucleus extends BossAbilityGroup {
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute at " + mBoss.getUniqueId() + " run growable grow " + (int) (mSpawnLoc.getX() - 1) + " " + (int) (mSpawnLoc.getY() + 21) + " " + (int) (mSpawnLoc.getZ() - 1) + " jellyfish 1 20 true");
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.MUSIC, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 		new BukkitRunnable() {
 

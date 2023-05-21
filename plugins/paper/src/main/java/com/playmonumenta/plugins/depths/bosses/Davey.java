@@ -227,7 +227,7 @@ public class Davey extends BossAbilityGroup {
 		mBoss.setHealth(modifiedHealth);
 
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.MUSIC, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 		for (Player player : players) {
 			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Lieutenant Davey", ChatColor.GRAY + "Void Herald");

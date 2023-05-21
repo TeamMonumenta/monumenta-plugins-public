@@ -295,7 +295,7 @@ public final class PortalBoss extends BossAbilityGroup {
 		//Clear portals
 		players.forEach(PortalManager::clearAllPortals);
 
-		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.MUSIC, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
