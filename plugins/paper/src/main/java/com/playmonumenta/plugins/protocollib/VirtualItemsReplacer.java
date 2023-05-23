@@ -227,6 +227,27 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			}
 		}
 
+		// Purge nested "Items" key in "BlockEntityTag" to prevent NBT banning
+		if (ItemUtils.isShulkerBox(itemStack.getType())) {
+			// all shulkers should have a BlockEntityTag but check anyway
+			NBTCompound blockEntityTag = new NBTItem(itemStack, true).getCompound("BlockEntityTag");
+			if (blockEntityTag != null) {
+				NBTCompoundList items = blockEntityTag.getCompoundList("Items"); // this probably could be changed to ItemStatUtils.ITEMS_KEY but this is for vanilla
+				for (NBTCompound item : items) {
+					// we don't know if this is a container with a loottable! so check it
+					NBTCompound nestedBlockEntityTag = item.getCompound("BlockEntityTag");
+					if (nestedBlockEntityTag != null) {
+						// now check again if the Items tag exists
+						NBTCompoundList nestedItems = nestedBlockEntityTag.getCompoundList("Items");
+						if (nestedItems != null) {
+							nestedItems.clear();
+							markVirtual(itemStack);
+						}
+					}
+				}
+			}
+		}
+
 		// Custom shulker names
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
 			String prefix;
