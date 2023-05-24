@@ -53,6 +53,7 @@ public class ZoneUtils {
 		MONUMENT("Monument"),
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
 		BLITZ("Blitz"),
+		NO_PLACING_BOATS("No Placing Boats"),
 		ABYSSAL_FORCED("Abyssal Forced");
 
 		private final String mPropertyName;

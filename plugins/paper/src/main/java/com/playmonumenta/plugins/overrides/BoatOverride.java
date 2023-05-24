@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -21,6 +22,11 @@ public class BoatOverride extends BaseOverride {
 		// Ignore the passed-in block and compute which block the player is looking at
 		block = player.getTargetBlockExact(6, FluidCollisionMode.SOURCE_ONLY);
 		if (block == null) {
+			return false;
+		}
+
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PLACING_BOATS)
+				|| ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.NO_PLACING_BOATS)) {
 			return false;
 		}
 
