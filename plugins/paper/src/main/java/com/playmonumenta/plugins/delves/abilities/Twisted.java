@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ public class Twisted {
 
 	private static final int ANIMATION_DURATION = 20 * 2;
 	private static final int MAX_SPIRAL_ANIMATOR_COUNT = 3;
+	private static final int MAX_DISTANCE_FROM_PLAYERS = 20;
 
 	public static final String DESCRIPTION = "Something, everything is wrong...";
 
@@ -75,6 +77,10 @@ public class Twisted {
 	}
 
 	public static void applyModifiers(LivingEntity mob, int level) {
+		if (PlayerUtils.playersInRange(mob.getLocation(), MAX_DISTANCE_FROM_PLAYERS, true, false).size() == 0) {
+			return;
+		}
+
 		if (DelvesUtils.isValidTwistedMob(mob)) {
 			int spawnSinceLast = 1;
 
