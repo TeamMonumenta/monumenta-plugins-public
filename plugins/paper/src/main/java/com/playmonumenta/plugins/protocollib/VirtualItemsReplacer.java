@@ -229,23 +229,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 
 		// Purge nested "Items" key in "BlockEntityTag" to prevent NBT banning
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
-			// all shulkers should have a BlockEntityTag but check anyway
-			NBTCompound blockEntityTag = new NBTItem(itemStack, true).getCompound("BlockEntityTag");
-			if (blockEntityTag != null) {
-				NBTCompoundList items = blockEntityTag.getCompoundList("Items"); // this probably could be changed to ItemStatUtils.ITEMS_KEY but this is for vanilla
-				for (NBTCompound item : items) {
-					// we don't know if this is a container with a loottable! so check it
-					NBTCompound nestedBlockEntityTag = item.getCompound("BlockEntityTag");
-					if (nestedBlockEntityTag != null) {
-						// now check again if the Items tag exists
-						NBTCompoundList nestedItems = nestedBlockEntityTag.getCompoundList("Items");
-						if (nestedItems != null) {
-							nestedItems.clear();
-							markVirtual(itemStack);
-						}
-					}
-				}
-			}
+			nestedShulkerCheck(itemStack);
 		}
 
 		// Custom shulker names
@@ -300,4 +284,29 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		new NBTItem(item, true).addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(IS_VIRTUAL_ITEM_NBT_KEY, true);
 	}
 
+	/**
+	 * Purge "Items" key in nested "BlockEntityTag" for shulker boxes
+	 * Ensures mods such as Shulker Tooltip can still operate properly
+	 */
+	private static void nestedShulkerCheck(ItemStack itemStack) {
+		// all shulkers should have a BlockEntityTag but check anyway
+		NBTCompound blockEntityTag = new NBTItem(itemStack, true).getCompound("BlockEntityTag");
+		if (blockEntityTag == null) return;
+		NBTCompoundList items = blockEntityTag.getCompoundList("Items"); // this probably could be changed to ItemStatUtils.ITEMS_KEY but this is for vanilla
+		if (items == null) return;
+		Boolean foundNested = false;
+		for (NBTCompound item : items) {
+			// we don't know if this is a container with a loottable! so check it
+			NBTCompound nestedBlockEntityTag = item.getCompound("BlockEntityTag");
+			if (nestedBlockEntityTag == null) continue;
+			// now check again if the Items tag exists
+			NBTCompoundList nestedItems = nestedBlockEntityTag.getCompoundList("Items");
+			if (nestedItems == null) continue;
+			foundNested = true;
+			nestedItems.clear();
+		}
+		if (foundNested) {
+			markVirtual(itemStack);
+		}
+	}
 }
