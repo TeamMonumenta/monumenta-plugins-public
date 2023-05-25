@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +56,7 @@ public class FishingCombatManager implements Listener {
 		{ 0, 1, 1, 1, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0}
 	};
 	private static final int[] MOB_SPAWN_DELAYS = new int[] { 25, 18 };
+	private static final String FISH_TABLE = "epic:r3/world/fishing/ring_fish_full";
 	private final LoSPool POOL_COMMON = new LoSPool.LibraryPool("~FishingCommonMobs");
 	private final LoSPool POOL_UNCOMMON = new LoSPool.LibraryPool("~FishingUncommonMobs");
 	private final LoSPool POOL_ELITE = new LoSPool.LibraryPool("~FishingEliteMobs");
@@ -136,6 +138,7 @@ public class FishingCombatManager implements Listener {
 						ScoreboardUtils.setScoreboardValue(player, COMBAT_LIMIT, combatLimit - 1);
 					} else {
 						reward.setItemMeta(FishingManager.getLesserChest().getItemMeta());
+						reward.setAmount(FastUtils.randomDoubleInRange(0, 1) < 0.08 * difficulty ? 2 : 1);
 					}
 
 					int playerTotal = ScoreboardUtils.getScoreboardValue(player, COMBAT_TOTAL).orElse(0);
@@ -159,7 +162,10 @@ public class FishingCombatManager implements Listener {
 			mPlayerArenaMap.remove(player);
 			if (awardParticipants) {
 				player.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 1.5f);
-				player.sendMessage(Component.text("You have been awarded some EXP for your participation.", NamedTextColor.GRAY));
+				for (int i = 0; i < arena.mDifficulty + 2; i++) {
+					InventoryUtils.giveItemFromLootTable(player, NamespacedKeyUtils.fromString(FISH_TABLE), 1);
+				}
+				player.sendMessage(Component.text("You have been awarded some EXP and fish for your participation.", NamedTextColor.GRAY));
 				player.giveExp(ExperienceUtils.getTotalExperience(10));
 			}
 		}

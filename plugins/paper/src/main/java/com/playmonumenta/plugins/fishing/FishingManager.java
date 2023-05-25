@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.fishing;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.protocollib.FishingParticleListener;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -23,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.FishHook;
@@ -42,9 +44,9 @@ public class FishingManager implements Listener {
 		() -> new RingsFM(4, false, 0),
 		() -> new RingsFM(3, true, 0),
 		() -> new RingsFM(3, false, 2),
-		() -> new DirectionalFM(200, 0.3, Color.fromRGB(200, 0, 20), 0.019, false),
-		() -> new DirectionalFM(140, 0.45, Color.fromRGB(180, 20, 120), 0.033, false),
-	    () -> new DirectionalFM(140, 0.75, Color.fromRGB(255, 200, 50), 0.028, true),
+		() -> new DirectionalFM(200, 0.3, Color.fromRGB(200, 0, 20), 0.016, false),
+		() -> new DirectionalFM(140, 0.45, Color.fromRGB(180, 20, 120), 0.026, false),
+	    () -> new DirectionalFM(140, 0.75, Color.fromRGB(255, 200, 50), 0.021, true),
 		() -> new RhythmFM(false, false),
 		() -> new RhythmFM(true, false),
 		() -> new RhythmFM(false, true),
@@ -252,6 +254,7 @@ public class FishingManager implements Listener {
 
 	public void minigameSuccess(Player player) {
 		player.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 1.5f);
+		new PartialParticle(Particle.VILLAGER_HAPPY, player.getEyeLocation(), 20).delta(3, 0.5, 3).spawnAsPlayerActive(player);
 		double chooseReward = FastUtils.randomDoubleInRange(0, 1);
 		if (chooseReward < 0.8) {
 			InventoryUtils.giveItemFromLootTable(player, NamespacedKeyUtils.fromString(WEIGHTED_FISH_TABLE), 1);
