@@ -291,17 +291,25 @@ public class VirtualItemsReplacer extends PacketAdapter {
 	private static void nestedShulkerCheck(ItemStack itemStack) {
 		// all shulkers should have a BlockEntityTag but check anyway
 		NBTCompound blockEntityTag = new NBTItem(itemStack, true).getCompound("BlockEntityTag");
-		if (blockEntityTag == null) return;
+		if (blockEntityTag == null) {
+			return;
+		}
 		NBTCompoundList items = blockEntityTag.getCompoundList("Items"); // this probably could be changed to ItemStatUtils.ITEMS_KEY but this is for vanilla
-		if (items == null) return;
+		if (items == null) {
+			return;
+		}
 		Boolean foundNested = false;
 		for (NBTCompound item : items) {
 			// we don't know if this is a container with a loottable! so check it
 			NBTCompound nestedBlockEntityTag = item.getCompound("BlockEntityTag");
-			if (nestedBlockEntityTag == null) continue;
+			if (nestedBlockEntityTag == null) {
+				continue;
+			}
 			// now check again if the Items tag exists
 			NBTCompoundList nestedItems = nestedBlockEntityTag.getCompoundList("Items");
-			if (nestedItems == null) continue;
+			if (nestedItems == null) {
+				continue;
+			}
 			foundNested = true;
 			nestedItems.clear();
 		}
