@@ -287,6 +287,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 	/**
 	 * Purge "Items" key in nested "BlockEntityTag" for shulker boxes
 	 * Ensures mods such as Shulker Tooltip can still operate properly
+	 * Reference: https://gist.github.com/U5B/415a976f2481e2e8ae770607aa4a3919
 	 */
 	private static void nestedShulkerCheck(ItemStack itemStack) {
 		// all shulkers should have a BlockEntityTag but check anyway
@@ -300,8 +301,13 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		}
 		Boolean foundNested = false;
 		for (NBTCompound item : items) {
+			if (item == null) continue; // sanity null check
+			// apparentally I missed this tag
+			// https://gist.github.com/U5B/415a976f2481e2e8ae770607aa4a3919#file-lootbox-json-L25
+			NBTCompound tag = item.getCompound("tag");
+			if (tag == null) continue;
 			// we don't know if this is a container with a loottable! so check it
-			NBTCompound nestedBlockEntityTag = item.getCompound("BlockEntityTag");
+			NBTCompound nestedBlockEntityTag = tag.getCompound("BlockEntityTag");
 			if (nestedBlockEntityTag == null) {
 				continue;
 			}
