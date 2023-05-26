@@ -34,6 +34,7 @@ public class AbilityTriggersGui extends Gui {
 	private @Nullable AbilityInfo<?> mSelectedAbility;
 	private @Nullable AbilityTriggerInfo<?> mSelectedTrigger;
 	private @Nullable AbilityTrigger mNewTrigger;
+	private int mKeyOptionsStartIndex = 0;
 
 	public AbilityTriggersGui(Player player) {
 		super(player, 6 * 9, MAIN_PAGE_TITLE);
@@ -60,6 +61,9 @@ public class AbilityTriggersGui extends Gui {
 			for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilitiesInTriggerOrder()) {
 				AbilityInfo<?> info = ability.getInfo();
 				for (AbilityTriggerInfo<?> trigger : ability.getCustomTriggers()) {
+					if (!trigger.meetsPrerequsite(mPlayer)) {
+						continue;
+					}
 					List<Component> lore = new ArrayList<>();
 					if (trigger.getDescription() != null) {
 						lore.add(Component.text(trigger.getDescription(), NamedTextColor.GRAY));
@@ -112,6 +116,7 @@ public class AbilityTriggersGui extends Gui {
 					NamedTextColor.GRAY, false, "Return to the trigger selection page.", NamedTextColor.GRAY, 40))
 					.onLeftClick(() -> {
 						mSelectedAbility = null;
+						mKeyOptionsStartIndex = 0;
 						update();
 					});
 
@@ -196,24 +201,41 @@ public class AbilityTriggersGui extends Gui {
 			setItem(3, 0, GUIUtils.createBasicItem(Material.CHAIN_COMMAND_BLOCK, "Extras", NamedTextColor.WHITE, false,
 					"Extra options for held items.\n"
 							+ "When the main key is changed these are set to defaults, unless the trigger has an unchangeable item restriction.", NamedTextColor.GRAY, 40));
-			int col = 1;
-			for (AbilityTrigger.KeyOptions keyOption : AbilityTrigger.KeyOptions.values()) {
-				Material mat = switch (keyOption) {
-					case NO_POTION -> Material.POTION;
-					case NO_FOOD -> Material.COOKED_BEEF;
-					case NO_PROJECTILE_WEAPON -> Material.CROSSBOW;
-					case NO_SHIELD -> Material.SHIELD;
-					case NO_BLOCKS -> Material.COBBLESTONE;
-					case NO_MISC -> Material.COMPASS;
-					case NO_PICKAXE -> Material.IRON_PICKAXE;
-					case SNEAK_WITH_SHIELD -> Material.SHIELD;
-				};
+
+			int colStart = 1;
+			int colEnd = 8;
+			mKeyOptionsStartIndex = Math.max(0, Math.min(AbilityTrigger.KeyOptions.values().length - 7, mKeyOptionsStartIndex));
+			if (mKeyOptionsStartIndex == 1) {
+				mKeyOptionsStartIndex = 0;
+			} else if (mKeyOptionsStartIndex > 1) {
+				colStart = 2;
+				setItem(3, 1, GUIUtils.createBasicItem(Material.ARROW, "Scroll back for more options", NamedTextColor.GRAY)).onLeftClick(() -> {
+					mKeyOptionsStartIndex -= 6;
+					update();
+				});
+			}
+			if (mKeyOptionsStartIndex + 7 < AbilityTrigger.KeyOptions.values().length) {
+				colEnd = 7;
+				setItem(3, 8, GUIUtils.createBasicItem(Material.ARROW, "Scroll forward for more options", NamedTextColor.GRAY)).onLeftClick(() -> {
+					mKeyOptionsStartIndex += mKeyOptionsStartIndex == 0 ? 7 : 6;
+					update();
+				});
+			}
+
+			for (int col = colStart; col <= colEnd; col++) {
+				AbilityTrigger.KeyOptions keyOption = AbilityTrigger.KeyOptions.values()[mKeyOptionsStartIndex + col - colStart];
 				boolean enabled = mNewTrigger.getKeyOptions().contains(keyOption);
-				makeOptionIcons(3, col++, GUIUtils.createBasicItem(mat, capitalize(keyOption.getDisplay(enabled)), enabled ? NamedTextColor.RED : NamedTextColor.GRAY, false,
+				makeOptionIcons(3, col, GUIUtils.createBasicItem(keyOption.getMaterial(), capitalize(keyOption.getDisplay(enabled)), enabled ? NamedTextColor.RED : NamedTextColor.GRAY, false,
 						"Click to toggle", NamedTextColor.GRAY, 40), enabled ? Material.RED_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE, () -> {
 					EnumSet<AbilityTrigger.KeyOptions> keyOptions = mNewTrigger.getKeyOptions();
 					if (!keyOptions.remove(keyOption)) {
 						keyOptions.add(keyOption);
+
+						if (keyOption == AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON) {
+							keyOptions.remove(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON);
+						} else if (keyOption == AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON) {
+							keyOptions.remove(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON);
+						}
 					}
 					update();
 				});
@@ -233,6 +255,7 @@ public class AbilityTriggersGui extends Gui {
 						mPlugin.mAbilityManager.setCustomTrigger(mPlayer, mSelectedAbility, mSelectedTrigger.getId(), mNewTrigger);
 						ProtocolLibrary.getProtocolManager().updateEntity(mPlayer, ProtocolLibrary.getProtocolManager().getEntityTrackers(mPlayer));
 						mSelectedAbility = null;
+						mKeyOptionsStartIndex = 0;
 						update();
 					});
 				}
@@ -246,6 +269,7 @@ public class AbilityTriggersGui extends Gui {
 					setItem(5, 6, cancel).onLeftClick(() -> {
 						mNewTrigger = new AbilityTrigger(mSelectedTrigger.getTrigger());
 						mSelectedAbility = null;
+						mKeyOptionsStartIndex = 0;
 						update();
 					});
 				}
@@ -259,6 +283,7 @@ public class AbilityTriggersGui extends Gui {
 					mSelectedTrigger.setTrigger(mNewTrigger);
 					mPlugin.mAbilityManager.setCustomTrigger(mPlayer, mSelectedAbility, mSelectedTrigger.getId(), null);
 					mSelectedAbility = null;
+					mKeyOptionsStartIndex = 0;
 					update();
 				});
 			}

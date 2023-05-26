@@ -46,6 +46,8 @@ public class AbilityTriggerInfo<T extends Ability> {
 
 	private final @Nullable TriggerRestriction mRestriction;
 
+	private final @Nullable Predicate<Player> mPrerequisite;
+
 	public static class TriggerRestriction {
 		private final String mDisplay;
 		private final Predicate<Player> mPredicate;
@@ -73,12 +75,17 @@ public class AbilityTriggerInfo<T extends Ability> {
 	}
 
 	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction) {
+		this(id, displayName, description, action, trigger, restriction, null);
+	}
+
+	public AbilityTriggerInfo(String id, String displayName, @Nullable String description, Consumer<T> action, AbilityTrigger trigger, @Nullable TriggerRestriction restriction, @Nullable Predicate<Player> prerequisite) {
 		mId = id;
 		mDisplayName = displayName;
 		mDescription = description;
 		mAction = action;
 		mTrigger = trigger;
 		mRestriction = restriction;
+		mPrerequisite = prerequisite;
 	}
 
 	public String getDisplayName() {
@@ -109,6 +116,10 @@ public class AbilityTriggerInfo<T extends Ability> {
 		return mRestriction;
 	}
 
+	public boolean meetsPrerequsite(Player player) {
+		return mPrerequisite == null || mPrerequisite.test(player);
+	}
+
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		json.addProperty("displayName", mDisplayName);
@@ -120,7 +131,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 	}
 
 	public boolean check(Player player, AbilityTrigger.Key key) {
-		return mTrigger.check(player, key) && (mRestriction == null || mRestriction.getPredicate().test(player));
+		return mTrigger.check(player, key) && (mRestriction == null || mRestriction.getPredicate().test(player)) && meetsPrerequsite(player);
 	}
 
 	public AbilityTriggerInfo<T> withCustomTrigger(AbilityInfo<?> ability, Player player) {

@@ -66,8 +66,8 @@ public class EyeOfTheStorm extends Ability {
 			)
 			.simpleDescription("Summon a medium sized ring which deals damage to mobs within and pulls them towards its center.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EyeOfTheStorm::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EyeOfTheStorm::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.WHITE_CANDLE);
 
 	public double mDamage;

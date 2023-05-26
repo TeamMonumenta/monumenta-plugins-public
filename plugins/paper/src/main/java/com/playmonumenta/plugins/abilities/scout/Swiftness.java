@@ -50,12 +50,15 @@ public class Swiftness extends Ability {
 			.shorthandName("Swf")
 			.descriptions(
 				String.format("Gain +%d%% Speed when you are not inside a town.", (int) (SWIFTNESS_SPEED_BONUS * 100)),
-				String.format("In addition, gain Jump Boost %s when you are not inside a town. " +
-					              "Swap hands looking up, not sneaking, and not holding a projectile weapon to toggle the Jump Boost.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)),
+				String.format("In addition, gain Jump Boost %s when you are not inside a town.", StringUtils.toRoman(SWIFTNESS_EFFECT_JUMP_LVL + 1)),
 				String.format("You now have a %d%% chance to dodge any projectile or melee attack.", (int) (DODGE_CHANCE * 100)))
 			.simpleDescription("Gain speed and jump boost.")
-			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle jump boost", Swiftness::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false).lookDirections(AbilityTrigger.LookDirection.UP),
-				AbilityTriggerInfo.NOT_HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("toggle", "toggle jump boost", null, Swiftness::toggleJumpBoost, new AbilityTrigger(AbilityTrigger.Key.SWAP).enabled(false).sneaking(false).lookDirections(AbilityTrigger.LookDirection.UP)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PROJECTILE_WEAPON), null,
+				player -> {
+					Swiftness swiftness = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, Swiftness.class);
+					return swiftness != null && swiftness.isLevelTwo();
+				}))
 			.displayItem(Material.RABBIT_FOOT);
 
 	private boolean mWasInNoMobilityZone = false;
@@ -100,10 +103,6 @@ public class Swiftness extends Ability {
 	}
 
 	public void toggleJumpBoost() {
-		if (isLevelOne()) {
-			return;
-		}
-
 		if (mJumpBoost) {
 			mJumpBoost = false;
 			mPlugin.mPotionManager.removePotion(mPlayer, PotionID.ABILITY_SELF, PotionEffectType.JUMP);

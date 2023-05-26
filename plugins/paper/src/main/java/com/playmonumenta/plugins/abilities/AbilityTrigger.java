@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.abilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -23,6 +22,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -62,25 +62,34 @@ public class AbilityTrigger {
 	}
 
 	public enum KeyOptions {
-		NO_POTION("not holding a potion", "may be holding a potion",
+		NO_POTION("not holding a potion", "may be holding a potion", Material.POTION,
 			player -> !ItemUtils.isSomePotion(player.getInventory().getItemInMainHand())),
-		NO_FOOD("not holding food", "may be holding food",
+		NO_FOOD("not holding food", "may be holding food", Material.COOKED_BEEF,
 			player -> !player.getInventory().getItemInMainHand().getType().isEdible()),
-		NO_PROJECTILE_WEAPON("not holding a projectile weapon", "may be holding a projectile weapon",
+		NO_PROJECTILE_WEAPON("not holding a projectile weapon", "may be holding a projectile weapon", Material.CROSSBOW,
 			player -> !ItemUtils.isShootableItem(player.getInventory().getItemInMainHand())),
-		NO_SHIELD("not holding a shield", "may be holding a shield",
+		NO_SHIELD("not holding a shield", "may be holding a shield", Material.SHIELD,
 			player -> player.getInventory().getItemInMainHand().getType() != Material.SHIELD),
-		NO_BLOCKS("not holding blocks", "may be holding blocks",
+		NO_BLOCKS("not holding blocks", "may be holding blocks", Material.COBBLESTONE,
 			player -> !player.getInventory().getItemInMainHand().getType().isBlock()),
-		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming",
-			player -> !(player.getInventory().getItemInMainHand().getType() == Material.COMPASS
-				|| Plugin.getInstance().mItemStatManager.getEnchantmentLevel(player, ItemStatUtils.EnchantmentType.MULTITOOL) > 0
-				|| ((LocationUtils.isLocationInWater(player.getLocation()) || player.isInRain()) && ItemStatUtils.hasEnchantment(player.getInventory().getItemInMainHand(), ItemStatUtils.EnchantmentType.RIPTIDE)))
-			),
-		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe",
+		NO_MISC("not holding a compass, a multitool, or a riptide trident while swimming", "may be holding a compass, a multitool, or a riptide trident while swimming", Material.COMPASS,
+			player -> {
+				ItemStack mainhand = player.getInventory().getItemInMainHand();
+				return !(mainhand.getType() == Material.COMPASS
+					|| ItemStatUtils.hasEnchantment(mainhand, ItemStatUtils.EnchantmentType.MULTITOOL)
+					|| ((LocationUtils.isLocationInWater(player.getLocation()) || player.isInRain()) && ItemStatUtils.hasEnchantment(mainhand, ItemStatUtils.EnchantmentType.RIPTIDE)));
+			}),
+		NO_PICKAXE("not holding a pickaxe", "may be holding a pickaxe", Material.IRON_PICKAXE,
 			player -> !ItemUtils.isPickaxe(player.getInventory().getItemInMainHand())),
-		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield",
-			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD));
+		NO_SHOVEL("not holding a shovel", "may be holding a shovel", Material.IRON_SHOVEL,
+			player -> !ItemUtils.isShovel(player.getInventory().getItemInMainHand())),
+		NO_AXE("not holding an axe", "may be holding an axe", Material.IRON_AXE,
+			player -> !ItemUtils.isAxe(player.getInventory().getItemInMainHand())),
+		REQUIRE_PROJECTILE_WEAPON("holding a projective weapon", "may be not holding a projectile weapon", Material.CROSSBOW,
+			player -> ItemUtils.isShootableItem(player.getInventory().getItemInMainHand())),
+		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield", Material.SHIELD,
+			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)),
+		;
 
 		public static final KeyOptions[] NO_USABLE_ITEMS = {
 			NO_POTION,
@@ -93,17 +102,22 @@ public class AbilityTrigger {
 
 		private final String mEnabledDisplay;
 		private final String mDisabledDisplay;
-
+		private final Material mMaterial;
 		private final Predicate<Player> mPredicate;
 
-		KeyOptions(String enabledDisplay, String disabledDisplay, Predicate<Player> predicate) {
+		KeyOptions(String enabledDisplay, String disabledDisplay, Material material, Predicate<Player> predicate) {
 			mEnabledDisplay = enabledDisplay;
 			mDisabledDisplay = disabledDisplay;
+			mMaterial = material;
 			mPredicate = predicate;
 		}
 
 		public String getDisplay(boolean enabled) {
 			return enabled ? mEnabledDisplay : mDisabledDisplay;
+		}
+
+		public Material getMaterial() {
+			return mMaterial;
 		}
 
 		@Override

@@ -87,8 +87,8 @@ public class WindBomb extends Ability {
 				String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int) PULL_RADIUS, PULL_DURATION / 20))
 			.simpleDescription("Throw a bomb that damages and shoots mobs up in the air, weakening them.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindBomb::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindBomb::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.TNT);
 
 	private final double mDamageFraction;
@@ -166,7 +166,9 @@ public class WindBomb extends Ability {
 			float velocity = (float) (LAUNCH_VELOCITY * Math.sqrt(velocityMultSquared));
 			Hitbox damageHitbox = new Hitbox.SphereHitbox(loc, radius);
 			for (LivingEntity mob : damageHitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
+				if (damage > 0) {
+					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
+				}
 				if (!EntityUtils.isBoss(mob)) {
 					mob.setVelocity(new Vector(0.f, velocity, 0.f));
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, SLOW_FALL_EFFECT, true, false));
