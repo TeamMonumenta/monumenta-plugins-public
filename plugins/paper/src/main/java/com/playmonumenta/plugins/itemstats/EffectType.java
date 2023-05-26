@@ -33,9 +33,9 @@ import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
@@ -273,10 +273,10 @@ public enum EffectType {
 		boolean includeTime = true;
 
 		if (effectType == EffectType.STARVATION) {
-			text = effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength);
+			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 			includeTime = false;
 		} else if (effectType.getPotionEffectType() != null) {
-			text = effectType.mName + " " + ItemStatUtils.toRomanNumerals((int) strength);
+			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 		} else if (effectType.getType().contains("Instant")) {
 			text = (int) (strength * 100) + "% " + effectType.mName;
 			includeTime = false;

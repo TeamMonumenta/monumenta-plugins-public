@@ -92,7 +92,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private static final String GALLERY_SCB = "DGLobby";
 	private static final TextColor DEPTH_COLOR = TextColor.fromHexString("#5D2D87");
 	private static final TextColor DELVE_COLOR = TextColor.fromHexString("#B47028");
-	private static final TextColor PRESTIGE_COLOR = TextColor.fromHexString("#FEDC10");
+	public static final TextColor PRESTIGE_COLOR = TextColor.fromHexString("#FEDC10");
 	private static final TextColor GALLERY_COLOR = TextColor.fromHexString("#39B14E");
 	private static final int DEPTH_ENTRY_LOC = 20;
 	private static final int DELVE_ENTRY_LOC = 21;

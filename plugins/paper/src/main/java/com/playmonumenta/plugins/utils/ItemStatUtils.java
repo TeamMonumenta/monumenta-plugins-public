@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.classes.Warrior;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkillShopGUI;
 import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
@@ -50,12 +51,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
@@ -153,33 +152,33 @@ public class ItemStatUtils {
 
 	public enum Tier {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
-		ZERO("0", Component.text("Tier 0", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
-		I("1", Component.text("Tier I", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
-		II("2", Component.text("Tier II", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
-		III("3", Component.text("Tier III", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
-		IV("4", Component.text("Tier IV", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
-		V("5", Component.text("Tier V", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)),
-		COMMON("common", Component.text("Common", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
-		UNCOMMON("uncommon", Component.text("Uncommon", TextColor.fromHexString("#C0C0C0")).decoration(TextDecoration.ITALIC, false)),
-		RARE("rare", Component.text("Rare", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
-		ARTIFACT("artifact", Component.text("Artifact", TextColor.fromHexString("#D02E28")).decoration(TextDecoration.ITALIC, false)),
+		ZERO("0", "Tier 0", NamedTextColor.DARK_GRAY),
+		I("1", "Tier I", NamedTextColor.DARK_GRAY),
+		II("2", "Tier II", NamedTextColor.DARK_GRAY),
+		III("3", "Tier III", NamedTextColor.DARK_GRAY),
+		IV("4", "Tier IV", NamedTextColor.DARK_GRAY),
+		V("5", "Tier V", NamedTextColor.DARK_GRAY),
+		COMMON("common", "Common", TextColor.fromHexString("#C0C0C0")),
+		UNCOMMON("uncommon", "Uncommon", TextColor.fromHexString("#C0C0C0")),
+		RARE("rare", "Rare", TextColor.fromHexString("#4AC2E5")),
+		ARTIFACT("artifact", "Artifact", TextColor.fromHexString("#D02E28")),
 		EPIC("epic", Component.text("Epic", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
 		LEGENDARY("legendary", Component.text("Legendary", TextColor.fromHexString("#FFD700")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
-		UNIQUE("unique", Component.text("Unique", TextColor.fromHexString("#C8A2C8")).decoration(TextDecoration.ITALIC, false)),
-		PATRON("patron", Component.text("Patron Made", TextColor.fromHexString("#82DB17")).decoration(TextDecoration.ITALIC, false)),
-		EVENT("event", Component.text("Event", TextColor.fromHexString("#7FFFD4")).decoration(TextDecoration.ITALIC, false)),
-		LEGACY("legacy", Component.text("Legacy", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
-		CURRENCY("currency", Component.text("Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
-		EVENT_CURRENCY("event_currency", Component.text("Event Currency", TextColor.fromHexString("#DCAE32")).decoration(TextDecoration.ITALIC, false)),
-		FISH("fish", Component.text("Fish", TextColor.fromHexString("#1DCC9A")).decoration(TextDecoration.ITALIC, false)),
-		KEYTIER("key", Component.text("Key", TextColor.fromHexString("#47B6B5")).decoration(TextDecoration.ITALIC, false)),
-		TROPHY("trophy", Component.text("Trophy", TextColor.fromHexString("#CAFFFD")).decoration(TextDecoration.ITALIC, false)),
+		UNIQUE("unique", "Unique", TextColor.fromHexString("#C8A2C8")),
+		PATRON("patron", "Patron Made", TextColor.fromHexString("#82DB17")),
+		EVENT("event", "Event", TextColor.fromHexString("#7FFFD4")),
+		LEGACY("legacy", "Legacy", TextColor.fromHexString("#EEE6D6")),
+		CURRENCY("currency", "Currency", TextColor.fromHexString("#DCAE32")),
+		EVENT_CURRENCY("event_currency", "Event Currency", TextColor.fromHexString("#DCAE32")),
+		FISH("fish", "Fish", TextColor.fromHexString("#1DCC9A")),
+		KEYTIER("key", "Key", TextColor.fromHexString("#47B6B5")),
+		TROPHY("trophy", "Trophy", TextColor.fromHexString("#CAFFFD")),
 		OBFUSCATED("obfuscated", Component.text("Stick_:)", TextColor.fromHexString("#5D2D87")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true)),
-		SHULKER_BOX("shulker", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false)),
-		CHARM("charm", Component.text("Charm", TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false)),
-		RARE_CHARM("rarecharm", Component.text("Rare Charm", TextColor.fromHexString("#4AC2E5")).decoration(TextDecoration.ITALIC, false)),
+		SHULKER_BOX("shulker", "Invalid Type", TextColor.fromHexString("#EEE6D6")),
+		CHARM("charm", "Charm", TextColor.fromHexString("#FFFA75")),
+		RARE_CHARM("rarecharm", "Rare Charm", TextColor.fromHexString("#4AC2E5")),
 		EPIC_CHARM("epiccharm", Component.text("Epic Charm", TextColor.fromHexString("#B314E3")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true)),
-		QUEST_COMPASS("quest_compass", Component.text("Invalid Type", TextColor.fromHexString("#EEE6D6")).decoration(TextDecoration.ITALIC, false));
+		QUEST_COMPASS("quest_compass", "Invalid Type", TextColor.fromHexString("#EEE6D6"));
 
 		static final String KEY = "Tier";
 
@@ -191,6 +190,10 @@ public class ItemStatUtils {
 			mName = name;
 			mDisplay = display;
 			mPlainDisplay = MessagingUtils.plainText(display);
+		}
+
+		Tier(String name, String display, TextColor color) {
+			this(name, Component.text(display, color).decoration(TextDecoration.ITALIC, false));
 		}
 
 		public String getName() {
@@ -218,19 +221,20 @@ public class ItemStatUtils {
 
 	public enum Masterwork {
 		NONE("none", DUMMY_LORE_TO_REMOVE),
-		ZERO("0", Component.text("", NamedTextColor.DARK_GRAY).append(Component.text("☆☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		I("1", Component.text("★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		II("2", Component.text("★★", TextColor.fromHexString("#FFB43E")).append(Component.text("☆", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		III("3", Component.text("★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		IV("4", Component.text("★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		V("5", Component.text("★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VI("6", Component.text("★★★★★★", TextColor.fromHexString("#FFB43E")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VIIA("7a", Component.text("★★★★★★★", TextColor.fromHexString("#D02E28")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VIIB("7b", Component.text("★★★★★★★", TextColor.fromHexString("#4AC2E5")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
-		VIIC("7c", Component.text("★★★★★★★", TextColor.fromHexString("#FFFA75")).append(Component.text("", NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false)),
+		ZERO("0", 0),
+		I("1", 1),
+		II("2", 2),
+		III("3", 3),
+		IV("4", 4),
+		V("5", 5),
+		VI("6", 6),
+		VIIA("7a", 7, TextColor.fromHexString("#D02E28")),
+		VIIB("7b", 7, TextColor.fromHexString("#4AC2E5")),
+		VIIC("7c", 7, TextColor.fromHexString("#FFFA75")),
 		ERROR("error", Component.text("ERROR", TextColor.fromHexString("#704C8A")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true));
 
 		static final String KEY = "Masterwork";
+		static final int CURRENT_MAX_MASTERWORK = 3;
 
 		final String mName;
 		final Component mDisplay;
@@ -240,6 +244,14 @@ public class ItemStatUtils {
 			mName = name;
 			mDisplay = display;
 			mPlainDisplay = MessagingUtils.plainText(display);
+		}
+
+		Masterwork(String name, int level, TextColor color) {
+			this(name, Component.text("★".repeat(level), color).append(Component.text("☆".repeat(Math.max(0, CURRENT_MAX_MASTERWORK - level)), NamedTextColor.DARK_GRAY)).decoration(TextDecoration.ITALIC, false));
+		}
+
+		Masterwork(String name, int level) {
+			this(name, level, TextColor.fromHexString("#FFB43E"));
 		}
 
 		public String getName() {
@@ -319,6 +331,7 @@ public class ItemStatUtils {
 		INTELLECT("intellect", "Intellect Crystallizer", TextColor.fromHexString("#82DB17")),
 		DELVES("delves", "Dungeon Delves", TextColor.fromHexString("#B47028")),
 		MYTHIC("mythic", "Mythic Reliquary", TextColor.fromHexString("#C4971A")),
+		CHALLENGER_SKIN("challenger", "Challenger Skin", CosmeticSkillShopGUI.PRESTIGE_COLOR),
 		CARNIVAL("carnival", "Floating Carnival", TextColor.fromHexString("#D02E28")),
 		LOWTIDE("lowtide", "Lowtide Smuggler", TextColor.fromHexString("#196383")),
 		DOCKS("docks", "Expedition Docks", TextColor.fromHexString("#196383")),
@@ -343,6 +356,7 @@ public class ItemStatUtils {
 		BLACK("black", "Black Dungeon", TextColor.fromHexString("#454040")),
 		LIGHT("light", "Arena of Terth", TextColor.fromHexString("#FFFFAA")),
 		PASS("seasonpass", "Seasonal Pass", TextColor.fromHexString("#FFF63C")),
+		SKETCHED("sketched", "Sketched Skin", TextColor.fromHexString("#FFF63C")),
 		BLITZ("blitz", "Plunderer's Blitz", TextColor.fromHexString("#DAAD3E")),
 		SOULTHREAD("soul", "Soulwoven", TextColor.fromHexString("#7FFFD4")),
 		SCIENCE("science", "P.O.R.T.A.L.", TextColor.fromHexString("#DCE8E3")),
@@ -590,15 +604,15 @@ public class ItemStatUtils {
 		STRENGTH_CANCEL(new StrengthCancel(), false, false, false, false);
 
 		public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(EnchantmentType.values())
-			                                                                    .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
+			.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
 		public static final Set<EnchantmentType> SPAWNABLE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
-			                                                                  .filter(type -> type.mIsSpawnable)
-			                                                                  .collect(Collectors.toUnmodifiableSet());
+			.filter(type -> type.mIsSpawnable)
+			.collect(Collectors.toUnmodifiableSet());
 
 		public static final Set<EnchantmentType> PROJECTILE_ENCHANTMENTS = Arrays.stream(EnchantmentType.values())
-			                                                                   .filter(type -> type.getItemStat() instanceof com.playmonumenta.plugins.itemstats.Enchantment ench && ench.getSlots().contains(Slot.PROJECTILE))
-			                                                                   .collect(Collectors.toUnmodifiableSet());
+			.filter(type -> type.getItemStat() instanceof com.playmonumenta.plugins.itemstats.Enchantment ench && ench.getSlots().contains(Slot.PROJECTILE))
+			.collect(Collectors.toUnmodifiableSet());
 
 		static final String KEY = "Enchantments";
 
@@ -671,7 +685,7 @@ public class ItemStatUtils {
 				if (!mUsesLevels && level == 1) {
 					return Component.text(mName, color).decoration(TextDecoration.ITALIC, false);
 				} else {
-					return Component.text(mName + " " + toRomanNumerals(level), color).decoration(TextDecoration.ITALIC, false);
+					return Component.text(mName + " " + StringUtils.toRoman(level), color).decoration(TextDecoration.ITALIC, false);
 				}
 			}
 		}
@@ -752,15 +766,15 @@ public class ItemStatUtils {
 		STAT_TRACK_DAMAGE_TAKEN(new StatTrackDamageTaken(), "", true, false, false, true, false, false),
 		STAT_TRACK_HEALING_DONE(new StatTrackHealingDone(), "", true, false, false, true, false, false);
 		public static final Map<String, InfusionType> REVERSE_MAPPINGS = Arrays.stream(InfusionType.values())
-			                                                                 .collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
+			.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
 
 		public static final Set<InfusionType> STAT_TRACK_OPTIONS = Arrays.stream(InfusionType.values())
-			                                                           .filter(type -> type.mIsStatTrackOption)
-			                                                           .collect(Collectors.toUnmodifiableSet());
+			.filter(type -> type.mIsStatTrackOption)
+			.collect(Collectors.toUnmodifiableSet());
 
 		public static final Set<InfusionType> SPAWNABLE_INFUSIONS = Arrays.stream(InfusionType.values())
-			                                                            .filter(type -> type.mIsSpawnable)
-			                                                            .collect(Collectors.toUnmodifiableSet());
+			.filter(type -> type.mIsSpawnable)
+			.collect(Collectors.toUnmodifiableSet());
 
 		static final String KEY = "Infusions";
 
@@ -820,9 +834,9 @@ public class ItemStatUtils {
 				return Component.text(mName + ": " + (level - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
 			} else {
 				if (mMessage.isEmpty() || infuser == null) {
-					return Component.text(mName + " " + toRomanNumerals(level), color).decoration(TextDecoration.ITALIC, false);
+					return Component.text(mName + " " + StringUtils.toRoman(level), color).decoration(TextDecoration.ITALIC, false);
 				} else {
-					return Component.text(mName + " " + toRomanNumerals(level), color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
+					return Component.text(mName + " " + StringUtils.toRoman(level), color).decoration(TextDecoration.ITALIC, false).append(Component.text(" (" + mMessage + " by " + infuser + ")", NamedTextColor.DARK_GRAY));
 				}
 			}
 		}
@@ -861,7 +875,7 @@ public class ItemStatUtils {
 		POTION_RADIUS(new PotionRadius(), true, false);
 
 		static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(AttributeType.values())
-			                                                           .collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
+			.collect(Collectors.toUnmodifiableMap(AttributeType::getCodeName, type -> type));
 
 		public static final ImmutableList<AttributeType> MAINHAND_ATTRIBUTE_TYPES = ImmutableList.of(
 			ATTACK_DAMAGE_ADD,
@@ -1219,36 +1233,6 @@ public class ItemStatUtils {
 	static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.###");
 	static final DecimalFormat NUMBER_CHANGE_FORMATTER = new DecimalFormat("+0.###;-0.###");
 	static final DecimalFormat PERCENT_CHANGE_FORMATTER = new DecimalFormat("+0.###%;-0.###%");
-
-	static final NavigableMap<Integer, String> ROMAN_NUMERAL_VALUES = new TreeMap<>();
-
-	static {
-		ROMAN_NUMERAL_VALUES.put(1000, "M");
-		ROMAN_NUMERAL_VALUES.put(900, "CM");
-		ROMAN_NUMERAL_VALUES.put(500, "D");
-		ROMAN_NUMERAL_VALUES.put(400, "CD");
-		ROMAN_NUMERAL_VALUES.put(100, "C");
-		ROMAN_NUMERAL_VALUES.put(90, "XC");
-		ROMAN_NUMERAL_VALUES.put(50, "L");
-		ROMAN_NUMERAL_VALUES.put(40, "XL");
-		ROMAN_NUMERAL_VALUES.put(10, "X");
-		ROMAN_NUMERAL_VALUES.put(9, "IX");
-		ROMAN_NUMERAL_VALUES.put(5, "V");
-		ROMAN_NUMERAL_VALUES.put(4, "IV");
-		ROMAN_NUMERAL_VALUES.put(1, "I");
-	}
-
-	public static String toRomanNumerals(int value) {
-		if (value == 0) {
-			return "0";
-		}
-		Map.Entry<Integer, String> nextNumeralValue = ROMAN_NUMERAL_VALUES.floorEntry(value);
-		if (value == nextNumeralValue.getKey()) {
-			return nextNumeralValue.getValue();
-		}
-
-		return nextNumeralValue.getValue() + toRomanNumerals(value - nextNumeralValue.getKey());
-	}
 
 	public static Optional<NBTCompound> getCompound(@Nullable NBTCompound compound, String... path) {
 		if (compound == null) {
@@ -2166,8 +2150,8 @@ public class ItemStatUtils {
 
 	public static QuiverListener.ArrowTransformMode getArrowTransformMode(@Nullable ItemStack item) {
 		return getCompound(item, MONUMENTA_KEY, PLAYER_MODIFIED_KEY)
-			       .map(playerModified -> getEnum(playerModified, QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.class))
-			       .orElse(QuiverListener.ArrowTransformMode.NONE);
+			.map(playerModified -> getEnum(playerModified, QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.class))
+			.orElse(QuiverListener.ArrowTransformMode.NONE);
 	}
 
 	public static boolean isUpgradedLimeTesseract(@Nullable ItemStack item) {
@@ -2359,7 +2343,7 @@ public class ItemStatUtils {
 					if (charmPower > 0) {
 						String starString = "★".repeat(charmPower);
 						lore.add(Component.text("Charm Power : ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false).append(Component.text(starString, TextColor.fromHexString("#FFFA75")).decoration(TextDecoration.ITALIC, false))
-							         .append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClassComponent(monumenta.getStringList(CHARM_KEY))));
+							.append(Component.text(" - ", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)).append(getCharmClassComponent(monumenta.getStringList(CHARM_KEY))));
 					}
 				}
 
@@ -2396,10 +2380,10 @@ public class ItemStatUtils {
 			QuiverListener.ArrowTransformMode transformMode = getArrowTransformMode(item);
 			if (transformMode == QuiverListener.ArrowTransformMode.NONE) {
 				lore.add(Component.text("Arrow transformation ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					         .append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+					.append(Component.text("disabled", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			} else {
 				lore.add(Component.text("Transforms arrows to ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-					         .append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
+					.append(Component.text(transformMode.getArrowName(), NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)));
 			}
 		}
 
@@ -2407,13 +2391,13 @@ public class ItemStatUtils {
 
 		if (isUpgradedLimeTesseract(item)) {
 			lore.add(Component.text("Stored anvils: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-				         .append(Component.text(getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
+				.append(Component.text(getCharges(item), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)));
 		}
 
 		int shatterLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
 		if (shatterLevel > 0) {
 			TextColor color = TextColor.color(155 + (int) (100.0 * (shatterLevel - 1) / (Shattered.MAX_LEVEL - 1)), 0, 0);
-			lore.add(Component.text("* SHATTERED - " + toRomanNumerals(shatterLevel) + " *", color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+			lore.add(Component.text("* SHATTERED - " + StringUtils.toRoman(shatterLevel) + " *", color, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("Return to your grave to remove one level", color).decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("of Shattered, or use an anvil on this item.", color).decoration(TextDecoration.ITALIC, false));
 		}
