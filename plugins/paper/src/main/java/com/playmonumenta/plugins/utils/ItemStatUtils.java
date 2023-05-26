@@ -1465,7 +1465,7 @@ public class ItemStatUtils {
 		item.setItemMeta(nbt.getItem().getItemMeta());
 	}
 
-	public static int getCharmPower(final ItemStack item) {
+	public static int getCharmPower(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;
 		}
@@ -1480,7 +1480,7 @@ public class ItemStatUtils {
 		return monumenta.getInteger(CHARM_POWER_KEY);
 	}
 
-	public static int getFishQuality(final ItemStack item) {
+	public static int getFishQuality(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;
 		}
@@ -1493,6 +1493,21 @@ public class ItemStatUtils {
 			return 0;
 		}
 		return monumenta.getInteger(FISH_QUALITY_KEY);
+	}
+
+	public static @Nullable PlayerClass getCharmClass(@Nullable ItemStack itemStack) {
+		if (itemStack == null) {
+			return null;
+		}
+		NBTItem nbt = new NBTItem(itemStack);
+		if (!nbt.hasKey(MONUMENTA_KEY)) {
+			return null;
+		}
+		NBTCompound monumenta = nbt.getCompound(MONUMENTA_KEY);
+		if (!monumenta.hasKey(CHARM_KEY)) {
+			return null;
+		}
+		return getCharmClass(monumenta.getStringList(CHARM_KEY));
 	}
 
 	public static @Nullable PlayerClass getCharmClass(NBTList<String> charmLore) {

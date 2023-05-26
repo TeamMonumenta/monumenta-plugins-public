@@ -44,6 +44,8 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.loot.LootTable;
+import org.bukkit.loot.Lootable;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -619,6 +621,20 @@ public class ItemUtils {
 		return ((BookMeta) itemMeta).getAuthor();
 	}
 
+	public static @Nullable LootTable getLootTable(@Nullable ItemStack itemStack) {
+		if (itemStack == null) {
+			return null;
+		}
+		ItemMeta meta = itemStack.getItemMeta();
+		if (meta == null) {
+			return null;
+		}
+		if (meta instanceof Lootable lootable) {
+			return lootable.getLootTable();
+		}
+		return null;
+	}
+
 	public static void addPotionEffect(ItemStack potion, PotionInfo info) {
 		PotionMeta meta = (PotionMeta)potion.getItemMeta();
 		meta.addCustomEffect(new PotionEffect(info.mType, info.mDuration, info.mAmplifier, false, true), false);
@@ -674,6 +690,21 @@ public class ItemUtils {
 				     PINK_WOOL, PURPLE_WOOL, RED_WOOL, YELLOW_WOOL -> true;
 			default -> false;
 		};
+	}
+
+	public static float getDamagePercent(@Nullable ItemStack item) {
+		if (item == null) {
+			return 0.0f;
+		}
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) {
+			return 0.0f;
+		}
+		if (!(meta instanceof Damageable damageable)) {
+			return 0.0f;
+		} else {
+			return 1.0f * damageable.getDamage() / item.getType().getMaxDurability();
+		}
 	}
 
 	public static void damageItem(ItemStack item, int damage, boolean canBreak) {

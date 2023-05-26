@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.integrations;
 
+import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -27,6 +28,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.loot.LootTable;
 
 public class ChestSortIntegration implements Listener {
 	private static boolean checkedForPlugin = false;
@@ -143,6 +145,30 @@ public class ChestSortIntegration implements Listener {
 				sortMap.put("{customName}", customName);
 			}
 
+			String strBookAuthor = ItemUtils.getBookAuthor(item);
+			if (strBookAuthor == null) {
+				strBookAuthor = "~bookAuthor~";
+			} else {
+				strBookAuthor = ChatColor.stripColor(strBookAuthor) + " ";
+			}
+
+			String strBookTitle = ItemUtils.getBookTitle(item);
+			if (strBookTitle == null) {
+				strBookTitle = "~bookTitle~";
+			} else {
+				strBookTitle = ChatColor.stripColor(strBookTitle) + " ";
+			}
+
+			String strCharmClass;
+			PlayerClass playerClass = ItemStatUtils.getCharmClass(item);
+			if (playerClass == null) {
+				strCharmClass = "~Generalist";
+			} else {
+				strCharmClass = playerClass.mClassName;
+			}
+
+			String strCharmPower = String.valueOf(ItemStatUtils.getCharmPower(item));
+
 			int itemCount = 0;
 			if (item != null) {
 				itemCount = item.getAmount();
@@ -151,13 +177,12 @@ public class ChestSortIntegration implements Listener {
 			// A max custom stack has 127 items, a min custom stack has -128. Scale from max -> 0 to min -> 255.
 			String strCount = String.format("%03d", 127 - itemCount);
 
-			String strRegion = "~region~"; // Missing values start with ~ and wind up at the end
-			ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
-			if (region != null) {
-				int ordinal = region.ordinal();
-				String name = region.toString();
-				strRegion = ordinal + "_" + name;
-			}
+			String strDamage = String.format("%5.3f", ItemUtils.getDamagePercent(item));
+
+			String strFishQuality = String.valueOf(ItemStatUtils.getFishQuality(item));
+
+			String strIsMaterial = String.valueOf(
+				ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.MATERIAL));
 
 			String strLocation = "~location~"; // Missing values start with ~ and wind up at the end
 			ItemStatUtils.Location location = ItemStatUtils.getLocation(item);
@@ -165,6 +190,28 @@ public class ChestSortIntegration implements Listener {
 				int ordinal = location.ordinal();
 				String name = location.toString();
 				strLocation = String.format("%03d_%s", ordinal, name);
+			}
+
+			String strLootTable = "~lootTable~";
+			LootTable lootTable = ItemUtils.getLootTable(item);
+			if (lootTable != null) {
+				// Trailing space to make shorter names appear first
+				strLootTable = lootTable.getKey() + " ";
+			}
+
+			String strQuest = ItemUtils.getItemQuestId(item);
+			if (strQuest == null) {
+				strQuest = "~quest~";
+			} else {
+				strQuest = strQuest + " ";
+			}
+
+			String strRegion = "~region~"; // Missing values start with ~ and wind up at the end
+			ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
+			if (region != null) {
+				int ordinal = region.ordinal();
+				String name = region.toString();
+				strRegion = ordinal + "_" + name;
 			}
 
 			String strTier = "~tier~";
@@ -175,32 +222,19 @@ public class ChestSortIntegration implements Listener {
 				strTier = String.format("%02d_%s", ordinal, name);
 			}
 
-			String strQuest = ItemUtils.getItemQuestId(item);
-			if (strQuest == null) {
-				strQuest = "~quest~";
-			}
-
-			String strBookTitle = ItemUtils.getBookTitle(item);
-			if (strBookTitle == null) {
-				strBookTitle = "~bookTitle~";
-			} else {
-				strBookTitle = ChatColor.stripColor(strBookTitle);
-			}
-
-			String strBookAuthor = ItemUtils.getBookAuthor(item);
-			if (strBookAuthor == null) {
-				strBookAuthor = "~bookAuthor~";
-			} else {
-				strBookAuthor = ChatColor.stripColor(strBookAuthor);
-			}
-
-			sortMap.put("{count}", strCount);
-			sortMap.put("{region}", strRegion);
-			sortMap.put("{location}", strLocation);
-			sortMap.put("{tier}", strTier);
-			sortMap.put("{quest}", strQuest);
-			sortMap.put("{bookTitle}", strBookTitle);
 			sortMap.put("{bookAuthor}", strBookAuthor);
+			sortMap.put("{bookTitle}", strBookTitle);
+			sortMap.put("{charmClass}", strCharmClass);
+			sortMap.put("{charmPower}", strCharmPower);
+			sortMap.put("{count}", strCount);
+			sortMap.put("{damage}", strDamage);
+			sortMap.put("{fishQuality}", strFishQuality);
+			sortMap.put("{isMaterial}", strIsMaterial);
+			sortMap.put("{location}", strLocation);
+			sortMap.put("{lootTable}", strLootTable);
+			sortMap.put("{quest}", strQuest);
+			sortMap.put("{region}", strRegion);
+			sortMap.put("{tier}", strTier);
 		}
 	}
 }
