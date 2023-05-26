@@ -111,7 +111,7 @@ public class RingsFM extends FishingMinigame {
 				}
 
 				if (mSuccess >= mRingCount) {
-					fishingManager.minigameSuccess(player);
+					fishingManager.minigameSuccess(player, getForcedLootTable());
 					this.cancel();
 				}
 			}

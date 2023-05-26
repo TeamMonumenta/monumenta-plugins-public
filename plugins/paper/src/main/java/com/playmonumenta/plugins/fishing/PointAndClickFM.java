@@ -79,7 +79,7 @@ public class PointAndClickFM extends FishingMinigame {
 			public void run() {
 				mTicks++;
 				if (adjustedCircleLocations.isEmpty()) {
-					fishingManager.minigameSuccess(player);
+					fishingManager.minigameSuccess(player, getForcedLootTable());
 					this.cancel();
 					return;
 				}

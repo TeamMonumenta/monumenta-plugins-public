@@ -316,5 +316,11 @@ public class Constants {
 			Material.SPECTRAL_ARROW,
 			Material.TIPPED_ARROW
 		);
+		public static final EnumSet<Material> FISH = EnumSet.of(
+			Material.COD,
+			Material.PUFFERFISH,
+			Material.SALMON,
+			Material.TROPICAL_FISH
+		);
 	}
 }

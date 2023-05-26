@@ -129,7 +129,7 @@ public class DirectionalFM extends FishingMinigame {
 				}
 
 				if (mTicks > GAME_DURATION) {
-					fishingManager.minigameSuccess(player);
+					fishingManager.minigameSuccess(player, getForcedLootTable());
 					this.cancel();
 				}
 			}

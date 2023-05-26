@@ -231,7 +231,7 @@ public class RhythmFM extends FishingMinigame {
 					mLoop++;
 				}
 				if (mTicks > mDuration + END_TIME) {
-					fishingManager.minigameSuccess(player);
+					fishingManager.minigameSuccess(player, getForcedLootTable());
 					this.cancel();
 				}
 			}
