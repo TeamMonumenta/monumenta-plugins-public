@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.point.Point;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -16,6 +17,7 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -144,6 +146,20 @@ public class PlayerTracking implements EntityTracking {
 			mPlugin.mPotionManager.updatePotionStatus(player, ticks);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+
+		// Calculate and apply anti speed if the player is in (enters) an anti speed zone.
+		// This allows canceling speed gear, and is also recalculated in ItemStatManager when the player changes gear.
+		// This here mostly handles applying/removing the penalty when entering/leaving the zone.
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ANTI_SPEED)) {
+			if (!EntityUtils.hasAttributesContaining(player, Attribute.GENERIC_MOVEMENT_SPEED, Constants.ANTI_SPEED_MODIFIER)) {
+				PlayerUtils.cancelGearSpeed(player);
+			}
+		} else {
+			// Remove anti speed, if the player has it.
+			if (EntityUtils.hasAttributesContaining(player, Attribute.GENERIC_MOVEMENT_SPEED, Constants.ANTI_SPEED_MODIFIER)) {
+				EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, Constants.ANTI_SPEED_MODIFIER);
+			}
 		}
 	}
 

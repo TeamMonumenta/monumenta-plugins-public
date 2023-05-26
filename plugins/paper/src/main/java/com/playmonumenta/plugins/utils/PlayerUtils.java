@@ -34,6 +34,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
@@ -495,6 +497,18 @@ public class PlayerUtils {
 		PotionEffect jump = player.getPotionEffect(PotionEffectType.JUMP);
 		double jumpLevel = (jump == null ? -1 : jump.getAmplifier());
 		return jumpLevel < 0 ? 1.2523 : 0.0308354 * jumpLevel * jumpLevel + 0.744631 * jumpLevel + 1.836131; // Quadratic function taken from mc wiki - thanks mojank!
+	}
+
+	public static void cancelGearSpeed(Player player) {
+		double speed = EntityUtils.getAttributeOrDefault(player, Attribute.GENERIC_MOVEMENT_SPEED, 0.1);
+		// Sprinting adds 30% speed, and we don't want to have that be factored in the penalty.
+		if (player.isSprinting()) {
+			speed /= 1.3;
+		}
+		double multiplier = 1 / (speed / 0.1) - 1;
+		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED,
+			new AttributeModifier(Constants.ANTI_SPEED_MODIFIER, multiplier, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+		);
 	}
 
 	/**

@@ -54,7 +54,8 @@ public class ZoneUtils {
 		FESTIVE_TESSERACT_DISABLED("Festive Tesseract Disabled"),
 		BLITZ("Blitz"),
 		NO_PLACING_BOATS("No Placing Boats"),
-		ABYSSAL_FORCED("Abyssal Forced");
+		ABYSSAL_FORCED("Abyssal Forced"),
+		ANTI_SPEED("Anti Speed");
 
 		private final String mPropertyName;
 

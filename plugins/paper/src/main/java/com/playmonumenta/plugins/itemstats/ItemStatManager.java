@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -27,6 +28,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -210,6 +212,8 @@ public class ItemStatManager implements Listener {
 				}, 1);
 			}
 
+			// Reapply anti-speed for worn gear changes.
+			Bukkit.getScheduler().runTaskLater(plugin, () -> recalculateAntiSpeed(player), 1);
 		}
 
 		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll, @Nullable ItemStatUtils.Region region) {
@@ -350,6 +354,8 @@ public class ItemStatManager implements Listener {
 			mMainhandAddStats = newMainhandAddStats;
 			mStats = newStats;
 
+			// Mainhand items take longer to update. Make sure to catch those.
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> recalculateAntiSpeed(player), 2);
 		}
 
 		public void print(Player player) {
@@ -866,6 +872,25 @@ public class ItemStatManager implements Listener {
 			region = ItemStatUtils.getRegion(item);
 		}
 		return getRegionScaling(player, region, serverRegion, baseScaling, oneRegionScaling, twoRegionScaling);
+	}
+
+	/**
+	 * This method handles the Anti Speed zone, which can be used to cancel speed gear.
+	 * The movement penalty attribute has to be recalculated every time the player changes gear, since they could
+	 * have put on or removed speed gear.
+	 * The recalculation is done only if the player is still in an Anti Speed zone.
+	 * PlayerTracking already handles applying and removing the speed penalty when entering/leaving the zone.
+	 * @param player the affected player.
+	 */
+	private static void recalculateAntiSpeed(Player player) {
+		// Remove anti speed, if the player has it.
+		if (EntityUtils.hasAttributesContaining(player, org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED, Constants.ANTI_SPEED_MODIFIER)) {
+			EntityUtils.removeAttribute(player, org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED, Constants.ANTI_SPEED_MODIFIER);
+		}
+		// Calculate and apply anti speed if the player is in an anti speed zone.
+		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.ANTI_SPEED)) {
+			PlayerUtils.cancelGearSpeed(player);
+		}
 	}
 
 }
