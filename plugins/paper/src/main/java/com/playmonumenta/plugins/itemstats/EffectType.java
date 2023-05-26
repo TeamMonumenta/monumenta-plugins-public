@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.itemstats;
 
-import com.playmonumenta.plugins.CustomLogger;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.AbilityCooldownDecrease;
 import com.playmonumenta.plugins.effects.AbilityCooldownIncrease;
@@ -33,6 +32,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -72,7 +72,7 @@ public enum EffectType {
 	VANILLA_SATURATION("Saturation", "Saturation", true, false, PotionEffectType.SATURATION),
 	VANILLA_GLOW("Glowing", "Glowing", true, true, PotionEffectType.GLOWING),
 	VANILLA_SLOWFALL("SlowFalling", "Slow Falling", true, false, PotionEffectType.SLOW_FALLING),
-	VANILLA_CONDUIT("ConduitPower", "Conduit Power", true, true, PotionEffectType.CONDUIT_POWER),
+	VANILLA_CONDUIT("ConduitPower", "Conduit Power", true, false, PotionEffectType.CONDUIT_POWER),
 	VANILLA_HUNGER("Hunger", "Hunger", false, false, PotionEffectType.HUNGER),
 	VANILLA_NAUSEA("Nausea", "Nausea", false, true, PotionEffectType.CONFUSION),
 	VANILLA_BADLUCK("BadLuck", "Bad Luck", false, false, PotionEffectType.UNLUCK),
@@ -127,7 +127,7 @@ public enum EffectType {
 	PROJECTILE_DAMAGE("ProjectileDamage", "Projectile Damage", true, false, false),
 
 	//Weakness type of effects
-	WEAKNESS("Weakness", "Weakness", false, false, false),
+	WEAKNESS("Weakness", "Strength", false, false, false),
 	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false),
 	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false),
 	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false),
@@ -219,17 +219,11 @@ public enum EffectType {
 	}
 
 	public static boolean isEffectTypeAppliedEffect(@Nullable String source) {
-		// Inputs a source, and looks up through all the EffectTypes to check if their source starts with mName.
-		// Since Source is registered as:
-		// mName + <Source> or
-		// mName (if not source),
-		// We can determine if a source comes from a EffectType.applyEffect if the source starts with mName.
 		if (source == null) {
 			return false;
 		}
-
 		for (EffectType type : values()) {
-			if (source.startsWith(type.getName())) {
+			if (source.equals(type.getType())) {
 				return true;
 			}
 		}
@@ -239,6 +233,15 @@ public enum EffectType {
 	public static @Nullable EffectType fromType(String type) {
 		for (EffectType effectType : values()) {
 			if (effectType.mType.equals(type)) {
+				return effectType;
+			}
+		}
+		return null;
+	}
+
+	public static @Nullable EffectType fromTypeIgnoreCase(String type) {
+		for (EffectType effectType : values()) {
+			if (effectType.mType.equalsIgnoreCase(type)) {
 				return effectType;
 			}
 		}
@@ -275,13 +278,13 @@ public enum EffectType {
 		if (effectType == EffectType.STARVATION) {
 			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 			includeTime = false;
+		} else if (effectType.isConstant()) {
+			text = effectType.mName;
 		} else if (effectType.getPotionEffectType() != null) {
 			text = effectType.mName + " " + StringUtils.toRoman((int) strength);
 		} else if (effectType.getType().contains("Instant")) {
 			text = (int) (strength * 100) + "% " + effectType.mName;
 			includeTime = false;
-		} else if (effectType.isConstant()) {
-			text = effectType.mName;
 		} else if (effectType.isFlat()) {
 			text = add + ((int) strength) + " " + effectType.mName;
 		} else {
@@ -296,7 +299,7 @@ public enum EffectType {
 			if (minutes > 999) {
 				timeString = "(∞)";
 			}
-			component = component.append(Component.text(" " + timeString, TextColor.fromHexString("#55555")).decoration(TextDecoration.ITALIC, false));
+			component = component.append(Component.text(" " + timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false));
 		}
 		return component;
 	}
@@ -319,110 +322,120 @@ public enum EffectType {
 			return;
 		}
 
-		String sourceString = (source != null ? effectType.mName + source : effectType.mName);
-
-		switch (effectType) {
-			case SPEED -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, strength, sourceString));
-			case SLOW -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentSpeed(duration, -strength, sourceString));
-
-			case ATTACK_SPEED -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentAttackSpeed(duration, strength, sourceString));
-			case NEGATIVE_ATTACK_SPEED -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentAttackSpeed(duration, -strength, sourceString));
-
-			case KNOCKBACK_RESIST -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentKnockbackResist(duration, strength, sourceString));
-			case NEGATIVE_KNOCKBACK_RESIST -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentKnockbackResist(duration, -strength, sourceString));
-
-			case MAX_HEALTH_INCREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHealthBoost(duration, strength, sourceString));
-			case MAX_HEALTH_DECREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHealthBoost(duration, -strength, sourceString));
-
-			case ABSORPTION -> {
-				double amount = strength * EntityUtils.getMaxHealth(entity);
-				AbsorptionUtils.addAbsorption(entity, amount, amount, duration);
-				applyAbsorptionSickness(entity, applySickness, plugin);
+		// Special cases, does not correspond to vanilla or monumenta effect
+		if (effectType == ABSORPTION) {
+			double amount = strength * EntityUtils.getMaxHealth(entity);
+			AbsorptionUtils.addAbsorption(entity, amount, amount, duration);
+			applyAbsorptionSickness(entity, applySickness, plugin);
+			return;
+		} else if (effectType == STARVATION) {
+			if (entity instanceof Player player) {
+				Starvation.apply(player, (int) strength);
 			}
-			case STARVATION -> {
-				if (entity instanceof Player player) {
-					Starvation.apply(player, (int) strength);
-				}
+			return;
+		} else if (effectType == INSTANT_HEALTH) {
+			if (entity instanceof Player player) {
+				PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(entity) * strength);
+				applyHealingSickness(entity, applySickness, plugin);
 			}
-
-			case RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength));
-			case MELEE_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE)));
-			case PROJECTILE_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE)));
-			case MAGIC_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC)));
-			case BLAST_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.BLAST)));
-			case FIRE_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FIRE)));
-			case FALL_RESISTANCE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FALL)));
-
-			case DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength));
-			case MELEE_DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MELEE)));
-			case PROJECTILE_DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE)));
-			case MAGIC_DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MAGIC)));
-			case BLAST_DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.BLAST)));
-			case FIRE_DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FIRE)));
-			case FALL_DAMAGE_NEGATE -> plugin.mEffectManager.addEffect(entity, sourceString, new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FALL)));
-
-			case VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength));
-			case MELEE_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE)));
-			case PROJECTILE_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE)));
-			case MAGIC_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC)));
-			case BLAST_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.BLAST)));
-			case FIRE_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE)));
-			case FALL_VULNERABILITY -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL)));
-
-			case DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getScalableDamageType()));
-			case PROJECTILE_DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE)));
-			case MAGIC_DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC)));
-			case MELEE_DAMAGE -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE)));
-
-			case WEAKNESS -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, -strength));
-			case PROJECTILE_WEAKNESS -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE)));
-			case MAGIC_WEAKNESS -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC)));
-			case MELEE_WEAKNESS -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE)));
-
-			case HEAL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, strength));
-			case ANTI_HEAL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, -strength));
-
-			case INSTANT_HEALTH -> {
-				if (entity instanceof Player player) {
-					PlayerUtils.healPlayer(plugin, player, EntityUtils.getMaxHealth(entity) * strength);
-					applyHealingSickness(entity, applySickness, plugin);
-				}
-			}
-			case INSTANT_DAMAGE -> DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
-
-			case ARROW_SAVING -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, strength));
-			case ARROW_LOSS -> plugin.mEffectManager.addEffect(entity, sourceString, new ArrowSaving(duration, -strength));
-
-			case SOUL_THREAD_BONUS -> plugin.mEffectManager.addEffect(entity, sourceString, new BonusSoulThreads(duration, strength));
-			case SOUL_THREAD_REDUCTION -> plugin.mEffectManager.addEffect(entity, sourceString, new BonusSoulThreads(duration, -strength));
-
-			case DURABILITY_SAVE -> plugin.mEffectManager.addEffect(entity, sourceString, new DurabilitySaving(duration, strength));
-			case DURABILITY_LOSS -> plugin.mEffectManager.addEffect(entity, sourceString, new DurabilitySaving(duration, -strength));
-
-			case COOLDOWN_DECREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new AbilityCooldownDecrease(duration, strength));
-			case COOLDOWN_INCREASE -> plugin.mEffectManager.addEffect(entity, sourceString, new AbilityCooldownIncrease(duration, strength));
-
-			case EXP_BONUS -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentExperience(duration, strength));
-			case EXP_LOSS -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentExperience(duration, -strength));
-
-			case BLEED -> plugin.mEffectManager.addEffect(entity, sourceString, new Bleed(duration, strength, plugin));
-
-			case STASIS -> plugin.mEffectManager.addEffect(entity, sourceString, new Stasis(duration));
-
-			case BOON_OF_THE_PIT -> plugin.mEffectManager.addEffect(entity, sourceString, new BoonOfThePit(duration));
-			case BOON_OF_SILVER_SCALES -> plugin.mEffectManager.addEffect(entity, sourceString, new AbilityCooldownDecrease(duration, 0.05));
-			case BOON_OF_KNIGHTLY_PRAYER -> plugin.mEffectManager.addEffect(entity, sourceString, new BoonOfKnightlyPrayer(duration));
-			case CRYSTALLINE_BLESSING -> plugin.mEffectManager.addEffect(entity, sourceString, new CrystalineBlessing(duration));
-			case CURSE_OF_THE_DARK_SOUL -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentDamageReceived(duration, 1));
-			case DEEP_GODS_ENDOWMENT -> plugin.mEffectManager.addEffect(entity, sourceString, new DeepGodsEndowment(duration));
-			case HARRAKFARS_BLESSING -> plugin.mEffectManager.addEffect(entity, sourceString, new PercentHeal(duration, 0.1));
-			case SILVER_PRAYER -> plugin.mEffectManager.addEffect(entity, sourceString, new SilverPrayer(duration));
-			case STAR_COMMUNION -> plugin.mEffectManager.addEffect(entity, sourceString, new StarCommunion(duration));
-			case TUATHAN_BLESSING -> plugin.mEffectManager.addEffect(entity, sourceString, new TuathanBlessing(duration));
-
-			default -> CustomLogger.getInstance().warning("No EffectType implemented in applyEffect(..) for: " + effectType.mType);
-
+			return;
+		} else if (effectType == INSTANT_DAMAGE) {
+			DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
+			return;
 		}
+
+		String sourceString = source != null ? source : effectType.mType;
+
+		// This could be refactored to include a Supplier<Effect> as an option in the EffectType constructor and make this method much simpler
+		Effect effect = switch (effectType) {
+			case SPEED -> new PercentSpeed(duration, strength, sourceString);
+			case SLOW -> new PercentSpeed(duration, -strength, sourceString);
+
+			case ATTACK_SPEED -> new PercentAttackSpeed(duration, strength, sourceString);
+			case NEGATIVE_ATTACK_SPEED -> new PercentAttackSpeed(duration, -strength, sourceString);
+
+			case KNOCKBACK_RESIST -> new PercentKnockbackResist(duration, strength, sourceString);
+			case NEGATIVE_KNOCKBACK_RESIST -> new PercentKnockbackResist(duration, -strength, sourceString);
+
+			case MAX_HEALTH_INCREASE -> new PercentHealthBoost(duration, strength, sourceString);
+			case MAX_HEALTH_DECREASE -> new PercentHealthBoost(duration, -strength, sourceString);
+
+			case RESISTANCE -> new PercentDamageReceived(duration, -strength);
+			case MELEE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE));
+			case PROJECTILE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MAGIC_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case BLAST_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.BLAST));
+			case FIRE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FIRE));
+			case FALL_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FALL));
+
+			case DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength);
+			case MELEE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MELEE));
+			case PROJECTILE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MAGIC_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case BLAST_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.BLAST));
+			case FIRE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FIRE));
+			case FALL_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FALL));
+
+			case VULNERABILITY -> new PercentDamageReceived(duration, strength);
+			case MELEE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE));
+			case PROJECTILE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MAGIC_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case BLAST_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.BLAST));
+			case FIRE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE));
+			case FALL_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL));
+
+			case DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getScalableDamageType());
+			case PROJECTILE_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MAGIC_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case MELEE_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE));
+
+			case WEAKNESS -> new PercentDamageDealt(duration, -strength);
+			case PROJECTILE_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MAGIC_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
+			case MELEE_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE));
+
+			case HEAL -> new PercentHeal(duration, strength);
+			case ANTI_HEAL -> new PercentHeal(duration, -strength);
+
+			case ARROW_SAVING -> new ArrowSaving(duration, strength);
+			case ARROW_LOSS -> new ArrowSaving(duration, -strength);
+
+			case SOUL_THREAD_BONUS -> new BonusSoulThreads(duration, strength);
+			case SOUL_THREAD_REDUCTION -> new BonusSoulThreads(duration, -strength);
+
+			case DURABILITY_SAVE -> new DurabilitySaving(duration, strength);
+			case DURABILITY_LOSS -> new DurabilitySaving(duration, -strength);
+
+			case COOLDOWN_DECREASE -> new AbilityCooldownDecrease(duration, strength);
+			case COOLDOWN_INCREASE -> new AbilityCooldownIncrease(duration, strength);
+
+			case EXP_BONUS -> new PercentExperience(duration, strength);
+			case EXP_LOSS -> new PercentExperience(duration, -strength);
+
+			case BLEED -> new Bleed(duration, strength, plugin);
+
+			case STASIS -> new Stasis(duration);
+
+			case BOON_OF_THE_PIT -> new BoonOfThePit(duration);
+			case BOON_OF_SILVER_SCALES -> new AbilityCooldownDecrease(duration, 0.05);
+			case BOON_OF_KNIGHTLY_PRAYER -> new BoonOfKnightlyPrayer(duration);
+			case CRYSTALLINE_BLESSING -> new CrystalineBlessing(duration);
+			case CURSE_OF_THE_DARK_SOUL -> new PercentDamageReceived(duration, 1);
+			case DEEP_GODS_ENDOWMENT -> new DeepGodsEndowment(duration);
+			case HARRAKFARS_BLESSING -> new PercentHeal(duration, 0.1);
+			case SILVER_PRAYER -> new SilverPrayer(duration);
+			case STAR_COMMUNION -> new StarCommunion(duration);
+			case TUATHAN_BLESSING -> new TuathanBlessing(duration);
+
+			default -> null;
+		};
+
+		if (effect == null) {
+			MMLog.warning("No EffectType implemented in applyEffect(..) for: " + effectType.mType);
+			return;
+		}
+
+		plugin.mEffectManager.addEffect(entity, sourceString, effect);
 	}
 
 	private static void applyHealingSickness(Entity entity, boolean applySickness, Plugin plugin) {

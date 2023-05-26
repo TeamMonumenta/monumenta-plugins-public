@@ -75,7 +75,7 @@ public class PercentHealthBoost extends Effect {
 
 	@Override
 	public @Nullable String getSpecificDisplay() {
-		return StringUtils.to2DP(mAmount * 100) + "% Max Health";
+		return StringUtils.doubleToColoredAndSignedPercentage(mAmount) + " Max Health";
 	}
 
 	@Override

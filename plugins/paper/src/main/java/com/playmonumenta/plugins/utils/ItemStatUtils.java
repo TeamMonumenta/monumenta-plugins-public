@@ -1109,7 +1109,6 @@ public class ItemStatUtils {
 			String type = effect.getString(EFFECT_TYPE_KEY);
 			int duration = effect.getInteger(EFFECT_DURATION_KEY);
 			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-			String source = effect.getString(EFFECT_SOURCE_KEY);
 
 			int modifiedDuration = (int) (duration * quenchScale);
 
@@ -1122,7 +1121,7 @@ public class ItemStatUtils {
 						Effect sick = sicks.last();
 						sicknessPenalty = sick.getMagnitude();
 					}
-					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), source, applySickness);
+					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
 				} else if (effectType == EffectType.INSTANT_HEALTH) {
 					double sicknessPenalty = 0;
 					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
@@ -1130,9 +1129,9 @@ public class ItemStatUtils {
 						Effect sick = sicks.last();
 						sicknessPenalty = sick.getMagnitude();
 					}
-					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), source, applySickness);
+					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
 				} else {
-					EffectType.applyEffect(effectType, player, modifiedDuration, strength, source, applySickness);
+					EffectType.applyEffect(effectType, player, modifiedDuration, strength, null, applySickness);
 				}
 			}
 		}
@@ -1153,10 +1152,9 @@ public class ItemStatUtils {
 			String type = effect.getString(EFFECT_TYPE_KEY);
 			int duration = effect.getInteger(EFFECT_DURATION_KEY);
 			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-			String source = effect.getString(EFFECT_SOURCE_KEY);
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, duration + durationChange, strength, source, false);
+				EffectType.applyEffect(effectType, player, duration + durationChange, strength, null, false);
 			}
 		}
 	}
@@ -1176,10 +1174,9 @@ public class ItemStatUtils {
 			String type = effect.getString(EFFECT_TYPE_KEY);
 			int duration = effect.getInteger(EFFECT_DURATION_KEY);
 			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-			String source = effect.getString(EFFECT_SOURCE_KEY);
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, source, false);
+				EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, null, false);
 			}
 		}
 	}
@@ -1549,7 +1546,7 @@ public class ItemStatUtils {
 		return Component.text("Generalist", TextColor.fromHexString("#9F8F91"));
 	}
 
-	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration, @Nullable String source) {
+	public static void addConsumeEffect(final ItemStack item, final EffectType type, final double strength, final int duration) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
@@ -1560,9 +1557,6 @@ public class ItemStatUtils {
 		effect.setString(EFFECT_TYPE_KEY, type.getType());
 		effect.setDouble(EFFECT_STRENGTH_KEY, strength);
 		effect.setInteger(EFFECT_DURATION_KEY, duration);
-		if (source != null) {
-			effect.setString(EFFECT_SOURCE_KEY, source);
-		}
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 

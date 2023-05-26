@@ -493,7 +493,7 @@ public class ItemStatCommands {
 			int duration = (int) args[1];
 			double strength = (double) args[2];
 
-			ItemStatUtils.addConsumeEffect(item, type, strength, duration, null);
+			ItemStatUtils.addConsumeEffect(item, type, strength, duration);
 		}).register();
 
 		arguments.clear();
