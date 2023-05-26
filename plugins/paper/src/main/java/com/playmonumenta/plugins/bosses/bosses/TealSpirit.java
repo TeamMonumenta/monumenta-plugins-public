@@ -66,6 +66,7 @@ public class TealSpirit extends BossAbilityGroup {
 	private final List<Entity> mMarchers = new ArrayList<>();
 	private String mEncounterType;
 	private @Nullable DoomsdayClock mDoomsdayClock = null;
+	private @Nullable RewriteHistory mRewriteHistory = null;
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
@@ -136,7 +137,7 @@ public class TealSpirit extends BossAbilityGroup {
 		} else if (mEncounterType.equals("Hard")) {
 			mHealth = 24500;
 
-			RewriteHistory rewriteHistory = new RewriteHistory(mPlugin, mBoss, 20 * 5, 30, mSpawnLoc);
+			mRewriteHistory = new RewriteHistory(mPlugin, mBoss, 20 * 5, 30, mSpawnLoc);
 			MidnightToll midnightToll = new MidnightToll(mPlugin, mBoss, 20 * 5, 80, 40, mSpawnLoc);
 			MidnightToll finalMidnightToll = new MidnightToll(mPlugin, mBoss, 20 * 15, 99999999, 40, mSpawnLoc);
 			mDoomsdayClock = new DoomsdayClock(mBoss, mSpawnLoc, 20 * 25);
@@ -208,7 +209,9 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(25, mBoss -> {
-				rewriteHistory.run();
+				if (mRewriteHistory != null) {
+					mRewriteHistory.run();
+				}
 			});
 
 			events.put(20, mBoss -> {
@@ -218,7 +221,9 @@ public class TealSpirit extends BossAbilityGroup {
 			});
 
 			events.put(15, mBoss -> {
-				rewriteHistory.run();
+				if (mRewriteHistory != null) {
+					mRewriteHistory.run();
+				}
 			});
 
 			events.put(10, mBoss -> {
@@ -352,6 +357,9 @@ public class TealSpirit extends BossAbilityGroup {
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 		if (mDoomsdayClock != null) {
 			mDoomsdayClock.disableClock();
+		}
+		if (mRewriteHistory != null) {
+			mRewriteHistory.reset();
 		}
 	}
 

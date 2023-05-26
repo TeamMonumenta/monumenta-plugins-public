@@ -70,6 +70,13 @@ public class RewriteHistory extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
+	public void reset() {
+		mStack = 1;
+		PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
+			EntityUtils.removeAttribute(p, Attribute.GENERIC_MAX_HEALTH, "TealSpirit-" + mBoss.getUniqueId());
+		});
+	}
+
 	@Override
 	public int cooldownTicks() {
 		return mHealthCastTime + 20 * 5;
