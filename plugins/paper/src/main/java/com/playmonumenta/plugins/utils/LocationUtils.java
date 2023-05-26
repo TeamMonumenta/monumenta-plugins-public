@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.adapters.VersionAdapter;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.structures.StructuresPlugin;
 import com.playmonumenta.structures.managers.RespawningStructure;
 import java.util.ArrayList;
@@ -644,7 +645,8 @@ public class LocationUtils {
 	);
 
 	public static boolean isInSnowyBiome(Location loc) {
-		return SNOWY_BIOMES.contains(loc.getBlock().getBiome());
+		Biome biome = loc.getBlock().getBiome();
+		return SNOWY_BIOMES.contains(biome) || (biome == Biome.CUSTOM && ServerProperties.getShardName().equals("lightgray"));
 	}
 
 	public static double xzDistance(Location loc1, Location loc2) {
