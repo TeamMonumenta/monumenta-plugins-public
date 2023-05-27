@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -22,6 +21,8 @@ public class Stasis extends ZeroArgumentEffect {
 
 	public static final String GENERIC_NAME = "Stasis";
 
+	public static final String SPEED_EFFECT_NAME = "StasisSpeedEffect";
+
 	public Stasis(int duration) {
 		super(duration, effectID);
 	}
@@ -36,9 +37,7 @@ public class Stasis extends ZeroArgumentEffect {
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Player player) {
 			player.sendActionBar(Component.text("You are in stasis! You cannot use abilities for " + getDuration() / 20 + "s", NamedTextColor.DARK_RED));
-			player.addScoreboardTag(Constants.Tags.STASIS);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getDuration(), 9));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, getDuration(), 4));
+			Plugin.getInstance().mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(getDuration(), -1, SPEED_EFFECT_NAME).displays(false));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, getDuration(), 1));
 			player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1, 1.2f);
 			AbilityManager.getManager().updateSilence(player, true);
@@ -59,9 +58,9 @@ public class Stasis extends ZeroArgumentEffect {
 	@Override
 	public void entityLoseEffect(Entity entity) {
 		if (entity instanceof Player player) {
-			entity.removeScoreboardTag(Constants.Tags.STASIS);
 			AbilityManager.getManager().updatePlayerAbilities(player, false); // also updates silence
 		}
+		Plugin.getInstance().mEffectManager.clearEffects(entity, SPEED_EFFECT_NAME);
 	}
 
 	public static Stasis deserialize(JsonObject object, Plugin plugin) {

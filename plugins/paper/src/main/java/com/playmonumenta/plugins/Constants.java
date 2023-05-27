@@ -119,7 +119,6 @@ public class Constants {
 		// PlayerData
 		public static final String NO_SELF_PARTICLES = "noSelfParticles";
 		public static final String NO_TRANSPOSING = "NoTransposing";
-		public static final String STASIS = "Stasis";
 		public static final String FORMATION = "Formation";
 		public static final String ENTROPIC = "Entropic";
 	}

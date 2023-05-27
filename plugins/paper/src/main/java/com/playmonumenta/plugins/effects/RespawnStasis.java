@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
-import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
@@ -51,9 +50,7 @@ public class RespawnStasis extends Stasis {
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> showMessages(player, false));
 
 			// The following lines are from base Stasis with sound, glowing, and action bar message removed; and also potion effects' icons and particles removed
-			player.addScoreboardTag(Constants.Tags.STASIS);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, getDuration(), 9, false, false, false));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, getDuration(), 4, false, false, false));
+			Plugin.getInstance().mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(getDuration(), -1, SPEED_EFFECT_NAME).displays(false));
 			AbilityManager.getManager().updateSilence(player, true);
 		}
 	}

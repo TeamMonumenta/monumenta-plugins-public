@@ -26,6 +26,7 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.effects.SilverPrayer;
 import com.playmonumenta.plugins.effects.StarCommunion;
 import com.playmonumenta.plugins.effects.Stasis;
+import com.playmonumenta.plugins.effects.TemporalFlux;
 import com.playmonumenta.plugins.effects.TuathanBlessing;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
@@ -156,6 +157,7 @@ public enum EffectType {
 	BLEED("Bleed", "Bleed", false, false, false),
 
 	STASIS("Stasis", "Stasis", true, false, true),
+	PARADOX("Paradox", "Paradox", false, false, true),
 
 	BOON_OF_THE_PIT("BoonOfThePit", "Boon of the Pit", true, false, true),
 	BOON_OF_SILVER_SCALES("BoonOfSilverScales", "Boon of Silver Scales", true, false, true),
@@ -415,6 +417,7 @@ public enum EffectType {
 			case BLEED -> new Bleed(duration, strength, plugin);
 
 			case STASIS -> new Stasis(duration);
+			case PARADOX -> new TemporalFlux(duration);
 
 			case BOON_OF_THE_PIT -> new BoonOfThePit(duration);
 			case BOON_OF_SILVER_SCALES -> new AbilityCooldownDecrease(duration, 0.05);

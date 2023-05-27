@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -183,7 +184,7 @@ public class MarchingFate extends Spell {
 	}
 
 	private Component obfuscate(int num, TextColor color) {
-		List<TextComponent> comps = IntStream.range(0, SPELL_NAME.length()).mapToObj(i -> SPELL_NAME.toCharArray()[i]).map(c -> Component.text(c, color)).toList();
+		List<TextComponent> comps = IntStream.range(0, SPELL_NAME.length()).mapToObj(i -> SPELL_NAME.toCharArray()[i]).map(c -> Component.text(c, color)).collect(Collectors.toCollection(ArrayList::new));
 		for (int i = 0; i < num; i++) {
 			int index = FastUtils.RANDOM.nextInt(SPELL_NAME.length());
 			comps.set(index, comps.get(index).decorate(TextDecoration.OBFUSCATED));
