@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
@@ -27,6 +27,7 @@ import com.playmonumenta.plugins.bosses.spells.lich.SpellSalientOfDecay;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellShadowRealm;
 import com.playmonumenta.plugins.bosses.spells.lich.SpellSoulShackle;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.effects.LichCurseEffect;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
@@ -107,6 +108,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class Lich extends BossAbilityGroup {
 	public static final String identityTag = "boss_lich";
+	public static final String curseSource = "LichCurse";
 	public static final int detectionRange = 55;
 	public static final int mShieldMin = 5;
 	private static final int mCeiling = 35;
@@ -134,7 +136,6 @@ public final class Lich extends BossAbilityGroup {
 	private final List<Location> mTower3 = new ArrayList<>();
 	private final List<List<Location>> mTowerGroup = new ArrayList<>();
 	private final List<Location> mTp = new ArrayList<>();
-	private static final List<Player> mCursed = new ArrayList<>();
 	private static boolean mActivated = false;
 	private static boolean mGotHit = false;
 	private boolean mTrigger = false;
@@ -153,7 +154,7 @@ public final class Lich extends BossAbilityGroup {
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
 		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new Lich(plugin, boss, spawnLoc, endLoc));
+																				  new Lich(plugin, boss, spawnLoc, endLoc));
 	}
 
 	@Override
@@ -251,8 +252,8 @@ public final class Lich extends BossAbilityGroup {
 				} else if (!mCutscene) {
 					mT += 5;
 					if (mT >= 20 * 9
-						    && mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
-						    && !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
+							&& mBoss.getLocation().getY() <= mStart.getLocation().getY() + 3
+							&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 						mT = 0;
 						Collections.shuffle(mTp);
 						World world = mBoss.getWorld();
@@ -418,7 +419,7 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.setGravity(false);
 			// dialogue?
-			String[] dio = new String[] {
+			String[] dio = new String[]{
 				"I PROMISED THAT IF I SAW YOU AGAIN, I WOULD DESTROY YOU.",
 				"WHY DO YOU PERSIST?"
 			};
@@ -567,7 +568,7 @@ public final class Lich extends BossAbilityGroup {
 			mBoss.setAI(false);
 			mBoss.setGravity(false);
 			// dialogue?
-			String[] dio = new String[] {
+			String[] dio = new String[]{
 				"ENOUGH. YOU CANNOT DEFEAT ME.",
 				"MY SEARCH IS FAR TOO IMPORTANT FOR YOUR MEDDLING.",
 				"THE VEIL IS RIPPING APART AND I SEEK THE SOURCE.",
@@ -751,11 +752,11 @@ public final class Lich extends BossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		mBoss.teleport(mStart.getLocation().add(0, 17, 0));
 		// new spawn animation
-		String[] ani = new String[] {"loadstructure \"isles/lich/Spawn1\" ~-17 ~6 ~-17",
-		                             "loadstructure \"isles/lich/Spawn2\" ~-17 ~6 ~-17",
-		                             "loadstructure \"isles/lich/Spawn3\" ~-17 ~6 ~-17"};
-		String[] end = new String[] {"loadstructure \"isles/lich/Spawn4\" ~-17 ~6 ~-17",
-		                             "loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17"};
+		String[] ani = new String[]{"loadstructure \"isles/lich/Spawn1\" ~-17 ~6 ~-17",
+			"loadstructure \"isles/lich/Spawn2\" ~-17 ~6 ~-17",
+			"loadstructure \"isles/lich/Spawn3\" ~-17 ~6 ~-17"};
+		String[] end = new String[]{"loadstructure \"isles/lich/Spawn4\" ~-17 ~6 ~-17",
+			"loadstructure \"isles/lich/clear\" ~-17 ~6 ~-17"};
 
 		EntityEquipment equips = mBoss.getEquipment();
 		ItemStack[] a = Objects.requireNonNull(equips).getArmorContents();
@@ -780,15 +781,15 @@ public final class Lich extends BossAbilityGroup {
 						if (mT < ani.length) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 10.0f, 0.75f);
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-								             + ani[mT];
+											 + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+											 + ani[mT];
 							NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 							mT++;
 						} else {
 							this.cancel();
 							String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-								             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-								             + end[0];
+											 + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+											 + end[0];
 							NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 							// make boss visible
 							new PartialParticle(Particle.END_ROD, mStart.getLocation().add(0, 17, 0), 750, 6, 6, 6, 0).spawnAsBoss();
@@ -813,8 +814,8 @@ public final class Lich extends BossAbilityGroup {
 								@Override
 								public void run() {
 									String cmd = "execute positioned " + mStart.getLocation().getX() + " "
-										             + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
-										             + end[1];
+													 + mStart.getLocation().getY() + " " + mStart.getLocation().getZ() + " run "
+													 + end[1];
 									NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 									world.playSound(mStart.getLocation().add(0, 17, 0), Sound.BLOCK_ENDER_CHEST_CLOSE,
 										SoundCategory.HOSTILE, 10.0f, 0.5f);
@@ -822,7 +823,7 @@ public final class Lich extends BossAbilityGroup {
 							}.runTaskLater(mPlugin, 50);
 
 							// dialogue functions
-							String[] dio = new String[] {
+							String[] dio = new String[]{
 								"AH, THE SWEET SMELL OF THE DESERT. HOW I HAVE MISSED THIS.",
 								"MY MONTHS AWAY FROM THE SANDS HAVE TAKEN A TOLL.",
 								"NOW, I BELIEVE YOU HAVE DISTURBED MY SEARCH."
@@ -873,7 +874,7 @@ public final class Lich extends BossAbilityGroup {
 				EntityEquipment equip = e.getEquipment();
 				Objects.requireNonNull(mBoss.getEquipment())
 					.setArmorContents(Objects.requireNonNull(equip)
-						.getArmorContents());
+										  .getArmorContents());
 				mBoss.getEquipment().setItemInMainHand(equip.getItemInMainHand());
 				mBoss.getEquipment().setItemInOffHand(equip.getItemInOffHand());
 				e.remove();
@@ -895,10 +896,10 @@ public final class Lich extends BossAbilityGroup {
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		if (player.getLocation().distanceSquared(mSpawnLoc) > detectionRange * detectionRange
-			    || player.getLocation().getY() - mSpawnLoc.getY() > mCeiling) {
+				|| player.getLocation().getY() - mSpawnLoc.getY() > mCeiling) {
 			return;
 		}
-		removeCursed(player);
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, curseSource);
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 		World world = player.getWorld();
@@ -1067,9 +1068,9 @@ public final class Lich extends BossAbilityGroup {
 			mTotalDamage += event.getDamage();
 			Location loc = mBoss.getLocation();
 			if (mTotalDamage / EntityUtils.getMaxHealth(mBoss) >= 0.04
-				    && !mActivated
-				    && !mCutscene
-				    && !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
+					&& !mActivated
+					&& !mCutscene
+					&& !hasRunningSpellOfType(SpellDiesIrae.class, SpellDesecrate.class, SpellDarkOmen.class, SpellSalientOfDecay.class)) {
 				World world = mBoss.getWorld();
 				mTotalDamage = 0;
 				boolean locFound = false;
@@ -1167,7 +1168,7 @@ public final class Lich extends BossAbilityGroup {
 			ItemStack vanityBoots = vanityData.getEquipped(EquipmentSlot.FEET);
 			boots = ItemUtils.clone(vanityBoots != null && !VanityManager.isInvisibleVanityItem(vanityBoots) ? vanityBoots : inv.getBoots());
 		}
-		ItemStack[] items = new ItemStack[] {helm, chest, legs, boots};
+		ItemStack[] items = new ItemStack[]{helm, chest, legs, boots};
 		for (ItemStack item : items) {
 			if (item == null) {
 				continue;
@@ -1243,41 +1244,10 @@ public final class Lich extends BossAbilityGroup {
 		int score = ScoreboardUtils.getScoreboardValue(p, "LichAccursedOne").orElse(0);
 		ScoreboardUtils.setScoreboardValue(p, "LichAccursedOne", score + 1);
 
-		//don't add repeat instances of cursed players
-		if (!mCursed.contains(p)) {
-			mCursed.add(p);
-		}
 		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 0.5f);
-		AbilityUtils.increaseHealingPlayer(p, 20 * time, -0.5, "CurseEffect");
-		AbilityUtils.increaseDamageRecievedPlayer(p, 20 * time, 1.0, "CurseEffect");
+		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, curseSource, new LichCurseEffect(time * 20));
 		p.sendMessage(ChatColor.LIGHT_PURPLE + "I CAST DOWN DOOM UPON THEE, AND CURSE YOUR VERY BONES. YOU SHALL JOIN MY REVENANTS.");
 		p.sendActionBar(Component.text("You are cursed! You take double damage for " + time + " Seconds.", NamedTextColor.DARK_RED));
-		new BukkitRunnable() {
-			int mT;
-
-			@Override
-			public void run() {
-				mT += 10;
-				new PartialParticle(Particle.SOUL, p.getLocation().add(0, 0.75, 0), 6, 0.3, 0.3, 0.3, 0.01).spawnAsBoss();
-				if ((mT > 20 * time) && mCursed.contains(p)) {
-					this.cancel();
-					mCursed.remove(p);
-				} else if (!mCursed.contains(p)) {
-					this.cancel();
-				} else if (mT % 200 == 0) {
-					p.sendActionBar(Component.text("Cursed for " + (time - mT / 20) + " seconds.", NamedTextColor.DARK_RED));
-				}
-			}
-
-		}.runTaskTimer(plugin, 0, 10);
-	}
-
-	public static List<Player> getCursed() {
-		return mCursed;
-	}
-
-	public static void removeCursed(Player p) {
-		mCursed.remove(p);
 	}
 
 	public static void bossGotHit(boolean gotHit) {
@@ -1307,7 +1277,7 @@ public final class Lich extends BossAbilityGroup {
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 17, 10));
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 17, 1));
 		}
-		String[] dio1 = new String[] {
+		String[] dio1 = new String[]{
 			"I... WILL... NOT... BE... DESTROYED...",
 			"NO! I MUST... SPEAK... THE PARTING VEIL..."
 		};
@@ -1455,7 +1425,7 @@ public final class Lich extends BossAbilityGroup {
 
 	private void surprise() {
 		mDefeated = false;
-		String[] dio = new String[] {
+		String[] dio = new String[]{
 			"...THE PARTING VEIL GRANTS ME STRENGTH.",
 			"IT SUSTAINS ME. I HAVE NO TIME FOR DEATH."
 		};
@@ -1468,19 +1438,19 @@ public final class Lich extends BossAbilityGroup {
 
 		//prevent players above the barrier ceiling from seeing title
 		Component title = Component.text("", NamedTextColor.GOLD, TextDecoration.BOLD)
-			.append(Component.text("VI"))
-			.append(Component.text("C").decoration(TextDecoration.OBFUSCATED, true))
-			.append(Component.text("T"))
-			.append(Component.text("OR").decoration(TextDecoration.OBFUSCATED, true))
-			.append(Component.text("Y"));
+							  .append(Component.text("VI"))
+							  .append(Component.text("C").decoration(TextDecoration.OBFUSCATED, true))
+							  .append(Component.text("T"))
+							  .append(Component.text("OR").decoration(TextDecoration.OBFUSCATED, true))
+							  .append(Component.text("Y"));
 
 		Component subtitle = Component.text("", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
-			.append(Component.text("H").decoration(TextDecoration.OBFUSCATED, true))
-			.append(Component.text("ek"))
-			.append(Component.text("aw").decoration(TextDecoration.OBFUSCATED, true))
-			.append(Component.text("t, Th"))
-			.append(Component.text("e").decoration(TextDecoration.OBFUSCATED, true))
-			.append(Component.text(" Eternal"));
+								 .append(Component.text("H").decoration(TextDecoration.OBFUSCATED, true))
+								 .append(Component.text("ek"))
+								 .append(Component.text("aw").decoration(TextDecoration.OBFUSCATED, true))
+								 .append(Component.text("t, Th"))
+								 .append(Component.text("e").decoration(TextDecoration.OBFUSCATED, true))
+								 .append(Component.text(" Eternal"));
 
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
 			MessagingUtils.sendTitle(p, title, subtitle, 0, 80, 20);
@@ -1595,7 +1565,7 @@ public final class Lich extends BossAbilityGroup {
 
 		// partial respawn arena
 		String cmd = "execute positioned " + mStart.getLocation().getX() + " " + mStart.getLocation().getY() + " "
-			             + mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
+						 + mStart.getLocation().getZ() + " run loadstructure \"isles/lich/LichPhase4\" ~-30 ~-2 ~-30";
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		//warning smoke ring
@@ -1847,12 +1817,12 @@ public final class Lich extends BossAbilityGroup {
 			public void run() {
 				mDead = true;
 				World world = mBoss.getWorld();
-				String[] finalDialog = new String[] {
+				String[] finalDialog = new String[]{
 					"I SHOULD NOT HAVE EMERGED... THE VEIL IS FRAYING.",
 					"THERE IS POWER OUT THERE THAT COULD BE MINE, IF ONLY I HAD REMAINED.",
 					"SEARCHING... SOMETHING HAS BROKEN..."
 				};
-				String[] endDialog = new String[] {
+				String[] endDialog = new String[]{
 					"REALITY...",
 					"WOULD...",
 					"BE...",
@@ -1989,6 +1959,10 @@ public final class Lich extends BossAbilityGroup {
 									if (mT >= endDialog.length + 4) {
 										this.cancel();
 										mBoss.remove();
+										// clear curse from all players
+										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
+											com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, curseSource);
+										}
 										// kill mobs again
 										List<LivingEntity> en = EntityUtils.getNearbyMobs(mStart.getLocation(), detectionRange);
 										en.removeIf(e -> e.getType() == EntityType.ARMOR_STAND);

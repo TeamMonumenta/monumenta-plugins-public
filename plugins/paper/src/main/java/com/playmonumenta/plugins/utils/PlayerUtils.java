@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.destroystokyo.paper.MaterialSetTag;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.classes.Alchemist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Cleric;
@@ -77,9 +78,9 @@ public class PlayerUtils {
 
 	public static boolean playerCountsForLootScaling(Player player) {
 		return player.getGameMode() != GameMode.SPECTATOR
-			       && (player.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
-			       && ActivityManager.getManager().isActive(player)
-			       && !Shattered.hasMaxShatteredItemEquipped(player);
+				   && (player.getGameMode() != GameMode.CREATIVE || !Plugin.IS_PLAY_SERVER)
+				   && ActivityManager.getManager().isActive(player)
+				   && !Shattered.hasMaxShatteredItemEquipped(player);
 	}
 
 	public static List<Player> playersInLootScalingRange(Location loc) {
@@ -87,17 +88,17 @@ public class PlayerUtils {
 		boolean isDungeon = ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) > 0;
 		if (isDungeon) {
 			return loc.getWorld().getPlayers().stream()
-				       .filter(PlayerUtils::playerCountsForLootScaling)
-				       .toList();
+					   .filter(PlayerUtils::playerCountsForLootScaling)
+					   .toList();
 		}
 
 		// In a POI, all players within the same POI are in range
 		List<RespawningStructure> structures = StructuresPlugin.getInstance().mRespawnManager.getStructures(loc.toVector(), false)
-			                                       .stream().filter(structure -> structure.isWithin(loc)).toList();
+												   .stream().filter(structure -> structure.isWithin(loc)).toList();
 		if (!structures.isEmpty()) {
 			return loc.getWorld().getPlayers().stream()
-				       .filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
-				       .toList();
+					   .filter(p -> playerCountsForLootScaling(p) && playerIsInPOI(structures, p))
+					   .toList();
 		}
 
 		// Otherwise, perform no loot scaling
@@ -130,9 +131,9 @@ public class PlayerUtils {
 		double rangeSquared = range * range;
 		for (Player player : loc.getWorld().getPlayers()) {
 			if (player.getLocation().distanceSquared(loc) < rangeSquared
-				    && player.getGameMode() != GameMode.SPECTATOR
-				    && (includeNonTargetable || !AbilityUtils.isStealthed(player))
-				    && (includeDead || !Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class))) {
+					&& player.getGameMode() != GameMode.SPECTATOR
+					&& (includeNonTargetable || !AbilityUtils.isStealthed(player))
+					&& (includeDead || !Plugin.getInstance().mEffectManager.hasEffect(player, RespawnStasis.class))) {
 				players.add(player);
 			}
 		}
@@ -151,7 +152,7 @@ public class PlayerUtils {
 	}
 
 	public static boolean isCursed(Plugin plugin, Player p) {
-		return plugin.mEffectManager.hasEffect(p, "CurseEffect");
+		return plugin.mEffectManager.hasEffect(p, Lich.curseSource);
 	}
 
 	public static void removeCursed(Plugin plugin, Player p) {
@@ -161,7 +162,7 @@ public class PlayerUtils {
 	}
 
 	public static void setCursedTicks(Plugin plugin, Player p, int ticks) {
-		NavigableSet<Effect> cursed = plugin.mEffectManager.getEffects(p, "CurseEffect");
+		NavigableSet<Effect> cursed = plugin.mEffectManager.getEffects(p, Lich.curseSource);
 		if (cursed != null) {
 			for (Effect curse : cursed) {
 				curse.setDuration(ticks);

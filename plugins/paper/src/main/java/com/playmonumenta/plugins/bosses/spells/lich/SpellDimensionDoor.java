@@ -114,7 +114,7 @@ public class SpellDimensionDoor extends Spell {
 		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
 			p.sendMessage(Component.text("THE SHADOWS HOLD MANY SECRETS.", NamedTextColor.LIGHT_PURPLE));
-			if (Lich.getCursed().contains(p) || PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
+			if (PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
 				p.sendMessage(Component.text("I can cleanse the curse on me if I enter the shadows.", NamedTextColor.AQUA));
 			}
 			if (p.getLocation().getY() < mSpawnLoc.getY() - 8) {
@@ -195,8 +195,8 @@ public class SpellDimensionDoor extends Spell {
 					//move portal center to ground, stop above bedrock so that it doesn't replace bedrock
 					Location locDown = mLoc.clone().subtract(0, 1, 0);
 					while ((mLoc.getBlock().isPassable() || mLoc.getBlock().isLiquid()
-						        || mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
-						       && mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
+								|| mLoc.getBlock().isEmpty()) && locDown.getBlock().getType() != Material.BEDROCK
+							   && mLoc.getY() > mSpawnLoc.getY() - 5 && mT <= 5) {
 						mLoc.setY(mLoc.getY() - 1);
 						locDown = mLoc.clone().subtract(0, 1, 0);
 					}
@@ -326,7 +326,7 @@ public class SpellDimensionDoor extends Spell {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
 		mShadowed.add(p);
 
-		String[] dio = new String[] {
+		String[] dio = new String[]{
 			"There's something moving in the darkness! It looks like... me?!",
 			"This darkness is dangerous. I need to find a way out!",
 			"What is that pulsating mass in the center of the arena?"
@@ -346,7 +346,7 @@ public class SpellDimensionDoor extends Spell {
 				PlayerUtils.removeCursed(com.playmonumenta.plugins.Plugin.getInstance(), p);
 				p.sendMessage(Component.text("You felt a curse being lifted.", NamedTextColor.AQUA));
 			}
-			Lich.getCursed().remove(p);
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, Lich.curseSource);
 		} else {
 			t = 20 * 10;
 			DamageUtils.damage(mBoss, p, DamageType.OTHER, 1);

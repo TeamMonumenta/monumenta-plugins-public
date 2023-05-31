@@ -80,7 +80,7 @@ public final class EffectManager implements Listener {
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
 				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
-					             + source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
+								 + source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
 				return;
 			}
 			effect.mUsed = true;
@@ -308,6 +308,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(ItemCooldown.effectID, ItemCooldown::deserialize);
 		mEffectDeserializer.put(JudgementChainMobEffect.effectID, JudgementChainMobEffect::deserialize);
 		mEffectDeserializer.put(JudgementChainPlayerEffect.effectID, JudgementChainPlayerEffect::deserialize);
+		mEffectDeserializer.put(LichCurseEffect.effectId, LichCurseEffect::deserialize);
 		mEffectDeserializer.put(NegateDamage.effectID, NegateDamage::deserialize);
 		mEffectDeserializer.put(OnHitTimerEffect.effectID, OnHitTimerEffect::deserialize);
 		mEffectDeserializer.put(Paralyze.effectID, Paralyze::deserialize);
