@@ -39,6 +39,7 @@ import org.bukkit.entity.Evoker;
 import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -338,7 +339,14 @@ public class MobListener implements Listener {
 								if (modifiers != null) {
 									for (AttributeModifier modifier : modifiers) {
 										if (modifier.getOperation() == Operation.ADD_NUMBER) {
-											event.setDamage(modifier.getAmount() + 1);
+											// if Ghast, then scale with distance as well
+											if (source instanceof Ghast) {
+												double maxOriginalDamage = 14 * fireball.getYield() + 1;
+												double ratio = Math.max(0, (event.getDamage() - 1) / (maxOriginalDamage - 1));
+												event.setDamage(ratio * (modifier.getAmount() + 1));
+											} else {
+												event.setDamage(modifier.getAmount() + 1);
+											}
 										}
 									}
 								}
