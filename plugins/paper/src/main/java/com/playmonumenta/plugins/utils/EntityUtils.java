@@ -335,8 +335,8 @@ public class EntityUtils {
 	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, etc.
 	public static boolean isCCImmuneMob(Entity entity) {
 		return isBoss(entity)
-			|| ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
-			|| EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
+				   || ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
+				   || EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
 	}
 
 	public static boolean isTrainingDummy(Entity entity) {
@@ -351,9 +351,9 @@ public class EntityUtils {
 			return false;
 		}
 		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
-			|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-			|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
-			|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
+				|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
+				|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
+				|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
@@ -371,7 +371,7 @@ public class EntityUtils {
 
 	public static boolean isFireResistant(LivingEntity mob) {
 		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
-			|| mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
+				   || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -420,9 +420,9 @@ public class EntityUtils {
 	/**
 	 * Get the nearest entity that the player is looking at
 	 *
-	 * @param player              player
-	 * @param range               range
-	 * @param filter              predicate to filter mobs
+	 * @param player player
+	 * @param range  range
+	 * @param filter predicate to filter mobs
 	 * @return entity
 	 */
 	public static @Nullable LivingEntity getEntityAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
@@ -430,7 +430,8 @@ public class EntityUtils {
 		Location eyeLoc = player.getEyeLocation();
 		// Stole 0.425 ray size from hallowed beam. Could be made into an argument, but it's probably good that it is consistent everywhere
 		RayTraceResult result = world.rayTrace(eyeLoc, eyeLoc.getDirection(), range, FluidCollisionMode.NEVER, true, 0.425, filter);
-		if (result != null && result.getHitEntity() instanceof LivingEntity le) {
+		// the raySize parameter changes the size of entity bounding boxes, so the entity may actually be outside the max range, hence the range check here
+		if (result != null && result.getHitEntity() instanceof LivingEntity le && le.getLocation().distance(player.getLocation()) < range) {
 			return le;
 		}
 		return null;
@@ -671,16 +672,16 @@ public class EntityUtils {
 
 	public static @Nullable LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
 		return nearbyMobs
-			.stream()
-			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			.orElse(null);
+				   .stream()
+				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+				   .orElse(null);
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
 		return PlayerUtils.playersInRange(loc, radius, true)
-			.stream()
-			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			.orElse(null);
+				   .stream()
+				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+				   .orElse(null);
 	}
 
 	/**
@@ -716,10 +717,10 @@ public class EntityUtils {
 	public static @Nullable LivingEntity getNearestHostile(Player player, double range) {
 		Location loc = player.getLocation();
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
-			.stream()
-			.filter(e -> e.isValid() && isHostileMob(e))
-			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			.orElse(null);
+				   .stream()
+				   .filter(e -> e.isValid() && isHostileMob(e))
+				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+				   .orElse(null);
 	}
 
 	public static void amplifyPotionLevel(LivingEntity en, PotionEffectType effectType, int ampAmount, int ampCap) {
@@ -1224,10 +1225,10 @@ public class EntityUtils {
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		return loc.getNearbyEntities(1f, 1f, 1f)
-			.stream()
-			.filter(e -> e.getType().equals(type))
-			.min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-			.orElseThrow(() -> new Exception("Summoned mob but no mob appeared - " + cmd));
+				   .stream()
+				   .filter(e -> e.getType().equals(type))
+				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+				   .orElseThrow(() -> new Exception("Summoned mob but no mob appeared - " + cmd));
 	}
 
 	/*
@@ -1432,7 +1433,7 @@ public class EntityUtils {
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null
-				&& projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
+					   && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
 		}
 		return false;
 	}
@@ -1465,7 +1466,7 @@ public class EntityUtils {
 			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()
-					&& !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
+						&& !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
 					return true;
 				}
 			}
