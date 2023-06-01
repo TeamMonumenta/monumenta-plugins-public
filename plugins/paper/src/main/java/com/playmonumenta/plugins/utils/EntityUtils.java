@@ -437,6 +437,17 @@ public class EntityUtils {
 		return null;
 	}
 
+	public static Set<LivingEntity> getEntitiesAtCursor(Player player, double range, @Nullable Predicate<Entity> filter) {
+		Set<LivingEntity> entities = new HashSet<>();
+		LivingEntity e = getEntityAtCursor(player, range, filter);
+		while (e != null) {
+			entities.add(e);
+			Predicate<Entity> noRepeat = entity -> !(entity instanceof LivingEntity && entities.contains(entity));
+			e = getEntityAtCursor(player, range, filter == null ? noRepeat : noRepeat.and(filter));
+		}
+		return entities;
+	}
+
 	public static Projectile spawnProjectile(LivingEntity player, double yawOffset, double pitchOffset, Vector offset, float speed, Class<? extends Projectile> projectileClass) {
 		Location loc = player.getEyeLocation();
 		loc.add(offset);

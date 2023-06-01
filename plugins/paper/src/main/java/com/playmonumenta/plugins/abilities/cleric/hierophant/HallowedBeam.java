@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.HallowedBeamCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
@@ -25,6 +26,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.function.Predicate;
 import org.bukkit.Bukkit;
@@ -119,13 +121,36 @@ public class HallowedBeam extends MultipleChargeAbility {
 		});
 	}
 
+	public double getPercentHealth(LivingEntity le) {
+		return le.getHealth()/EntityUtils.getMaxHealth(le);
+	}
+
 	public void cast() {
 		World world = mPlayer.getWorld();
 
+		// Targeting
 		double range = CharmManager.getRadius(mPlayer, CHARM_DISTANCE, CAST_RANGE);
-		Predicate<Entity> playerFilter = e -> mMode != Mode.ATTACK && e instanceof Player p && p != mPlayer && p.getGameMode() != GameMode.SPECTATOR;
-		Predicate<Entity> hostileFilter = e -> mMode != Mode.HEALING && EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid();
-		LivingEntity e = EntityUtils.getEntityAtCursor(mPlayer, range, playerFilter.or(hostileFilter));
+		Predicate<Entity> playerFilter = e -> e instanceof Player p && p != mPlayer && p.getGameMode() != GameMode.SPECTATOR
+			&& getPercentHealth(p) < 0.995 // Do not heal if health is full
+			&& Plugin.getInstance().mEffectManager.getEffects(p, PercentHeal.class).stream() // Do not heal if there is a custom effect preventing heal
+				.filter(percentHeal -> percentHeal.getValue() < -0.995).findAny().isEmpty();
+		Predicate<Entity> hostileFilter = e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid();
+
+		LivingEntity e = null;
+		switch (mMode) {
+			case ATTACK -> e = EntityUtils.getEntityAtCursor(mPlayer, range, hostileFilter);
+			case HEALING -> {
+				ArrayList<LivingEntity> entities = new ArrayList<>(EntityUtils.getEntitiesAtCursor(mPlayer, range, playerFilter));
+				if (entities.size() != 0) {
+					// Sort by lower %hp
+					entities.sort((a, b) -> Double.compare(getPercentHealth(a), getPercentHealth(b)));
+					e = entities.get(0);
+				}
+			}
+			case DEFAULT -> e = EntityUtils.getEntityAtCursor(mPlayer, range, hostileFilter.or(playerFilter));
+			default -> {
+			}
+		}
 
 		if (e == null) {
 			return;
@@ -142,19 +167,11 @@ public class HallowedBeam extends MultipleChargeAbility {
 		ItemStack inMainHand = inventory.getItemInMainHand();
 
 		//Unsure why the runnable needs to exist, but it breaks if I don't have it
+		LivingEntity targetedEntity = e;
 		Bukkit.getScheduler().runTask(mPlugin, () -> {
 			Location loc = mPlayer.getEyeLocation();
 			Vector dir = loc.getDirection();
 
-			LivingEntity targetedEntity = e;
-			if (mMode == Mode.DEFAULT) {
-				//Check if heal should override damage
-				for (Entity en : EntityUtils.getNearestPlayers(e.getLocation(), 1.5)) {
-					if (en instanceof Player enPlayer && enPlayer.getGameMode() != GameMode.SPECTATOR && en != mPlayer) {
-						targetedEntity = enPlayer;
-					}
-				}
-			}
 			if (targetedEntity instanceof Player healedPlayer) {
 				mCosmetic.beamHealEffect(world, mPlayer, healedPlayer, dir, CAST_RANGE);
 				PlayerUtils.healPlayer(mPlugin, healedPlayer, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEAL, EntityUtils.getMaxHealth(healedPlayer) * HALLOWED_HEAL_PERCENT), mPlayer);
@@ -168,7 +185,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 				}
 			} else {
 
-				mCosmetic.beamHarm(world, mPlayer, e, dir, CAST_RANGE);
+				mCosmetic.beamHarm(world, mPlayer, targetedEntity, dir, CAST_RANGE);
 				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);
 				int stunDuration;
 				if (Crusade.enemyTriggersAbilities(targetedEntity, mCrusade)) {
