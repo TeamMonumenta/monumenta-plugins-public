@@ -167,7 +167,7 @@ public class CursedWound extends Ability {
 		if (isEnhanced() && entityDamageEvent != null && entityDamageEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 
 			mStoredPotionEffects = entity.getActivePotionEffects();
-			mStoredPotionEffects.removeIf(effect -> PotionUtils.hasPositiveEffects(effect.getType()));
+			mStoredPotionEffects.removeIf(effect -> effect.getType().isInstant() || PotionUtils.hasPositiveEffects(effect.getType()));
 			mStoredPotionEffects.removeIf(PotionUtils::isInfinite);
 
 			mStoredCustomEffects = new HashMap<>();
