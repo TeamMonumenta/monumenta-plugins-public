@@ -1157,10 +1157,11 @@ public class EntityListener implements Listener {
 			&& INVISIBLE_ITEM_FRAME_NAME.equals(frame.getCustomName())
 			&& !(event instanceof HangingBreakByEntityEvent breakByEntityEvent && breakByEntityEvent.getRemover() instanceof Player player && player.getGameMode() == GameMode.CREATIVE)) {
 			event.setCancelled(true);
-			frame.getWorld().dropItemNaturally(frame.getLocation(), InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
+			Location centeredLocation = frame.getLocation().toCenterLocation();
+			frame.getWorld().dropItem(centeredLocation, InventoryUtils.getItemFromLootTable(frame, INVISIBLE_ITEM_FRAME_LOOT_TABLE));
 			if (!ItemUtils.isNullOrAir(frame.getItem())
 				&& frame.getItemDropChance() > FastUtils.RANDOM.nextFloat()) {
-				frame.getWorld().dropItemNaturally(frame.getLocation(), frame.getItem());
+				frame.getWorld().dropItem(centeredLocation, frame.getItem());
 			}
 			frame.remove();
 		}
