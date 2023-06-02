@@ -4,22 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class FishingMinigame {
 	private boolean mHasBegun = false;
 	private boolean mTwentyTicksPassed = false;
 	private boolean mBlockInput = false;
-
-	private @Nullable String mForcedLootTablePath = null;
-
-	public void setForcedLootTable(String lootTablePath) {
-		mForcedLootTablePath = lootTablePath;
-	}
-
-	public @Nullable String getForcedLootTable() {
-		return mForcedLootTablePath;
-	}
 
 	protected final void beginTracking() {
 		mHasBegun = true;

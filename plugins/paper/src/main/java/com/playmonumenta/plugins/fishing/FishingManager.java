@@ -3,11 +3,14 @@ package com.playmonumenta.plugins.fishing;
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.infusions.StatTrackFishCaught;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.protocollib.FishingParticleListener;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -47,7 +50,7 @@ public class FishingManager implements Listener {
 		() -> new RingsFM(3, false, 2),
 		() -> new DirectionalFM(200, 0.3, Color.fromRGB(200, 0, 20), 0.016, false),
 		() -> new DirectionalFM(140, 0.45, Color.fromRGB(180, 20, 120), 0.026, false),
-	    () -> new DirectionalFM(140, 0.75, Color.fromRGB(255, 200, 50), 0.021, true),
+		() -> new DirectionalFM(140, 0.75, Color.fromRGB(255, 200, 50), 0.021, true),
 		() -> new RhythmFM(false, false),
 		() -> new RhythmFM(true, false),
 		() -> new RhythmFM(false, true),
@@ -57,6 +60,7 @@ public class FishingManager implements Listener {
 	);
 	private final HashMap<Player, FishingMinigame> mPlayerMinigameMap = new HashMap<>();
 	private final HashMap<Player, FishHook> mPlayerFishHookMap = new HashMap<>();
+	private final HashMap<Player, BaitInfo> mPlayerBaitInfoMap = new HashMap<>();
 	private final ArrayList<Player> mLeftClickSuppression = new ArrayList<>();
 	private final ArrayList<Player> mPlayerPrepCombatList = new ArrayList<>();
 	private final FishingCombatManager mCombatManager;
@@ -105,17 +109,16 @@ public class FishingManager implements Listener {
 			} else if (Constants.Materials.FISH.contains(caughtItemType)) {
 				// If the player has a bait to have a higher chance at a specific fish type,
 				// roll the chance, and get a fish from that loot table if successful.
-				BaitInfo baitInfo = getFirstBait(player);
-				if (baitInfo != null && baitInfo.mBait.mReplacementLootTable != null) {
-					baitInfo.mItemStack.setAmount(baitInfo.mItemStack.getAmount() - 1);
-					if (shouldReplaceCaughtFish(baitInfo)) {
-						ItemStack overrideItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(baitInfo.mBait.mReplacementLootTable.mPath));
-						if (overrideItem != null) {
-							caughtItemStack.setItemMeta(overrideItem.getItemMeta());
-							caughtItemStack.setType(overrideItem.getType());
-						}
+				BaitInfo baitInfo = mPlayerBaitInfoMap.get(player);
+				if (baitInfo != null && shouldReplaceCaughtFish(baitInfo) && baitInfo.mBait.mReplacementLootTable != null) {
+					ItemStack overrideItem = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(baitInfo.mBait.mReplacementLootTable.mPath));
+					if (overrideItem != null) {
+						caughtItemStack.setItemMeta(overrideItem.getItemMeta());
+						caughtItemStack.setType(overrideItem.getType());
 					}
 				}
+
+				modifyAndAssessFishQuality(player, caughtItemStack, baitInfo);
 			}
 		}
 	}
@@ -206,25 +209,25 @@ public class FishingManager implements Listener {
 		double combatOdds = 0.05;
 
 		// Bait Management
+		// Remove any previous bait effects being applied to the player, get the next bait, then put them on the bait map.
+		mPlayerBaitInfoMap.remove(player);
 		BaitInfo baitInfo = getFirstBait(player);
-		if (baitInfo != null && baitInfo.mBait.hasCombatOrMinigameOdds()) {
+		mPlayerBaitInfoMap.put(player, baitInfo);
+
+		// If they have bait, the quantity may be decreased, and we can do *stuff* with it.
+		if (baitInfo != null) {
+			baitInfo.mItemStack.setAmount(baitInfo.mItemStack.getAmount() - 1);
 			minigameOdds += baitInfo.mBait.mMinigameOdds;
 			combatOdds += baitInfo.mBait.mCombatOdds;
-			baitInfo.mItemStack.setAmount(baitInfo.mItemStack.getAmount() - 1);
 		}
 
 		if (eventProbability < minigameOdds) {
 			FishingParticleListener.suppressFishingParticles(player, fishHook.getLocation());
-			if (baitInfo != null && baitInfo.mBait.mReplacementLootTable != null && shouldReplaceCaughtFish(baitInfo)) {
-				baitInfo.mItemStack.setAmount(baitInfo.mItemStack.getAmount() - 1);
-				mPlayerMinigameMap.put(player, rollMinigameWithForcedLootTable(baitInfo.mBait.mReplacementLootTable.mGreaterPath));
-			} else {
-				mPlayerMinigameMap.put(player, rollMinigame());
-			}
+			mPlayerMinigameMap.put(player, rollMinigame());
 		} else if (eventProbability < minigameOdds + combatOdds &&
-			!ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
-			player.hasPermission(FISH_COMBAT_PERMISSION)) {
+			           !ZoneUtils.hasZoneProperty(fishHook.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			           !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ADVENTURE_MODE) &&
+			           player.hasPermission(FISH_COMBAT_PERMISSION)) {
 			mPlayerPrepCombatList.add(player);
 		}
 	}
@@ -264,12 +267,26 @@ public class FishingManager implements Listener {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> fishingMinigame.beginMinigame(this, player, centre), 20);
 	}
 
-	public void minigameSuccess(Player player, @Nullable String forcedLootTable) {
+	public void minigameSuccess(Player player) {
 		player.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 1.5f);
 		new PartialParticle(Particle.VILLAGER_HAPPY, player.getEyeLocation(), 20).delta(3, 0.5, 3).spawnAsPlayerActive(player);
 		double chooseReward = FastUtils.randomDoubleInRange(0, 1);
 		if (chooseReward < 0.8) {
-			InventoryUtils.giveItemFromLootTable(player, NamespacedKeyUtils.fromString(Objects.requireNonNullElse(forcedLootTable, WEIGHTED_FISH_TABLE)), 1);
+			BaitInfo baitInfo = mPlayerBaitInfoMap.get(player);
+			@Nullable FishLootTable forcedLootTable = baitInfo == null ? null : baitInfo.mBait.mReplacementLootTable;
+			@Nullable String forcedLootTableString = forcedLootTable == null ? null : forcedLootTable.mGreaterPath;
+			if (baitInfo == null || !shouldReplaceCaughtFish(baitInfo)) {
+				forcedLootTableString = null;
+			}
+
+			ItemStack reward = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(Objects.requireNonNullElse(forcedLootTableString, WEIGHTED_FISH_TABLE)));
+			if (reward == null) {
+				return;
+			}
+
+			modifyAndAssessFishQuality(player, reward, baitInfo);
+
+			InventoryUtils.giveItem(player, reward);
 		} else {
 			ItemStack reward = new ItemStack(Material.CHEST);
 			reward.setItemMeta(getLesserChest().getItemMeta());
@@ -285,12 +302,6 @@ public class FishingManager implements Listener {
 
 	private FishingMinigame rollMinigame() {
 		return FISHING_MINIGAMES.get(FastUtils.randomIntInRange(0, FISHING_MINIGAMES.size() - 1)).get();
-	}
-
-	private FishingMinigame rollMinigameWithForcedLootTable(String lootTablePath) {
-		FishingMinigame minigame = FISHING_MINIGAMES.get(FastUtils.randomIntInRange(0, FISHING_MINIGAMES.size() - 1)).get();
-		minigame.setForcedLootTable(lootTablePath);
-		return minigame;
 	}
 
 	private void removeHook(Player player, boolean inMinigame) {
@@ -367,6 +378,39 @@ public class FishingManager implements Listener {
 					NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false)
 			)
 		);
+	}
+
+	private @Nullable ItemStack getNextFish(Player player, String previousFishName, int newQuality) {
+		StringBuilder lootTablePath = new StringBuilder("epic:r3/items/fishing/fish/t" + newQuality + "/");
+		String[] previousFishNameSplit = previousFishName.split(" ");
+		for (int i = 1; i < previousFishNameSplit.length - 1; i++) {
+			lootTablePath.append(previousFishNameSplit[i].toLowerCase()).append("_");
+		}
+		lootTablePath.append(previousFishNameSplit[previousFishNameSplit.length - 1].toLowerCase());
+		return InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(lootTablePath.toString()));
+	}
+
+	private void modifyAndAssessFishQuality(Player player, ItemStack fishItem, @Nullable BaitInfo baitInfo) {
+		StatTrackFishCaught.fishCaught(player);
+		int quality = ItemStatUtils.getFishQuality(fishItem);
+		if (baitInfo != null && quality < 5 && FastUtils.randomDoubleInRange(0, 1) <= baitInfo.mBait.mQualityIncreaseOdds) {
+			quality++;
+			new PartialParticle(Particle.ELECTRIC_SPARK, player.getEyeLocation(), 20).delta(1, 0.5, 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+			ItemStack nextFish = getNextFish(player, ItemUtils.getPlainName(fishItem), quality);
+			if (nextFish == null) {
+				return;
+			}
+			fishItem.setItemMeta(nextFish.getItemMeta());
+		}
+
+		if (quality == 5) {
+			fiveStarAesthetics(player);
+		}
+	}
+
+	public static void fiveStarAesthetics(Player player) {
+		player.playSound(player, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 1f, 1.5f);
+		new PartialParticle(Particle.REDSTONE, player.getEyeLocation(), 30).delta(1, 0.5, 1).data(new Particle.DustOptions(Color.fromRGB(255, 200, 70), 0.9f)).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
 	}
 
 	public @Nullable BaitInfo getFirstBait(Player player) {

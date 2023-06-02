@@ -414,6 +414,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new ZoneListener(), this);
 		manager.registerEvents(new TridentListener(), this);
 		manager.registerEvents(new CrossbowListener(this), this);
+		manager.registerEvents(new FishListener(), this);
 		manager.registerEvents(mJunkItemsListener, this);
 		manager.registerEvents(mItemDropListener, this);
 		manager.registerEvents(mBlockInteractionsListener, this);

@@ -79,7 +79,7 @@ public class PointAndClickFM extends FishingMinigame {
 			public void run() {
 				mTicks++;
 				if (adjustedCircleLocations.isEmpty()) {
-					fishingManager.minigameSuccess(player, getForcedLootTable());
+					fishingManager.minigameSuccess(player);
 					this.cancel();
 					return;
 				}
@@ -164,6 +164,7 @@ public class PointAndClickFM extends FishingMinigame {
 	protected void previewMinigame(Player player, Location centre) {
 		centre.setY(centre.getY() + 3 * BOARD_HEIGHT / 5);
 		mDirection = player.getEyeLocation().clone().add(0, 1.5, 0).subtract(centre).toVector().normalize();
+		centre.subtract(mDirection.clone().multiply(2));
 		Vector planeVectorX = mDirection.clone().crossProduct(new Vector(0, 1, 0)).normalize(); // Left pointing
 		Vector planeVectorY = planeVectorX.clone().crossProduct(mDirection).normalize();
 		Location progressBottomCorner = centre.clone().add(planeVectorY.clone().multiply(PROGRESS_SEPARATION + BOARD_HEIGHT / 2).subtract(planeVectorX.clone().multiply(PROGRESS_WIDTH / 2)));

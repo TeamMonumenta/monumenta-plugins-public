@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -163,7 +164,11 @@ public class FishingCombatManager implements Listener {
 			if (awardParticipants) {
 				player.playSound(player, Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1f, 1.5f);
 				for (int i = 0; i < arena.mDifficulty + 2; i++) {
-					InventoryUtils.giveItemFromLootTable(player, NamespacedKeyUtils.fromString(FISH_TABLE), 1);
+					ItemStack fish = InventoryUtils.getItemFromLootTable(player, NamespacedKeyUtils.fromString(FISH_TABLE));
+					if (ItemStatUtils.getFishQuality(fish) == 5) {
+						FishingManager.fiveStarAesthetics(player);
+					}
+					InventoryUtils.giveItem(player, fish);
 				}
 				player.sendMessage(Component.text("You have been awarded some EXP and fish for your participation.", NamedTextColor.GRAY));
 				player.giveExp(ExperienceUtils.getTotalExperience(10));

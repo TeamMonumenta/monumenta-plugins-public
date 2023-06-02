@@ -51,6 +51,7 @@ public class StatTrackItem extends GenericCommand {
 		options.put("convert", InfusionType.STAT_TRACK_CONVERT);
 		options.put("dmgtaken", InfusionType.STAT_TRACK_DAMAGE_TAKEN);
 		options.put("healdone", InfusionType.STAT_TRACK_HEALING_DONE);
+		options.put("fish", InfusionType.STAT_TRACK_FISH_CAUGHT);
 
 		Argument<?> selectionArg = new MultiLiteralArgument(options.keySet().toArray(new String[options.size()]));
 
