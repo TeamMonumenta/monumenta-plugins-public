@@ -93,7 +93,7 @@ public class CleansingTotem extends TotemAbility {
 	}
 
 	@Override
-	public int getTotemDuration() {
+	public int getInitialAbilityDuration() {
 		return mDuration;
 	}
 

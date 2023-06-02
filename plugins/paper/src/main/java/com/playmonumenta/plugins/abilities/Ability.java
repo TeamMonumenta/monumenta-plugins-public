@@ -364,7 +364,29 @@ public abstract class Ability {
 	}
 
 	/**
+	 * Return the initial Duration if the ability has a duration
+	 */
+	public @Nullable Integer getInitialDuration() {
+		if (this instanceof AbilityWithDuration ability) {
+			return ability.getInitialAbilityDuration();
+		}
+		return null;
+	}
+
+	/**
+	 * Return the initial Duration if the ability has a duration
+	 */
+	public @Nullable Integer getRemainingDuration() {
+		if (this instanceof AbilityWithDuration ability) {
+			int remainingDuration = ability.getRemainingAbilityDuration();
+			return remainingDuration > 0 ? remainingDuration : null;
+		}
+		return null;
+	}
+
+	/**
 	 * Show the player the number of charges available
+	 * Get current duration if the ability is a totem ability
 	 */
 	public void showChargesMessage() {
 		if (this instanceof AbilityWithChargesOrStacks abilityWithChargesOrStacks) {

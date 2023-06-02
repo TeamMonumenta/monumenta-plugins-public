@@ -61,7 +61,7 @@ public class ClientModHandler {
 	/**
 	 * Sends an ability update to the player.
 	 * <p>
-	 * Does nothing if the player does not have a compatible client mod installed, or if the ability makes no sense to send to clients (see {@link #shouldHandleAbility(Ability)}).
+	 * Does nothing if the player does not have a compatible client mod installed, or if the ability makes no sense to send to clients (see {@link #shouldHandleAbility(Player, Ability)}).
 	 */
 	public static void updateAbility(Player player, Ability ability) {
 		if (INSTANCE == null || !playerHasClientMod(player) || !shouldHandleAbility(player, ability)) {
@@ -76,6 +76,8 @@ public class ClientModHandler {
 		packet.remainingCooldown = remainingCooldown;
 		packet.remainingCharges = charges;
 		packet.mode = ability.getMode();
+		packet.initialDuration = ability.getInitialDuration();
+		packet.remainingDuration = ability.getRemainingDuration();
 		INSTANCE.sendPacket(player, packet);
 	}
 
@@ -106,6 +108,8 @@ public class ClientModHandler {
 					info.remainingCharges = charges;
 					info.maxCharges = maxCharges;
 					info.mode = ability.getMode();
+					info.initialDuration = ability.getInitialDuration();
+					info.remainingDuration = ability.getRemainingDuration();
 					return info;
 				})
 				.sorted(Comparator.comparing(i -> i.name == null ? "" : i.name))
@@ -211,6 +215,9 @@ public class ClientModHandler {
 
 			@Nullable String mode;
 
+			@Nullable Integer remainingDuration;
+			@Nullable Integer initialDuration;
+
 		}
 
 	}
@@ -231,6 +238,9 @@ public class ClientModHandler {
 		int remainingCharges;
 
 		@Nullable String mode;
+
+		@Nullable Integer remainingDuration;
+		@Nullable Integer initialDuration;
 
 	}
 

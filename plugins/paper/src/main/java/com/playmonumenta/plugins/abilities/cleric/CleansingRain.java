@@ -5,9 +5,11 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -25,7 +27,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 
-public class CleansingRain extends Ability {
+public class CleansingRain extends Ability implements AbilityWithDuration {
 
 	private static final int CLEANSING_DURATION = 15 * 20;
 	private static final double PERCENT_DAMAGE_RESIST = -0.2;
@@ -67,15 +69,20 @@ public class CleansingRain extends Ability {
 		mRadius = CharmManager.getRadius(player, CHARM_RANGE, isEnhanced() ? CLEANSING_RADIUS_ENHANCED : CLEANSING_RADIUS);
 	}
 
+	private int mCurrDuration = -1;
+
 	public void cast() {
 		if (isOnCooldown()) {
 			return;
 		}
+
 		World world = mPlayer.getWorld();
 		world.playSound(mPlayer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1.45f, 0.8f);
 		putOnCooldown();
 
 		// Run cleansing rain here until it finishes
+		mCurrDuration = 0;
+		ClientModHandler.updateAbility(mPlayer, this);
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 			final List<Player> mCleansedPlayers = new ArrayList<>();
@@ -136,11 +143,33 @@ public class CleansingRain extends Ability {
 				}
 
 				mTicks += CLEANSING_APPLY_PERIOD;
+
+				if (mCurrDuration >= 0) {
+					mCurrDuration++;
+				}
+
 				if (mTicks > CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION)) {
 					this.cancel();
 				}
 			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, CleansingRain.this);
+			}
 		}.runTaskTimer(mPlugin, 0, CLEANSING_APPLY_PERIOD));
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return CharmManager.getDuration(mPlayer, CHARM_DURATION, CLEANSING_DURATION);
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 
 }

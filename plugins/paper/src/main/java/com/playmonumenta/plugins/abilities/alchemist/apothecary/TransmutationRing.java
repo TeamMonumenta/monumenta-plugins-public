@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.alchemist.apothecary;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -10,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.Transmuta
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
@@ -23,7 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
-public class TransmutationRing extends Ability implements PotionAbility {
+public class TransmutationRing extends Ability implements PotionAbility, AbilityWithDuration {
 	private static final int TRANSMUTATION_RING_1_COOLDOWN = 25 * 20;
 	private static final int TRANSMUTATION_RING_2_COOLDOWN = 20 * 20;
 	private static final int TRANSMUTATION_RING_RADIUS = 5;
@@ -96,6 +98,8 @@ public class TransmutationRing extends Ability implements PotionAbility {
 		}
 	}
 
+	private int mCurrDuration = -1;
+
 	@Override
 	public boolean createAura(Location loc, ThrownPotion potion, ItemStatManager.PlayerItemStats playerItemStats) {
 		if (!potion.hasMetadata(TRANSMUTATION_POTION_METAKEY)) {
@@ -111,6 +115,9 @@ public class TransmutationRing extends Ability implements PotionAbility {
 		double amplifier = DAMAGE_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_AMPLIFIER);
 		double perKillAmplifier = DAMAGE_PER_DEATH_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_PER_KILL_AMPLIFIER);
 		int maxKills = MAX_KILLS + (int) CharmManager.getLevel(mPlayer, CHARM_MAX_KILLS);
+
+		mCurrDuration = 0;
+		ClientModHandler.updateAbility(mPlayer, this);
 
 		mActiveTask = new BukkitRunnable() {
 			int mTicks = 0;
@@ -139,6 +146,16 @@ public class TransmutationRing extends Ability implements PotionAbility {
 				mCosmetic.periodicEffect(mPlayer, mCenter, mRadius, mTicks, mMaxTicks, duration + MAX_DURATION_INCREASE);
 
 				mTicks += 5;
+				if (mCurrDuration >= 0) {
+					mCurrDuration += 5;
+				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, TransmutationRing.this);
 			}
 		}.runTaskTimer(mPlugin, 0, 5);
 
@@ -161,4 +178,13 @@ public class TransmutationRing extends Ability implements PotionAbility {
 		mCosmetic.effectOnKill(mPlayer, event.getEntity().getLocation());
 	}
 
+	@Override
+	public int getInitialAbilityDuration() {
+		return CharmManager.getDuration(mPlayer, CHARM_DURATION, TRANSMUTATION_RING_DURATION);
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
 }

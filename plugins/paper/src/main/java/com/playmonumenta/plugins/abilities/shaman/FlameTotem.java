@@ -92,7 +92,7 @@ public class FlameTotem extends TotemAbility {
 	}
 
 	@Override
-	public int getTotemDuration() {
+	public int getInitialAbilityDuration() {
 		return mDuration;
 	}
 

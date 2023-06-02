@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.PotionAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -34,7 +36,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 
-public class Panacea extends Ability {
+public class Panacea extends Ability implements AbilityWithDuration {
 
 	private static final double PANACEA_DAMAGE_FRACTION = 1;
 	private static final int PANACEA_1_SHIELD = 2;
@@ -119,6 +121,8 @@ public class Panacea extends Ability {
 		});
 	}
 
+	private int mCurrDuration = -1;
+
 	public void cast() {
 		if (isOnCooldown() || mAlchemistPotions == null) {
 			return;
@@ -139,6 +143,10 @@ public class Panacea extends Ability {
 
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION);
 		double dotDamage = mAlchemistPotions.getDamage() * (isLevelOne() ? PANACEA_LEVEL_1_DOT_MULTIPLIER : PANACEA_LEVEL_2_DOT_MULTIPLIER);
+
+		mCurrDuration = 0;
+		ClientModHandler.updateAbility(mPlayer, this);
+
 		cancelOnDeath(new BukkitRunnable() {
 			final Location mLoc = mPlayer.getEyeLocation();
 			Vector mIncrement = mLoc.getDirection().multiply(moveSpeed);
@@ -221,11 +229,34 @@ public class Panacea extends Ability {
 					mLoc.setYaw(yaw);
 
 					mTicks--;
+					if (mCurrDuration > 0) {
+						mCurrDuration--;
+					}
 				} else {
 					mTicks++;
+					if (mCurrDuration >= 0) {
+						mCurrDuration++;
+					}
 				}
 				mTotalTicks++;
 			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, Panacea.this);
+			}
 		}.runTaskTimer(mPlugin, 0, 1));
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return PANACEA_MAX_DURATION;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }

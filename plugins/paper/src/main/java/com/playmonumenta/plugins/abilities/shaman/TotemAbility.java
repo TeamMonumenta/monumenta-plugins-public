@@ -4,8 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Map;
@@ -15,13 +17,19 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TotemAbility extends Ability {
+public abstract class TotemAbility extends Ability implements AbilityWithDuration {
 
 	private static final double VELOCITY = 2;
 
@@ -116,6 +124,8 @@ public abstract class TotemAbility extends Ability {
 		}
 	}
 
+	private int mCurrDuration = -1;
+
 	private void placeTotem(Location bLoc, ItemStatManager.PlayerItemStats stats) {
 		World world = mPlayer.getWorld();
 		bLoc.setDirection(mPlayer.getLocation().toVector().subtract(bLoc.toVector()).normalize());
@@ -137,7 +147,9 @@ public abstract class TotemAbility extends Ability {
 			durationStand.setCustomNameVisible(true);
 		}
 
-		int duration = getTotemDuration();
+		int duration = getInitialAbilityDuration();
+		mCurrDuration = 0;
+		ClientModHandler.updateAbility(mPlayer, this);
 		mTotemTickingRunnable = new BukkitRunnable() {
 			int mT = 0;
 			@Override
@@ -168,6 +180,11 @@ public abstract class TotemAbility extends Ability {
 					this.cancel();
 				}
 				mT++;
+
+				if (mCurrDuration >= 0) {
+					mCurrDuration++;
+				}
+
 			}
 
 			@Override
@@ -176,13 +193,21 @@ public abstract class TotemAbility extends Ability {
 				mMobStuckWithEffect = null;
 				durationStand.remove();
 				TotemicEmpowerment.removeTotem(mPlayer, stand);
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, TotemAbility.this);
 				super.cancel();
 			}
 		};
 		mTotemTickingRunnable.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public abstract int getTotemDuration();
+	@Override
+	public abstract int getInitialAbilityDuration();
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
 
 	public abstract void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats);
 

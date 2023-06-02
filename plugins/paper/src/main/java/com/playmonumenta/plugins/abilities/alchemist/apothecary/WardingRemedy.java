@@ -5,11 +5,13 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.apothecary.WardingRemedyCS;
 import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -19,7 +21,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class WardingRemedy extends Ability {
+public class WardingRemedy extends Ability implements AbilityWithDuration {
 
 	private static final int WARDING_REMEDY_1_COOLDOWN = 20 * 30;
 	private static final int WARDING_REMEDY_2_COOLDOWN = 20 * 25;
@@ -79,6 +81,8 @@ public class WardingRemedy extends Ability {
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WardingRemedyCS());
 	}
 
+	private int mCurrDuration = -1;
+
 	public void cast() {
 		if (isOnCooldown()) {
 			return;
@@ -97,6 +101,9 @@ public class WardingRemedy extends Ability {
 		int absorptionDuration = CharmManager.getDuration(mPlayer, CHARM_ABSORPTION_DURATION, WARDING_REMEDY_ABSORPTION_DURATION);
 
 		mCosmetic.remedyStartEffect(world, loc, mPlayer, radius);
+
+		mCurrDuration = 0;
+		ClientModHandler.updateAbility(mPlayer, this);
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mPulses = 0;
@@ -123,6 +130,16 @@ public class WardingRemedy extends Ability {
 				}
 
 				mTick++;
+				if (mCurrDuration >= 0) {
+					mCurrDuration++;
+				}
+			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, WardingRemedy.this);
 			}
 		}.runTaskTimer(mPlugin, 0, 1));
 	}
@@ -144,4 +161,13 @@ public class WardingRemedy extends Ability {
 		}
 	}
 
+	@Override
+	public int getInitialAbilityDuration() {
+		return (WARDING_REMEDY_PULSES + (int) CharmManager.getLevel(mPlayer, CHARM_PULSES)) * CharmManager.getDuration(mPlayer, CHARM_DELAY, WARDING_REMEDY_PULSE_DELAY); //pulses * delay
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
+	}
 }
