@@ -1175,10 +1175,6 @@ public class EntityUtils {
 		return getRecoilDisableAmount(plugin, mob) >= amount;
 	}
 
-	public static boolean isRiptideDisable(Plugin plugin, LivingEntity mob) {
-		return plugin.mEffectManager.hasEffect(mob, NO_RECOIL_EFFECT_NAME);
-	}
-
 	private static final String ARROW_IFRAMES_EFFECT_NAME = "SplitArrrowIframesEffect";
 
 	public static void applyArrowIframes(Plugin plugin, int ticks, LivingEntity mob) {

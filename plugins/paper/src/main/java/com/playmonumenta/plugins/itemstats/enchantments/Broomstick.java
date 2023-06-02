@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.effects.RiptideDisable;
+import com.playmonumenta.plugins.effects.BroomstickSlowFalling;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -11,8 +11,8 @@ import org.bukkit.event.player.PlayerRiptideEvent;
 
 public class Broomstick implements Enchantment {
 
-	private static final String RIPTIDE_DISABLE_EFFECT = "BroomstickDisable";
-	private static final int DISABLE_DURATION = 1000 * 20;
+	private static final String BROOMSTICK_EFFECT = "BroomstickSlowFalling";
+	private static final int DURATION = 1000 * 20;
 
 	@Override
 	public String getName() {
@@ -31,6 +31,6 @@ public class Broomstick implements Enchantment {
 
 	@Override
 	public void onRiptide(Plugin plugin, Player player, double level, PlayerRiptideEvent event) {
-		plugin.mEffectManager.addEffect(player, RIPTIDE_DISABLE_EFFECT, new RiptideDisable(DISABLE_DURATION));
+		plugin.mEffectManager.addEffect(player, BROOMSTICK_EFFECT, new BroomstickSlowFalling(DURATION));
 	}
 }

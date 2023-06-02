@@ -13,24 +13,24 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
-public class RiptideDisable extends ZeroArgumentEffect {
-	public static final String effectID = "RiptideDisable";
+public class BroomstickSlowFalling extends ZeroArgumentEffect {
+	public static final String effectID = "BroomstickSlowFalling";
 
 	private @Nullable BukkitTask mTask;
 
-	public RiptideDisable(int duration) {
+	public BroomstickSlowFalling(int duration) {
 		super(duration, effectID);
 	}
 
-	public static RiptideDisable deserialize(JsonObject object, Plugin plugin) {
+	public static BroomstickSlowFalling deserialize(JsonObject object, Plugin plugin) {
 		int duration = object.get("duration").getAsInt();
 
-		return new RiptideDisable(duration);
+		return new BroomstickSlowFalling(duration);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("RiptideDisable duration:%d", this.getDuration());
+		return String.format("BroomstickSlowFalling duration:%d", this.getDuration());
 	}
 
 	@Override
