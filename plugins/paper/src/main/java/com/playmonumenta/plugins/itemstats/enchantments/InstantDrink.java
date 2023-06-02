@@ -70,6 +70,9 @@ public class InstantDrink implements Enchantment {
 						item.setAmount(item.getAmount() - 1);
 					}
 				}
+				// fix for ghost potions on hotbar - bug #14893
+				// is hard to reproduce even with high ping so this may not be necessary
+				player.updateInventory();
 			}
 		}
 	}

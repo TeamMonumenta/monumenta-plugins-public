@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -42,9 +43,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -69,6 +72,8 @@ public class PotionConsumeListener implements Listener {
 	private final Map<UUID, BukkitRunnable> mRunnables = new HashMap<>();
 	/* This will only contain an item if currently consuming a potion, cleared after complete */
 	private final Map<UUID, ItemStack> mPotionsConsumed = new HashMap<>();
+	/* This will only contain an slot number if currently consuming a potion, cleared after complete */
+	private final Map<UUID, Integer> mPotionsSlot = new HashMap<>();
 
 	/* Note that this map only contains non-cancelled tasks. Everywhere these runnables are cancelled they should be removed from this map */
 	private final Map<UUID, BukkitTask> mCooldowns = new HashMap<>();
@@ -95,7 +100,8 @@ public class PotionConsumeListener implements Listener {
 
 		Inventory clickedInventory = event.getClickedInventory();
 		if (clickedInventory == null ||
-			    ((clickedInventory.getHolder() == null || clickedInventory.getHolder() instanceof Villager) && clickedInventory.getType() != InventoryType.ENDER_CHEST)) {
+			    ((clickedInventory.getHolder() == null || clickedInventory.getHolder() instanceof Villager) &&
+						clickedInventory.getType() != InventoryType.ENDER_CHEST)) {
 			return;
 		}
 
@@ -185,6 +191,8 @@ public class PotionConsumeListener implements Listener {
 			mPlugin.mEffectManager.addEffect(player, INVENTORY_DRINK_SLOW_EFFECT_NAME, new PercentSpeed(DRINK_DURATION + 5, -0.8, INVENTORY_DRINK_SLOW_EFFECT_NAME).displays(false));
 
 			UUID uuid = player.getUniqueId();
+			mPotionsConsumed.put(uuid, new ItemStack(item));
+			mPotionsSlot.put(uuid, slot);
 			BukkitRunnable runnable = new BukkitRunnable() {
 				int mTicks = 0;
 				@Override
@@ -197,23 +205,15 @@ public class PotionConsumeListener implements Listener {
 
 						Starvation.apply(player, starvation);
 
-						ItemStack invItem = clickedInventory.getItem(slot);
 						//If Sacred Provisions check passes, do not consume, but do not enable cancel quick drink function
 						//Do not run addition on infinity potions
 						if (potion != null && ItemStatUtils.getEnchantmentLevel(potion, EnchantmentType.INFINITY) == 0 &&
 							    NonClericProvisionsPassive.testRandomChance(player)) {
 							NonClericProvisionsPassive.sacredProvisionsSound(player);
-
-							if (invItem == null || invItem.getType().isAir() || invItem.getType().equals(Material.GLASS_BOTTLE)) {
-								clickedInventory.setItem(slot, potion);
-							} else {
-								clickedInventory.addItem(potion);
-							}
+							postPotionDrink(player, clickedInventory, potion, false);
 						} else {
 							//Remove glass bottle from inventory once drinked
-							if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
-								clickedInventory.setItem(slot, null);
-							}
+							postPotionDrink(player, clickedInventory, null, false);
 						}
 
 						this.cancel();
@@ -224,9 +224,8 @@ public class PotionConsumeListener implements Listener {
 					mTicks += DRINK_TICK_DELAY;
 				}
 			};
-			runnable.runTaskTimer(mPlugin, 5, DRINK_TICK_DELAY); //Delay of 5 seconds before first drink in minecraft
 			mRunnables.put(uuid, runnable);
-			mPotionsConsumed.put(uuid, new ItemStack(item));
+			runnable.runTaskTimer(mPlugin, 5, DRINK_TICK_DELAY); //Delay of 5 seconds before first drink in minecraft
 		}
 
 		if (reduceStack) {
@@ -234,6 +233,74 @@ public class PotionConsumeListener implements Listener {
 			if (!instantDrink && item.getAmount() == 0) {
 				clickedInventory.setItem(slot, new ItemStack(Material.GLASS_BOTTLE));
 			}
+		}
+	}
+
+	/**
+	 * This is called after the potion drink runnable has finished and when InventoryCloseEvent is called
+	 * @param player - player that drank the potion
+	 * @param inventory - inventory to check and refund potion
+	 * @param potion - potion to refund
+	 * @param inventoryClose - if this is an InventoryClose event
+	 */
+	private void postPotionDrink(Player player, Inventory inventory, @Nullable ItemStack potion, Boolean inventoryClose) {
+		UUID uuid = player.getUniqueId();
+		BukkitRunnable runnable = mRunnables.get(uuid);
+		// return if there is no drink in progress
+		if (runnable == null) {
+			return;
+		}
+
+		Integer slot = mPotionsSlot.get(uuid);
+		if (slot == null) {
+			return;
+		}
+		Inventory playerInv = player.getInventory();
+		ItemStack invItem = inventory.getItem(slot);
+		if (potion != null) { // if potion is not null, then assume that provisions is triggered
+			// only run if player still has container open
+			if (inventory.equals(player.getOpenInventory().getTopInventory()) || inventory.equals(player.getOpenInventory().getBottomInventory())) {
+				if (invItem == null || invItem.getType().isAir() || invItem.getType().equals(Material.GLASS_BOTTLE)) {
+					inventory.setItem(slot, potion);
+				} else {
+					addPotion(player, inventory, potion);
+				}
+			} else {
+				// otherwise put the potion anywhere in player inventory
+				addPotion(player, playerInv, potion);
+			}
+			mPotionsSlot.remove(uuid); // provisions should NEVER be triggered by InventoryCloseEvent
+		} else if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
+			inventory.setItem(slot, null);
+			if (!inventoryClose) {
+				mPotionsSlot.remove(uuid);
+			}
+		}
+	}
+
+	/**
+	 * Tries to add a potion to the current inventory.
+	 * If it is full, add it to the player's inventory.
+	 * If that is full, drop the potion on the ground at the player's feet.
+	 * @param player - the player (fallback if inventory is)
+	 * @param inventory - the inventory to try and add the potion to
+	 * @param potion - the potion
+	 */
+	private boolean addPotion(Player player, Inventory inventory, ItemStack potion) {
+		Location playerLoc = player.getLocation();
+		// only run if player still has container open
+		if (inventory.firstEmpty() == -1) {
+			// if inventory is the player's inventory
+			if (inventory instanceof PlayerInventory) {
+				playerLoc.getWorld().dropItem(playerLoc, potion);
+				return false;
+			} else {
+				return addPotion(player, player.getInventory(), potion);
+			}
+		} else {
+			// add item to container
+			inventory.addItem(potion);
+			return true;
 		}
 	}
 
@@ -287,6 +354,7 @@ public class PotionConsumeListener implements Listener {
 			clickedInventory.addItem(prevPotion);
 		}
 		mPotionsConsumed.remove(uuid);
+		mPotionsSlot.remove(uuid);
 		if (cooldownApplies(prevPotion)) {
 			mCooldowns.remove(uuid);
 		}
@@ -370,5 +438,14 @@ public class PotionConsumeListener implements Listener {
 				event.setCancelled(true);
 			}
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void inventoryCloseEvent(InventoryCloseEvent event) {
+		Inventory inventory = event.getInventory();
+		if (inventory instanceof PlayerInventory) {
+			return;
+		}
+		postPotionDrink((Player) event.getPlayer(), inventory, null, true);
 	}
 }
