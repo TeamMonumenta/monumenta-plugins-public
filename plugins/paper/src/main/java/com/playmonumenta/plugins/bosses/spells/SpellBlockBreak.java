@@ -19,6 +19,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.type.Fence;
 import org.bukkit.block.data.type.Gate;
+import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.block.data.type.Wall;
 import org.bukkit.entity.Entity;
@@ -122,13 +123,12 @@ public class SpellBlockBreak extends Spell {
 						// 3 Bad blocks Top level (3 * 2) = 6 (Break)
 						// 4 Foot Level blocks (4 * 1) + 1 Top level block (1 * 2) = 6 (Break)
 						// 3 Foot Level blocks (2 * 1) + 1 Top level block (1 * 2) = 5 (Don't Break)
-						if (y == 0 && !mFootLevelBreak) {
-							// Even if we don't break foot level blocks, count them towards the threshold as half a block.
-							badScore += 1;
-						} else {
+						if (y != 0 || (mFootLevelBreak && shouldBreakSlab(block))) {
 							// If we plan to break this block, add to list and count them towards the threshold as full block.
 							breakBlockList.add(block);
 							badScore += 2;
+						} else {
+							badScore += 1;
 						}
 					}
 				}
@@ -171,5 +171,14 @@ public class SpellBlockBreak extends Spell {
 	@Override
 	public int cooldownTicks() {
 		return 1;
+	}
+
+	private boolean shouldBreakSlab(Block block) {
+		if (block instanceof Slab s) {
+			// if block is slab, don't break if it's a bottom slab
+			return s.getType() != Slab.Type.BOTTOM;
+		}
+		// if block is not a slab, don't break
+		return true;
 	}
 }
