@@ -283,6 +283,7 @@ public class Plugin extends JavaPlugin {
 		TimeWarpCommand.register();
 		ParticleUtilsCommand.register();
 		ChargeUpBarCommand.register(this);
+		BoatUtilsCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
