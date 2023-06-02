@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.abilities.scout.ranger;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.ranger.TacticalManeuverCS;
@@ -24,6 +26,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 
 public class TacticalManeuver extends MultipleChargeAbility {
@@ -63,6 +66,7 @@ public class TacticalManeuver extends MultipleChargeAbility {
 			.displayItem(Material.STRING);
 
 	private int mLastCastTicks = 0;
+	private @Nullable SwiftCuts mSwiftCuts;
 	private final TacticalManeuverCS mCosmetic;
 
 	public TacticalManeuver(Plugin plugin, Player player) {
@@ -70,6 +74,10 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		mMaxCharges = (isLevelOne() ? TACTICAL_MANEUVER_1_MAX_CHARGES : TACTICAL_MANEUVER_2_MAX_CHARGES) + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new TacticalManeuverCS());
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
+		});
 	}
 
 	public void cast(boolean forwards) {
@@ -85,6 +93,18 @@ public class TacticalManeuver extends MultipleChargeAbility {
 		}
 
 		mLastCastTicks = ticks;
+
+		putOnCooldown();
+		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
+			for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+				ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
+				if (abil == this && linkedSpell != null) {
+					int totalCD = abil.getModifiedCooldown();
+					int reducedCD = (int) Math.floor(totalCD * (SwiftCuts.TACTICAL_MANEUVER_CDR + CharmManager.getLevelPercentDecimal(mPlayer, SwiftCuts.CHARM_ENHANCE)));
+					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
+				}
+			}
+		}
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, TACTICAL_MANEUVER_RADIUS);
 

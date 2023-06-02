@@ -47,6 +47,8 @@ public class HauntingShades extends Ability {
 	public static final String CHARM_COOLDOWN = "Haunting Shades Cooldown";
 	public static final String CHARM_RADIUS = "Haunting Shades Radius";
 	public static final String CHARM_DURATION = "Haunting Shades Duration";
+	public static final String CHARM_VULN = "Haunting Shades Vulnerability Modifier";
+	public static final String CHARM_DAMAGE = "Haunting Shades Damage Modifier";
 
 	public static final AbilityInfo<HauntingShades> INFO =
 		new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
@@ -141,19 +143,23 @@ public class HauntingShades extends Ability {
 			public void run() {
 				mT++;
 				if (mT % 5 == 0) {
-					List<Player> affectedPlayers = PlayerUtils.playersInRange(bLoc, mAoeRadius, true);
-					Set<LivingEntity> affectedMobs = new HashSet<LivingEntity>(EntityUtils.getNearbyMobs(bLoc, mAoeRadius));
 					if (isLevelTwo()) {
+						List<Player> affectedPlayers = PlayerUtils.playersInRange(bLoc, mAoeRadius, true);
+
+						double healPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT);
+						double strength = EFFECT_LEVEL + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 						for (Player p : affectedPlayers) {
 							double maxHealth = EntityUtils.getMaxHealth(p);
-							mPlugin.mEffectManager.addEffect(p, HEAL_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEAL_PERCENT), mPlayer, mPlugin));
-							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, EFFECT_LEVEL));
+							mPlugin.mEffectManager.addEffect(p, HEAL_NAME, new CustomRegeneration(EFFECT_DURATION, maxHealth * healPercent, mPlayer, mPlugin));
+							mPlugin.mEffectManager.addEffect(p, STR_NAME, new PercentDamageDealt(EFFECT_DURATION, strength));
 						}
 					}
 
-				    for (LivingEntity m : affectedMobs) {
-						EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, VULN, m);
-				    }
+					List<LivingEntity> affectedMobs = EntityUtils.getNearbyMobs(bLoc, mAoeRadius);
+					double vuln = VULN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
+					for (LivingEntity m : affectedMobs) {
+						EntityUtils.applyVulnerability(mPlugin, EFFECT_DURATION, vuln, m);
+					}
 				}
 
 				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mAoeRadius, mT);

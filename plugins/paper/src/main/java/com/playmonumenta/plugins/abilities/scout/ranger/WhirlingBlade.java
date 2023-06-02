@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
+import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -14,6 +15,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,12 +32,13 @@ import org.bukkit.util.Vector;
 
 public class WhirlingBlade extends MultipleChargeAbility {
 
-	private static final int BLADE_1_DAMAGE = 7;
-	private static final int BLADE_2_DAMAGE = 14;
+	private static final int BLADE_1_DAMAGE = 9;
+	private static final int BLADE_2_DAMAGE = 18;
 	private static final float BLADE_KNOCKBACK = 0.4f;
 	private static final double BLADE_WEAKEN = 0.3;
-	private static final int BLADE_WEAKEN_DURATION = 3 * 20;
-	private static final int BLADE_2_SILENCE_DURATION = 1 * 20;
+	private static final double BLADE_SLOWNESS = 0.2;
+	private static final int BLADE_1_DURATION = 3 * 20;
+	private static final int BLADE_2_DURATION = 15;
 	private static final double THROW_RADIUS = 3;
 	private static final double BLADE_RADIUS = 1;
 	private static final int BLADE_MAX_CHARGES = 2;
@@ -47,8 +50,10 @@ public class WhirlingBlade extends MultipleChargeAbility {
 	public static final String CHARM_CHARGES = "Whirling Blade Charges";
 	public static final String CHARM_COOLDOWN = "Whirling Blade Cooldown";
 	public static final String CHARM_WEAKEN = "Whirling Blade Weakness Amplifier";
+	public static final String CHARM_SLOWNESS = "Whirling Blade Slowness Amplifier";
 	public static final String CHARM_WEAKEN_DURATION = "Whirling Blade Weakness Duration";
-	public static final String CHARM_SILENCE_DURATION = "Whirling Blade Silence Duration";
+	public static final String CHARM_SLOWNESS_DURATION = "Whirling Blade Slowness Duration";
+	public static final String CHARM_STUN_DURATION = "Whirling Blade Stun Duration";
 
 	public static final AbilityInfo<WhirlingBlade> INFO =
 		new AbilityInfo<>(WhirlingBlade.class, "Whirling Blade", WhirlingBlade::new)
@@ -57,9 +62,9 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			.shorthandName("WB")
 			.descriptions(
 				"Use the swap key while holding a weapon to throw a whirling blade that circles around you, " +
-					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness for " + BLADE_WEAKEN_DURATION / 20 + "s. " +
+					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness and " + (int) (100 * BLADE_SLOWNESS) + " for " + BLADE_1_DURATION / 20 + "s. " +
 					"Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".",
-				"The damage is increased to " + BLADE_2_DAMAGE + " and also silences for " + BLADE_2_SILENCE_DURATION / 20 + "s.")
+				"The damage is increased to " + BLADE_2_DAMAGE + " and also stun for " + BLADE_2_DURATION / 20.0 + "s.")
 			.simpleDescription("Damage, weaken, and knock nearby mobs back.")
 			.cooldown(BLADE_COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WhirlingBlade::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP)
@@ -68,6 +73,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 
 	private final double mDamage;
 	private final float mKnockback;
+	private @Nullable SwiftCuts mSwiftCuts;
 
 	private int mLastCastTicks = 0;
 
@@ -77,6 +83,10 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BLADE_KNOCKBACK);
 		mMaxCharges = BLADE_MAX_CHARGES + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCharges = getTrackedCharges();
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
+		});
 	}
 
 	public void cast() {
@@ -88,12 +98,26 @@ public class WhirlingBlade extends MultipleChargeAbility {
 		}
 		mLastCastTicks = ticks;
 
-		double throwRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
-		double bladeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
+		double throwRad = CharmManager.getRadius(mPlayer, CHARM_RADIUS, THROW_RADIUS);
+		double bladeRad = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BLADE_RADIUS);
+		double dmg = mDamage;
+
+		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
+			double charmBuff = (1 + CharmManager.getLevelPercentDecimal(mPlayer, SwiftCuts.CHARM_ENHANCE));
+			throwRad *= (1 + SwiftCuts.WHIRLING_BLADE_BUFF * charmBuff);
+			bladeRad *= (1 + SwiftCuts.WHIRLING_BLADE_BUFF * charmBuff);
+			dmg *= (1 + SwiftCuts.WHIRLING_BLADE_BUFF * charmBuff);
+		}
+
+		double throwRadius = throwRad;
+		double bladeRadius = bladeRad;
+		double damage = dmg;
 
 		double weakenAmount = BLADE_WEAKEN + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKEN);
-		int weakenDuration = CharmManager.getDuration(mPlayer, CHARM_WEAKEN_DURATION, BLADE_WEAKEN_DURATION);
-		int silenceDuration = CharmManager.getDuration(mPlayer, CHARM_SILENCE_DURATION, BLADE_2_SILENCE_DURATION);
+		double slowAmount = BLADE_SLOWNESS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
+		int weakenDuration = CharmManager.getDuration(mPlayer, CHARM_WEAKEN_DURATION, BLADE_1_DURATION);
+		int slownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, BLADE_1_DURATION);
+		int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, BLADE_2_DURATION);
 		cancelOnDeath(new BukkitRunnable() {
 			final World mWorld = mPlayer.getWorld();
 			final Location mLoc = mPlayer.getEyeLocation().add(0, -0.5, 0);
@@ -125,11 +149,12 @@ public class WhirlingBlade extends MultipleChargeAbility {
 				while (mobIter.hasNext()) {
 					LivingEntity mob = mobIter.next();
 					if (mBox1.overlaps(mob.getBoundingBox()) || mBox2.overlaps(mob.getBoundingBox()) || mBox3.overlaps(mob.getBoundingBox())) {
-						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
+						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell(), true);
 						MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 						EntityUtils.applyWeaken(mPlugin, weakenDuration, weakenAmount, mob);
+						EntityUtils.applySlow(mPlugin, slownessDuration, slowAmount, mob);
 						if (isLevelTwo()) {
-							EntityUtils.applySilence(mPlugin, silenceDuration, mob);
+							EntityUtils.applyStun(mPlugin, stunDuration, mob);
 						}
 						mobIter.remove();
 					}

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
@@ -24,6 +25,7 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -82,6 +84,7 @@ public class PredatorStrike extends Ability {
 	private boolean mActive = false;
 	private final double mDistanceScale;
 	private final double mExplodeRadius;
+	private @Nullable SwiftCuts mSwiftCuts;
 
 	private final PredatorStrikeCS mCosmetic;
 
@@ -89,8 +92,11 @@ public class PredatorStrike extends Ability {
 		super(plugin, player, INFO);
 		mDistanceScale = isLevelOne() ? DISTANCE_SCALE_1 : DISTANCE_SCALE_2;
 		mExplodeRadius = CharmManager.getRadius(player, CHARM_RADIUS, EXPLODE_RADIUS);
-
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PredatorStrikeCS());
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
+		});
 	}
 
 	public void cast() {
@@ -124,6 +130,18 @@ public class PredatorStrike extends Ability {
 		}
 		mActive = false;
 		putOnCooldown();
+
+		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
+			for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+				ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
+				if (abil == this && linkedSpell != null) {
+					int totalCD = abil.getModifiedCooldown();
+					int reducedCD = (int) Math.floor(totalCD * (SwiftCuts.PREDATOR_STRIKE_CDR + CharmManager.getLevelPercentDecimal(mPlayer, SwiftCuts.CHARM_ENHANCE)));
+					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, reducedCD);
+				}
+			}
+		}
+
 		projectile.remove();
 		mPlugin.mProjectileEffectTimers.removeEntity(projectile);
 

@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
@@ -15,6 +16,7 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -28,6 +30,7 @@ import org.bukkit.entity.SpectralArrow;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 public class SplitArrow extends Ability {
 
@@ -53,10 +56,15 @@ public class SplitArrow extends Ability {
 			.displayItem(Material.BLAZE_ROD);
 
 	private final double mDamagePercent;
+	private @Nullable SwiftCuts mSwiftCuts;
 
 	public SplitArrow(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamagePercent = isLevelOne() ? SPLIT_ARROW_1_DAMAGE_PERCENT : SPLIT_ARROW_2_DAMAGE_PERCENT;
+
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mSwiftCuts = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SwiftCuts.class);
+		});
 	}
 
 	@Override
@@ -64,6 +72,9 @@ public class SplitArrow extends Ability {
 		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && EntityUtils.isHostileMob(enemy)) {
 			double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getDamage() * mDamagePercent);
 			int count = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_BOUNCES);
+			if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
+				count++;
+			}
 			double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, SPLIT_ARROW_CHAIN_RANGE);
 			LivingEntity sourceEnemy = enemy;
 			List<LivingEntity> chainedMobs = new ArrayList<>();
