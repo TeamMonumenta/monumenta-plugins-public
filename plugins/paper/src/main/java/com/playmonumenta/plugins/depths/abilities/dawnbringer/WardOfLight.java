@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.depths.abilities.dawnbringer;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
@@ -60,6 +61,7 @@ public class WardOfLight extends DepthsAbility {
 			// Don't heal players with PvP enabled
 			// If the source player was included (because PvP is on), heal them
 			if (!p.getScoreboardTags().contains("disable_class")
+			        && !AbilityManager.getManager().isPvPEnabled(mPlayer)
 			        && (playerDir.dot(toMobVector) > HEALING_DOT_ANGLE
 			        || p.getLocation().distance(mPlayer.getLocation()) < 2)) {
 

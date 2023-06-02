@@ -59,7 +59,6 @@ public class Swiftness extends Ability {
 					Swiftness swiftness = Plugin.getInstance().mAbilityManager.getPlayerAbilityIgnoringSilence(player, Swiftness.class);
 					return swiftness != null && swiftness.isLevelTwo();
 				}))
-			.remove(Swiftness::removeModifier)
 			.displayItem(Material.RABBIT_FOOT);
 
 	private boolean mWasInNoMobilityZone = false;
@@ -67,7 +66,9 @@ public class Swiftness extends Ability {
 
 	public Swiftness(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		addModifier(player);
+		if (player != null) {
+			addModifier(player);
+		}
 	}
 
 	@Override

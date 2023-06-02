@@ -99,7 +99,6 @@ public class DivineJustice extends Ability {
 				)
 			)
 			.simpleDescription("Deal extra damage on critical melee attacks against Undead enemies and heal when killing Undead enemies.")
-			.remove(DivineJustice::remove)
 			.displayItem(Material.IRON_SWORD);
 
 	private final boolean mDoHealingAndMultiplier;
@@ -296,12 +295,12 @@ public class DivineJustice extends Ability {
 			new PercentDamageDealt(duration, bonusDamage, null, 2, (attacker, enemy) -> Crusade.enemyTriggersAbilities(enemy, mCrusade)));
 	}
 
-	public static void remove(Player p) {
-		Plugin plugin = Plugin.getInstance();
-		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			DivineJustice dj = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(p, DivineJustice.class);
+	@Override
+	public void remove(Player p) {
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			DivineJustice dj = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(p, DivineJustice.class);
 			if (dj == null || !dj.isEnhanced()) {
-				plugin.mEffectManager.clearEffects(p, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
+				mPlugin.mEffectManager.clearEffects(p, ENHANCEMENT_BONUS_DAMAGE_EFFECT_NAME);
 			}
 		}, 5);
 	}

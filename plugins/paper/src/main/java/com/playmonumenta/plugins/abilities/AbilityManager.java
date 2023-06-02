@@ -60,6 +60,7 @@ import com.playmonumenta.plugins.abilities.other.PatronGreen;
 import com.playmonumenta.plugins.abilities.other.PatronPurple;
 import com.playmonumenta.plugins.abilities.other.PatronRed;
 import com.playmonumenta.plugins.abilities.other.PatronWhite;
+import com.playmonumenta.plugins.abilities.other.PvP;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -148,6 +149,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkChatIntegration;
+import com.playmonumenta.plugins.itemstats.infusions.Vitality;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -175,6 +177,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -249,6 +254,7 @@ public class AbilityManager {
 			AttribaMovementSpeed.INFO,
 
 			// All other non-class abilities
+			PvP.INFO,
 			PatronWhite.INFO,
 			PatronGreen.INFO,
 			PatronPurple.INFO,
@@ -466,10 +472,78 @@ public class AbilityManager {
 	}
 
 	public AbilityCollection updatePlayerAbilities(Player player, boolean resetAbsorption) {
-		double originalHealth = player.getHealth();
-
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
+
+		AttributeInstance knockbackResistance = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+		AttributeInstance movementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+		AttributeInstance attackDamage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+		AttributeInstance attackSpeed = player.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+		AttributeInstance maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+
+		// Reset passive buffs to player base attributes
+		if (knockbackResistance != null) {
+			knockbackResistance.setBaseValue(0);
+		}
+		if (attackDamage != null) {
+			attackDamage.setBaseValue(1.0);
+		}
+		if (attackSpeed != null) {
+			attackSpeed.setBaseValue(4.0);
+		}
+		if (maxHealth != null) {
+			maxHealth.setBaseValue(20);
+		}
+		// This zooms the player's screen obnoxiously, so try not to do it if it's not needed
+		if (movementSpeed != null
+			&& movementSpeed.getValue() != 0.1
+			&& !player.getGameMode().equals(GameMode.CREATIVE)
+			&& !player.getGameMode().equals(GameMode.SPECTATOR)) {
+			movementSpeed.setBaseValue(0.1);
+		}
+
+		/*
+		 * Supposing that all instances of attribute modifiers are from abilities (which is the
+		 * case currently), this code is fine. If we use attribute modifiers for other things
+		 * in the future, then we'll need some way to differentiate them.
+		 *
+		 * This accounts for skipping over modifiers from items, but will remove all other
+		 * attribute modifiers, so hopefully those aren't used anywhere else in Vanilla...
+		 *
+		 * Haha turns out potions use modifiers too. So double hopefully these aren't used
+		 * anywhere else in Vanilla.
+		 *
+		 * As a side note, we should only really ever be adding modifiers to KBR, Speed, and
+		 * Health, but check all of them here just in case.
+		 *
+		 *
+		 *
+		 * TODO: This should be replaced with calls to remove() in each respective ability.
+		 */
+		@Nullable AttributeInstance[] instances = {
+			knockbackResistance,
+			attackDamage,
+			attackSpeed,
+			movementSpeed,
+			maxHealth
+		};
+
+		for (AttributeInstance instance : instances) {
+			if (instance != null) {
+				for (AttributeModifier mod : instance.getModifiers()) {
+					String name = mod.getName();
+					// The name of modifiers from vanilla attributes or potions or the vitality infusion
+					if (!name.equals("Modifier")
+						&& !name.startsWith("minecraft:generic.")
+						&& !name.startsWith("effect.minecraft.")
+						&& !name.startsWith("Armor ")
+						&& !name.startsWith("Weapon ")
+						&& !name.equals(Vitality.MODIFIER)) {
+						instance.removeModifier(mod);
+					}
+				}
+			}
+		}
 
 		player.setWalkSpeed(DEFAULT_WALK_SPEED);
 		player.setInvulnerable(false);
@@ -532,8 +606,6 @@ public class AbilityManager {
 		MonumentaNetworkChatIntegration.refreshPlayer(player);
 		ClientModHandler.updateAbilities(player);
 
-		player.setHealth(Math.min(originalHealth, EntityUtils.getMaxHealth(player)));
-
 		updateSilence(player, collection, false);
 
 		return collection;
@@ -562,6 +634,11 @@ public class AbilityManager {
 	/* Do not modify the returned data! */
 	public List<AbilityInfo<?>> getDisabledSpecAbilities() {
 		return mDisabledSpecAbilities;
+	}
+
+	/* Convenience method */
+	public boolean isPvPEnabled(Player player) {
+		return getPlayerAbilities(player).getAbilityIgnoringSilence(PvP.class) != null;
 	}
 
 	public JsonElement getAsJson(Player player) {

@@ -14,14 +14,15 @@ public class AttribaKnockbackResistance extends Ability {
 
 	public static final AbilityInfo<AttribaKnockbackResistance> INFO =
 		new AbilityInfo<>(AttribaKnockbackResistance.class, null, AttribaKnockbackResistance::new)
-			.canUse(player -> player.getScoreboardTags().contains(MODIFIER_NAME))
-			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_KNOCKBACK_RESISTANCE, MODIFIER_NAME))
+			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME))
 			.ignoresSilence(true);
 
 	public AttribaKnockbackResistance(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		EntityUtils.addAttribute(player, Attribute.GENERIC_KNOCKBACK_RESISTANCE,
-			new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		if (player != null) {
+			EntityUtils.addAttribute(player, Attribute.GENERIC_KNOCKBACK_RESISTANCE,
+				new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		}
 	}
 }
