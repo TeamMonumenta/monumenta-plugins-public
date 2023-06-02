@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -24,7 +25,7 @@ public class SpellMiasma extends Spell {
 	private final Location mCenter;
 	private final double mDepth;
 	private final double mRange;
-	private List<Player> mWarnedPlayers = new ArrayList<Player>();
+	private final List<Player> mWarnedPlayers = new ArrayList<>();
 
 
 	public SpellMiasma(LivingEntity boss, Location loc, double j, double r) {
@@ -49,7 +50,7 @@ public class SpellMiasma extends Spell {
 					player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 6 * 20, 1));
 					if (!mWarnedPlayers.contains(player)) {
 						mWarnedPlayers.add(player);
-						player.sendMessage(ChatColor.DARK_PURPLE + "BEGONE THEN! FLY AWAY LITTLE BIRD!");
+						player.sendMessage(Component.text("BEGONE THEN! FLY AWAY LITTLE, BIRD!", NamedTextColor.LIGHT_PURPLE));
 					}
 				}
 			}
