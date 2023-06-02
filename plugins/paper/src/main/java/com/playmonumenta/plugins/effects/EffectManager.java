@@ -345,7 +345,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(VoodooBondsOtherPlayer.effectID, VoodooBondsOtherPlayer::deserialize);
 		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
-		mEffectDeserializer.put(WindBombAirTag.effectID, WindBombAirTag::deserialize);
 	}
 
 	private static final int PERIOD = 5;

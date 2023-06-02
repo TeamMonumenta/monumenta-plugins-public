@@ -51,6 +51,7 @@ public class ShieldWall extends Ability {
 	public static final String CHARM_COOLDOWN = "Shield Wall Cooldown";
 	public static final String CHARM_ANGLE = "Shield Wall Angle";
 	public static final String CHARM_KNOCKBACK = "Shield Wall Knockback";
+	public static final String CHARM_HEIGHT = "Shield Wall Height";
 
 	public static final AbilityInfo<ShieldWall> INFO =
 		new AbilityInfo<>(ShieldWall.class, "Shield Wall", ShieldWall::new)
@@ -58,7 +59,7 @@ public class ShieldWall extends Ability {
 			.scoreboardId("ShieldWall")
 			.shorthandName("SW")
 			.descriptions(
-				String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles %s blocks high and %s blocks wide in front of the user. " +
+				String.format("Press the swap key while holding a shield in either hand to create a %s degree arc of particles from 1 block below to %s blocks above the user's location and with a %s block radius in front of the user. " +
 					"Enemies that pass through the wall are dealt %s melee damage and knocked back. The wall also blocks all enemy projectiles such as arrows or fireballs. The shield lasts %s seconds. Cooldown: %ss.",
 					SHIELD_WALL_ANGLE,
 					SHIELD_WALL_HEIGHT,
@@ -80,11 +81,13 @@ public class ShieldWall extends Ability {
 			.displayItem(Material.STONE_BRICK_WALL);
 
 	private final int mDuration;
+	private final int mHeight;
 	private final ShieldWallCS mCosmetic;
 
 	public ShieldWall(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, (isLevelOne() ? SHIELD_WALL_1_DURATION : SHIELD_WALL_2_DURATION));
+		mHeight = SHIELD_WALL_HEIGHT + (int) CharmManager.getLevel(mPlayer, CHARM_HEIGHT);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldWallCS());
 	}
 
@@ -114,7 +117,7 @@ public class ShieldWall extends Ability {
 			public void run() {
 				mT++;
 				Vector vec;
-				for (int y = 0; y < SHIELD_WALL_HEIGHT; y++) {
+				for (int y = -1; y < mHeight; y++) {
 					for (double degree = 0; degree < angle; degree += 10) {
 						double radian1 = Math.toRadians(degree - 0.5 * angle);
 						vec = new Vector(-FastUtils.sin(radian1) * SHIELD_WALL_RADIUS, y, FastUtils.cos(radian1) * SHIELD_WALL_RADIUS);
@@ -122,7 +125,7 @@ public class ShieldWall extends Ability {
 
 						Location l = mLoc.clone().add(vec);
 						if (mT % 4 == 0) {
-							mCosmetic.shieldWallDot(mPlayer, l, degree, angle, y, SHIELD_WALL_HEIGHT);
+							mCosmetic.shieldWallDot(mPlayer, l, degree, angle, y, mHeight);
 						}
 						if (!mHitboxes) {
 							mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),

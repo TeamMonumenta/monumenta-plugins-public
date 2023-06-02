@@ -110,6 +110,10 @@ public class LocationUtils {
 		return block.getType() == Material.WATER || BlockUtils.containsWater(block);
 	}
 
+	public static boolean isAirborne(Entity entity) {
+		return !entity.isOnGround() && !isLocationInWater(entity.getLocation()) && !(entity.getLocation().getBlock().getType() == Material.LAVA);
+	}
+
 	public static boolean isValidBoatLocation(Location loc) {
 		/*
 		 * Check up to 50 blocks underneath the location.

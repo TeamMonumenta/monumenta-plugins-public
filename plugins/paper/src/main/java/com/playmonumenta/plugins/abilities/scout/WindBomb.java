@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.effects.WindBombAirTag;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -17,11 +16,13 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Triple;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -49,10 +50,9 @@ public class WindBomb extends Ability {
 	private static final int COOLDOWN_2 = 20 * 10;
 	private static final double DAMAGE_FRACTION_1 = 0.4;
 	private static final double DAMAGE_FRACTION_2 = 0.5;
-	private static final double MIDAIR_DAMAGE_BONUS = 0.2;
+	private static final double MIDAIR_DAMAGE_BONUS = 0.15;
 	private static final int RADIUS = 3;
 	private static final double VELOCITY = 1.5;
-	private static final String AIR_TAG = "WindBombAirTag";
 
 	private static final int PULL_INTERVAL = 10;
 	private static final double PULL_VELOCITY = 0.35;
@@ -82,10 +82,10 @@ public class WindBomb extends Ability {
 					              "giving them Slow Falling and %d%% Weaken for %ds. Cooldown: %ds.",
 					(int) (DAMAGE_FRACTION_1 * 100), RADIUS, (int) (WEAKEN_EFFECT * 100), DURATION / 20, COOLDOWN_1 / 20),
 				String.format("The damage is increased to %s%% of your projectile damage and the cooldown is reduced to %ds. " +
-					              "Additionally, you deal %d%% more damage to enemies affected by this skill for 4 seconds.",
+					              "Additionally, you passively deal %d%% more damage to airborne enemies.",
 					(int) (DAMAGE_FRACTION_2 * 100), COOLDOWN_2 / 20, (int) (MIDAIR_DAMAGE_BONUS * 100)),
 				String.format("On impact, generate a vortex that pulls mobs within %s blocks toward the center for %d seconds.", (int) PULL_RADIUS, PULL_DURATION / 20))
-			.simpleDescription("Throw a bomb that damages and shoots mobs up in the air, weakening them.")
+			.simpleDescription("Throw a bomb that damages and launches mobs up in the air, weakening them.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", WindBomb::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
 				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
@@ -135,6 +135,7 @@ public class WindBomb extends Ability {
 		}
 
 		if (triple != null) {
+			event.setCancelled(true);
 			mProjectiles.remove(triple);
 			double damage = triple.getMiddle();
 			ItemStatManager.PlayerItemStats playerItemStats = triple.getRight();
@@ -145,19 +146,15 @@ public class WindBomb extends Ability {
 			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.25f);
 
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-			new BukkitRunnable() {
 
-				@Override
-				public void run() {
-					for (double j = 0; j < 360; j += 6) {
-						double radian1 = Math.toRadians(j);
-						loc.add(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
-						new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-						loc.subtract(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
-					}
-					this.cancel();
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				for (double j = 0; j < 360; j += 6) {
+					double radian1 = Math.toRadians(j);
+					loc.add(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
+					new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
+					loc.subtract(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}, 1);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			double weaken = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
@@ -165,7 +162,8 @@ public class WindBomb extends Ability {
 			double velocityMultSquared = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEIGHT, 1);
 			float velocity = (float) (LAUNCH_VELOCITY * Math.sqrt(velocityMultSquared));
 			Hitbox damageHitbox = new Hitbox.SphereHitbox(loc, radius);
-			for (LivingEntity mob : damageHitbox.getHitMobs()) {
+			List<LivingEntity> launchedMobs = damageHitbox.getHitMobs();
+			for (LivingEntity mob : launchedMobs) {
 				if (damage > 0) {
 					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.PROJECTILE_SKILL, mInfo.getLinkedSpell(), playerItemStats), damage, true, false, false);
 				}
@@ -174,9 +172,6 @@ public class WindBomb extends Ability {
 					PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.SLOW_FALLING, duration, SLOW_FALL_EFFECT, true, false));
 				}
 				EntityUtils.applyWeaken(mPlugin, duration, weaken, mob);
-				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(mob, AIR_TAG + mPlayer.getName(), new WindBombAirTag(duration, MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER), mPlayer));
-				}
 			}
 
 			if (isEnhanced()) {
@@ -203,7 +198,7 @@ public class WindBomb extends Ability {
 									Vector vector = mob.getLocation().toVector().subtract(loc.toVector());
 									double ratio = PULL_RATIO + vector.length() / pullRadius;
 									Vector velocity = mob.getVelocity().add(vector.normalize().multiply(pullVelocity).multiply(-ratio).add(new Vector(0, 0.1 + 0.2 * ratio, 0)));
-									if (mPlugin.mEffectManager.hasEffect(mob, AIR_TAG)) {
+									if (launchedMobs.contains(mob)) {
 										// If mob was launched by the ability, don't change their Y
 										velocity.setY(mob.getVelocity().getY());
 									}
@@ -223,5 +218,13 @@ public class WindBomb extends Ability {
 
 			proj.remove();
 		}
+	}
+
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (isLevelTwo() && LocationUtils.isAirborne(enemy) && event.getType() != DamageEvent.DamageType.TRUE) {
+			event.setDamage(event.getDamage() * (1 + MIDAIR_DAMAGE_BONUS + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER)));
+		}
+		return false;
 	}
 }
