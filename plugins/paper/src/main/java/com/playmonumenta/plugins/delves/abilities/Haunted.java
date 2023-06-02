@@ -38,9 +38,12 @@ public class Haunted {
 	public static final double MAX_SPEED = 0.5;
 	public static final double DAMAGE = 0.4; //percentage
 	public static final double RANGE = 50;
-	public static final double VERTICAL_SPEED_DEBUFF = 3;
+	public static final double VERTICAL_SPEED_DEBUFF = 3; // This makes Looming Consequence move slower vertically
+	public static final double PLAYER_VERTICAL_CHANGE_DEBUFF = 2; // This makes the player's vertical movement factor less into Looming Consequence movement
 
 	private static void followPlayer(Player p, ArmorStand armorStand) {
+		Vector playerYDivider = new Vector(1, PLAYER_VERTICAL_CHANGE_DEBUFF, 1);
+		Vector hauntedYDivider = new Vector(1, VERTICAL_SPEED_DEBUFF, 1);
 		new BukkitRunnable() {
 			Location mPLoc = p.getLocation();
 			double mRadian = 0;
@@ -129,15 +132,15 @@ public class Haunted {
 				}
 				mRangeCD--;
 
-				double pMovedTick = mPLoc.distance(p.getLocation());
-
+				double pMovedTick = mPLoc.clone().subtract(p.getLocation()).toVector() // Delta between last location and current location
+					.divide(playerYDivider).length(); // Decrease movement based on vertical player movement
 				if (pMovedTick < 0.005) {
 					return;
 				} else if (pMovedTick > 1) {
 					pMovedTick = 1;
 				}
 
-				armorStand.teleport(sLoc.add(direction.multiply(mSpeed*pMovedTick).divide(new Vector(1, VERTICAL_SPEED_DEBUFF, 1))));
+				armorStand.teleport(sLoc.add(direction.multiply(mSpeed*pMovedTick).divide(hauntedYDivider)));
 				mPLoc = p.getLocation();
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0L, 1L);
