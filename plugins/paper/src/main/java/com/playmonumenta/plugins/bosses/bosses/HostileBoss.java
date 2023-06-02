@@ -30,10 +30,14 @@ public class HostileBoss extends BossAbilityGroup {
 		@BossParam(help = "Particles summon at player eye")
 		public ParticlesList PARTICLES = ParticlesList.EMPTY;
 
-		@BossParam(help = "Sounds player when deal damage")
+		@BossParam(help = "Sounds played when damage is dealt")
 		public SoundsList SOUNDS = SoundsList.EMPTY;
 
+		@BossParam(help = "Name of the attack that shows up in chat")
 		public String SPELL_NAME = "";
+
+		@BossParam(help = "How long the attack breaks shields for. If 0, attack doesn't break shields")
+		public int SHIELD_BREAK_TICKS = 0;
 	}
 
 	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
@@ -48,7 +52,7 @@ public class HostileBoss extends BossAbilityGroup {
 			if (boss instanceof Creature creature) {
 				NmsUtils.getVersionAdapter().setAggressive(creature, (LivingEntity target) -> {
 					if (p.DAMAGE != 0) {
-						BossUtils.blockableDamage(mBoss, target, p.TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), 0);
+						BossUtils.blockableDamage(mBoss, target, p.TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation(), p.SHIELD_BREAK_TICKS);
 					}
 
 					if (p.DAMAGE_PERCENTAGE != 0) {
