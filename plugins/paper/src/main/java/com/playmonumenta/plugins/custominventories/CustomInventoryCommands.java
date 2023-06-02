@@ -259,7 +259,7 @@ public class CustomInventoryCommands {
 			})
 			.register();
 		new CommandAPICommand("emote")
-			.withPermission("monumenta.command.emote")
+			.withPermission("monumenta.command.emote.self")
 			.executesPlayer((player, arg) -> {
 				emote(player);
 			})

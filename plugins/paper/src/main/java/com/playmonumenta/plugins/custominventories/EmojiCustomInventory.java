@@ -50,10 +50,12 @@ public class EmojiCustomInventory extends CustomInventory {
 
 	public static final ArrayList<Emoji> EMOJI_LIST = new ArrayList<>();
 
+	//Default IDs not necessarily following order, so that all non-patreon emojis appear together in the front, and to make sure default selections stay the same between updates.
 	static {
 		EMOJI_LIST.add(new Emoji("Thumbs Up", "Default Discord thumbs up!", Material.RABBIT_FOOT, false, "thumbsup", 1));
 		EMOJI_LIST.add(new Emoji("Thumbs Down", "Default Discord thumbs down.", Material.PUFFERFISH, false, "thumbsdown", 2));
 		EMOJI_LIST.add(new Emoji("Smiley Face", "Default Discord smile!", Material.PLAYER_HEAD, false, "smiley", 3));
+		EMOJI_LIST.add(new Emoji("Rainbow", "Default Discord rainbow.", Material.FIREWORK_ROCKET, false, "rainbow", 19));
 		EMOJI_LIST.add(new Emoji("Croggers", "Monumenta's own happy croc!", Material.TURTLE_EGG, true, "croggers", 4));
 		EMOJI_LIST.add(new Emoji("Gigachad", "The internet-famous man with the endlessly sharp jawline.", Material.DIAMOND_SWORD, true, "gigachad", 5));
 		EMOJI_LIST.add(new Emoji("Confetti", "Party Time!", Material.BELL, true, "confetti", 6));

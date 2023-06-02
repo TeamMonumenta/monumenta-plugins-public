@@ -95,16 +95,18 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(1, 24, "Void", "Nothing to see here.", Material.BLACK_STAINED_GLASS, null, 0, "void"));
 
 
-		BORDER_ITEMS.add(new TeleportEntry(2, 20, "Celsian Isles: Chillwind", "Located in the frosty forests of Chillwind.", Material.SNOW_BLOCK, "Quest101", 13, "celsian_isles_chillwind"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 21, "Celsian Isles: Ishnir", "Located in the desert of Ishnir.", Material.SANDSTONE, "Quest101", 13, "celsian_isles_ishnir"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 22, "Kaul's Arena", "Located in the Kaul arena.", Material.JUNGLE_LEAVES, "KaulWins", 1, "kaul_arena"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Eldrask's Arena", "Located in the Eldrask arena.", Material.PACKED_ICE, "FGWins", 1, "eldrask_arena"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Hekawt's Arena", "Located in the Hekawt arena.", Material.RED_SANDSTONE, "LichWins", 1, "hekawt_arena"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 29, "Verdant Remnants", "A plot located right in the middle of Verdant Remnants.", Material.JUNGLE_SAPLING, "Verdant Remnants", "dungeons/verdant_remnants"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 30, "Corsair's Claw", "Located under a looming claw on the beach.", Material.SAND, "Corsair's Claw", "pois/corsairs_claw"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 31, "SKT Teal Arena", "The silver knights keep watch over this plot.", Material.IRON_SWORD, "SKT Teal Arena", "pass/skttealarena"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 32, "Monumenta Spawn Box", "Pulled directly from the new spawn location, with its scenic views and stylized signage.", Material.OAK_SIGN, "Monumenta Spawn Box", "pass/spawnbox"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 33, "Sierhaven", "Located right in the town square of Sierhaven.", Material.BLUE_CONCRETE, "Sierhaven", "pass/sierhaven"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 11, "Celsian Isles: Chillwind", "Located in the frosty forests of Chillwind.", Material.SNOW_BLOCK, "Quest101", 13, "celsian_isles_chillwind"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 12, "Celsian Isles: Ishnir", "Located in the desert of Ishnir.", Material.SANDSTONE, "Quest101", 13, "celsian_isles_ishnir"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 13, "Kaul's Arena", "Located in the Kaul arena.", Material.JUNGLE_LEAVES, "KaulWins", 1, "kaul_arena"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 14, "Eldrask's Arena", "Located in the Eldrask arena.", Material.PACKED_ICE, "FGWins", 1, "eldrask_arena"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 15, "Hekawt's Arena", "Located in the Hekawt arena.", Material.RED_SANDSTONE, "LichWins", 1, "hekawt_arena"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 20, "Verdant Remnants", "A plot located right in the middle of Verdant Remnants.", Material.JUNGLE_SAPLING, "Verdant Remnants", "dungeons/verdant_remnants"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 21, "Corsair's Claw", "Located under a looming claw on the beach.", Material.SAND, "Corsair's Claw", "pois/corsairs_claw"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 22, "SKT Teal Arena", "The silver knights keep watch over this plot.", Material.IRON_SWORD, "SKT Teal Arena", "pass/skttealarena"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Monumenta Spawn Box", "Pulled directly from the new spawn location, with its scenic views and stylized signage.", Material.OAK_SIGN, "Monumenta Spawn Box", "pass/spawnbox"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Sierhaven", "Located right in the town square of Sierhaven.", Material.BLUE_CONCRETE, "Sierhaven", "pass/sierhaven"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 31, "Ta'Ksaav", "The mystical village only seen in dreams.", Material.WHEAT, "Taksaav", "pass/taksaav"));
+
 
 		BORDER_ITEMS.add(new TeleportEntry(3, 18, "Halls of Wind and Blood", "A plot right in the middle of the main room.", Material.WHITE_WOOL, "White", 1, "dungeons/white"));
 		BORDER_ITEMS.add(new TeleportEntry(3, 19, "Arcane Rivalry", "Located in the lake looking in towards the first castle.", Material.LIGHT_BLUE_WOOL, "LightBlue", 1, "dungeons/lightblue"));
