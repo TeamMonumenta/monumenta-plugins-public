@@ -1,7 +1,9 @@
 package com.playmonumenta.plugins.server.properties;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.DungeonUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -22,9 +24,11 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
@@ -54,6 +58,9 @@ public class ServerProperties {
 	private int mHTTPStatusPort = 8000;
 
 	private String mShardName = "default_settings";
+
+	private boolean mDisableEntityScoresInDefaultWorld = true;
+	private List<String> mDisableEntityScoresInWorlds = new ArrayList<>();
 
 	private final EnumSet<Material> mUnbreakableBlocks = EnumSet.noneOf(Material.class);
 	private final EnumSet<Material> mAlwaysPickupMats = EnumSet.noneOf(Material.class);
@@ -163,6 +170,22 @@ public class ServerProperties {
 		return INSTANCE.mShardName;
 	}
 
+	public static boolean getEntityScoresDisabled(World world) {
+		if (world == null) {
+			return true;
+		}
+
+		if (INSTANCE.mDisableEntityScoresInDefaultWorld) {
+			// TODO Should statically read server.properties instead, or add NMS code
+			if (Bukkit.getServer().getWorlds().get(0) == world) {
+				return true;
+			}
+		}
+
+		String worldName = world.getName();
+		return INSTANCE.mDisableEntityScoresInWorlds.contains(worldName);
+	}
+
 	public static Set<Material> getUnbreakableBlocks() {
 		return INSTANCE.mUnbreakableBlocks;
 	}
@@ -242,6 +265,20 @@ public class ServerProperties {
 			mLootBoxEnabled = getPropertyValueBool(object, "lootBoxEnabled", mLootBoxEnabled);
 			mHTTPStatusPort = getPropertyValueInt(object, "httpStatusPort", mHTTPStatusPort);
 
+			mDisableEntityScoresInDefaultWorld = getPropertyValueBool(object,
+				"disableEntityScoresInDefaultWorld",
+				mDisableEntityScoresInDefaultWorld);
+			mDisableEntityScoresInWorlds.clear();
+			JsonElement disableEntityScoresInWorldsElement = object.get("disableEntityScoresInWorlds");
+			if (disableEntityScoresInWorldsElement instanceof JsonArray disableEntityScoresInWorldsArray) {
+				for (JsonElement disabledWorldElement : disableEntityScoresInWorldsArray) {
+					if (disabledWorldElement instanceof JsonPrimitive disabledWorld
+						&& disabledWorld.isString()) {
+						mDisableEntityScoresInWorlds.add(disabledWorld.getAsString());
+					}
+				}
+			}
+
 			mShardName = getPropertyValueString(object, "shardName", mShardName);
 
 			getPropertyValueMaterialList(plugin, object, "unbreakableBlocks", sender, mUnbreakableBlocks);
@@ -302,6 +339,9 @@ public class ServerProperties {
 		out.add("httpStatusPort = " + mHTTPStatusPort);
 
 		out.add("shardName = " + mShardName);
+
+		out.add("disableEntityScoresInDefaultWorld = " + mDisableEntityScoresInDefaultWorld);
+		out.add("disableEntityScoresInWorlds = [" + String.join(" ", mDisableEntityScoresInWorlds) + "]");
 
 		out.add("unbreakableBlocks = [" + mUnbreakableBlocks.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");
 		out.add("alwaysPickupMaterials = [" + mAlwaysPickupMats.stream().map(Enum::toString).collect(Collectors.joining("  ")) + "]");

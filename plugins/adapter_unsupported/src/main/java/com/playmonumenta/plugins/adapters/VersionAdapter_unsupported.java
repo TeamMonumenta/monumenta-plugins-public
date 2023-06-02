@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import com.google.gson.JsonObject;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -187,6 +189,14 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	@Override
 	public void setEntityLocation(Entity entity, Vector target, float yaw, float pitch) {
 		entity.teleport(new Location(entity.getWorld(), target.getX(), target.getY(), target.getZ(), yaw, pitch));
+	}
+
+	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, Scoreboard scoreboard) {
+		return new JsonObject();
+	}
+
+	@Override
+	public void resetScoreHolderScores(String scoreHolder, Scoreboard scoreboard) {
 	}
 
 }

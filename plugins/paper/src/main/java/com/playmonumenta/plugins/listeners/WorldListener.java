@@ -2,9 +2,14 @@ package com.playmonumenta.plugins.listeners;
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.adapters.VersionAdapter;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -12,20 +17,28 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -46,17 +59,24 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.Lootable;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class WorldListener implements Listener {
 	Plugin mPlugin;
 	public static final int SPAWNER_BREAK_CHEST_CHECK_RADIUS = 16;
+	public static final NamespacedKey ENTITY_SCORES_DATA_KEY = NamespacedKeyUtils.fromString("monumenta:entity_scores");
 
 	public WorldListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -98,6 +118,97 @@ public class WorldListener implements Listener {
 	                                                         new Vector(-1, -1, 1),
 	                                                         new Vector(-1, -1, -1)
 	                                                     );
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onEntitiesLoadEvent(EntitiesLoadEvent event) {
+		if (!Plugin.IS_PLAY_SERVER || ServerProperties.getEntityScoresDisabled(event.getWorld())) {
+			return;
+		}
+
+		Gson gson = new Gson();
+		for (Entity entity : event.getEntities()) {
+			if (entity instanceof Player) {
+				continue;
+			}
+
+			String objectStr = entity.getPersistentDataContainer().getOrDefault(ENTITY_SCORES_DATA_KEY, PersistentDataType.STRING, "{}");
+			JsonObject object;
+			try {
+				object = gson.fromJson(objectStr, JsonObject.class);
+			} catch (Exception e) {
+				MMLog.warning("Could not load scores from entity " + entity.getUniqueId() + " (" + entity.getLocation() + "): " + objectStr);
+				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
+				continue;
+			}
+
+			for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+				String objective = entry.getKey();
+				int value;
+				try {
+					value = entry.getValue().getAsInt();
+				} catch (Exception e) {
+					MMLog.warning("Could not load score from entity " + entity.getUniqueId()
+						+ " (" + entity.getLocation() + ") for objective " + objective + ": " + entry.getValue());
+					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), e);
+					continue;
+				}
+				ScoreboardUtils.setScoreboardValue(entity, objective, value);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onWorldSave(WorldSaveEvent event) {
+		if (!Plugin.IS_PLAY_SERVER || ServerProperties.getEntityScoresDisabled(event.getWorld())) {
+			return;
+		}
+		Collection<Entity> entities = event.getWorld().getEntities();
+		for (Entity entity : entities) {
+			saveEntityScores(entity, false);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onEntitiesUnloadEvent(EntitiesUnloadEvent event) {
+		if (!Plugin.IS_PLAY_SERVER || ServerProperties.getEntityScoresDisabled(event.getWorld())) {
+			return;
+		}
+		Collection<Entity> entities = event.getEntities();
+		for (Entity entity : entities) {
+			saveEntityScores(entity, true);
+		}
+	}
+
+	// Doesn't trigger EntitiesUnloadEvent for remaining chunks
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onWorldUnload(WorldUnloadEvent event) {
+		if (!Plugin.IS_PLAY_SERVER || ServerProperties.getEntityScoresDisabled(event.getWorld())) {
+			return;
+		}
+		Collection<Entity> entities = event.getWorld().getEntities();
+		for (Entity entity : entities) {
+			saveEntityScores(entity, true);
+		}
+	}
+
+	private void saveEntityScores(Entity entity, boolean deleteFromScoreboard) {
+		if (entity instanceof Player) {
+			return;
+		}
+		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		String scoreHolder = entity.getUniqueId().toString();
+		VersionAdapter versionAdapter = NmsUtils.getVersionAdapter();
+		JsonObject entityScores = versionAdapter.getScoreHolderScoresAsJson(scoreHolder, scoreboard);
+		if (deleteFromScoreboard) {
+			versionAdapter.resetScoreHolderScores(scoreHolder, scoreboard);
+		}
+
+		if (entityScores.size() > 0) {
+			entity.getPersistentDataContainer().set(ENTITY_SCORES_DATA_KEY, PersistentDataType.STRING, entityScores.toString());
+		} else {
+			entity.getPersistentDataContainer().remove(ENTITY_SCORES_DATA_KEY);
+		}
+	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void structureGrowEvent(StructureGrowEvent event) {

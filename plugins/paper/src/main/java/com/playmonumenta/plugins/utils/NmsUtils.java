@@ -21,7 +21,7 @@ public class NmsUtils {
 			Class<?> clazz = Class.forName("com.playmonumenta.plugins.adapters.VersionAdapter_" + version);
 			// Check if we have a valid adapter class at that location.
 			if (VersionAdapter.class.isAssignableFrom(clazz)) {
-				mVersionAdapter = (VersionAdapter) clazz.getConstructor().newInstance();
+				mVersionAdapter = (VersionAdapter) clazz.getConstructor(Logger.class).newInstance(logger);
 				logger.info("Loaded NMS adapter for " + version);
 			} else {
 				logger.severe("Somehow VersionAdapter is not assignable from " + clazz + ". NMS utilities will fail and throw NullPointerException's");
@@ -34,7 +34,7 @@ public class NmsUtils {
 				Class<?> clazz = Class.forName("com.playmonumenta.plugins.adapters.VersionAdapter_unsupported");
 				// Check if we have a valid adapter class at that location.
 				if (VersionAdapter.class.isAssignableFrom(clazz)) {
-					mVersionAdapter = (VersionAdapter) clazz.getConstructor().newInstance();
+					mVersionAdapter = (VersionAdapter) clazz.getConstructor(Logger.class).newInstance(logger);
 				}
 				logger.severe("Loaded 'unsupported' version adapter, which should at least reduce the number of null pointer exceptions");
 			} catch (Exception ex) {

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import com.google.gson.JsonObject;
 import io.papermc.paper.adventure.PaperAdventure;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,9 +9,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -43,6 +46,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Score;
+import net.minecraft.world.scores.Scoreboard;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -58,6 +64,7 @@ import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftVector;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.Bee;
@@ -84,6 +91,12 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class VersionAdapter_v1_18_R2 implements VersionAdapter {
+
+	final Logger mLogger;
+
+	public VersionAdapter_v1_18_R2(Logger logger) {
+		mLogger = logger;
+	}
 
 	public void removeAllMetadata(Plugin plugin) {
 		CraftServer server = (CraftServer) plugin.getServer();
@@ -579,6 +592,41 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	@Override
 	public void setEntityLocation(Entity entity, Vector target, float yaw, float pitch) {
 		((CraftEntity) entity).getHandle().moveTo(target.getX(), target.getY(), target.getZ(), yaw, pitch);
+	}
+
+	@SuppressWarnings("unchecked")
+	public JsonObject getScoreHolderScoresAsJson(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
+		Scoreboard nmsScoreboard = ((CraftScoreboard)scoreboard).getHandle();
+
+		JsonObject data = new JsonObject();
+		Map<String, Map<Objective, Score>> playerScores;
+
+		try {
+			Field playerScoresField = Scoreboard.class.getDeclaredField("j");
+			playerScoresField.setAccessible(true);
+			playerScores = (Map<String, Map<Objective, Score>>)playerScoresField.get(nmsScoreboard);
+		} catch (NoSuchFieldException | IllegalAccessException ex) {
+			mLogger.severe("Failed to access playerScores scoreboard field: " + ex.getMessage());
+			ex.printStackTrace();
+			return data;
+		}
+
+		Map<Objective, Score> scores = playerScores.get(scoreHolder);
+		if (scores == null) {
+			// No scores for this player
+			return data;
+		}
+
+		for (Map.Entry<Objective, Score> entry : scores.entrySet()) {
+			data.addProperty(entry.getKey().getName(), entry.getValue().getScore());
+		}
+
+		return data;
+	}
+
+	public void resetScoreHolderScores(String scoreHolder, org.bukkit.scoreboard.Scoreboard scoreboard) {
+		Scoreboard nmsScoreboard = ((CraftScoreboard)scoreboard).getHandle();
+		nmsScoreboard.resetPlayerScore(scoreHolder, null);
 	}
 
 }

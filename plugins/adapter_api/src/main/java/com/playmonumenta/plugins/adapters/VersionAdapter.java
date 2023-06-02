@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.adapters;
 
+import com.google.gson.JsonObject;
 import java.util.Set;
 import java.util.function.Predicate;
 import net.kyori.adventure.text.Component;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +87,6 @@ public interface VersionAdapter {
 
 	/**
 	 * Make this entity lose all desire to attack any Entity and make this only attack entities accepted by the predicate
-	 *
 	 *
 	 * @param entity        The entity
 	 * @param action        The damage action that will cat when this entity hit someone
@@ -191,5 +192,9 @@ public interface VersionAdapter {
 	 * Unlike {@link Entity#teleport(Location)}, this can be used to move an entity that has passengers.
 	 */
 	void setEntityLocation(Entity entity, Vector target, float yaw, float pitch);
+
+	JsonObject getScoreHolderScoresAsJson(String scoreHolder, Scoreboard scoreboard);
+
+	void resetScoreHolderScores(String scoreHolder, Scoreboard scoreboard);
 
 }
