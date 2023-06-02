@@ -559,13 +559,14 @@ public class WalletManager implements Listener {
 												return false;
 											}
 
-											// If retrieving compressed items, take out the appropriate amount of compressed/uncompressed
+											ItemStack base = compressionInfo == null ? item.mItem : compressionInfo.mBase;
+											// If retrieving items that can be compressed, take out the appropriate amount of compressed/uncompressed
 											// Requires special handling for the inventory space calculation in case of partial stacks
-											if (compressionInfo != null) {
+											if (isBase(base)) {
 												int leftToRemove = (int) desiredAmount;
 												List<ItemStack> result = new ArrayList<>();
 												for (CompressionInfo ci : COMPRESSIBLE_CURRENCIES) {
-													if (ci.mBase.isSimilar(compressionInfo.mBase)) {
+													if (ci.mBase.isSimilar(base)) {
 														ItemStack res = ItemUtils.clone(ci.mCompressed);
 														int compressed = leftToRemove / ci.mAmount;
 														res.setAmount(compressed);
@@ -577,14 +578,14 @@ public class WalletManager implements Listener {
 													}
 												}
 												if (leftToRemove > 0) {
-													ItemStack res = ItemUtils.clone(compressionInfo.mBase);
+													ItemStack res = ItemUtils.clone(base);
 													res.setAmount(leftToRemove);
 													result.add(res);
 												}
 												if (InventoryUtils.canFitInInventory(result, player.getInventory())) {
-													ItemStack base = ItemUtils.clone(compressionInfo.mBase);
-													base.setAmount((int) desiredAmount);
-													mWallet.remove(mPlayer, base);
+													ItemStack baseClone = ItemUtils.clone(base);
+													baseClone.setAmount((int) desiredAmount);
+													mWallet.remove(mPlayer, baseClone);
 													result.forEach(mPlayer.getInventory()::addItem);
 												} else {
 													player.sendMessage(Component.text("Not enough space in inventory for all items. No items have been retrieved.", NamedTextColor.RED));
@@ -839,6 +840,14 @@ public class WalletManager implements Listener {
 			       && (settings.allCurrencies || ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) < 0 || MAIN_CURRENCIES.stream().anyMatch(c -> c.isSimilar(item)));
 	}
 
+	private static boolean isBase(ItemStack item) {
+		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
+			if (compressionInfo.mBase.isSimilar(item)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	private static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
 		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 			if (compressionInfo.mCompressed.isSimilar(item)) {
