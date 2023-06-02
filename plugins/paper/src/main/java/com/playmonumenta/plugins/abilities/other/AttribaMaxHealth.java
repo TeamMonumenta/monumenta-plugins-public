@@ -14,15 +14,14 @@ public class AttribaMaxHealth extends Ability {
 
 	public static final AbilityInfo<AttribaMaxHealth> INFO =
 		new AbilityInfo<>(AttribaMaxHealth.class, null, AttribaMaxHealth::new)
-			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME))
+			.canUse(player -> player.getScoreboardTags().contains(MODIFIER_NAME))
+			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, MODIFIER_NAME))
 			.ignoresSilence(true);
 
 	public AttribaMaxHealth(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		if (player != null) {
-			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
-				new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-		}
+		EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
+			new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 }
