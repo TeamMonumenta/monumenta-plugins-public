@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.HashMap;
+import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -19,6 +21,8 @@ public class Promenade implements EliteFinisher {
 
 	public static final String NAME = "Promenade";
 
+	private static final HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
+
 	private enum Instrument {
 		TREBLE(Sound.BLOCK_NOTE_BLOCK_HARP),
 		BASS(Sound.BLOCK_NOTE_BLOCK_BASS);
@@ -32,6 +36,14 @@ public class Promenade implements EliteFinisher {
 
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
+		int mobsKilled = mMobsKilled.getOrDefault(p.getUniqueId(), 1);
+		final int startTick;
+		if (mobsKilled == 2) {
+			startTick = 66;
+		} else {
+			startTick = 0;
+		}
+
 		World world = p.getWorld();
 		Location loc1 = killedMob.getLocation().add(0, 1.7, 0);
 		loc1.setPitch(0.0F);
@@ -40,7 +52,7 @@ public class Promenade implements EliteFinisher {
 		final Location bassLoc = eyeLoc.clone().subtract(horizontalDir);
 
 		new BukkitRunnable() {
-			int mTicks = 0;
+			int mTicks = startTick;
 
 			@Override
 			public void run() {
@@ -57,7 +69,17 @@ public class Promenade implements EliteFinisher {
 					case 42 -> playNote(Instrument.TREBLE, Note.AS4);
 					case 48 -> playNote(Instrument.TREBLE, Note.C5);
 					case 54 -> playNote(Instrument.TREBLE, Note.G4);
-					case 60 -> playNote(Instrument.TREBLE, Note.F4);
+					case 60 -> {
+						playNote(Instrument.TREBLE, Note.F4);
+
+						if (mobsKilled >= 2) {
+							mMobsKilled.put(p.getUniqueId(), 1);
+						} else {
+							mMobsKilled.put(p.getUniqueId(), mobsKilled + 1);
+						}
+						this.cancel();
+						return;
+					}
 					case 66 -> {
 						playNote(Instrument.TREBLE, Note.G4);
 						playNote(Instrument.TREBLE, Note.D4);
@@ -130,7 +152,14 @@ public class Promenade implements EliteFinisher {
 						playNote(Instrument.TREBLE, Note.C4);
 						playNote(Instrument.TREBLE, Note.A3);
 						playNote(Instrument.BASS, Note.F4);
+
+						if (mobsKilled >= 2) {
+							mMobsKilled.put(p.getUniqueId(), 1);
+						} else {
+							mMobsKilled.put(p.getUniqueId(), mobsKilled + 1);
+						}
 						this.cancel();
+						return;
 					}
 					default -> {
 					}

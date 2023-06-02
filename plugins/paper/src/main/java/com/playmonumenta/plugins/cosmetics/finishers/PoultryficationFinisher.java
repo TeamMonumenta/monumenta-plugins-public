@@ -39,7 +39,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 	@Override
 	public void run(Player p, Entity killedMob, Location loc) {
 		int mobsKilled = mMobsKilled.getOrDefault(p.getUniqueId(), 1);
-		int barOffset = 8 * (mobsKilled - 1) + 1;
+		int barOffset = 4 * (mobsKilled - 1) + 1;
 
 		new BukkitRunnable() {
 			int mTicks = 0;
@@ -404,30 +404,9 @@ public class PoultryficationFinisher implements EliteFinisher {
 					int halfBeatInBar = (chickenTicks % 24) / 3;
 
 					switch (bar) {
-						case 4, 8, 12 -> {
+						case 4, 8, 12, 16 -> {
 							switch (halfBeatInBar) {
 								case 0, 2, 4, 6 -> hurtChicken();
-								default -> {
-								}
-							}
-						}
-						case 16 -> {
-							switch (halfBeatInBar) {
-								case 0, 2, 4 -> hurtChicken();
-								case 6 -> {
-									if (mChicken != null) {
-										if (mChicken.isValid()) {
-											new PartialParticle(Particle.REDSTONE, mChicken.getLocation(), 50,
-												0.5, 1, 0.5, WHITE).spawnAsPlayerActive(p);
-											mChicken.getWorld().playSound(mLastNoteLocation, Sound.ENTITY_CHICKEN_DEATH,
-												SoundCategory.PLAYERS, 1F, 1F);
-											mChicken.setInvulnerable(false);
-											mChicken.setHealth(0.0);
-										}
-										mChicken.remove();
-										mChicken = null;
-									}
-								}
 								default -> {
 								}
 							}
@@ -437,13 +416,14 @@ public class PoultryficationFinisher implements EliteFinisher {
 					}
 				}
 
-				if (mTicks > 24 * 8 - 3) {
+				if (mTicks > 24 * 4 - 3) {
 					if (mChicken != null) {
-						new PartialParticle(Particle.REDSTONE, mChicken.getLocation(), 50, 0.5, 1, 0.5, WHITE).spawnAsPlayerActive(p);
-						mChicken.setHealth(0);
+						new PartialParticle(Particle.REDSTONE, mChicken.getLocation(), 50,
+							0.5, 1, 0.5, WHITE).spawnAsPlayerActive(p);
 						mChicken.remove();
+						mChicken = null;
 					}
-					if (mobsKilled >= 2) {
+					if (mobsKilled >= 4) {
 						mMobsKilled.put(p.getUniqueId(), 1);
 					} else {
 						mMobsKilled.put(p.getUniqueId(), mobsKilled + 1);
