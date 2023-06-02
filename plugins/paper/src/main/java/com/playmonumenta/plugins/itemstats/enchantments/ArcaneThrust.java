@@ -48,7 +48,7 @@ public class ArcaneThrust implements Enchantment {
 
 	@Override
 	public double getPriorityAmount() {
-		return 30;
+		return 31;
 	}
 
 	@Override

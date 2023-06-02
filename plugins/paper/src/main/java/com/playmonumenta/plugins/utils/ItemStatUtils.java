@@ -576,6 +576,7 @@ public class ItemStatUtils {
 		MAGIC_FRAGILITY(new MagicFragility(), true, true, false, false),
 		FIRE_FRAGILITY(new FireFragility(), true, true, false, false),
 		FALL_FRAGILITY(new FallFragility(), true, true, false, false),
+		CUMBERSOME(new Cumbersome(), false, true, false, false),
 		// Durability
 		UNBREAKING(Enchantment.DURABILITY, "Unbreaking", true, false, false, false),
 		UNBREAKABLE(null, "Unbreakable", false, false, false, false),

@@ -36,7 +36,7 @@ public class Vengeful implements Infusion {
 
 	@Override
 	public double getPriorityAmount() {
-		return 29;
+		return 30;
 	}
 
 	@Override
