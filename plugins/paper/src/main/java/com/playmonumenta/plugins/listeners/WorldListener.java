@@ -175,7 +175,8 @@ public class WorldListener implements Listener {
 		}
 		Collection<Entity> entities = event.getEntities();
 		for (Entity entity : entities) {
-			saveEntityScores(entity, true);
+			// TODO Delete from scoreboard when we figure out why these are disappearing
+			saveEntityScores(entity, false);
 		}
 	}
 
@@ -187,7 +188,8 @@ public class WorldListener implements Listener {
 		}
 		Collection<Entity> entities = event.getWorld().getEntities();
 		for (Entity entity : entities) {
-			saveEntityScores(entity, true);
+			// TODO Delete from scoreboard when we figure out why these are disappearing
+			saveEntityScores(entity, false);
 		}
 	}
 
