@@ -172,6 +172,7 @@ public abstract class ExperiencinatorUtils {
 			player.sendRawMessage(ChatColor.AQUA + "No items were converted.");
 		} else {
 			StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, ItemStatUtils.InfusionType.STAT_TRACK_CONVERT, soldItems);
+			player.updateInventory();
 		}
 
 	}
