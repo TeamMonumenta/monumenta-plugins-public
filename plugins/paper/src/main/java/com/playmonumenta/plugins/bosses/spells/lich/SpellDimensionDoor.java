@@ -16,10 +16,15 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -52,8 +57,8 @@ public class SpellDimensionDoor extends Spell {
 	private static final String SPELL_NAME = "Dimension Door";
 	private static final int COOLDOWN = 20 * 45;
 	private static final int PLAYER_CAP = 15;
-	private static final List<Player> mShadowed = new ArrayList<>();
-	private static final List<Player> mWarned = new ArrayList<>();
+	private static final List<WeakReference<Player>> mShadowed = new ArrayList<>();
+	private static final HashSet<UUID> mWarned = new HashSet<>();
 	private static final EnumSet<Material> IGNORED_MATS = EnumSet.of(
 		Material.COMMAND_BLOCK,
 		Material.CHAIN_COMMAND_BLOCK,
@@ -84,7 +89,8 @@ public class SpellDimensionDoor extends Spell {
 	}
 
 	public static List<Player> getShadowed() {
-		return mShadowed;
+		// Return to the caller a list of all the non-garbage-collected player entries
+		return mShadowed.stream().map((playerref) -> playerref.get()).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	public static void clearShadowed() {
@@ -108,8 +114,9 @@ public class SpellDimensionDoor extends Spell {
 		mByPortal.clear();
 		List<Player> players = Lich.playersInRange(mSpawnLoc, mRange, true);
 
-		if (!mShadowed.isEmpty()) {
-			players.removeAll(mShadowed);
+		List<Player> shadowed = getShadowed();
+		if (!shadowed.isEmpty()) {
+			players.removeAll(shadowed);
 		}
 		List<Player> toRemove = new ArrayList<>();
 		for (Player p : players) {
@@ -324,7 +331,7 @@ public class SpellDimensionDoor extends Spell {
 		}
 		p.teleport(tele, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 		p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
-		mShadowed.add(p);
+		mShadowed.add(new WeakReference<>(p));
 
 		String[] dio = new String[]{
 			"There's something moving in the darkness! It looks like... me?!",
@@ -335,11 +342,11 @@ public class SpellDimensionDoor extends Spell {
 		//do different stuff for different entry method
 		int t = 20 * 20;
 		if (byPortal) {
-			if (mWarned.contains(p)) {
+			if (mWarned.contains(p.getUniqueId())) {
 				p.sendMessage(Component.text(dio[FastUtils.RANDOM.nextInt(3)], NamedTextColor.AQUA));
 			} else {
 				p.sendMessage(Component.text(dio[0], NamedTextColor.AQUA));
-				mWarned.add(p);
+				mWarned.add(p.getUniqueId());
 			}
 			//remove curse only through portal
 			if (PlayerUtils.isCursed(com.playmonumenta.plugins.Plugin.getInstance(), p)) {
@@ -406,7 +413,7 @@ public class SpellDimensionDoor extends Spell {
 					bar.removeAll();
 					this.cancel();
 					Location leaveLoc = tLoc.clone().add(0, 1.5, 0);
-					mShadowed.remove(p);
+					mShadowed.removeIf((pref) -> pref.get() == p || pref.get() == null);
 					if (byPortal) {
 						p.teleport(leaveLoc, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20 * 5, 0));
@@ -421,7 +428,7 @@ public class SpellDimensionDoor extends Spell {
 					}
 				}
 				if (p.getLocation().getY() > Lich.getLichSpawn().getY() - 10 || !Lich.playersInRange(shadowLoc, 60, true).contains(p)) {
-					mShadowed.remove(p);
+					mShadowed.removeIf((pref) -> pref.get() == p || pref.get() == null);
 					bar.setVisible(false);
 					bar.removeAll();
 					this.cancel();
