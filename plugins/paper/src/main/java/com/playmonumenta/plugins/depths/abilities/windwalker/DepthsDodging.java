@@ -21,6 +21,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -29,6 +30,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +56,11 @@ public class DepthsDodging extends DepthsAbility {
 	public boolean playerCombustByEntityEvent(EntityCombustByEntityEvent event) {
 		// Don't proc on Fire Aspect
 		if (!(event.getCombuster() instanceof Projectile)) {
+			return true;
+		}
+
+		// don't proc if the player has fire resistance.
+		if (mPlayer.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
 			return true;
 		}
 
@@ -85,6 +92,9 @@ public class DepthsDodging extends DepthsAbility {
 			return true;
 		}
 		if (mPlayer.getActiveItem() != null && mPlayer.getActiveItem().getType() == Material.SHIELD) {
+			return true;
+		}
+		if (proj instanceof Fireball && mPlayer.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
 			return true;
 		}
 		if (!dodge()) {

@@ -22,6 +22,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -31,6 +32,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -98,6 +100,11 @@ public class Dodging extends Ability {
 			return true;
 		}
 
+		// don't proc if the player has fire resistance.
+		if (mPlayer.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+			return true;
+		}
+
 		// See if we should dodge. If false, allow the event to proceed normally
 		if (!dodge()) {
 			return true;
@@ -146,6 +153,9 @@ public class Dodging extends Ability {
 			return true;
 		}
 		if (mPlayer.getActiveItem() != null && mPlayer.getActiveItem().getType() == Material.SHIELD) {
+			return true;
+		}
+		if (proj instanceof Fireball && mPlayer.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
 			return true;
 		}
 		if (!dodge()) {
