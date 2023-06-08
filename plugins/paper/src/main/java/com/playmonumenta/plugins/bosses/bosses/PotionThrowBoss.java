@@ -96,7 +96,7 @@ public class PotionThrowBoss extends BossAbilityGroup {
 						double potVelocityX = targetVec.getX() + targetSpeedVec.getX() - bossLocation.getX();
 						double potVelocityY = targetVec.getY() + target.getEyeHeight() - 1.2 - bossLocation.getY();
 						double potVelocityZ = targetVec.getZ() + targetSpeedVec.getZ() - bossLocation.getZ();
-						double distance = Math.sqrt(potVelocityX * potVelocityX + potVelocityZ * potVelocityZ);
+						double distance = Math.sqrt(potVelocityX * potVelocityX + potVelocityY * potVelocityY + potVelocityZ * potVelocityZ);
 
 						Entity pot = world.spawnEntity(mBoss.getEyeLocation(), EntityType.SPLASH_POTION);
 						if (pot instanceof ThrownPotion tp) {
