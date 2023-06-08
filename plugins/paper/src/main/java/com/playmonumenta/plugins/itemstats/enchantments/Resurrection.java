@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import org.bukkit.Bukkit;
@@ -67,7 +68,7 @@ public class Resurrection implements Enchantment {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.ABSORPTION, 20 * 5, 1, true, true));
+				AbsorptionUtils.addAbsorption(player, 8, 8, 20 * 5);
 			}
 		}.runTaskLater(plugin, 1);
 

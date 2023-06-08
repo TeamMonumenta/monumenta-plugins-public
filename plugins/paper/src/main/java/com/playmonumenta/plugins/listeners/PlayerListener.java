@@ -23,6 +23,7 @@ import com.playmonumenta.plugins.portals.PortalManager;
 import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.server.reset.DailyReset;
+import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -90,6 +91,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -1650,4 +1652,14 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityPotionEffectEvent(EntityPotionEffectEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			// If Player pops a totem of undying, replace absorption event with absorption utils.
+			if (event.getCause() == EntityPotionEffectEvent.Cause.TOTEM && event.getNewEffect().getType().equals(PotionEffectType.ABSORPTION)) {
+				event.setCancelled(true);
+				AbsorptionUtils.addAbsorption(player, 8, 8, 5 * 20);
+			}
+		}
+	}
 }
