@@ -64,12 +64,12 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 
 		SpellManager spells = new SpellManager(List.of(
 			new Spell() {
+				boolean mTelegraphInterrupt = false;
 				@Override
 				public void run() {
 					boolean hasGlowing = mBoss.isGlowing();
 					mBoss.setGlowing(true);
 					List<? extends LivingEntity> targets = p.TARGETS_DIRECTION.getTargetsList(mBoss);
-
 					if (targets.size() > 0) {
 						Location bossEyeLoc = mBoss.getEyeLocation();
 						Location targetLoc = targets.get(0).getLocation().clone().add(0, 1.8, 0);
@@ -78,11 +78,17 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 
 						mParams.SOUND_TELL.play(mBoss.getLocation());
 
+						mTelegraphInterrupt = false;
 						new BukkitRunnable() {
 							int mDegree = 45;
 
 							@Override
 							public void run() {
+								if (EntityUtils.shouldCancelSpells(mBoss)) {
+									cancel();
+									mTelegraphInterrupt = true;
+									return;
+								}
 
 								for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
 									for (double degree = mDegree; degree < mDegree + 30; degree += 5) {
@@ -104,7 +110,9 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 							}
 						}.runTaskTimer(mPlugin, 0, 1);
 
-
+						if (mTelegraphInterrupt) {
+							return;
+						}
 						new BukkitRunnable() {
 							final Vector mTargetDirection = targetDirection;
 							int mTimes = 0;
