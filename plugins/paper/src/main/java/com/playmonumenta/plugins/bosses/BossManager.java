@@ -329,6 +329,7 @@ public class BossManager implements Listener {
 		mStatelessBosses.put(TagScalingBoss.identityTag, TagScalingBoss::new);
 		mStatelessBosses.put(CancelDamageBoss.identityTag, CancelDamageBoss::new);
 		mStatelessBosses.put(ParticleRingBoss.identityTag, ParticleRingBoss::new);
+		mStatelessBosses.put(ShieldStunBoss.identityTag, ShieldStunBoss::new);
 
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
@@ -605,6 +606,7 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(TagScalingBoss.identityTag, TagScalingBoss::deserialize);
 		mBossDeserializers.put(CancelDamageBoss.identityTag, CancelDamageBoss::deserialize);
 		mBossDeserializers.put(ParticleRingBoss.identityTag, ParticleRingBoss::deserialize);
+		mBossDeserializers.put(ShieldStunBoss.identityTag, ShieldStunBoss::deserialize);
 
 		/*
 		 Boss Parameters
@@ -685,6 +687,7 @@ public class BossManager implements Listener {
 		mBossParameters.put(WormBoss.identityTag, new WormBoss.Parameters());
 		mBossParameters.put(ParticleRingBoss.identityTag, new ParticleRingBoss.Parameters());
 		mBossParameters.put(ResistanceBoss.identityTag, new ResistanceBoss.Parameters());
+		mBossParameters.put(ShieldStunBoss.identityTag, new ShieldStunBoss.Parameters());
 
 	}
 
