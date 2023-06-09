@@ -95,8 +95,10 @@ public final class EffectManager implements Listener {
 				boolean foundEffect = false;
 				for (Effect effectIter : effectGroup) {
 					if (effectIter.compareTo(effect) == 0 && effectIter.getDuration() < effect.getDuration()) {
-						effectIter.entityLoseEffect(mEntity);
-						effectIter.entityGainEffect(mEntity);
+						if (effectIter == currentEffect) {
+							effectIter.entityLoseEffect(mEntity);
+							effectIter.entityGainEffect(mEntity);
+						}
 						effectIter.setDuration(effect.getDuration());
 						foundEffect = true;
 						break;
