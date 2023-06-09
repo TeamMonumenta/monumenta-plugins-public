@@ -50,10 +50,11 @@ public class DaggerThrow extends Ability {
 			.scoreboardId("DaggerThrow")
 			.shorthandName("DT")
 			.descriptions(
-				String.format("Sneak left click while holding two swords to throw three daggers which deal %s melee damage and gives each target %s%% Vulnerability for %s seconds. Cooldown: %ss.",
+				String.format("Sneak left click while holding two swords to throw three daggers which deal %s melee damage and gives each target %s%% Vulnerability for %s seconds. The daggers travel up to %s blocks. Cooldown: %ss.",
 					DAGGER_THROW_1_DAMAGE,
 					(int) (DAGGER_THROW_1_VULN * 100),
 					DAGGER_THROW_DURATION / 20,
+					DAGGER_THROW_RANGE,
 					DAGGER_THROW_COOLDOWN / 20),
 				String.format("The damage is increased to %s and the Vulnerability increased to %s%%.",
 					DAGGER_THROW_2_DAMAGE,

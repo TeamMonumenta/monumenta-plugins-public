@@ -62,7 +62,7 @@ public class WhirlingBlade extends MultipleChargeAbility {
 			.shorthandName("WB")
 			.descriptions(
 				"Use the swap key while holding a weapon to throw a whirling blade that circles around you, " +
-					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness and " + (int) (100 * BLADE_SLOWNESS) + " for " + BLADE_1_DURATION / 20 + "s. " +
+					"knocking back and dealing " + BLADE_1_DAMAGE + " melee damage to enemies it hits and inflicts " + (int) (100 * BLADE_WEAKEN) + "% weakness and " + (int) (100 * BLADE_SLOWNESS) + "% slowness for " + BLADE_1_DURATION / 20 + "s. " +
 					"Cooldown: " + BLADE_COOLDOWN / 20 + "s. Charges: " + BLADE_MAX_CHARGES + ".",
 				"The damage is increased to " + BLADE_2_DAMAGE + " and also stun for " + BLADE_2_DURATION / 20.0 + "s.")
 			.simpleDescription("Damage, weaken, and knock nearby mobs back.")

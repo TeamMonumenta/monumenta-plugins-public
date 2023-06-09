@@ -40,7 +40,7 @@ public class Scout extends PlayerClass {
 		mClassColor = TextColor.fromHexString("#59B4EB");
 		mDisplayItem = Material.BOW;
 		mClassDescription = "Scouts are agile masters of archery and exploration.";
-		mClassPassiveDescription = String.format("You gain %d%% of your Bow Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Bow Damage.",
+		mClassPassiveDescription = String.format("You gain %d%% of your Projectile Damage %% as Attack Damage and you gain %d%% of your Attack Damage %% as Projectile Damage.",
 			(int) (Versatile.DAMAGE_MULTIPLY_MELEE * 100), (int) (Versatile.DAMAGE_MULTIPLY_PROJ * 100));
 		mClassPassiveName = "Versatile";
 

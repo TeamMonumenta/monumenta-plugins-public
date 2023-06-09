@@ -87,7 +87,7 @@ public class DepthsSharpshooter extends DepthsAbility implements AbilityWithChar
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
-		Component decay = rarity == 6 ? Component.text(TWISTED_SHARPSHOOTER_DECAY_TIMER / 20, color) : Component.text(SHARPSHOOTER_DECAY_TIMER);
+		Component decay = rarity == 6 ? Component.text(StringUtils.ticksToSeconds(TWISTED_SHARPSHOOTER_DECAY_TIMER), color) : Component.text(StringUtils.ticksToSeconds(SHARPSHOOTER_DECAY_TIMER));
 		return Component.text("Each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to " + MAX_STACKS + ". Stacks decay after ")
 			.append(decay)
 			.append(Component.text(" seconds of not gaining a stack. Each stack increases your projectile damage by "))
