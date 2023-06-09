@@ -399,7 +399,6 @@ public abstract class Ability {
 
 	/**
 	 * Show the player the number of charges available
-	 * Get current duration if the ability is a totem ability
 	 */
 	public void showChargesMessage() {
 		if (this instanceof AbilityWithChargesOrStacks abilityWithChargesOrStacks) {

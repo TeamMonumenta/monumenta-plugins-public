@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.EnumSet;
 import org.bukkit.Location;
@@ -94,9 +95,22 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 			mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME, new PercentDamageDealt(mDuration, damageBoost, AFFECTED_DAMAGE_TYPES));
 			if (mStacks < mMaxStacks) {
 				mStacks += 1;
+				//send stack update to client
+				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}
 		return false; // only changes event damage
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		if (mStacks > 0 && oneSecond) {
+			//clear and send stack update if needed.
+			if (!hasEffect()) {
+				mStacks = 0;
+				ClientModHandler.updateAbility(mPlayer, this);
+			}
+		}
 	}
 
 	private boolean hasEffect() {
