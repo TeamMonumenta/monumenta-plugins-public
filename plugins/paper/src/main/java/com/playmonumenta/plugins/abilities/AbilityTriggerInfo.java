@@ -136,7 +136,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 
 	public AbilityTriggerInfo<T> withCustomTrigger(AbilityInfo<?> ability, Player player) {
 		AbilityTrigger customTrigger = Plugin.getInstance().mAbilityManager.getCustomTrigger(player, ability, mId);
-		return new AbilityTriggerInfo<>(mId, mDisplayName, mDescription, mAction, customTrigger != null ? customTrigger : mTrigger, mRestriction);
+		return new AbilityTriggerInfo<>(mId, mDisplayName, mDescription, mAction, customTrigger != null ? customTrigger : mTrigger, mRestriction, mPrerequisite);
 	}
 
 	public List<Component> getTriggerDescription() {
