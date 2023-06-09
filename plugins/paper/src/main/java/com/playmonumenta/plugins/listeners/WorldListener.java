@@ -77,6 +77,8 @@ public class WorldListener implements Listener {
 	Plugin mPlugin;
 	public static final int SPAWNER_BREAK_CHEST_CHECK_RADIUS = 16;
 	public static final NamespacedKey ENTITY_SCORES_DATA_KEY = NamespacedKeyUtils.fromString("monumenta:entity_scores");
+	public int mEntityScoreLastDeleteTick = Integer.MIN_VALUE;
+	public Set<String> mEntityScoresDeletedThisTick = new HashSet<>();
 
 	public WorldListener(Plugin plugin) {
 		mPlugin = plugin;
@@ -164,7 +166,7 @@ public class WorldListener implements Listener {
 		}
 		Collection<Entity> entities = event.getWorld().getEntities();
 		for (Entity entity : entities) {
-			saveEntityScores(entity, false);
+			saveEntityScores(entity, false, "world save");
 		}
 	}
 
@@ -175,8 +177,7 @@ public class WorldListener implements Listener {
 		}
 		Collection<Entity> entities = event.getEntities();
 		for (Entity entity : entities) {
-			// TODO Delete from scoreboard when we figure out why these are disappearing
-			saveEntityScores(entity, false);
+			saveEntityScores(entity, true, "entities unload");
 		}
 	}
 
@@ -188,21 +189,59 @@ public class WorldListener implements Listener {
 		}
 		Collection<Entity> entities = event.getWorld().getEntities();
 		for (Entity entity : entities) {
-			// TODO Delete from scoreboard when we figure out why these are disappearing
-			saveEntityScores(entity, false);
+			saveEntityScores(entity, true, "world unload");
 		}
 	}
 
-	private void saveEntityScores(Entity entity, boolean deleteFromScoreboard) {
+	private void saveEntityScores(Entity entity, boolean deleteFromScoreboard, String reason) {
 		if (entity instanceof Player) {
 			return;
 		}
+
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		String scoreHolder = entity.getUniqueId().toString();
 		VersionAdapter versionAdapter = NmsUtils.getVersionAdapter();
 		JsonObject entityScores = versionAdapter.getScoreHolderScoresAsJson(scoreHolder, scoreboard);
+
 		if (deleteFromScoreboard) {
-			versionAdapter.resetScoreHolderScores(scoreHolder, scoreboard);
+			int thisTick = Bukkit.getCurrentTick();
+			if (thisTick != mEntityScoreLastDeleteTick) {
+				mEntityScoresDeletedThisTick.clear();
+				mEntityScoreLastDeleteTick = thisTick;
+			}
+
+			if (!mEntityScoresDeletedThisTick.contains(scoreHolder)) {
+				versionAdapter.resetScoreHolderScores(scoreHolder, scoreboard);
+				mEntityScoresDeletedThisTick.add(scoreHolder);
+				MMLog.finer(() -> "[Entity Scores] "
+					+ Bukkit.getCurrentTick()
+					+ ": "
+					+ scoreHolder
+					+ ": Deleted scores for this entity: "
+					+ entityScores.size()
+					+ ", "
+					+ reason);
+			} else {
+				MMLog.finer(() -> "[Entity Scores] "
+					+ Bukkit.getCurrentTick()
+					+ ": "
+					+ scoreHolder
+					+ ": Already deleted scores for this entity: "
+					+ entityScores.size()
+					+ ", "
+					+ reason);
+				return;
+			}
+		} else if (mEntityScoresDeletedThisTick.contains(scoreHolder)) {
+			MMLog.finer(() -> "[Entity Scores] "
+				+ Bukkit.getCurrentTick()
+				+ ": "
+				+ scoreHolder
+				+ ": Not saving entity scores as they were deleted this tick: "
+				+ entityScores.size()
+				+ ", "
+				+ reason);
+			return;
 		}
 
 		if (entityScores.size() > 0) {
