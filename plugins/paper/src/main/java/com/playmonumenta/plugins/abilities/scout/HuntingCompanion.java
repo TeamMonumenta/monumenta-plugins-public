@@ -14,6 +14,8 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.parrots.ParrotManager;
+import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -294,10 +297,25 @@ public class HuntingCompanion extends Ability {
 	private void summon(String name, double damage, ItemStatManager.PlayerItemStats playerItemStats, boolean eagle) {
 		Location loc = mPlayer.getLocation();
 		Vector facingDirection = mPlayer.getEyeLocation().getDirection().normalize();
-		Vector sideOffset = getSideOffset(loc, facingDirection, eagle);
-		if (sideOffset == null) {
+		Vector perp = new Vector(-facingDirection.getZ(), 0, facingDirection.getX()).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
+		// Eagles and dolphins spawn on opposite side by default
+		if (eagle) {
+			perp.multiply(-1);
+		}
+		boolean switchedSides = false;
+		Vector sideOffset = new Vector();
+		Location pos = loc.clone().add(perp);
+		Location neg = loc.clone().subtract(perp);
+		if (canSpawnAt(pos)) {
+			sideOffset = perp;
+		} else if (canSpawnAt(neg)) {
+			sideOffset = perp.clone().multiply(-1);
+			switchedSides = true;
+		} else if (!loc.isChunkLoaded()) {
+			// Player is standing somewhere that's not loaded, abort
 			return;
 		}
+
 		loc.add(sideOffset).add(facingDirection.clone().setY(0).normalize().multiply(-0.25));
 		if (eagle) {
 			loc.add(0, 2, 0);
@@ -342,6 +360,19 @@ public class HuntingCompanion extends Ability {
 
 		if (summon instanceof Fox fox && LocationUtils.isInSnowyBiome(loc)) {
 			fox.setFoxType(Fox.Type.SNOW);
+		} else if (summon instanceof Parrot parrot) {
+			ParrotManager.ParrotVariant parrotVariant = switchedSides ? ParrotManager.getRightShoulderParrotVariant(mPlayer) : ParrotManager.getLeftShoulderParrotVariant(mPlayer);
+			if (parrotVariant == null) {
+				parrotVariant = switchedSides ? ParrotManager.getLeftShoulderParrotVariant(mPlayer) : ParrotManager.getRightShoulderParrotVariant(mPlayer);
+			}
+			if (parrotVariant != null) {
+				parrot.setVariant(parrotVariant.getVariant());
+				parrot.customName(Component.text(parrotVariant.getName()));
+				parrot.setCustomNameVisible(false);
+				if (parrotVariant == ParrotManager.ParrotVariant.RAINBOW) {
+					mPlugin.mBossManager.manuallyRegisterBoss(parrot, new RainbowParrot(mPlugin, parrot));
+				}
+			}
 		}
 
 		Attribute attribute;
@@ -355,26 +386,6 @@ public class HuntingCompanion extends Ability {
 		mSummons.put(summon, null);
 
 		mCosmetic.onSummon(loc.getWorld(), loc, mPlayer, summon);
-	}
-
-	private @Nullable Vector getSideOffset(Location loc, Vector facingDirection, boolean eagle) {
-		Vector perp = new Vector(-facingDirection.getZ(), 0, facingDirection.getX()).normalize(); //projection of the perpendicular vector to facingDirection onto the xz plane
-		// Eagles and dolphins spawn on opposite side by default
-		if (eagle) {
-			perp.multiply(-1);
-		}
-		Vector sideOffset = new Vector();
-		Location pos = loc.clone().add(perp);
-		Location neg = loc.clone().subtract(perp);
-		if (canSpawnAt(pos)) {
-			sideOffset = perp;
-		} else if (canSpawnAt(neg)) {
-			sideOffset = perp.clone().multiply(-1);
-		} else if (!loc.isChunkLoaded()) {
-			// Player is standing somewhere that's not loaded, abort
-			return null;
-		}
-		return sideOffset;
 	}
 
 	private boolean canSpawnAt(Location test) {

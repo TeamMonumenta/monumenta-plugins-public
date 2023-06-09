@@ -194,16 +194,25 @@ public class ParrotManager implements Listener {
 		}
 	}
 
+	public static @Nullable ParrotVariant getLeftShoulderParrotVariant(Player player) {
+		return getParrotVariantFromScoreboard(player, SCOREBOARD_PARROT_LEFT);
+	}
+
+	public static @Nullable ParrotVariant getRightShoulderParrotVariant(Player player) {
+		return getParrotVariantFromScoreboard(player, SCOREBOARD_PARROT_RIGHT);
+	}
+
+	private static @Nullable ParrotVariant getParrotVariantFromScoreboard(Player player, String objective) {
+		return areParrotsVisible(player) ? ParrotVariant.getVariantByNumber(ScoreboardUtils.getScoreboardValue(player, objective).orElse(0)) : null;
+	}
+
 	public static void updateParrots(Player player) {
 
-		boolean visible = areParrotsVisible(player);
-		int leftShoulderParrot = visible ? ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_LEFT).orElse(0) : 0;
-		int rightShoulderParrot = visible ? ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_PARROT_RIGHT).orElse(0) : 0;
-		ParrotVariant leftVariant = ParrotVariant.getVariantByNumber(leftShoulderParrot);
-		ParrotVariant rightVariant = ParrotVariant.getVariantByNumber(rightShoulderParrot);
+		ParrotVariant leftVariant = getLeftShoulderParrotVariant(player);
+		ParrotVariant rightVariant = getRightShoulderParrotVariant(player);
 
 		// Verify player unlocks and remove if anything doesn't match
-		if (!hasDoubleShoulders(player) && leftShoulderParrot != 0 && rightShoulderParrot != 0) {
+		if (!hasDoubleShoulders(player) && leftVariant != null && rightVariant != null) {
 			ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_PARROT_RIGHT, 0);
 			rightVariant = null;
 		}
