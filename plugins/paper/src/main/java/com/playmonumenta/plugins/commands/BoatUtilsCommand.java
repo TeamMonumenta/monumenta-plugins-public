@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.TreeSpecies;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -20,6 +21,7 @@ import org.bukkit.util.Vector;
 public class BoatUtilsCommand {
 
 	private static final HashMap<Player, BukkitTask> SCHEDULED_MOUNTS = new HashMap<>();
+	public static final String ONE_PLAYER_BOAT_TAG = "OnePlayerBoat";
 
 	public static void register() {
 		new CommandAPICommand("boatutils")
@@ -136,7 +138,13 @@ public class BoatUtilsCommand {
 
 	private static void mount(Player player) {
 		Boat boat = (Boat) player.getWorld().spawnEntity(player.getLocation(), EntityType.BOAT);
+		ArmorStand armorStand = (ArmorStand) player.getWorld().spawnEntity(boat.getLocation(), EntityType.ARMOR_STAND);
+		armorStand.setVisible(false);
+		armorStand.setMarker(true);
+		armorStand.setSilent(true);
+		armorStand.addScoreboardTag(ONE_PLAYER_BOAT_TAG);
 		boat.setWoodType(getPreferredBoat(player));
+		boat.addPassenger(armorStand);
 		boat.addPassenger(player);
 	}
 
