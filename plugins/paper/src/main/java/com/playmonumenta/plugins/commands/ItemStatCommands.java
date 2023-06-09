@@ -21,6 +21,7 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.TimeArgument;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -478,7 +479,7 @@ public class ItemStatCommands {
 
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new StringArgument("enchantment").includeSuggestions(ArgumentSuggestions.strings(info -> effects)));
-		arguments.add(new IntegerArgument("duration", 0));
+		arguments.add(new TimeArgument("duration"));
 		arguments.add(new DoubleArgument("strength", 0));
 
 		new CommandAPICommand("editconsume").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
@@ -534,8 +535,21 @@ public class ItemStatCommands {
 			}
 		}
 
+		Argument<?> enchantmentArgument = new StringArgument("enchantment").replaceSuggestions(ArgumentSuggestions.strings(info -> enchantments));
+
 		List<Argument<?>> arguments = new ArrayList<>();
-		arguments.add(new StringArgument("enchantment").replaceSuggestions(ArgumentSuggestions.strings(info -> enchantments)));
+		arguments.add(enchantmentArgument);
+
+		new CommandAPICommand("editench").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
+			ItemStack item = getHeldItemAndSendErrors(player);
+			if (item == null) {
+				return;
+			}
+			String enchantment = (String) args[0];
+
+			addEnchantmentOrInfusion(item, player, enchantment, 1);
+		}).register();
+
 		arguments.add(new IntegerArgument("level", 0));
 
 		new CommandAPICommand("editench").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
@@ -551,7 +565,7 @@ public class ItemStatCommands {
 
 		List<Argument<?>> argumentsOther = new ArrayList<>();
 		argumentsOther.add(new EntitySelectorArgument.OnePlayer("player"));
-		argumentsOther.add(new StringArgument("enchantment").replaceSuggestions(ArgumentSuggestions.strings(info -> enchantments)));
+		argumentsOther.add(enchantmentArgument);
 		argumentsOther.add(new IntegerArgument("level", 0));
 
 		new CommandAPICommand("editench").withPermission(perms).withArguments(argumentsOther).executes((sender, args) -> {
@@ -560,7 +574,7 @@ public class ItemStatCommands {
 			Integer level = (Integer) args[2];
 			ItemStack item = player.getInventory().getItemInMainHand();
 			if (item.getType() == Material.AIR) {
-				player.sendMessage(ChatColor.RED + "Must be holding an item!");
+				player.sendMessage(Component.text("Must be holding an item!", NamedTextColor.RED));
 				return;
 			}
 
