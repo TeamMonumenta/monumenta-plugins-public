@@ -2,10 +2,10 @@ package com.playmonumenta.plugins.bosses.spells.tealspirit;
 
 import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.effects.PercentHealthBoost;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -14,8 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -60,8 +58,7 @@ public class TealFinalStand extends Spell {
 				public void run() {
 					if (mChargeHealth.nextTick()) {
 						PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
-							EntityUtils.removeAttribute(p, Attribute.GENERIC_MAX_HEALTH, "TealSpirit-" + mBoss.getUniqueId());
-							EntityUtils.addAttribute(p, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("TealSpirit-" + mBoss.getUniqueId(), (-10 * mStack) / 100.0, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+							com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, RewriteHistory.PERCENT_HEALTH_EFFECT, new PercentHealthBoost(72000, (-10 * mStack) / 100.0, RewriteHistory.PERCENT_HEALTH_EFFECT).displaysTime(false));
 							new PPExplosion(Particle.PORTAL, p.getLocation())
 								.speed(1)
 								.count(120)

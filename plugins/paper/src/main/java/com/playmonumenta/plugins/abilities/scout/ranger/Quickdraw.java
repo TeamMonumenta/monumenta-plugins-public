@@ -70,8 +70,9 @@ public class Quickdraw extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		if (ItemStatUtils.hasEnchantment(inMainHand, ItemStatUtils.EnchantmentType.TWO_HANDED)
-			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, ItemStatUtils.EnchantmentType.WEIGHTLESS))) {
+		if ((ItemStatUtils.hasEnchantment(inMainHand, ItemStatUtils.EnchantmentType.TWO_HANDED)
+			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, ItemStatUtils.EnchantmentType.WEIGHTLESS)))
+			|| ItemUtils.isShootableItem(inOffHand)) {
 			return;
 		}
 		World world = mPlayer.getWorld();

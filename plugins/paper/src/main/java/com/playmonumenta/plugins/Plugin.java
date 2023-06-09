@@ -284,6 +284,7 @@ public class Plugin extends JavaPlugin {
 		ParticleUtilsCommand.register();
 		ChargeUpBarCommand.register(this);
 		BoatUtilsCommand.register();
+		AttributeModifierCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
