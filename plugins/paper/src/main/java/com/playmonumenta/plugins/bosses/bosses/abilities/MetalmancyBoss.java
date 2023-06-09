@@ -27,10 +27,6 @@ public class MetalmancyBoss extends BossAbilityGroup {
 	private double mDamage = 0;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new MetalmancyBoss(plugin, boss);
-	}
-
 	public MetalmancyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -65,7 +61,7 @@ public class MetalmancyBoss extends BossAbilityGroup {
 			return;
 		}
 		Set<String> tags = target.getScoreboardTags();
-		if (!EntityUtils.isHostileMob(target) || (tags != null && tags.contains(AbilityUtils.IGNORE_TAG))) {
+		if (!EntityUtils.isHostileMob(target) || tags.contains(AbilityUtils.IGNORE_TAG)) {
 			event.setCancelled(true);
 		}
 	}

@@ -39,10 +39,6 @@ public class FriendlyBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FriendlyBoss(plugin, boss);
-	}
-
 	public FriendlyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());

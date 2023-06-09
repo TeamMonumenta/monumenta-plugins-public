@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseGrenadeLauncher;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -99,91 +97,84 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 	}
 
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new GrenadeLauncherBoss(plugin, boss);
-	}
-
 	public GrenadeLauncherBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseGrenadeLauncher(
-				plugin,
-				boss,
-				p.BOMB_MATERIAL,
-				p.EXPLODE_ON_TOUCH,
-				p.EXPLOSION_DELAY,
-				p.LOBS,
-				p.LOBS_DELAY,
-				p.DURATION,
-				p.COOLDOWN,
-				p.LINGERING_DURATION,
-				p.EXPLOSION_TARGET.getRange(),
-				() -> {
-					return p.BOMB_TARGET.getTargetsList(boss);
-				},
-				(Location loc) -> {
-					return p.EXPLOSION_TARGET.getTargetsListByLocation(boss, loc);
-				},
-				(LivingEntity bosss, Location loc) -> {
-					//init aesthetics
-					//not used for now
-				},
-				(LivingEntity bosss, Location loc) -> {
-					//aesthetics follow the grenade
-					p.PARTICLE_BOMB.spawn(boss, loc);
-					p.SOUND_GRENADE.play(loc);
+		Spell spell = new SpellBaseGrenadeLauncher(
+			plugin,
+			boss,
+			p.BOMB_MATERIAL,
+			p.EXPLODE_ON_TOUCH,
+			p.EXPLOSION_DELAY,
+			p.LOBS,
+			p.LOBS_DELAY,
+			p.DURATION,
+			p.COOLDOWN,
+			p.LINGERING_DURATION,
+			p.EXPLOSION_TARGET.getRange(),
+			() -> {
+				return p.BOMB_TARGET.getTargetsList(boss);
+			},
+			(Location loc) -> {
+				return p.EXPLOSION_TARGET.getTargetsListByLocation(boss, loc);
+			},
+			(LivingEntity bosss, Location loc) -> {
+				//init aesthetics
+				//not used for now
+			},
+			(LivingEntity bosss, Location loc) -> {
+				//aesthetics follow the grenade
+				p.PARTICLE_BOMB.spawn(boss, loc);
+				p.SOUND_GRENADE.play(loc);
 
-				},
-				(LivingEntity bosss, Location loc) -> {
-					//aesthetics
-					p.PARTICLE_EXPLOSION.spawn(boss, loc);
-					p.SOUND_EXPLOSION.play(loc);
-				},
-				(LivingEntity bosss, LivingEntity target, Location loc) -> {
-					//hit actions
+			},
+			(LivingEntity bosss, Location loc) -> {
+				//aesthetics
+				p.PARTICLE_EXPLOSION.spawn(boss, loc);
+				p.SOUND_EXPLOSION.play(loc);
+			},
+			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+				//hit actions
 
-					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc);
-					}
-
-					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
-					}
-
-					p.EFFECTS.apply(target, boss);
-				},
-				//Aesthetics and hit for the lingering ring
-				(Location loc) -> {
-					//particle for ring
-					p.PARTICLE_LINGERING_RING.spawn(boss, loc, 0.1, 0.2, 0.1, 0.1);
-				},
-				(Location loc, int ticks) -> {
-					//particle for ring center
-					if (ticks % 20 == 0) {
-						p.SOUND_LINGERING.play(loc);
-					}
-					p.PARTICLE_LINGERING_CENTER.spawn(boss, loc, p.EXPLOSION_TARGET.getRange() / 3, 0.2, p.EXPLOSION_TARGET.getRange() / 3, 0.5);
-				},
-				(LivingEntity bosss, LivingEntity target, Location loc) -> {
-					String spellName = p.SPELL_NAME.isEmpty() ? null : p.SPELL_NAME;
-					//hit ring actions
-					if (p.LINGERING_DAMAGE > 0) {
-						DamageUtils.damage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE, null, false, false, spellName);
-					}
-
-					if (p.LINGERING_DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, spellName);
-					}
-
-					p.LINGERING_EFFECTS.apply(target, boss);
+				if (p.DAMAGE > 0) {
+					BossUtils.blockableDamage(boss, target, DamageType.BLAST, p.DAMAGE, p.SPELL_NAME, loc);
 				}
-			)
-		));
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+
+				if (p.DAMAGE_PERCENTAGE > 0.0) {
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, loc, p.SPELL_NAME);
+				}
+
+				p.EFFECTS.apply(target, boss);
+			},
+			//Aesthetics and hit for the lingering ring
+			(Location loc) -> {
+				//particle for ring
+				p.PARTICLE_LINGERING_RING.spawn(boss, loc, 0.1, 0.2, 0.1, 0.1);
+			},
+			(Location loc, int ticks) -> {
+				//particle for ring center
+				if (ticks % 20 == 0) {
+					p.SOUND_LINGERING.play(loc);
+				}
+				p.PARTICLE_LINGERING_CENTER.spawn(boss, loc, p.EXPLOSION_TARGET.getRange() / 3, 0.2, p.EXPLOSION_TARGET.getRange() / 3, 0.5);
+			},
+			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+				String spellName = p.SPELL_NAME.isEmpty() ? null : p.SPELL_NAME;
+				//hit ring actions
+				if (p.LINGERING_DAMAGE > 0) {
+					DamageUtils.damage(boss, target, DamageType.BLAST, p.LINGERING_DAMAGE, null, false, false, spellName);
+				}
+
+				if (p.LINGERING_DAMAGE_PERCENTAGE > 0.0) {
+					BossUtils.bossDamagePercent(mBoss, target, p.LINGERING_DAMAGE_PERCENTAGE, spellName);
+				}
+
+				p.LINGERING_EFFECTS.apply(target, boss);
+			}
+		);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 
 	}
 

@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -20,17 +18,11 @@ public class TpBehindTargetedBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_tpbehindtargeted";
 	public static final int detectionRange = 20;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TpBehindTargetedBoss(plugin, boss);
-	}
-
 	public TpBehindTargetedBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpBehindPlayer(plugin, boss, 240)));
+		Spell spell = new SpellTpBehindPlayer(plugin, boss, 240);
 
-
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(spell, detectionRange);
 	}
 }

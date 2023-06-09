@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
@@ -17,11 +16,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +36,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-public final class MimicQueen extends BossAbilityGroup {
+public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_mimicqueen";
 	public static final int detectionRange = 20;
 
@@ -56,26 +52,8 @@ public final class MimicQueen extends BossAbilityGroup {
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 35;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new MimicQueen(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
-
 	public MimicQueen(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
-
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		SpellManager activeSpells = new SpellManager(Arrays.asList(
 			new SpellMultihitHeal(plugin, boss),
@@ -116,8 +94,7 @@ public final class MimicQueen extends BossAbilityGroup {
 			new SpellPurgeNegatives(boss, 20 * 6)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, null);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}

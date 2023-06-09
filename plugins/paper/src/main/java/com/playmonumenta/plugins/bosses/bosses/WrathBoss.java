@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.Collections;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -39,10 +40,6 @@ public class WrathBoss extends BossAbilityGroup {
 
 		@BossParam(help = "The spell name shown when a player is killed by this skill")
 		public String SPELL_NAME = "";
-	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new WrathBoss(plugin, boss);
 	}
 
 	private final Parameters mParams;
@@ -129,12 +126,7 @@ public class WrathBoss extends BossAbilityGroup {
 				}.runTaskTimer(mPlugin, 0, 1);
 			}, null, null), new SpellDuelist(plugin, boss, mParams.COOLDOWN, mParams.DAMAGE)));
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1);
-			}
-		}.runTaskLater(plugin, 1);
+		Bukkit.getScheduler().runTaskLater(plugin, () -> EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 1), 1);
 
 		super.constructBoss(activeSpells, Collections.emptyList(), mParams.DETECTION, null);
 	}

@@ -24,11 +24,6 @@ public final class TpBehindBoss extends BossAbilityGroup {
 
 	}
 
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TpBehindBoss(plugin, boss);
-	}
-
 	public TpBehindBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

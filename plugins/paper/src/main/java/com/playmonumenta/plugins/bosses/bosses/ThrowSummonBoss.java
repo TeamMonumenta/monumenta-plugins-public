@@ -1,10 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellThrowSummon;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -38,18 +36,14 @@ public class ThrowSummonBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ThrowSummonBoss(plugin, boss);
-	}
-
 	public ThrowSummonBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellThrowSummon(plugin, boss, p.DETECTION, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL, p.LOB_DELAY)));
+
+		Spell spell = new SpellThrowSummon(plugin, boss, p.DETECTION, p.LOBS, p.COOLDOWN, p.SPAWNEDMOB, p.POOL, p.LOB_DELAY);
 
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

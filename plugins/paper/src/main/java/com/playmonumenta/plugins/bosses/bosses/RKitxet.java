@@ -50,7 +50,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class RKitxet extends BossAbilityGroup {
+public class RKitxet extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_rkitxet";
 	public static final int detectionRange = 50;
 	public static final int RKITXET_HEALTH = 1400;
@@ -62,9 +62,6 @@ public class RKitxet extends BossAbilityGroup {
 	private static final int COOLDOWN_TICKS_1 = 10 * 20;
 	private static final int COOLDOWN_TICKS_2 = 7 * 20;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	public SpellShardShield mShieldSpell;
 	public List<Location> mAgonyLocations;
 
@@ -74,20 +71,8 @@ public class RKitxet extends BossAbilityGroup {
 	private @Nullable String mLastUsedSpell;
 	private boolean mSameSpellUsedTwice;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new RKitxet(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public RKitxet(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mAgonyLocations = new ArrayList<>();
 
 		mLastUsedSpell = null;

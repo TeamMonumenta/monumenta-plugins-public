@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellFrostNova;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -30,19 +28,13 @@ public class FrostNovaBoss extends BossAbilityGroup {
 		public int DETECTION = 20;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FrostNovaBoss(plugin, boss);
-	}
-
 	public FrostNovaBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellFrostNova(plugin, boss, p.RADIUS, p.DAMAGE, p.DAMAGE, p.DURATION, p.COOLDOWN)
-		));
+		Spell spell = new SpellFrostNova(plugin, boss, p.RADIUS, p.DAMAGE, p.DAMAGE, p.DURATION, p.COOLDOWN);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

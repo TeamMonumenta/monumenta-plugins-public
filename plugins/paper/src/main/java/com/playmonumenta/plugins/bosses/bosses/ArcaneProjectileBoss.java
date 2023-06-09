@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -48,10 +46,6 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 		public boolean COLLIDES_WITH_BLOCKS = true;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ArcaneProjectileBoss(plugin, boss);
-	}
-
 	public ArcaneProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -59,8 +53,7 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 
 		int lifetimeTicks = (int) (p.DISTANCE / p.SPEED);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
+		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
 				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
@@ -87,9 +80,8 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 					if (target != null) {
 						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);
 					}
-				})
-		));
+				});
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null);
+		super.constructBoss(spell, p.DETECTION);
 	}
 }

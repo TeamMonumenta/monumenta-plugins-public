@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,28 +33,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class CrownbearerBoss extends BossAbilityGroup {
+public final class CrownbearerBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_crownbearer";
 	public static final int detectionRange = 60;
 	private static final int SUMMON_RADIUS = 5;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new CrownbearerBoss(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public CrownbearerBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		mBoss.setRemoveWhenFarAway(false);

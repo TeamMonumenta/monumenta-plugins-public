@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,30 +50,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class RabbitGodBoss extends BossAbilityGroup {
+public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_rabbitgod";
 	public static final int detectionRange = 30;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	private boolean mPhase2;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new RabbitGodBoss(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public RabbitGodBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mPhase2 = false;
 		mBoss.setRemoveWhenFarAway(false);
 		World world = mBoss.getWorld();

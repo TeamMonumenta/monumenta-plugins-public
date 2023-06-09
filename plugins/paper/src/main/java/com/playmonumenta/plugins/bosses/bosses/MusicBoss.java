@@ -1,10 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellMusic;
-import java.util.Collections;
-import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -45,10 +42,6 @@ public class MusicBoss extends BossAbilityGroup {
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 		double range = Math.max(p.RADIUS_INNER, p.RADIUS_OUTER);
 		SpellMusic spell = new SpellMusic(boss, p.TRACK, p.DURATION, p.VOLUME, p.DELAY, p.RADIUS_INNER, range, p.CLEAR, p.CLEAR_DELAY, p.FORCE);
-		super.constructBoss(new SpellManager(List.of(spell)), Collections.emptyList(), (int) (range * 2), null);
-	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new MusicBoss(plugin, boss);
+		super.constructBoss(spell, (int) (range * 2));
 	}
 }

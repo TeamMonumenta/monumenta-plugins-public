@@ -19,10 +19,6 @@ public class UnstableBoss extends BossAbilityGroup {
 
 	private final Parameters mPFinal;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new UnstableBoss(plugin, boss);
-	}
-
 	public UnstableBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mPFinal = BossParameters.getParameters(boss, identityTag, new Parameters());

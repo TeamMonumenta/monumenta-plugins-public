@@ -11,10 +11,6 @@ public class NoExperienceBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_no_exp";
 	public static final int detectionRange = 30;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new NoExperienceBoss(plugin, boss);
-	}
-
 	public NoExperienceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

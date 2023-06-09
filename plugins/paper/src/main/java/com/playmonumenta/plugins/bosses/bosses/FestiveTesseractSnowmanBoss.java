@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -22,13 +21,9 @@ public class FestiveTesseractSnowmanBoss extends BossAbilityGroup {
 
 	private int mTicksLived = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FestiveTesseractSnowmanBoss(plugin, boss);
-	}
-
 	public FestiveTesseractSnowmanBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				mTicksLived += 5;
 

@@ -67,7 +67,4 @@ public class PhasesManagerBoss extends BossAbilityGroup {
 		mParam.PHASES.onCustom(mBoss, key);
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PhasesManagerBoss(plugin, boss);
-	}
 }

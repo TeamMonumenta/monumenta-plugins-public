@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
 import java.util.List;
@@ -12,13 +13,11 @@ public class BlockBreakBoss extends BossAbilityGroup {
 	public static final int detectionRange = 40;
 
 	public static class Parameters extends BossParameters {
+		@BossParam(help = "Whether or not the mob's bounding box affects the range of where blocks are destroyed")
 		public boolean ADAPT_TO_BOUNDING_BOX = false;
 
+		@BossParam(help = "Whether or not blocks at the same level as where the mob is standing will be destroyed")
 		public boolean ALLOW_FOOTLEVEL_BREAK = false;
-	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlockBreakBoss(plugin, boss);
 	}
 
 	public BlockBreakBoss(Plugin plugin, LivingEntity boss) {

@@ -23,10 +23,6 @@ public class TemporalShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_temporalshield";
 	public static final int detectionRange = 30;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TemporalShieldBoss(plugin, boss);
-	}
-
 	public TemporalShieldBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		EffectManager manager = com.playmonumenta.plugins.Plugin.getInstance().mEffectManager;

@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -12,8 +12,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -78,15 +77,11 @@ public final class PounceBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_HIT = ParticlesList.fromString("[(FLAME,60,0,0,0,0.2),(EXPLOSION_NORMAL,20,0,0,0,0.3),(LAVA,27,3,0.25,3,0)]");
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PounceBoss(plugin, boss);
-	}
-
 	public PounceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
+		Spell spell = new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 			(World world, Location loc) -> {
 				p.SOUND_START.play(loc, 1f, 1f);
 				p.PARTICLE_START.spawn(boss, loc, 1d, 0d, 1d);
@@ -97,7 +92,7 @@ public final class PounceBoss extends BossAbilityGroup {
 			p.PARTICLE_LEAPING.spawn(boss, loc, 0.5, 0.5, 0.5, 1d);
 		}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-				Arrays.asList(
+				List.of(
 					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 						p.PARTICLE_RING.spawn(boss, loc, 0.1, 0.1, 0.1, 0.1);
 					})
@@ -127,7 +122,7 @@ public final class PounceBoss extends BossAbilityGroup {
 				}
 				p.EFFECTS.apply(players, boss);
 			}
-		})));
-		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		});
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

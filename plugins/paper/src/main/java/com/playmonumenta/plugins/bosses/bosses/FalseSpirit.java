@@ -23,7 +23,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,7 +61,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public final class FalseSpirit extends BossAbilityGroup {
+public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_falsespirit";
 	public static final int detectionRange = 75;
 	public static final int meleeRange = 10;
@@ -70,17 +69,14 @@ public final class FalseSpirit extends BossAbilityGroup {
 	//If delves is enabled in instance, turn on delves mode
 	private boolean mDelve = false;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	private static final int HEALTH_HEALED = 100;
 	private double mCoef;
 
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	private LapseOfReality mMania;
-	private GatesOfHell mHell;
-	private GatesOfHell mCeilingHell;
+	private final LapseOfReality mMania;
+	private final GatesOfHell mHell;
+	private final GatesOfHell mCeilingHell;
 
 	private static final String PORTAL_TAG = "PortalOfHell";
 	//WARNING: Ceiling Portal should only have PORTAL_CEILING_TAG as a tag
@@ -94,22 +90,8 @@ public final class FalseSpirit extends BossAbilityGroup {
 		Material.BASALT
 	);
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new FalseSpirit(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public FalseSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		//Look to see if delves is enabled
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 100, true);
@@ -142,7 +124,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 		}
 
 		mHell = new GatesOfHell(plugin, boss, portals, 1);
-		mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(Arrays.asList(ceilingPortal)), 5);
+		mCeilingHell = new GatesOfHell(plugin, boss, new ArrayList<>(List.of(ceilingPortal)), 5);
 
 		int multiEarthshakeDuration = 50;
 
@@ -318,7 +300,7 @@ public final class FalseSpirit extends BossAbilityGroup {
 		if (damager instanceof Trident trident) {
 			ItemStack item = trident.getItemStack();
 
-			if (item != null && ItemUtils.getPlainName(item).contains("Gate Closer")) {
+			if (ItemUtils.getPlainName(item).contains("Gate Closer")) {
 				event.setCancelled(true);
 			}
 		}

@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -32,7 +31,7 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_festivetess_snowman";
 	public static final int detectionRange = 50;
 	private static final int LIFETIME = 60 * 20;
-	private Parameters mParams;
+	private final Parameters mParams;
 	private int mTicksLived = 0;
 
 	public static class Parameters extends BossParameters {
@@ -40,16 +39,12 @@ public class FestiveTessUpgradeSnowmenBoss extends BossAbilityGroup {
 		public int DAMAGE = 1;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FestiveTessUpgradeSnowmenBoss(plugin, boss);
-	}
-
 	public FestiveTessUpgradeSnowmenBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				mTicksLived += 5;
 				if (mTicksLived > LIFETIME) {

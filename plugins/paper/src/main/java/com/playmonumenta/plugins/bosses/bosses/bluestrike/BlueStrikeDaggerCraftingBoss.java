@@ -59,14 +59,10 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 	private final Location mSpawnLoc;
 	public static String identityTag = "boss_bluestrikedaggercraft";
 	public static @Nullable BukkitTask mRunnable;
-	public List<Spell> mOnlinePassives = List.of();
+	public List<Spell> mOnlinePassives;
 	public List<Spell> mOfflinePassives = new ArrayList<>();
-	private Samwell mSamwellAbility;
+	private final Samwell mSamwellAbility;
 	private final SpellManager mSpellManager = SpellManager.EMPTY;
-
-	public static @Nullable BlueStrikeDaggerCraftingBoss deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return construct(plugin, boss);
-	}
 
 	public static @Nullable BlueStrikeDaggerCraftingBoss construct(Plugin plugin, LivingEntity boss) {
 		// Get nearest entity called Samwell.
@@ -218,13 +214,13 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			// Begin Crafting
 			switch (npcName.toLowerCase()) {
 				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That's enough. We'll start conjuring the dagger!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That's enough. We'll start conjuring the dagger!"));
 				}
 				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Yarr, that be enough! Dagger ahoy!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Yarr, that be enough! Dagger ahoy!"));
 				}
 				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That should do it. We'll start weaving the dagger together now."));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "That should do it. We'll start weaving the dagger together now."));
 				}
 				default -> {
 
@@ -235,13 +231,13 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 		} else {
 			switch (npcName.toLowerCase()) {
 				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Thank you. We'll need " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more to put together the dagger."));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Thank you. We'll need " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more to put together the dagger."));
 				}
 				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Gonna need ye to get " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more cap'n! Then it'll be dagger ahoy!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Gonna need ye to get " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more cap'n! Then it'll be dagger ahoy!"));
 				}
 				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "If you can grab " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more, we should be able to get the dagger together. Thanks!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "If you can grab " + (mSamwellAbility.mShardsReq - mSamwellAbility.getShards()) + " more, we should be able to get the dagger together. Thanks!"));
 				}
 				default -> {
 
@@ -260,13 +256,13 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			String npcName = mBoss.getName();
 			switch (npcName.toLowerCase()) {
 				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done! Collect the dagger and let's take this monster down."));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done! Collect the dagger and let's take this monster down."));
 				}
 				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Ahoy cap'n, the dagger be done! Get Samwell, quick!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Ahoy cap'n, the dagger be done! Get Samwell, quick!"));
 				}
 				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done, Captain! Get the dagger and stab the traitor!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "It's done, Captain! Get the dagger and stab the traitor!"));
 				}
 				default -> {
 
@@ -283,13 +279,13 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			mSamwellAbility.addFail();
 			switch (npcName.toLowerCase()) {
 				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Help! The Masked are on me! I can't focus!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Help! The Masked are on me! I can't focus!"));
 				}
 				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Yarr, help me! Can't be craftin' if them fools are on me!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Yarr, help me! Can't be craftin' if them fools are on me!"));
 				}
 				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Quick! Help! I'm under attack!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "Quick! Help! I'm under attack!"));
 				}
 				default -> {
 
@@ -307,13 +303,13 @@ public class BlueStrikeDaggerCraftingBoss extends BossAbilityGroup {
 			// 3 Fails = Restart!
 			switch (npcName.toLowerCase()) {
 				case "bhairavi" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "There was too many of them... We'll need new shards - the Masked ruined it..."));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "There was too many of them... We'll need new shards - the Masked ruined it..."));
 				}
 				case "levyn" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "My spleen! I can't keep craftin' like this, cap'n! Gimme some new sharrrrds!"));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "My spleen! I can't keep craftin' like this, cap'n! Gimme some new sharrrrds!"));
 				}
 				case "izzy" -> {
-					mSpawnLoc.getNearbyPlayers(100).stream().forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "I'm sorry Captain, we'll need more shards. The Masked broke what we've made."));
+					mSpawnLoc.getNearbyPlayers(100).forEach(p -> MessagingUtils.sendNPCMessage(p, npcName, "I'm sorry Captain, we'll need more shards. The Masked broke what we've made."));
 				}
 				default -> {
 

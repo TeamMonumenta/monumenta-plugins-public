@@ -37,10 +37,6 @@ public class ParticleRingBoss extends BossAbilityGroup {
 		public int DETECTION = 30;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ParticleRingBoss(plugin, boss);
-	}
-
 	public ParticleRingBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

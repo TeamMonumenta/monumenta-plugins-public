@@ -46,16 +46,12 @@ public class SummonOnExplosionBoss extends BossAbilityGroup {
 	public SummonOnExplosionBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 
-		if (!(boss instanceof Creeper creeper)) {
+		if (!(boss instanceof Creeper)) {
 			throw new Exception("This boss ability can only be used on Creeper!");
 		}
 		mParam = BossParameters.getParameters(boss, identityTag, new Parameters());
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), -1, null);
-	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SummonOnExplosionBoss(plugin, boss);
 	}
 
 	@Override

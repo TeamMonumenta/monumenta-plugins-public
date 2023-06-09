@@ -22,10 +22,6 @@ public class ToughBoss extends BossAbilityGroup {
 	final Parameters mParam;
 	private final ArmorStand mBannerHolder;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ToughBoss(plugin, boss);
-	}
-
 	public ToughBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParam = Parameters.getParameters(boss, identityTag, new ToughBoss.Parameters());

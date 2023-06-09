@@ -18,7 +18,6 @@ import org.bukkit.plugin.Plugin;
 public class MessageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_message";
 
-
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "The text to be sent to players.")
 		public String TEXT = "";
@@ -32,14 +31,7 @@ public class MessageBoss extends BossAbilityGroup {
 		public boolean OBFUSCATED = false;
 		@BossParam(help = "The color of the text. Accepts Hex and mc colors")
 		public String COLOR = "GRAY";
-
-
 	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new MessageBoss(plugin, boss);
-	}
-
 
 	public MessageBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);

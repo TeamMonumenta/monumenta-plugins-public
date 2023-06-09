@@ -22,10 +22,6 @@ public class SnowballDamageBoss extends BossAbilityGroup {
 
 	private final Parameters mParams;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SnowballDamageBoss(plugin, boss);
-	}
-
 	public SnowballDamageBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 

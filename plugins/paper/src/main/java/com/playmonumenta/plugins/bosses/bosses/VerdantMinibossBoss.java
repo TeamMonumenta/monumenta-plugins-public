@@ -52,7 +52,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class VerdantMinibossBoss extends BossAbilityGroup {
+public class VerdantMinibossBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_verdantmini";
 	public static final int detectionRange = 70;
 
@@ -65,28 +65,12 @@ public class VerdantMinibossBoss extends BossAbilityGroup {
 	private static final int IMPACT_TIME = 1 * 20;
 	private static final int CHARGE_TIME = FURY_PERIOD - IMPACT_TIME;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	private @Nullable Player mFuryTarget = null;
 	private @Nullable Location mCrystalLoc;
 	private boolean mShielded = true;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new VerdantMinibossBoss(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public VerdantMinibossBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		Collection<ArmorStand> nearbyStands = mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), detectionRange);
 		for (ArmorStand stand : nearbyStands) {

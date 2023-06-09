@@ -14,20 +14,13 @@ public class VolatileBoss extends BossAbilityGroup {
 
 	private final Creeper mCreeper;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		if (!(boss instanceof Creeper)) {
-			throw new Exception("Attempted to give non-creeper the " + identityTag + " ability: " + boss.toString());
-		}
-		return new VolatileBoss(plugin, boss);
-	}
-
 	public VolatileBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
-		if (!(boss instanceof Creeper)) {
+		if (!(boss instanceof Creeper creeper)) {
 			throw new Exception("Attempted to give non-creeper the " + identityTag + " ability: " + boss.toString());
 		}
 
-		mCreeper = (Creeper) boss;
+		mCreeper = creeper;
 
 		// Boss effectively does nothing
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

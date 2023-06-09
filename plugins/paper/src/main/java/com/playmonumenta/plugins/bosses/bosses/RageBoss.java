@@ -1,10 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRage;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -33,19 +31,13 @@ public class RageBoss extends BossAbilityGroup {
 		public boolean CC_IMMUNE_BUFF = false;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new RageBoss(plugin, boss);
-	}
-
 	public RageBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellRage(plugin, boss, p.RADIUS, p.DELAY, p.COOLDOWN, p.BUFF_DURATION, p.STRENGTH_POWER, p.SPEED_POWER, p.KBR_POWER, p.CC_IMMUNE_BUFF)
-		));
+		Spell spell = new SpellRage(plugin, boss, p.RADIUS, p.DELAY, p.COOLDOWN, p.BUFF_DURATION, p.STRENGTH_POWER, p.SPEED_POWER, p.KBR_POWER, p.CC_IMMUNE_BUFF);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(spell, detectionRange);
 	}
 }

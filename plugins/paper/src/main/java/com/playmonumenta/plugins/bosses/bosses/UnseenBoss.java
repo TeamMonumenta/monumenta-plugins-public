@@ -20,11 +20,6 @@ public class UnseenBoss extends BossAbilityGroup {
 
 	final Parameters mParam;
 
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new UnseenBoss(plugin, boss);
-	}
-
 	public UnseenBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParam = Parameters.getParameters(boss, identityTag, new UnseenBoss.Parameters());

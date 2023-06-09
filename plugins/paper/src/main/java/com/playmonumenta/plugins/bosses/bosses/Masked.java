@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class Masked extends BossAbilityGroup {
+public class Masked extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_masked";
 	public static final int DETECTION_RANGE = 50;
@@ -61,27 +60,12 @@ public class Masked extends BossAbilityGroup {
 	private static final String DEATH_DIALOG_COMMAND = "tellraw @s [\"\",{\"text\":\"[Masked Man]\",\"color\":\"gold\"},{\"text\":\" Hah... My death won't stop the shard... We will not fail... We will not fail Lord Calder...\"}]";
 
 	private final World mWorld;
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private final ItemStack mMeleeWeapon;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Masked(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Masked(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mWorld = boss.getWorld();
-		mSpawnLoc = spawnLoc;
 		mSpawnLoc.setY(mSpawnLoc.getBlockY());
-		mEndLoc = endLoc;
 
 		// Store the Arcane Gladius to a variable for phase 2
 		mMeleeWeapon = mBoss.getEquipment().getItemInMainHand();

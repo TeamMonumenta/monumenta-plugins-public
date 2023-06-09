@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -56,7 +55,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("NullAway") // so many...
-public class ImperialConstruct extends BossAbilityGroup {
+public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_imperialconstruct";
 	public static final int detectionRange = 50;
@@ -66,8 +65,6 @@ public class ImperialConstruct extends BossAbilityGroup {
 	private LivingEntity mStart;
 	private final int mHealth;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	//Changes based on the current phase
 	private Location mCurrentLoc;
 	private Location mPhase2Loc;
@@ -83,20 +80,8 @@ public class ImperialConstruct extends BossAbilityGroup {
 	private final SpellFloor mFloor;
 	private final SpellSlice mSlice;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new ImperialConstruct(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public ImperialConstruct(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		boss.setRemoveWhenFarAway(false);
 		boss.addScoreboardTag("Boss");
 

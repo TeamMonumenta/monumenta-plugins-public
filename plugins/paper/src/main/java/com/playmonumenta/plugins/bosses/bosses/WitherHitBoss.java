@@ -25,11 +25,7 @@ public class WitherHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_witherhit";
 	public static final int detectionRange = 20;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new WitherHitBoss(plugin, boss);
-	}
-
-	public WitherHitBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public WitherHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}

@@ -16,11 +16,7 @@ public final class DebuffHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_debuffhit";
 	public static final int detectionRange = 50;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DebuffHitBoss(plugin, boss);
-	}
-
-	public DebuffHitBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public DebuffHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}

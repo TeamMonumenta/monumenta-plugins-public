@@ -5,8 +5,7 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.Arrays;
+import com.playmonumenta.plugins.utils.BossUtils;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -20,24 +19,12 @@ public class BlueEarthBoss extends BossAbilityGroup {
 
 	private int mBlueTimeOfDay = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlueEarthBoss(plugin, boss);
-	}
-
 	public BlueEarthBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
-			long time = boss.getWorld().getTime();
-			mBlueTimeOfDay = (int) Math.floor(time / 6000.0);
+		mBlueTimeOfDay = BossUtils.getBlueTimeOfDay(boss);
 
-			// Pretty sure Time ranges from 0 to 23999, but just in case...
-			if (mBlueTimeOfDay > 3) {
-				mBlueTimeOfDay = 3;
-			}
-		}
-
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (mBlueTimeOfDay > 0) {
 					EffectManager.getInstance().addEffect(mBoss, KB_RESIST_EFFECT_NAME, new PercentKnockbackResist(100, KB_RESIST[mBlueTimeOfDay], KB_RESIST_EFFECT_NAME));

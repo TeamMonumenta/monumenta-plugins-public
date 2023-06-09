@@ -3,8 +3,8 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -21,22 +21,10 @@ public class BlueAirBoss extends BossAbilityGroup {
 
 	private int mBlueTimeOfDay = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlueAirBoss(plugin, boss);
-	}
-
 	public BlueAirBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
-			long time = boss.getWorld().getTime();
-			mBlueTimeOfDay = (int) Math.floor(time / 6000.0);
-
-			// Pretty sure Time ranges from 0 to 23999, but just in case...
-			if (mBlueTimeOfDay > 3) {
-				mBlueTimeOfDay = 3;
-			}
-		}
+		mBlueTimeOfDay = BossUtils.getBlueTimeOfDay(boss);
 
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null, 100, 20);
 	}

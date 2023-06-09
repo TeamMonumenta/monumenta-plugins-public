@@ -23,10 +23,6 @@ public class TpSwapBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE = ParticlesList.fromString("[(PORTAL,10,1,1,1,0.03)]");
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TpSwapBoss(plugin, boss);
-	}
-
 	private final SpellTpSwapPlaces mSpell;
 
 	public TpSwapBoss(Plugin plugin, LivingEntity boss) {

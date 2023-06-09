@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -74,6 +73,14 @@ public abstract class BossAbilityGroup {
 		mActiveSpells.cancelAll();
 		mActiveSpells = activeSpells;
 		mPassiveSpells = passiveSpells;
+	}
+
+	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange) {
+		constructBoss(activeSpell, detectionRange, null);
+	}
+
+	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange, @Nullable BossBarManager bossBar) {
+		constructBoss(activeSpell, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
@@ -466,7 +473,7 @@ public abstract class BossAbilityGroup {
 					try {
 						SerializationUtils.storeDataOnEntity(mBoss, content);
 					} catch (Exception ex) {
-						mPlugin.getLogger().log(Level.SEVERE, "Failed to save data to entity: ", ex);
+						MMLog.severe("Failed to save data to entity: ", ex);
 					}
 				}
 			}

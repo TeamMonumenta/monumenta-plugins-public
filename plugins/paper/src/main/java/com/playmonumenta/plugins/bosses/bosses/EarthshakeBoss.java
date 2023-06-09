@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellEarthshake;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Material;
@@ -94,10 +93,6 @@ public class EarthshakeBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new EarthshakeBoss(plugin, boss);
-	}
-
 	public EarthshakeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -106,9 +101,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.PLAYER, p.RANGE, false, EntityTargets.Limit.DEFAULT_ONE, p.LINE_OF_SIGHT ? List.of(EntityTargets.PLAYERFILTER.HAS_LINEOFSIGHT) : Collections.emptyList());
 		}
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellEarthshake(plugin, boss, p)
-		));
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		Spell spell = new SpellEarthshake(plugin, boss, p);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

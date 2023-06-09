@@ -17,11 +17,7 @@ public class NoAbilityDamageBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_no_ability_damage";
 	public static final int detectionRange = 40;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new NoAbilityDamageBoss(plugin, boss);
-	}
-
-	public NoAbilityDamageBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public NoAbilityDamageBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}

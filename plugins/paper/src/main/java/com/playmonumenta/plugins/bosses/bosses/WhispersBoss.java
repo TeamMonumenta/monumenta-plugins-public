@@ -30,11 +30,6 @@ public class WhispersBoss extends BossAbilityGroup {
 	private final List<Player> mStolenPlayers = new ArrayList<>();
 	private final List<BukkitRunnable> mCleanse = new ArrayList<>();
 
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new WhispersBoss(plugin, boss);
-	}
-
 	public WhispersBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParam = Parameters.getParameters(boss, identityTag, new WhispersBoss.Parameters());

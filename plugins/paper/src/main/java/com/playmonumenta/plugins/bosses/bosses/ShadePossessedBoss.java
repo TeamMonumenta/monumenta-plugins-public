@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellShadePossessedParticle;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -24,13 +23,9 @@ public class ShadePossessedBoss extends BossAbilityGroup {
 
 	private static final String SHADE_OF_DEATH = "ShadeofDeath";
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ShadePossessedBoss(plugin, boss);
-	}
-
 	public ShadePossessedBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellShadePossessedParticle(mBoss)
 		);
 

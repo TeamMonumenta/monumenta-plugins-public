@@ -24,10 +24,6 @@ public class ResistanceBoss extends BossAbilityGroup {
 		public ItemStatUtils.Operation DAMAGE_INCREASE_TYPE = ItemStatUtils.Operation.MULTIPLY;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ResistanceBoss(plugin, boss);
-	}
-
 	public ResistanceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());

@@ -7,11 +7,11 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.headlesshorseman.SpellBeeBombs;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -23,10 +23,6 @@ public class LichConquestBoss extends BossAbilityGroup {
 
 	Location mCenter;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LichConquestBoss(plugin, boss);
-	}
-
 	public LichConquestBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mCenter = Lich.getLichSpawn();
@@ -35,10 +31,9 @@ public class LichConquestBoss extends BossAbilityGroup {
 		int playercount = Lich.playersInRange(loc, detectionRange, true).size();
 		double hpdel = 425;
 		double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.log(playercount)));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
-		mBoss.setHealth(hp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
+		SpellManager activeSpells = new SpellManager(List.of(
 			new SpellBeeBombs(plugin, boss, 20 * 30, mCenter, 15, detectionRange)
 		));
 

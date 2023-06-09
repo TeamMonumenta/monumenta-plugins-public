@@ -9,12 +9,10 @@ import com.playmonumenta.plugins.effects.BrownPolarityDisplay;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -61,10 +59,6 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 	private Team mRedTeam;
 	private Team mBlueTeam;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BrownMagnetSwapBoss(plugin, boss);
-	}
-
 	public BrownMagnetSwapBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		BrownMagnetSwapBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BrownMagnetSwapBoss.Parameters());
@@ -72,7 +66,8 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 		mPlayerResist = p.PLAYER_DAMAGE_RESIST;
 		mBossVuln = p.ENEMY_DAMAGE_VULN;
 		mLastDamageTick = mBoss.getTicksLived();
-		createTeams(); // TODO: Replace this with ScoreboardUtils.getExistingTeamOrCreate() when #1859 is pushed
+		mRedTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);
+		mBlueTeam = ScoreboardUtils.getExistingTeamOrCreate("Blue", NamedTextColor.BLUE);
 
 		mBoss.setGlowing(true);
 
@@ -86,7 +81,7 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 
 		BossBarManager bossBar = new BossBarManager(plugin, boss, 40, mIsPositive ? BarColor.RED : BarColor.BLUE, BarStyle.SEGMENTED_20, null);
 
-		List<Spell> passives = Arrays.asList(
+		List<Spell> passives = List.of(
 			new SpellRunAction(() -> {
 				// Every SWAP TICKS duration, swap charges.
 				if (mTicks <= 0) {
@@ -190,22 +185,6 @@ public class BrownMagnetSwapBoss extends BossAbilityGroup {
 			mBoss.getWorld().playSound(mBoss.getLocation(), Sound.ENTITY_GENERIC_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 			new PartialParticle(Particle.CRIT_MAGIC, mBoss.getLocation().add(0, 1, 0), 10, 0.5, 1).spawnAsEnemy();
 			mLastDamageTick = mBoss.getTicksLived();
-		}
-	}
-
-	private void createTeams() {
-		mRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Red");
-
-		if (mRedTeam == null) {
-			mRedTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("Red");
-			mRedTeam.color(NamedTextColor.RED);
-		}
-
-		mBlueTeam = Bukkit.getScoreboardManager().getMainScoreboard().getTeam("Blue");
-
-		if (mBlueTeam == null) {
-			mBlueTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("Blue");
-			mBlueTeam.color(NamedTextColor.BLUE);
 		}
 	}
 }

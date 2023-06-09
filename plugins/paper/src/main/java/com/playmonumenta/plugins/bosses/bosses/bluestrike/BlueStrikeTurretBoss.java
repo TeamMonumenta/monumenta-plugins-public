@@ -34,10 +34,6 @@ public class BlueStrikeTurretBoss extends BossAbilityGroup {
 	public static final int CHARGE_DURATION = 7 * 20; // 7 seconds charging
 	public @Nullable LivingEntity mTarget;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlueStrikeTurretBoss(plugin, boss);
-	}
-
 	public BlueStrikeTurretBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);

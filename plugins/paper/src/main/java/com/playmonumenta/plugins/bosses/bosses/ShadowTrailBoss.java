@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellBaseTrail;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,14 +28,10 @@ public class ShadowTrailBoss extends BossAbilityGroup {
 	private static final int HITBOX_LENGTH = 1;
 	private static final int DAMAGE = 15;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ShadowTrailBoss(plugin, boss);
-	}
-
 	public ShadowTrailBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellBaseTrail(boss, TICK_RATE, TRAIL_RATE, TRAIL_DURATION, TRAIL_GROUND_ONLY, TRAIL_CONSUMED, HITBOX_LENGTH,
 				// Trail Aesthetic
 				(World world, Location loc) -> {

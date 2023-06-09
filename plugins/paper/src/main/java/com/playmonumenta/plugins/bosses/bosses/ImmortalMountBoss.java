@@ -37,10 +37,6 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 	private double mMountDamageThisTick = 0;
 	private double mPassengerDamageThisTick = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ImmortalMountBoss(plugin, boss);
-	}
-
 	public ImmortalMountBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

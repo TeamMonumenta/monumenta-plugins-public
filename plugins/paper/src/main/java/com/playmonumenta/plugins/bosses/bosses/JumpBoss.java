@@ -1,15 +1,13 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -59,16 +57,12 @@ public class JumpBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new JumpBoss(plugin, boss);
-	}
-
 	public JumpBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager manager = new SpellManager(List.of(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
+		Spell spell = new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 			(World world, Location loc) -> {
 				p.SOUND_JUMP.play(loc);
 				p.PARTICLE_START.spawn(boss, loc, 1, 0, 1);
@@ -79,7 +73,7 @@ public class JumpBoss extends BossAbilityGroup {
 			p.PARTICLE_AIR.spawn(boss, loc, 4, 0.5, 0.5);
 		}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-				Arrays.asList(
+				List.of(
 					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 						p.PARTICLE_LAND_GROUND.spawn(boss, loc, 1, 0.1, 0.1);
 					})
@@ -87,7 +81,7 @@ public class JumpBoss extends BossAbilityGroup {
 
 			p.SOUND_LANDING.play(loc);
 			p.PARTICLE_LAND.spawn(boss, loc);
-		})));
-		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		});
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

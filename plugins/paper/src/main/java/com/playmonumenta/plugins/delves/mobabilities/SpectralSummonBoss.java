@@ -63,8 +63,4 @@ public class SpectralSummonBoss extends BossAbilityGroup {
 			}
 		}
 	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SpectralSummonBoss(plugin, boss);
-	}
 }

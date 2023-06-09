@@ -55,10 +55,6 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_kaulprimordial";
 	public static final int detectionRange = 100;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PrimordialElementalKaulBoss(plugin, boss);
-	}
-
 	public PrimordialElementalKaulBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
@@ -91,7 +87,7 @@ public final class PrimordialElementalKaulBoss extends BossAbilityGroup {
 			new SpellShieldStun(30 * 20)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(50, mBoss -> {
 			super.forceCastSpell(SpellRaiseJungle.class);
 		});

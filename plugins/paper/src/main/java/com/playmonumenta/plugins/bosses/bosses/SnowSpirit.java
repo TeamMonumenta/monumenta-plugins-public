@@ -19,7 +19,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,31 +49,17 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class SnowSpirit extends BossAbilityGroup {
+public class SnowSpirit extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_snowspirit";
 	public static final int detectionRange = 75;
-
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 
 	private boolean mFinalPhase;
 	private boolean mMinibossesPresent;
 	private List<Entity> mActiveMinibosses;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new SnowSpirit(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public SnowSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
 		mFinalPhase = false;
 		mMinibossesPresent = false;
 		mActiveMinibosses = new ArrayList<>();
@@ -322,7 +307,7 @@ public class SnowSpirit extends BossAbilityGroup {
 		for (Entity miniboss : mActiveMinibosses) {
 			if (miniboss instanceof LivingEntity mini) {
 				int playerCount = PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true).size();
-				int hpDel = (int) mini.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+				double hpDel = EntityUtils.getMaxHealth(mini);
 				double bossTargetHp = hpDel * BossUtils.healthScalingCoef(playerCount, 0.5, 0.6);
 				EntityUtils.setAttributeBase(mini, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 				mini.setHealth(bossTargetHp);

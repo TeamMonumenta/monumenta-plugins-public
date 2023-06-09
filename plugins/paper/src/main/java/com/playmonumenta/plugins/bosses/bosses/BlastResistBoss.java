@@ -11,10 +11,6 @@ public final class BlastResistBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_blastresist";
 	public static final int detectionRange = 100;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlastResistBoss(plugin, boss);
-	}
-
 	public BlastResistBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

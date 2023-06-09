@@ -62,10 +62,6 @@ public class AvengerBoss extends BossAbilityGroup {
 	private int mStacks = 0;
 	private final Parameters mParam;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new AvengerBoss(plugin, boss);
-	}
-
 	public AvengerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParam = BossParameters.getParameters(boss, identityTag, new Parameters());

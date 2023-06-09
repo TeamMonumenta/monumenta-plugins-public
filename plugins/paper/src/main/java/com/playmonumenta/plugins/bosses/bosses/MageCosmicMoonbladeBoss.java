@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -13,7 +12,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -50,10 +48,6 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 		public SoundsList SOUND_SWING = SoundsList.fromString("[(ENTITY_PLAYER_ATTACK_SWEEP,0.75,0.8),(ENTITY_WITHER_SHOOT,0.75,0)]");
 	}
 
-	public static BossAbilityGroup deserialize(com.playmonumenta.plugins.Plugin plugin, LivingEntity boss) throws Exception {
-		return new MageCosmicMoonbladeBoss(plugin, boss);
-	}
-
 	public final Parameters mParams;
 
 	public MageCosmicMoonbladeBoss(Plugin plugin, LivingEntity boss) {
@@ -62,187 +56,186 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
 		mParams = p;
 
-		SpellManager spells = new SpellManager(List.of(
-			new Spell() {
-				boolean mTelegraphInterrupt = false;
-				@Override
-				public void run() {
-					boolean hasGlowing = mBoss.isGlowing();
-					mBoss.setGlowing(true);
-					List<? extends LivingEntity> targets = p.TARGETS_DIRECTION.getTargetsList(mBoss);
-					if (targets.size() > 0) {
-						Location bossEyeLoc = mBoss.getEyeLocation();
-						Location targetLoc = targets.get(0).getLocation().clone().add(0, 1.8, 0);
-						Vector targetDirection = targetLoc.toVector().subtract(bossEyeLoc.toVector()).normalize();
-						Location originTargetDirection = mBoss.getLocation().clone().setDirection(targetDirection);
+		Spell spell = new Spell() {
+			boolean mTelegraphInterrupt = false;
+			@Override
+			public void run() {
+				boolean hasGlowing = mBoss.isGlowing();
+				mBoss.setGlowing(true);
+				List<? extends LivingEntity> targets = p.TARGETS_DIRECTION.getTargetsList(mBoss);
 
-						mParams.SOUND_TELL.play(mBoss.getLocation());
+				if (targets.size() > 0) {
+					Location bossEyeLoc = mBoss.getEyeLocation();
+					Location targetLoc = targets.get(0).getLocation().clone().add(0, 1.8, 0);
+					Vector targetDirection = targetLoc.toVector().subtract(bossEyeLoc.toVector()).normalize();
+					Location originTargetDirection = mBoss.getLocation().clone().setDirection(targetDirection);
 
-						mTelegraphInterrupt = false;
-						new BukkitRunnable() {
-							int mDegree = 45;
+					mParams.SOUND_TELL.play(mBoss.getLocation());
 
-							@Override
-							public void run() {
+					mTelegraphInterrupt = false;
+					new BukkitRunnable() {
+						int mDegree = 45;
+
+						@Override
+						public void run() {
 								if (EntityUtils.shouldCancelSpells(mBoss)) {
 									cancel();
 									mTelegraphInterrupt = true;
 									return;
 								}
 
-								for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
-									for (double degree = mDegree; degree < mDegree + 30; degree += 5) {
-										double radian1 = Math.toRadians(degree);
-										Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-										vec = VectorUtils.rotateZAxis(vec, -8);
-										vec = VectorUtils.rotateXAxis(vec, originTargetDirection.getPitch());
-										vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
+							for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
+								for (double degree = mDegree; degree < mDegree + 30; degree += 5) {
+									double radian1 = Math.toRadians(degree);
+									Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
+									vec = VectorUtils.rotateZAxis(vec, -8);
+									vec = VectorUtils.rotateXAxis(vec, originTargetDirection.getPitch());
+									vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
 
-										Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
-										mParams.PARTICLE_TELL.spawn(boss, l);
-									}
+									Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
+									mParams.PARTICLE_TELL.spawn(boss, l);
 								}
-								if (mDegree >= 135) {
-									cancel();
-									return;
-								}
-								mDegree += 30;
 							}
-						}.runTaskTimer(mPlugin, 0, 1);
+							if (mDegree >= 135) {
+								cancel();
+								return;
+							}
+							mDegree += 30;
+						}
+					}.runTaskTimer(mPlugin, 0, 1);
 
 						if (mTelegraphInterrupt) {
 							return;
 						}
-						new BukkitRunnable() {
-							final Vector mTargetDirection = targetDirection;
-							int mTimes = 0;
-							float mPitch = 1.2f;
-							int mSwings = 0;
+					new BukkitRunnable() {
+						final Vector mTargetDirection = targetDirection;
+						int mTimes = 0;
+						float mPitch = 1.2f;
+						int mSwings = 0;
 
-							@Override
-							public void run() {
-								if (mTimes == 0 && !hasGlowing) {
-									mBoss.setGlowing(false);
-								}
+						@Override
+						public void run() {
+							if (mTimes == 0 && !hasGlowing) {
+								mBoss.setGlowing(false);
+							}
 
-								if (EntityUtils.shouldCancelSpells(mBoss)) {
-									cancel();
-									return;
-								}
-								mTimes++;
-								mSwings++;
-								Location origin = mBoss.getLocation().clone();
-								Location originTargetDirection = origin.setDirection(mTargetDirection);
-								List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
+							if (EntityUtils.shouldCancelSpells(mBoss)) {
+								cancel();
+								return;
+							}
+							mTimes++;
+							mSwings++;
+							Location origin = mBoss.getLocation().clone();
+							Location originTargetDirection = origin.setDirection(mTargetDirection);
+							List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
 
-								if (mTimes >= p.SWINGS) {
-									mPitch = 1.45f;
-								}
-								mParams.SOUND_SWING.play(originTargetDirection, 1, mPitch);
+							if (mTimes >= p.SWINGS) {
+								mPitch = 1.45f;
+							}
+							mParams.SOUND_SWING.play(originTargetDirection, 1, mPitch);
 
-								new BukkitRunnable() {
-									final int mI = mSwings;
-									double mRoll;
-									double mD = 45;
-									boolean mInit = false;
-									final List<LivingEntity> mAlreadyHit = new ArrayList<>();
+							new BukkitRunnable() {
+								final int mI = mSwings;
+								double mRoll;
+								double mD = 45;
+								boolean mInit = false;
+								final List<LivingEntity> mAlreadyHit = new ArrayList<>();
 
-									@Override
-									public void run() {
-										if (!mInit) {
-											if (mI % 2 == 0) {
-												mRoll = -8;
-												mD = 45;
-											} else {
-												mRoll = 8;
-												mD = 135;
-											}
-											mInit = true;
-										}
-										if (EntityUtils.shouldCancelSpells(mBoss)) {
-											cancel();
-											return;
-										}
+								@Override
+								public void run() {
+									if (!mInit) {
 										if (mI % 2 == 0) {
-											Vector vec;
-											for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
-												for (double degree = mD; degree < mD + 30; degree += 5) {
-													double radian1 = Math.toRadians(degree);
-													vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-													vec = VectorUtils.rotateZAxis(vec, mRoll);
-													vec = VectorUtils.rotateXAxis(vec, originTargetDirection.getPitch());
-													vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
-
-													Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
-													mParams.PARTICLE_SWING.spawn(boss, l);
-
-													BoundingBox box = BoundingBox.of(l, 0.3, 1, 0.3);
-
-													for (LivingEntity target : targets) {
-														if (target.getBoundingBox().overlaps(box) && !mAlreadyHit.contains(target)) {
-															damageAction(target);
-															mAlreadyHit.add(target);
-														}
-													}
-												}
-											}
-
-											mD += 30;
+											mRoll = -8;
+											mD = 45;
 										} else {
-											Vector vec;
-											for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
-												for (double degree = mD; degree > mD - 30; degree -= 5) {
-													double radian1 = Math.toRadians(degree);
-													vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
-													vec = VectorUtils.rotateZAxis(vec, mRoll);
-													vec = VectorUtils.rotateXAxis(vec, originTargetDirection.getPitch());
-													vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
+											mRoll = 8;
+											mD = 135;
+										}
+										mInit = true;
+									}
+									if (EntityUtils.shouldCancelSpells(mBoss)) {
+										cancel();
+										return;
+									}
+									if (mI % 2 == 0) {
+										Vector vec;
+										for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
+											for (double degree = mD; degree < mD + 30; degree += 5) {
+												double radian1 = Math.toRadians(degree);
+												vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
+												vec = VectorUtils.rotateZAxis(vec, mRoll);
+												vec = VectorUtils.rotateXAxis(vec, originTargetDirection.getPitch());
+												vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
 
-													Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
-													l.setPitch(-l.getPitch());
-													mParams.PARTICLE_SWING.spawn(boss, l);
+												Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
+												mParams.PARTICLE_SWING.spawn(boss, l);
 
-													BoundingBox box = BoundingBox.of(l, 0.3, 1, 0.3);
+												BoundingBox box = BoundingBox.of(l, 0.3, 1, 0.3);
 
-													for (LivingEntity target : targets) {
-														if (target.getBoundingBox().overlaps(box) && !mAlreadyHit.contains(target)) {
-															damageAction(target);
-															mAlreadyHit.add(target);
-														}
+												for (LivingEntity target : targets) {
+													if (target.getBoundingBox().overlaps(box) && !mAlreadyHit.contains(target)) {
+														damageAction(target);
+														mAlreadyHit.add(target);
 													}
 												}
 											}
-											mD -= 30;
 										}
 
-										if ((mD >= 135 && mI % 2 == 0) || (mD <= 45 && mI % 2 > 0)) {
-											mAlreadyHit.clear();
-											this.cancel();
+										mD += 30;
+									} else {
+										Vector vec;
+										for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
+											for (double degree = mD; degree > mD - 30; degree -= 5) {
+												double radian1 = Math.toRadians(degree);
+												vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
+												vec = VectorUtils.rotateZAxis(vec, mRoll);
+												vec = VectorUtils.rotateXAxis(vec, originTargetDirection.getPitch());
+												vec = VectorUtils.rotateYAxis(vec, originTargetDirection.getYaw());
+
+												Location l = originTargetDirection.clone().add(0, 1.25, 0).add(vec);
+												l.setPitch(-l.getPitch());
+												mParams.PARTICLE_SWING.spawn(boss, l);
+
+												BoundingBox box = BoundingBox.of(l, 0.3, 1, 0.3);
+
+												for (LivingEntity target : targets) {
+													if (target.getBoundingBox().overlaps(box) && !mAlreadyHit.contains(target)) {
+														damageAction(target);
+														mAlreadyHit.add(target);
+													}
+												}
+											}
 										}
+										mD -= 30;
 									}
 
-								}.runTaskTimer(mPlugin, 0, 1);
-								if (mTimes >= p.SWINGS) {
-									this.cancel();
+									if ((mD >= 135 && mI % 2 == 0) || (mD <= 45 && mI % 2 > 0)) {
+										mAlreadyHit.clear();
+										this.cancel();
+									}
 								}
+
+							}.runTaskTimer(mPlugin, 0, 1);
+							if (mTimes >= p.SWINGS) {
+								this.cancel();
 							}
-						}.runTaskTimer(mPlugin, p.SPELL_DELAY, p.SWINGS_DELAY);
-					}
-				}
-
-				@Override
-				public boolean canRun() {
-					return p.TARGETS_DIRECTION.getTargetsList(mBoss).size() > 0;
-				}
-
-				@Override
-				public int cooldownTicks() {
-					return p.COOLDOWN;
+						}
+					}.runTaskTimer(mPlugin, p.SPELL_DELAY, p.SWINGS_DELAY);
 				}
 			}
-		));
 
-		super.constructBoss(spells, Collections.emptyList(), (int) p.TARGETS.getRange(), null, p.DELAY);
+			@Override
+			public boolean canRun() {
+				return p.TARGETS_DIRECTION.getTargetsList(mBoss).size() > 0;
+			}
+
+			@Override
+			public int cooldownTicks() {
+				return p.COOLDOWN;
+			}
+		};
+
+		super.constructBoss(spell, (int) p.TARGETS.getRange(), null, p.DELAY);
 	}
 
 	public void damageAction(LivingEntity target) {

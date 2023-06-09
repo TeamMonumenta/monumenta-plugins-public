@@ -11,10 +11,6 @@ public class NoFireBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_nofire";
 	public static final int detectionRange = 30;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new NoFireBoss(plugin, boss);
-	}
-
 	public NoFireBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

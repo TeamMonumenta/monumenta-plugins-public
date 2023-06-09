@@ -39,15 +39,11 @@ public class CarapaceBoss extends BossAbilityGroup {
 	private final double mCarapaceHealth;
 	private final double mSpeedEffect;
 
-	private final List<DamageInstance> mDamageInstancesPeriod = new ArrayList<DamageInstance>();
-	private final List<DamageInstance> mDamageInstancesReactivate = new ArrayList<DamageInstance>();
+	private final List<DamageInstance> mDamageInstancesPeriod = new ArrayList<>();
+	private final List<DamageInstance> mDamageInstancesReactivate = new ArrayList<>();
 
 	private double mDamageCounterPeriod = 0;
 	private double mDamageCounterReactivate = 0;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new CarapaceBoss(plugin, boss);
-	}
 
 	public CarapaceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);

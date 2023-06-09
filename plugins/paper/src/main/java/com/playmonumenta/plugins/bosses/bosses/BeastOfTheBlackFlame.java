@@ -45,7 +45,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public final class BeastOfTheBlackFlame extends BossAbilityGroup {
+public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_beast_blackflame";
 	public static final int detectionRange = 75;
@@ -55,28 +55,17 @@ public final class BeastOfTheBlackFlame extends BossAbilityGroup {
 
 	private static final int BASE_HEALTH = 3333;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	//Lower number = faster cast speed
 	//0.5 is double casting speed
 	public double mCastSpeed = 1;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new BeastOfTheBlackFlame(plugin, boss, spawnLoc, endLoc));
-	}
-
 	@Override
 	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc.clone().subtract(0, 3, 0), mEndLoc);
 	}
 
 	public BeastOfTheBlackFlame(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-
-		mSpawnLoc = spawnLoc.add(0, 3, 0);
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc.clone().add(0, 3, 0), endLoc);
 
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
 			new BlackflameCharge(plugin, boss, this),

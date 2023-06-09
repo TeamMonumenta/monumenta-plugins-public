@@ -25,10 +25,6 @@ public class SilenceOnHitBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_silencehit";
 	public static final int detectionRange = 30;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
-		return new SilenceOnHitBoss(plugin, boss);
-	}
-
 	public SilenceOnHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

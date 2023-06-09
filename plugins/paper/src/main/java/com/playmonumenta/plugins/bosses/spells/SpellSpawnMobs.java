@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
 
 public class SpellSpawnMobs extends Spell {
 	public static final int DEFAULT_MOB_CAP_RADIUS = 10;
@@ -72,7 +71,7 @@ public class SpellSpawnMobs extends Spell {
 	}
 
 	//overwrite this function to modify summon mobs with extra tags/stats
-	public void summonPlugins(@NotNull Entity summon) {
+	public void summonPlugins(Entity summon) {
 
 	}
 

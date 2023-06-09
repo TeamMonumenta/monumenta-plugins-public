@@ -11,10 +11,6 @@ import org.bukkit.plugin.Plugin;
 public class AbilityMarkerEntityBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_ability_marker_entity";
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new AbilityMarkerEntityBoss(plugin, boss);
-	}
-
 	public AbilityMarkerEntityBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

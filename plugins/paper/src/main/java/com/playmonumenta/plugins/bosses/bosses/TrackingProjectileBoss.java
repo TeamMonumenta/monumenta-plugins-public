@@ -1,13 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -46,44 +44,38 @@ public class TrackingProjectileBoss extends BossAbilityGroup {
 	private static final boolean LAUNCH_TRACKING = true;
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TrackingProjectileBoss(plugin, boss);
-	}
-
 	public TrackingProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-				// Initiate Aesthetic
-				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-					world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 1f, 0.5f);
-				},
-				// Launch Aesthetic
-				(World world, Location loc, int ticks) -> {
-					new PartialParticle(Particle.SPELL_WITCH, loc, 40, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
-					world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1f, 0.5f);
-				},
-				// Projectile Aesthetic
-				(World world, Location loc, int ticks) -> {
-					new PartialParticle(Particle.SPELL_WITCH, loc, 6, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(boss);
-					if (ticks % 40 == 0) {
-						world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 0.4f, 0.5f);
-					}
-				},
-				// Hit Action
-				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-					world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 2f, 0.5f);
-					new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-					if (player != null) {
-						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, prevLoc);
-					}
-				})
-		));
+		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
+			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+			// Initiate Aesthetic
+			(World world, Location loc, int ticks) -> {
+				PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+				world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 1f, 0.5f);
+			},
+			// Launch Aesthetic
+			(World world, Location loc, int ticks) -> {
+				new PartialParticle(Particle.SPELL_WITCH, loc, 40, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
+				world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1f, 0.5f);
+			},
+			// Projectile Aesthetic
+			(World world, Location loc, int ticks) -> {
+				new PartialParticle(Particle.SPELL_WITCH, loc, 6, 0, 0, 0, 0.3).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SMOKE_LARGE, loc, 2, 0.4, 0.4, 0.4, 0).spawnAsEntityActive(boss);
+				if (ticks % 40 == 0) {
+					world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 0.4f, 0.5f);
+				}
+			},
+			// Hit Action
+			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
+				world.playSound(loc, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.HOSTILE, 2f, 0.5f);
+				new PartialParticle(Particle.SPELL_WITCH, loc, 50, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+				if (player != null) {
+					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, prevLoc);
+				}
+			});
 
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(spell, detectionRange);
 	}
 }

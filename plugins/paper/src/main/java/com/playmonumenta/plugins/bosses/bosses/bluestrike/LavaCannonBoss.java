@@ -58,10 +58,6 @@ public class LavaCannonBoss extends BossAbilityGroup {
 	private boolean mForecastBlocks = false;
 	private final int mChargeTime;
 
-	public static @Nullable LavaCannonBoss deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return construct(plugin, boss);
-	}
-
 	public static @Nullable LavaCannonBoss construct(Plugin plugin, LivingEntity boss) {
 		// Get nearest entity called Samwell.
 		Samwell samwell = null;

@@ -23,10 +23,6 @@ public class GenericTargetBoss extends BossAbilityGroup {
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setOptional(false);
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new GenericTargetBoss(plugin, boss);
-	}
-
 	private @Nullable LivingEntity mLastTarget = null;
 
 	public GenericTargetBoss(Plugin plugin, LivingEntity boss) throws Exception {
@@ -43,14 +39,12 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 		Spell targetSpell = new Spell() {
 
-
 			@Override
 			public void run() {
 				if (EntityUtils.isStunned(mob)) {
 					return;
 				}
 
-				//may we want a check for confusion?
 				if (mLastTarget != mob.getTarget() && mob.getTarget() != null) {
 					mLastTarget = mob.getTarget();
 				}

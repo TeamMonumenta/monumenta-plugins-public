@@ -7,11 +7,11 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBossBlockBreak;
 import com.playmonumenta.plugins.bosses.spells.SpellConditionalTeleport;
 import com.playmonumenta.plugins.bosses.spells.lich.horseman.SpellLichSinisterReach;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -23,10 +23,6 @@ public class LichStrifeBoss extends BossAbilityGroup {
 
 	Location mCenter;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LichStrifeBoss(plugin, boss);
-	}
-
 	public LichStrifeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mCenter = Lich.getLichSpawn();
@@ -35,10 +31,9 @@ public class LichStrifeBoss extends BossAbilityGroup {
 		int playercount = Lich.playersInRange(loc, detectionRange, true).size();
 		double hpdel = 425;
 		double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.log(playercount)));
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(hp);
-		mBoss.setHealth(hp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
+		SpellManager activeSpells = new SpellManager(List.of(
 			new SpellLichSinisterReach(plugin, mBoss, mCenter, detectionRange)
 		));
 

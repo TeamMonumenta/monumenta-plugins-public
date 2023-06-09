@@ -9,10 +9,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collections;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class SizeChangerBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_size_changer";
@@ -45,14 +45,10 @@ public class SizeChangerBoss extends BossAbilityGroup {
 		public SoundsList SOUNDS = SoundsList.EMPTY;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SizeChangerBoss(plugin, boss);
-	}
-
 	private final int mStartSize;
 	private final Parameters mParams;
 
-	public SizeChangerBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public SizeChangerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mStartSize = EntityUtils.getSize(boss);
@@ -85,20 +81,16 @@ public class SizeChangerBoss extends BossAbilityGroup {
 			double height = mBoss.getHeight();
 
 			if (!mParams.PARTICLES.isEmpty()) {
-				new BukkitRunnable() {
-					final Location mLoc = mBoss.getLocation().clone().add(0, height / 2, 0);
-
-					@Override
-					public void run() {
-						for (int i = 0; i < 360; i = (int) (i + 20 * (2f / currentSize))) {
-							double rad = Math.toRadians(i);
-							double cos = FastUtils.cos(rad) * height;
-							double sin = FastUtils.sin(rad) * height;
-							mParams.PARTICLES.spawn(mBoss, mLoc.clone().add(cos, sin, sin));
-							mParams.PARTICLES.spawn(mBoss, mLoc.clone().add(sin, sin, cos));
-						}
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+					Location loc = mBoss.getLocation().clone().add(0, height / 2, 0);
+					for (int i = 0; i < 360; i = (int) (i + 20 * (2f / currentSize))) {
+						double rad = Math.toRadians(i);
+						double cos = FastUtils.cos(rad) * height;
+						double sin = FastUtils.sin(rad) * height;
+						mParams.PARTICLES.spawn(mBoss, loc.clone().add(cos, sin, sin));
+						mParams.PARTICLES.spawn(mBoss, loc.clone().add(sin, sin, cos));
 					}
-				}.runTaskLater(mPlugin, 1);
+				}, 1);
 			}
 
 		}

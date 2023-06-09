@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -57,17 +56,12 @@ public final class FlameTrailBoss extends BossAbilityGroup {
 		public String SPELL_NAME = "";
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FlameTrailBoss(plugin, boss);
-	}
-
 	public FlameTrailBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellBaseTrail(boss, p.TICK_RATE, p.TRAIL_RATE, p.TRAIL_DURATION, p.TRAIL_GROUND_ONLY, p.TRAIL_CONSUMED, p.HITBOX_LENGTH,
 				// Trail Aesthetic
 				(World world, Location loc) -> {

@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,29 +41,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class Varcosa extends BossAbilityGroup {
+public final class Varcosa extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_varcosa";
 	public static final int detectionRange = 110;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private double mCoef;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Varcosa(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Varcosa(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		boss.setRemoveWhenFarAway(false);
 
 		boss.addScoreboardTag("Boss");
@@ -111,7 +95,7 @@ public final class Varcosa extends BossAbilityGroup {
 				                                                  b.getLocation().getBlock().getType() == Material.LAVA)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, (mob) -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Thank ye fer comin' and seein' me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
 		});

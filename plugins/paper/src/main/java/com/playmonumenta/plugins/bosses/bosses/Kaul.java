@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.BossBarManager;
 import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
+import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -34,7 +34,6 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -132,7 +131,7 @@ The elemental will lose his "Raise Jungle" ability, but will still possess the o
  * (Aka Disco Inferno)
  */
 
-public class Kaul extends BossAbilityGroup {
+public class Kaul extends SerializedLocationBossAbilityGroup {
 	public static final int ARENA_WIDTH = 111;
 	// Barrier layer is from Y 62.0 to 64.0
 	public static final int ARENA_MAX_Y = 62;
@@ -154,8 +153,6 @@ public class Kaul extends BossAbilityGroup {
 	public static final int detectionRange = 50;
 	private static final String primordial = "PrimordialElemental";
 	private static final String immortal = "ImmortalElemental";
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private boolean mDefeated = false;
 	private boolean mCooldown = false;
 	private boolean mPrimordialPhase = false;
@@ -170,21 +167,8 @@ public class Kaul extends BossAbilityGroup {
 	private static final String PUTRID_PLAGUE_TAG_GREEN = "KaulPutridPlagueGreen";
 	private static final Particle.DustOptions RED_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Kaul(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Kaul(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		mShrineMarker = boss;
 		for (Entity e : boss.getWorld().getEntities()) {

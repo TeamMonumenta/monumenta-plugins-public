@@ -19,6 +19,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -78,11 +79,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	//If delves is enabled in the instance
 	private boolean mDelve = false;
 
-	private List<Player> mWarned = new ArrayList<>();
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
-		return new FalseSpiritPortal(plugin, boss);
-	}
+	private final List<Player> mWarned = new ArrayList<>();
 
 	public FalseSpiritPortal(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -99,53 +96,50 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 		}
 
 		//Wait until scoreboard tag is assigned first
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				for (String s : mBoss.getScoreboardTags()) {
-					if (s.startsWith("PortalNum")) {
-						mPortalNumTag = s;
-					}
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			for (String s : mBoss.getScoreboardTags()) {
+				if (s.startsWith("PortalNum")) {
+					mPortalNumTag = s;
 				}
-
-				NamespacedKey key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo");
-				switch (mPortalNumTag) {
-					case "PortalNum1":
-						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
-						break;
-					case "PortalNum2":
-						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
-						break;
-					case "PortalNum3":
-						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
-						break;
-					case "PortalNum4":
-						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
-						break;
-					case "PortalNum5":
-						key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
-						break;
-					default:
-						break;
-				}
-
-				if (mTrident == null) {
-					mTrident = InventoryUtils.getItemFromLootTable(mBoss, key);
-					if (mTrident == null) {
-						com.playmonumenta.plugins.Plugin.getInstance().getLogger().severe("Failed to get trident from loot table! False Spirit will be impossible to defeat");
-						return;
-					}
-				}
-
-				if (mTridentName == null) {
-					mTridentName = mTrident.getItemMeta().getDisplayName();
-				}
-
-				Damageable dm = (Damageable) mTrident.getItemMeta();
-				dm.setDamage(248);
-				mTrident.setItemMeta((ItemMeta) dm);
 			}
-		}.runTaskLater(mPlugin, 1);
+
+			NamespacedKey key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo");
+			switch (mPortalNumTag) {
+				case "PortalNum1":
+					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_hallud");
+					break;
+				case "PortalNum2":
+					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_chasom");
+					break;
+				case "PortalNum3":
+					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_midat");
+					break;
+				case "PortalNum4":
+					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_daath");
+					break;
+				case "PortalNum5":
+					key = NamespacedKeyUtils.fromString("epic:r2/dungeons/forum/ex_nihilo_keter");
+					break;
+				default:
+					break;
+			}
+
+			if (mTrident == null) {
+				mTrident = InventoryUtils.getItemFromLootTable(mBoss, key);
+				if (mTrident == null) {
+					com.playmonumenta.plugins.Plugin.getInstance().getLogger().severe("Failed to get trident from loot table! False Spirit will be impossible to defeat");
+					return;
+				}
+			}
+
+			if (mTridentName == null) {
+				mTridentName = mTrident.getItemMeta().getDisplayName();
+			}
+
+			Damageable dm = (Damageable) mTrident.getItemMeta();
+			dm.setDamage(248);
+			mTrident.setItemMeta(dm);
+		}, 1);
 
 		Collection<ArmorStand> stands = mBoss.getWorld().getNearbyEntitiesByType(ArmorStand.class, mBoss.getLocation(), 20);
 		for (ArmorStand as : stands) {
@@ -357,7 +351,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	public void bossHitByProjectile(ProjectileHitEvent event) {
 		if (event.getEntity() instanceof Trident trident) {
 
-			if (trident.getItemStack() != null && equalsTrident(trident.getItemStack())) {
+			if (equalsTrident(trident.getItemStack())) {
 				closePortal();
 				trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
 				deleteTridents();
@@ -369,7 +363,7 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 	public void onHurtByEntity(DamageEvent event, Entity damager) {
 		if (damager instanceof Player player) {
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
-			if (mainhand != null && equalsTrident(mainhand)) {
+			if (equalsTrident(mainhand)) {
 				event.setCancelled(true);
 				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " It needs to be travelling faster than that! Throw the Spear!");
 			} else if (!mWarned.contains(player)) {

@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -46,27 +45,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class CAxtal extends BossAbilityGroup {
+public class CAxtal extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_caxtal";
 	public static final int detectionRange = 110;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private double mCoefficient = 1.0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new CAxtal(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public CAxtal(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 
 		mBoss.addScoreboardTag("Boss");

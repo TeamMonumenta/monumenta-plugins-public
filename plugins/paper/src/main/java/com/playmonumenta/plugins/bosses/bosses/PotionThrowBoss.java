@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -11,8 +10,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import java.util.Collections;
-import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -69,77 +66,71 @@ public class PotionThrowBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PotionThrowBoss(plugin, boss);
-	}
-
 	private final Parameters mParams;
 
 	public PotionThrowBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mParams = Parameters.getParameters(boss, identityTag, new Parameters());
-		SpellManager spell = new SpellManager(List.of(
-			new Spell() {
-				@Override
-				public void run() {
-					World world = mBoss.getWorld();
-					Location bossLocation = mBoss.getLocation();
-					boolean first = true;
-					for (LivingEntity target : mParams.THROWING_TARGET.getTargetsList(mBoss)) {
-						if (first) {
-							mParams.SOUND.play(mBoss.getEyeLocation());
-							first = false;
-						}
-						Vector targetVec = target.getLocation().toVector();
-						Vector targetSpeedVec = target.getVelocity();
-						double potVelocityX = targetVec.getX() + targetSpeedVec.getX() - bossLocation.getX();
-						double potVelocityY = targetVec.getY() + target.getEyeHeight() - 1.2 - bossLocation.getY();
-						double potVelocityZ = targetVec.getZ() + targetSpeedVec.getZ() - bossLocation.getZ();
-						double distance = Math.sqrt(potVelocityX * potVelocityX + potVelocityY * potVelocityY + potVelocityZ * potVelocityZ);
+		Spell spell = new Spell() {
+			@Override
+			public void run() {
+				World world = mBoss.getWorld();
+				Location bossLocation = mBoss.getLocation();
+				boolean first = true;
+				for (LivingEntity target : mParams.THROWING_TARGET.getTargetsList(mBoss)) {
+					if (first) {
+						mParams.SOUND.play(mBoss.getEyeLocation());
+						first = false;
+					}
+					Vector targetVec = target.getLocation().toVector();
+					Vector targetSpeedVec = target.getVelocity();
+					double potVelocityX = targetVec.getX() + targetSpeedVec.getX() - bossLocation.getX();
+					double potVelocityY = targetVec.getY() + target.getEyeHeight() - 1.2 - bossLocation.getY();
+					double potVelocityZ = targetVec.getZ() + targetSpeedVec.getZ() - bossLocation.getZ();
+					double distance = Math.sqrt(potVelocityX * potVelocityX + potVelocityY * potVelocityY + potVelocityZ * potVelocityZ);
 
-						Entity pot = world.spawnEntity(mBoss.getEyeLocation(), EntityType.SPLASH_POTION);
-						if (pot instanceof ThrownPotion tp) {
-							ItemStack stack = new ItemStack(Material.SPLASH_POTION);
-							ItemMeta meta = stack.getItemMeta();
-							if (meta instanceof PotionMeta ptMeta) {
-								ptMeta.setColor(mParams.COLOR);
-							}
-							stack.setItemMeta(meta);
-							tp.setItem(stack);
-							tp.setShooter(mBoss);
-							double distanceSpeed = distance * 0.1;
-							Vector potVelocity = new Vector(potVelocityX, potVelocityY + distanceSpeed, potVelocityZ);
-							double potSpeed = Math.max(Math.min(mParams.MAX_POTION_SPEED, distanceSpeed), mParams.MIN_POTION_SPEED);
-							tp.setVelocity(potVelocity.normalize().multiply(potSpeed));
-							tp.setMetadata(potionTag, new FixedMetadataValue(mPlugin, null));
-							new BukkitRunnable() {
-								@Override
-								public void run() {
-									if (!tp.isValid() || tp.isDead()) {
-										cancel();
-										return;
-									}
-									mParams.PARTICLE_TRAIL.spawn(boss, tp.getLocation());
-								}
-							}.runTaskTimer(mPlugin, 0, 1);
+					Entity pot = world.spawnEntity(mBoss.getEyeLocation(), EntityType.SPLASH_POTION);
+					if (pot instanceof ThrownPotion tp) {
+						ItemStack stack = new ItemStack(Material.SPLASH_POTION);
+						ItemMeta meta = stack.getItemMeta();
+						if (meta instanceof PotionMeta ptMeta) {
+							ptMeta.setColor(mParams.COLOR);
 						}
+						stack.setItemMeta(meta);
+						tp.setItem(stack);
+						tp.setShooter(mBoss);
+						double distanceSpeed = distance * 0.1;
+						Vector potVelocity = new Vector(potVelocityX, potVelocityY + distanceSpeed, potVelocityZ);
+						double potSpeed = Math.max(Math.min(mParams.MAX_POTION_SPEED, distanceSpeed), mParams.MIN_POTION_SPEED);
+						tp.setVelocity(potVelocity.normalize().multiply(potSpeed));
+						tp.setMetadata(potionTag, new FixedMetadataValue(mPlugin, null));
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								if (!tp.isValid() || tp.isDead()) {
+									cancel();
+									return;
+								}
+								mParams.PARTICLE_TRAIL.spawn(boss, tp.getLocation());
+							}
+						}.runTaskTimer(mPlugin, 0, 1);
 					}
 				}
-
-				@Override
-				public int cooldownTicks() {
-					return mParams.COOLDOWN;
-				}
-
-				@Override
-				public boolean canRun() {
-					return !mParams.THROWING_TARGET.getTargetsList(mBoss).isEmpty();
-				}
 			}
-		));
 
-		super.constructBoss(spell, Collections.emptyList(), (int) (mParams.THROWING_TARGET.getRange() * 2), null);
+			@Override
+			public int cooldownTicks() {
+				return mParams.COOLDOWN;
+			}
+
+			@Override
+			public boolean canRun() {
+				return !mParams.THROWING_TARGET.getTargetsList(mBoss).isEmpty();
+			}
+		};
+
+		super.constructBoss(spell, (int) (mParams.THROWING_TARGET.getRange() * 2));
 	}
 
 

@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -33,13 +32,9 @@ public class VindictiveBoss extends BossAbilityGroup {
 
 	public static final int RANGE = 12;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new VindictiveBoss(plugin, boss);
-	}
-
 	public VindictiveBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellVindictiveParticle(boss)
 		);
 

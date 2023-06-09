@@ -33,10 +33,6 @@ public class LimitedLifespanBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LimitedLifespanBoss(plugin, boss);
-	}
-
 	private @Nullable BukkitTask mTask;
 
 	public LimitedLifespanBoss(Plugin plugin, LivingEntity boss) {

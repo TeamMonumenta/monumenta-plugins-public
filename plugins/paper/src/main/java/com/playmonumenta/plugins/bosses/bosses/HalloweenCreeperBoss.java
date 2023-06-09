@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Collections;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,9 +24,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,10 +32,6 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_halloween_creeper";
 
 	private static final NamespacedKey LOOT_TABLE = NamespacedKeyUtils.fromString("epic:event/halloween2019/tricked_creeper");
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new HalloweenCreeperBoss(plugin, boss);
-	}
 
 	public HalloweenCreeperBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
@@ -101,22 +97,6 @@ public class HalloweenCreeperBoss extends BossAbilityGroup {
 	}
 
 	private void summonFirework(Location loc, boolean first) {
-		loc.getWorld().spawn(loc, Firework.class, firework -> {
-			FireworkMeta fwm = firework.getFireworkMeta();
-			FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
-			fwBuilder.withColor(Color.fromRGB(255, 106, 31));
-			if (first) {
-				fwBuilder.with(FireworkEffect.Type.BALL_LARGE);
-			} else {
-				fwBuilder.withFlicker();
-				fwBuilder.with(FireworkEffect.Type.CREEPER);
-			}
-			FireworkEffect fwEffect = fwBuilder.build();
-			fwm.addEffect(fwEffect);
-			firework.setFireworkMeta(fwm);
-			firework.setSilent(true);
-			firework.detonate();
-		});
-
+		EntityUtils.fireworkAnimation(loc, List.of(Color.fromRGB(255, 106, 31)), first ? FireworkEffect.Type.BALL_LARGE : FireworkEffect.Type.CREEPER, 0, !first);
 	}
 }

@@ -29,10 +29,6 @@ public class BlueStrikeTargetNPCBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_bluestriketargetnpc";
 	public @Nullable LivingEntity mTarget;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlueStrikeTargetNPCBoss(plugin, boss);
-	}
-
 	public BlueStrikeTargetNPCBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Team redTeam = ScoreboardUtils.getExistingTeamOrCreate("Red", NamedTextColor.RED);

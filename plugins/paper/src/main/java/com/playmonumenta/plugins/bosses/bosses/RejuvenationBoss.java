@@ -1,17 +1,15 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellMobHealAoE;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
-import java.util.Arrays;
-import java.util.Collections;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 
 public class RejuvenationBoss extends BossAbilityGroup {
@@ -58,10 +56,6 @@ public class RejuvenationBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new RejuvenationBoss(plugin, boss);
-	}
-
 	public RejuvenationBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -72,49 +66,49 @@ public class RejuvenationBoss extends BossAbilityGroup {
 			p.TARGETS = new EntityTargets(EntityTargets.TARGETS.MOB, p.RANGE, false);
 			p.PARTICLE_RADIUS = p.RANGE;
 		}
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellMobHealAoE(
-				plugin,
-				boss,
-				p.COOLDOWN,
-				p.DURATION,
-				p.PARTICLE_RADIUS,
-				p.CAN_MOVE,
-				() -> {
-					return p.TARGETS.getTargetsList(mBoss);
-				},
-				(Location loc, int ticks) -> {
-					p.PARTICLE_CHARGE_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
-					if (ticks <= (p.DURATION - 5) && ticks % 2 == 0) {
-						p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float) ticks / (float) 100));
-					}
-				},
-				(Location loc, int ticks) -> {
-					p.PARTICLE_CHARGE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25);
-				},
-				(Location loc, int ticks) -> {
-					p.PARTICLE_OUTBURST_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
-					p.SOUND_OUTBURST_CIRCLE.play(loc);
-				},
-				(Location loc, int ticks) -> {
-					p.PARTICLE_OUTBURST_CIRCLE.spawn(boss, loc);
-				},
-				(LivingEntity target) -> {
-					p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
-					double hp = target.getHealth() + p.HEAL;
-					double max = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-					if (hp >= max) {
-						target.setHealth(max);
-						if (p.OVERHEAL) {
-							int missing = (int) (hp - max);
-							AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
-						}
-					} else {
-						target.setHealth(hp);
-					}
-				}
-			)));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		Spell spell = new SpellMobHealAoE(
+			plugin,
+			boss,
+			p.COOLDOWN,
+			p.DURATION,
+			p.PARTICLE_RADIUS,
+			p.CAN_MOVE,
+			() -> {
+				return p.TARGETS.getTargetsList(mBoss);
+			},
+			(Location loc, int ticks) -> {
+				p.PARTICLE_CHARGE_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
+				if (ticks <= (p.DURATION - 5) && ticks % 2 == 0) {
+					p.SOUND_CHARGE.play(mBoss.getLocation(), 0.8f, 0.25f + ((float) ticks / (float) 100));
+				}
+			},
+			(Location loc, int ticks) -> {
+				p.PARTICLE_CHARGE_CIRCLE.spawn(boss, loc, 0.25, 0.25, 0.25);
+			},
+			(Location loc, int ticks) -> {
+				p.PARTICLE_OUTBURST_AIR.spawn(boss, loc, 3.5, 3.5, 3.5, 0.25);
+				p.SOUND_OUTBURST_CIRCLE.play(loc);
+			},
+			(Location loc, int ticks) -> {
+				p.PARTICLE_OUTBURST_CIRCLE.spawn(boss, loc);
+			},
+			(LivingEntity target) -> {
+				p.PARTICLE_HEAL.spawn(boss, target.getEyeLocation());
+				double hp = target.getHealth() + p.HEAL;
+				double max = EntityUtils.getMaxHealth(target);
+				if (hp >= max) {
+					target.setHealth(max);
+					if (p.OVERHEAL) {
+						int missing = (int) (hp - max);
+						AbsorptionUtils.addAbsorption(target, missing, p.HEAL, -1);
+					}
+				} else {
+					target.setHealth(hp);
+				}
+			}
+		);
+
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

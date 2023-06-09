@@ -3,7 +3,6 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellDistanceCloser;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -13,14 +12,10 @@ public class DistanceCloserBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_distancecloser";
 	public static final int detectionRange = 24;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DistanceCloserBoss(plugin, boss);
-	}
-
 	public DistanceCloserBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		if (!(boss instanceof Mob)) {
+		if (!(boss instanceof Mob mob)) {
 			return;
 		}
 
@@ -41,8 +36,8 @@ public class DistanceCloserBoss extends BossAbilityGroup {
 			}
 		}
 
-		List<Spell> passiveSpells = Arrays.asList(
-			new SpellDistanceCloser((Mob) boss, distance, speed)
+		List<Spell> passiveSpells = List.of(
+			new SpellDistanceCloser(mob, distance, speed)
 		);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);

@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -44,28 +43,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-public final class Azacor extends BossAbilityGroup {
+public final class Azacor extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_azacor";
 	public static final int detectionRange = 50;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Azacor(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Azacor(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
@@ -127,7 +110,7 @@ public final class Azacor extends BossAbilityGroup {
 				(entity) -> (entity.getType().equals(EntityType.WITHER_SKELETON) || entity.getType().equals(EntityType.SKELETON)) && entity.getScoreboardTags().contains("azacor_minion"))
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		int playerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange);
 		events.put(100, (mBoss) -> {
 			randomMinion("I took his offer and I remain here. Even assassins cannot make me face death! What makes you think you can fare better?");

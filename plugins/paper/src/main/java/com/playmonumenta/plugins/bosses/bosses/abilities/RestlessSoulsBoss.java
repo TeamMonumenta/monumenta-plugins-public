@@ -48,10 +48,6 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	private Ability[] mAbilities = {};
 	private static final String DOT_EFFECT_NAME = "RestlessSoulsDamageOverTimeEffect";
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new RestlessSoulsBoss(plugin, boss);
-	}
-
 	public RestlessSoulsBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		boss.setInvulnerable(true);
@@ -130,7 +126,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		Entity target = event.getTarget();
 		if (target != null) {
 			Set<String> tags = target.getScoreboardTags();
-			if (!EntityUtils.isHostileMob(target) || (tags != null && tags.contains(AbilityUtils.IGNORE_TAG))) {
+			if (!EntityUtils.isHostileMob(target) || tags.contains(AbilityUtils.IGNORE_TAG)) {
 				event.setCancelled(true);
 			}
 		}

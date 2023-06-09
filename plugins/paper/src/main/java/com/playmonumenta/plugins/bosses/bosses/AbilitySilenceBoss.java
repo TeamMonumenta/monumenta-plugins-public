@@ -37,11 +37,7 @@ public class AbilitySilenceBoss extends BossAbilityGroup {
 
 	private final Parameters mParams;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new AbilitySilenceBoss(plugin, boss);
-	}
-
-	public AbilitySilenceBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public AbilitySilenceBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());

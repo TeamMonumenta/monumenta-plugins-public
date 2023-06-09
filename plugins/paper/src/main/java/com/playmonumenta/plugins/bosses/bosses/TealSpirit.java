@@ -25,7 +25,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,35 +53,19 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
-public class TealSpirit extends BossAbilityGroup {
+public class TealSpirit extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_tealspirit";
 	public static final int detectionRange = 70;
 
 	private final int mHealth;
-
-	public final Location mSpawnLoc;
-	private final Location mEndLoc;
 
 	private final List<Entity> mMarchers = new ArrayList<>();
 	private String mEncounterType;
 	private @Nullable DoomsdayClock mDoomsdayClock = null;
 	private @Nullable RewriteHistory mRewriteHistory = null;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new TealSpirit(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public TealSpirit(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		Team team = ScoreboardUtils.getExistingTeamOrCreate("TealSpiritVulnerable", NamedTextColor.AQUA);
 		team.addEntity(mBoss);

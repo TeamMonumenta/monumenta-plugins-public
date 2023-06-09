@@ -39,8 +39,4 @@ public class ChestLockBoss extends BossAbilityGroup {
 			chest.update();
 		}
 	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ChestLockBoss(plugin, boss);
-	}
 }

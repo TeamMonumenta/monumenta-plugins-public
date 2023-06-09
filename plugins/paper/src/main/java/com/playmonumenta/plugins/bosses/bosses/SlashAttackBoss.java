@@ -81,10 +81,6 @@ public class SlashAttackBoss extends BossAbilityGroup {
 
 	public final Parameters mParams;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SlashAttackBoss(plugin, boss);
-	}
-
 	public SlashAttackBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

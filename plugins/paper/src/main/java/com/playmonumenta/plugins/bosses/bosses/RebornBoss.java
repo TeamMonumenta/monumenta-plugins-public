@@ -33,10 +33,6 @@ public class RebornBoss extends BossAbilityGroup {
 	private int mTimesReborn = 0;
 	public static final int detectionRange = 40;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new RebornBoss(plugin, boss);
-	}
-
 	public RebornBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());

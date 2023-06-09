@@ -49,10 +49,6 @@ public class DeathSummonBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), -1, null);
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DeathSummonBoss(plugin, boss);
-	}
-
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
 		Location loc = mBoss.getLocation();

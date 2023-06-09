@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -11,11 +10,10 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets.PLAYERFILTER;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseLaser;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -83,10 +81,6 @@ public class LaserBoss extends BossAbilityGroup {
 		public int MAX_RANGE = 0;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LaserBoss(plugin, boss);
-	}
-
 	public LaserBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -97,10 +91,9 @@ public class LaserBoss extends BossAbilityGroup {
 			//probably an older mob version?
 			//build a new target from others config
 			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.DETECTION, false, p.SINGLE_TARGET ? new Limit(1) : new Limit(LIMITSENUM.ALL), List.of(PLAYERFILTER.HAS_LINEOFSIGHT));
-			//by default LaserBoss don't take player in stealt and need LINEOFSIGHT to cast.
+			//by default LaserBoss don't take player in stealth and need LINEOFSIGHT to cast.
 		}
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseLaser(plugin, boss, p.DURATION, false, p.COOLDOWN,
+		Spell spell = new SpellBaseLaser(plugin, boss, p.DURATION, false, p.COOLDOWN,
 				() -> {
 					return p.TARGETS.getTargetsList(mBoss);
 				},
@@ -145,10 +138,9 @@ public class LaserBoss extends BossAbilityGroup {
 
 
 				},
-				p.MAX_RANGE)
-		));
+				p.MAX_RANGE);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }
 

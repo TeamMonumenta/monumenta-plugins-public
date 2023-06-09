@@ -1,18 +1,16 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseCharge;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
@@ -92,10 +90,6 @@ public class ChargerBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ChargerBoss(plugin, boss);
-	}
-
 	public ChargerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -109,62 +103,59 @@ public class ChargerBoss extends BossAbilityGroup {
 			//by default Charger don't take player in stealth.
 		}
 
+		Spell spell = new SpellBaseCharge(plugin, boss, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
+			0, 0, 0,
+			() -> {
+				List<? extends LivingEntity> targetList = p.TARGETS.getTargetsList(mBoss);
+				if (p.MIN_DISTANCE > 0) {
+					Location bossLoc = mBoss.getLocation();
+					targetList.removeIf(target -> target.getLocation().distance(bossLoc) < p.MIN_DISTANCE);
+				}
+				return targetList;
+			},
+			// Warning sound/particles at boss location and slow boss
+			(LivingEntity player) -> {
+				p.PARTICLE_WARNING.spawn(boss, boss.getLocation(), 2d, 2d, 2d);
+				p.SOUND_WARNING.play(boss.getLocation(), 1f, 1.5f);
+				boss.setAI(false);
+			},
+			// Warning particles
+			(Location loc) -> {
+				p.PARTICLE_TELL.spawn(boss, loc, 0.65d, 0.65d, 0.65d);
+			},
+			// Charge attack sound/particles at boss location
+			(LivingEntity player) -> {
+				p.PARTICLE_ROAR.spawn(boss, boss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
+				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
+			},
+			// Attack hit a player
+			(LivingEntity target) -> {
+				p.PARTICLE_HIT.spawn(boss, target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
+				if (p.DAMAGE > 0) {
+					BossUtils.blockableDamage(boss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
+				}
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseCharge(plugin, boss, p.COOLDOWN, p.DURATION, p.STOP_ON_HIT,
-				0, 0, 0,
-				() -> {
-					List<? extends LivingEntity> targetList = p.TARGETS.getTargetsList(mBoss);
-					if (p.MIN_DISTANCE > 0) {
-						Location bossLoc = mBoss.getLocation();
-						targetList.removeIf(target -> target.getLocation().distance(bossLoc) < p.MIN_DISTANCE);
-					}
-					return targetList;
-				},
-				// Warning sound/particles at boss location and slow boss
-				(LivingEntity player) -> {
-					p.PARTICLE_WARNING.spawn(boss, boss.getLocation(), 2d, 2d, 2d);
-					p.SOUND_WARNING.play(boss.getLocation(), 1f, 1.5f);
-					boss.setAI(false);
-				},
-				// Warning particles
-				(Location loc) -> {
-					p.PARTICLE_TELL.spawn(boss, loc, 0.65d, 0.65d, 0.65d);
-				},
-				// Charge attack sound/particles at boss location
-				(LivingEntity player) -> {
-					p.PARTICLE_ROAR.spawn(boss, boss.getLocation(), 0.3d, 0.3d, 0.3d, 0.15d);
-					p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
-				},
-				// Attack hit a player
-				(LivingEntity target) -> {
-					p.PARTICLE_HIT.spawn(boss, target.getEyeLocation(), 0.4d, 0.4d, 0.4d, 0.4d);
-					if (p.DAMAGE > 0) {
-						BossUtils.blockableDamage(boss, target, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, mBoss.getLocation());
-					}
+				if (p.DAMAGE_PERCENTAGE > 0.0) {
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
+				}
 
-					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, mBoss.getLocation(), p.SPELL_NAME);
-					}
+				if (p.CHANGE_TARGET && mBoss instanceof Mob mobAI && !(target instanceof Player player && AbilityUtils.isStealthed(player))) {
+					mobAI.setTarget(target);
+				}
 
-					if (p.CHANGE_TARGET && mBoss instanceof Mob mobAI && !(target instanceof Player player && AbilityUtils.isStealthed(player))) {
-						mobAI.setTarget(target);
-					}
+				p.EFFECTS.apply(target, mBoss);
+			},
+			// Attack particles
+			(Location loc) -> {
+				p.PARTICLE_ATTACK.spawn(boss, loc);
+			},
+			// Ending particles on boss
+			() -> {
+				p.PARTICLE_ROAR.spawn(boss, boss.getLocation(), 0.3, 0.3, 0.3, 0.15);
+				p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
+				boss.setAI(true);
+			});
 
-					p.EFFECTS.apply(target, mBoss);
-				},
-				// Attack particles
-				(Location loc) -> {
-					p.PARTICLE_ATTACK.spawn(boss, loc);
-				},
-				// Ending particles on boss
-				() -> {
-					p.PARTICLE_ROAR.spawn(boss, boss.getLocation(), 0.3, 0.3, 0.3, 0.15);
-					p.SOUND_ROAR.play(boss.getLocation(), 1f, 1.5f);
-					boss.setAI(true);
-				})
-		));
-
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

@@ -64,8 +64,4 @@ public class DreadfulSummonBoss extends BossAbilityGroup {
 			}
 		}
 	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DreadfulSummonBoss(plugin, boss);
-	}
 }

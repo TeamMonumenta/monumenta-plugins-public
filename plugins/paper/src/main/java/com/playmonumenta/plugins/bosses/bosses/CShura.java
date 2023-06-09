@@ -20,7 +20,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -49,33 +48,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class CShura extends BossAbilityGroup {
+public class CShura extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_cshura";
 	public static final int detectionRange = 50;
 	private static final String START_TAG = "shuraCenter";
 	private static final int DODGE_CD = 5;
 
 	private LivingEntity mStart;
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private boolean mDodge = false;
 	private boolean mCutscene = false;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new CShura(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public CShura(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 
 		mBoss.addScoreboardTag("Boss");
@@ -105,7 +89,7 @@ public class CShura extends BossAbilityGroup {
 		);
 		String suffix = ChatColor.GOLD + "[" + ChatColor.DARK_RED + ChatColor.BOLD + "C'Shura" + ChatColor.GOLD + "] ";
 
-		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<Integer, BossBarManager.BossHealthAction>();
+		Map<Integer, BossBarManager.BossHealthAction> events = new HashMap<>();
 		events.put(50, mBoss -> {
 			String[] dio1 = new String[] {
 				ChatColor.GREEN + "Enough! My " + ChatColor.RED + "purpose " + ChatColor.GREEN + "here is too great for you to interrupt!",

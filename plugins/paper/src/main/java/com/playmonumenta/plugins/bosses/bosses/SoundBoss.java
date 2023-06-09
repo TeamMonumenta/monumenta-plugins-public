@@ -43,10 +43,6 @@ public class SoundBoss extends BossAbilityGroup {
 		public SoundsList DEATH_SOUND = SoundsList.EMPTY;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new SoundBoss(plugin, boss);
-	}
-
 	private final Parameters mParams;
 
 	public SoundBoss(Plugin plugin, LivingEntity boss) {

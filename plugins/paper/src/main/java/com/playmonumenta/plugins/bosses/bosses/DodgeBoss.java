@@ -30,10 +30,6 @@ public class DodgeBoss extends BossAbilityGroup {
 	private final Parameters mParams;
 	private boolean mDodge = true;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DodgeBoss(plugin, boss);
-	}
-
 	public DodgeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParams = Parameters.getParameters(boss, identityTag, new Parameters());

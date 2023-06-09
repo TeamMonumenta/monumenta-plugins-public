@@ -15,10 +15,6 @@ public class PunchResistBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_punchresist";
 	public static final int detectionRange = 100;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PunchResistBoss(plugin, boss);
-	}
-
 	public PunchResistBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

@@ -28,10 +28,6 @@ public class AlchemicalAberrationBoss extends BossAbilityGroup {
 	private double mBleedAmount = 0;
 	private @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new AlchemicalAberrationBoss(plugin, boss);
-	}
-
 	public AlchemicalAberrationBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

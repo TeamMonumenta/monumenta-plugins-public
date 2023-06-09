@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,16 +34,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class Svalgot extends BossAbilityGroup {
+public final class Svalgot extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_svalgot";
 	public static final int detectionRange = 75;
 
 	private static final int BASE_HEALTH = 2000;
 	private static final String duoTag = "ghalkortheforgemaster";
-
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 
 	private @Nullable LivingEntity mGhalkor;
 	private @Nullable Ghalkor mGhalkorBoss;
@@ -56,21 +52,8 @@ public final class Svalgot extends BossAbilityGroup {
 	//0.5 is double casting speed
 	public double mCastSpeed = 1;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new Svalgot(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Svalgot(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		SpellManager normalSpells = new SpellManager(Arrays.asList(
 			new SvalgotBoneSlam(plugin, boss, this),

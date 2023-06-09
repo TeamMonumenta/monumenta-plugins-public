@@ -39,7 +39,7 @@ public class OnHitBoss extends BossAbilityGroup {
 		public String COMMAND_AS_PLAYER = "";
 	}
 
-	private Parameters mParams;
+	private final Parameters mParams;
 
 	public OnHitBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
@@ -80,10 +80,6 @@ public class OnHitBoss extends BossAbilityGroup {
 		mParams.SOUND.play(loc);
 		mParams.PARTICLE.spawn(mBoss, loc, 0d, 0d, 0d);
 
-	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new OnHitBoss(plugin, boss);
 	}
 
 }

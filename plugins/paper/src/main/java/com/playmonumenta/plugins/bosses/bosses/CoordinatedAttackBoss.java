@@ -34,10 +34,6 @@ public class CoordinatedAttackBoss extends BossAbilityGroup {
 
 	private int mLastTriggered = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new CoordinatedAttackBoss(plugin, boss);
-	}
-
 	public CoordinatedAttackBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

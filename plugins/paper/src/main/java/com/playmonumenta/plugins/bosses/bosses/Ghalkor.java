@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +38,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public final class Ghalkor extends BossAbilityGroup {
+public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_ghalkor";
 	public static final int detectionRange = 75;
@@ -47,8 +46,6 @@ public final class Ghalkor extends BossAbilityGroup {
 	private static final int BASE_HEALTH = 2000;
 	private static final String duoTag = "svalgotthevoidwalker";
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private final Location mMiddleLoc;
 
 	private @Nullable LivingEntity mSvalgot;
@@ -61,21 +58,8 @@ public final class Ghalkor extends BossAbilityGroup {
 	//0.5 is double casting speed
 	public double mCastSpeed = 1;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new Ghalkor(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Ghalkor(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		mMiddleLoc = mSpawnLoc.add(-2, 0, 0);
 

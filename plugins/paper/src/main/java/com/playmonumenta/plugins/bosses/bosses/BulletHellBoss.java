@@ -1,14 +1,11 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.SpellBullet;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -75,16 +72,12 @@ public class BulletHellBoss extends BossAbilityGroup {
 		public double ROTATION_SPEED = 480.0;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BulletHellBoss(plugin, boss);
-	}
-
 	public BulletHellBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		World world = boss.getWorld();
 		BulletHellBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BulletHellBoss.Parameters());
 
-		super.constructBoss(new SpellManager(Arrays.asList(
+		super.constructBoss(
 			new SpellBullet(plugin, boss, new Vector(0, p.OFFSET_Y, 0), p.DURATION, p.DELAY, p.EMISSION_TICKS, p.VELOCITY, p.DETECTION, p.HITBOX_RADIUS, p.COOLDOWN, p.BULLET_DURATION, p.PATTERN,
 				p.ACCEL, p.ACCEL_START, p.ACCEL_END, p.PASS_THROUGH, p.ROTATION_SPEED,
 				(Entity entity, int tick) -> {
@@ -103,7 +96,7 @@ public class BulletHellBoss extends BossAbilityGroup {
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 5, 0, 0, 0, 0.175).spawnAsEnemy();
 				}
-			))), Collections.emptyList(), p.DETECTION, null, 0);
+			), p.DETECTION, null, 0);
 
 	}
 

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -9,12 +8,11 @@ import com.playmonumenta.plugins.bosses.parameters.EntityTargets.Limit.LIMITSENU
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -147,11 +145,6 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ProjectileBoss(plugin, boss);
-	}
-
-
 	public ProjectileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -175,8 +168,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 			p.MIRROR = 0;
 		}
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL, p.COOLDOWN, p.SPELL_DELAY,
+		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, p.LAUNCH_TRACKING, p.CHARGE, p.CHARGE_INTERVAL, p.COOLDOWN, p.SPELL_DELAY,
 				p.OFFSET_LEFT, p.OFFSET_UP, p.OFFSET_FRONT, p.MIRROR, p.FIX_YAW, p.FIX_PITCH, p.SPLIT, p.SPLIT_ANGLE,
 				p.SPEED, p.TURN_RADIUS, lifetimeTicks, p.HITBOX_LENGTH, p.LINGERS, p.COLLIDES_WITH_BLOCKS, p.SPEED_LIQUID, p.SPEED_BLOCKS, p.COLLIDES_WITH_OTHERS, 0,
 				//spell targets
@@ -217,10 +209,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 							p.EFFECTS.apply(target, boss);
 						}
 					}
-				})
-		));
+				});
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 
 	}
 }

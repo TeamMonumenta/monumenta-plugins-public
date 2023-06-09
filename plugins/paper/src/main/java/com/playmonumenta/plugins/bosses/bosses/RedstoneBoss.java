@@ -28,10 +28,6 @@ public class RedstoneBoss extends BossAbilityGroup {
 		public Material MATERIAL = Material.REDSTONE_BLOCK;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new RedstoneBoss(plugin, boss);
-	}
-
 	private final Location mLocation;
 	private final Material mMaterial;
 

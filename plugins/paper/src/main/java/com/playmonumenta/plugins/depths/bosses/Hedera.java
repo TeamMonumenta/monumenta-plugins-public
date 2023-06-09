@@ -76,11 +76,6 @@ public class Hedera extends BossAbilityGroup {
 	public int mCooldownTicks;
 	public int mTimesHealed = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new Hedera(plugin, boss, spawnLoc, endLoc));
-	}
-
 	@Override
 	public String serialize() {
 		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);

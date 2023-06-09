@@ -13,10 +13,6 @@ public class GraySummoned extends BossAbilityGroup {
 	public static final String identityTag = "boss_gray_summoned";
 	public static final int detectionRange = 40;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new GraySummoned(plugin, boss);
-	}
-
 	public GraySummoned(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -25,7 +21,7 @@ public class GraySummoned extends BossAbilityGroup {
 
 	@Override
 	public void areaEffectAppliedToBoss(AreaEffectCloudApplyEvent event) {
-		if (event.getEntity() != null && event.getEntity().hasMetadata("MonumentaBossesGrayExorcism")) {
+		if (event.getEntity().hasMetadata("MonumentaBossesGrayExorcism")) {
 			mBoss.damage(15);
 			mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 2, false, true));
 		}

@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellInspire;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -21,21 +20,17 @@ public final class CommanderBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		public int DETECTION = 24;
-		private int RANGE = 8;
+		public int RANGE = 8;
 	}
 
 	private final Parameters mParams;
 	boolean mSummonedReinforcements = false;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new CommanderBoss(plugin, boss);
-	}
-
 	public CommanderBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellInspire(com.playmonumenta.plugins.Plugin.getInstance(), boss, mParams.RANGE)
 		);
 

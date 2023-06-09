@@ -35,9 +35,5 @@ public class BlockLockBoss extends BossAbilityGroup {
 	public void unload() {
 		mLoc.getBlock().removeMetadata("Unbreakable", mPlugin);
 	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlockLockBoss(plugin, boss);
-	}
 }
 

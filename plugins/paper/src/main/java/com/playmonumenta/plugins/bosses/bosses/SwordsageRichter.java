@@ -20,11 +20,11 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -46,29 +46,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 
-public final class SwordsageRichter extends BossAbilityGroup {
+public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_swordsagerichter";
 	public static final int detectionRange = 60;
 	private static final Particle.DustOptions BOLT_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f);
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new SwordsageRichter(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public SwordsageRichter(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 		World world = mSpawnLoc.getWorld();
 
@@ -118,7 +102,7 @@ public final class SwordsageRichter extends BossAbilityGroup {
 			new SpellProjectileDeflection(mBoss)
 		);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
 			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"[Richter] \",\"color\":\"gold\"},{\"text\":\"This is the challenger you speak of, master? Very well, let's get this over with quickly.\",\"color\":\"white\"}]");
 		});
@@ -153,61 +137,50 @@ public final class SwordsageRichter extends BossAbilityGroup {
 
 
 			knockback(plugin, 10);
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					mBoss.remove();
-					world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 2, 1);
-					new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
-					new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
 
-					new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(boss);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				mBoss.remove();
+				world.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, SoundCategory.HOSTILE, 2, 1);
+				new PartialParticle(Particle.SPELL_WITCH, mBoss.getLocation().add(0, 1, 0), 70, 0.25, 0.45, 0.25, 0.15).spawnAsEntityActive(boss);
+				new PartialParticle(Particle.SMOKE_LARGE, mBoss.getLocation().add(0, 1, 0), 35, 0.1, 0.45, 0.1, 0.15).spawnAsEntityActive(boss);
 
-					new BukkitRunnable() {
-						@Override
-						public void run() {
+				new PartialParticle(Particle.EXPLOSION_NORMAL, mBoss.getLocation(), 25, 0.2, 0, 0.2, 0.1).spawnAsEntityActive(boss);
 
-							new BukkitRunnable() {
-								int mT = 0;
-								boolean mAttacked = false;
+				new BukkitRunnable() {
+					int mT = 0;
+					boolean mAttacked = false;
 
-								@Override
-								public void run() {
-									mT++;
-									if (mT >= 20 * 2 && !mAttacked) {
-										mAttacked = true;
-										for (Player player : players) {
-											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
-											player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.5f);
-											new PartialParticle(Particle.FLAME, player.getLocation(), 200, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-											new PartialParticle(Particle.CLOUD, player.getLocation(), 100, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-											new PartialParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0).spawnAsEntityActive(boss);
-										}
-									} else {
-										float pitch = mT / 20;
-										double offset = 2.5 - pitch;
-										for (Player player : players) {
-											Location loc = player.getLocation().add(0, 1, 0);
-											player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, pitch);
-											new PartialParticle(Particle.SWEEP_ATTACK, loc, 20, offset, offset, offset, 0).spawnAsEntityActive(boss);
-											new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, offset, offset, offset, 0).spawnAsEntityActive(boss);
-										}
-									}
-
-									if (mT >= 20 * 2.1) {
-										this.cancel();
-										mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-									}
-								}
-
-							}.runTaskTimer(plugin, 0, 2);
-
+					@Override
+					public void run() {
+						mT++;
+						if (mT >= 20 * 2 && !mAttacked) {
+							mAttacked = true;
+							for (Player player : players) {
+								player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 1);
+								player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 1, 0.5f);
+								new PartialParticle(Particle.FLAME, player.getLocation(), 200, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.CLOUD, player.getLocation(), 100, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.SWEEP_ATTACK, player.getLocation(), 200, 4, 4, 4, 0).spawnAsEntityActive(boss);
+							}
+						} else {
+							float pitch = mT / 20;
+							double offset = 2.5 - pitch;
+							for (Player player : players) {
+								Location loc = player.getLocation().add(0, 1, 0);
+								player.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.HOSTILE, 1, pitch);
+								new PartialParticle(Particle.SWEEP_ATTACK, loc, 20, offset, offset, offset, 0).spawnAsEntityActive(boss);
+								new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 40, offset, offset, offset, 0).spawnAsEntityActive(boss);
+							}
 						}
 
-					}.runTaskLater(plugin, 20 * 1);
-				}
+						if (mT >= 20 * 2.1) {
+							this.cancel();
+							mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
+						}
+					}
 
-			}.runTaskLater(plugin, 20 * 2);
+				}.runTaskTimer(plugin, 20, 2);
+			}, 20 * 2);
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 

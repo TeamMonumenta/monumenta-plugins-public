@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.utils.BossUtils;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
@@ -20,10 +19,6 @@ public final class HiddenBoss extends BossAbilityGroup {
 	public static final int visibleRange = 5;
 	public static final PotionEffect potion = new PotionEffect(PotionEffectType.INVISIBILITY, 10, 0, false, false);
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new HiddenBoss(plugin, boss);
-	}
-
 	public HiddenBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -35,7 +30,7 @@ public final class HiddenBoss extends BossAbilityGroup {
 		});
 		invis.run();
 
-		List<Spell> passiveSpells = Arrays.asList(invis);
+		List<Spell> passiveSpells = List.of(invis);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 	}

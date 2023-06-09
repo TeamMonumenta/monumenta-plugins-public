@@ -34,11 +34,7 @@ public final class IceAspectBoss extends BossAbilityGroup {
 
 	private final Parameters mParams;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new IceAspectBoss(plugin, boss);
-	}
-
-	public IceAspectBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public IceAspectBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		mParams = BossParameters.getParameters(boss, identityTag, new Parameters());

@@ -1,14 +1,12 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSeekingProjectile;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -51,16 +49,11 @@ public class WeakHookBoss extends BossAbilityGroup {
 		public float MULTIPLIER = 3;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new WeakHookBoss(plugin, boss);
-	}
-
 	public WeakHookBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
+		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
@@ -89,8 +82,8 @@ public class WeakHookBoss extends BossAbilityGroup {
 						MovementUtils.pullTowardsByUnit(boss, player, p.MULTIPLIER);
 					}
 				}
-			)));
+			);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(spell, detectionRange);
 	}
 }

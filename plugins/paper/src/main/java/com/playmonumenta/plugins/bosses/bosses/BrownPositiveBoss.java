@@ -27,10 +27,6 @@ public class BrownPositiveBoss extends BossAbilityGroup {
 		public double ENEMY_DAMAGE_VULN = 1.2;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BrownPositiveBoss(plugin, boss);
-	}
-
 	public BrownPositiveBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		BrownPositiveBoss.Parameters p = BossParameters.getParameters(boss, identityTag, new BrownPositiveBoss.Parameters());

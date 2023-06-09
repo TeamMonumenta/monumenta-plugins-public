@@ -18,7 +18,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +48,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class PortalBoss extends BossAbilityGroup {
+public final class PortalBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_portalfight";
 	public static final int detectionRange = 50;
 	public static final int BASE_HEALTH = 5000;
@@ -60,9 +59,6 @@ public final class PortalBoss extends BossAbilityGroup {
 	public static final String MUSIC_TITLE = "epic:music.misanthropic_circuitry";
 	private static final int MUSIC_DURATION = 233; //seconds
 
-	public final Location mSpawnLoc;
-	public final Location mEndLoc;
-
 	public int mCooldownTicks;
 	public boolean mIsHidden;
 	public int mCubesDropped;
@@ -70,20 +66,8 @@ public final class PortalBoss extends BossAbilityGroup {
 	public @Nullable BukkitRunnable mHideRunnable = null;
 	public List<Location> mReplaceBlocks;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new PortalBoss(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public PortalBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mReplaceBlocks = new ArrayList<>();
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");

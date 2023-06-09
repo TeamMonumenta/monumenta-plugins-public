@@ -19,10 +19,6 @@ public class FocusFireBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_focusfire";
 	public static final int detectionRange = 15;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FocusFireBoss(plugin, boss);
-	}
-
 	public FocusFireBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

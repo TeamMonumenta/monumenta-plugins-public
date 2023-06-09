@@ -61,10 +61,6 @@ public class WormBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new WormBoss(plugin, boss);
-	}
-
 	private final List<LivingEntity> mParts = new ArrayList<>();
 	private final Parameters mParams;
 	private final WormMovement mMovement;

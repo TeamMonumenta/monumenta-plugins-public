@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellFlameNova;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -31,19 +29,13 @@ public final class FlameNovaBoss extends BossAbilityGroup {
 		public int FIRE_DURATION = 80;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new FlameNovaBoss(plugin, boss);
-	}
-
 	public FlameNovaBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellFlameNova(plugin, boss, p.RANGE, p.FUSE_TIME, p.COOLDOWN, p.DAMAGE, p.FIRE_DURATION)
-		));
+		Spell spell = new SpellFlameNova(plugin, boss, p.RANGE, p.FUSE_TIME, p.COOLDOWN, p.DAMAGE, p.FIRE_DURATION);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

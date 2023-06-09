@@ -37,10 +37,6 @@ public class DashBoss extends BossAbilityGroup {
 
 	public final Parameters mParams;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DashBoss(plugin, boss);
-	}
-
 	public DashBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

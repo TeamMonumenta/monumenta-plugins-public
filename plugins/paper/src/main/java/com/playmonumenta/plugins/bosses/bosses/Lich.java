@@ -45,7 +45,6 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
@@ -106,7 +105,7 @@ import org.jetbrains.annotations.Nullable;
  * I'm too lazy so here's the formal write-up for reference :) -Fwap
  * https://docs.google.com/document/d/149Wa83eyxaJ_EuOn1oCZl4ivoDzj-tw5m04i_xVA87M/edit?usp=sharing
  */
-public final class Lich extends BossAbilityGroup {
+public final class Lich extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_lich";
 	public static final String curseSource = "LichCurse";
 	public static final int detectionRange = 55;
@@ -114,8 +113,6 @@ public final class Lich extends BossAbilityGroup {
 	private static final int mCeiling = 35;
 	private int mCounter = 0;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private static final String START_TAG = "lich_center";
 	private static final String mShieldCrystal = "DeathCrystal";
 	private static final String mCrystalShield = "CrystalShield";
@@ -152,21 +149,9 @@ public final class Lich extends BossAbilityGroup {
 
 	private final double mPhylactHealth;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-																				  new Lich(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public Lich(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
 		mPlayerCount = BossUtils.getPlayersInRangeForHealthScaling(mSpawnLoc, detectionRange, mCeiling);
 		mDefenseScaling = BossUtils.healthScalingCoef(mPlayerCount, SCALING_X, SCALING_Y);
 

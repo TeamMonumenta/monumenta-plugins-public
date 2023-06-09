@@ -23,10 +23,6 @@ public class DamageCapBoss extends BossAbilityGroup {
 		public boolean PERCENT = false;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DamageCapBoss(plugin, boss);
-	}
-
 	public DamageCapBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

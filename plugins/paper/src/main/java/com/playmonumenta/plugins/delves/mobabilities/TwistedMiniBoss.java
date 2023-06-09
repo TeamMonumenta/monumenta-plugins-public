@@ -38,7 +38,8 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 
 		Spell spell = new Spell() {
 			int mTimer = 0;
-			@Override public void run() {
+			@Override
+			public void run() {
 				mTimer += 5;
 
 				if (mTimer >= 20 * 120 && mBoss.isValid() && !mBoss.isDead()) {
@@ -53,21 +54,25 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 				}
 			}
 
-			@Override public int cooldownTicks() {
+			@Override
+			public int cooldownTicks() {
 				return 5;
 			}
 
-			@Override public void onDamage(DamageEvent event, LivingEntity damagee) {
+			@Override
+			public void onDamage(DamageEvent event, LivingEntity damagee) {
 				mTimer = 0;
 			}
 
-			@Override public void onHurtByEntity(DamageEvent event, Entity damager) {
+			@Override
+			public void onHurtByEntity(DamageEvent event, Entity damager) {
 				if (damager instanceof Player) {
 					mTimer = 0;
 				}
 			}
 
-			@Override public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
+			@Override
+			public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
 				if (source instanceof Player) {
 					mTimer = 0;
 				}
@@ -75,10 +80,6 @@ public class TwistedMiniBoss extends BossAbilityGroup {
 		};
 
 		super.constructBoss(SpellManager.EMPTY, List.of(spell), -1, null);
-	}
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TwistedMiniBoss(plugin, boss);
 	}
 
 	public void playerDeath(Player player) {

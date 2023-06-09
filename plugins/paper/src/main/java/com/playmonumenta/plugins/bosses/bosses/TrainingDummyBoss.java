@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -42,20 +41,15 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	private double mMaxDPS = -1;
 	private @Nullable ArmorStand mHologram = null;
 
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TrainingDummyBoss(plugin, boss);
-	}
-
 	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
+		SpellManager activeSpells = new SpellManager(List.of(
 			new SpellRunAction(() -> {
 				boss.setHealth(EntityUtils.getMaxHealth(boss));
 			}, 60 * 20)
 		));
 
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (mHologram != null) {
 					mHologram.teleport(mBoss.getEyeLocation().add(0, 0.5, 0));

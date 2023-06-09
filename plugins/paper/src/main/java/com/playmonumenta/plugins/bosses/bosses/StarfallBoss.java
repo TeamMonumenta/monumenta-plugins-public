@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
@@ -13,7 +12,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import org.bukkit.Location;
@@ -67,44 +65,37 @@ public class StarfallBoss extends BossAbilityGroup {
 
 	}
 
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new StarfallBoss(plugin, boss);
-	}
-
 	public StarfallBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
-		SpellManager spellManager = new SpellManager(List.of(
-			new Spell() {
-				@Override
-				public void run() {
-					if (p.DOES_TARGETING) {
-						List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-						targets.forEach(e -> spawnStarfall(p, mBoss, e.getLocation(), (ticks, oldLoc) -> ticks <= p.TRACKING ? e.getLocation() : oldLoc));
-					} else {
-						List<Location> locs = new ArrayList<>();
-						for (int i = 1; i <= p.COUNT; i++) {
-							locs.add(LocationUtils.randomLocationInCircle(mBoss.getLocation(), p.RANGE));
-						}
-						locs.forEach(l -> spawnStarfall(p, mBoss, l, (ticks, oldLoc) -> l));
+		Spell spell = new Spell() {
+			@Override
+			public void run() {
+				if (p.DOES_TARGETING) {
+					List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
+					targets.forEach(e -> spawnStarfall(p, mBoss, e.getLocation(), (ticks, oldLoc) -> ticks <= p.TRACKING ? e.getLocation() : oldLoc));
+				} else {
+					List<Location> locs = new ArrayList<>();
+					for (int i = 1; i <= p.COUNT; i++) {
+						locs.add(LocationUtils.randomLocationInCircle(mBoss.getLocation(), p.RANGE));
 					}
-				}
-
-				@Override
-				public int cooldownTicks() {
-					return p.COOLDOWN;
-				}
-
-				@Override
-				public boolean canRun() {
-					return !p.TARGETS.getTargetsList(mBoss).isEmpty() || !p.DOES_TARGETING;
+					locs.forEach(l -> spawnStarfall(p, mBoss, l, (ticks, oldLoc) -> l));
 				}
 			}
-		));
 
-		super.constructBoss(spellManager, Collections.emptyList(), (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
+			@Override
+			public int cooldownTicks() {
+				return p.COOLDOWN;
+			}
+
+			@Override
+			public boolean canRun() {
+				return !p.TARGETS.getTargetsList(mBoss).isEmpty() || !p.DOES_TARGETING;
+			}
+		};
+
+		super.constructBoss(spell, (int) (p.TARGETS.getRange() * 2), null, p.DELAY);
 	}
 
 	private void spawnStarfall(Parameters p, LivingEntity boss, Location loc, BiFunction<Integer, Location, Location> locationGetter) {

@@ -31,7 +31,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,12 +123,6 @@ public class Samwell extends BossAbilityGroup {
 	private BlueStrikeDaggerCraftingBoss mBhairaviAbility;
 	private BlueStrikeDaggerCraftingBoss mIzzyAbility;
 	private BlueStrikeDaggerCraftingBoss mLevynAbility;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Samwell(plugin, boss, spawnLoc, endLoc);
-		});
-	}
 
 	public Samwell(Plugin plugin, LivingEntity boss, Location startLoc, Location endLoc) {
 		super(plugin, identityTag, boss);

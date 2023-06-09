@@ -6,13 +6,11 @@ import com.playmonumenta.plugins.bosses.bosses.Lich;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.lich.undeadplayers.SpellCrystalParticle;
 import com.playmonumenta.plugins.events.DamageEvent;
-import java.util.Arrays;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -22,38 +20,30 @@ import org.bukkit.plugin.Plugin;
 public class LichShieldBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_lichshield";
 	public static final int detectionRange = 55;
-	private final Location mCenter = Lich.getLichSpawn();
-	private final Location mSpawnLoc;
-	private double mHp = 0;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LichShieldBoss(plugin, boss);
-	}
 
 	public LichShieldBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		mSpawnLoc = mBoss.getLocation();
-		List<Spell> passiveSpells = Arrays.asList(
-			new SpellCrystalParticle(mBoss, mSpawnLoc)
+		List<Spell> passiveSpells = List.of(
+			new SpellCrystalParticle(mBoss, mBoss.getLocation())
 		);
 
 		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
 
 		int hpScaling = Lich.mShieldMin;
-		List<Player> players = Lich.playersInRange(mCenter, detectionRange, true);
+		List<Player> players = Lich.playersInRange(Lich.getLichSpawn(), detectionRange, true);
+		double hp = 0;
 		if (players.size() > hpScaling) {
 			//14 hp crystals if there are more than 10 players to prevent aleph spam
-			mHp = 14 * (1 + (1 - 1 / Math.E) * Math.log(players.size() - hpScaling));
+			hp = 14 * (1 + (1 - 1 / Math.E) * Math.log(players.size() - hpScaling));
 		}
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mHp);
-		mBoss.setHealth(mHp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 	}
 
 	@Override
 	public void onHurt(DamageEvent event) {
 		Entity damager = event.getDamager();
-		if (damager != null && damager instanceof AbstractArrow proj) {
+		if (damager instanceof AbstractArrow proj) {
 			proj.remove();
 		}
 		if (event.getDamage() > 32) {

@@ -1,19 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseShatter;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import java.util.Arrays;
-import java.util.Collections;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -72,54 +70,48 @@ public class ShatterBoss extends BossAbilityGroup {
 		public SoundsList SOUND_LAUNCH = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,10,0),(ENTITY_GENERIC_EXPLODE, 10,0.5),(ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,10,0.5)]");
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ShatterBoss(plugin, boss);
-	}
-
 	public ShatterBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellBaseShatter(
-				plugin,
-				boss,
-				p.RADIUS,
-				p.COOLDOWN,
-				p.DURATION,
-				p.NUM_LINES,
-				p.HEIGHT,
-				p.INDICATOR_MATERIAL,
-				() -> {
-					// Targets of spell launch
-					return p.LAUNCH_TARGET.getTargetsList(boss);
-				},
-				(LivingEntity bosss, Location loc, float pitch) -> {
-					p.SOUND_WARNING.play(loc, 10, pitch);
-				},
-				(LivingEntity bosss, Location loc) -> {
-					p.SOUND_LAUNCH.play(loc);
-				},
-				(LivingEntity bosss, LivingEntity target, Location loc) -> {
-					// Hit Action
-					p.PARTICLE_HIT.spawn(bosss, target.getLocation());
+		Spell spell = new SpellBaseShatter(
+			plugin,
+			boss,
+			p.RADIUS,
+			p.COOLDOWN,
+			p.DURATION,
+			p.NUM_LINES,
+			p.HEIGHT,
+			p.INDICATOR_MATERIAL,
+			() -> {
+				// Targets of spell launch
+				return p.LAUNCH_TARGET.getTargetsList(boss);
+			},
+			(LivingEntity bosss, Location loc, float pitch) -> {
+				p.SOUND_WARNING.play(loc, 10, pitch);
+			},
+			(LivingEntity bosss, Location loc) -> {
+				p.SOUND_LAUNCH.play(loc);
+			},
+			(LivingEntity bosss, LivingEntity target, Location loc) -> {
+				// Hit Action
+				p.PARTICLE_HIT.spawn(bosss, target.getLocation());
 
-					if (p.DAMAGE > 0) {
-						DamageUtils.damage(boss, target, DamageEvent.DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
-					}
-
-					if (p.DAMAGE_PERCENTAGE > 0.0) {
-						BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
-					}
-
-					p.EFFECTS.apply(target, boss);
-
-					MovementUtils.knockAway(boss.getLocation(), target, p.HORIZONTAL_KNOCKBACK, p.VERTICAL_KNOCKBACK, false);
+				if (p.DAMAGE > 0) {
+					DamageUtils.damage(boss, target, DamageEvent.DamageType.MAGIC, p.DAMAGE, null, false, true, p.SPELL_NAME);
 				}
-			)
-		));
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+				if (p.DAMAGE_PERCENTAGE > 0.0) {
+					BossUtils.bossDamagePercent(mBoss, target, p.DAMAGE_PERCENTAGE, p.SPELL_NAME);
+				}
+
+				p.EFFECTS.apply(target, boss);
+
+				MovementUtils.knockAway(boss.getLocation(), target, p.HORIZONTAL_KNOCKBACK, p.VERTICAL_KNOCKBACK, false);
+			}
+		);
+
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

@@ -34,10 +34,6 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 	private double mPassengerDamageThisTick = 0;
 	private double mVehicleDamageThisTick = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ImmortalPassengerBoss(plugin, boss);
-	}
-
 	public ImmortalPassengerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

@@ -74,11 +74,6 @@ public class Davey extends BossAbilityGroup {
 
 	public int mCooldownTicks;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new Davey(plugin, boss, spawnLoc, endLoc));
-	}
-
 	@Override
 	public String serialize() {
 		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);

@@ -11,10 +11,10 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +26,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.LivingEntity;
@@ -38,7 +37,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class TealQuestBoss extends BossAbilityGroup {
+public class TealQuestBoss extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_teal_quest";
 	public static final int detectionRange = 100;
@@ -63,24 +62,9 @@ public class TealQuestBoss extends BossAbilityGroup {
 	private static final int HITS_TO_BREAK = 1;
 	private static final Particle.DustOptions REDSTONE_COLOR_BARRIER = new Particle.DustOptions(Color.fromRGB(225, 15, 255), 1.0f);
 
-	private Location mEndLoc;
-	private Location mSpawnLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new Varcosa(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public TealQuestBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mEndLoc = endLoc;
-		mSpawnLoc = spawnLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
+
 		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, JUMP_HEIGHT, detectionRange, MIN_RANGE, RUN_DISTANCE, COOLDOWN_SLAM, VELOCITY_MULTIPLIER,
 				(World world, Location loc) -> {
 					world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
@@ -92,7 +76,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 				new PartialParticle(Particle.REDSTONE, loc, 4, 0.5, 0.5, 0.5, 1, new Particle.DustOptions(Color.fromRGB(255, 255, 255), 1.0f)).spawnAsEntityActive(boss);
 			}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 				ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-					Arrays.asList(
+					List.of(
 						new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 							new PartialParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 							new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
@@ -164,9 +148,7 @@ public class TealQuestBoss extends BossAbilityGroup {
 	public void init() {
 		int players = BossUtils.getPlayersInRangeForHealthScaling(mBoss, 35);
 		double targetHealth = 1000 * (Math.log1p(players) / Math.log(2));
-
-		mBoss.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(targetHealth);
-		mBoss.setHealth(targetHealth);
+		EntityUtils.setMaxHealthAndHealth(mBoss, targetHealth);
 	}
 
 	@Override

@@ -1,19 +1,17 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets.TARGETS;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAoE;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import java.util.Collections;
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -77,10 +75,6 @@ public final class NovaBoss extends BossAbilityGroup {
 
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new NovaBoss(plugin, boss);
-	}
-
 	public NovaBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -91,12 +85,12 @@ public final class NovaBoss extends BossAbilityGroup {
 			//probably an older mob version?
 			//build a new target from others config
 			p.TARGETS = new EntityTargets(TARGETS.PLAYER, p.RADIUS, true);
-			//by default LaserBoss take player in stealt.
+			//by default LaserBoss take player in stealth.
 		} else {
 			p.NEED_LINE_OF_SIGHT = false;
 		}
-		SpellManager activeSpells = new SpellManager(List.of(
-			new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE, p.SOUND_CHARGE_VOLUME, p.SOUND_CHARGE_FREQUENCY) {
+
+		Spell spell = new SpellBaseAoE(plugin, boss, (int) p.TARGETS.getRange(), p.DURATION, p.COOLDOWN, p.CAN_MOVE, p.NEED_LINE_OF_SIGHT, p.SOUND_CHARGE, p.SOUND_CHARGE_VOLUME, p.SOUND_CHARGE_FREQUENCY) {
 				@Override
 				protected void chargeAuraAction(Location loc) {
 					p.PARTICLE_AIR.spawn(boss, loc, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, p.TARGETS.getRange() / 2, 0.05);
@@ -134,8 +128,8 @@ public final class NovaBoss extends BossAbilityGroup {
 						p.EFFECTS.apply(target, mBoss);
 					}
 				}
-			}));
+			};
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossBarManager.BossHealthAction;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellPlayerAction;
@@ -13,12 +12,9 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,28 +33,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 
-public final class VarcosaSummonerBoss extends BossAbilityGroup {
+public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_summoner";
 	public static final int detectionRange = 50;
 	public static int mSummonPeriod = 20 * 5;
 	private Location mCenter;
 	private boolean mActive;
-	private final Location mEndLoc;
-	private final Location mSpawnLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new VarcosaSummonerBoss(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
 
 	public VarcosaSummonerBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mEndLoc = endLoc;
-		mSpawnLoc = spawnLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		List<String> summonableMobs = List.of("SeaWolf", "PirateGunner", "DrownedCrewman");
 
@@ -69,7 +52,7 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 
 		int radius = 50;
 		for (LivingEntity e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, radius, radius, radius)) {
-			if (e.getScoreboardTags() != null && !e.getScoreboardTags().isEmpty() && e.getScoreboardTags().contains("varcosa_center")) {
+			if (e.getScoreboardTags().contains("varcosa_center")) {
 				mCenter = e.getLocation();
 				break;
 			}
@@ -94,11 +77,9 @@ public final class VarcosaSummonerBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = Arrays.asList(new SpellSummonConstantly(summonableMobs, mSummonPeriod, 50, 6, 2, mCenter, this),
 			new SpellJibberJabber(mBoss, speak, radius),
 			action, tooHighAction);
-		SpellManager activeSpells = new SpellManager(Arrays.asList(new SpellPurgeNegatives(mBoss, 100)));
+		SpellManager activeSpells = new SpellManager(List.of(new SpellPurgeNegatives(mBoss, 100)));
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
-
-		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
+		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, null);
 
 		super.constructBoss(activeSpells, passiveSpells, detectionRange, bossBar);
 	}

@@ -13,7 +13,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,12 +38,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public class OldLabsBoss extends BossAbilityGroup {
+public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_oldlabs";
 	public static final int detectionRange = 32;
-
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 
 	private static final String[] mDialog = new String[] {
 		"Well, this is very peculiar...",
@@ -53,24 +49,12 @@ public class OldLabsBoss extends BossAbilityGroup {
 		"Your intrusion on my plans ends here! Have at ye, commoners!"
 	};
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new OldLabsBoss(plugin, boss, spawnLoc, endLoc, false));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public OldLabsBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		this(plugin, boss, spawnLoc, endLoc, true);
 	}
 
 	public OldLabsBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc, boolean newBoss) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");

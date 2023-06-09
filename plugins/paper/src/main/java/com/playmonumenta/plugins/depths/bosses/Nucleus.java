@@ -77,11 +77,6 @@ public final class Nucleus extends BossAbilityGroup {
 	public boolean mIsHidden;
 	public boolean mCanSpawnMobs = true;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) ->
-			new Nucleus(plugin, boss, spawnLoc, endLoc));
-	}
-
 	@Override
 	public String serialize() {
 		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);

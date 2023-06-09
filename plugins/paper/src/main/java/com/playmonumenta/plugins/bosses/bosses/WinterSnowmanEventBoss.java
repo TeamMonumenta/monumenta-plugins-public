@@ -26,10 +26,6 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_winter_snowman";
 	public static final int detectionRange = 50;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new WinterSnowmanEventBoss(plugin, boss);
-	}
-
 	public WinterSnowmanEventBoss(Plugin plugin, LivingEntity boss) throws Exception {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);
@@ -63,8 +59,7 @@ public class WinterSnowmanEventBoss extends BossAbilityGroup {
 
 	@Override
 	public void bossProjectileHit(ProjectileHitEvent event) {
-		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player) {
-			Player player = (Player) event.getHitEntity();
+		if (event.getHitEntity() != null && event.getHitEntity() instanceof Player player) {
 			if ((player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE)) && !player.isDead() && player.getHealth() > 0) {
 				AbsorptionUtils.subtractAbsorption(player, 2);
 

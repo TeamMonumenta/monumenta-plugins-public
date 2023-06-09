@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,27 +49,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class VarcosasLastBreathBoss extends BossAbilityGroup {
+public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_breath";
 	public static final int detectionRange = 50;
 	private static final String[] mSpeak = {"Arr, I be killin' ye myself then. I shan't be stopped twice...", "The air be growin' stale. I shan't let me end be this!"};
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private Location mCenter;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new VarcosasLastBreathBoss(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public VarcosasLastBreathBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 
 		//Possible summons
@@ -118,7 +104,7 @@ public final class VarcosasLastBreathBoss extends BossAbilityGroup {
 		BukkitRunnable runnable = SpellActions.getTeleportEntityRunnable(mBoss, mCenter);
 		runnable.runTaskTimer(plugin, 20, 20 * 2);
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(10, mBoss -> forceCastSpell(SpellGhostlyCannons.class));
 		BossBarManager bossBar = new BossBarManager(mPlugin, mBoss, detectionRange + 20, BarColor.RED, BarStyle.SEGMENTED_10, events);
 

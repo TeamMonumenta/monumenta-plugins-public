@@ -40,10 +40,6 @@ public class HostileBoss extends BossAbilityGroup {
 		public int SHIELD_BREAK_TICKS = 0;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new HostileBoss(plugin, boss);
-	}
-
 	public HostileBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());

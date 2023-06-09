@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.bosses.spells.SpellDrawAggro;
 import com.playmonumenta.plugins.depths.abilities.shadow.DummyDecoy;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -24,15 +23,10 @@ public class DummyDecoyBoss extends BossAbilityGroup {
 
 	private int mStunTime = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DummyDecoyBoss(plugin, boss);
-	}
-
 	public DummyDecoyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		List<Spell> passives = new ArrayList<>();
-		passives.add(new SpellDrawAggro(boss, DummyDecoy.AGGRO_RADIUS));
+		List<Spell> passives = List.of(new SpellDrawAggro(boss, DummyDecoy.AGGRO_RADIUS));
 
 		super.constructBoss(SpellManager.EMPTY, passives, detectionRange, null);
 	}

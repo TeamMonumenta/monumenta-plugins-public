@@ -105,36 +105,23 @@ are also blinded for 5 seconds.)
 
  */
 
-public class HeadlessHorsemanBoss extends BossAbilityGroup {
+public class HeadlessHorsemanBoss extends SerializedLocationBossAbilityGroup {
 
 	public static final String identityTag = "boss_horseman";
 	public static final int detectionRange = 22;
 	public static final int arenaSize = 45;
 	public int mCooldownTicks = 11 * 20;
 
-	private final Location mOriginalSpawnLoc;
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
 	private List<Player> mPlayers = new ArrayList<>();
 	private boolean mCooldown = false;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new HeadlessHorsemanBoss(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
 	@Override
 	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mOriginalSpawnLoc, mEndLoc);
+		return SerializationUtils.statefulBossSerializer(mSpawnLoc.clone().add(0, 4, 0), mEndLoc);
 	}
 
 	public HeadlessHorsemanBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mOriginalSpawnLoc = spawnLoc;
-		mSpawnLoc = spawnLoc.clone().subtract(0, 4, 0);
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc.clone().subtract(0, 4, 0), endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 
 		new BukkitRunnable() {

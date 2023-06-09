@@ -16,12 +16,12 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,26 +42,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class TCalin extends BossAbilityGroup {
+public final class TCalin extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_tcalin";
 	public static final int detectionRange = 60;
 
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> new TCalin(plugin, boss, spawnLoc, endLoc));
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public TCalin(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 		World world = mSpawnLoc.getWorld();
 		mBoss.addScoreboardTag("Boss");
@@ -236,14 +222,7 @@ public final class TCalin extends BossAbilityGroup {
 						mBoss.setAI(true);
 						mBoss.setInvulnerable(false);
 						changePhase(SpellManager.EMPTY, passiveSpells, null);
-						new BukkitRunnable() {
-
-							@Override
-							public void run() {
-								changePhase(phase2Spells, passiveSpells, null);
-							}
-
-						}.runTaskLater(plugin, 20 * 10);
+						Bukkit.getScheduler().runTaskLater(plugin, () -> changePhase(phase2Spells, passiveSpells, null), 20 * 10);
 					}
 				}
 

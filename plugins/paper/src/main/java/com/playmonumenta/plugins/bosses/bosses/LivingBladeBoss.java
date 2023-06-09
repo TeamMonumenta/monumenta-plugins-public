@@ -15,10 +15,6 @@ public class LivingBladeBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_livingblade";
 	public static final int detectionRange = 40;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LivingBladeBoss(plugin, boss);
-	}
-
 	public LivingBladeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = Arrays.asList(

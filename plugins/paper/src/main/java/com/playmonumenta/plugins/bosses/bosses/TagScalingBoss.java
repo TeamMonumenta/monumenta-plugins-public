@@ -22,10 +22,6 @@ public class TagScalingBoss extends BossAbilityGroup {
 		public double DAMAGE_INCREASE = 0.2;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TagScalingBoss(plugin, boss);
-	}
-
 	private final TagScalingBoss.Parameters mParams;
 
 	public TagScalingBoss(Plugin plugin, LivingEntity boss) {

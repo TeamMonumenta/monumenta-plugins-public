@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseSlam;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -10,8 +10,7 @@ import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils.SpawnParticleAction;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -52,15 +51,11 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 		//notes: this ability will probably become deprecated in the future!
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new MeteorSlamBoss(plugin, boss);
-	}
-
 	public MeteorSlamBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
-		SpellManager manager = new SpellManager(Arrays.asList(new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
+		Spell spell = new SpellBaseSlam(plugin, boss, p.JUMP_HEIGHT, p.DETECTION, p.MIN_RANGE, p.RUN_DISTANCE, p.COOLDOWN, p.VELOCITY_MULTIPLIER,
 			(World world, Location loc) -> {
 				mBoss.addScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
 				world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1, 1);
@@ -73,7 +68,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 		}, (World world, @Nullable Player player, Location loc, Vector dir) -> {
 			mBoss.removeScoreboardTag(BlockPlacerBoss.STOP_PLACING_BLOCK);
 			ParticleUtils.explodingRingEffect(plugin, loc, 4, 1, 4,
-				Arrays.asList(
+				List.of(
 					new AbstractMap.SimpleEntry<Double, SpawnParticleAction>(0.5, (Location location) -> {
 						new PartialParticle(Particle.FLAME, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
 						new PartialParticle(Particle.CLOUD, loc, 1, 0.1, 0.1, 0.1, 0.1).spawnAsEntityActive(boss);
@@ -94,7 +89,7 @@ public class MeteorSlamBoss extends BossAbilityGroup {
 				BossUtils.blockableDamage(boss, players, DamageType.BLAST, p.DAMAGE);
 				BossUtils.bossDamagePercent(boss, players, p.DAMAGE_PERCENT, boss.getLocation());
 			}
-		})));
-		super.constructBoss(manager, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		});
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

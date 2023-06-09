@@ -11,11 +11,7 @@ public class PlayerDamageOnlyBoss extends BossAbilityGroup {
 	public static final String identityTag = "boss_player_dmg_only";
 	public static final int detectionRange = 50;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new PlayerDamageOnlyBoss(plugin, boss);
-	}
-
-	public PlayerDamageOnlyBoss(Plugin plugin, LivingEntity boss) throws Exception {
+	public PlayerDamageOnlyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}

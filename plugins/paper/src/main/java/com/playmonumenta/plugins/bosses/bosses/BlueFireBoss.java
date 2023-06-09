@@ -6,9 +6,8 @@ import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
@@ -24,25 +23,13 @@ public class BlueFireBoss extends BossAbilityGroup {
 
 	private int mBlueTimeOfDay = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlueFireBoss(plugin, boss);
-	}
-
 	public BlueFireBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
-			long time = boss.getWorld().getTime();
-			mBlueTimeOfDay = (int) Math.floor(time / 6000.0);
-
-			// Pretty sure Time ranges from 0 to 23999, but just in case...
-			if (mBlueTimeOfDay > 3) {
-				mBlueTimeOfDay = 3;
-			}
-		}
+		mBlueTimeOfDay = BossUtils.getBlueTimeOfDay(boss);
 
 		// Fire: Player takes 0 / 20 / 30 / 40% more fire damage
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (mBlueTimeOfDay > 0) {
 					List<Player> players = EntityUtils.getNearestPlayers(boss.getLocation(), 30);

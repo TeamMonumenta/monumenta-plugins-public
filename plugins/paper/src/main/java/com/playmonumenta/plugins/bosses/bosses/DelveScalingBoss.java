@@ -37,10 +37,6 @@ public class DelveScalingBoss extends BossAbilityGroup {
 	private final double mDamageMult;
 	private final double mResistMult;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DelveScalingBoss(plugin, boss);
-	}
-
 	public DelveScalingBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

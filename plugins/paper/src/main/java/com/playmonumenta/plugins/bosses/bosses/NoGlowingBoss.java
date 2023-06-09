@@ -13,10 +13,6 @@ public class NoGlowingBoss extends BossAbilityGroup {
 	public static String identityTag = "boss_no_glowing";
 	public static int detectionRange = 100;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
-		return new NoGlowingBoss(plugin, boss);
-	}
-
 	public NoGlowingBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);

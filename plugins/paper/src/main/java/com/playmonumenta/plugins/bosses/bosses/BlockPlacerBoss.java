@@ -71,13 +71,8 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 		Material.BLACK_CARPET
 	);
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BlockPlacerBoss(plugin, boss);
-	}
-
 	public BlockPlacerBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-
 
 		List<Spell> spells = List.of(
 			new Spell() {

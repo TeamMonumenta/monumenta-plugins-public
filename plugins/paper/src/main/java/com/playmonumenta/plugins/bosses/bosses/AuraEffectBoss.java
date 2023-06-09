@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBaseAura;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -46,15 +45,11 @@ public class AuraEffectBoss extends BossAbilityGroup {
 		public boolean CANCELABLE = false;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new AuraEffectBoss(plugin, boss);
-	}
-
 	public AuraEffectBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellBaseAura(boss, p.RADIUS, p.HEIGHT, p.RADIUS,
 				(Entity entity) -> {
 					p.PARTICLE.spawn(boss, entity.getLocation(), p.RADIUS / 2, p.HEIGHT / 2, p.RADIUS / 2);

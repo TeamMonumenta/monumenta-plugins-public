@@ -23,10 +23,6 @@ public class AntiMeleeBoss extends BossAbilityGroup {
 		public int DISTANCE = 12;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new AntiMeleeBoss(plugin, boss);
-	}
-
 	public AntiMeleeBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		Parameters p = BossParameters.getParameters(boss, identityTag, new AntiMeleeBoss.Parameters());

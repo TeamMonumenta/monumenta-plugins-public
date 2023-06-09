@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -24,10 +23,6 @@ public class LichDemiseBoss extends BossAbilityGroup {
 
 	Location mCenter;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new LichDemiseBoss(plugin, boss);
-	}
-
 	public LichDemiseBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mCenter = Lich.getLichSpawn();
@@ -36,10 +31,9 @@ public class LichDemiseBoss extends BossAbilityGroup {
 		int playercount = Lich.playersInRange(loc, detectionRange, true).size();
 		double hpdel = 325;
 		double hp = (int) (hpdel * (1 + (1 - 1 / Math.E) * Math.log(playercount)));
-		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, hp);
-		mBoss.setHealth(hp);
+		EntityUtils.setMaxHealthAndHealth(mBoss, hp);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
+		SpellManager activeSpells = new SpellManager(List.of(
 			new SpellBurningVengence(plugin, boss, 20 * 25, mCenter, detectionRange, 0.3)
 		));
 

@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class SerializationUtils {
 	private static final String SERIALCONST = "SERIALDATA=";
@@ -136,11 +137,11 @@ public class SerializationUtils {
 
 	@FunctionalInterface
 	public interface BossConstructor {
-		BossAbilityGroup run(Location spawnLoc, Location endLoc);
+		@Nullable BossAbilityGroup run(Location spawnLoc, Location endLoc);
 	}
 
-	public static BossAbilityGroup statefulBossDeserializer(LivingEntity boss, String identityTag,
-	                                                        BossConstructor constructor) throws Exception {
+	public static @Nullable BossAbilityGroup statefulBossDeserializer(LivingEntity boss, String identityTag,
+	                                                                  BossConstructor constructor) throws Exception {
 		String content = SerializationUtils.retrieveDataFromEntity(boss);
 
 		if (content == null || content.isEmpty()) {

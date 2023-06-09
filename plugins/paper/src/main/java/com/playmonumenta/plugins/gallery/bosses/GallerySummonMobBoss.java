@@ -1,18 +1,15 @@
 package com.playmonumenta.plugins.gallery.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.bosses.BossParameters;
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellSpawnMobs;
 import com.playmonumenta.plugins.gallery.GalleryGame;
 import com.playmonumenta.plugins.gallery.GalleryUtils;
-import java.util.Collections;
-import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 public class GallerySummonMobBoss extends BossAbilityGroup {
 
@@ -37,10 +34,6 @@ public class GallerySummonMobBoss extends BossAbilityGroup {
 		public int MOB_CAP = 15;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new GallerySummonMobBoss(plugin, boss);
-	}
-
 	public GallerySummonMobBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
@@ -48,16 +41,15 @@ public class GallerySummonMobBoss extends BossAbilityGroup {
 
 		GalleryGame game = GalleryUtils.getGame(boss.getLocation());
 
-		SpellManager activeSpells = new SpellManager(List.of(
-			new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.MOB_CAP) {
-				@Override public void summonPlugins(@NotNull Entity summon) {
-					if (summon instanceof LivingEntity livingEntity && !GalleryUtils.ignoreScaling(livingEntity) && game != null) {
-						game.scaleMob(livingEntity);
-					}
+		Spell spell = new SpellSpawnMobs(boss, p.SPAWNCOUNT, p.SPAWNEDMOB, p.COOLDOWN, p.RANGE, p.MIN_RANGE, p.MOB_CAP) {
+			@Override
+			public void summonPlugins(Entity summon) {
+				if (summon instanceof LivingEntity livingEntity && !GalleryUtils.ignoreScaling(livingEntity) && game != null) {
+					game.scaleMob(livingEntity);
 				}
 			}
-		));
+		};
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.DELAY);
+		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

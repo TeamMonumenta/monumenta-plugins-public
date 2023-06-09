@@ -29,10 +29,6 @@ public class DreadnaughtParticleBoss extends BossAbilityGroup {
 
 	private double mDamageCounter = 0;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new DreadnaughtParticleBoss(plugin, boss);
-	}
-
 	public DreadnaughtParticleBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		List<Spell> passiveSpells = List.of(

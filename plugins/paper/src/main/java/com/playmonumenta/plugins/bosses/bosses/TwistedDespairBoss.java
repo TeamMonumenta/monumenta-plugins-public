@@ -1,12 +1,10 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellTpBehindPlayer;
-import java.util.Arrays;
-import java.util.Collections;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class TwistedDespairBoss extends BossAbilityGroup {
 
@@ -16,26 +14,18 @@ public class TwistedDespairBoss extends BossAbilityGroup {
 	public static final int TP_BEHIND_COOLDOWN = 20 * 8;
 	public static final int LIFE_TIME = 20 * 28;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new TwistedDespairBoss(plugin, boss);
-	}
-
 	public TwistedDespairBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 
-		SpellManager activeSpells = new SpellManager(Arrays.asList(
-			new SpellTpBehindPlayer(plugin, boss, TP_BEHIND_COOLDOWN)));
+		Spell spell = new SpellTpBehindPlayer(plugin, boss, TP_BEHIND_COOLDOWN);
 
-		super.constructBoss(activeSpells, Collections.emptyList(), detectionRange, null);
+		super.constructBoss(spell, detectionRange);
 
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!boss.isDead() && boss.isValid()) {
-					boss.setHealth(0);
-				}
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			if (!boss.isDead() && boss.isValid()) {
+				boss.setHealth(0);
 			}
-		}.runTaskLater(plugin, LIFE_TIME);
+		}, LIFE_TIME);
 	}
 
 }

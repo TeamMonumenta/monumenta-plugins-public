@@ -14,10 +14,6 @@ public class MistMob extends BossAbilityGroup {
 	public static final int detectionRange = 20;
 	public static final String identityTag = "MistMob";
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) {
-		return new MistMob(plugin, boss);
-	}
-
 	public MistMob(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
-import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
@@ -8,7 +7,6 @@ import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,10 +45,6 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_PROJECTILE = ParticlesList.fromString("[(CRIT,1)]");
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new ScoutVolleyBoss(plugin, boss);
-	}
-
 	private final Set<AbstractArrow> mVolleyArrowSet = new HashSet<>();
 
 	public ScoutVolleyBoss(Plugin plugin, LivingEntity boss) {
@@ -59,90 +53,88 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 		Parameters p = Parameters.getParameters(boss, identityTag, new Parameters());
 		float spacing = ((float) p.CONE) / p.PROJECTILE_NUMBER;
 
-		SpellManager spells = new SpellManager(List.of(
-			new Spell() {
+		Spell spell = new Spell() {
 
-				@Override
-				public void run() {
-					new BukkitRunnable() {
-						int mTimer = 0;
-						boolean mHasGlowing = false;
-						boolean mHasPlayedEndAesthetic = false;
+			@Override
+			public void run() {
+				new BukkitRunnable() {
+					int mTimer = 0;
+					boolean mHasGlowing = false;
+					boolean mHasPlayedEndAesthetic = false;
 
-						@Override
-						public void run() {
-							if (mBoss.isDead() || !mBoss.isValid()) {
-								cancel();
-								return;
-							}
+					@Override
+					public void run() {
+						if (mBoss.isDead() || !mBoss.isValid()) {
+							cancel();
+							return;
+						}
 
-							if (mTimer == 0) {
-								//STARTING aesthetic
-								mHasGlowing = mBoss.isGlowing();
-								mBoss.setGlowing(true);
-								p.SOUND_START.play(mBoss.getLocation());
-							}
+						if (mTimer == 0) {
+							//STARTING aesthetic
+							mHasGlowing = mBoss.isGlowing();
+							mBoss.setGlowing(true);
+							p.SOUND_START.play(mBoss.getLocation());
+						}
 
-							if (mTimer >= p.SPELL_DELAY - 10 && !mHasPlayedEndAesthetic) {
-								mHasPlayedEndAesthetic = true;
-								mBoss.setGlowing(mHasGlowing);
-								p.SOUND_END.play(mBoss.getLocation());
-							}
+						if (mTimer >= p.SPELL_DELAY - 10 && !mHasPlayedEndAesthetic) {
+							mHasPlayedEndAesthetic = true;
+							mBoss.setGlowing(mHasGlowing);
+							p.SOUND_END.play(mBoss.getLocation());
+						}
 
-							if (mTimer >= p.SPELL_DELAY) {
-								mVolleyArrowSet.clear();
+						if (mTimer >= p.SPELL_DELAY) {
+							mVolleyArrowSet.clear();
 
-								p.SOUND_SHOOT.play(mBoss.getLocation());
-								Location eyeLoc = mBoss.getEyeLocation();
-								List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-								if (!targets.isEmpty()) {
-									Location targetEyeLoc = targets.get(0).getEyeLocation();
-									Vector dir = targetEyeLoc.toVector().subtract(eyeLoc.toVector()).normalize();
-									for (int i = 0; i < p.PROJECTILE_NUMBER; i++) {
-										double yaw = spacing * (i - (p.PROJECTILE_NUMBER - 1) / 2f);
-										AbstractArrow arrow = spawnArrow(mBoss, dir, yaw, p.SPEED);
-										arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
-										arrow.setPierceLevel(p.PIERCING);
-										arrow.setDamage(p.DAMAGE);
-										mVolleyArrowSet.add(arrow);
-										if (!p.PARTICLE_PROJECTILE.isEmpty()) {
-											new BukkitRunnable() {
+							p.SOUND_SHOOT.play(mBoss.getLocation());
+							Location eyeLoc = mBoss.getEyeLocation();
+							List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
+							if (!targets.isEmpty()) {
+								Location targetEyeLoc = targets.get(0).getEyeLocation();
+								Vector dir = targetEyeLoc.toVector().subtract(eyeLoc.toVector()).normalize();
+								for (int i = 0; i < p.PROJECTILE_NUMBER; i++) {
+									double yaw = spacing * (i - (p.PROJECTILE_NUMBER - 1) / 2f);
+									AbstractArrow arrow = spawnArrow(mBoss, dir, yaw, p.SPEED);
+									arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+									arrow.setPierceLevel(p.PIERCING);
+									arrow.setDamage(p.DAMAGE);
+									mVolleyArrowSet.add(arrow);
+									if (!p.PARTICLE_PROJECTILE.isEmpty()) {
+										new BukkitRunnable() {
 
-												@Override
-												public void run() {
-													p.PARTICLE_PROJECTILE.spawn(boss, arrow.getLocation());
+											@Override
+											public void run() {
+												p.PARTICLE_PROJECTILE.spawn(boss, arrow.getLocation());
 
-													if (arrow.isInBlock() || !arrow.isValid()) {
-														this.cancel();
-													}
+												if (arrow.isInBlock() || !arrow.isValid()) {
+													this.cancel();
 												}
-											}.runTaskTimer(mPlugin, 0, 1);
-										}
+											}
+										}.runTaskTimer(mPlugin, 0, 1);
 									}
 								}
-
-								cancel();
 							}
 
-							mTimer++;
+							cancel();
 						}
-					}.runTaskTimer(mPlugin, 0, 1);
 
-				}
+						mTimer++;
+					}
+				}.runTaskTimer(mPlugin, 0, 1);
 
-				@Override
-				public int cooldownTicks() {
-					return p.COOLDOWN;
-				}
-
-				@Override
-				public boolean canRun() {
-					return !p.TARGETS.getTargetsList(mBoss).isEmpty();
-				}
 			}
-		));
 
-		super.constructBoss(spells, Collections.emptyList(), -1, null, p.DELAY);
+			@Override
+			public int cooldownTicks() {
+				return p.COOLDOWN;
+			}
+
+			@Override
+			public boolean canRun() {
+				return !p.TARGETS.getTargetsList(mBoss).isEmpty();
+			}
+		};
+
+		super.constructBoss(spell, -1, null, p.DELAY);
 	}
 
 	@Override

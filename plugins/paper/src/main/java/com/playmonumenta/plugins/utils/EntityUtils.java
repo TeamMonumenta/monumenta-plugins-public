@@ -1528,11 +1528,18 @@ public class EntityUtils {
 	}
 
 	public static void fireworkAnimation(Location loc, List<Color> colors, FireworkEffect.Type type, int delay) {
+		fireworkAnimation(loc, colors, type, delay, false);
+	}
+
+	public static void fireworkAnimation(Location loc, List<Color> colors, FireworkEffect.Type type, int delay, boolean flicker) {
 		Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
 		FireworkMeta fwm = fw.getFireworkMeta();
 		FireworkEffect.Builder fwBuilder = FireworkEffect.builder();
 		fwBuilder.withColor(colors);
 		fwBuilder.with(type);
+		if (flicker) {
+			fwBuilder.withFlicker();
+		}
 		FireworkEffect fwEffect = fwBuilder.build();
 		fwm.addEffect(fwEffect);
 		fw.setFireworkMeta(fwm);

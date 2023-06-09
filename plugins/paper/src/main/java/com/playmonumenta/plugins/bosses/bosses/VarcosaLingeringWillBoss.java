@@ -22,7 +22,6 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,29 +48,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-public final class VarcosaLingeringWillBoss extends BossAbilityGroup {
+public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_varcosa_will";
 	public static final int detectionRange = 50;
-	private final Location mSpawnLoc;
-	private final Location mEndLoc;
 	private Location mCenter;
 	private String[] mSpeak = {"The cold beyond be takin' me. It'll be takin' ye too...", "The veil be partin'... I won't go... not without me treasure..."};
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new VarcosaLingeringWillBoss(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public VarcosaLingeringWillBoss(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		mBoss.setRemoveWhenFarAway(false);
 
 		List<String> mSummonableMobs = new ArrayList<>();

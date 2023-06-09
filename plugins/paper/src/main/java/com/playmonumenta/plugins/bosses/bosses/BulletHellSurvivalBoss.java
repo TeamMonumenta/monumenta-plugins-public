@@ -35,19 +35,15 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 	}
 
 	final Parameters mParam;
-	private static double PLAYER_BOUNDING_BOX_XZ = 0.61;
-	private static double PLAYER_BASE_JUMP_HEIGHT = 1.2523;
-	private static double BULLET_HITBOX_RADIUS = 0.3125 / 2.0;
-	private static List<Material> cheeseBlocks = Arrays.asList(Material.TWISTING_VINES, Material.CAVE_VINES, Material.LADDER, Material.WATER, Material.LAVA, Material.VINE, Material.WEEPING_VINES, Material.SCAFFOLDING);
-
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new BulletHellSurvivalBoss(plugin, boss);
-	}
+	private static final double PLAYER_BOUNDING_BOX_XZ = 0.61;
+	private static final double PLAYER_BASE_JUMP_HEIGHT = 1.2523;
+	private static final double BULLET_HITBOX_RADIUS = 0.3125 / 2.0;
+	private static final List<Material> cheeseBlocks = Arrays.asList(Material.TWISTING_VINES, Material.CAVE_VINES, Material.LADDER, Material.WATER, Material.LAVA, Material.VINE, Material.WEEPING_VINES, Material.SCAFFOLDING);
 
 	public BulletHellSurvivalBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mParam = Parameters.getParameters(boss, identityTag, new BulletHellSurvivalBoss.Parameters());
-		List<Spell> passiveSpells = Arrays.asList(
+		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				if (!mBoss.isDead()) {
 					int doDamage = shouldDamage(mBoss);

@@ -33,7 +33,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.SerializationUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,7 +156,7 @@ the Frost Giant explodes dealing 60 damage in an 8 block radius. High CD, High D
  */
 
 
-public class FrostGiant extends BossAbilityGroup {
+public class FrostGiant extends SerializedLocationBossAbilityGroup {
 	public static final String identityTag = "boss_frostgiant";
 	public static final int detectionRange = 80;
 	public static final int hailstormRadius = 16;
@@ -169,10 +168,6 @@ public class FrostGiant extends BossAbilityGroup {
 
 	public static @Nullable FrostGiant mInstance = null;
 
-	//DO NOT USE - boss spawns 42 blocks above actual arena center
-	private final Location mSpawnLoc;
-
-	private final Location mEndLoc;
 	private static final String START_TAG = "FrostGiantStart";
 	private final Location mStartLoc;
 	private boolean mCutsceneDone = false;
@@ -210,25 +205,12 @@ public class FrostGiant extends BossAbilityGroup {
 	private static final double SCALING_X = 0.6;
 	private static final double SCALING_Y = 0.35;
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return SerializationUtils.statefulBossDeserializer(boss, identityTag, (spawnLoc, endLoc) -> {
-			return new FrostGiant(plugin, boss, spawnLoc, endLoc);
-		});
-	}
-
 	public @Nullable ItemStack[] mArmor = null;
 	private @Nullable ItemStack mMainhand = null;
 	private @Nullable ItemStack mOffhand = null;
 
-	@Override
-	public String serialize() {
-		return SerializationUtils.statefulBossSerializer(mSpawnLoc, mEndLoc);
-	}
-
 	public FrostGiant(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
-		super(plugin, identityTag, boss);
-		mSpawnLoc = spawnLoc;
-		mEndLoc = endLoc;
+		super(plugin, identityTag, boss, spawnLoc, endLoc);
 		World world = boss.getWorld();
 		mBoss.addScoreboardTag("Boss");
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20 * 9999, 0));

@@ -21,10 +21,6 @@ public class GenericBoss extends BossAbilityGroup {
 		public boolean BOSS_FOG = true;
 	}
 
-	public static BossAbilityGroup deserialize(Plugin plugin, LivingEntity boss) throws Exception {
-		return new GenericBoss(plugin, boss);
-	}
-
 	public GenericBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
 		mBoss.setRemoveWhenFarAway(false);

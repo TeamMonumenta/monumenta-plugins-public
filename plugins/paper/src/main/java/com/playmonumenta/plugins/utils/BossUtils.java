@@ -348,4 +348,18 @@ public class BossUtils {
 		}
 		return null;
 	}
+
+	public static int getBlueTimeOfDay(Entity entity) {
+		int timeOfDay = 0;
+		if (ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
+			long time = entity.getWorld().getTime();
+			timeOfDay = (int) Math.floor(time / 6000.0);
+
+			// Pretty sure Time ranges from 0 to 23999, but just in case...
+			if (timeOfDay > 3) {
+				timeOfDay = 3;
+			}
+		}
+		return timeOfDay;
+	}
 }
