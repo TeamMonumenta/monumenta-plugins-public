@@ -657,6 +657,12 @@ public class PlayerListener implements Listener {
 			GUIUtils.refreshOffhand(event);
 		}
 
+		if (item != null && item.getType() == Material.WRITTEN_BOOK && item.getAmount() == 1 && ItemUtils.isNullOrAir(event.getCursor()) && event.getClick() == ClickType.RIGHT) {
+			player.openBook(item);
+			player.playSound(player.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1, 1);
+			event.setCancelled(true);
+		}
+
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
