@@ -51,11 +51,11 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 		new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsPlayerActive(player);
 		new PPCircle(Particle.END_ROD, loc.clone().add(0, 0.2, 0), 2).count(10).spawnAsPlayerActive(player);
 
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.6f, 1.4f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.8f, 1.4f);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.6f, 2f);
+				world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.8f, 2f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 6);
 	}
@@ -113,8 +113,8 @@ public class AstralObfuscationCS extends CloakAndDaggerCS {
 
 		Location loc = enemy.getLocation();
 		World world = player.getWorld();
-		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 2f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1f, 2f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 1.25f, 2f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.25f, 2f);
 	}
 
 	private void drawStar(Location location, Player player) {

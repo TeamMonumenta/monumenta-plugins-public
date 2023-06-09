@@ -81,7 +81,7 @@ public class Swiftness extends Ability {
 			Location loc = mPlayer.getLocation();
 			World world = mPlayer.getWorld();
 			new PartialParticle(Particle.CLOUD, loc, 40, 0.25, 0.45, 0.25, 0.1).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1, 2f);
+			world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.25f, 2f);
 		}
 	}
 

@@ -70,7 +70,7 @@ public class TouchOfEntropyCS extends HandOfLightCS {
 		loc = loc.clone().add(0, 1, 0);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 50, 0, 0, 0, 0.125)
 			.spawnAsPlayerActive(player);
-		player.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1.5f, 0f);
+		player.getWorld().playSound(loc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 0.8f, 0f);
 		createOrb(new Vector(FastUtils.randomDoubleInRange(-1, 1), FastUtils.randomDoubleInRange(-0.5, 0.5),
 			FastUtils.randomDoubleInRange(-1, 1)), LocationUtils.getHalfHeightLocation(target),
 			player, target, target.getLocation().add(

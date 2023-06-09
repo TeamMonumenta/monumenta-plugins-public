@@ -83,7 +83,7 @@ public class TranscCombosCS extends ViciousCombosCS {
 		Location eLoc = LocationUtils.getHalfHeightLocation(target);
 		eLoc.setPitch(0);
 		eLoc.setYaw(mPlayer.getLocation().getYaw());
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 2f, 1.3f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1.7f, 1.3f);
 		drawX(eLoc, mPlayer, LINE_LENGTH + 0.75, TRANSC_LINE_ELITE_COLOR);
 
 		new PartialParticle(Particle.END_ROD, eLoc, 15, 0, 0, 0, 0.15).spawnAsPlayerActive(mPlayer);
@@ -98,27 +98,27 @@ public class TranscCombosCS extends ViciousCombosCS {
 			public void run() {
 				mT++;
 
-				world.playSound(finalLoc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 0.75f + mPufferPitch);
-				world.playSound(finalLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1.25f);
-				world.playSound(finalLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 2f, 0.75f);
+				world.playSound(finalLoc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1.7f, 0.75f + mPufferPitch);
+				world.playSound(finalLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.7f, 1.25f);
+				world.playSound(finalLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.7f, 0.75f);
 
 				for (int i = 0; i < 6; i++) {
 					createRandomLine(finalLoc, mPlayer);
 				}
 				if (mT < 5) {
-					world.playSound(finalLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.85f + mTridentPitch);
+					world.playSound(finalLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.7f, 0.85f + mTridentPitch);
 				} else {
 					this.cancel();
 
 					Location newLoc = mPlayer.getLocation().add(0, 1, 0);
 					newLoc.setPitch(0);
 
-					world.playSound(newLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.75f);
+					world.playSound(newLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.7f, 0.75f);
 					world.playSound(newLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1f, 0.75f);
-					world.playSound(newLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1.25f);
+					world.playSound(newLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.7f, 1.25f);
 					world.playSound(newLoc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1f, 1.65f);
-					world.playSound(newLoc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 2f, 1f);
-					world.playSound(newLoc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 2f, 0.8f);
+					world.playSound(newLoc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1.7f, 1f);
+					world.playSound(newLoc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 1.7f, 0.8f);
 					ParticleUtils.drawParticleLineSlash(eLoc, VectorUtils.rotateTargetDirection(mPlayer.getLocation().getDirection(), 90, 15),
 						0, LINE_LENGTH, 0.05, 4,
 						(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> {
@@ -202,9 +202,9 @@ public class TranscCombosCS extends ViciousCombosCS {
 					new Particle.DustOptions(color, size)).spawnAsPlayerActive(mPlayer);
 			});
 
-		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 2f, 0.75f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.85f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 2f, 1.25f);
+		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1.7f, 0.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.7f, 0.85f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.7f, 1.25f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.75f);
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

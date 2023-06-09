@@ -72,8 +72,8 @@ public class DecapitationCS extends ByMyBladeCS implements GalleryCS {
 	@Override
 	public void bmbDamage(World world, Player mPlayer, LivingEntity enemy, int level) {
 		Location loc = enemy.getLocation();
-		world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.3f, 2f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.7f, 2f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.5f, 2f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1.0f, 2f);
 		world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 5f, 0.5f);
 		new PartialParticle(Particle.CRIT_MAGIC, loc, level * 20, 0.3, 0.6, 0.3, 0.01).spawnAsPlayerActive(mPlayer);
 

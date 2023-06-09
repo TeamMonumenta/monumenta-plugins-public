@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -46,11 +45,11 @@ public class InfernalFlamesCS extends CholericFlamesCS {
 
 	@Override
 	public void flameEffects(Player player, World world, Location loc, double range) {
-		world.playSound(loc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1.5f, 0);
-		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 1.5f, 0.65f);
-		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.PLAYERS, 1.5f, 0.85f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 0.9f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 0.9f);
+		world.playSound(loc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1.3f, 0);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 1.3f, 0.65f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_ATTACK, SoundCategory.PLAYERS, 1.3f, 0.85f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 0.9f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 0.9f);
 		new BukkitRunnable() {
 
 			double mRadius = 0;

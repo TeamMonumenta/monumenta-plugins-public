@@ -91,28 +91,28 @@ public class Quake implements Enchantment {
 				player.playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 1.5f, 0.5f);
 			}
 			if (fire > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.PLAYERS, 0.6f, 0.9f);
+				player.playSound(player.getLocation(), Sound.BLOCK_LAVA_POP, SoundCategory.PLAYERS, 1.0f, 0.9f);
 				new PartialParticle(Particle.LAVA, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (ice > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.6f, 1.3f);
+				player.playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.3f);
 				new PartialParticle(Particle.SNOW_SHOVEL, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (thunder > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.PLAYERS, 0.6f, 0.8f);
+				player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 				new PartialParticle(Particle.REDSTONE, target.getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_1_COLOR).spawnAsPlayerActive(player);
 				new PartialParticle(Particle.REDSTONE, target.getLocation(), 12, 1.5, 1.5, 1.5, YELLOW_2_COLOR).spawnAsPlayerActive(player);
 			}
 			if (decay > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.4f, 0.7f);
+				player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.7f, 0.7f);
 				new PartialParticle(Particle.SQUID_INK, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 			if (bleed > 0) {
-				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.8f);
+				player.playSound(player.getLocation(), Sound.BLOCK_SLIME_BLOCK_BREAK, SoundCategory.PLAYERS, 1.25f, 0.8f);
 				new PartialParticle(Particle.REDSTONE, target.getLocation(), 25, 1.5, 1.5, 1.5, BLEED_COLOR).spawnAsPlayerActive(player);
 			}
 			if (wind > 0) {
-				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.30f);
+				player.playSound(player.getLocation(), Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.25f, 0.30f);
 				new PartialParticle(Particle.CLOUD, target.getLocation(), 25, 1.5, 1.5, 1.5).spawnAsPlayerActive(player);
 			}
 		}

@@ -80,8 +80,8 @@ public class ShieldBash extends Ability {
 		new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
-		world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1);
-		world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 2.0f, 1);
+		world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 0.5f);
 
 		bash(mob, ClassAbility.SHIELD_BASH);
 		if (isLevelTwo()) {
