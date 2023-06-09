@@ -41,6 +41,7 @@ public class Toughness extends Ability {
 				"Gain +20% max health and damage from Poison, Wither, and Drowning is reduced by 40%.",
 				"Gain an additional +5% max health. Additionally, when below 50% health, gain 20% healing.")
 			.simpleDescription("Increase your max health and resistance to ailment damage.")
+			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, TOUGHNESS_MODIFIER_NAME))
 			.displayItem(Material.IRON_HELMET);
 
 	private final double mDoTDamageReduction;
@@ -49,15 +50,13 @@ public class Toughness extends Ability {
 		super(plugin, player, INFO);
 		mDoTDamageReduction = (isLevelOne() ? DOT_DAMAGE_REDUCTION_1 : DOT_DAMAGE_REDUCTION_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_REDUCTION);
 
-		if (player != null) {
-			double healthBoost = isLevelOne() ? PERCENT_HEALTH_1 : PERCENT_HEALTH_2;
-			if (isEnhanced()) {
-				healthBoost += PERCENT_HEALTH_ENHANCEMENT;
-			}
-			healthBoost += CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
-			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
-				new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		double healthBoost = isLevelOne() ? PERCENT_HEALTH_1 : PERCENT_HEALTH_2;
+		if (isEnhanced()) {
+			healthBoost += PERCENT_HEALTH_ENHANCEMENT;
 		}
+		healthBoost += CharmManager.getLevelPercentDecimal(mPlayer, CHARM_HEALTH);
+		EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH,
+			new AttributeModifier(TOUGHNESS_MODIFIER_NAME, healthBoost, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	@Override

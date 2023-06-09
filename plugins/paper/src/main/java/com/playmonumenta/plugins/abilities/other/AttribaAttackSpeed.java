@@ -14,15 +14,14 @@ public class AttribaAttackSpeed extends Ability {
 
 	public static final AbilityInfo<AttribaAttackSpeed> INFO =
 		new AbilityInfo<>(AttribaAttackSpeed.class, null, AttribaAttackSpeed::new)
-			.canUse(player -> player != null && player.getScoreboardTags().contains(MODIFIER_NAME))
+			.canUse(player -> player.getScoreboardTags().contains(MODIFIER_NAME))
+			.remove(player -> EntityUtils.removeAttribute(player, Attribute.GENERIC_ATTACK_SPEED, MODIFIER_NAME))
 			.ignoresSilence(true);
 
 	public AttribaAttackSpeed(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 
-		if (player != null) {
-			EntityUtils.addAttribute(player, Attribute.GENERIC_ATTACK_SPEED,
-				new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
-		}
+		EntityUtils.addAttribute(player, Attribute.GENERIC_ATTACK_SPEED,
+			new AttributeModifier(MODIFIER_NAME, REDUCTION, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 }

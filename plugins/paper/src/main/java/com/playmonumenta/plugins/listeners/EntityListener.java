@@ -294,11 +294,9 @@ public class EntityListener implements Listener {
 		}
 
 		if (damager instanceof Player playerDamager) {
-			if (damagee instanceof Player playerDamagee) {
-				if (!mAbilities.isPvPEnabled(playerDamagee) || !mAbilities.isPvPEnabled(playerDamager)) {
-					event.setCancelled(true);
-					return;
-				}
+			if (damagee instanceof Player) {
+				event.setCancelled(true);
+				return;
 			}
 
 			// Plot Security: If damagee is inside a plot but the player is in adventure, cancel.
@@ -314,7 +312,7 @@ public class EntityListener implements Listener {
 				return;
 			}
 
-			if (damagee instanceof Player playerDamagee && !AbilityManager.getManager().isPvPEnabled(playerDamagee)) {
+			if (damagee instanceof Player) {
 				damager.remove();
 				event.setCancelled(true);
 				return;

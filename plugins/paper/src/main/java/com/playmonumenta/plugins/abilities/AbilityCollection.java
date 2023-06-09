@@ -26,13 +26,6 @@ public class AbilityCollection {
 
 	private final ImmutableList<Ability> mAbilitiesInTriggerOrder;
 
-	/*
-	 * This map just contains delve modifiers for when the player is silenced
-	 *
-	 * Delve modifiers should probably not be piggybacking off the abilities
-	 * system, but that's a problem for another day
-	 */
-
 	private boolean mIsSilenced = false;
 
 	public AbilityCollection(List<Ability> abilities) {

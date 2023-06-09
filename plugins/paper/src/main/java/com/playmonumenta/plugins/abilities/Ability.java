@@ -347,19 +347,6 @@ public abstract class Ability {
 		return String.format("%s: %d", this.getClass().getName().replaceAll("com.playmonumenta.plugins.abilities.", ""), getAbilityScore());
 	}
 
-	/*
-	 * This is called when a player's class is refreshed REGARDLESS OF WHETHER THE PLAYER HAS
-	 * THE ABILITY, so any effects of the ability that persist outside of the plugin, like
-	 * attributes or tags, should be removed here.
-	 *
-	 * Treat this as a static method (i.e. use the player argument, not mPlayer nor any other
-	 * instance variable) because it is called from the reference abilities list, not the
-	 * actual ability object associated with the player.
-	 */
-	public void remove(Player player) {
-
-	}
-
 	/* When called, the ability is no longer applicable to the player and any active runnables should be cancelled */
 	public void invalidate() {
 
