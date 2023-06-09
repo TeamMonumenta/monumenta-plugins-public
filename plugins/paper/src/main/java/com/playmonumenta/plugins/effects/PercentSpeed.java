@@ -50,7 +50,7 @@ public class PercentSpeed extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Attributable attributable && (!(entity instanceof Player) || !ZoneUtils.hasZoneProperty(entity, ZoneProperty.NO_MOBILITY_ABILITIES))) {
-			EntityUtils.addAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 

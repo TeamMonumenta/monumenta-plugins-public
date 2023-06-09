@@ -1292,6 +1292,11 @@ public class EntityUtils {
 		}
 	}
 
+	public static void replaceAttribute(Attributable attributable, Attribute attribute, AttributeModifier attributeModifier) {
+		removeAttribute(attributable, attribute, attributeModifier.getName());
+		addAttribute(attributable, attribute, attributeModifier);
+	}
+
 	public static void removeAttributesContaining(Attributable attributable, Attribute attribute, String modifierName) {
 		AttributeInstance instance = attributable.getAttribute(attribute);
 		if (instance != null) {

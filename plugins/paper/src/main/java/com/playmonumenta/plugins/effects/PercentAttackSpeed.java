@@ -31,7 +31,7 @@ public class PercentAttackSpeed extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Attributable attributable) {
-			EntityUtils.addAttribute(attributable, Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 

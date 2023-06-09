@@ -42,7 +42,7 @@ public class PercentHealthBoost extends Effect {
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof LivingEntity le) {
 			double oldMaxHealth = EntityUtils.getMaxHealth(le);
-			EntityUtils.addAttribute(le, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.replaceAttribute(le, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 			le.setHealth(Math.min(le.getHealth() + oldMaxHealth * mAmount, EntityUtils.getMaxHealth(le)));
 		}
 	}

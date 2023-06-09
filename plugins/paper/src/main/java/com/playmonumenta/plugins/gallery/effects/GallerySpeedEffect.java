@@ -22,7 +22,7 @@ public class GallerySpeedEffect extends GalleryStackableEffect {
 		if (player == null) {
 			return;
 		}
-		EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		EntityUtils.replaceAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class GallerySpeedEffect extends GalleryStackableEffect {
 		Player player = galleryPlayer.getPlayer();
 		if (galleryPlayer.isOnline() && player != null) {
 			EntityUtils.removeAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, "GallerySpeedEffect");
-			EntityUtils.addAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.replaceAttribute(player, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier("GallerySpeedEffect", SPEED_EFFECT_PER_STACK * mStacks, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 }

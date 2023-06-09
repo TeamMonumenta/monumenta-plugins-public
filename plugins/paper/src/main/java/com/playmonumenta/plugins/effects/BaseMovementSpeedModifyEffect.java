@@ -36,7 +36,7 @@ public class BaseMovementSpeedModifyEffect extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Attributable attributable) {
-			EntityUtils.addAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(MODIFIER_NAME, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(MODIFIER_NAME, mAmount, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 

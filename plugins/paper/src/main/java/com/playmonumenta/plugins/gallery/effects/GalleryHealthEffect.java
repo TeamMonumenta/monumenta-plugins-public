@@ -22,7 +22,7 @@ public class GalleryHealthEffect extends GalleryStackableEffect {
 		if (player == null) {
 			return;
 		}
-		EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+		EntityUtils.replaceAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class GalleryHealthEffect extends GalleryStackableEffect {
 		Player player = galleryPlayer.getPlayer();
 		if (galleryPlayer.isOnline() && player != null) {
 			EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "GalleryHealthEffect");
-			EntityUtils.addAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+			EntityUtils.replaceAttribute(player, Attribute.GENERIC_MAX_HEALTH, new AttributeModifier("GalleryHealthEffect", mStacks * HEALTH_EFFECT_PER_STACK, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
 		}
 	}
 }

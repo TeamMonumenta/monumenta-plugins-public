@@ -41,7 +41,7 @@ public class PercentKnockbackResist extends Effect {
 	@Override
 	public void entityGainEffect(Entity entity) {
 		if (entity instanceof Attributable attributable) {
-			EntityUtils.addAttribute(attributable, Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.ADD_NUMBER));
+			EntityUtils.replaceAttribute(attributable, Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(mModifierName, mAmount, AttributeModifier.Operation.ADD_NUMBER));
 		}
 	}
 
