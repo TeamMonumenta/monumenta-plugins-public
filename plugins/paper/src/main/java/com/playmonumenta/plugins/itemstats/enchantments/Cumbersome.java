@@ -30,10 +30,7 @@ public class Cumbersome implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
-			return;
-		}
-		if (event.getType() == DamageType.MELEE && PlayerUtils.isCriticalAttack(player)) {
+		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(player)) {
 			event.setDamage(event.getDamage() / CRIT_BONUS);
 		}
 	}
