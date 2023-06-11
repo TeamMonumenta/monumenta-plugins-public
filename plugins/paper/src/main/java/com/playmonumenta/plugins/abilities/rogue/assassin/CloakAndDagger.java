@@ -38,6 +38,7 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 
 	public static final String CHARM_DAMAGE = "Cloak and Dagger Damage";
 	public static final String CHARM_STACKS = "Cloak and Dagger Max Stacks";
+	public static final String CHARM_STACKS_GAIN = "Cloak and Dagger Stacks Per Kill";
 	public static final String CHARM_STEALTH = "Cloak and Dagger Stealth Duration";
 
 	public static final AbilityInfo<CloakAndDagger> INFO =
@@ -124,10 +125,11 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 	@Override
 	public void triggerOnKill(LivingEntity mob) {
 		if (mCloak < mMaxStacks) {
+			int extraStacks = (int) CharmManager.getLevel(mPlayer, CHARM_STACKS_GAIN);
 			if (EntityUtils.isElite(mob) || EntityUtils.isBoss(mob)) {
-				mCloak = Math.min(mMaxStacks, mCloak + CLOAK_STACKS_ON_ELITE_KILL);
+				mCloak = Math.min(mMaxStacks, mCloak + CLOAK_STACKS_ON_ELITE_KILL + extraStacks);
 			} else {
-				mCloak++;
+				mCloak = Math.min(mMaxStacks, mCloak + 1 + extraStacks);
 			}
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
