@@ -36,6 +36,7 @@ public class SpellEarthshake extends Spell {
 		Material.BARRIER,
 		Material.SPAWNER,
 		Material.CHEST,
+		Material.TRAPPED_CHEST,
 		Material.END_PORTAL,
 		Material.END_PORTAL_FRAME,
 		Material.LIGHT
