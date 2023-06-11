@@ -146,8 +146,10 @@ public class TradeListener implements Listener {
 				// Check that the playerItem has the same base item as the trade's source:
 				// - same type (and for shulker boxes, ignore color)
 				// - same plain name (or both have no plain name)
+				// - same masterwork level
 				if (!(source.getType() == playerItem.getType() || (ItemUtils.isShulkerBox(source.getType()) && ItemUtils.isShulkerBox(playerItem.getType())))
-					    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))) {
+					    || !Objects.equals(ItemUtils.getPlainNameIfExists(source), ItemUtils.getPlainNameIfExists(playerItem))
+					    || !(ItemStatUtils.getMasterwork(source) == ItemStatUtils.getMasterwork(playerItem))) {
 					continue;
 				}
 				// if not a re-skin trade, do not allow moving varying cost infusions
