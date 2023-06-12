@@ -30,7 +30,9 @@ enum PSGUISecondaryStat {
 	INURE(2, Material.NETHERITE_SCRAP, ItemStatUtils.EnchantmentType.INURE, true, """
 		Gain (Level*20%) effective Armor
 		when taking the same type of mob damage consecutively
-		(Melee, Projectile, Blast, or Magic)."""),
+		(Melee, Projectile, Blast, or Magic). Breaking Inure
+		by taking a different type of damage will give half
+		the bonus for 1 hit."""),
 	STEADFAST(3, Material.LEAD, ItemStatUtils.EnchantmentType.STEADFAST, true, """
 		Scaling with percent health missing,
 		gain up to (Level*20%%) effective Armor
