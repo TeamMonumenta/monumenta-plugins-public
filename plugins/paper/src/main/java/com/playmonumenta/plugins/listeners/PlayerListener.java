@@ -807,13 +807,16 @@ public class PlayerListener implements Listener {
 
 		//Cleanse mobs around player in dungeon if running solo
 		if (Plugin.IS_PLAY_SERVER && ScoreboardUtils.getScoreboardValue("$IsDungeon", "const").orElse(0) == 1) {
-			if (PlayerUtils.otherPlayersInRange(event.getEntity(), 48, true).size() == 0) {
-				List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(event.getEntity().getLocation(), 20);
-				for (LivingEntity entity : nearbyEntities) {
-					if (entity.getRemoveWhenFarAway()) {
-						entity.remove();
+			if (PlayerUtils.otherPlayersInRange(player, 48, true).size() == 0) {
+				// Delay by a tick to allow the entity that killed the player (if any) to still be valid until all damage/death events resolve
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+					List<LivingEntity> nearbyEntities = EntityUtils.getNearbyMobs(player.getLocation(), 20);
+					for (LivingEntity entity : nearbyEntities) {
+						if (entity.getRemoveWhenFarAway()) {
+							entity.remove();
+						}
 					}
-				}
+				});
 			}
 		}
 
