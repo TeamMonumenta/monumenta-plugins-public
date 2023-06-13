@@ -351,10 +351,12 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		 * Passive starts here
 		 */
 
+		// Same dd instance in each spell list, so that it stays on the same 45-second cycle
+		SpellDimensionDoor dimensionDoor = new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange);
 		List<Spell> passiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
 			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-			new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			dimensionDoor,
 			new SpellPurgeNegatives(mBoss, 4 * 20),
 			new SpellShadowRealm(mStart.getLocation(), detectionRange),
 			new SpellEdgeKill(mBoss, mStart.getLocation()),
@@ -363,7 +365,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase2PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
 			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-			new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			dimensionDoor,
 			new SpellPurgeNegatives(mBoss, 3 * 20),
 			new SpellShadowRealm(mStart.getLocation(), detectionRange),
 			new SpellEdgeKill(mBoss, mStart.getLocation()),
@@ -373,7 +375,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		List<Spell> phase3PassiveSpells = Arrays.asList(
 			new SpellBossBlockBreak(mBoss, mStart.getLocation().getY(), 1, 3, 1, false, false),
 			new SpellMiasma(mBoss, mStart.getLocation(), mStart.getLocation().getY(), detectionRange),
-			new SpellDimensionDoor(mPlugin, mBoss, mStart.getLocation(), detectionRange),
+			dimensionDoor,
 			new SpellPurgeNegatives(mBoss, 2 * 20),
 			new SpellShadowRealm(mStart.getLocation(), detectionRange),
 			new SpellEdgeKill(mBoss, mStart.getLocation()),
