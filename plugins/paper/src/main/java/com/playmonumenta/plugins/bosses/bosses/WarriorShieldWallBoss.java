@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -69,6 +70,10 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
+				if (EntityUtils.isSilenced(mBoss) || EntityUtils.isStunned(mBoss)) {
+					return;
+				}
+
 				p.PARTICLE_CAST.spawn(mBoss, mBoss.getLocation());
 				p.SOUND_CAST.play(mBoss.getLocation());
 				new BukkitRunnable() {
