@@ -207,21 +207,22 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc)));
 
-
+		// Needed to prevent potential double instance on phase change
+		SpellKaulsJudgement singleKaulsJudgementInstance = new SpellKaulsJudgement(mBoss);
 
 		SpellManager phase2Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, false),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellRaiseJungle(mPlugin, mBoss, 10, detectionRange, 20 * 8, 20 * 10, mShrineMarker.getLocation().getY()),
 				new SpellArachnopocolypse(mPlugin, mBoss, detectionRange, mSpawnLoc),
-				new SpellKaulsJudgement(mBoss)));
+				singleKaulsJudgementInstance));
 
 		SpellManager phase3Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
 				new SpellEarthsWrath(mPlugin, mBoss, mShrineMarker.getLocation().getY()),
 				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
 				new SpellGroundSurge(mPlugin, mBoss, detectionRange),
-				new SpellKaulsJudgement(mBoss)));
+				singleKaulsJudgementInstance));
 
 		SpellManager phase4Spells = new SpellManager(
 			Arrays.asList(new SpellPutridPlague(mPlugin, mBoss, this, true),
