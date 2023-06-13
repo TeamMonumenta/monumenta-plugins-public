@@ -73,14 +73,14 @@ public class SpellFrostRift extends Spell {
 
 		List<Player> players = PlayerUtils.playersInRange(mStartLoc, FrostGiant.fighterRange, true);
 		List<Player> targets = new ArrayList<>();
-		List<Location> locs = new ArrayList<>();
+		List<Location> playerAttackLocs = new ArrayList<>();
 		if (players.size() >= 2) {
 			int cap = (int) Math.min(Math.ceil(players.size() / 2.0), 3);
 			for (int i = 0; i < cap; i++) {
 				Player player = players.get(FastUtils.RANDOM.nextInt(players.size()));
 				if (!targets.contains(player)) {
 					targets.add(player);
-					locs.add(player.getLocation());
+					playerAttackLocs.add(player.getLocation());
 				} else {
 					cap++;
 				}
@@ -88,7 +88,7 @@ public class SpellFrostRift extends Spell {
 		} else {
 			for (Player p : players) {
 				targets.add(p);
-				locs.add(p.getLocation());
+				playerAttackLocs.add(p.getLocation());
 			}
 		}
 		mBoss.setAI(false);
@@ -103,7 +103,7 @@ public class SpellFrostRift extends Spell {
 				mT += 2;
 				mPitch += 0.025f;
 
-				for (Location p : locs) {
+				for (Location p : playerAttackLocs) {
 					Vector line = LocationUtils.getDirectionTo(p, mLoc).setY(0);
 					double xloc = line.getX();
 					double yloc = line.getY();
@@ -120,8 +120,8 @@ public class SpellFrostRift extends Spell {
 				if (mT >= 20 * 2) {
 					this.cancel();
 
-					for (Location l : locs) {
-						createRift(l, players);
+					for (Location playerAttackLoc : playerAttackLocs) {
+						createRift(playerAttackLoc, mLoc, players);
 					}
 					mBoss.setAI(true);
 				}
@@ -130,13 +130,13 @@ public class SpellFrostRift extends Spell {
 
 	}
 
-	private void createRift(Location loc, List<Player> players) {
+	private void createRift(Location playerAttackLoc, Location initialBossLoc, List<Player> players) {
 		List<Location> locs = new ArrayList<>();
 
 		BukkitRunnable runnable = new BukkitRunnable() {
-			final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+			final Location mLoc = initialBossLoc.add(0, 0.5, 0);
 			final World mWorld = mLoc.getWorld();
-			final Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
+			final Vector mDir = LocationUtils.getDirectionTo(playerAttackLoc, mLoc).setY(0).normalize();
 			final BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 0.35, 0.85);
 			final Location mOgLoc = mLoc.clone();
 
