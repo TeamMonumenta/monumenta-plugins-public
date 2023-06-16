@@ -52,7 +52,13 @@ public class WorldNameReplacer extends PacketAdapter {
 
 		World world = NmsUtils.getVersionAdapter().getWorldByResourceKey(currentWorldKey);
 		String worldName = world == null ? null : world.getPersistentDataContainer().get(WORLD_NAME_KEY, PersistentDataType.STRING);
-		Object shardWorldNameKey = NmsUtils.getVersionAdapter().createDimensionTypeResourceKey("monumenta", worldName != null ? worldName : ServerProperties.getShardName());
+		if (worldName == null) {
+			worldName = ServerProperties.getShardName();
+		}
+		if (worldName.endsWith("plots") && worldName.length() > 5) { // ends with 'plots', but is not 'plots' itself
+			return;
+		}
+		Object shardWorldNameKey = NmsUtils.getVersionAdapter().createDimensionTypeResourceKey("monumenta", worldName);
 
 		worldNameMod.write(0, shardWorldNameKey);
 
