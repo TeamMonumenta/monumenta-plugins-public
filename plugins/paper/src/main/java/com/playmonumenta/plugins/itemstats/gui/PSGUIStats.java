@@ -134,14 +134,15 @@ class PSGUIStats {
 			       .orElse(0);
 	}
 
-	boolean hasMaxShatteredItemEquipped() {
-		for (PSGUIEquipment slot : PSGUIEquipment.values()) {
+	int getShatteredItemEquipped() {
+		int totalLevel = 0;
+		for (PSGUIEquipment slot: PSGUIEquipment.values()) {
 			ItemStack item = getItem(slot);
-			if (item != null && Shattered.isMaxShatter(item)) {
-				return true;
+			if (item != null) {
+				totalLevel += Shattered.getShatterLevel(item);
 			}
 		}
-		return false;
+		return totalLevel;
 	}
 
 	double getDamageDealtMultiplier() {
@@ -149,7 +150,7 @@ class PSGUIStats {
 		double result = 1.0;
 
 		if (getInfusion(ItemStatUtils.InfusionType.SHATTERED) > 0) {
-			result *= Shattered.getDamageDealtMultiplier(hasMaxShatteredItemEquipped());
+			result *= (1 - Shattered.getMultiplier(getShatteredItemEquipped()));
 		}
 
 		result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER[getRegionScaling(mPlayer, true)];
@@ -200,7 +201,7 @@ class PSGUIStats {
 		}
 
 		if (getInfusion(ItemStatUtils.InfusionType.SHATTERED) > 0) {
-			damageMultiplier *= Shattered.getDamageTakenMultiplier(hasMaxShatteredItemEquipped());
+			damageMultiplier *= (1 + Shattered.getMultiplier(getShatteredItemEquipped()));
 		}
 
 		damageMultiplier *= Tenacity.getDamageTakenMultiplier(getInfusion(ItemStatUtils.InfusionType.TENACITY));

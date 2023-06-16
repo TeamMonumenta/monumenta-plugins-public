@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import java.time.Duration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -103,19 +104,18 @@ public class RespawnStasis extends Stasis {
 			// For the first 10 seconds, show hint on how to repair gear if shattered
 			if (mShatter == 1) {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
-					                     .append(Component.text("a lot more damage", NamedTextColor.RED))
-					                     .append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
-					                     .append(Component.text("collecting your grave", NamedTextColor.AQUA))
-					                     .append(Component.text("!", NamedTextColor.GOLD)));
-				mRemoveActionbar = false;
+					.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatter)) + "% more damage", NamedTextColor.RED))
+					.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
+					.append(Component.text("collecting your grave", NamedTextColor.AQUA))
+					.append(Component.text("!", NamedTextColor.GOLD)));
 			} else {
 				player.sendActionBar(Component.text("You will take ", NamedTextColor.GOLD)
-					                     .append(Component.text("massively more damage", NamedTextColor.RED).decorate(TextDecoration.BOLD))
-					                     .append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
-					                     .append(Component.text("using anvils on it", NamedTextColor.AQUA))
-					                     .append(Component.text("!", NamedTextColor.GOLD)));
-				mRemoveActionbar = false;
+					.append(Component.text(StringUtils.multiplierToPercentage(Shattered.getMultiplier(mShatter)) + "% more damage", NamedTextColor.RED))
+					.append(Component.text(" until you repair your gear by ", NamedTextColor.GOLD))
+					.append(Component.text("using anvils on it", NamedTextColor.AQUA))
+					.append(Component.text("!", NamedTextColor.GOLD)));
 			}
+			mRemoveActionbar = false;
 		} else if (getDuration() >= DURATION / 2) {
 			// After 10 seconds, tell the player that they can click to respawn (or after the minimal duration if not showing the shatter message)
 			if (getDuration() <= DURATION - MINIMUM_DURATION) {

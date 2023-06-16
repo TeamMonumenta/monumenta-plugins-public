@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -9,14 +10,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.Nullable;
 
 public class Shattered implements Infusion {
 
@@ -30,13 +28,12 @@ public class Shattered implements Infusion {
 
 	public static final int MINING_FATIGUE_AMPLIFIER = 1;
 
-	private static final double LIGHT_DAMAGE_DEALT_MULTIPLIER = -0.3;
-	private static final double HEAVY_DAMAGE_DEALT_MULTIPLIER = -0.6;
-
-	private static final double LIGHT_DAMAGE_TAKEN_MULTIPLIER = 0.3;
-	private static final double HEAVY_DAMAGE_TAKEN_MULTIPLIER = 0.6;
+	private static final double MULTIPLIER = 0.04;
 
 	private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+	public static final String DAMAGE_DEALT_EFFECT = "Shatter-DD";
+	public static final String DAMAGE_TAKEN_EFFECT = "Shatter-DT";
 
 	private static final HashSet<UUID> mShatteredDebuff = new HashSet<>();
 
@@ -55,41 +52,27 @@ public class Shattered implements Infusion {
 		return 4998; // just before region scaling
 	}
 
-	public static double getDamageDealtMultiplier(boolean maxShatter) {
-		if (maxShatter) {
-			return 1 + HEAVY_DAMAGE_DEALT_MULTIPLIER;
+	public static double getMultiplier(int level) {
+		return (MULTIPLIER * level);
+	}
+
+	public static void updateEffects(Plugin plugin, Player player, int level) {
+		if (level == 0) {
+			plugin.mEffectManager.clearEffects(player, DAMAGE_DEALT_EFFECT);
+			plugin.mEffectManager.clearEffects(player, DAMAGE_TAKEN_EFFECT);
 		} else {
-			return 1 + LIGHT_DAMAGE_DEALT_MULTIPLIER;
+			plugin.mEffectManager.addEffect(player, DAMAGE_DEALT_EFFECT, new PercentDamageDealt(40, -getMultiplier(level)));
+			plugin.mEffectManager.addEffect(player, DAMAGE_TAKEN_EFFECT, new PercentDamageReceived(40, getMultiplier(level)));
 		}
-	}
-
-	public static double getDamageTakenMultiplier(boolean maxShatter) {
-		if (maxShatter) {
-			return 1 + HEAVY_DAMAGE_TAKEN_MULTIPLIER;
-		} else {
-			return 1 + LIGHT_DAMAGE_TAKEN_MULTIPLIER;
-		}
-	}
-
-	@Override
-	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
-			return;
-		}
-		event.setDamage(event.getDamage() * getDamageDealtMultiplier(hasMaxShatteredItemEquipped(player)));
-	}
-
-	@Override
-	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
-			return;
-		}
-		event.setDamage(event.getDamage() * getDamageTakenMultiplier(hasMaxShatteredItemEquipped(player)));
 	}
 
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
-		if (plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED) >= MAX_LEVEL) {
+		int shatterLevel = (int) plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED);
+		if (shatterLevel == 0) {
+			updateEffects(plugin, player, 0);
+		}
+		if (shatterLevel >= MAX_LEVEL) {
 			// Need to delay this code as it checks equipped items which may not yet have changed, as this method is called from within events
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				if (hasMaxShatteredItemEquipped(player)) {
@@ -109,7 +92,14 @@ public class Shattered implements Infusion {
 		if (oneHz) {
 			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
 				new PotionEffect(PotionEffectType.BAD_OMEN, 40, 0, false, false, true));
+
+			int shatterLevel = getShatteredLevelsEquipped(player);
+			updateEffects(plugin, player, shatterLevel);
 		}
+	}
+
+	public static int getShatteredLevelsEquipped(Player player) {
+		return (int) Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED);
 	}
 
 	public static boolean hasMaxShatteredItemEquipped(Player player) {
@@ -128,6 +118,10 @@ public class Shattered implements Infusion {
 		return Arrays.stream(EquipmentSlot.values())
 			       .mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), ItemStatUtils.InfusionType.SHATTERED))
 			       .max().orElse(0);
+	}
+
+	public static int getShatterLevel(ItemStack item) {
+		return ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED);
 	}
 
 	public static boolean isMaxShatter(ItemStack item) {
