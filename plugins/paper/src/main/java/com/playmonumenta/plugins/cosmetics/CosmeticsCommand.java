@@ -6,8 +6,10 @@ import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.cosmetics.gui.CosmeticsGUI;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
+import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
@@ -30,27 +32,36 @@ public class CosmeticsCommand extends GenericCommand {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.cosmetics");
 		String[] types = Arrays.stream(CosmeticType.values()).map(CosmeticType::getType).toArray(String[]::new);
 
-		GreedyStringArgument allCosmeticsArgument = (GreedyStringArgument) new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(info -> {
-			CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
-			if (type == CosmeticType.ELITE_FINISHER) {
-				return EliteFinishers.getNames();
-			} else if (type == CosmeticType.PLOT_BORDER) {
-				return PlotBorderCustomInventory.getCosmeticNames();
-			} else if (type == CosmeticType.VANITY) {
-				return Arrays.stream(Material.values()).filter(mat -> !mat.isLegacy()).map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":").toArray(String[]::new);
-			} else if (type == CosmeticType.COSMETIC_SKILL) {
-				return CosmeticSkills.getNames();
-			} else {
-				return new String[0];
-			}
-		}));
+		Argument<?> allCosmeticsArgument = new GreedyStringArgument("name")
+			.replaceSuggestions(ArgumentSuggestions.strings(info -> {
+				CosmeticType type = CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT));
+				if (type == CosmeticType.ELITE_FINISHER) {
+					return EliteFinishers.getNames();
+				} else if (type == CosmeticType.PLOT_BORDER) {
+					return PlotBorderCustomInventory.getCosmeticNames();
+				} else if (type == CosmeticType.VANITY) {
+					return Arrays.stream(Material.values())
+						.filter(mat -> !mat.isLegacy())
+						.map(mat -> mat.name().toLowerCase(Locale.ROOT) + ":")
+						.map(CommandUtils::quoteIfNeeded)
+						.toArray(String[]::new);
+				} else if (type == CosmeticType.COSMETIC_SKILL) {
+					return CosmeticSkills.getNames();
+				} else {
+					return new String[0];
+				}
+			}));
 
 		// requires the first argument to be the player, and the second to be the cosmetic type
-		GreedyStringArgument ownedCosmeticsArgument = (GreedyStringArgument) new GreedyStringArgument("name").replaceSuggestions(ArgumentSuggestions.strings(
-			info -> CosmeticsManager.getInstance().getCosmeticsOfTypeAlphabetical((Player) info.previousArgs()[0], CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
-				        .map(Cosmetic::getName)
-				        .filter(n -> n.startsWith(info.currentArg()))
-				        .toArray(String[]::new)));
+		Argument<?> ownedCosmeticsArgument = new GreedyStringArgument("name")
+			.replaceSuggestions(ArgumentSuggestions.strings(info ->
+				CosmeticsManager.getInstance()
+					.getCosmeticsOfTypeAlphabetical((Player) info.previousArgs()[0],
+						CosmeticType.valueOf(((String) info.previousArgs()[1]).toUpperCase(Locale.ROOT))).stream()
+					.map(Cosmetic::getName)
+					.filter(n -> n.startsWith(info.currentArg()))
+					.map(CommandUtils::quoteIfNeeded)
+					.toArray(String[]::new)));
 
 		// ADD COSMETIC COMMAND
 		new CommandAPICommand("cosmetics")

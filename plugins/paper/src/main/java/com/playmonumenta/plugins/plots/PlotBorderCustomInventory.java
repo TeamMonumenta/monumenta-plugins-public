@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.plots;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import com.playmonumenta.scriptedquests.utils.ScoreboardUtils;
@@ -60,7 +61,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			mLeftClick = leftClick;
 		}
 
-		public TeleportEntry(int page, int slot, String name, String lore, Material type, String cosmetic, String leftClick) {
+		public TeleportEntry(int page, int slot, String name, String lore, Material type, @Nullable String cosmetic, String leftClick) {
 			mPage = page;
 			mSlot = slot;
 			mName = name;
@@ -105,7 +106,7 @@ public class PlotBorderCustomInventory extends CustomInventory {
 		BORDER_ITEMS.add(new TeleportEntry(2, 22, "SKT Teal Arena", "The silver knights keep watch over this plot.", Material.IRON_SWORD, "SKT Teal Arena", "pass/skttealarena"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 23, "Monumenta Spawn Box", "Pulled directly from the new spawn location, with its scenic views and stylized signage.", Material.OAK_SIGN, "Monumenta Spawn Box", "pass/spawnbox"));
 		BORDER_ITEMS.add(new TeleportEntry(2, 24, "Sierhaven", "Located right in the town square of Sierhaven.", Material.BLUE_CONCRETE, "Sierhaven", "pass/sierhaven"));
-		BORDER_ITEMS.add(new TeleportEntry(2, 31, "Ta'Ksaav", "The mystical village only seen in dreams.", Material.WHEAT, "Taksaav", "pass/taksaav"));
+		BORDER_ITEMS.add(new TeleportEntry(2, 31, "Ta'Ksaav", "The mystical village only seen in dreams.", Material.WHEAT, "taksaav", "pass/taksaav"));
 
 
 		BORDER_ITEMS.add(new TeleportEntry(3, 18, "Halls of Wind and Blood", "A plot right in the middle of the main room.", Material.WHITE_WOOL, "White", 1, "dungeons/white"));
@@ -254,7 +255,11 @@ public class PlotBorderCustomInventory extends CustomInventory {
 	}
 
 	public static String[] getCosmeticNames() {
-		return BORDER_ITEMS.stream().map(item -> item.mCosmeticString).filter(Objects::nonNull).toArray(String[]::new);
+		return BORDER_ITEMS.stream()
+			.map(item -> item.mCosmeticString)
+			.map(CommandUtils::quoteIfNeeded)
+			.filter(Objects::nonNull)
+			.toArray(String[]::new);
 	}
 
 }

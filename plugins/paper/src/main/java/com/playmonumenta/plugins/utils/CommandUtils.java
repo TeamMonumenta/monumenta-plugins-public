@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
+import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class CommandUtils {
+
+	private static final Pattern RE_ALLOWED_WITHOUT_QUOTES = Pattern.compile("[0-9A-Za-z_.+-]+");
 
 	public static CommandSender getCallee(CommandSender sender) {
 		if (sender instanceof ProxiedCommandSender) {
@@ -104,4 +107,23 @@ public class CommandUtils {
 		}
 		throw CommandAPI.failWithString("This command must be run by/as a player");
 	}
+
+	public static boolean requiresQuotes(String arg) {
+		if (arg == null) {
+			return true;
+		}
+		return !RE_ALLOWED_WITHOUT_QUOTES.matcher(arg).matches();
+	}
+
+	public static @Nullable String quoteIfNeeded(@Nullable String arg) {
+		if (arg == null) {
+			return null;
+		}
+		if (requiresQuotes(arg)) {
+			return "\"" + arg.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+		} else {
+			return arg;
+		}
+	}
+
 }

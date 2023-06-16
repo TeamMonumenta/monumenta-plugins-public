@@ -66,6 +66,7 @@ import com.playmonumenta.plugins.cosmetics.skills.warrior.ColossalBruteCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloryExecutionCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.PrestigiousSlamCS;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.PrestigiousShieldCS;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.bukkit.Material;
@@ -172,8 +173,8 @@ public class CosmeticSkills {
 	private static final ImmutableList<PrestigeCS> PRESTIGE_CS;
 
 	static {
-		ImmutableList.Builder<DepthsCS> depthsBuilder = ImmutableList.<DepthsCS>builder();
-		ImmutableList.Builder<GalleryCS> galleryBuilder = ImmutableList.<GalleryCS>builder();
+		ImmutableList.Builder<DepthsCS> depthsBuilder = ImmutableList.builder();
+		ImmutableList.Builder<GalleryCS> galleryBuilder = ImmutableList.builder();
 		for (Supplier<CosmeticSkill> supplier : COSMETIC_SKILLS_BY_NAME.values()) {
 			CosmeticSkill cs = supplier.get();
 			if (cs instanceof DepthsCS) {
@@ -230,7 +231,7 @@ public class CosmeticSkills {
 	}
 
 	public static String[] getNames() {
-		return COSMETIC_SKILLS_BY_NAME.keySet().toArray(new String[0]);
+		return COSMETIC_SKILLS_BY_NAME.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
 	}
 
 	public static ImmutableList<DepthsCS> getDepthsSkins() {
@@ -238,7 +239,7 @@ public class CosmeticSkills {
 	}
 
 	public static ImmutableList<String> getDepthsNames() {
-		ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
+		ImmutableList.Builder<String> builder = ImmutableList.builder();
 		for (DepthsCS cs : getDepthsSkins()) {
 			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
@@ -262,7 +263,7 @@ public class CosmeticSkills {
 	}
 
 	public static ImmutableList<String> getGalleryNames() {
-		ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
+		ImmutableList.Builder<String> builder = ImmutableList.builder();
 		for (GalleryCS cs : getGallerySkins()) {
 			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
@@ -274,7 +275,7 @@ public class CosmeticSkills {
 	}
 
 	public static ImmutableList<String> getPrestigeNames() {
-		ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
+		ImmutableList.Builder<String> builder = ImmutableList.builder();
 		for (PrestigeCS cs : getPrestigeSkins()) {
 			builder.add(Objects.requireNonNull(((CosmeticSkill) cs).getName()));
 		}
