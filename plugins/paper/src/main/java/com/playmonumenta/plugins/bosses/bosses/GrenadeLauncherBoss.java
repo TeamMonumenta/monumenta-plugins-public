@@ -95,6 +95,9 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "Sound played at the ring center each second ")
 		public SoundsList SOUND_LINGERING = SoundsList.fromString("[(ENTITY_BLAZE_BURN,4,1.5)]");
 
+		@BossParam(help = "Name of the mob spawned when the grenade explodes")
+		public String SPAWNEDMOB = "";
+
 	}
 
 	public GrenadeLauncherBoss(Plugin plugin, LivingEntity boss) {
@@ -172,7 +175,8 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 				}
 
 				p.LINGERING_EFFECTS.apply(target, boss);
-			}
+			},
+			p.SPAWNEDMOB
 		);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 

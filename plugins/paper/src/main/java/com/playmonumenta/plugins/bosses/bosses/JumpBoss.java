@@ -55,6 +55,7 @@ public class JumpBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_LAND = ParticlesList.fromString("[(CLOUD,60,0,0,0,0.2),(EXPLOSION_NORMAL,20,0,0,0,0.3)]");
 		@BossParam(help = "Landing Particles on the ground")
 		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
+		public boolean PREFER_TARGET = true;
 	}
 
 	public JumpBoss(Plugin plugin, LivingEntity boss) {
@@ -81,7 +82,7 @@ public class JumpBoss extends BossAbilityGroup {
 
 			p.SOUND_LANDING.play(loc);
 			p.PARTICLE_LAND.spawn(boss, loc);
-		});
+		}, p.PREFER_TARGET);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

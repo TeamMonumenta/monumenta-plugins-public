@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -39,6 +41,41 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final HitAction mLingeringHit;
 	private final LingeringRingAesthetics mLingeringRingAesthetics;
 	private final LingeringCenterAesthetics mLingeringCenterAesthetics;
+
+	private final String mSummonName;
+
+	public SpellBaseGrenadeLauncher(
+		Plugin plugin,
+		LivingEntity boss,
+		Material grenadeMaterial,
+		Boolean explodeOnTouch,
+		int explodeDelay,
+		int lobs,
+		int lobsDelay,
+		int duration,
+		int cooldown,
+
+		//lingering stuff
+		int lingeringDuration,
+		double lingeringRadius,
+
+		GetSpellTargets<LivingEntity> grenadeTargets,
+		GetGrenadeTarget<LivingEntity> explosionTargets,
+		InitAesthetics aestheticsBoss,
+		GrenadeAesthetics grenadeAesthetics,
+		GrenadeAesthetics explosionAesthetics,
+		HitAction hitAction,
+
+		//lingering stuff
+		LingeringRingAesthetics ringAesthetics,
+		LingeringCenterAesthetics cencterAesthetics,
+		HitAction lingeringHitAction
+	) {
+		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
+			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, "");
+	}
+
 	/**
 	 * mPlugin
 	 * mBoss
@@ -79,6 +116,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	 * @param ringAesthetics      aesthetics for the ring lingering
 	 * @param cencterAesthetics   aesthetics for the cencter of the ring lingering
 	 * @param lingeringHitAction  action called for each livingentity that explosionTargets return if inside of the range lingeringRadius
+	 * @param spawnedmob          the mob to be spawned when the grenade explodes
 	 */
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -105,7 +143,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		//lingering stuff
 		LingeringRingAesthetics ringAesthetics,
 		LingeringCenterAesthetics cencterAesthetics,
-		HitAction lingeringHitAction
+		HitAction lingeringHitAction,
+
+		String spawnedmob
 	) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -130,7 +170,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		mLingeringRingAesthetics = ringAesthetics;
 		mLingeringHit = lingeringHitAction;
 
-
+		mSummonName = spawnedmob;
 	}
 
 
@@ -222,6 +262,10 @@ public class SpellBaseGrenadeLauncher extends Spell {
 								for (LivingEntity target : targets) {
 									mHitAction.launch(mBoss, target, blockLocation);
 								}
+								Entity spawn = LibraryOfSoulsIntegration.summon(blockLocation, mSummonName);
+								if (spawn != null) {
+									summonPlugins(spawn);
+								}
 
 								this.cancel();
 								return;
@@ -241,6 +285,10 @@ public class SpellBaseGrenadeLauncher extends Spell {
 							for (LivingEntity target : targets) {
 								mHitAction.launch(mBoss, target, blockLocation);
 							}
+							Entity spawn = LibraryOfSoulsIntegration.summon(blockLocation, mSummonName);
+							if (spawn != null) {
+								summonPlugins(spawn);
+							}
 
 							this.cancel();
 							return;
@@ -255,6 +303,11 @@ public class SpellBaseGrenadeLauncher extends Spell {
 						for (LivingEntity target : targets) {
 							mHitAction.launch(mBoss, target, blockLocation);
 						}
+						Entity entity = LibraryOfSoulsIntegration.summon(blockLocation, mSummonName);
+						if (entity != null) {
+							summonPlugins(entity);
+						}
+
 						this.cancel();
 						return;
 					}
@@ -370,5 +423,9 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	@FunctionalInterface
 	public interface LingeringCenterAesthetics {
 		void launch(Location loc, int ticks);
+	}
+
+	public void summonPlugins(Entity summon) {
+
 	}
 }

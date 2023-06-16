@@ -77,7 +77,15 @@ public class SpellBaseLeapAttack extends Spell {
 	private final HitAction mHitAction;
 	private final @Nullable JumpVelocityModifier mVelocityModifier;
 	private final @Nullable MidLeapTickAction mMidLeapTick;
+	private final boolean mPreferTarget;
 
+	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
+							   double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
+							   AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
+							   @Nullable MidLeapTickAction midLeapTick) {
+		this(plugin, boss, range, minRange, runDistance, cooldown, velocityMultiplier, initiateAesthetic, leapAesthetic,
+			leapingAesthetic, hitAction, velocityModifier, midLeapTick, false);
+	}
 	/**
 	 * @param plugin             Plugin
 	 * @param boss               Boss
@@ -92,11 +100,12 @@ public class SpellBaseLeapAttack extends Spell {
 	 * @param hitAction          Called when the boss intersects a player or lands
 	 * @param velocityModifier   Called just before the boss's velocity is set to leap them towards the player
 	 * @param midLeapTick        Called whilet he boss is in mid air heading towards a target player
+	 * @param preferTarget       Leap will target the mob's target instead of a random player
 	 */
 	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
 	                           double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
 	                           AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
-	                           @Nullable MidLeapTickAction midLeapTick) {
+	                           @Nullable MidLeapTickAction midLeapTick, boolean preferTarget) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -111,6 +120,7 @@ public class SpellBaseLeapAttack extends Spell {
 		mHitAction = hitAction;
 		mVelocityModifier = velocityModifier;
 		mMidLeapTick = midLeapTick;
+		mPreferTarget = preferTarget;
 	}
 
 	@Override
@@ -132,6 +142,12 @@ public class SpellBaseLeapAttack extends Spell {
 					break;
 				}
 			}
+		}
+
+		LivingEntity target = ((Mob) mBoss).getTarget();
+		if (mPreferTarget && target instanceof Player) {
+			locTarget = target.getLocation();
+			targetPlayer = (Player) target;
 		}
 
 		if (locTarget == null || targetPlayer == null || EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {

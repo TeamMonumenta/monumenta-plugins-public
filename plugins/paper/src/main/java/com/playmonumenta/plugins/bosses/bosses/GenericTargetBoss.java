@@ -21,6 +21,8 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setOptional(false);
+		public boolean TARGET_EVERY_TICK = false;
+		public int DELAY = 10;
 	}
 
 	private @Nullable LivingEntity mLastTarget = null;
@@ -56,7 +58,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 					}
 				}
 
-				if (mLastTarget == null) {
+				if (mLastTarget == null || param.TARGET_EVERY_TICK) {
 					List<? extends LivingEntity> targets = param.TARGETS.getTargetsList(mob);
 					if (targets.size() > 0) {
 						mob.setTarget(targets.get(0));
@@ -77,7 +79,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 		};
 
-		super.constructBoss(SpellManager.EMPTY, List.of(targetSpell), (int) (param.TARGETS.getRange() * 1.5), null, 10);
+		super.constructBoss(SpellManager.EMPTY, List.of(targetSpell), (int) (param.TARGETS.getRange() * 1.5), null, param.DELAY);
 	}
 
 	public void setTarget(LivingEntity target) {
