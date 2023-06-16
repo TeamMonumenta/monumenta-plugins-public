@@ -51,7 +51,7 @@ public class Scout extends PlayerClass {
 		mSpecOne.mSpecialization = RANGER_SPEC_ID;
 		mSpecOne.mSpecName = "Ranger";
 		mSpecOne.mDisplayItem = Material.LARGE_FERN;
-		mSpecOne.mDescription = "Rangers are agile masters of archery and that have unparalleled mastery of movement.";
+		mSpecOne.mDescription = "Rangers are agile experts of exploration that have unparalleled mastery of movement.";
 
 		mSpecTwo.mAbilities.add(PinningShot.INFO);
 		mSpecTwo.mAbilities.add(SplitArrow.INFO);
@@ -60,7 +60,7 @@ public class Scout extends PlayerClass {
 		mSpecTwo.mSpecialization = HUNTER_SPEC_ID;
 		mSpecTwo.mSpecName = "Hunter";
 		mSpecTwo.mDisplayItem = Material.LEATHER;
-		mSpecTwo.mDescription = "Hunters are agile masters of exploration that have dedicated their lives to archery.";
+		mSpecTwo.mDescription = "Hunters are precise masters of archery that have dedicated themselves to projectile weaponry.";
 
 		mTriggerOrder = ImmutableList.of(
 			EagleEye.INFO,
