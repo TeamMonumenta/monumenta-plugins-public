@@ -582,10 +582,10 @@ public class ItemStatUtils {
 		UNBREAKABLE(null, "Unbreakable", false, false, false, false),
 		MENDING(Enchantment.MENDING, "Mending", false, false, false, false),
 		// Cosmetic Item Enchants
-		BAAING(new Baaing(), false, false, true, false),
-		CLUCKING(new Clucking(), false, false, true, false),
+		BAAING(new Baaing(), false, true, true, false),
+		CLUCKING(new Clucking(), false, true, true, false),
 		DIVINE_AURA(new DivineAura(), false, false, false, false),
-		OINKING(new Oinking(), false, false, true, false),
+		OINKING(new Oinking(), false, true, true, false),
 		MATERIAL(new MaterialEnch(), false, false, false, false),
 		// Item Tags
 		MAGIC_WAND(new MagicWandEnch(), false, false, false, false),
@@ -659,7 +659,7 @@ public class ItemStatUtils {
 
 		public boolean isItemTypeEnchantment() {
 			return this == MAGIC_WAND
-				       || this == ALCHEMICAL_ALEMBIC;
+				|| this == ALCHEMICAL_ALEMBIC;
 		}
 
 		public boolean isRegionScaled() {
@@ -668,12 +668,12 @@ public class ItemStatUtils {
 
 		public boolean isHidden() {
 			return this == MAINHAND_OFFHAND_DISABLE
-				       || this == OFFHAND_MAINHAND_DISABLE
-				       || this == HIDE_ATTRIBUTES
-				       || this == HIDE_ENCHANTS
-				       || this == HIDE_INFO
-				       || this == NO_GLINT
-				       || this == DELETE_ON_SHATTER;
+				|| this == OFFHAND_MAINHAND_DISABLE
+				|| this == HIDE_ATTRIBUTES
+				|| this == HIDE_ENCHANTS
+				|| this == HIDE_INFO
+				|| this == NO_GLINT
+				|| this == DELETE_ON_SHATTER;
 		}
 
 		public Component getDisplay(int level) {
@@ -1957,7 +1957,7 @@ public class ItemStatUtils {
 		}
 
 		attributes.removeIf((attribute) ->
-			                    attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
+			attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
 
 		item.setItemMeta(nbt.getItem().getItemMeta());
 
@@ -2167,8 +2167,8 @@ public class ItemStatUtils {
 
 	public static boolean isUpgradedLimeTesseract(@Nullable ItemStack item) {
 		return item != null
-			       && item.getType() == Material.LIME_STAINED_GLASS
-			       && "Tesseract of Knowledge (u)".equals(ItemUtils.getPlainNameIfExists(item));
+			&& item.getType() == Material.LIME_STAINED_GLASS
+			&& "Tesseract of Knowledge (u)".equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
 	public static int getCharges(@Nullable ItemStack item) {
@@ -2436,7 +2436,7 @@ public class ItemStatUtils {
 
 		NBTCompoundList attributes = getAttributes(nbt);
 		if (attributes != null
-			    && getEnchantmentLevel(item, EnchantmentType.HIDE_ATTRIBUTES) == 0) {
+			&& getEnchantmentLevel(item, EnchantmentType.HIDE_ATTRIBUTES) == 0) {
 			EnumMap<Slot, EnumMap<AttributeType, List<NBTListCompound>>> attributesBySlots = new EnumMap<>(Slot.class);
 			for (NBTListCompound attribute : attributes) {
 				Slot slot = Slot.getSlot(attribute.getString(Slot.KEY));
@@ -2464,7 +2464,7 @@ public class ItemStatUtils {
 							for (NBTListCompound attribute : attributesByType) {
 								Operation operation = Operation.getOperation(attribute.getString(Operation.KEY));
 								if (operation == null
-									    || (operation != Operation.ADD && attributeType != AttributeType.PROJECTILE_SPEED)) {
+									|| (operation != Operation.ADD && attributeType != AttributeType.PROJECTILE_SPEED)) {
 									continue;
 								}
 								lore.add(AttributeType.getDisplay(attributeType, attribute.getDouble(AMOUNT_KEY), slot, operation));

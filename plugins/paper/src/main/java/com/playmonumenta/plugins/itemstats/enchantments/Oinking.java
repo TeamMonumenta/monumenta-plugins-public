@@ -34,7 +34,7 @@ public class Oinking implements Enchantment {
 
 		if (oneHz && mRun) {
 			mRun = false;
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 		} else if (oneHz) {
 			mRun = true;
 		}
@@ -52,7 +52,7 @@ public class Oinking implements Enchantment {
 					return;
 				}
 
-				item.getWorld().playSound(item.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
+				item.getWorld().playSound(item.getLocation(), Sound.ENTITY_PIG_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 
 				// Very infrequently check if the item is still actually there
 				mTicks++;

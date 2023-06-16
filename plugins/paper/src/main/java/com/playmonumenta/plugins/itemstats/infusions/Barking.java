@@ -33,7 +33,7 @@ public class Barking implements Infusion {
 		if (value == 1 && plugin.mItemStatManager.getInfusionLevel(player, InfusionType.DEBARKING) == 0) {
 			if (listOfStrippedWood.contains(event.getBlock().getType())) {
 				if (FastUtils.RANDOM.nextInt(5) == 0) {
-					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
+					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 				}
 			}
 		}
@@ -48,7 +48,7 @@ public class Barking implements Infusion {
 
 			if (oneHz && mRun) {
 				mRun = false;
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.HOSTILE, 1.0f, 0.8f);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WOLF_AMBIENT, SoundCategory.PLAYERS, 1.0f, 0.8f);
 			} else if (oneHz) {
 				mRun = true;
 			}
