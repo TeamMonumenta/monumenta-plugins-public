@@ -349,7 +349,7 @@ public class PlayerTitleManager {
 	private void sendPacketNoFilters(Player receiver, PacketHandle packet) {
 		try {
 			mProtocolManager.sendServerPacket(receiver, PacketContainer.fromPacket(packet.getRaw()), false);
-		} catch (InvocationTargetException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

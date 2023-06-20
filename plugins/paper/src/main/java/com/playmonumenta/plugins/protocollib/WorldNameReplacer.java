@@ -4,7 +4,6 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.injector.server.TemporaryPlayer;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.Converters;
 import com.playmonumenta.plugins.Plugin;
@@ -32,8 +31,7 @@ public class WorldNameReplacer extends PacketAdapter {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void onPacketSending(PacketEvent event) {
 
-		if (event.getPlayer() instanceof TemporaryPlayer
-			    || !ScoreboardUtils.checkTag(event.getPlayer(), WorldNameCommand.TAG)
+		if (!ScoreboardUtils.checkTag(event.getPlayer(), WorldNameCommand.TAG)
 			    || !event.getPlayer().hasPermission(WorldNameCommand.PERMISSION)) {
 			return;
 		}

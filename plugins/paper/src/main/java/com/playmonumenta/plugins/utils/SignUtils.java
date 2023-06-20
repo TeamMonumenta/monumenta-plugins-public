@@ -231,7 +231,7 @@ public final class SignUtils {
 			try {
 				ProtocolLibrary.getProtocolManager().sendServerPacket(player, signData);
 				ProtocolLibrary.getProtocolManager().sendServerPacket(player, openSign);
-			} catch (InvocationTargetException exception) {
+			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
 			mInputs.put(player, this);

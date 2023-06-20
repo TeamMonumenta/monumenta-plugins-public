@@ -49,7 +49,7 @@ dependencies {
     compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.18.2-v2")
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.10.0")
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     compileOnly("io.prometheus:simpleclient:0.11.0")
     errorprone("com.google.errorprone:error_prone_core:2.10.0")
     errorprone("com.uber.nullaway:nullaway:0.9.5")
