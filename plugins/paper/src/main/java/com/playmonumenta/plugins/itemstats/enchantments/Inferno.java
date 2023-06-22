@@ -4,12 +4,14 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.InfernoDamage;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Inferno implements Enchantment {
 
@@ -32,8 +34,8 @@ public class Inferno implements Enchantment {
 	}
 
 	//Called in EntityUtils.applyFire()
-	public static void apply(Plugin plugin, Player player, int level, LivingEntity enemy, int duration) {
-		plugin.mEffectManager.addEffect(enemy, INFERNO_EFFECT_NAME, new InfernoDamage(duration, level, player));
+	public static void apply(Plugin plugin, Player player, @Nullable PlayerItemStats playerItemStats, int level, LivingEntity enemy, int duration) {
+		plugin.mEffectManager.addEffect(enemy, INFERNO_EFFECT_NAME, new InfernoDamage(duration, level, player, playerItemStats));
 	}
 
 	public static boolean hasInferno(Plugin plugin, LivingEntity mob) {

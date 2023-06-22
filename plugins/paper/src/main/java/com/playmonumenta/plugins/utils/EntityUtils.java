@@ -1044,7 +1044,7 @@ public class EntityUtils {
 
 		int inferno = plugin.mItemStatManager.getEnchantmentLevel(playerItemStats, EnchantmentType.INFERNO);
 		if (inferno > 0) {
-			Inferno.apply(plugin, player, inferno, target, fireTicks);
+			Inferno.apply(plugin, player, playerItemStats, inferno, target, fireTicks);
 		}
 
 		setFireTicksIfLower(fireTicks, target);

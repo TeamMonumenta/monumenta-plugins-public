@@ -3,7 +3,9 @@ package com.playmonumenta.plugins.effects;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -20,11 +22,17 @@ public class InfernoDamage extends Effect {
 
 	private final int mLevel;
 	private final @Nullable Player mPlayer;
+	private final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 
-	public InfernoDamage(int duration, int level, @Nullable Player player) {
+	public InfernoDamage(int duration, int level, @Nullable Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats) {
 		super(duration, effectID);
 		mLevel = level;
 		mPlayer = player;
+		mPlayerItemStats = playerItemStats;
+	}
+
+	public InfernoDamage(int duration, int level, @Nullable Player player) {
+		this(duration, level, player, player == null ? null : Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player));
 	}
 
 	@Override
@@ -44,7 +52,7 @@ public class InfernoDamage extends Effect {
 			if (mPlayer != null) {
 				damage = CharmManager.calculateFlatAndPercentValue(mPlayer, Inferno.CHARM_DAMAGE, damage);
 			}
-			DamageUtils.damage(mPlayer, le, DamageType.AILMENT, damage, ClassAbility.INFERNO, true, false);
+			DamageUtils.damage(mPlayer, le, new DamageEvent.Metadata(DamageType.AILMENT, ClassAbility.INFERNO, mPlayerItemStats), damage, true, false, false);
 			new PartialParticle(Particle.FLAME, le.getLocation().add(0, 1, 0), 11, 0.4, 0.4, 0.4, 0.05).spawnAsEnemyBuff();
 		}
 	}

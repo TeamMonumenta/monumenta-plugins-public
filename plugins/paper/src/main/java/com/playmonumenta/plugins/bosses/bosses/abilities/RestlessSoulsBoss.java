@@ -111,7 +111,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
 							EntityUtils.applyVulnerability(plugin, duration, 0.1, damagee);
 						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
-							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, null));
+							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, playerItemStats, null, DamageType.AILMENT));
 						}
 					}
 				}

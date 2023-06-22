@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class CustomDamageOverTime extends Effect {
 	protected final double mDamage;
 	protected final int mPeriod;
 	protected final @Nullable Player mPlayer;
+	protected final @Nullable ItemStatManager.PlayerItemStats mPlayerItemStats;
 	protected final @Nullable ClassAbility mSpell;
 	private int mTicks;
 	private final DamageType mDamageType;
@@ -28,22 +30,22 @@ public class CustomDamageOverTime extends Effect {
 	// This is not serialized
 	private Consumer<LivingEntity> mVisuals = entity -> new PartialParticle(Particle.SQUID_INK, entity.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
 
-	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, DamageType damageType) {
+	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats, @Nullable ClassAbility spell, DamageType damageType) {
 		super(duration, effectID);
 		mDamage = damage;
 		mPeriod = period;
 		mPlayer = player;
 		mSpell = spell;
 		mDamageType = damageType;
+		mPlayerItemStats = playerItemStats;
+	}
+
+	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell, DamageType damageType) {
+		this(duration, damage, period, player, player == null ? null : Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player), spell, damageType);
 	}
 
 	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ClassAbility spell) {
-		super(duration, effectID);
-		mDamage = damage;
-		mPeriod = period;
-		mPlayer = player;
-		mSpell = spell;
-		mDamageType = DamageType.AILMENT;
+		this(duration, damage, period, player, spell, DamageType.AILMENT);
 	}
 
 	public void setVisuals(Consumer<LivingEntity> visuals) {
@@ -87,6 +89,7 @@ public class CustomDamageOverTime extends Effect {
 		if (mSpell != null) {
 			object.addProperty("spell", mSpell.name());
 		}
+		object.addProperty("damageType", mDamageType.name());
 
 		return object;
 	}
@@ -106,7 +109,12 @@ public class CustomDamageOverTime extends Effect {
 			spell = ClassAbility.valueOf(object.get("spell").getAsString());
 		}
 
-		return new CustomDamageOverTime(duration, damage, period, player, spell);
+		DamageType damageType = DamageType.AILMENT;
+		if (object.has("damageType")) {
+			damageType = DamageType.valueOf(object.get("damageType").getAsString());
+		}
+
+		return new CustomDamageOverTime(duration, damage, period, player, spell, damageType);
 	}
 
 	@Override

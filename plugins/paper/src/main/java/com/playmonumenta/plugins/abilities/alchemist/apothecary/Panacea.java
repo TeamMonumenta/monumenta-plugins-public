@@ -172,7 +172,7 @@ public class Panacea extends Ability implements AbilityWithDuration {
 						continue;
 					}
 					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), damage, true, true, false);
-					CustomDamageOverTime damageOverTime = new CustomDamageOverTime(PANACEA_DOT_DURATION, dotDamage, PANACEA_DOT_PERIOD, mPlayer, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
+					CustomDamageOverTime damageOverTime = new CustomDamageOverTime(PANACEA_DOT_DURATION, dotDamage, PANACEA_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageEvent.DamageType.MAGIC);
 					damageOverTime.setVisuals(mCosmetic::damageOverTimeEffects);
 					mPlugin.mEffectManager.addEffect(mob, PANACEA_DOT_EFFECT_NAME, damageOverTime);
 
