@@ -71,7 +71,7 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 
 					mD += 30;
 				} else {
-					for (double r = 1; r < 5; r += 0.5) {
+					for (double r = 1; r < range; r += 0.5) {
 						for (double degree = mD; degree > mD - 30; degree -= 5) {
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
 							l.setPitch(-l.getPitch());
