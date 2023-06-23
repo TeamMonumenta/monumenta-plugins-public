@@ -496,12 +496,26 @@ public class EntityUtils {
 		return cloud;
 	}
 
-	public static ThrownPotion spawnCustomSplashPotion(Player player, ItemStack potionStack, Location loc) {
-		ThrownPotion potion = (ThrownPotion) loc.getWorld().spawnEntity(loc.add(0, 0.5, 0), EntityType.SPLASH_POTION);
-		potion.setShooter(player);
+	/*
+	 * This spawns a potion with a high downward velocity so that it can immediately be splashed
+	 */
+	public static ThrownPotion spawnSplashPotion(Player player, ItemStack potionStack, Boolean shooter) {
+		//Create item as type splash or lingering and set entity item to the inv potion
+		ThrownPotion potion = (ThrownPotion) player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.SPLASH_POTION);
 		potion.setItem(potionStack);
 
+		if (shooter) {
+			potion.setShooter(player);
+		}
+
+		// Potions sometimes miss players if they are moving so increase velocity to compensate
+		potion.setVelocity(new Vector(0, -0.5, 0));
+
 		return potion;
+	}
+
+	public static ThrownPotion spawnSplashPotion(Player player, ItemStack potionStack) {
+		return spawnSplashPotion(player, potionStack, true);
 	}
 
 	public static boolean withinRangeOfMonster(Player player, double range) {

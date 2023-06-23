@@ -10,9 +10,11 @@ import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -25,11 +27,9 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -255,7 +255,6 @@ public class PotionConsumeListener implements Listener {
 		if (slot == null) {
 			return;
 		}
-		Inventory playerInv = player.getInventory();
 		ItemStack invItem = inventory.getItem(slot);
 		if (potion != null) { // if potion is not null, then assume that provisions is triggered
 			// only run if player still has container open
@@ -263,11 +262,11 @@ public class PotionConsumeListener implements Listener {
 				if (invItem == null || invItem.getType().isAir() || invItem.getType().equals(Material.GLASS_BOTTLE)) {
 					inventory.setItem(slot, potion);
 				} else {
-					addPotion(player, inventory, potion);
+					InventoryUtils.giveItem(player, potion, inventory);
 				}
 			} else {
 				// otherwise put the potion anywhere in player inventory
-				addPotion(player, playerInv, potion);
+				InventoryUtils.giveItem(player, potion);
 			}
 			mPotionsSlot.remove(uuid); // provisions should NEVER be triggered by InventoryCloseEvent
 		} else if (invItem != null && invItem.getType().equals(Material.GLASS_BOTTLE) && !invItem.hasItemMeta()) {
@@ -278,43 +277,15 @@ public class PotionConsumeListener implements Listener {
 		}
 	}
 
-	/**
-	 * Tries to add a potion to the current inventory.
-	 * If it is full, add it to the player's inventory.
-	 * If that is full, drop the potion on the ground at the player's feet.
-	 * @param player - the player (fallback if inventory is)
-	 * @param inventory - the inventory to try and add the potion to
-	 * @param potion - the potion
-	 */
-	private boolean addPotion(Player player, Inventory inventory, ItemStack potion) {
-		Location playerLoc = player.getLocation();
-		// only run if player still has container open
-		if (inventory.firstEmpty() == -1) {
-			// if inventory is the player's inventory
-			if (inventory instanceof PlayerInventory) {
-				playerLoc.getWorld().dropItem(playerLoc, potion);
-				return false;
-			} else {
-				return addPotion(player, player.getInventory(), potion);
-			}
-		} else {
-			// add item to container
-			inventory.addItem(potion);
-			return true;
-		}
-	}
-
 	private void rightClickSplashPotion(Player player, ItemStack item) {
 		//Create item as type splash or lingering and set entity item to the inv potion
-		ThrownPotion potion = (ThrownPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.SPLASH_POTION);
-		potion.setItem(item);
-		ProjectileLaunchEvent newEvent = new ProjectileLaunchEvent(potion);
-		Bukkit.getPluginManager().callEvent(newEvent);
-		//Set shooter AFTER the event is called so that Sacred Provisions does not trigger twice - this leads to a dupe exploit
-		potion.setShooter(player);
-		if (newEvent.isCancelled()) {
-			potion.remove();
-			return;
+		ThrownPotion potion = EntityUtils.spawnSplashPotion(player, item, true);
+		// mimic splash range of a regular splash potion
+		// this only exists because mojank code doesn't allow me to have potions collide with the player
+		if (potion.getItem().getType() == Material.SPLASH_POTION) {
+			PotionUtils.mimicSplashPotionEffect(player, potion);
+			PotionUtils.splashPotionParticles(player, potion.getPotionMeta().getColor());
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, SoundCategory.PLAYERS, 0.65f, 1f);
 		}
 
 		//If Sacred Provisions check passes, do not consume

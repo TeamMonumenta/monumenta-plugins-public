@@ -342,6 +342,14 @@ public class InventoryUtils {
 	}
 
 	public static void giveItem(final Player player, final @Nullable ItemStack item, boolean silent) {
+		giveItem(player, item, player.getInventory(), silent);
+	}
+
+	public static void giveItem(final Player player, final @Nullable ItemStack item, final Inventory inventory) {
+		giveItem(player, item, inventory, false);
+	}
+
+	public static void giveItem(final Player player, final @Nullable ItemStack item, final Inventory inventory, boolean silent) {
 		if (item == null) {
 			return;
 		}
@@ -349,13 +357,18 @@ public class InventoryUtils {
 		if (item.getAmount() == 0) {
 			return;
 		}
-		final PlayerInventory inv = player.getInventory();
-		if (canFitInInventory(item, inv)) {
-			inv.addItem(item);
+		if (canFitInInventory(item, inventory)) {
+			inventory.addItem(item);
 		} else {
-			dropTempOwnedItem(item, player.getLocation(), player);
-			if (!silent) {
-				player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+			if (inventory instanceof PlayerInventory) {
+				// drop if inventory is the player's inventory
+				dropTempOwnedItem(item, player.getLocation(), player);
+				if (!silent) {
+					player.sendMessage(Component.text("Your inventory is full! Some items were dropped on the ground!", NamedTextColor.RED));
+				}
+			} else {
+				// otherwise attempt to give it to the player's inventory
+				giveItem(player, item, player.getInventory(), silent);
 			}
 		}
 	}

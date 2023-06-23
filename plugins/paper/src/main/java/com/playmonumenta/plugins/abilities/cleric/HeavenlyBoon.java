@@ -22,9 +22,10 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -180,8 +181,11 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			if (potion == null) {
 				return;
 			}
-			Location pos = mPlayer.getLocation().add(0, 1, 0);
-			EntityUtils.spawnCustomSplashPotion(mPlayer, potion, pos);
+
+			ThrownPotion splashPotion = EntityUtils.spawnSplashPotion(mPlayer, potion);
+			PotionUtils.mimicSplashPotionEffect(mPlayer, splashPotion);
+			PotionUtils.splashPotionParticles(mPlayer, splashPotion.getPotionMeta().getColor());
+			heavenlyBoonSound(mPlayer);
 
 			if (isEnhanced() && Bukkit.getCurrentTick() > mLastSuccessfulProcTick + ENHANCEMENT_COOLDOWN_TICKS) {
 				mLastSuccessfulProcTick = Bukkit.getCurrentTick();
@@ -208,5 +212,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 				}
 			}
 		}
+	}
+
+	public static void heavenlyBoonSound(Player player) {
+		// copied from sacred provisions sound
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_COW_BELL, SoundCategory.PLAYERS, 0.65f, 2f);
 	}
 }

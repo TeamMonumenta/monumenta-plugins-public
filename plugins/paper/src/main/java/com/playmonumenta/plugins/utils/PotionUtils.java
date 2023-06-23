@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import java.util.ArrayList;
@@ -15,9 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -420,5 +425,57 @@ public class PotionUtils {
 
 	public static boolean isInfinite(int duration) {
 		return duration > 1000000;
+	}
+
+	/**
+	 * This directly applies the splash potion effect to the player and surrounding entities by using the PotionSplashEvent.
+	 * Doesn't play splash potion break sound (Sound.ENTITY_SPLASH_POTION_BREAK) or particles
+
+	 * @param player - The player that splashed the potion
+	 * @param potion - The thrown potion entity to splash
+	 */
+	public static boolean mimicSplashPotionEffect(Player player, ThrownPotion potion) {
+		// remove potion immediately after spawning to prevent "ghost" splash potions
+		potion.remove();
+		Map<LivingEntity, Double> affectedEntites = new HashMap<>();
+		// adjust range of potion effects here
+		// these values are from vanilla (ThrownPotion.java#L138 - applySplash function)
+		List<Entity> nearbyEntities = player.getNearbyEntities(4.0d, 2.0d, 4.0d);
+		for (Entity entity : nearbyEntities) {
+			if (entity instanceof LivingEntity) {
+				// intensity can be 1.0d because PotionSplashEvent listener in EntityListener already scales intensities by distance
+				affectedEntites.put((LivingEntity) entity, 1.0d);
+			}
+		}
+		// add the player to the list of affected entities otherwise the player who splashed the potion won't get any effects
+		affectedEntites.put(player, 1.0d);
+
+		PotionSplashEvent potionEvent = new PotionSplashEvent(potion, affectedEntites);
+		Bukkit.getPluginManager().callEvent(potionEvent);
+
+		// ignore if splash event if cancelled
+		if (potionEvent.isCancelled()) {
+			return false;
+		}
+		return true;
+	}
+
+	public static void splashPotionParticles(Player player, Color color) {
+		player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.POTION_BREAK, color.asRGB());
+	}
+
+	public static void instantDrinkParticles(Player player, Color color) {
+		if (color != null) {
+			double red = color.getRed() / 255D;
+			double green = color.getGreen() / 255D;
+			double blue = color.getBlue() / 255D;
+			for (int i = 0; i < 30; i++) {
+				double y = FastUtils.randomDoubleInRange(0.25, 1.75);
+				new PartialParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 1, red, green, blue, 1)
+					.directionalMode(true).spawnAsPlayerActive(player);
+			}
+		} else {
+			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1).spawnAsPlayerActive(player);
+		}
 	}
 }

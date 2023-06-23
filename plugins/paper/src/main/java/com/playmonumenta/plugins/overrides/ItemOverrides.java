@@ -245,7 +245,6 @@ public final class ItemOverrides {
 
 		mItems.put(Material.FISHING_ROD, new FishingRodOverride());
 		mItems.put(Material.ENCHANTING_TABLE, new EnchantmentTableOverride());
-		mItems.put(Material.GOLDEN_APPLE, new GoldenAppleOverride());
 		mItems.put(Material.ENDER_CHEST, new EnderChestOverride());
 		mItems.put(Material.FARMLAND, new FarmlandOverride());
 		mItems.put(Material.PACKED_ICE, new PackedIceOverride());

@@ -7,6 +7,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.EnumSet;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -16,6 +18,10 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 
 public class NonClericProvisionsPassive extends Ability {
+	private static final EnumSet<Material> PROHIBITED_FOOD = EnumSet.of(
+		Material.GOLDEN_APPLE,
+		Material.ENCHANTED_GOLDEN_APPLE
+	);
 
 	public static final AbilityInfo<NonClericProvisionsPassive> INFO =
 		new AbilityInfo<>(NonClericProvisionsPassive.class, null, NonClericProvisionsPassive::new)
@@ -54,7 +60,7 @@ public class NonClericProvisionsPassive extends Ability {
 
 	@Override
 	public void playerItemConsumeEvent(PlayerItemConsumeEvent event) {
-		if (testRandomChance(mPlayer)) {
+		if (!PROHIBITED_FOOD.contains(event.getItem().getType()) && testRandomChance(mPlayer)) {
 			event.setReplacement(event.getItem());
 			sacredProvisionsSound(mPlayer);
 		}
