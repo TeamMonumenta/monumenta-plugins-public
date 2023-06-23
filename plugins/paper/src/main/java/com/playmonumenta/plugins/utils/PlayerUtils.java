@@ -109,6 +109,8 @@ public class PlayerUtils {
 		List<Player> players = new ArrayList<>(playersInLootScalingRange(player.getLocation()));
 		if (excludeTarget) {
 			players.remove(player);
+		} else if (!players.contains(player)) { // add player if it doesn't exist and excludeTarget is false
+			players.add(player);
 		}
 		return players;
 	}

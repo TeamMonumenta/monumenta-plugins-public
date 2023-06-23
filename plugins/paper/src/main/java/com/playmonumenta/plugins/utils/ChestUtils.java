@@ -3,10 +3,8 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelveLootTableGroup;
 import com.playmonumenta.plugins.listeners.LootTableManager;
+import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +15,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -31,7 +29,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
@@ -40,12 +37,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.Lootable;
-import org.jetbrains.annotations.Nullable;
 
 public class ChestUtils {
-	private static final int LOOTBOX_EPIC_MAX_SIZE = 100;
-	private static final int LOOTBOX_WARN_FREE_SPACES = 6;
-
 	private static final double[] BONUS_ITEMS = {
 			0, // Dummy value, this is a player count indexed array
 			0.5,
@@ -94,31 +87,29 @@ public class ChestUtils {
 			if (lootTable != null) {
 				/* Figure out what the luck level should be and which players contribute to scaling */
 				int luckAmount; // The amount of luck the loot table should be rolled with
-				List<Player> otherPlayers; // Other players not including the rolling player that may receive loot slices
+				List<Player> nearbyPlayers = Collections.singletonList(player); // All players that may receive loot slices
 
 				LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
 				if (lootEntry == null) {
 					// This loot table doesn't exist, likely an error
 					MMLog.severe("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which wasn't loaded by LootTableManager");
 					luckAmount = 0;
-					otherPlayers = Collections.emptyList();
 				} else if (ZoneUtils.hasZoneProperty(inventory.getLocation() != null ? inventory.getLocation() : player.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
 					// Loot scaling is disabled (dungeon loot rooms)
 					luckAmount = 0;
-					otherPlayers = Collections.emptyList();
 				} else if (!lootEntry.hasBonusRolls()) {
 					// This chest doesn't have bonus rolls, don't apply luck
 					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which did not have scaling enabled");
 					luckAmount = 0;
-					otherPlayers = Collections.emptyList();
 				} else {
 					// Loot scaling is enabled
 					MMLog.fine("Player '" + player.getName() + " opened loot chest '" + lootTable.getKey() + "' which was scaled & distributed");
 
-					// Get all other players in range, excluding the source player
-					otherPlayers = PlayerUtils.playersInLootScalingRange(player, true);
+					// Get all players in range
+					nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
 
-					int otherPlayersMultiplier = otherPlayers.size() + 1;
+					// This should at minimum be one since there should always be one player (the person who opened the chest)
+					int otherPlayersMultiplier = nearbyPlayers.size();
 
 					MMLog.fine("Lootable seed: " + lootable.getSeed());
 					// Loot table seed set and use the seed for number of players
@@ -145,41 +136,68 @@ public class ChestUtils {
 				inventory.clear();
 
 				if (forceLootshare) {
-					otherPlayers = PlayerUtils.playersInLootScalingRange(player, true);
+					nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
 				}
 
 				// Divide the items up into fractional buckets for all the players
-				List<List<ItemStack>> itemBuckets = distributeLootToBuckets(new ArrayList<>(popLoot), otherPlayers.size() + 1);
+				List<List<ItemStack>> itemBuckets = LootboxManager.distributeLootToBuckets(new ArrayList<>(popLoot), nearbyPlayers.size());
 
 				// The orig container starts with the first bucket of items
 				// Need to make a copy here because the buckets lists are not modifiable
-				List<ItemStack> itemsForOrigContainer = new ArrayList<>(itemBuckets.get(0));
+				List<ItemStack> itemsForOrigContainer = new ArrayList<>();
 
-				int bucketIdx = 1; // Start at 1, first one was already taken by source player
-				Set<String> otherLootBoxPlayers = new TreeSet<>();
+				Set<String> lootBoxPlayers = new TreeSet<>();
 				Set<String> noSharePlayers = new TreeSet<>();
-				for (Player other : otherPlayers) {
-					if (ServerProperties.getLootBoxEnabled() && giveLootBoxSliceToPlayer(itemBuckets.get(bucketIdx), other)) {
-						otherLootBoxPlayers.add(other.getName());
-					} else {
-						// Failed to give this slice to the other player (no lootbox or it is full or lootbox is disabled on this shard)
-						// Put all these items in the orig container
-						itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
-						noSharePlayers.add(other.getName());
+				// if lootbox isn't enabled for this shard or
+				// if the opener is the only player, don't bother trying to give them a lootshare
+				if (ServerProperties.getLootBoxEnabled() && !(nearbyPlayers.size() == 1 && nearbyPlayers.contains(player))) {
+					int bucketIdx = 0; // Start at 0
+					for (Player other : nearbyPlayers) {
+						if (other.getUniqueId().equals(player.getUniqueId())) {
+							// Don't give lootshare to self
+							itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
+							bucketIdx++;
+							continue;
+						}
+						// otherwise give lootshare to other players
+						@Nullable List<ItemStack> rejectedItems = LootboxManager.giveShareToPlayer(new ArrayList<>(itemBuckets.get(bucketIdx)), other);
+						// rejectedItems will be null if player has no lootbox
+						// if rejectedItems is empty or has items, that means player has a lootbox
+						if (rejectedItems == null) {
+							// Failed to give this slice to the other player (no lootbox or lootbox is full)
+							// Put all these items in the orig container
+							itemsForOrigContainer.addAll(itemBuckets.get(bucketIdx));
+							noSharePlayers.add(other.getName());
+						} else {
+							// Put rejected items in original container
+							if (!rejectedItems.isEmpty()) {
+								itemsForOrigContainer.addAll(rejectedItems);
+							}
+							lootBoxPlayers.add(other.getName());
+						}
+						bucketIdx++;
 					}
-					bucketIdx++;
+				} else {
+					// Add all items to chest if lootboxes are not enabled or there is only one player opening the chest
+					for (List<ItemStack> items : itemBuckets) {
+						itemsForOrigContainer.addAll(items);
+					}
 				}
 
-				if (!otherLootBoxPlayers.isEmpty()) {
+				if (!lootBoxPlayers.isEmpty()) {
 					// Sound to indicate loot was split
 					player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 0.2f, 1.4f);
 
 					StringJoiner otherPlayersJoiner = new StringJoiner(", ");
-					for (String other : otherLootBoxPlayers) {
+					for (String other : lootBoxPlayers) {
 						otherPlayersJoiner.add(other);
 					}
-					Component lootboxPlayers = Component.text(otherLootBoxPlayers.size()
-						+ " other nearby player" + (otherLootBoxPlayers.size() == 1 ? "" : "s"),
+					StringJoiner noSharePlayerJoiner = new StringJoiner(", ");
+					for (String noShare : noSharePlayers) {
+						noSharePlayerJoiner.add(noShare);
+					}
+					Component lootboxPlayers = Component.text(lootBoxPlayers.size()
+						+ " nearby player" + (lootBoxPlayers.size() == 1 ? "" : "s"),
 						NamedTextColor.GOLD)
 						.hoverEvent(Component.text(otherPlayersJoiner.toString()));
 
@@ -192,9 +210,9 @@ public class ChestUtils {
 							noShareJoiner.add(other);
 						}
 						noSharePlayerComponent = Component.text(noSharePlayers.size()
-									+ " other player" + (noSharePlayers.size() == 1 ? "" : "s") + " got no share",
-								NamedTextColor.GOLD)
-							.hoverEvent(Component.text(otherPlayersJoiner.toString()));
+									+ " player" + (noSharePlayers.size() == 1 ? "" : "s") + " got no share",
+								NamedTextColor.RED)
+							.hoverEvent(Component.text(noSharePlayerJoiner.toString()));
 						noSharePlayerComponent = Component.text(", and ", NamedTextColor.GOLD)
 							.append(noSharePlayerComponent);
 					}
@@ -222,386 +240,6 @@ public class ChestUtils {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Distribute a collection of items into a number of distinct buckets.
-	 *
-	 * Biggest challenge here is to get things sort of evenly distributed. A lot of different tuning is possible here.
-	 *
-	 * TODO: Someday it would be nice to have many invocations of this function somehow spread out rares evenly among players
-	 * This would require some state keeping about who has gotten what. Maybe just counters based on tiers? Tricky...
-	 *
-	 * This is right now the most fair shuffle I can come up with
-	 *
-	 * Caller should take care not to actually change the returned lists, they are sublists of the original input list
-	 */
-	private static List<List<ItemStack>> distributeLootToBuckets(List<ItemStack> loot, int numBuckets) {
-		// Output buckets
-		List<List<ItemStack>> buckets = new ArrayList<>(numBuckets);
-
-		// No reason to shuffle things around if numBuckets is 1
-		if (numBuckets == 1) {
-			buckets.add(loot);
-			return buckets;
-		}
-
-		// TODO: Check if items in the input are stacked or not, if they are, unstack them
-
-		// Shuffle the input items so there is no bias to the first player getting the first item every time
-		Collections.shuffle(loot, FastUtils.RANDOM);
-
-		// Compute the min items per bucket
-		int minItemsPerBucket = (loot.size() / numBuckets);
-		// Compute how many buckets need 1 additional item
-		int numBucketsWithExtra = (loot.size() % numBuckets);
-
-		int itemsMoved = 0;
-		for (int i = 0; i < numBuckets; i++) {
-			final int itemsToMove;
-			if (i < numBucketsWithExtra) {
-				itemsToMove = minItemsPerBucket + 1;
-			} else {
-				itemsToMove = minItemsPerBucket;
-			}
-
-			// Pull off that many items from the input list and put them in a bucket
-			buckets.add(new ArrayList<>(loot.subList(itemsMoved, itemsMoved + itemsToMove)));
-
-			itemsMoved += itemsToMove;
-		}
-
-		// Shuffle the buckets themselves so the 1st player isn't more likely to get +1 item
-		Collections.shuffle(buckets, FastUtils.RANDOM);
-
-		MMLog.finer("LOOTBOX: Attempting to merge items in " + buckets.size() + " buckets");
-
-		// Compact the buckets down to save space. Every little bit helps with the big lootbox
-		// For example: compacting two CXP items into one CXP item with count 2
-		for (List<ItemStack> bucket : buckets) {
-			if (MMLog.isLevelEnabled(Level.FINER)) {
-				MMLog.finer("LOOTBOX: Processing bucket which contains:");
-				bucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
-			}
-
-			// Iterate from the end of the bucket backwards, attempting to merge each item
-			// with the items that came before it
-			for (int testIdx = bucket.size() - 1; testIdx >= 0; testIdx--) {
-				// Get the item to try to merge into those before it
-				ItemStack testItemToMerge = bucket.get(testIdx);
-
-				// Iterate over all items before this one, trying to merge into them
-				for (int baseIdx = 0; baseIdx < testIdx; baseIdx++) {
-					ItemStack mergeToCandidate = bucket.get(baseIdx);
-
-					if (mergeToCandidate.isSimilar(testItemToMerge) &&
-						(mergeToCandidate.getAmount() + testItemToMerge.getAmount()) <= testItemToMerge.getMaxStackSize()) {
-						// These items are the same and they can be combined without exceeding stack size - merge them
-
-						MMLog.finer("LOOTBOX:   Merging item in slot " + testIdx + " into " + baseIdx);
-
-						// Increment the earlier item
-						mergeToCandidate.add(testItemToMerge.getAmount());
-
-						// Remove the item that was merged
-						bucket.remove(testIdx);
-
-						// No more merge attempts needed for this item
-						break;
-					}
-				}
-			}
-
-			if (MMLog.isLevelEnabled(Level.FINER)) {
-				MMLog.finer("LOOTBOX: Bucket resulting contents:");
-				bucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
-			}
-		}
-
-		return buckets;
-	}
-
-	/**
-	 * Puts a player's fractional split of loot in a LOOTBOX in their inventory if present.
-	 *
-	 * Returns whether this was possible. If false the loot should be shared back into the generating chest.
-	 */
-	private static boolean giveLootBoxSliceToPlayer(List<ItemStack> loot, Player player) {
-		ItemStack lootBox = getNextLootboxWithSpace(player);
-		// No lootbox space. Indicate to the caller that the items should be distributed in the original chest
-		if (lootBox == null) {
-			return false;
-		}
-
-		// Create a new Loot Share container and add the loot to it
-		ItemStack lootShare = new ItemStack(Material.CHEST);
-		if (lootShare.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof Chest chestMeta) {
-			blockMeta.displayName(Component.text("Loot Share").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.LIGHT_PURPLE));
-			ChestUtils.generateLootInventory(loot, chestMeta.getInventory(), player, false);
-			blockMeta.setBlockState(chestMeta);
-			lootShare.setItemMeta(blockMeta);
-		}
-		ItemUtils.setPlainTag(lootShare);
-
-		if (isEpicLootBox(lootBox)) {
-			// Add the item to the epic lootbox's Monumenta.Items[] inventory
-			NBTItem nbt = new NBTItem(lootBox);
-			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-			NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-			items.addCompound(NBTItem.convertItemtoNBT(lootShare));
-
-			// Refresh the lootbox item
-			lootBox.setItemMeta(nbt.getItem().getItemMeta());
-
-			// Update the lore text with the new count
-			updateLootBoxSharesLore(lootBox, items.size(), true);
-		} else {
-			// Add the item to the normal lootbox's shulker inventory
-			// Note that if we got here, that lootbox always has space available
-			if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
-				// Update the lootbox's inventory with the added item
-				shulkerMeta.getInventory().addItem(lootShare);
-				blockMeta.setBlockState(shulkerMeta);
-				lootBox.setItemMeta(blockMeta);
-
-				// Update the lore text with the new count
-				updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), false);
-			}
-		}
-
-		return true;
-	}
-
-	public static @Nullable List<ItemStack> removeOneLootshareFromLootbox(ItemStack lootBox) {
-		if (isEpicLootBox(lootBox)) {
-			return removeOneLootshareFromEpicLootbox(lootBox);
-		} else {
-			return removeOneLootshareFromNormalLootbox(lootBox);
-		}
-	}
-
-	private static @Nullable List<ItemStack> removeOneLootshareFromEpicLootbox(ItemStack lootBox) {
-		@Nullable List<ItemStack> returnContents = null;
-
-		NBTItem nbt = new NBTItem(lootBox);
-		NBTCompound monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
-		if (monumenta == null) {
-			return null;
-		}
-
-		NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-		if (playerModified == null) {
-			return null;
-		}
-
-		// The epic stores items only in {Monumenta:{Items:[{item}]}}, it does not use the normal shulker contents at all
-		NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-		if (items == null || items.isEmpty()) {
-			return null;
-		}
-
-		// Remove the first item from the list
-		ItemStack lootShare = NBTItem.convertNBTtoItem(items.remove(0));
-		if (lootShare == null) {
-			return null;
-		}
-
-		// Update the lootbox to remove the item
-		lootBox.setItemMeta(nbt.getItem().getItemMeta());
-
-		// Get the contents of the removed chest
-		if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta && shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
-			returnContents = Arrays.stream(chestMeta.getInventory().getContents())
-				.filter((item) -> item != null && !item.getType().isAir())
-				.collect(Collectors.toList());
-		}
-
-		// Update the lore text with the new count
-		updateLootBoxSharesLore(lootBox, items.size(), true);
-
-		return returnContents;
-	}
-
-	public static void updateLootBoxSharesLore(ItemStack lootBox) {
-		if (!isLootBox(lootBox)) {
-			return;
-		}
-		if (isEpicLootBox(lootBox)) {
-			NBTItem nbt = new NBTItem(lootBox);
-			NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-			NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-			NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-			if (items != null) {
-				updateLootBoxSharesLore(lootBox, items.size(), true);
-			} else {
-				updateLootBoxSharesLore(lootBox, 0, true);
-			}
-		} else if (isNormalLootBox(lootBox)) {
-			int usedSlots = 0;
-			if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
-				@Nullable ItemStack[] lootBoxContents = shulkerMeta.getInventory().getContents();
-				for (@Nullable ItemStack lootBoxItem : lootBoxContents) {
-					if (lootBoxItem != null && !lootBoxItem.getType().equals(Material.AIR)) {
-						++usedSlots;
-					}
-				}
-			}
-			updateLootBoxSharesLore(lootBox, usedSlots, false);
-		}
-	}
-
-	private static void updateLootBoxSharesLore(ItemStack lootBox, int amount, boolean isEpic) {
-		int max = isEpic ? LOOTBOX_EPIC_MAX_SIZE : 27;
-		int loreIndex = isEpic ? 5 : 2;
-		if (ItemStatUtils.getLore(lootBox).size() > loreIndex) {
-			ItemStatUtils.removeLore(lootBox, loreIndex);
-		}
-		ItemStatUtils.addLore(lootBox, loreIndex, Component.text(amount + "/" + max + " shares").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
-		ItemStatUtils.generateItemStats(lootBox);
-	}
-
-	private static @Nullable List<ItemStack> removeOneLootshareFromNormalLootbox(ItemStack lootBox) {
-		@Nullable List<ItemStack> returnContents = null;
-
-		if (lootBox.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
-			@Nullable ItemStack[] lootBoxContents = shulkerMeta.getInventory().getContents();
-
-			// Find the first lootshare item in that lootbox
-			@Nullable ItemStack lootShare = null;
-			for (@Nullable ItemStack lootBoxItem : lootBoxContents) {
-				if (lootBoxItem != null && lootBoxItem.getType().equals(Material.CHEST)) {
-					lootShare = lootBoxItem;
-					break;
-				}
-			}
-
-			if (lootShare == null) {
-				// LootBox is empty
-				return null;
-			}
-
-			if (lootShare.getItemMeta() instanceof BlockStateMeta shareBlockMeta && shareBlockMeta.getBlockState() instanceof Chest chestMeta) {
-				returnContents = Arrays.stream(chestMeta.getInventory().getContents())
-					.filter((item) -> item != null && !item.getType().isAir())
-					.collect(Collectors.toList());
-			}
-
-			// Remove this lootshare item from the lootbox
-			lootShare.subtract();
-
-			// Update the lootbox's inventory with the removed item
-			blockMeta.setBlockState(shulkerMeta);
-			lootBox.setItemMeta(blockMeta);
-
-			// Update the lore text with the new count
-			updateLootBoxSharesLore(lootBox, 27 - countEmptyNormalLootboxSpaces(shulkerMeta.getInventory()), false);
-		}
-
-		return returnContents;
-	}
-
-	private static int countEmptyNormalLootboxSpaces(Inventory inventory) {
-		int empty = 0;
-		for (ItemStack subItem : inventory.getContents()) {
-			if (subItem == null || subItem.getType().isAir()) {
-				empty++;
-			}
-		}
-		return empty;
-	}
-
-	private static @Nullable ItemStack getNextLootboxWithSpace(Player player) {
-		ItemStack lootBox = null;
-		int numAvailSpaces = 0;
-		boolean foundLootBox = false;
-
-		for (ItemStack item : player.getInventory().getContents()) {
-			if (isLootBox(item)) {
-				foundLootBox = true;
-
-				if (isEpicLootBox(item)) {
-					// Epic lootbox
-					NBTItem nbt = new NBTItem(item);
-					NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
-					NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-					NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-					if (items != null) {
-						int availSpaces = LOOTBOX_EPIC_MAX_SIZE - items.size();
-						// Will return the first available box
-						if (availSpaces > 0 && lootBox == null) {
-							lootBox = item;
-						}
-						numAvailSpaces += availSpaces;
-					}
-				} else if (item.getItemMeta() instanceof BlockStateMeta blockMeta && blockMeta.getBlockState() instanceof ShulkerBox shulkerMeta) {
-					// Normal lootbox
-					int availSpaces = countEmptyNormalLootboxSpaces(shulkerMeta.getInventory());
-					// Will return the first available box
-					if (availSpaces > 0 && lootBox == null) {
-						lootBox = item;
-					}
-					numAvailSpaces += availSpaces;
-				}
-
-				if (numAvailSpaces > LOOTBOX_WARN_FREE_SPACES) {
-					// No reason to keep examining boxes, there's at least the threshold number remaining to not complain about space
-					break;
-				}
-			}
-		}
-
-		if (foundLootBox) {
-			if (numAvailSpaces > LOOTBOX_WARN_FREE_SPACES) {
-				// Plenty of space
-				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 0.8f, 1.2f);
-				MessagingUtils.sendActionBarMessage(player, "LOOTBOX chest added", NamedTextColor.GREEN);
-			} else if (numAvailSpaces > 0) {
-				// Only a few spaces left
-				player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, SoundCategory.PLAYERS, 0.5f, 1.5f);
-				MessagingUtils.sendActionBarMessage(player, "LOOTBOX chest added, " + (numAvailSpaces - 1) + " spaces left", NamedTextColor.YELLOW);
-			} else {
-				// No space left
-				player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 0.8f, 1.8f);
-				MessagingUtils.sendActionBarMessage(player, "LOOTBOX is full", NamedTextColor.RED);
-			}
-		}
-
-		return lootBox;
-	}
-
-	public static boolean isLootBox(ItemStack item) {
-		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
-			return false;
-		}
-
-		String plainName = ItemUtils.getPlainName(item);
-		return plainName.equals("LOOTBOX") || plainName.equals("Box of Endless Echoes") || plainName.equals("Mouth of the Mimic");
-	}
-
-	public static boolean isEpicLootBox(ItemStack item) {
-		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
-			return false;
-		}
-
-		String plainName = ItemUtils.getPlainName(item);
-		return plainName.equals("Box of Endless Echoes") || plainName.equals("Mouth of the Mimic");
-	}
-
-	public static boolean isNormalLootBox(ItemStack item) {
-		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
-			return false;
-		}
-
-		return ItemUtils.getPlainName(item).equals("LOOTBOX");
-	}
-
-	public static boolean isLootShare(ItemStack item) {
-		return item != null &&
-			   ItemUtils.isShulkerBox(item.getType()) &&
-			   item.hasItemMeta() &&
-			   item.getItemMeta().hasDisplayName() &&
-			   ItemUtils.getPlainName(item).equals("Loot Share");
 	}
 
 	public static void generateLootInventory(Collection<ItemStack> populatedLoot, Inventory inventory, Player player, boolean randomlyDistribute) {

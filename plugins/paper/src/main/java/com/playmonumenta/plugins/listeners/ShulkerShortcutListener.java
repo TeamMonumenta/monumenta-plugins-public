@@ -5,14 +5,13 @@ import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventory;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
-import com.playmonumenta.plugins.utils.ChestUtils;
+import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -182,30 +181,11 @@ public class ShulkerShortcutListener implements Listener {
 			player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
-		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
-			           && ChestUtils.isLootBox(itemClicked)) {
-			if (click == ClickType.SWAP_OFFHAND) {
-				return;
-			}
-			// Right-clicked a lootbox - dump contents into player's inventory
-			List<ItemStack> items = ChestUtils.removeOneLootshareFromLootbox(itemClicked);
-			if (items == null) {
-				// Lootbox empty
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			} else {
-				// Non-empty, got some items, drop them on the player
-				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, SoundCategory.PLAYERS, 0.6f, 1f);
-				for (ItemStack item : items) {
-					if (item != null && !item.getType().isAir()) {
-						InventoryUtils.dropTempOwnedItem(item, player.getLocation(), player);
-					}
-				}
-			}
-			event.setCancelled(true);
 		} else if (itemClicked != null
 			           && ItemUtils.isShulkerBox(itemClicked.getType())
 			           && !ShulkerEquipmentListener.isAnyEquipmentBox(itemClicked)
-			           && !PortableEnderListener.isPortableEnder(itemClicked)) {
+			           && !PortableEnderListener.isPortableEnder(itemClicked)
+								 && !LootboxManager.isLootbox(itemClicked)) {
 			// Player clicked a non-equipment shulker box in an inventory.
 			if (clickedInventory == topInventory && shulkerInventory != null && (click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)) {
 				// A shulker inside another shulker was right-clicked, cancel.
@@ -389,30 +369,6 @@ public class ShulkerShortcutListener implements Listener {
 				});
 
 				item.subtract();
-			} else if (ChestUtils.isLootBox(event.getItemInHand())) {
-				event.setCancelled(true);
-				event.setBuild(false);
-
-				ItemStack item = event.getItemInHand();
-				@Nullable List<ItemStack> contents = ChestUtils.removeOneLootshareFromLootbox(item);
-				if (contents == null) {
-					// LootBox is empty
-					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					return;
-				}
-
-				// Get the new chest and update that
-				Bukkit.getScheduler().runTask(mPlugin, () -> {
-					// Clears contents
-					block.setType(Material.CHEST);
-
-					if (block.getState() instanceof Chest chest) {
-						chest.update();
-
-						chest = (Chest) block.getState();
-						ChestUtils.generateLootInventory(contents, chest.getInventory(), player, true);
-					}
-				});
 			}
 		}
 	}
@@ -469,7 +425,7 @@ public class ShulkerShortcutListener implements Listener {
 	public static boolean isRestrictedShulker(ItemStack item) {
 		return isPurpleTesseractContainer(item)
 			       || isEnderExpansion(item)
-			       || ChestUtils.isLootBox(item)
+			       || LootboxManager.isLootbox(item)
 			       || ShulkerEquipmentListener.isAnyEquipmentBox(item)
 			       || PortableEnderListener.isPortableEnder(item);
 	}

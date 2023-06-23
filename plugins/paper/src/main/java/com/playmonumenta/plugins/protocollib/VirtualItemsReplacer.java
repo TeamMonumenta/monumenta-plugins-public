@@ -19,8 +19,8 @@ import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
+import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
-import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -216,24 +216,24 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		}
 
 		// Lootboxes: don't send stored items to prevent NBT banning
-		if (ChestUtils.isLootBox(itemStack)) {
+		if (LootboxManager.isLootbox(itemStack)) {
 			NBTCompound monumenta = new NBTItem(itemStack, true).getCompound(ItemStatUtils.MONUMENTA_KEY);
 			if (monumenta != null) {
 				NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 				if (playerModified != null) {
+					// old lootbox format (needed for legacy reasons)
 					playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
+					// new lootbox format
+					// playerModified.removeKey(LootboxManager.LOOTBOX_INDEX_KEY);
+					// playerModified.removeKey(LootboxManager.LOOTBOX_SHARES_KEY);
 					markVirtual(itemStack);
 				}
 			}
 		}
 
-		// Purge nested "Items" key in "BlockEntityTag" to prevent NBT banning
-		if (ItemUtils.isShulkerBox(itemStack.getType())) {
-			nestedShulkerCheck(itemStack);
-		}
-
 		// Custom shulker names
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
+			nestedShulkerCheck(itemStack);
 			String prefix;
 			String suffix;
 			if (ItemStatUtils.getRegion(itemStack) == ItemStatUtils.Region.SHULKER_BOX) {
@@ -300,8 +300,12 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		}
 		Boolean foundNested = false;
 		for (NBTCompound item : items) {
+			NBTCompound tag = item.getCompound("tag");
+			if (tag == null) {
+				continue;
+			}
 			// we don't know if this is a container with a loottable! so check it
-			NBTCompound nestedBlockEntityTag = item.getCompound("BlockEntityTag");
+			NBTCompound nestedBlockEntityTag = tag.getCompound("BlockEntityTag");
 			if (nestedBlockEntityTag == null) {
 				continue;
 			}

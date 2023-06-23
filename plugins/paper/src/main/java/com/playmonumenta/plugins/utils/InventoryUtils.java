@@ -25,9 +25,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
@@ -360,7 +360,7 @@ public class InventoryUtils {
 		if (canFitInInventory(item, inventory)) {
 			inventory.addItem(item);
 		} else {
-			if (inventory instanceof PlayerInventory) {
+			if (inventory.getType().equals(InventoryType.PLAYER)) {
 				// drop if inventory is the player's inventory
 				dropTempOwnedItem(item, player.getLocation(), player);
 				if (!silent) {

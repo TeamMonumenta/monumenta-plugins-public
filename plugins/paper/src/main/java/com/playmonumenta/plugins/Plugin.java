@@ -45,6 +45,7 @@ import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateManager;
 import com.playmonumenta.plugins.listeners.*;
 import com.playmonumenta.plugins.managers.LoadoutManager;
+import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.managers.TimeWarpManager;
 import com.playmonumenta.plugins.minigames.chess.ChessManager;
 import com.playmonumenta.plugins.mmquest.commands.MMQuest;
@@ -412,6 +413,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(new WorldListener(this), this);
 		manager.registerEvents(new ShulkerShortcutListener(this), this);
 		manager.registerEvents(mShulkerEquipmentListener, this);
+		manager.registerEvents(new LootboxManager(this), this);
 		manager.registerEvents(new PortableEnderListener(), this);
 		manager.registerEvents(new PotionConsumeListener(this), this);
 		manager.registerEvents(new ZoneListener(), this);

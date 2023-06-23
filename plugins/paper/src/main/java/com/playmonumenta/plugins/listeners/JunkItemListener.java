@@ -168,20 +168,10 @@ public final class JunkItemListener implements Listener {
 				return;
 			}
 			UUID uuid = player.getUniqueId();
-			PlayerInventory inv = player.getInventory();
 
 			// If they're in none of the groups, quit immediately without doing a bunch of checks
 			if (!(mInterestingPlayers.contains(uuid) || mLorePlayers.contains(uuid) || mTieredPlayers.contains(uuid))) {
 				return;
-			}
-
-			// Allow collection of any items on the hotbar
-			for (int i = 0; i <= 8; i++) {
-				ItemStack hotbarItem = inv.getItem(i);
-				if (hotbarItem != null && hotbarItem.isSimilar(item)) {
-					// This is the same as something on the player's hotbar, definitely don't want to cancel pickup
-					return;
-				}
 			}
 
 			// Allow collection of valuable player-dropped items
@@ -189,32 +179,60 @@ public final class JunkItemListener implements Listener {
 				return;
 			}
 
-			int minStack = ScoreboardUtils.getScoreboardValue(player, PICKUP_MIN_OBJ_NAME).orElse(0);
-			if (minStack <= 0) { // Initializes PickupMin at JUNK_ITEM_SIZE_THRESHOLD; removes useless PickupMin values
-				minStack = JUNK_ITEM_SIZE_THRESHOLD;
-				ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, minStack);
-			}
-
-			// If the stack size is at least the specified size, bypass restrictions
-			if (item.getAmount() >= minStack) {
-				return;
-			}
-
-			if (mTieredPlayers.contains(uuid)) {
-				ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
-				if ((tier == ItemStatUtils.Tier.NONE || tier == ItemStatUtils.Tier.ZERO) && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
-					event.setCancelled(true);
-				}
-			} else if (mLorePlayers.contains(uuid)) {
-				if (!ItemUtils.hasLore(item)) {
-					event.setCancelled(true);
-				}
-			} else if (mInterestingPlayers.contains(uuid)) {
-				if (!ItemUtils.isInteresting(item)) {
-					event.setCancelled(true);
-				}
+			if (pickupFilter(player, item)) {
+				event.setCancelled(true);
 			}
 		}
+	}
+
+	/**
+	 * This checks if the item can be picked up or not by this player.
+	 * @return True if pickup should be cancelled, false if not
+	 */
+	public boolean pickupFilter(Player player, ItemStack item) {
+		PlayerInventory inventory = player.getInventory();
+		UUID uuid = player.getUniqueId();
+
+		// If they're in none of the groups, quit immediately without doing a bunch of checks
+		if (!(mInterestingPlayers.contains(uuid) || mLorePlayers.contains(uuid) || mTieredPlayers.contains(uuid))) {
+			return false;
+		}
+
+		// Allow collection of any items on the hotbar
+		for (int i = 0; i <= 8; i++) {
+			ItemStack hotbarItem = inventory.getItem(i);
+			if (hotbarItem != null && hotbarItem.isSimilar(item)) {
+				// This is the same as something on the player's hotbar, definitely don't want to cancel pickup
+				return false;
+			}
+		}
+
+		int minStack = ScoreboardUtils.getScoreboardValue(player, PICKUP_MIN_OBJ_NAME).orElse(0);
+		if (minStack <= 0) { // Initializes PickupMin at JUNK_ITEM_SIZE_THRESHOLD; removes useless PickupMin values
+			minStack = JUNK_ITEM_SIZE_THRESHOLD;
+			ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, minStack);
+		}
+
+		// If the stack size is at least the specified size, bypass restrictions
+		if (item.getAmount() >= minStack) {
+			return false;
+		}
+
+		if (mTieredPlayers.contains(uuid)) {
+			ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
+			if ((tier == ItemStatUtils.Tier.NONE || tier == ItemStatUtils.Tier.ZERO) && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
+				return true;
+			}
+		} else if (mLorePlayers.contains(uuid)) {
+			if (!ItemUtils.hasLore(item)) {
+				return true;
+			}
+		} else if (mInterestingPlayers.contains(uuid)) {
+			if (!ItemUtils.isInteresting(item)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean hasTag(Player player) {
