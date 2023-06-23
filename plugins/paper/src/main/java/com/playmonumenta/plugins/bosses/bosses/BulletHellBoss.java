@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
+import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.spells.SpellBullet;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -27,6 +28,10 @@ public class BulletHellBoss extends BossAbilityGroup {
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Damage")
 		public int DAMAGE = 15;
+		@BossParam(help = "The name of the spell.")
+		public String SPELL_NAME = "";
+		@BossParam(help = "Effects to apply on hit.")
+		public EffectsList EFFECTS = EffectsList.EMPTY;
 		@BossParam(help = "Cast Duration (30 for Junko, 50 for sanae and 600 for border)")
 		public int DURATION = 50;
 		@BossParam(help = "Bullet Initial Speed (0 for sanae, 0.1 for Junko, 0.3 for border)")
@@ -92,7 +97,8 @@ public class BulletHellBoss extends BossAbilityGroup {
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
-						DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, null), p.DAMAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, false);
+						DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, p.SPELL_NAME), p.DAMAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, false);
+						p.EFFECTS.apply(player, mBoss);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 5, 0, 0, 0, 0.175).spawnAsEnemy();
 				}
