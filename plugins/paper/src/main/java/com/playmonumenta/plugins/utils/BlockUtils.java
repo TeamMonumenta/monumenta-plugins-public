@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -176,5 +177,9 @@ public class BlockUtils {
 		Vector dir = direction.clone().setY(0).normalize();
 		return Stream.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
 			.min(Comparator.comparingDouble(bf -> bf.getDirection().distance(dir))).orElse(BlockFace.NORTH);
+	}
+
+	public static Location getCenterBlockLocation(Block block) {
+		return block.getLocation().add(0.5, 0.5, 0.5);
 	}
 }

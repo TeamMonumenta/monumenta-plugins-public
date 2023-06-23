@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.particle.ParticleCategory;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -580,6 +582,96 @@ public class ParticleUtils {
 					pp
 			);
 		}
+	}
+
+	public static void drawSevenSegmentNumber(int number, Location center, Player player, double scale, double spacing, Particle particle, @Nullable Object data) {
+		// Each digit takes up (scale + spacing) space.
+		double digitSpace = scale + spacing;
+		char[] digits = Integer.toString(number).toCharArray();
+		int digitCount = digits.length;
+		double leftMost;
+
+		if (digitCount % 2 == 0) {
+			// If there is an even number of digits, the leftmost digit's center is offset by
+			// leftMost = (1/2 + digits/2) * digitSpace
+			leftMost = (0.5 + (float) (digitCount / 2)) * digitSpace;
+		} else {
+			// If there is an odd number of digits, the leftmost digit's center is offset by
+			// leftMost = (digits / 2 + 1) * digitSpace
+			leftMost = ((float) (digitCount / 2) + 1) * digitSpace;
+		}
+		// The number has to be facing the specified player. The digits are placed along the perpendicular vector.
+		Vector front = LocationUtils.getDirectionTo(player.getLocation(), center).setY(0).normalize();
+		Vector up = new Vector(0, 1, 0);
+		Vector right = VectorUtils.crossProd(up, front);
+
+		// Then, each digit's center is found by the iteration:
+		// leftMost + digitSpace * i, i = 0, i < digitCount
+		Location currentDigitCenter = center.clone().subtract(right.clone().multiply(leftMost));
+		for (char digit : digits) {
+			int currentNumber = Integer.parseInt(String.valueOf(digit));
+			currentDigitCenter.add(right.clone().multiply(digitSpace));
+			drawSevenSegmentDigit(currentNumber, currentDigitCenter.clone(), player, scale, up, right, particle, data);
+		}
+	}
+
+	public static void drawSevenSegmentDigit(int number, Location center, Player player, double scale, Particle particle, @Nullable Object data) {
+		// Draw the number facing the specified player.
+		Vector front = LocationUtils.getDirectionTo(player.getLocation(), center).setY(0).normalize();
+		Vector up = new Vector(0, 1, 0);
+		Vector right = VectorUtils.crossProd(up, front);
+
+		drawSevenSegmentDigit(number, center, player, scale, up, right, particle, data);
+	}
+
+	public static void drawSevenSegmentDigit(int number, Location center, Player player, double scale, Vector up, Vector right, Particle particle, @Nullable Object data) {
+		// Scale down the number
+		Vector eUp = up.clone().multiply(scale);
+		Vector eRight = right.clone().multiply(0.5).multiply(scale);
+
+		PPLine top = new PPLine(particle, center.clone().add(eUp).subtract(eRight), center.clone().add(eUp).add(eRight))
+			.countPerMeter(4);
+		PPLine middle = new PPLine(particle, center.clone().subtract(eRight), center.clone().add(eRight))
+			.countPerMeter(4);
+		PPLine bottom = new PPLine(particle, center.clone().subtract(eUp).subtract(eRight), center.clone().subtract(eUp).add(eRight))
+			.countPerMeter(4);
+
+		PPLine topLeft = new PPLine(particle, center.clone().add(eUp).subtract(eRight), center.clone().subtract(eRight))
+			.countPerMeter(4);
+		PPLine topRight = new PPLine(particle, center.clone().add(eUp).add(eRight), center.clone().add(eRight))
+			.countPerMeter(4);
+
+		PPLine bottomLeft = new PPLine(particle, center.clone().subtract(eUp).subtract(eRight), center.clone().subtract(eRight))
+			.countPerMeter(4);
+		PPLine bottomRight = new PPLine(particle, center.clone().subtract(eUp).add(eRight), center.clone().add(eRight))
+			.countPerMeter(4);
+
+		if (data != null) {
+			top.data(data);
+			middle.data(data);
+			bottom.data(data);
+			topLeft.data(data);
+			topRight.data(data);
+			bottomLeft.data(data);
+			bottomRight.data(data);
+		}
+
+		List<PPLine> linesToDraw;
+
+		switch (number) {
+			case 0 -> linesToDraw = List.of(top, topLeft, topRight, bottom, bottomLeft, bottomRight);
+			case 1 -> linesToDraw = List.of(topRight, bottomRight);
+			case 2 -> linesToDraw = List.of(top, topRight, middle, bottom, bottomLeft);
+			case 3 -> linesToDraw = List.of(top, topRight, middle, bottom, bottomRight);
+			case 4 -> linesToDraw = List.of(topLeft, topRight, middle, bottomRight);
+			case 5 -> linesToDraw = List.of(top, topLeft, middle, bottom, bottomRight);
+			case 6 -> linesToDraw = List.of(top, topLeft, middle, bottom, bottomLeft, bottomRight);
+			case 7 -> linesToDraw = List.of(top, topRight, bottomRight);
+			case 8 -> linesToDraw = List.of(top, topLeft, topRight, middle, bottom, bottomLeft, bottomRight);
+			default -> linesToDraw = List.of(top, topLeft, topRight, middle, bottomRight);
+		}
+
+		linesToDraw.forEach(l -> l.spawnForPlayer(ParticleCategory.BOSS, player));
 	}
 
 }

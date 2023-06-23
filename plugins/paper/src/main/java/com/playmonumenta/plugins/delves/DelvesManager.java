@@ -48,6 +48,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -72,6 +73,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 
 public class DelvesManager implements Listener {
@@ -125,6 +127,7 @@ public class DelvesManager implements Listener {
 
 	private static final String HAS_DELVE_MODIFIER_TAG = "DelveModifiersApplied";
 	public static final String AVOID_MODIFIERS = "boss_delveimmune";
+	public static @Nullable CreatureSpawner NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE = null;
 
 	public static int getRank(Player player, DelvesModifier modifier) {
 		if (player == null || modifier == null) {
@@ -318,6 +321,7 @@ public class DelvesManager implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void entitySpawnEvent(EntitySpawnEvent event) {
 		if (!DUNGEONS.contains(ServerProperties.getShardName())) {
+			setForcedReferenceToSpawner(null);
 			return;
 		}
 		Entity entity = event.getEntity();
@@ -332,12 +336,14 @@ public class DelvesManager implements Listener {
 		 */
 		Set<String> tags = entity.getScoreboardTags();
 		if (tags.contains(HAS_DELVE_MODIFIER_TAG) || tags.contains(AVOID_MODIFIERS)) {
+			setForcedReferenceToSpawner(null);
 			return;
 		}
 
 		if (entity instanceof LivingEntity livingEntity) {
 			PotionEffect resistance = livingEntity.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			if (resistance != null && (resistance.getAmplifier() > 4 || resistance.getDuration() > 20 * 7)) {
+				setForcedReferenceToSpawner(null);
 				return;
 			}
 		}
@@ -348,10 +354,15 @@ public class DelvesManager implements Listener {
 			if (!playerParty.isEmpty()) {
 				Map<DelvesModifier, Integer> delvesApplied = DelvesUtils.getPartyDelvePointsMap(playerParty);
 				//check if this mob is summoned by command or by spawners
-				if (event instanceof SpawnerSpawnEvent) {
-					//normal spawn - handle all the mods
-					Riftborn.applyModifiers(((SpawnerSpawnEvent) event).getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
-					Chronology.applyModifiers(((SpawnerSpawnEvent) event).getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
+				if (NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE != null) {
+					// faked normal spawn - used for lospool spawners
+					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
+					Riftborn.applyModifiers(NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE.getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Chronology.applyModifiers(NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE, delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
+				} else if (event instanceof SpawnerSpawnEvent spawnerSpawnEvent) {
+					// normal spawn - handle all the mods
+					Riftborn.applyModifiers(spawnerSpawnEvent.getSpawner().getBlock(), delvesApplied.getOrDefault(DelvesModifier.RIFTBORN, 0));
+					Chronology.applyModifiers(spawnerSpawnEvent.getSpawner(), delvesApplied.getOrDefault(DelvesModifier.CHRONOLOGY, 0));
 
 					delvesApplied.forEach((mod, level) -> mod.applyDelve(livingEntity, level));
 				} else {
@@ -359,10 +370,12 @@ public class DelvesManager implements Listener {
 					//give only death trigger abilities
 					// Delay this by a tick to allow the 'delve immune' tag to be applied to the mob after spawning it
 					if (entity.getScoreboardTags().contains(AVOID_MODIFIERS)) {
+						setForcedReferenceToSpawner(null);
 						return;
 					}
 					for (DelvesModifier mod : DelvesModifier.deathTriggerDelvesModifier()) {
 						mod.applyDelve(livingEntity, delvesApplied.getOrDefault(mod, 0));
+
 					}
 					// Apply unyielding on all elites (e.g. gray evokers)
 					DelvesModifier.UNYIELDING.applyDelve(livingEntity, delvesApplied.getOrDefault(DelvesModifier.UNYIELDING, 0));
@@ -374,6 +387,8 @@ public class DelvesManager implements Listener {
 				StatMultiplier.applyModifiers(livingEntity, DelvesUtils.getTotalPoints(delvesApplied));
 			}
 		}
+
+		setForcedReferenceToSpawner(null);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -637,6 +652,10 @@ public class DelvesManager implements Listener {
 			}
 			mTotalPoint = Math.min(mTotalPoint, DelvesUtils.MAX_DEPTH_POINTS);
 		}
+	}
+
+	public static void setForcedReferenceToSpawner(@Nullable CreatureSpawner creatureSpawner) {
+		NEXT_SPAWN_SPAWNER_BLOCK_REFERENCE = creatureSpawner;
 	}
 
 }

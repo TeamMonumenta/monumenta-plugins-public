@@ -1,8 +1,12 @@
 package com.playmonumenta.plugins;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Locale;
+import java.util.function.Function;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -321,5 +325,28 @@ public class Constants {
 			Material.SALMON,
 			Material.TROPICAL_FISH
 		);
+	}
+
+	public enum SupportedPersistentDataType {
+		BYTE(PersistentDataType.BYTE, Byte::parseByte),
+		SHORT(PersistentDataType.SHORT, Short::parseShort),
+		INTEGER(PersistentDataType.INTEGER, Integer::parseInt),
+		LONG(PersistentDataType.LONG, Long::parseLong),
+		FLOAT(PersistentDataType.FLOAT, Float::parseFloat),
+		DOUBLE(PersistentDataType.DOUBLE, Double::parseDouble),
+		STRING(PersistentDataType.STRING, s -> s),
+		;
+
+		public final PersistentDataType<?, ?> mPersistentDataType;
+		public final Function<String, Object> mParser;
+
+		SupportedPersistentDataType(PersistentDataType<?, ?> persistentDataType, Function<String, Object> parser) {
+			this.mPersistentDataType = persistentDataType;
+			this.mParser = parser;
+		}
+
+		public static String[] getLowerCaseNames() {
+			return Arrays.stream(values()).map(e -> e.name().toLowerCase(Locale.ROOT)).toArray(String[]::new);
+		}
 	}
 }

@@ -371,6 +371,8 @@ public class Plugin extends JavaPlugin {
 
 		DailyReset.startTimer(this);
 
+		SpawnerCommand.register();
+
 		//  Load info.
 		reloadMonumentaConfig(null);
 

@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.delves.DelvesUtils;
-import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.EntityUtils;

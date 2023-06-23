@@ -9,14 +9,15 @@ import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.StringTooltip;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.DoubleArgument;
+import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
@@ -54,113 +55,135 @@ public class ParticleUtilsCommand {
 		// Line
 		new CommandAPICommand(COMMAND)
 			.withPermission("monumenta.particleutils")
-			.withArguments(
-				new LiteralArgument("line"),
-				new LocationArgument("start"),
-				new LocationArgument("end"),
-				new DoubleArgument("count per meter"),
-				particleArgument,
-				distanceFalloffArgument,
-				extraDataArgument
+			.withSubcommands(
+				// Line
+				new CommandAPICommand("line")
+					.withPermission("monumenta.particleutils.line")
+					.withArguments(
+						new LocationArgument("start"),
+						new LocationArgument("end"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument
+					)
+					.executes((sender, args) -> {
+						Location start = (Location) args[0];
+						Location end = (Location) args[1];
+						double countPerMeter = (double) args[2];
+						Particle particle = Particle.valueOf((String) args[3]);
+						double distanceFalloff = (double) args[4];
+						String extraData = (String) args[5];
+
+						CommandSender callee = getFinalCallee(sender, distanceFalloff);
+						doLine(callee, start, end, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
+					}),
+				// Rectangle
+				new CommandAPICommand("rectangle")
+					.withPermission("monumenta.particleutils.rectangle")
+					.withArguments(
+						new LocationArgument("start"),
+						new DoubleArgument("dx"),
+						new DoubleArgument("dz"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument
+					)
+					.executes((sender, args) -> {
+						Location start = (Location) args[0];
+						double dx = (double) args[1];
+						double dz = (double) args[2];
+						double countPerMeter = (double) args[3];
+						Particle particle = Particle.valueOf((String) args[4]);
+						double distanceFalloff = (double) args[5];
+						String extraData = (String) args[6];
+
+						CommandSender callee = getFinalCallee(sender, distanceFalloff);
+						doRectangle(callee, start, dx, dz, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
+					}),
+				// Circle
+				new CommandAPICommand("circle")
+					.withPermission("monumenta.particleutils.circle")
+					.withArguments(
+						new BooleanArgument("ring mode"),
+						new LocationArgument("center"),
+						new DoubleArgument("radius"),
+						new DoubleArgument("count per meter"),
+						particleArgument,
+						distanceFalloffArgument,
+						extraDataArgument
+					)
+					.executes((sender, args) -> {
+						boolean ringMode = (boolean) args[0];
+						Location center = (Location) args[1];
+						double radius = (double) args[2];
+						double countPerMeter = (double) args[3];
+						Particle particle = Particle.valueOf((String) args[4]);
+						double distanceFalloff = (double) args[5];
+						String extraData = (String) args[6];
+
+						CommandSender callee = getFinalCallee(sender, distanceFalloff);
+						doCircle(callee, ringMode, center, radius, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
+					}),
+				// Circle Telegraph
+				new CommandAPICommand("circletelegraph")
+					.withPermission("monumenta.particleutils.circletelegraph")
+					.withArguments(
+						new LocationArgument("center"),
+						new DoubleArgument("radius"),
+						new IntegerArgument("count"),
+						particleArgument,
+						distanceFalloffArgument,
+						new DoubleArgument("particle speed"),
+						new IntegerArgument("pulses"),
+						new IntegerArgument("telegraph duration"),
+						new IntegerArgument("pulse start offset"),
+						extraDataArgument
+					)
+					.executes((sender, args) -> {
+						Location center = (Location) args[0];
+						double radius = (double) args[1];
+						int count = (int) args[2];
+						Particle particle = Particle.valueOf((String) args[3]);
+						double distanceFalloff = (double) args[4];
+						double particleSpeed = (double) args[5];
+						int pulses = (int) args[6];
+						int telegraphDuration = (int) args[7];
+						int pulseStartOffset = (int) args[8];
+						String extraData = (String) args[9];
+
+						CommandSender callee = getFinalCallee(sender, distanceFalloff);
+						doCircleTelegraph(callee, center, radius, count, particle, distanceFalloff, particleSpeed, pulses, telegraphDuration, pulseStartOffset, parseExtraData(extraData, particle));
+					}),
+				// Number
+				new CommandAPICommand("number")
+					.withPermission("monumenta.particleutils.number")
+						.withArguments(
+							new IntegerArgument("number"),
+							new LocationArgument("location"),
+							new DoubleArgument("scale"),
+							new DoubleArgument("spacing"),
+							new EntitySelectorArgument.OnePlayer("facing player"),
+							particleArgument,
+							//distanceFalloffArgument,
+							extraDataArgument
+						)
+						.executes((sender, args) -> {
+							int number = (int) args[0];
+							Location location = (Location) args[1];
+							double scale = (double) args[2];
+							double spacing = (double) args[3];
+							Player player = (Player) args[4];
+							Particle particle = Particle.valueOf((String) args[5]);
+							//double distanceFalloff = (double) args[6];
+							// String extraData = (String) args[7];
+							String extraData = (String) args[6];
+
+							//CommandSender callee = getFinalCallee(sender, distanceFalloff);
+							ParticleUtils.drawSevenSegmentNumber(number, location, player, scale, spacing, particle, parseExtraData(extraData, particle));
+						})
 			)
-			.executes((sender, args) -> {
-				Location start = (Location) args[0];
-				Location end = (Location) args[1];
-				double countPerMeter = (double) args[2];
-				Particle particle = Particle.valueOf((String) args[3]);
-				double distanceFalloff = (double) args[4];
-				String extraData = (String) args[5];
-
-				CommandSender callee = getFinalCallee(sender, distanceFalloff);
-				doLine(callee, start, end, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
-			})
-			.register();
-
-		// Rectangle
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.particleutils")
-			.withArguments(
-				new LiteralArgument("rectangle"),
-				new LocationArgument("start"),
-				new DoubleArgument("dx"),
-				new DoubleArgument("dz"),
-				new DoubleArgument("count per meter"),
-				particleArgument,
-				distanceFalloffArgument,
-				extraDataArgument
-			)
-			.executes((sender, args) -> {
-				Location start = (Location) args[0];
-				double dx = (double) args[1];
-				double dz = (double) args[2];
-				double countPerMeter = (double) args[3];
-				Particle particle = Particle.valueOf((String) args[4]);
-				double distanceFalloff = (double) args[5];
-				String extraData = (String) args[6];
-
-				CommandSender callee = getFinalCallee(sender, distanceFalloff);
-				doRectangle(callee, start, dx, dz, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
-			})
-			.register();
-
-		// Circle
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.particleutils")
-			.withArguments(
-				new LiteralArgument("circle"),
-				new BooleanArgument("ring mode"),
-				new LocationArgument("center"),
-				new DoubleArgument("radius"),
-				new DoubleArgument("count per meter"),
-				particleArgument,
-				distanceFalloffArgument,
-				extraDataArgument
-			)
-			.executes((sender, args) -> {
-				boolean ringMode = (boolean) args[0];
-				Location center = (Location) args[1];
-				double radius = (double) args[2];
-				double countPerMeter = (double) args[3];
-				Particle particle = Particle.valueOf((String) args[4]);
-				double distanceFalloff = (double) args[5];
-				String extraData = (String) args[6];
-
-				CommandSender callee = getFinalCallee(sender, distanceFalloff);
-				doCircle(callee, ringMode, center, radius, countPerMeter, particle, distanceFalloff, parseExtraData(extraData, particle));
-			})
-			.register();
-
-		// Circle Telegraph
-		new CommandAPICommand(COMMAND)
-			.withPermission("monumenta.particleutils")
-			.withArguments(
-				new LiteralArgument("circletelegraph"),
-				new LocationArgument("center"),
-				new DoubleArgument("radius"),
-				new IntegerArgument("count"),
-				particleArgument,
-				distanceFalloffArgument,
-				new DoubleArgument("particle speed"),
-				new IntegerArgument("pulses"),
-				new IntegerArgument("telegraph duration"),
-				new IntegerArgument("pulse start offset"),
-				extraDataArgument
-			)
-			.executes((sender, args) -> {
-				Location center = (Location) args[0];
-				double radius = (double) args[1];
-				int count = (int) args[2];
-				Particle particle = Particle.valueOf((String) args[3]);
-				double distanceFalloff = (double) args[4];
-				double particleSpeed = (double) args[5];
-				int pulses = (int) args[6];
-				int telegraphDuration = (int) args[7];
-				int pulseStartOffset = (int) args[8];
-				String extraData = (String) args[9];
-
-				CommandSender callee = getFinalCallee(sender, distanceFalloff);
-				doCircleTelegraph(callee, center, radius, count, particle, distanceFalloff, particleSpeed, pulses, telegraphDuration, pulseStartOffset, parseExtraData(extraData, particle));
-			})
 			.register();
 	}
 

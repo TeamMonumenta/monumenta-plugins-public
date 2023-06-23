@@ -511,6 +511,7 @@ public class ItemStatUtils {
 		CHAOTIC(new Chaotic(), true, false, false, true),
 		DARKSIGHT(new Darksight(), false, false, false, false),
 		DECAY(new Decay(), true, false, false, true),
+		DRILLING(new Drilling(), true, false, false, true),
 		DUELIST(new Duelist(), true, false, false, true),
 		ERUPTION(new Eruption(), true, false, false, true),
 		EXCAVATOR(new Excavator(), false, false, false, true),

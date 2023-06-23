@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.Constants;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
@@ -13,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -25,25 +25,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
 public class PersistentDataCommand {
-
-	private enum SupportedPersistentDataType {
-		BYTE(PersistentDataType.BYTE, Byte::parseByte),
-		SHORT(PersistentDataType.SHORT, Short::parseShort),
-		INTEGER(PersistentDataType.INTEGER, Integer::parseInt),
-		LONG(PersistentDataType.LONG, Long::parseLong),
-		FLOAT(PersistentDataType.FLOAT, Float::parseFloat),
-		DOUBLE(PersistentDataType.DOUBLE, Double::parseDouble),
-		STRING(PersistentDataType.STRING, s -> s),
-		;
-
-		private final PersistentDataType<?, ?> mPersistentDataType;
-		private final Function<String, Object> mParser;
-
-		SupportedPersistentDataType(PersistentDataType<?, ?> persistentDataType, Function<String, Object> parser) {
-			this.mPersistentDataType = persistentDataType;
-			this.mParser = parser;
-		}
-	}
 
 	public static void register() {
 		new CommandAPICommand("persistentdata")
@@ -88,7 +69,7 @@ public class PersistentDataCommand {
 							.withArguments(new NamespacedKeyArgument("key")
 								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
 									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs()[0])))))
-							.withArguments(new MultiLiteralArgument(Arrays.stream(SupportedPersistentDataType.values()).map(e -> e.name().toLowerCase(Locale.ROOT)).toArray(String[]::new)))
+							.withArguments(new MultiLiteralArgument(Arrays.stream(Constants.SupportedPersistentDataType.values()).map(e -> e.name().toLowerCase(Locale.ROOT)).toArray(String[]::new)))
 							.withArguments(new GreedyStringArgument("value"))
 							.executesPlayer((player, args) -> {
 								NamespacedKey key = (NamespacedKey) args[0];
@@ -104,7 +85,7 @@ public class PersistentDataCommand {
 							.withArguments(new NamespacedKeyArgument("key")
 								               .replaceSuggestions(ArgumentSuggestions.stringCollection(
 									               info -> suggestions(Bukkit.getWorld((String) info.previousArgs()[0])))))
-							.withArguments(new MultiLiteralArgument(Arrays.stream(SupportedPersistentDataType.values()).map(e -> e.name().toLowerCase(Locale.ROOT)).toArray(String[]::new)))
+							.withArguments(new MultiLiteralArgument(Constants.SupportedPersistentDataType.getLowerCaseNames()))
 							.withArguments(new GreedyStringArgument("value"))
 							.executes((sender, args) -> {
 								World world = Bukkit.getWorld((String) args[0]);
@@ -128,7 +109,7 @@ public class PersistentDataCommand {
 	}
 
 	private static void get(CommandSender sender, World world, NamespacedKey key) {
-		for (SupportedPersistentDataType supportedType : SupportedPersistentDataType.values()) {
+		for (Constants.SupportedPersistentDataType supportedType : Constants.SupportedPersistentDataType.values()) {
 			try {
 				Object value = world.getPersistentDataContainer().get(key, supportedType.mPersistentDataType);
 				if (value != null) {
@@ -143,9 +124,9 @@ public class PersistentDataCommand {
 	}
 
 	private static void set(CommandSender sender, World world, NamespacedKey key, String dataType, String valueString) throws WrapperCommandSyntaxException {
-		SupportedPersistentDataType type;
+		Constants.SupportedPersistentDataType type;
 		try {
-			type = SupportedPersistentDataType.valueOf(((String) dataType).toUpperCase(Locale.ROOT));
+			type = Constants.SupportedPersistentDataType.valueOf(((String) dataType).toUpperCase(Locale.ROOT));
 		} catch (IllegalArgumentException e) {
 			throw CommandAPI.failWithString("Invalid data type " + dataType);
 		}
