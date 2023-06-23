@@ -132,7 +132,11 @@ public class MessagingUtils {
 	}
 
 	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {
-		sendTitle(player, Component.text(title != null ? title : "").decorate(TextDecoration.BOLD), Component.text(subtitle != null ? subtitle : "").decorate(TextDecoration.BOLD));
+		sendBoldTitle(player, Component.text(title != null ? title : ""), Component.text(subtitle != null ? subtitle : ""));
+	}
+
+	public static void sendBoldTitle(Player player, Component title, Component subtitle) {
+		sendTitle(player, title.decorate(TextDecoration.BOLD), subtitle.decorate(TextDecoration.BOLD));
 	}
 
 	public static void sendTitle(Player player, @Nullable String title, @Nullable String subtitle) {

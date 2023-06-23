@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -319,7 +318,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 		}
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Orasomn", ChatColor.RED + "The Hand of Fate");
+			MessagingUtils.sendBoldTitle(player, Component.text("Orasomn", NamedTextColor.AQUA), Component.text("The Hand of Fate", NamedTextColor.RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
@@ -334,15 +333,12 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 			mob.remove();
 		}
 		PlayerUtils.playersInRange(mSpawnLoc, TealSpirit.detectionRange, true).forEach(player -> {
-			player.sendMessage(ChatColor.DARK_AQUA + "no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!");
-			EntityUtils.removeAttribute(player, Attribute.GENERIC_MAX_HEALTH, "TealSpirit-" + mBoss.getUniqueId());
+			player.sendMessage(Component.text("no, this cannot be! time... betrays me? why do the hands of time not turn? i... will... be... forever!", NamedTextColor.DARK_AQUA));
+			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(player, RewriteHistory.PERCENT_HEALTH_EFFECT);
 		});
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 		if (mDoomsdayClock != null) {
 			mDoomsdayClock.disableClock();
-		}
-		if (mRewriteHistory != null) {
-			mRewriteHistory.reset();
 		}
 	}
 

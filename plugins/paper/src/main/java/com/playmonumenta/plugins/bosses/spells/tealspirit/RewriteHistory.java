@@ -66,13 +66,6 @@ public class RewriteHistory extends Spell {
 		mActiveRunnables.add(runnable);
 	}
 
-	public void reset() {
-		mStack = 1;
-		PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
-			com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.clearEffects(p, PERCENT_HEALTH_EFFECT);
-		});
-	}
-
 	@Override
 	public int cooldownTicks() {
 		return mHealthCastTime + 20 * 5;
