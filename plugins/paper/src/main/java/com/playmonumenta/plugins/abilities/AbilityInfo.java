@@ -319,10 +319,10 @@ public class AbilityInfo<T extends Ability> {
 
 		Component component = Component.text("");
 		component = component.append(getFormattedDescription(player, 1, enabled));
-		if (level > 1) {
+		if (level > 1 && mDescriptions.size() > 1) {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 2, enabled));
 		}
-		if (isEnhanced) {
+		if (isEnhanced && mDescriptions.size() > 2) {
 			component = component.append(Component.newline()).append(getFormattedDescription(player, 3, enabled));
 		}
 		return component;
