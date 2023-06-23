@@ -45,9 +45,7 @@ public class DamageEvent extends Event implements Cancellable {
 		public static DamageType getType(DamageCause cause) {
 			// List every cause for completeness
 			switch (cause) {
-				case CONTACT:
 				case ENTITY_ATTACK:
-				case FALLING_BLOCK:
 					return DamageType.MELEE;
 				case ENTITY_SWEEP_ATTACK:
 					return DamageType.MELEE_ENCH;
@@ -73,10 +71,12 @@ public class DamageEvent extends Event implements Cancellable {
 					return DamageType.POISON;
 				case WITHER:
 					return DamageType.AILMENT;
+				case CONTACT:
 				case CRAMMING:
 				case CUSTOM:
 				case DROWNING:
 				case DRYOUT:
+				case FALLING_BLOCK:
 				case LIGHTNING:
 				case MELTING:
 				case STARVATION:

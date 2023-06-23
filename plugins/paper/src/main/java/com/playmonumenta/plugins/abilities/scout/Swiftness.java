@@ -73,7 +73,7 @@ public class Swiftness extends Ability {
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		DamageEvent.DamageType type = event.getType();
-		if ((type == DamageEvent.DamageType.MELEE || type == DamageEvent.DamageType.PROJECTILE) && isEnhanced() && FastUtils.RANDOM.nextDouble() < DODGE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DODGE)) {
+		if ((type == DamageEvent.DamageType.MELEE || type == DamageEvent.DamageType.PROJECTILE) && isEnhanced() && !event.isBlocked() && FastUtils.RANDOM.nextDouble() < DODGE_CHANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DODGE)) {
 			event.setCancelled(true);
 			mPlayer.setNoDamageTicks(20);
 			mPlayer.setLastDamage(event.getDamage());
