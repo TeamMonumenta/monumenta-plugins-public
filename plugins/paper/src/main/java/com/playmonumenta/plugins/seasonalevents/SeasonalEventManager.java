@@ -3,20 +3,24 @@ package com.playmonumenta.plugins.seasonalevents;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.seasonalevents.gui.PassGui;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.QuestUtils;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SeasonalEventManager {
@@ -30,12 +34,14 @@ public class SeasonalEventManager {
 		}
 	}
 
-	public static final int MP_PER_LEVEL = 75;
-	public static final String MISSION_SCOREBOARD = "WeeklyMission";
+	// The first week of the rework; used to mark old progress as unknown
+	public static final long PLAYER_PROGRESS_REWORK_WEEK = DateUtils.getWeeklyVersion(
+		LocalDateTime.of(2023, 6, 30, 0, 0));
 	public static final String ALL_MISSIONS_TITLE_NAME = "Tryhard";
 	public static final String SEASONAL_PASSES_FOLDER = "seasonalevents";
 	public static TreeMap<LocalDateTime, SeasonalPass> mAllPasses = new TreeMap<>();
 	public static @Nullable SeasonalPass mActivePass = null;
+	private static final Map<UUID, PlayerProgress> mPlayerProgress = new HashMap<>();
 
 	public SeasonalEventManager() {
 		reloadPasses(Bukkit.getConsoleSender());
@@ -51,12 +57,13 @@ public class SeasonalEventManager {
 		QuestUtils.loadScriptedQuests(plugin,
 			SEASONAL_PASSES_FOLDER,
 			sender,
-			(object, file) -> {
+			(JsonObject object, File file) -> {
 				@Nullable JsonElement startDateJson = object.get("start_date");
 				if (startDateJson == null) {
 					// Invalid seasonal pass file, ignore
-					sender.sendMessage(Component.text("No start_date in " + file, NamedTextColor.RED));
-					return null;
+					String msg = "No start_date in " + file;
+					sender.sendMessage(Component.text(msg, NamedTextColor.RED));
+					throw new Exception(msg);
 				}
 				String startDateString = startDateJson.getAsString();
 				PassFiles passFiles = allPassFiles.computeIfAbsent(startDateString, (key) -> {
@@ -66,11 +73,16 @@ public class SeasonalEventManager {
 
 				if (object.has("missions")) {
 					passFiles.mMissionsJson = object;
+					return file.getName() + "_missions";
 				}
 				if (object.has("rewards")) {
 					passFiles.mRewardsJson = object;
+					return file.getName() + "_rewards";
 				}
-				return null;
+
+				String msg = "File is neither missions nor rewards file: " + file;
+				sender.sendMessage(Component.text(msg, NamedTextColor.RED));
+				throw new Exception(msg);
 			});
 
 		for (Map.Entry<String, PassFiles> passFilesEntry : allPassFiles.entrySet()) {
@@ -101,6 +113,7 @@ public class SeasonalEventManager {
 				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), exception);
 			}
 		}
+
 		mAllPasses = allPasses;
 		mActivePass = getPass(DateUtils.localDateTime());
 		if (mActivePass != null) {
@@ -108,22 +121,8 @@ public class SeasonalEventManager {
 		} else {
 			sender.sendMessage(Component.text("There is no currently active season pass", NamedTextColor.GOLD));
 		}
-	}
 
-	public static void handlePlayerDailyChange(Player p) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			int currentPassWeek = mActivePass.getWeekOfPass();
-			int playerLastDailyVersion = ScoreboardUtils.getScoreboardValue(p, "DailyVersion").orElse(0);
-			LocalDateTime lastPlayedDate = DateUtils.localDateTime(playerLastDailyVersion);
-			int lastPlayedWeek = mActivePass.getWeekOfPass(lastPlayedDate);
-			if (lastPlayedWeek != currentPassWeek) {
-				mActivePass.resetPlayerPassMissions(p);
-			}
-			if (lastPlayedWeek < 1) {
-				// Player has not played during this pass yet, reset their MP
-				ScoreboardUtils.setScoreboardValue(p, SeasonalPass.PASS_MP_SCOREBOARD, 0);
-			}
-		}
+		PassGui.refreshOpenGuis();
 	}
 
 	public static @Nullable SeasonalPass getPass() {
@@ -131,7 +130,7 @@ public class SeasonalEventManager {
 	}
 
 	public static @Nullable SeasonalPass getPass(LocalDateTime localDateTime) {
-		@Nullable Map.Entry<LocalDateTime, SeasonalPass> seasonalPassEntry = SeasonalEventManager.mAllPasses.floorEntry(localDateTime);
+		@Nullable Map.Entry<LocalDateTime, SeasonalPass> seasonalPassEntry = mAllPasses.floorEntry(localDateTime);
 		if (seasonalPassEntry == null) {
 			return null;
 		}
@@ -142,31 +141,16 @@ public class SeasonalEventManager {
 		return null;
 	}
 
-	/**
-	 * Adds a certain amount of MP to the player
-	 * If above the threshold for a new unlock, awards it to the player
-	 */
-	public static void addMP(Player p, int amount) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			mActivePass.addMP(p, amount);
-		}
+	public static @Nullable SeasonalPass getMostRecentPass() {
+		return getMostRecentPass(DateUtils.localDateTime());
 	}
 
-	/**
-	 * This method is called before opening the GUI to view the battle pass and updates player MP
-	 * with any new earned MP from completed missions
-	 */
-	public static void updatePlayerPassProgress(Player p) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			mActivePass.updatePlayerPassProgress(p);
+	public static @Nullable SeasonalPass getMostRecentPass(LocalDateTime localDateTime) {
+		@Nullable Map.Entry<LocalDateTime, SeasonalPass> seasonalPassEntry = mAllPasses.floorEntry(localDateTime);
+		if (seasonalPassEntry == null) {
+			return null;
 		}
-	}
-
-	public static int getWeekOfPass() {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getWeekOfPass();
-		}
-		return 1;
+		return seasonalPassEntry.getValue();
 	}
 
 	/**
@@ -180,32 +164,9 @@ public class SeasonalEventManager {
 		return new ArrayList<>();
 	}
 
-	/**
-	 * Debug method to get missions for given week
-	 */
-	public static List<WeeklyMission> getMissionsInWeek(int week) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getMissionsInWeek(week);
-		}
-		return new ArrayList<>();
-	}
-
 	public static int getMP(Player p) {
 		if (mActivePass != null && mActivePass.isActive()) {
 			return mActivePass.getMP(p);
-		}
-		return 0;
-	}
-
-	public static void setMP(Player p, int amount) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			mActivePass.setMP(p, amount);
-		}
-	}
-
-	public static int getLevelFromMP(int mp) {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getLevelFromMP(mp);
 		}
 		return 0;
 	}
@@ -214,39 +175,41 @@ public class SeasonalEventManager {
 	 * Triggered by multiple event handlers, this method adds an amount of progress
 	 * to the provided weekly mission number for that week
 	 */
-	public static void addWeeklyMissionProgress(Player p, WeeklyMission mission, int missionNumber, int amount) {
+	public static void addWeeklyMissionProgress(Player p, int missionNumber, int amount) {
 		if (mActivePass != null && mActivePass.isActive()) {
-			mActivePass.addWeeklyMissionProgress(p, mission, missionNumber, amount);
+			mActivePass.addWeeklyMissionProgress(p, missionNumber, amount);
 		}
 	}
 
 	// Time Utils
 
-	public static int getDaysUntilMissionReset() {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getDaysUntilMissionReset();
-		}
-		return 0;
+	public static @Nullable PlayerProgress getPlayerProgress(Player player) {
+		return mPlayerProgress.get(player.getUniqueId());
 	}
 
-	public static int getHoursUntilMissionReset() {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getHoursUntilMissionReset();
-		}
-		return 0;
+	public static void overwritePlayerProgress(Player player, PlayerProgress playerProgress) {
+		mPlayerProgress.put(player.getUniqueId(), playerProgress);
 	}
 
-	public static int getDaysUntilPassEnd() {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getDaysUntilPassEnd();
-		}
-		return 0;
+	public static void unloadPlayerData(@NotNull Player player) {
+		mPlayerProgress.remove(player.getUniqueId());
 	}
 
-	public static int getHoursUntilPassEnd() {
-		if (mActivePass != null && mActivePass.isActive()) {
-			return mActivePass.getHoursUntilPassEnd();
+	public static void loadPlayerProgressJson(Player player, @Nullable JsonElement data) {
+		UUID playerId = player.getUniqueId();
+		if (data instanceof JsonObject playerProgressJson) {
+			mPlayerProgress.put(playerId, new PlayerProgress(player, playerProgressJson));
+		} else {
+			mPlayerProgress.put(playerId, new PlayerProgress());
 		}
-		return 0;
+	}
+
+	public static JsonObject getPlayerProgressJson(Player player) {
+		UUID playerId = player.getUniqueId();
+		PlayerProgress playerProgress = mPlayerProgress.get(playerId);
+		if (playerProgress == null) {
+			return new JsonObject();
+		}
+		return playerProgress.toJson();
 	}
 }

@@ -14,6 +14,8 @@ public class SeasonalReward {
 
 	// Int data - for amounts such as number of loot spins
 	public int mAmount;
+	// Cost to purchase after the pass is over; -1 cannot be purchased
+	public int mCost = -1;
 
 	// Fields for item display in GUI
 	public @Nullable String mName;

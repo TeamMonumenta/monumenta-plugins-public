@@ -1,24 +1,31 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.CosmeticsManager;
+import com.playmonumenta.plugins.cosmetics.finishers.EliteFinishers;
 import com.playmonumenta.plugins.delves.DelvesModifier;
+import com.playmonumenta.plugins.plots.PlotBorderCustomInventory;
+import com.playmonumenta.plugins.seasonalevents.PlayerProgress.PassProgress;
 import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
-import com.playmonumenta.redissync.utils.ScoreboardUtils;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,12 +36,20 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
 
 public class SeasonalPass {
+	// cost of rewards, in Metamorphosis Tokens
+	private static final int[] DUMMY_COSTS = {2, 3};
+	private static final ImmutableMap<CosmeticType, int[]> COSMETIC_COSTS = ImmutableMap.of(
+		CosmeticType.TITLE, new int[] {1, 1, 2, 2, 3, 3},
+		CosmeticType.ELITE_FINISHER, new int[] {2, 3, 4},
+		CosmeticType.PLOT_BORDER, new int[] {5}
+	);
+
 	public static final int MP_PER_LEVEL = 75;
-	public static final String PASS_MP_SCOREBOARD = "SeasonalEventMP";
 	// Loot tables for rewards
 	public static final String ITEM_SKIN_KEY = "epic:pass/metamorphosis_token";
 	public static final String TREASURE_WHEEL_KEY = "epic:pass/treasure_wheel_token";
@@ -46,7 +61,7 @@ public class SeasonalPass {
 	public TextColor mNameColor;
 	public int mNumberOfWeeks = 0;
 	public int mTotalMp = 0;
-	public final List<WeeklyMission> mMissions = new ArrayList<>();
+	public final Map<Integer, List<WeeklyMission>> mMissions = new HashMap<>();
 	public final List<SeasonalReward> mRewards = new ArrayList<>();
 
 	/**
@@ -65,6 +80,9 @@ public class SeasonalPass {
 	 * Load reward objects from json parsing
 	 */
 	private void loadRewards(final CommandSender sender, JsonObject data, boolean showWarnings) {
+		int dummiesSoFar = 0;
+		Map<CosmeticType, Integer> rewardsSoFar = new HashMap<>();
+
 		String startDateStr = data.get("start_date").getAsString();
 		JsonArray rewardParse = data.get("rewards").getAsJsonArray();
 		for (JsonElement missionElement : rewardParse) {
@@ -106,12 +124,16 @@ public class SeasonalPass {
 									.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 							}
 						} else {
-							Collection<ItemStack> loot = rewardTable.populateLoot(FastUtils.RANDOM, context);
-							if (loot.size() > 0) {
-								for (ItemStack item : loot) {
-									reward.mLootTable = item;
-									mRewards.add(reward);
+							Iterator<ItemStack> loot = rewardTable.populateLoot(FastUtils.RANDOM, context).iterator();
+							if (loot.hasNext()) {
+								reward.mLootTable = loot.next();
+								if (SeasonalRewardType.LOOT_TABLE.equals(reward.mType)
+									&& reward.mLootTable != null
+									&& reward.mLootTable.getItemMeta() instanceof SpawnEggMeta) {
+									reward.mCost = DUMMY_COSTS[Math.min(dummiesSoFar, DUMMY_COSTS.length - 1)];
+									dummiesSoFar++;
 								}
+								mRewards.add(reward);
 								continue;
 							}
 						}
@@ -177,6 +199,38 @@ public class SeasonalPass {
 					reward.mDescriptionColor = NamedTextColor.GRAY;
 				}
 
+				CosmeticType cosmeticType;
+				switch (reward.mType) {
+					case TITLE -> cosmeticType = CosmeticType.TITLE;
+					case ELITE_FINISHER -> {
+						if (showWarnings
+							&& !EliteFinishers.getNameSet().contains(reward.mData)) {
+							sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+									+ ": No such elite finisher " + reward.mData, NamedTextColor.RED)
+								.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+						}
+						cosmeticType = CosmeticType.ELITE_FINISHER;
+					}
+					case PLOT_BORDER -> {
+						if (showWarnings
+							&& PlotBorderCustomInventory.getCosmeticNameSet().contains(reward.mData)) {
+							sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
+										+ ": No such plot border " + reward.mData + " in the plot border GUI",
+									NamedTextColor.RED)
+								.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+						}
+						cosmeticType = CosmeticType.PLOT_BORDER;
+					}
+					default -> cosmeticType = null;
+				}
+				if (cosmeticType != null) {
+					int soFar = rewardsSoFar.merge(cosmeticType, 1, Integer::sum);
+					int[] costs = COSMETIC_COSTS.get(cosmeticType);
+					if (costs != null) {
+						reward.mCost = costs[Math.min(soFar - 1, costs.length - 1)];
+					}
+				}
+
 				mRewards.add(reward);
 			} catch (Exception e) {
 				MessagingUtils.sendStackTrace(sender, e);
@@ -218,8 +272,23 @@ public class SeasonalPass {
 						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 				}
 				mission.mWeek = toParse.get("week").getAsInt();
+				if (mission.mWeek <= 0 && showWarnings) {
+					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+							+ mName + ": Mission week is <= 0: " + mission.mWeek, NamedTextColor.RED)
+						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+				}
 				mission.mMP = toParse.get("mp").getAsInt();
+				if (mission.mMP <= 0 && showWarnings) {
+					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+							+ mName + ": Mission MP is <= 0: " + mission.mMP, NamedTextColor.RED)
+						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+				}
 				mission.mAmount = toParse.get("amount").getAsInt();
+				if (mission.mAmount <= 0 && showWarnings) {
+					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
+							+ mName + ": Mission Amount is <= 0: " + mission.mAmount, NamedTextColor.RED)
+						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+				}
 				mission.mDescription = toParse.get("description").getAsString();
 
 				// Optional fields
@@ -244,6 +313,12 @@ public class SeasonalPass {
 				}
 				if (toParse.get("region") != null) {
 					mission.mRegion = toParse.get("region").getAsInt();
+					if (showWarnings && !MonumentaContent.ALL_CONTENT_REGION_INDEXES.contains(mission.mRegion)) {
+						sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr
+								+ " " + mName + ": Region not used in Monumenta content: " + mission.mRegion,
+								NamedTextColor.RED)
+							.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
+					}
 				}
 				if (toParse.get("delvepoints") != null) {
 					mission.mDelvePoints = toParse.get("delvepoints").getAsInt();
@@ -303,7 +378,7 @@ public class SeasonalPass {
 				if (mission.mWeek > numberOfWeeks) {
 					numberOfWeeks = mission.mWeek;
 				}
-				mMissions.add(mission);
+				mMissions.computeIfAbsent(mission.mWeek, k -> new ArrayList<>()).add(mission);
 			} catch (Exception e) {
 				MessagingUtils.sendStackTrace(sender, e);
 			}
@@ -312,19 +387,25 @@ public class SeasonalPass {
 	}
 
 	/**
-	 * Adds a certain amount of MP to the player
-	 * If above the threshold for a new unlock, awards it to the player
+	 * Claim the rewards previously earned for the current pass
 	 */
-	public void addMP(Player p, int amount) {
-		if (!isActive()) {
+	public void claimMP(Player p) {
+		PlayerProgress playerProgress = SeasonalEventManager.getPlayerProgress(p);
+		if (playerProgress == null) {
 			return;
 		}
-		int newMP = amount + getMP(p);
+		PassProgress passProgress = playerProgress.getPassProgress(this);
+		if (passProgress == null) {
+			return;
+		}
+
 		//Check if they earned any new rewards from this
-		int currentLevel = getLevelFromMP(getMP(p));
+		int claimedMP = passProgress.getClaimedPoints();
+		int newMP = passProgress.getMissionPoints();
+		int claimedLevel = getLevelFromMP(claimedMP);
 		int newLevel = getLevelFromMP(newMP);
 		//Give any unclaimed rewards
-		for (int i = currentLevel + 1; i <= newLevel; i++) {
+		for (int i = claimedLevel + 1; i <= newLevel; i++) {
 			p.sendMessage(Component.text("You earned a new reward!", NamedTextColor.GOLD)
 				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 
@@ -340,46 +421,9 @@ public class SeasonalPass {
 			CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME);
 		}
 
-		//Actually set the score
-		ScoreboardUtils.setScoreboardValue(p.getName(), PASS_MP_SCOREBOARD, newMP);
-	}
-
-	/**
-	 * This method is called before opening the GUI to view the battle pass and updates player MP
-	 * with any new earned MP from completed missions
-	 */
-	public void updatePlayerPassProgress(Player p) {
-		if (!isActive()) {
-			return;
-		}
-		// Loop through our internal mission list and check scores
-		int mpToAdd = 0;
-		int missionCounter = 1;
-		for (WeeklyMission mission : getActiveMissions()) {
-			String scoreboard = SeasonalEventManager.MISSION_SCOREBOARD + missionCounter;
-			missionCounter++;
-			int playerScore = ScoreboardUtils.getScoreboardValue(p.getName(), scoreboard);
-			if (playerScore >= mission.mAmount) {
-				// Add mp and mark mission as claimed by setting score to -1
-				mpToAdd += mission.mMP;
-				ScoreboardUtils.setScoreboardValue(p.getName(), scoreboard, -1);
-			}
-		}
-		// Update MP with any earned
-		addMP(p, mpToAdd);
-	}
-
-	/**
-	 * This method is called every time a player logs in on a new week
-	 */
-	public void resetPlayerPassMissions(Player p) {
-		if (!isActive()) {
-			return;
-		}
-		// Loop through our internal mission list and check scores
-		for (int missionCounter = 1; missionCounter <= getActiveMissions().size(); ++missionCounter) {
-			String scoreboard = SeasonalEventManager.MISSION_SCOREBOARD + missionCounter;
-			ScoreboardUtils.setScoreboardValue(p.getName(), scoreboard, 0);
+		// Update claimed MP (unless this would allow re-claiming rewards)
+		if (newMP > claimedMP) {
+			passProgress.setClaimedPoints(newMP);
 		}
 	}
 
@@ -411,33 +455,17 @@ public class SeasonalPass {
 	}
 
 	/**
-	 * Runs through the missions list and returns all
-	 * matching the current week number of the pass
+	 * Returns all missions for the current week number of the pass
 	 */
 	public List<WeeklyMission> getActiveMissions() {
-		List<WeeklyMission> activeMissions = new ArrayList<>();
-		// Determine what week it is since the pass start
-
-		int week = getWeekOfPass();
-		for (WeeklyMission mission : mMissions) {
-			if (mission.mWeek == week) {
-				activeMissions.add(mission);
-			}
-		}
-		return activeMissions;
+		return getMissionsInWeek(getWeekOfPass());
 	}
 
 	/**
-	 * Debug method to get missions for given week
+	 * Method to get missions for given week
 	 */
 	public List<WeeklyMission> getMissionsInWeek(int week) {
-		List<WeeklyMission> activeMissions = new ArrayList<>();
-		for (WeeklyMission mission : mMissions) {
-			if (mission.mWeek == week) {
-				activeMissions.add(mission);
-			}
-		}
-		return activeMissions;
+		return mMissions.getOrDefault(week, new ArrayList<>());
 	}
 
 	/**
@@ -445,9 +473,6 @@ public class SeasonalPass {
 	 * on its type implementation
 	 */
 	public void givePassReward(Player p, int level) {
-		if (!isActive()) {
-			return;
-		}
 		SeasonalReward reward = mRewards.get(level - 1);
 		int amount = 1;
 		if (reward.mAmount != 0) {
@@ -497,9 +522,6 @@ public class SeasonalPass {
 	 * Helper method to give player loot from a table
 	 */
 	private void givePlayerLootTable(Player p, String lootTablePath) {
-		if (!isActive()) {
-			return;
-		}
 		if (lootTablePath == null || lootTablePath.length() == 0) {
 			return;
 		}
@@ -514,24 +536,18 @@ public class SeasonalPass {
 	}
 
 	public int getMP(Player p) {
-		if (!isActive()) {
+		PlayerProgress playerProgress = SeasonalEventManager.getPlayerProgress(p);
+		if (playerProgress == null) {
 			return 0;
 		}
-		return ScoreboardUtils.getScoreboardValue(p.getName(), PASS_MP_SCOREBOARD);
-	}
-
-	public void setMP(Player p, int amount) {
-		//Debug method - only use for testing as it will not apply rewards!
-		if (!isActive()) {
-			return;
+		PassProgress passProgress = playerProgress.getPassProgress(this);
+		if (passProgress == null) {
+			return 0;
 		}
-		ScoreboardUtils.setScoreboardValue(p.getName(), PASS_MP_SCOREBOARD, amount);
+		return passProgress.getMissionPoints();
 	}
 
 	public int getLevelFromMP(int mp) {
-		if (!isActive()) {
-			return 0;
-		}
 		return Math.min(mRewards.size(), mp / MP_PER_LEVEL);
 	}
 
@@ -539,34 +555,46 @@ public class SeasonalPass {
 	 * Triggered by multiple event handlers, this method adds an amount of progress
 	 * to the provided weekly mission number for that week
 	 */
-	public void addWeeklyMissionProgress(Player p, WeeklyMission mission, int missionNumber, int amount) {
-		String scoreboard = SeasonalEventManager.MISSION_SCOREBOARD + missionNumber;
-		int score = ScoreboardUtils.getScoreboardValue(p.getName(), scoreboard);
-		if (score == -1 || score >= mission.mAmount) {
-			// Rewards already claimed - don't add progress for infinite mp
+	public void addWeeklyMissionProgress(Player p, int missionNumber, int amount) {
+		LocalDateTime now = DateUtils.localDateTime();
+		int missionIndex = missionNumber - 1;
+		int week = getWeekOfPass();
+		int numWeeklyMissions = mMissions.getOrDefault(week, List.of()).size();
+		if (missionIndex < 0 || missionIndex >= numWeeklyMissions) {
 			return;
 		}
-		ScoreboardUtils.setScoreboardValue(p.getName(), scoreboard, Math.min(mission.mAmount, score + amount));
-		if (score + amount >= mission.mAmount) {
+
+		PlayerProgress playerProgress = SeasonalEventManager.getPlayerProgress(p);
+		if (playerProgress == null) {
+			MMLog.warning("No season pass player progress found for " + p.getName());
+			return;
+		}
+		int missionProgress = playerProgress.getPassMissionProgress(now, missionIndex).orElse(0);
+		if (missionProgress < 0) {
+			// Mission already completed
+			return;
+		}
+		missionProgress = playerProgress.addPassMissionProgress(now, missionIndex, amount);
+		if (missionProgress < 0) {
 			//Play an animation and notify player
 			p.sendMessage(Component.text(
-				"You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!",
-				NamedTextColor.GOLD)
-				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
+					"You completed a weekly mission! Open the Seasonal Pass menu to claim your progress!",
+					NamedTextColor.GOLD,
+					TextDecoration.BOLD));
 			EntityUtils.fireworkAnimation(p);
 		}
 	}
 
 	// Time Utils
 
-	public int getDaysUntilMissionReset() {
+	public int getDaysUntilMissionEnd() {
 		if (!isActive()) {
 			return 0;
 		}
 		return (int) DateUtils.getDaysLeftInWeeklyVersion() - 1;
 	}
 
-	public int getHoursUntilMissionReset() {
+	public int getHoursUntilMissionEnd() {
 		if (!isActive()) {
 			return 0;
 		}

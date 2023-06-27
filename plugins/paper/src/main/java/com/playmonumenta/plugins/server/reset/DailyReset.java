@@ -208,16 +208,16 @@ public class DailyReset {
 		plugin.getLogger().info("[DailyReset] " + message);
 		SeasonalEventManager.reloadPasses(Bukkit.getConsoleSender());
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
-			handle(plugin, player);
+			handle(player);
 		}
 	}
 
-	public static void handle(Plugin plugin, Player player) {
+	public static void handle(Player player) {
 		int dailyVersion = ScoreboardUtils.getScoreboardValue(player, "DailyVersion").orElse(0);
-		handle(plugin, player, dailyVersion);
+		handle(player, dailyVersion);
 	}
 
-	public static void handle(Plugin plugin, Player player, int dailyVersion) {
+	public static void handle(Player player, int dailyVersion) {
 		if (player != null) {
 			//  Test to see if the player's Daily version is different from the servers.
 			if (dailyVersion != getDailyVersion()) {
@@ -225,7 +225,6 @@ public class DailyReset {
 				String commandStr = DAILY_PLAYER_CHANGES_COMMAND.replaceAll("@S", player.getName());
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently(commandStr);
 
-				SeasonalEventManager.handlePlayerDailyChange(player);
 				POIManager.handlePlayerDailyChange(player);
 
 				ScoreboardUtils.setScoreboardValue(player, "DailyVersion", getDailyVersion());

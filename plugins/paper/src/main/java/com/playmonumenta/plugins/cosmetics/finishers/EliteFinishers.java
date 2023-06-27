@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.cosmetics.finishers;
 
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.utils.CommandUtils;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -51,6 +52,10 @@ public class EliteFinishers {
 
 	public static String[] getNames() {
 		return FINISHERS.keySet().stream().map(CommandUtils::quoteIfNeeded).toArray(String[]::new);
+	}
+
+	public static Set<String> getNameSet() {
+		return Set.copyOf(FINISHERS.keySet());
 	}
 
 }

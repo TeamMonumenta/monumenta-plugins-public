@@ -220,7 +220,7 @@ public class DateUtils {
 	}
 
 	public static String untilNewWeek() {
-		long seconds = untilNewDay(ChronoUnit.SECONDS);
+		long seconds = untilNewWeek(ChronoUnit.SECONDS);
 		long minutes = seconds / 60L;
 		seconds %= 60L;
 		long hours = minutes / 60L;

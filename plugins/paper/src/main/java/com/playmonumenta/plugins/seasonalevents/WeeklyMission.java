@@ -21,8 +21,6 @@ public class WeeklyMission {
 	//Unique fields for specific missions
 	//Which piece of content to clear (matters for CONTENT or DISTANCE types)
 	public @Nullable List<MonumentaContent> mContent;
-	//Which mobs are eligible to kill for mission (Library of Souls)
-	public @Nullable List<String> mEligibleMobs;
 	//Delve mission fields
 	public @Nullable List<DelvesModifier> mDelveModifiers;
 	public int mRotatingModifiersAmount;

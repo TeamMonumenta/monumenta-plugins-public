@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.seasonalevents;
 
 import com.playmonumenta.plugins.commands.GenericCommand;
+import com.playmonumenta.plugins.seasonalevents.gui.PassGui;
+import com.playmonumenta.plugins.utils.DateUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
@@ -8,6 +10,7 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -33,39 +36,6 @@ public class SeasonalEventCommand extends GenericCommand {
 			})
 			.register();
 
-		// Add battlepass xp command
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("addxp"));
-		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new IntegerArgument("amount"));
-
-		new CommandAPICommand("battlepass")
-		.withPermission(perms)
-		.withArguments(arguments)
-		.executes((sender, args) -> {
-			Player player = (Player) args[1];
-
-			SeasonalEventManager.addMP(player, (int) args[2]);
-		})
-		.register();
-
-		// Set battlepass xp command
-
-		arguments.clear();
-		arguments.add(new MultiLiteralArgument("setxp"));
-		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
-		arguments.add(new IntegerArgument("amount"));
-
-		new CommandAPICommand("battlepass")
-			.withPermission(perms)
-			.withArguments(arguments)
-			.executes((sender, args) -> {
-				Player player = (Player) args[1];
-
-				SeasonalEventManager.setMP(player, (int) args[2]);
-			})
-			.register();
-
 		// Get current xp of player
 
 		arguments.clear();
@@ -77,12 +47,8 @@ public class SeasonalEventCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[1];
-				Player senderPlayer = null;
-				if (sender instanceof Player) {
-					senderPlayer = (Player) sender;
-				}
-				if (senderPlayer != null) {
-					senderPlayer.sendMessage("" + SeasonalEventManager.getMP(player));
+				if (sender instanceof Player senderPlayer) {
+					senderPlayer.sendMessage(Component.text(SeasonalEventManager.getMP(player)));
 				}
 			})
 			.register();
@@ -98,12 +64,31 @@ public class SeasonalEventCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[1];
-				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.mActivePass;
-				if (seasonalPass == null || !seasonalPass.isActive()) {
-					player.sendMessage(Component.text("Could not load the current season pass", NamedTextColor.RED));
+				LocalDateTime now = DateUtils.localDateTime();
+				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
+				if (seasonalPass == null) {
+					player.sendMessage(Component.text("Could not load a season pass", NamedTextColor.RED));
 					return;
 				}
-				new SeasonalEventGUI(seasonalPass, player).open();
+				new PassGui(seasonalPass, player, player, now, false).open();
+			}).register();
+
+		arguments.add(new MultiLiteralArgument("view"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("other"));
+
+		new CommandAPICommand("battlepass")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[1];
+				Player otherPlayer = (Player) args[3];
+				LocalDateTime now = DateUtils.localDateTime();
+				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
+				if (seasonalPass == null) {
+					player.sendMessage(Component.text("Could not load a season pass", NamedTextColor.RED));
+					return;
+				}
+				new PassGui(seasonalPass, player, otherPlayer, now, false).open();
 			}).register();
 
 		//GUI command with specific week
@@ -118,12 +103,14 @@ public class SeasonalEventCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executes((sender, args) -> {
 				Player player = (Player) args[1];
-				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.mActivePass;
-				if (seasonalPass == null || !seasonalPass.isActive()) {
-					player.sendMessage(Component.text("Could not load the current season pass", NamedTextColor.RED));
+				int week = (int) args[3];
+				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
+				if (seasonalPass == null) {
+					player.sendMessage(Component.text("Could not load a season pass", NamedTextColor.RED));
 					return;
 				}
-				new SeasonalEventGUI(seasonalPass, player, (int) args[3]).open();
+				LocalDateTime dateTime = seasonalPass.mPassStart.plus(week - 1, ChronoUnit.WEEKS);
+				new PassGui(seasonalPass, player, player, dateTime, false).open();
 			}).register();
 
 		//GUI command with specific date
@@ -150,8 +137,27 @@ public class SeasonalEventCommand extends GenericCommand {
 					player.sendMessage(Component.text("Could not load the specified season pass", NamedTextColor.RED));
 					return;
 				}
-				int week = seasonalPass.getWeekOfPass(dateTime);
-				new SeasonalEventGUI(seasonalPass, player, week).open();
+				new PassGui(seasonalPass, player, player, dateTime, false).open();
+			}).register();
+
+		arguments.clear();
+		arguments.add(new MultiLiteralArgument("modgui"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("player"));
+		arguments.add(new EntitySelectorArgument.OnePlayer("other"));
+
+		new CommandAPICommand("battlepass")
+			.withPermission(perms)
+			.withArguments(arguments)
+			.executes((sender, args) -> {
+				Player player = (Player) args[1];
+				Player otherPlayer = (Player) args[2];
+				LocalDateTime now = DateUtils.localDateTime();
+				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
+				if (seasonalPass == null) {
+					player.sendMessage(Component.text("Could not load a season pass", NamedTextColor.RED));
+					return;
+				}
+				new PassGui(seasonalPass, player, otherPlayer, now, true).open();
 			}).register();
 	}
 }

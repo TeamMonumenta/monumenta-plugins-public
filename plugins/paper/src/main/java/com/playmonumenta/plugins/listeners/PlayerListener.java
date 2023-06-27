@@ -186,7 +186,7 @@ public class PlayerListener implements Listener {
 		POIManager.getInstance().playerJoinEvent(event);
 		mPlugin.mAbilityManager.playerJoinEvent(player, event);
 
-		DailyReset.handle(mPlugin, player);
+		DailyReset.handle(player);
 
 		// add player to the players team (and create the team if it doesn't exist already)
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {

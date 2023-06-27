@@ -33,10 +33,10 @@ public class SeasonalEventListener implements Listener {
 			int missionNumber = 1;
 			for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
 				if (mission.mType == WeeklyMissionType.SPAWNERS) {
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				}
 				if (mission.mType == WeeklyMissionType.SPAWNERS_POI && isPOIContent()) {
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				}
 				missionNumber++;
 			}
@@ -57,13 +57,13 @@ public class SeasonalEventListener implements Listener {
 		int missionNumber = 1;
 		for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == WeeklyMissionType.DEPTHS_ROOMS) {
-				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, roomNumber);
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, roomNumber);
 			} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && 2 == mission.mRegion) {
 				// Region matches up - award points
-				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			} else if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.DEPTHS) && roomNumber >= 30) {
 				// Content matches up - award points
-				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			}
 			missionNumber++;
 		}
@@ -79,7 +79,7 @@ public class SeasonalEventListener implements Listener {
 		for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
 			if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(MonumentaContent.GALLERY_ROUND)) {
 				// Content matches up - award points
-				SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+				SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 			}
 			missionNumber++;
 		}
@@ -100,21 +100,21 @@ public class SeasonalEventListener implements Listener {
 			for (WeeklyMission mission : SeasonalEventManager.getActiveMissions()) {
 				if (mission.mType == WeeklyMissionType.CONTENT && mission.mContent != null && mission.mContent.contains(content)) {
 					// Content matches up - award points
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.DUNGEONS && content.getContentType() == ContentType.DUNGEON) {
 					// Dungeon matches up - award points
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.STRIKES && content.getContentType() == ContentType.STRIKE) {
 					// Strike matches up - award points
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.BOSSES && content.getContentType() == ContentType.BOSS) {
 					// Boss matches up - award points
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				} else if ((mission.mType == WeeklyMissionType.DELVE_MODIFIER || mission.mType == WeeklyMissionType.DELVE_POINTS) && DelvesUtils.SHARD_SCOREBOARD_PREFIX_MAPPINGS.containsKey(content.getLabel())) {
 					// Content is eligible for delves - get scores and check for modifier
 					if (mission.mType == WeeklyMissionType.DELVE_POINTS && DelvesUtils.getPlayerTotalDelvePoint(null, p, content.getLabel()) >= mission.mDelvePoints) {
 						if (mission.mContent == null || mission.mContent.contains(content)) {
-							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+							SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 						}
 					} else if (mission.mType == WeeklyMissionType.DELVE_MODIFIER) {
 						boolean modsActive = true;
@@ -135,12 +135,12 @@ public class SeasonalEventListener implements Listener {
 							modsActive = modsActive && (rotatingPoints >= mission.mRotatingModifiersAmount);
 						}
 						if ((mission.mContent == null || mission.mContent.contains(content)) && modsActive) {
-							SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+							SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 						}
 					}
 				} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && content.getRegion() == mission.mRegion) {
 					// Region matches up - award points
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.ROD_WAVES && content == MonumentaContent.RUSH) {
 					// Cleared rod - add number of waves cleared
 					int waves = ScoreboardUtils.getScoreboardValue(p.getName(), ROD_WAVE_SCOREBOARD);
@@ -151,16 +151,15 @@ public class SeasonalEventListener implements Listener {
 					}
 
 					if (waves > 0) {
-						SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, waves);
+						SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, waves);
 					}
 				} else if (mission.mType == WeeklyMissionType.DAILY_BOUNTY && (content == MonumentaContent.KINGS_BOUNTY || content == MonumentaContent.CELSIAN_BOUNTY || content == MonumentaContent.RING_BOUNTY)) {
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				} else if (mission.mType == WeeklyMissionType.DELVE_BOUNTY && content == MonumentaContent.DELVE_BOUNTY) {
-					SeasonalEventManager.addWeeklyMissionProgress(p, mission, missionNumber, 1);
+					SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 				}
 				missionNumber++;
 			}
 		}
 	}
 }
-

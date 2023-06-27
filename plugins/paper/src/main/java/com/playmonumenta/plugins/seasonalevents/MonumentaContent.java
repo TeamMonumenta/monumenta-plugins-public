@@ -1,5 +1,8 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 
 public enum MonumentaContent {
@@ -51,6 +54,11 @@ public enum MonumentaContent {
 	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
 	RING_BOUNTY("r3daily", ContentType.OTHER, 0),
 	DELVE_BOUNTY("delvebounty", ContentType.OTHER, 0);
+
+	public static final Set<Integer> ALL_CONTENT_REGION_INDEXES
+		= Arrays.stream(MonumentaContent.values())
+		.map(content -> content.mRegion)
+		.collect(Collectors.toSet());
 
 	private final int mRegion;
 	private final String mLabel;

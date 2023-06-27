@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -87,22 +88,32 @@ public class MonumentaRedisSyncIntegration implements Listener {
 					ex.printStackTrace();
 				}
 			}
+
+			SeasonalEventManager.loadPlayerProgressJson(player, data.get("season_pass_progress"));
+		} else {
+			// data is null
+			SeasonalEventManager.loadPlayerProgressJson(player, null);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerSaveEvent(PlayerSaveEvent event) {
+		Player player = event.getPlayer();
+
 		JsonObject pluginData = new JsonObject();
-		pluginData.add("potions", mPlugin.mPotionManager.getAsJsonObject(event.getPlayer(), false));
-		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(event.getPlayer()));
+		pluginData.add("potions", mPlugin.mPotionManager.getAsJsonObject(player, false));
+		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(player));
+		pluginData.add("season_pass_progress", SeasonalEventManager.getPlayerProgressJson(player));
 		event.setPluginData(IDENTIFIER, pluginData);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			if (!event.getPlayer().isOnline()) {
-				mPlugin.mPotionManager.clearAllPotions(event.getPlayer());
+			if (!player.isOnline()) {
+				mPlugin.mPotionManager.clearAllPotions(player);
+				SeasonalEventManager.unloadPlayerData(player);
 			}
 		}, 5);
 	}

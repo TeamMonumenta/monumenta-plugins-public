@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -260,6 +262,13 @@ public class PlotBorderCustomInventory extends CustomInventory {
 			.map(CommandUtils::quoteIfNeeded)
 			.filter(Objects::nonNull)
 			.toArray(String[]::new);
+	}
+
+	public static Set<String> getCosmeticNameSet() {
+		return BORDER_ITEMS.stream()
+			.map(item -> item.mCosmeticString)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toSet());
 	}
 
 }

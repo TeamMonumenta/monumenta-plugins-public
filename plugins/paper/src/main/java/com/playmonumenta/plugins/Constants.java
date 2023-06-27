@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.function.Function;
+import net.kyori.adventure.text.KeybindComponent.KeybindLike;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
+import org.jetbrains.annotations.NotNull;
 
 
 public class Constants {
@@ -215,6 +216,55 @@ public class Constants {
 	public static class Colors {
 		public static final TextColor GREENISH_BLUE = TextColor.color(85, 255, 170);
 		public static final TextColor GREENISH_BLUE_DARK = TextColor.color(76, 230, 153);
+	}
+
+	public enum Keybind implements KeybindLike {
+		ATTACK("key.attack"),
+		USE("key.use"),
+		FORWARD("key.forward"),
+		LEFT("key.left"),
+		BACK("key.back"),
+		RIGHT("key.right"),
+		JUMP("key.jump"),
+		SNEAK("key.sneak"),
+		SPRINT("key.sprint"),
+		DROP("key.drop"),
+		INVENTORY("key.inventory"),
+		CHAT("key.chat"),
+		PLAYER_LIST("key.playerlist"),
+		PICK_ITEM("key.pickItem"),
+		COMMAND("key.command"),
+		SOCIAL_INTERACTIONS("key.socialInteractions"),
+		SCREENSHOT("key.screenshot"),
+		TOGGLE_PERSPECTIVE("key.togglePerspective"),
+		SMOOTH_CAMERA("key.smoothCamera"),
+		FULLSCREEN("key.fullscreen"),
+		SPECTATOR_OUTLINES("key.spectatorOutlines"),
+		SWAP_OFFHAND("key.swapOffhand"),
+		SAVE_TOOLBAR_ACTIVATOR("key.saveToolbarActivator"),
+		LOAD_TOOLBAR_ACTIVATOR("key.loadToolbarActivator"),
+		ADVANCEMENTS("key.advancements"),
+		HOTBAR_1("key.hotbar.1"),
+		HOTBAR_2("key.hotbar.2"),
+		HOTBAR_3("key.hotbar.3"),
+		HOTBAR_4("key.hotbar.4"),
+		HOTBAR_5("key.hotbar.5"),
+		HOTBAR_6("key.hotbar.6"),
+		HOTBAR_7("key.hotbar.7"),
+		HOTBAR_8("key.hotbar.8"),
+		HOTBAR_9("key.hotbar.9"),
+		OPTIFINE_ZOOM("of.key.zoom");
+
+		private final String mValue;
+
+		Keybind(String value) {
+			mValue = value;
+		}
+
+		@Override
+		public @NotNull String asKeybind() {
+			return mValue;
+		}
 	}
 
 	public static class Materials {
