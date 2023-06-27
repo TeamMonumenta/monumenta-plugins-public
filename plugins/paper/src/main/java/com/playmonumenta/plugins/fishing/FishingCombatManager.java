@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.fishing;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.parameters.LoSPool;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
+import com.playmonumenta.plugins.events.MonumentaEvent;
 import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -147,6 +148,8 @@ public class FishingCombatManager implements Listener {
 					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " " + COMBAT_TOTAL);
 
 					InventoryUtils.giveItem(player, reward);
+
+					Bukkit.getPluginManager().callEvent(new MonumentaEvent(player, "fishingcombat"));
 				}
 			}
 		}.runTaskLater(Plugin.getInstance(), 30);

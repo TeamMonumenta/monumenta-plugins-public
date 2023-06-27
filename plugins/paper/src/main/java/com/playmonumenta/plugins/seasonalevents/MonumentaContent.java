@@ -49,6 +49,7 @@ public enum MonumentaContent {
 	PORTAL("portal", ContentType.STRIKE, 3),
 	GALLERY("gallery", ContentType.OTHER, 3),
 	GALLERY_ROUND("galleryround", ContentType.OTHER, 0),
+	FISHING_COMBAT("fishingcombat", ContentType.OTHER, 3),
 	GODSPORE("godspore", ContentType.BOSS, 3),
 	KINGS_BOUNTY("r1daily", ContentType.OTHER, 0),
 	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
