@@ -660,6 +660,8 @@ public class PassGui extends Gui {
 		if (weekMissions.size() <= missionIndex) {
 			ItemStack item = new ItemStack(Material.BARRIER);
 			ItemMeta meta = item.getItemMeta();
+			meta.displayName(Component.text("Mission " + (missionIndex + 1), NamedTextColor.GREEN, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false));
 			GUIUtils.splitLoreLine(meta, "Failed to load mission", NamedTextColor.RED, 30, false);
 			item.setItemMeta(meta);
 			setItem(y, x, item);
