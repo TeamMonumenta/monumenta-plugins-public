@@ -304,7 +304,7 @@ public class PassGui extends Gui {
 
 	// For hiding future information
 	protected boolean isFutureEpochWeek(long epochWeek) {
-		return epochWeek > DateUtils.getWeeklyVersion();
+		return epochWeek > mOpenedEpochWeek;
 	}
 
 	protected boolean isFuture(LocalDateTime time) {
