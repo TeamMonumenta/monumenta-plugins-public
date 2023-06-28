@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -68,7 +69,8 @@ public class DepthsPlayer {
 	public DepthsPlayer(Player p) {
 		mPlayerId = p.getUniqueId();
 		mAbilities = new HashMap<>();
-		p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Initializing Depths System! Press button again to begin.");
+		p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+			"Initializing Depths System! Press button again to begin.")));
 		mEligibleTrees = initTrees(p);
 
 		//Randomize order of weapon aspects
@@ -103,7 +105,10 @@ public class DepthsPlayer {
 				return initTreesWithGuarantee(talismanScore);
 			} else if (rand < chance) {
 				//The Talisman granted them the tree when it wouldn't normally
-				player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Due to your Talisman, you have become a " + DepthsTree.values()[talismanScore - 1].getDisplayName() + " when you would not have otherwise!");
+				player.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+					"Due to your Talisman, you have become a "
+						+ DepthsTree.values()[talismanScore - 1].getDisplayName()
+						+ " when you would not have otherwise!")));
 				return initTreesWithGuarantee(talismanScore);
 			} else {
 				//They failed both the usual random chance of the tree and the Talisman chance

@@ -115,19 +115,19 @@ public class TowerGameUtils {
 
 	//----------------------Component for lore-----------------------------------
 
-	private static final int MAX_LORE_LENGHT = 40;
+	private static final int MAX_LORE_LENGTH = 40;
 
 	public static List<Component> getGenericLoreComponent(@Nullable String lore) {
 		if (lore == null || lore.isEmpty()) {
 			return List.of(Component.empty());
 		}
-		String[] splittedLore = lore.split(" ");
+		String[] splitLore = lore.split(" ");
 
 		List<Component> list = new ArrayList<>();
 		Component text = Component.empty();
 		int i = 0;
-		for (String s : splittedLore) {
-			if (i >= MAX_LORE_LENGHT) {
+		for (String s : splitLore) {
+			if (i >= MAX_LORE_LENGTH) {
 				i = 0;
 				list.add(text);
 				text = Component.empty();
@@ -249,14 +249,14 @@ public class TowerGameUtils {
 		ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
 		ItemMeta meta = item.getItemMeta();
 
-		int currentlvl = game.mPlayerLevel;
+		int currentLvl = game.mPlayerLevel;
 
-		meta.displayName(Component.text("Lvl: " + currentlvl, NamedTextColor.GREEN).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
+		meta.displayName(Component.text("Lvl: " + currentLvl, NamedTextColor.GREEN).decoration(TextDecoration.BOLD, true).decoration(TextDecoration.ITALIC, false));
 
 		List<Component> lore = new ArrayList<>();
 
-		if (currentlvl < TowerConstants.PLAYER_MAX_LEVEL) {
-			lore.add(Component.text("Pay " + TowerConstants.LEVEL_COST[currentlvl - 1] + " Coin to level up", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		if (currentLvl < TowerConstants.PLAYER_MAX_LEVEL) {
+			lore.add(Component.text("Pay " + TowerConstants.LEVEL_COST[currentLvl - 1] + " Coin to level up", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 		}
 
 		meta.lore(lore);
@@ -305,7 +305,7 @@ public class TowerGameUtils {
 
 
 
-	//---------------------------Game utils - giveloot and msg-------------------------------------
+	//---------------------------Game utils - giveLoot and msg-------------------------------------
 
 	public static void giveLoot(TowerGame game) {
 		int floor = game.mCurrentFloor;
@@ -366,17 +366,17 @@ public class TowerGameUtils {
 	public static double getFinalDamage(DamageEvent event, LivingEntity damager, LivingEntity damagee, double startingDamage) {
 		double finalDamage = startingDamage;
 		Set<String> damagerTags = damager.getScoreboardTags();
-		Set<String> damgaeeTags = damagee.getScoreboardTags();
+		Set<String> damageeTags = damagee.getScoreboardTags();
 
 
-		if ((damagerTags.contains(TowerConstants.MOB_TAG_CASTER) && damgaeeTags.contains(TowerConstants.MOB_TAG_DEFENDER)) || //casters do X% more damage to defenders
-			(damagerTags.contains(TowerConstants.MOB_TAG_DEFENDER) && damgaeeTags.contains(TowerConstants.MOB_TAG_FIGHTER)) || //defenders do X% more damage to TowerFighter
-			(damagerTags.contains(TowerConstants.MOB_TAG_FIGHTER) && damgaeeTags.contains(TowerConstants.MOB_TAG_CASTER))) { //TowerFighter do X% more damage to casters
+		if ((damagerTags.contains(TowerConstants.MOB_TAG_CASTER) && damageeTags.contains(TowerConstants.MOB_TAG_DEFENDER)) || //casters do X% more damage to defenders
+			(damagerTags.contains(TowerConstants.MOB_TAG_DEFENDER) && damageeTags.contains(TowerConstants.MOB_TAG_FIGHTER)) || //defenders do X% more damage to TowerFighter
+			(damagerTags.contains(TowerConstants.MOB_TAG_FIGHTER) && damageeTags.contains(TowerConstants.MOB_TAG_CASTER))) { //TowerFighter do X% more damage to casters
 			finalDamage *= TowerConstants.DAMAGE_MLT_CLASS;
 		}
 
 		double damageMult = 0.0;
-		int lvl = 0;
+		int lvl;
 		for (TowerMobRarity rarity : TowerMobRarity.values()) {
 			for (String tag : damagerTags) {
 				if (tag.startsWith(rarity.getTag() + "_")) {
@@ -384,7 +384,7 @@ public class TowerGameUtils {
 					damageMult += rarity.getDamageMult() * (lvl - 1);
 				}
 			}
-			for (String tag : damgaeeTags) {
+			for (String tag : damageeTags) {
 				if (tag.startsWith(rarity.getTag() + "_")) {
 					lvl = Integer.parseInt(tag.substring((rarity.getTag() + "_").length()));
 					damageMult -= rarity.getDamageMult() * (lvl - 1);

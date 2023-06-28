@@ -57,7 +57,8 @@ public class DepthsUtils {
 	public static final int LEVELSIX = 0x703663;
 
 	//Text that gets displayed by players getting messages
-	public static final String DEPTHS_MESSAGE_PREFIX = ChatColor.DARK_PURPLE + "[Depths Party] " + ChatColor.LIGHT_PURPLE;
+	public static final Component DEPTHS_COMPONENT_PREFIX = Component.empty().color(NamedTextColor.LIGHT_PURPLE)
+		.append(Component.text("[Depths Party] ", NamedTextColor.DARK_PURPLE));
 
 	//Material defined as ice
 	public static final Material ICE_MATERIAL = Material.ICE;

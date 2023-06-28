@@ -108,7 +108,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -125,7 +127,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This is the main brain of the depths plugin, responsible for handling all interactions from
  * depths commands, events, player and party interaction.
- *
+ * <p>
  * Anything from the playable world to the plugin goes through here and is then delegated to
  * other classes in the main package.
  *
@@ -168,10 +170,6 @@ public class DepthsManager {
 	public static final String LOOT_ROOM_STAND_NAME = "DepthsLootRoom";
 
 	public static final String PAID_SCOREBOARD_TAG = "DepthsWeaponAspectUpgradeBought";
-
-	public static final EnumSet<DepthsRoomType> mRoomOptionsWithoutBoss = EnumSet.of(DepthsRoomType.ABILITY,
-	                                                                                 DepthsRoomType.ABILITY_ELITE, DepthsRoomType.TREASURE, DepthsRoomType.TREASURE_ELITE,
-	                                                                                 DepthsRoomType.UPGRADE, DepthsRoomType.UPGRADE_ELITE, DepthsRoomType.UTILITY);
 
 	// Singleton implementation
 	private static @Nullable DepthsManager mInstance;
@@ -243,7 +241,7 @@ public class DepthsManager {
 		try {
 			String playerContent = FileUtils.readFile(mConfigPath + "players.json");
 			String partyContent = FileUtils.readFile(mConfigPath + "parties.json");
-			if (playerContent == null || playerContent.isEmpty()) {
+			if (playerContent.isEmpty()) {
 				logger.warning("Depths" + mConfigPath + "' is empty - defaulting to new depths manager");
 			} else {
 				Gson gson = new Gson();
@@ -425,11 +423,18 @@ public class DepthsManager {
 					Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
 					if (newPlayer != null && !newPlayer.equals(p)) {
 						if (level > 0 && level < 6) {
-							newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + DepthsUtils.getRarityText(level) + " level!");
+							newPlayer.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+								p.getName() + " now has ability: " + name
+									+ " at " + DepthsUtils.getRarityText(level) + " level!")));
 						} else if (level == 6) {
-							newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " now has ability: " + name + " at " + ChatColor.MAGIC + DepthsUtils.getRarityText(level) + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " level!");
+							newPlayer.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+								p.getName() + " now has ability: " + name + " at "))
+								.append(Component.text(DepthsUtils.getRarityText(level))
+									.decoration(TextDecoration.OBFUSCATED, true))
+								.append(Component.text(" level!")));
 						} else if (level == 0) {
-							newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has lost ability: " + name + "!");
+							newPlayer.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+								p.getName() + " has lost ability: " + name + "!")));
 						}
 					}
 				}
@@ -442,10 +447,12 @@ public class DepthsManager {
 				Player newPlayer = Bukkit.getPlayer(otherPlayer.mPlayerId);
 				if (newPlayer != null && !newPlayer.equals(p)) {
 					if (level == 1) {
-						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has selected " + name + " as their aspect!");
+						newPlayer.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							p.getName() + " has selected " + name + " as their aspect!")));
 					} else if (level == 2) {
 						// Aspect is being transformed from mystery box
-						newPlayer.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + p.getDisplayName() + " has had their mystery box transform into " + name + "!");
+						newPlayer.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							p.getName() + " has had their mystery box transform into " + name + "!")));
 					}
 				}
 			}
@@ -595,7 +602,7 @@ public class DepthsManager {
 
 	/**
 	 * This method generates ability items for the players with random rarities.
-	 * In the future, this might be more applicable to work on a per player basis,
+	 * In the future, this might be more applicable to work on a per-player basis,
 	 * with active skills they have influencing rarities or available abilities.
 	 */
 	private void initItems(List<DepthsTree> filter, boolean isElite, Player p) {
@@ -666,11 +673,7 @@ public class DepthsManager {
 		List<DepthsAbilityItem> offeredItems = mAbilityOfferings.get(p.getUniqueId());
 		if (offeredItems == null || offeredItems.size() == 0) {
 			//Filter the item offerings by the player's eligible trees for that run
-			if (dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE) {
-				initItems(dp.mEligibleTrees, true, p);
-			} else {
-				initItems(dp.mEligibleTrees, false, p);
-			}
+			initItems(dp.mEligibleTrees, dp.mEarnedRewards.peek() == DepthsRewardType.ABILITY_ELITE, p);
 		} else {
 			return offeredItems;
 		}
@@ -850,7 +853,7 @@ public class DepthsManager {
 		return getDepthsPlayer(p) != null;
 	}
 
-	// Tells us when a player in the system broke a spawner so we can track their progress
+	// Tells us when a player in the system broke a spawner, so we can track their progress
 	public void playerBrokeSpawner(Player p, Location l) {
 		DepthsParty party = getDepthsParty(p);
 		if (party != null && l.getX() >= party.getRoomX()) {
@@ -983,9 +986,8 @@ public class DepthsManager {
 		Vector roomSpawnerLocation = party.mRoomSpawnerLocation;
 		removeNearbyButton(roomSpawnerLocation, world);
 		//Remove the button later in case of structure bug
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			removeNearbyButton(roomSpawnerLocation, world);
-		}, 10);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () ->
+			removeNearbyButton(roomSpawnerLocation, world), 10);
 
 		// Generate the room
 		if (mRoomRepository == null) {
@@ -1015,12 +1017,12 @@ public class DepthsManager {
 	 * @param p player to get party summary for
 	 * @return a string containing the party summary
 	 */
-	public String getPartySummary(Player p) {
+	public Component getPartySummary(Player p) {
 		DepthsParty party = getDepthsParty(p);
 		if (party != null) {
-			return party.getSummaryString();
+			return party.getSummaryComponent();
 		} else {
-			return "You are not currently in a depths party!";
+			return Component.text("You are not currently in a depths party!");
 		}
 	}
 
@@ -1041,21 +1043,24 @@ public class DepthsManager {
 	 */
 	public void gotRoomEndpoint(Player p, Location l) {
 		DepthsPlayer dp = getDepthsPlayer(p);
+		DepthsParty party = getPartyFromId(dp);
 
-		if (dp == null || getPartyFromId(dp) == null) {
+		if (party == null) {
 			//Will be the main way players init their party, spawning the first room
 			init(p);
+			party = getPartyFromId(dp);
 		}
 
-		DepthsParty party = getPartyFromId(dp);
 		if (dp != null && party != null) {
 
 			// Check that spawner count is zero
 			if (party.mSpawnersToBreak > 0) {
 				if (party.mSpawnersToBreak == 1) {
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "There is still " + party.mSpawnersToBreak + " spawner left to break!");
+					p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+						"There is still " + party.mSpawnersToBreak + " spawner left to break!")));
 				} else {
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "There are still " + party.mSpawnersToBreak + " spawners left to break!");
+					p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+						"There are still " + party.mSpawnersToBreak + " spawners left to break!")));
 				}
 				return;
 			}
@@ -1082,7 +1087,7 @@ public class DepthsManager {
 
 	/**
 	 * This method is called when a player opens a chest
-	 * If the room is clear and they haven't picked a reward yet,
+	 * If the room is clear, and they haven't picked a reward yet,
 	 * they will get the gui to select their reward
 	 *
 	 * @param p player who opened the chest
@@ -1090,16 +1095,12 @@ public class DepthsManager {
 	 */
 	public Boolean getRoomReward(Player p, @Nullable Location l) {
 		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp == null) {
-			return false;
-		}
-
 		DepthsParty party = getPartyFromId(dp);
 		if (party == null) {
 			return false;
 		}
 
-		//First- check if the player has any rewards to open
+		//First - check if the player has any rewards to open
 		if (!dp.mEarnedRewards.isEmpty()) {
 			DepthsRewardType reward = dp.mEarnedRewards.peek();
 			if (reward == DepthsRewardType.ABILITY || reward == DepthsRewardType.ABILITY_ELITE) {
@@ -1117,7 +1118,7 @@ public class DepthsManager {
 
 		DepthsRoomType room = party.mCurrentRoomType;
 
-		//Give treasure if their reward queue is empty and it's a treasure room the party has cleared
+		//Give treasure if their reward queue is empty, and it's a treasure room the party has cleared
 		if (room == DepthsRoomType.TREASURE) {
 			party.giveTreasureReward(l, TREASURE_PER_NORMAL);
 			return false;
@@ -1212,11 +1213,13 @@ public class DepthsManager {
 
 		DepthsPlayer dp = getDepthsPlayer(p);
 		if (dp == null) {
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Player not in depths system!")));
 			return;
 		}
 		if (dp.mUsedChaosThisFloor) {
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You have already used the chaos system on this floor!");
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"You have already used the chaos system on this floor!")));
 			return;
 		}
 
@@ -1252,7 +1255,8 @@ public class DepthsManager {
 			}
 		}
 		setPlayerLevelInAbility(removedAbility, p, 0);
-		p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Removed ability: " + removedAbility);
+		p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+			"Removed ability: " + removedAbility)));
 		dp.mUsedChaosThisFloor = true;
 
 		//Give 2 random abilities that aren't the one we just removed
@@ -1287,7 +1291,8 @@ public class DepthsManager {
 			for (DepthsAbilityInfo<?> da : abilities) {
 				if (da.canBeOffered(p) && !da.getDisplayName().equals(removedAbility)) {
 					setPlayerLevelInAbility(da.getDisplayName(), p, removedLevel);
-					p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Gained ability: " + da.getDisplayName());
+					p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+						"Gained ability: " + da.getDisplayName())));
 
 					break;
 				}
@@ -1301,11 +1306,12 @@ public class DepthsManager {
 	 */
 	public void goToNextFloor(Player p) {
 		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp == null || getPartyFromId(dp) == null) {
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
+		DepthsParty party = getPartyFromId(dp);
+		if (dp == null || party == null) {
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Player not in depths system!")));
 			return;
 		}
-		DepthsParty party = getPartyFromId(dp);
 		int partyFloor = party.getFloor();
 		int treasureScoreIncrease = TREASURE_PER_FLOOR * partyFloor + 2;
 		party.mTreasureScore += treasureScoreIncrease;
@@ -1324,13 +1330,16 @@ public class DepthsManager {
 					if (player != null) {
 						DepthsUtils.storetoFile(dp, Plugin.getInstance().getDataFolder() + File.separator + "DepthsStats"); //Save the player's stats
 						dp.mFinalTreasureScore = party.mTreasureScore;
-						player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-						getPartyFromId(dp).populateLootRoom(player, false);
+						player.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							"Congratulations! Your final treasure score is " + dp.mFinalTreasureScore + "!")));
+						party.populateLootRoom(player, false);
 						int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
 						if (depthsWins == 0) {
-							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 						} else {
-							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + player.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths!\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+							Bukkit.getServer().sendMessage(Component.empty()
+								.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+								.append(Component.text(" defeated the Darkest Depths!")));
 						}
 						//Set score
 						ScoreboardUtils.setScoreboardValue(player, "Depths", depthsWins + 1);
@@ -1349,8 +1358,10 @@ public class DepthsManager {
 						transformMysteryBox(player);
 					}
 					//Set score
-					ScoreboardUtils.setScoreboardValue(player, "Depths", ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + player.getName() + " Depths");
+					ScoreboardUtils.setScoreboardValue(player, "Depths",
+						ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0) + 1);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
+						"leaderboard update " + player.getName() + " Depths");
 				}
 			}
 		}
@@ -1364,7 +1375,8 @@ public class DepthsManager {
 			for (DepthsPlayer playerInParty : playersToLoop) {
 				Player player = Bukkit.getPlayer(playerInParty.mPlayerId);
 				if (player != null) {
-					player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You will now take +" + 10 * (partyFloor - 12) / 3 + "% damage from all sources!");
+					player.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+						"You will now take +" + 10 * (partyFloor - 12) / 3 + "% damage from all sources!")));
 				}
 			}
 		}
@@ -1406,11 +1418,12 @@ public class DepthsManager {
 	public void startBossFight(Player p, Location l) {
 		//Check the player is in the system
 		DepthsPlayer dp = getDepthsPlayer(p);
-		if (dp == null || getPartyFromId(dp) == null) {
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
+		DepthsParty depthsParty = getPartyFromId(dp);
+		if (depthsParty == null) {
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Player not in depths system!")));
 			return;
 		}
-		DepthsParty depthsParty = getPartyFromId(dp);
 		//Teleport all players in party to the player activating the fight
 		for (DepthsPlayer dpInParty : depthsParty.mPlayersInParty) {
 			try {
@@ -1498,7 +1511,9 @@ public class DepthsManager {
 				for (int i = 0; i < 5; i++) {
 					if (roll < addUpChances(i, chances)) {
 						setPlayerLevelInAbility(da.getDisplayName(), p, i + 1);
-						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + da.getDisplayName() + " at " + DepthsUtils.getRarityText(i + 1) + " level!");
+						p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							"You gained ability " + da.getDisplayName()
+								+ " at " + DepthsUtils.getRarityText(i + 1) + " level!")));
 						break;
 					}
 				}
@@ -1531,10 +1546,14 @@ public class DepthsManager {
 		Collections.shuffle(abilities);
 		if (currentAbility.equals(abilities.get(0).getDisplayName()) && abilities.size() > 1) {
 			setPlayerLevelInAbility(abilities.get(1).getDisplayName(), p, 1);
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(1).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"You gained ability " + abilities.get(1).getDisplayName()
+					+ " at " + DepthsUtils.getRarityText(1) + " level!")));
 		} else if (!abilities.isEmpty()) {
 			setPlayerLevelInAbility(abilities.get(0).getDisplayName(), p, 1);
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You gained ability " + abilities.get(0).getDisplayName() + " at " + DepthsUtils.getRarityText(1) + " level!");
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"You gained ability " + abilities.get(0).getDisplayName()
+					+ " at " + DepthsUtils.getRarityText(1) + " level!")));
 		}
 
 	}
@@ -1547,7 +1566,8 @@ public class DepthsManager {
 	public void setRoomDebug(Player player, int number) {
 		DepthsParty depthsParty = getDepthsParty(player);
 		if (depthsParty == null) {
-			player.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Player not in depths system!");
+			player.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Player not in depths system!")));
 			return;
 		}
 		depthsParty.mRoomNumber = number;
@@ -1563,9 +1583,6 @@ public class DepthsManager {
 
 	public @Nullable DepthsParty getDepthsParty(Player player) {
 		DepthsPlayer dp = getDepthsPlayer(player);
-		if (dp != null) {
-			return getPartyFromId(dp);
-		}
-		return null;
+		return getPartyFromId(dp);
 	}
 }

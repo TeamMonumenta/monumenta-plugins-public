@@ -17,6 +17,7 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import java.io.File;
 import java.util.Map;
 import java.util.Random;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -155,9 +156,6 @@ public class DepthsListener implements Listener {
 
 		if (damagee instanceof Player player) {
 			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(player.getUniqueId());
-			if (dp == null) {
-				return;
-			}
 			DepthsParty party = DepthsManager.getInstance().getPartyFromId(dp);
 			if (party == null) {
 				return;
@@ -204,8 +202,10 @@ public class DepthsListener implements Listener {
 			if (party != null) {
 				dp.mFinalTreasureScore = party.mTreasureScore;
 				dp.setDeathRoom(party.getRoomNumber());
-				event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!");
-				event.getEntity().sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "You reached room " + party.mRoomNumber + "!");
+				event.getEntity().sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+					"You have died! Your final treasure score is " + dp.mFinalTreasureScore + "!")));
+				event.getEntity().sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+					"You reached room " + party.mRoomNumber + "!")));
 
 				if (!party.mEndlessMode) {
 					event.setKeepLevel(false);
