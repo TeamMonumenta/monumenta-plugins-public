@@ -27,7 +27,8 @@ public class PoultryficationFinisher implements EliteFinisher {
 	private static final HashMap<UUID, Integer> mMobsKilled = new HashMap<>();
 
 	private enum Instrument {
-		TREBLE(Sound.BLOCK_NOTE_BLOCK_BANJO), BASE(Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO);
+		TREBLE(Sound.BLOCK_NOTE_BLOCK_BANJO),
+		BASE(Sound.BLOCK_NOTE_BLOCK_DIDGERIDOO);
 
 		public final Sound mSound;
 
