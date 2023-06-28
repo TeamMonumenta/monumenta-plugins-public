@@ -132,7 +132,7 @@ public class SeasonalEventCommand extends GenericCommand {
 				int dayOfMonth = (Integer) args[5];
 				LocalDateTime dateTime = LocalDateTime.of(year, month, dayOfMonth, 0, 0);
 
-				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getPass(dateTime);
+				@Nullable SeasonalPass seasonalPass = SeasonalEventManager.getMostRecentPass();
 				if (seasonalPass == null) {
 					player.sendMessage(Component.text("Could not load the specified season pass", NamedTextColor.RED));
 					return;
