@@ -657,6 +657,14 @@ public class PassGui extends Gui {
 	                           @Nullable PlayerProgress playerProgress,
 	                           int week,
 	                           int missionIndex) {
+		if (weekMissions.size() <= missionIndex) {
+			ItemStack item = new ItemStack(Material.BARRIER);
+			ItemMeta meta = item.getItemMeta();
+			GUIUtils.splitLoreLine(meta, "Failed to load mission", NamedTextColor.RED, 30, false);
+			item.setItemMeta(meta);
+			setItem(y, x, item);
+			return;
+		}
 		WeeklyMission mission = weekMissions.get(missionIndex);
 		String missionDescription = mission.mDescription;
 		if (missionDescription == null) {
