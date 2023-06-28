@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,10 +20,11 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,7 +55,7 @@ public class DepthsParty {
 	public static final String EXPANDED_LEADERBOARD = "DepthsEndless6";
 
 	// The difference between where the player spawns in a loot room, and where the loot needs to be dropped
-	// Transient- don't try to save a circular reference to players (will crash data save)
+	// Transient - don't try to save a circular reference to players (will crash data save)
 	public transient List<DepthsPlayer> mPlayersInParty;
 	// The current room number the party is on
 	public int mRoomNumber;
@@ -116,11 +118,11 @@ public class DepthsParty {
 			mIsSixPlayerMode = true;
 		}
 
-		for (DepthsPlayer dp : players) {
+		for (DepthsPlayer dp : Objects.requireNonNull(players)) {
 
 			//Endless mode detection
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
-			p.removeScoreboardTag(DepthsManager.PAID_SCOREBOARD_TAG);
+			Objects.requireNonNull(p).removeScoreboardTag(DepthsManager.PAID_SCOREBOARD_TAG);
 			if (p.getScoreboardTags().contains(DepthsManager.ENDLESS_MODE_STRING)) {
 				mEndlessMode = true;
 				p.removeScoreboardTag(DepthsManager.ENDLESS_MODE_STRING);
@@ -150,7 +152,7 @@ public class DepthsParty {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
 					//Get random ability to start
 					int[] chances = {80, 15, 5, 0, 0};
-					DepthsManager.getInstance().getRandomAbility(p, dp, chances);
+					DepthsManager.getInstance().getRandomAbility(Objects.requireNonNull(p), dp, chances);
 				}
 			}
 
@@ -159,8 +161,8 @@ public class DepthsParty {
 		mRoomNumber = 0;
 		mSpawnersToBreak = 0;
 		mHasAtLeastOneAbility = false;
-		mOldRooms = new ArrayList<DepthsRoom>();
-		mLootRoomLocations = new ArrayList<Vector>();
+		mOldRooms = new ArrayList<>();
+		mLootRoomLocations = new ArrayList<>();
 		mDelveModifiers = new HashMap<>();
 		mSpawnedReward = false;
 		mRoomStartX = loc.getBlockX();
@@ -217,7 +219,7 @@ public class DepthsParty {
 		}
 
 		boolean spawnSlime = false;
-		//Check if the room is complete and we didnt already reward them
+		//Check if the room is complete, and we didn't already reward them
 		if (mSpawnersToBreak == 0 && !mSpawnedReward && mCurrentRoom.mSpawnerCount > 0) {
 
 			for (DepthsPlayer dp : mPlayersInParty) {
@@ -229,7 +231,9 @@ public class DepthsParty {
 					}
 					Player partyMember = Bukkit.getPlayer(dp.mPlayerId);
 					if (partyMember != null) {
-						partyMember.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "This room's " + DepthsUtils.rewardString(mCurrentRoomType) + " reward has been found!");
+						partyMember.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							"This room's " + DepthsUtils.rewardString(mCurrentRoomType)
+								+ " reward has been found!")));
 					}
 				}
 			}
@@ -259,7 +263,7 @@ public class DepthsParty {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
 				p.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				p.sendActionBar(Component.text("" + score + " treasure score added to loot room!", NamedTextColor.GOLD));
+				p.sendActionBar(Component.text(score + " treasure score added to loot room!", NamedTextColor.GOLD));
 			}
 		}
 
@@ -297,29 +301,53 @@ public class DepthsParty {
 	 * Gets some summary information about the party
 	 * @return info about the party as a string to print
 	 */
-	public String getSummaryString() {
-		String lineStart = "\n" + ChatColor.GOLD;
-		String ret = ChatColor.LIGHT_PURPLE + "Depths Party Summary:";
-		ret += lineStart + "Players in party: " + ChatColor.GREEN;
+	public Component getSummaryComponent() {
+		Component result = Component.empty().color(NamedTextColor.GOLD)
+			.append(Component.text("Depths Party Summary:", NamedTextColor.LIGHT_PURPLE));
+		StringBuilder partyMembers = new StringBuilder("Players in party:");
 		boolean endlessModeUnlocked = false;
 		for (DepthsPlayer dp : mPlayersInParty) {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null && p.isOnline()) {
-				ret += "" + p.getName() + " ";
+				partyMembers.append(" ").append(p.getName());
 				if (ScoreboardUtils.getScoreboardValue(p, "Depths").orElse(0) > 0) {
 					endlessModeUnlocked = true;
 				}
 			}
 		}
-		ret += lineStart + "Spawners left to break: " + ChatColor.WHITE + mSpawnersToBreak;
-		ret += lineStart + "Floor number: " + ChatColor.WHITE + getFloor();
-		ret += lineStart + "Room number: " + ChatColor.WHITE + mRoomNumber;
-		ret += lineStart + "Party number: " + ChatColor.WHITE + mPartyNum;
-		ret += lineStart + "Treasure score: " + ChatColor.WHITE + mTreasureScore;
+
+		result = result
+			.append(Component.newline())
+			.append(Component.text(partyMembers.toString(), NamedTextColor.GREEN))
+
+			.append(Component.newline())
+			.append(Component.text("Spawners left to break: "))
+			.append(Component.text(mSpawnersToBreak, NamedTextColor.WHITE))
+
+			.append(Component.newline())
+			.append(Component.text("Floor number: "))
+			.append(Component.text(getFloor(), NamedTextColor.WHITE))
+
+			.append(Component.newline())
+			.append(Component.text("Room number: "))
+			.append(Component.text(mRoomNumber, NamedTextColor.WHITE))
+
+			.append(Component.newline())
+			.append(Component.text("Party number: "))
+			.append(Component.text(mPartyNum, NamedTextColor.WHITE))
+
+			.append(Component.newline())
+			.append(Component.text("Treasure score: "))
+			.append(Component.text(mTreasureScore, NamedTextColor.WHITE));
+
 		if (mEndlessMode || endlessModeUnlocked) {
-			ret += lineStart + "Endless mode: " + ChatColor.WHITE + mEndlessMode;
+			result = result
+				.append(Component.newline())
+				.append(Component.text("Endless mode: "))
+				.append(Component.text(mEndlessMode, NamedTextColor.WHITE));
 		}
-		return ret;
+
+		return result;
 	}
 
 	/**
@@ -370,7 +398,8 @@ public class DepthsParty {
 		for (DepthsPlayer dp : mPlayersInParty) {
 			Player p = Bukkit.getPlayer(dp.mPlayerId);
 			if (p != null) {
-				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Spawned new " + room.mRoomType.getRoomString() + " room!");
+				p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+					"Spawned new " + room.mRoomType.getRoomString() + " room!")));
 			}
 		}
 
@@ -447,7 +476,8 @@ public class DepthsParty {
 			p.setBedSpawnLocation(lootRoomLoc, true);
 			p.addScoreboardTag(Constants.Tags.NO_TRANSPOSING);
 			mLootRoomsUsed++;
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Sending you to loot room " + mLootRoomsUsed);
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Sending you to loot room " + mLootRoomsUsed)));
 
 			//Remove delve score if applicable
 			new BukkitRunnable() {
@@ -482,42 +512,49 @@ public class DepthsParty {
 			DepthsLoot.generateLoot(lootRoomLoc.clone().add(DepthsLoot.LOOT_ROOM_LOOT_OFFSET), lootRoomTreasure, p, (roomReached > 120) && !mIsSixPlayerMode);
 
 			//Set their highest room score and do announcements
+			int highestRoom;
 			if (!mIsSixPlayerMode) {
-				int highestRoom = ScoreboardUtils.getScoreboardValue(p, ENDLESS_LEADERBOARD).orElse(0);
+				highestRoom = ScoreboardUtils.getScoreboardValue(p, ENDLESS_LEADERBOARD).orElse(0);
 				if (roomReached > highestRoom) {
 					ScoreboardUtils.setScoreboardValue(p, ENDLESS_LEADERBOARD, roomReached);
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " " + ENDLESS_LEADERBOARD);
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getName() + " " + ENDLESS_LEADERBOARD);
 				}
 				if (roomReached > 30) {
 					if (roomReached > highestRoom) {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 					} else {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+						Bukkit.getServer().sendMessage(Component.empty()
+							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+							.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
+								+ roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 					}
 				}
-				SeasonalEventListener.playerCompletedDepths(p, roomReached);
 			} else {
-				int highestRoom = ScoreboardUtils.getScoreboardValue(p, EXPANDED_LEADERBOARD).orElse(0);
+				highestRoom = ScoreboardUtils.getScoreboardValue(p, EXPANDED_LEADERBOARD).orElse(0);
 				if (roomReached > highestRoom) {
 					ScoreboardUtils.setScoreboardValue(p, EXPANDED_LEADERBOARD, roomReached);
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "leaderboard update " + p.getDisplayName() + " " + EXPANDED_LEADERBOARD);
+					NmsUtils.getVersionAdapter().runConsoleCommandSilently("leaderboard update " + p.getName() + " " + EXPANDED_LEADERBOARD);
 				}
 				if (roomReached > 30) {
 					if (roomReached > highestRoom) {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + p.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths with a new personal best in six player mode! (Endless Room Reached: " + roomReached + ")\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 					} else {
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw @a [\"\",{\"text\":\"" + p.getDisplayName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths! (Endless Room Reached: " + roomReached + ")\",\"color\":\"yellow\",\"italic\":true,\"bold\":false}]");
+						Bukkit.getServer().sendMessage(Component.empty()
+							.append(Component.text(p.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))
+							.append(Component.text(" defeated the Darkest Depths! (Endless Room Reached: "
+								+ roomReached + ")", NamedTextColor.YELLOW, TextDecoration.ITALIC)));
 					}
 				}
-				SeasonalEventListener.playerCompletedDepths(p, roomReached);
 			}
+			SeasonalEventListener.playerCompletedDepths(p, roomReached);
 
 			if (victory) {
 				Bukkit.getPluginManager().callEvent(new MonumentaEvent(p, "depths"));
 			}
 
 		} else {
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Max loot rooms reached! This should never happen- please contact a moderator.");
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Max loot rooms reached! This should never happen - please contact a moderator.")));
 			DepthsPlayer dp = DepthsManager.getInstance().mPlayers.get(p.getUniqueId());
 			if (dp != null) {
 				//Remove player from their party anyway

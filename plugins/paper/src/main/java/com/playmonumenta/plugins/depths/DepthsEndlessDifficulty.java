@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -23,7 +24,8 @@ public class DepthsEndlessDifficulty {
 				continue;
 			}
 			playerToUse = p;
-			p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.");
+			p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+				"Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.")));
 			break;
 		}
 
@@ -62,7 +64,8 @@ public class DepthsEndlessDifficulty {
 			}
 
 			if (pointsToAssign > 0) {
-				p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.");
+				p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+					"Assigning your party " + pointsToAssign + " Delve Points randomly. Sneak left click while holding your Depths Trinket to view all delve modifiers.")));
 			}
 
 			DelvesUtils.copyDelvePoint(null, playerToUse, p, shard);

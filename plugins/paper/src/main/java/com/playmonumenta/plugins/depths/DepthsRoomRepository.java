@@ -9,8 +9,9 @@ import com.playmonumenta.structures.StructuresAPI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -135,7 +136,7 @@ public class DepthsRoomRepository {
 		mF1BossRoom = new DepthsRoom("depths/f1r18", DepthsRoomType.BOSS, new Vector(51, 46, 56), new Vector(1.0, -16.0, -15.0), 0, RoomDirection.EVEN);
 
 		//F2 utility rooms
-		// ANVIL ROOM- disabled
+		// ANVIL ROOM - disabled
 		//mF2UtilityRooms.add(new DepthsRoom("depths/f2r11", DepthsRoomType.UTILITY, new Vector(33, 28, 29), new Vector(1.0, -1.0, -6.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r14", DepthsRoomType.UTILITY, new Vector(38, 26, 38), new Vector(1.0, -11.0, -17.0), 0, RoomDirection.EVEN));
 		mF2UtilityRooms.add(new DepthsRoom("depths/f2r16", DepthsRoomType.UTILITY, new Vector(34, 26, 33), new Vector(1.0, -6.0, -16.0), 0, RoomDirection.EVEN));
@@ -200,8 +201,7 @@ public class DepthsRoomRepository {
 		mF2TwistedRooms.add(new DepthsRoom("depths/f2r47", DepthsRoomType.TWISTED, new Vector(106, 64, 80), new Vector(1.0, -11.0, -25.0), 61, RoomDirection.UP));
 
 		//F2 boss room
-		DepthsRoom f2r26 = new DepthsRoom("depths/f2r26", DepthsRoomType.BOSS, new Vector(73, 48, 56), new Vector(1.0, -11.0, -35.0), 0, RoomDirection.EVEN);
-		mF2BossRoom = f2r26;
+		mF2BossRoom = new DepthsRoom("depths/f2r26", DepthsRoomType.BOSS, new Vector(73, 48, 56), new Vector(1.0, -11.0, -35.0), 0, RoomDirection.EVEN);
 
 		//F3 normal rooms
 		mF3NormalRooms.add(new DepthsRoom("depths/f3r1", DepthsRoomType.ABILITY, new Vector(39, 31, 35), new Vector(1.0, -0.0, -17.0), 9, RoomDirection.EVEN));
@@ -432,7 +432,9 @@ public class DepthsRoomRepository {
 				for (DepthsPlayer dp : party.mPlayersInParty) {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
 					if (p != null) {
-						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + ChatColor.RED + "Failed to load lobby structure " + path + ". Contact a moderator.");
+						p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							"Failed to load lobby structure " + path + ". Contact a moderator.",
+							NamedTextColor.RED)));
 					}
 				}
 			} else {
@@ -441,6 +443,7 @@ public class DepthsRoomRepository {
 					return;
 				}
 				Location l = new Location(world, party.mFloorLobbyLoadPlayerTpPoint.getX(), party.mFloorLobbyLoadPlayerTpPoint.getY(), party.mFloorLobbyLoadPlayerTpPoint.getZ(), 270.0f, 0.0f);
+				PlayerUtils.executeCommandOnNearbyPlayers(l, 20, "stopsound @s record");
 				//Tp all the players to it
 				for (DepthsPlayer dp : party.mPlayersInParty) {
 					Player p = Bukkit.getPlayer(dp.mPlayerId);
@@ -449,9 +452,11 @@ public class DepthsRoomRepository {
 					} else {
 						p.teleport(l, PlayerTeleportEvent.TeleportCause.UNKNOWN);
 						PotionUtils.applyPotion(Plugin.getInstance(), p, new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
-						p.sendMessage(DepthsUtils.DEPTHS_MESSAGE_PREFIX + "Your party earned " + treasure + " treasure score for clearing floor " + party.getFloor() + "! Sending your party to next floor.");
+						p.sendMessage(DepthsUtils.DEPTHS_COMPONENT_PREFIX.append(Component.text(
+							"Your party earned " + treasure
+								+ " treasure score for clearing floor " + party.getFloor()
+								+ "! Sending your party to next floor.")));
 					}
-					PlayerUtils.executeCommandOnNearbyPlayers(l, 20, "stopsound @s record");
 				}
 				//Reset used rooms
 				party.mOldRooms.clear();

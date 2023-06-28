@@ -226,7 +226,9 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 					mBoss.setAI(true);
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
 
-					SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
+					SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS,
+						MUSIC_DURATION, true, 2.0f, 1.0f, true),
+						true, mBoss, true, 0, 5);
 
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendTitle(player, Component.text("R'Kitxet", NamedTextColor.DARK_GREEN, TextDecoration.BOLD), Component.text("Forsaken Elder", NamedTextColor.GREEN, TextDecoration.BOLD));
@@ -272,7 +274,8 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 					message = "Thank you...";
 				} else {
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
-					PlayerUtils.executeCommandOnNearbyPlayers(mBoss.getLocation(), detectionRange, "stopsound @p");
+					SongManager.stopSong(PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true),
+						true);
 					this.cancel();
 					return;
 				}
