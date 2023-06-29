@@ -309,13 +309,8 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			if (nestedBlockEntityTag == null) {
 				continue;
 			}
-			// now check again if the Items tag exists
-			NBTCompoundList nestedItems = nestedBlockEntityTag.getCompoundList("Items");
-			if (nestedItems == null) {
-				continue;
-			}
 			foundNested = true;
-			nestedItems.clear();
+			tag.removeKey("BlockEntityTag");
 		}
 		if (foundNested) {
 			markVirtual(itemStack);

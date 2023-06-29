@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.commands.experiencinator;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.custominventories.ExperiencinatorMainGui;
 import com.playmonumenta.plugins.custominventories.ExperiencinatorSettingsGui;
+import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.scriptedquests.quests.QuestContext;
 import dev.jorel.commandapi.CommandAPI;
@@ -126,6 +127,10 @@ public class ExperiencinatorCommand {
 	}
 
 	private static void useExperiencinator(Player player, BiConsumer<ExperiencinatorConfig.Experiencinator, ItemStack> func) throws WrapperCommandSyntaxException {
+		if (ClickLimiter.isLocked(player)) {
+			return;
+		}
+
 		ExperiencinatorConfig experiencinatorConfig = ExperiencinatorUtils.getConfig(player.getLocation());
 		if (experiencinatorConfig == null) {
 			player.sendRawMessage(ChatColor.RED + "There's a problem with the server's Experiencinator configuration. Please contact a moderator.");

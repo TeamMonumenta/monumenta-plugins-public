@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
@@ -495,6 +496,10 @@ public class LoadoutManager implements Listener {
 	}
 
 	public void quickSwap(Player player) {
+		if (ClickLimiter.isLocked(player)) {
+			return;
+		}
+
 		if (!ShulkerEquipmentListener.checkAllowedToSwapEquipment(player)) {
 			return;
 		}
