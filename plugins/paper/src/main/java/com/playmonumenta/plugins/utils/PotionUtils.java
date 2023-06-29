@@ -460,7 +460,10 @@ public class PotionUtils {
 		return true;
 	}
 
-	public static void splashPotionParticles(Player player, Color color) {
+	/**
+	 * Plays the particle and sound effect of a potion splash
+	 */
+	public static void splashPotionParticlesAndSound(Player player, Color color) {
 		player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.POTION_BREAK, color.asRGB());
 	}
 

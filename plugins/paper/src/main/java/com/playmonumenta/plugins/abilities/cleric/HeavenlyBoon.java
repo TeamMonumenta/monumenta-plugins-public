@@ -184,7 +184,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 			ThrownPotion splashPotion = EntityUtils.spawnSplashPotion(mPlayer, potion);
 			PotionUtils.mimicSplashPotionEffect(mPlayer, splashPotion);
-			PotionUtils.splashPotionParticles(mPlayer, splashPotion.getPotionMeta().getColor());
+			PotionUtils.splashPotionParticlesAndSound(mPlayer, splashPotion.getPotionMeta().getColor());
 			heavenlyBoonSound(mPlayer);
 
 			if (isEnhanced() && Bukkit.getCurrentTick() > mLastSuccessfulProcTick + ENHANCEMENT_COOLDOWN_TICKS) {

@@ -284,8 +284,7 @@ public class PotionConsumeListener implements Listener {
 		// this only exists because mojank code doesn't allow me to have potions collide with the player
 		if (potion.getItem().getType() == Material.SPLASH_POTION) {
 			PotionUtils.mimicSplashPotionEffect(player, potion);
-			PotionUtils.splashPotionParticles(player, potion.getPotionMeta().getColor());
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, SoundCategory.PLAYERS, 0.65f, 1f);
+			PotionUtils.splashPotionParticlesAndSound(player, potion.getPotionMeta().getColor());
 		}
 
 		//If Sacred Provisions check passes, do not consume
