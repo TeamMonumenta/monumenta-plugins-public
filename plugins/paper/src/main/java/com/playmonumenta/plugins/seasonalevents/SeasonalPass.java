@@ -213,7 +213,7 @@ public class SeasonalPass {
 					}
 					case PLOT_BORDER -> {
 						if (showWarnings
-							&& PlotBorderCustomInventory.getCosmeticNameSet().contains(reward.mData)) {
+							&& !PlotBorderCustomInventory.getCosmeticNameSet().contains(reward.mData)) {
 							sender.sendMessage(Component.text("[SeasonPass] loadRewards for " + startDateStr
 										+ ": No such plot border " + reward.mData + " in the plot border GUI",
 									NamedTextColor.RED)
