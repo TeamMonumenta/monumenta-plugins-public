@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import de.jeff_media.chestsort.api.ChestSortAPI;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
@@ -105,70 +106,82 @@ public class LootboxManager implements Listener {
 	 * sublists of the original input list
 	 */
 	public static List<List<ItemStack>> distributeLootToBuckets(List<ItemStack> loot, int numBuckets) {
-		// Output buckets
-		List<List<ItemStack>> buckets = new ArrayList<>(numBuckets);
-
 		// No reason to shuffle things around if numBuckets is 1
 		if (numBuckets <= 1) {
+			List<List<ItemStack>> buckets = new ArrayList<>(numBuckets);
 			buckets.add(loot);
 			return buckets;
 		}
 
-		// TODO: Check if items in the input are stacked or not, if they are, unstack
-		// them
+		List<Inventory> tempBuckets = new ArrayList<>(numBuckets);
 
-		// Shuffle the input items so there is no bias to the first player getting the
-		// first item every time
-		Collections.shuffle(loot, FastUtils.RANDOM);
-
-		// Compute the min items per bucket
-		int minItemsPerBucket = (loot.size() / numBuckets);
-		// Compute how many buckets need 1 additional item
-		int numBucketsWithExtra = (loot.size() % numBuckets);
-
-		int itemsMoved = 0;
-		for (int i = 0; i < numBuckets; i++) {
-			final int itemsToMove;
-			if (i < numBucketsWithExtra) {
-				itemsToMove = minItemsPerBucket + 1;
-			} else {
-				itemsToMove = minItemsPerBucket;
-			}
-
-			// Pull off that many items from the input list and put them in a bucket
-			buckets.add(new ArrayList<>(loot.subList(itemsMoved, itemsMoved + itemsToMove)));
-
-			itemsMoved += itemsToMove;
+		// Create empty buckets
+		for (int bucketIndex = 0; bucketIndex < numBuckets; bucketIndex++) {
+			tempBuckets.add(Bukkit.createInventory(null, 54));
 		}
 
-		// Shuffle the buckets themselves so the 1st player isn't more likely to get +1
-		// item
-		Collections.shuffle(buckets, FastUtils.RANDOM);
+		if (MMLog.isLevelEnabled(Level.FINER)) {
+			MMLog.finer("LOOTBOX: # of Buckets: " + numBuckets);
+			MMLog.finer("LOOTBOX: Processing chest which contains:");
+			loot.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
+		}
 
-		MMLog.finer("LOOTBOX: Attempting to merge items in " + buckets.size() + " buckets");
+		// Sort the Loot Inventory
+		Inventory lootInventory = Bukkit.createInventory(null, 54);
+		lootInventory.addItem(loot.toArray(new ItemStack[0]));
+		ChestSortAPI.sortInventory(lootInventory);
 
-		// Compact the buckets down to save space. Every little bit helps with the big
-		// lootbox
-		// For example: compacting two CXP items into one CXP item with count 2
+		if (MMLog.isLevelEnabled(Level.FINER)) {
+			MMLog.finer("LOOTBOX: Sorted chest which contains:");
+			List<ItemStack> lootChest = Arrays.asList(lootInventory.getContents()).stream()
+				.filter((item) -> !ItemUtils.isNullOrAir(item))
+				.toList();
+			lootChest.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
+		}
+
+		// Distribute even
+		int bucketIdx = 0;
+		for (ItemStack item : lootInventory.getContents()) {
+			if (ItemUtils.isNullOrAir(item)) {
+				continue;
+			}
+			int amount = item.getAmount();
+			int amountThatSplitsEvenly = Math.floorDiv(amount, numBuckets);
+			int amountThatDoesnt = Math.floorMod(amount, numBuckets);
+			ItemStack clonedItem = item.asOne();
+			// this item can be evenly split, therefore add the split to all buckets
+			if (amountThatSplitsEvenly > 0) {
+				ItemStack evenSplitItem = clonedItem.asQuantity(amountThatSplitsEvenly);
+				for (Inventory inv : tempBuckets) {
+					inv.addItem(evenSplitItem);
+				}
+			}
+			// this item has leftovers, add it to the current bucket
+			while (amountThatDoesnt > 0) {
+				tempBuckets.get(bucketIdx).addItem(clonedItem);
+				amountThatDoesnt--;
+				bucketIdx++;
+				if (bucketIdx >= numBuckets) {
+					bucketIdx = 0;
+				}
+			}
+		}
+
+		// Shuffle the buckets themselves so the 1st player isn't more likely to get +1 item
+		Collections.shuffle(tempBuckets, FastUtils.RANDOM);
+
+		// Convert from an Inventory back into a List<ItemStack>
 		List<List<ItemStack>> outputBuckets = new ArrayList<>();
-		for (List<ItemStack> bucket : buckets) {
+		for (Inventory inv : tempBuckets) {
+			// convert back to list and filter out null entries
+			List<ItemStack> newBucket = Arrays.asList(inv.getContents()).stream()
+				.filter((item) -> !ItemUtils.isNullOrAir(item))
+				.toList();
 			if (MMLog.isLevelEnabled(Level.FINER)) {
-				MMLog.finer("LOOTBOX: Processing bucket which contains:");
-				bucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
+				MMLog.finer("LOOTBOX: Bucket contents");
+				newBucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
 			}
-
-			// compress loot using vanilla's inventory system
-			// create fake inventory (hardcoded to 27 slots)
-			Inventory compressedInventory = Bukkit.createInventory(null, 27);
-			// add loot to inventory
-			compressedInventory.addItem(bucket.toArray(new ItemStack[0]));
-			// convert back to list
-			outputBuckets.add(Arrays.asList(compressedInventory.getContents()));
-
-			if (MMLog.isLevelEnabled(Level.FINER)) {
-				MMLog.finer("LOOTBOX: Bucket resulting contents:");
-				bucket.forEach((item) -> MMLog.finer("LOOTBOX:     " + item.toString()));
-			}
+			outputBuckets.add(newBucket);
 		}
 
 		return outputBuckets;

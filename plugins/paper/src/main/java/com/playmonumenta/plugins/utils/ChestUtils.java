@@ -109,7 +109,7 @@ public class ChestUtils {
 					nearbyPlayers = PlayerUtils.playersInLootScalingRange(player, false);
 
 					// This should at minimum be one since there should always be one player (the person who opened the chest)
-					int otherPlayersMultiplier = nearbyPlayers.size();
+					int otherPlayersMultiplier = nearbyPlayers.size() - 1;
 
 					MMLog.fine("Lootable seed: " + lootable.getSeed());
 					// Loot table seed set and use the seed for number of players
@@ -119,6 +119,7 @@ public class ChestUtils {
 					}
 
 					double bonusItems = BONUS_ITEMS[Math.min(BONUS_ITEMS.length - 1, otherPlayersMultiplier)];
+					MMLog.fine("Lootscaling for " + nearbyPlayers.size() + " players: " + bonusItems);
 					luckAmount = (int) bonusItems;
 
 					// Account for fractions of extra items with random roll
