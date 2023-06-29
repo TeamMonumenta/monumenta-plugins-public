@@ -31,6 +31,7 @@ public class EliteFinishers {
 			.put(Promenade.NAME, new Promenade())
 			.put(PoultryficationFinisher.NAME, new PoultryficationFinisher())
 			.put(PaintSplashFinisher.NAME, new PaintSplashFinisher())
+			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(Woolerman.NAME, new Woolerman())
 			.put(Whirlpool.NAME, new Whirlpool())
 			.build();
