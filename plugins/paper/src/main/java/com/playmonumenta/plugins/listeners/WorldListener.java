@@ -43,6 +43,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -57,6 +58,7 @@ import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
@@ -473,6 +475,21 @@ public class WorldListener implements Listener {
 		}
 	}
 
+	// Prevent a cauldron's water level from decreasing when cleaning items on plot worlds
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void cauldronLevelChangeEvent(CauldronLevelChangeEvent event) {
+		CauldronLevelChangeEvent.ChangeReason reason = event.getReason();
+		if (event.getNewState().getBlockData() instanceof Levelled cauldron
+			    && (reason == CauldronLevelChangeEvent.ChangeReason.BANNER_WASH
+				        || reason == CauldronLevelChangeEvent.ChangeReason.ARMOR_WASH
+				        || reason == CauldronLevelChangeEvent.ChangeReason.SHULKER_WASH)
+			    && ServerProperties.getShardName().endsWith("plots")) {
+			// Cannot cancel the event, as that prevents cleaning items, so increase the level by one instead.
+			cauldron.setLevel(Math.min(cauldron.getLevel() + 1, cauldron.getMaximumLevel()));
+			event.getNewState().setBlockData(cauldron);
+		}
+	}
+
 	public void playerBrokeSpawner(Player player, Block spawner) {
 		if (!Plugin.IS_PLAY_SERVER) {
 			return;
@@ -481,7 +498,7 @@ public class WorldListener implements Listener {
 		List<Chunk> chunkList = LocationUtils.getSurroundingChunks(spawner, SPAWNER_BREAK_CHEST_CHECK_RADIUS);
 		int chests = 0;
 		for (Chunk chunk : chunkList) {
-			for (BlockState interestingBlock: chunk.getTileEntities()) {
+			for (BlockState interestingBlock : chunk.getTileEntities()) {
 				if (ChestUtils.isUnscaledChest(interestingBlock.getBlock()) && LocationUtils.blocksAreWithinRadius(spawner, interestingBlock.getBlock(), SPAWNER_BREAK_CHEST_CHECK_RADIUS)) {
 					chests++;
 					List<Player> players = PlayerUtils.playersInLootScalingRange(spawner.getLocation());
