@@ -32,7 +32,8 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 		public int DURATION = 8 * 20;
 
 		public int RADIUS = 180;
-		public int DISTANCE = 4;
+		public float DISTANCE = 4f;
+		public int HEIGHT = 5;
 
 		public String SPELL_NAME = "";
 
@@ -89,7 +90,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 					public void run() {
 						mT++;
 						Vector vec;
-						for (int y = 0; y < 5; y++) {
+						for (int y = 0; y < p.HEIGHT; y++) {
 							for (double degree = 0; degree < p.RADIUS; degree += 10) {
 								double radian1 = Math.toRadians(degree);
 								vec = new Vector(FastUtils.cos(radian1) * p.DISTANCE, y, FastUtils.sin(radian1) * p.DISTANCE);
@@ -101,7 +102,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 								}
 								if (!mHitboxes) {
 									mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
-										l.clone().add(0.6, 5, 0.6)));
+										l.clone().add(0.6, p.HEIGHT, 0.6)));
 								}
 							}
 							mHitboxes = true;

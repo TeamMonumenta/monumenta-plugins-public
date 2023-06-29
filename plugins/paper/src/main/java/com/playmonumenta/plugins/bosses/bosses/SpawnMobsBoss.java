@@ -11,9 +11,9 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "not written")
-		public int RANGE = 9;
+		public double RANGE = 9;
 		@BossParam(help = "Minimum Distance from Boss to spawn each mob.")
-		public int MIN_RANGE = 0;
+		public double MIN_RANGE = 0;
 		@BossParam(help = "not written")
 		public int DELAY = 100;
 		@BossParam(help = "not written")
@@ -27,7 +27,7 @@ public class SpawnMobsBoss extends BossAbilityGroup {
 		@BossParam(help = "Maximum Mobs within range (param MOB_CAP_RANGE) where the ability fails to spawn mobs (Default = 15)")
 		public int MOB_CAP = 15;
 		@BossParam(help = "Radius of mobs counted for the mob cap check where the ability fails to spawn mobs (Default = 10)")
-		public int MOB_CAP_RANGE = 10;
+		public double MOB_CAP_RANGE = 10;
 	}
 
 	public SpawnMobsBoss(Plugin plugin, LivingEntity boss) {

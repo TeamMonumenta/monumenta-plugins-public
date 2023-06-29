@@ -78,13 +78,14 @@ public class SpellBaseLeapAttack extends Spell {
 	private final @Nullable JumpVelocityModifier mVelocityModifier;
 	private final @Nullable MidLeapTickAction mMidLeapTick;
 	private final boolean mPreferTarget;
+	private final boolean mIgnoreWalls;
 
 	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
 							   double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
 							   AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
 							   @Nullable MidLeapTickAction midLeapTick) {
 		this(plugin, boss, range, minRange, runDistance, cooldown, velocityMultiplier, initiateAesthetic, leapAesthetic,
-			leapingAesthetic, hitAction, velocityModifier, midLeapTick, false);
+			leapingAesthetic, hitAction, velocityModifier, midLeapTick, true, false);
 	}
 	/**
 	 * @param plugin             Plugin
@@ -105,7 +106,7 @@ public class SpellBaseLeapAttack extends Spell {
 	public SpellBaseLeapAttack(Plugin plugin, LivingEntity boss, int range, int minRange, int runDistance, int cooldown,
 	                           double velocityMultiplier, AestheticAction initiateAesthetic, AestheticAction leapAesthetic,
 	                           AestheticAction leapingAesthetic, HitAction hitAction, @Nullable JumpVelocityModifier velocityModifier,
-	                           @Nullable MidLeapTickAction midLeapTick, boolean preferTarget) {
+	                           @Nullable MidLeapTickAction midLeapTick, boolean preferTarget, boolean ignoreWalls) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mWorld = boss.getWorld();
@@ -121,6 +122,7 @@ public class SpellBaseLeapAttack extends Spell {
 		mVelocityModifier = velocityModifier;
 		mMidLeapTick = midLeapTick;
 		mPreferTarget = preferTarget;
+		mIgnoreWalls = ignoreWalls;
 	}
 
 	@Override
@@ -136,7 +138,7 @@ public class SpellBaseLeapAttack extends Spell {
 			Collections.shuffle(players);
 			for (Player player : players) {
 				Location locPlayer = player.getLocation();
-				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(locPlayer) > mMinRange) {
+				if ((LocationUtils.hasLineOfSight(mBoss, player) || mIgnoreWalls) && loc.distance(locPlayer) > mMinRange) {
 					locTarget = locPlayer;
 					targetPlayer = player;
 					break;
@@ -154,7 +156,7 @@ public class SpellBaseLeapAttack extends Spell {
 			return;
 		}
 
-		launch(locTarget, loc, targetPlayer, true);
+		launch(locTarget, loc, targetPlayer, !mIgnoreWalls);
 	}
 
 	public void launch(Location locTarget, Location loc, Player targetPlayer, boolean checkPassable) {
@@ -252,7 +254,7 @@ public class SpellBaseLeapAttack extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(loc, mRange, false);
 		if (!players.isEmpty()) {
 			for (Player player : players) {
-				if (LocationUtils.hasLineOfSight(mBoss, player) && loc.distance(player.getLocation()) > mMinRange) {
+				if ((LocationUtils.hasLineOfSight(mBoss, player) || mIgnoreWalls) && loc.distance(player.getLocation()) > mMinRange) {
 					return true;
 				}
 			}

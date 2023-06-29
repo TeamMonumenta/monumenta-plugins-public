@@ -26,8 +26,10 @@ public class BulletHellBoss extends BossAbilityGroup {
 
 	@BossParam(help = "Bullets")
 	public static class Parameters extends BossParameters {
-		@BossParam(help = "Damage")
-		public int DAMAGE = 15;
+		@BossParam(help = "Amount of damage a bullet will deal")
+		public int DAMAGE = 0;
+		@BossParam(help = "Amount of true damage a bullet will deal, in %")
+		public int DAMAGE_PERCENTAGE = 0;
 		@BossParam(help = "The name of the spell.")
 		public String SPELL_NAME = "";
 		@BossParam(help = "Effects to apply on hit.")
@@ -97,7 +99,12 @@ public class BulletHellBoss extends BossAbilityGroup {
 				p.MATERIAL,
 				(@Nullable Player player, Location loc, boolean blocked, @Nullable Location prevLoc) -> {
 					if (player != null && !blocked) {
-						DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, p.SPELL_NAME), p.DAMAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, false);
+						if (p.DAMAGE > 0) {
+							DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, null, null, p.SPELL_NAME), p.DAMAGE, false, true, false);
+						}
+						if (p.DAMAGE_PERCENTAGE > 0) {
+							DamageUtils.damage(boss, player, new DamageEvent.Metadata(DamageEvent.DamageType.OTHER, null, null, p.SPELL_NAME), p.DAMAGE_PERCENTAGE * EntityUtils.getMaxHealth(player) / 100.0, false, true, false);
+						}
 						p.EFFECTS.apply(player, mBoss);
 					}
 					new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 5, 0, 0, 0, 0.175).spawnAsEnemy();

@@ -56,6 +56,7 @@ public class JumpBoss extends BossAbilityGroup {
 		@BossParam(help = "Landing Particles on the ground")
 		public ParticlesList PARTICLE_LAND_GROUND = ParticlesList.fromString("[(CLOUD,1,0.1,0.1,0.1,0.1)]");
 		public boolean PREFER_TARGET = true;
+		public boolean IGNORE_WALLS = false;
 	}
 
 	public JumpBoss(Plugin plugin, LivingEntity boss) {
@@ -82,7 +83,7 @@ public class JumpBoss extends BossAbilityGroup {
 
 			p.SOUND_LANDING.play(loc);
 			p.PARTICLE_LAND.spawn(boss, loc);
-		}, p.PREFER_TARGET);
+		}, p.PREFER_TARGET, p.IGNORE_WALLS);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 	}
 }

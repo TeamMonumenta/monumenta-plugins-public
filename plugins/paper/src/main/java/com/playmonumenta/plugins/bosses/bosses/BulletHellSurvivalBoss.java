@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.SpellManager;
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
 import com.playmonumenta.plugins.effects.EffectManager;
@@ -29,9 +30,16 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 	public static final int detectionRange = 50;
 
 	public static class Parameters extends BossParameters {
+		@BossParam(help = "The amount of health the boss heals if a player is cheesing")
 		public double HEALING = 0.02;
-		// Default 60 second survival
-		public double DAMAGE = 0.004;
+		@BossParam(help = "The amount of health the boss loses over time")
+		public double DAMAGE_SELF = 0.004; // Default 62.5 second survival
+		@BossParam(help = "The max % of health a player can deal to this mob at once")
+		public double PLAYER_DAMAGE_CAP = 0.08;
+		@BossParam(help = "The range within the boss will check for cheesing players and heal on player death")
+		public double RADIUS = 13;
+		@BossParam(help = "When a player dies in range, heal back this much HP")
+		public double PLAYER_KILL_HEAL = 1;
 	}
 
 	final Parameters mParam;
@@ -48,7 +56,7 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 				if (!mBoss.isDead()) {
 					int doDamage = shouldDamage(mBoss);
 					if (doDamage == 1) {
-						mBoss.setHealth(Math.max(mBoss.getHealth() - mParam.DAMAGE * EntityUtils.getMaxHealth(mBoss), 0));
+						mBoss.setHealth(Math.max(mBoss.getHealth() - mParam.DAMAGE_SELF * EntityUtils.getMaxHealth(mBoss), 0));
 					} else if (doDamage == -1) {
 						mBoss.setHealth(Math.min(mBoss.getHealth() + mParam.HEALING * EntityUtils.getMaxHealth(mBoss), EntityUtils.getMaxHealth(mBoss)));
 					}
@@ -59,7 +67,7 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 	}
 
 	private int shouldDamage(LivingEntity boss) {
-		List<Player> players = PlayerUtils.playersInRange(boss.getLocation(), 13, false);
+		List<Player> players = PlayerUtils.playersInRange(boss.getLocation(), mParam.RADIUS, false);
 		for (Player player : players) {
 			if (!EffectManager.getInstance().hasEffect(player, RespawnStasis.class) && !player.isDead() && player.getGameMode() != GameMode.SPECTATOR) {
 				if (player.isSleeping()) {
@@ -101,9 +109,9 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (event.getDamage() > 20 * mParam.DAMAGE * EntityUtils.getMaxHealth(mBoss)) {
+		if (event.getDamage() > mParam.PLAYER_DAMAGE_CAP * EntityUtils.getMaxHealth(mBoss)) {
 			// Strongest attack can only shorten it by 5 seconds
-			event.setDamage(20 * mParam.DAMAGE * EntityUtils.getMaxHealth(mBoss));
+			event.setDamage(mParam.PLAYER_DAMAGE_CAP * EntityUtils.getMaxHealth(mBoss));
 		}
 		Location loc = mBoss.getLocation();
 		if (source instanceof Player p) {
@@ -122,8 +130,8 @@ public class BulletHellSurvivalBoss extends BossAbilityGroup {
 
 	@Override
 	public void nearbyPlayerDeath(PlayerDeathEvent event) {
-		if (event.getPlayer().getLocation().distanceSquared(mBoss.getLocation()) <= 13 * 13) {
-			mBoss.setHealth(Math.min(mBoss.getHealth() + 40 * EntityUtils.getMaxHealth(mBoss), EntityUtils.getMaxHealth(mBoss)));
+		if (event.getPlayer().getLocation().distanceSquared(mBoss.getLocation()) <= mParam.RADIUS * mParam.RADIUS) {
+			mBoss.setHealth(Math.min(mBoss.getHealth() + mParam.PLAYER_KILL_HEAL * EntityUtils.getMaxHealth(mBoss), EntityUtils.getMaxHealth(mBoss)));
 		}
 	}
 

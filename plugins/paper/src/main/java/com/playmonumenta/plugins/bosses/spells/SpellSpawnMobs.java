@@ -11,21 +11,21 @@ import org.bukkit.entity.LivingEntity;
 public class SpellSpawnMobs extends Spell {
 	public static final int DEFAULT_MOB_CAP_RADIUS = 10;
 
-	private final int mSummonRange;
-	private final int mMinSummonRange;
+	private final double mSummonRange;
+	private final double mMinSummonRange;
 	private final int mCooldownTicks;
 	private final String mSummonName;
 	private final int mSpawns;
 	private final int mMobCap;
-	private final int mMobCapRange;
+	private final double mMobCapRange;
 
 	private final LivingEntity mBoss;
 
-	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range, int minrange, int mobcap) {
+	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap) {
 		this(boss, spawns, losname, cooldown, range, minrange, mobcap, DEFAULT_MOB_CAP_RADIUS);
 	}
 
-	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, int range, int minrange, int mobcap, int mobcaprange) {
+	public SpellSpawnMobs(LivingEntity boss, int spawns, String losname, int cooldown, double range, double minrange, int mobcap, double mobcaprange) {
 		mBoss = boss;
 		mSummonRange = range;
 		mMinSummonRange = minrange;

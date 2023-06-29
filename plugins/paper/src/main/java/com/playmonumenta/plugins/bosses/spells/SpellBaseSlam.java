@@ -10,7 +10,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 						 int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
 						 AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction) {
 		this(plugin, boss, jumpHeight, range, minRange, runDistance, cooldown, velocityMultiplier, initiateAesthetic,
-			leapAesthetic, leapingAesthetic, hitAction, true);
+			leapAesthetic, leapingAesthetic, hitAction, true, false);
 	}
 
 	/**
@@ -30,7 +30,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 	public SpellBaseSlam(Plugin plugin, LivingEntity boss, double jumpHeight, int range, int minRange, int runDistance,
 	                     int cooldown, double velocityMultiplier, AestheticAction initiateAesthetic,
 	                     AestheticAction leapAesthetic, AestheticAction leapingAesthetic, HitAction hitAction,
-						 boolean preferTarget) {
+						 boolean preferTarget, boolean ignoreWalls) {
 		super(plugin, boss, range, minRange, runDistance, cooldown,
 			velocityMultiplier, initiateAesthetic, leapAesthetic,
 			leapingAesthetic, hitAction,
@@ -51,7 +51,7 @@ public class SpellBaseSlam extends SpellBaseLeapAttack {
 				newVelocity.setY(originalVelocity.getY());
 				newVelocity.setZ((originalVelocity.getZ() * 20 + towardsPlayer.getZ() * scale) / 20);
 				boss.setVelocity(newVelocity);
-			}, preferTarget);
+			}, preferTarget, ignoreWalls);
 	}
 
 	@Override
