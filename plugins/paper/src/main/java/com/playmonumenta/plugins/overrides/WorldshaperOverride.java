@@ -30,6 +30,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.Tag;
 import org.bukkit.TreeType;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
@@ -37,6 +38,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Leaves;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.Wall;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.Inventory;
@@ -238,14 +240,15 @@ public class WorldshaperOverride {
 			}
 		}
 
-		if (LocationUtils.blocksIntersectPlayer(player, player.getWorld(), blockPlacePattern)) {
-			player.sendMessage(Component.text("A player is in the way!", TextColor.fromHexString("#D02E28")));
-			return false;
-		}
-
 		int blocksPlaced = 0;
+		World world = player.getWorld();
 		for (Location location : blockPlacePattern) {
 			if (location.getBlock().isSolid() || ItemUtils.interactableBlocks.contains(location.getBlock().getType()) || !ZoneUtils.playerCanMineBlock(player, location) || ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.NO_QUICK_BUILDING)) {
+				continue;
+			}
+
+			if (LocationUtils.blocksIntersectEntity(world, List.of(location),
+				hitbox -> hitbox.getHitEntities(e -> e instanceof LivingEntity && !e.isInvulnerable() && e != player))) {
 				continue;
 			}
 
@@ -269,7 +272,7 @@ public class WorldshaperOverride {
 					location.getBlock().setBlockData(blockData);
 					blocksPlaced++;
 					new PartialParticle(Particle.SMOKE_NORMAL, location, 10, 0.15, 0.15, 0.15).spawnAsPlayerActive(player);
-					player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1f, 0.75f);
+					world.playSound(player.getLocation(), Sound.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1f, 0.75f);
 					CoreProtectIntegration.logPlacement(player, location, blockData.getMaterial(), blockData);
 				} else {
 					if (blocksPlaced == 0) {

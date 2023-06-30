@@ -8,6 +8,7 @@ import org.apache.commons.math3.util.MathUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
@@ -429,6 +430,13 @@ public abstract class Hitbox {
 				                         && player.isValid()
 				                         && (includeNonTargetable || !AbilityUtils.isStealthed(player))
 				                         && intersects(player.getBoundingBox()))
+			       .collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	public List<Entity> getHitEntities(@Nullable Predicate<Entity> filter) {
+		return getWorld().getEntities().stream()
+			       .filter(filter == null ? e -> true : filter)
+			       .filter(e -> intersects(e.getBoundingBox()))
 			       .collect(Collectors.toCollection(ArrayList::new));
 	}
 

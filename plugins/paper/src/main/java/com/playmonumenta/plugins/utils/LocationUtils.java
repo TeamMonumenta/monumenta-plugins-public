@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import org.bukkit.Chunk;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -698,12 +699,16 @@ public class LocationUtils {
 	}
 
 	public static boolean blocksIntersectPlayer(@Nullable Player excludedPlayer, World world, List<Location> locs) {
+		return blocksIntersectEntity(world, locs, hitbox -> hitbox.getHitPlayers(excludedPlayer, true));
+	}
+
+	public static boolean blocksIntersectEntity(World world, List<Location> locs, Function<Hitbox, List<? extends Entity>> entityGetter) {
 		Hitbox hitbox = null;
 		for (Location loc : locs) {
 			Hitbox hb = new Hitbox.AABBHitbox(world, BoundingBox.of(loc.getBlock()));
 			hitbox = hitbox == null ? hb : hitbox.union(hb);
 		}
-		return hitbox != null && !hitbox.getHitPlayers(excludedPlayer, true).isEmpty();
+		return hitbox != null && !entityGetter.apply(hitbox).isEmpty();
 	}
 
 	public static Location rayTraceToBlock(Player player, double maxDist) {
