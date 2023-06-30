@@ -10,11 +10,7 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
@@ -38,7 +34,9 @@ public class PEBCustomInventory extends CustomInventory {
 		COMMON,
 		MAIN,
 		PLAYER_INFO,
-		TOGGLEABLE_OPTIONS,
+		GAMEPLAY_OPTIONS,
+		TECHNICAL_OPTIONS,
+		INTERACTABLE_OPTIONS,
 		SERVER_INFO,
 		BOOK_SKINS,
 		WOOL_BOOK_SKINS,
@@ -46,6 +44,10 @@ public class PEBCustomInventory extends CustomInventory {
 		GLOWING,
 		ROCKET_JUMP,
 		PARTIAL_PARTICLES,
+		SOUND_CONTROLS,
+		SOUND_CATEGORIES,
+		SOUND_OVERWORLD_PLOTS,
+		SOUND_DELAYS,
 	}
 
 	private static class PebItem {
@@ -53,7 +55,7 @@ public class PEBCustomInventory extends CustomInventory {
 		Function<PEBCustomInventory, String> mName;
 		Function<PEBCustomInventory, TextComponent> mLore;
 		Material mType;
-		@Nullable BiConsumer<PEBCustomInventory, InventoryClickEvent> mAction;
+		ArrayList<BiConsumer<PEBCustomInventory, InventoryClickEvent>> mActions;
 		boolean mCloseAfter;
 
 		public PebItem(int slot, String name, String lore, TextColor color, Material type, boolean closeAfter) {
@@ -74,36 +76,44 @@ public class PEBCustomInventory extends CustomInventory {
 			mLore = lore;
 			mType = type;
 			mCloseAfter = closeAfter;
+			mActions = new ArrayList<>();
 		}
 
 		public PebItem playerCommand(String command) {
-			mAction = (gui, event) -> {
+			mActions.add((gui, event) -> {
 				if (mCloseAfter) {
 					gui.mPlayer.closeInventory();
 				}
 				gui.mPlayer.performCommand(command);
-			};
+			});
+			return this;
+		}
+
+		public PebItem playerMessage(String message) {
+			mActions.add((gui, event) -> {
+				gui.mPlayer.sendMessage(message);
+			});
 			return this;
 		}
 
 		public PebItem serverCommand(String command) {
-			mAction = (gui, event) -> {
+			mActions.add((gui, event) -> {
 				String finalCommand = command.replace("@S", gui.mPlayer.getName());
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently(finalCommand);
 				if (mCloseAfter) {
 					gui.mPlayer.closeInventory();
 				}
-			};
+			});
 			return this;
 		}
 
 		public PebItem action(BiConsumer<PEBCustomInventory, InventoryClickEvent> action) {
-			mAction = action;
+			mActions.add(action);
 			return this;
 		}
 
 		public PebItem switchToPage(PebPage page) {
-			mAction = (gui, event) -> gui.setLayout(page);
+			mActions.add((gui, event) -> gui.setLayout(page));
 			return this;
 		}
 
@@ -133,25 +143,40 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(4, "Main Menu",
 				"A list of commonly used options, along with menu buttons to reach the full lists.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false),
-			new PebItem(20, "Filtered Pickup and Disabled Drop",
+			new PebItem(19, "Filtered Pickup and Disabled Drop",
 				"Click to choose your pickup and disabled drop preferences.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIRT, false).switchToPage(PebPage.PICKUP_AND_DISABLE_DROP),
-			new PebItem(21, "Toggle Darksight",
-				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
-				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
-			new PebItem(23, "Dailies",
+			new PebItem(20, "Particle Options",
+				"Click to choose how many particles will be shown for different categories. Also available under Gameplay/Combat options.", NamedTextColor.LIGHT_PURPLE,
+				Material.NETHER_STAR, false).switchToPage(PebPage.PARTIAL_PARTICLES),
+			new PebItem(21, "Glowing options",
+				"Click to choose your preferences for the \"glowing\" effect. Also available under Gameplay/Combat options.", NamedTextColor.LIGHT_PURPLE,
+				Material.SPECTRAL_ARROW, false).switchToPage(PebPage.GLOWING),
+
+			new PebItem(23, "Music Options",
+				"Click to choose your preferences across a wide variety of music", NamedTextColor.LIGHT_PURPLE,
+				Material.JUKEBOX, false).switchToPage(PebPage.SOUND_CONTROLS),
+			new PebItem(24, "Dailies",
 				"Click to see what daily content you have and haven't done today.", NamedTextColor.LIGHT_PURPLE,
 				Material.ACACIA_BOAT, true).playerCommand("clickable peb_dailies"),
-			new PebItem(24, "Dungeon Instances",
+			new PebItem(25, "Dungeon Instances",
 				"Click to view what dungeon instances you have open, and how old they are.", NamedTextColor.LIGHT_PURPLE,
 				Material.WHITE_WOOL, true).playerCommand("clickable peb_dungeoninfo"),
-			new PebItem(37, "Player Information",
+
+			new PebItem(37, "Gameplay/Combat Options",
+				"Particle options, skill-related toggles, and other toggle related to combat.", NamedTextColor.LIGHT_PURPLE,
+				Material.DIAMOND_SWORD, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
+			new PebItem(38, "Technical Options",
+				"Dungeon auto-abandon, world name spoofing, and other technical enhancements.", NamedTextColor.LIGHT_PURPLE,
+				Material.COMPARATOR, false).switchToPage(PebPage.TECHNICAL_OPTIONS),
+			new PebItem(39, "Trigger/Interactable Options",
+				"Offhand Swap, Filtered Pickup, and more options to change or disable triggers.", NamedTextColor.LIGHT_PURPLE,
+				Material.SHIELD, false).switchToPage(PebPage.INTERACTABLE_OPTIONS),
+
+			new PebItem(41, "Player Information",
 				"Details about your Class, Dailies, and other player-focused options.", NamedTextColor.LIGHT_PURPLE,
 				Material.PLAYER_HEAD, false).switchToPage(PebPage.PLAYER_INFO),
-			new PebItem(39, "Toggle-able Options",
-				"Inventory Sort, Filtered Pickup, and more toggleable choices.", NamedTextColor.LIGHT_PURPLE,
-				Material.LEVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
-			new PebItem(41, "Server Information",
+			new PebItem(42, "Server Information",
 				"Information such as how to use the PEB and random tips.", NamedTextColor.LIGHT_PURPLE,
 				Material.DISPENSER, false).switchToPage(PebPage.SERVER_INFO),
 			new PebItem(43, "Book Skins",
@@ -181,48 +206,38 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.KNOWLEDGE_BOOK, true).playerCommand("playerstats")
 		);
 
-		// Toggle-able Options
-		definePage(PebPage.TOGGLEABLE_OPTIONS,
-			new PebItem(4, "Toggleable Options",
+		definePage(PebPage.GAMEPLAY_OPTIONS,
+			new PebItem(4, "Gameplay Options",
 				"", NamedTextColor.LIGHT_PURPLE,
-				Material.LEVER, false),
-			new PebItem(19, "Particle Options",
+				Material.DIAMOND_SWORD, false),
+			new PebItem(20, "Particle Options",
 				"Click to choose how many particles will be shown for different categories.", NamedTextColor.LIGHT_PURPLE,
 				Material.NETHER_STAR, false).switchToPage(PebPage.PARTIAL_PARTICLES),
-			new PebItem(20, "Glowing options",
+			new PebItem(21, "Glowing Options",
 				"Click to choose your preferences for the \"glowing\" effect.", NamedTextColor.LIGHT_PURPLE,
 				Material.SPECTRAL_ARROW, false).switchToPage(PebPage.GLOWING),
-			new PebItem(21, "Passive ability sounds",
+			new PebItem(22, "Music Options",
+				"Click to choose your preferences across a wide variety of music", NamedTextColor.LIGHT_PURPLE,
+				Material.JUKEBOX, false).switchToPage(PebPage.SOUND_CONTROLS),
+			new PebItem(23, "Passive ability sounds",
 				"Click to toggle whether buffs and other long-lasting ability effects will play sounds.", NamedTextColor.LIGHT_PURPLE,
 				Material.NOTE_BLOCK, false).action((pebCustomInventory, event) -> {
 				boolean disabled = ScoreboardUtils.toggleTag((Player) event.getWhoClicked(), AbilityUtils.PASSIVE_SOUNDS_DISABLED_TAG);
 				event.getWhoClicked().sendMessage(Component.text("Passive ability sounds are now " + (disabled ? "disabled" : "enabled"), NamedTextColor.GOLD, TextDecoration.BOLD));
 			}),
-			new PebItem(22, gui -> "Toggle display other player's gear (" +
-				(ScoreboardUtils.getScoreboardValue(gui.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1) == 1 ? "Enabled)" : "Disabled)"),
-				gui -> Component.text("Toggles if you want to see the gear on other players, which may improve performance ", NamedTextColor.LIGHT_PURPLE),
-				Material.LEATHER_HELMET, false).action((inventory, action) -> {
-					int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1);
-					ScoreboardUtils.setScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear", oldValue == 0 ? 1 : 0);
-				}),
-			new PebItem(23, "Inventory Drink",
+			new PebItem(24, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, false).playerCommand("clickable peb_tid"),
-			new PebItem(24, "Filtered Pickup and Disabled Drop",
-				"Click to choose your pickup and disabled drop preferences.", NamedTextColor.LIGHT_PURPLE,
-				Material.DIRT, false).switchToPage(PebPage.PICKUP_AND_DISABLE_DROP),
-			new PebItem(25, "Compass Particles",
-				"Click to toggle a trail of guiding particles when following the quest compass.", NamedTextColor.LIGHT_PURPLE,
-				Material.COMPASS, false).playerCommand("clickable peb_comp_particles"),
-			new PebItem(28, "Show name on patron buff announcement.",
-				Component.text("Toggles whether the player has their IGN in the buff announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
-					.append(Component.text("Patreon ", NamedTextColor.GOLD))
-					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
-				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
-			new PebItem(29, "Rocket Jump",
+			new PebItem(29, "Toggle Darksight",
+				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
+				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
+			new PebItem(30, "Toggle Radiant",
+				"Click to toggle whether Radiant provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
+				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
+			new PebItem(31, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
-			new PebItem(30, "Earthen Tremor",
+			new PebItem(32, "Earthen Tremor",
 				"Click to enable or disable the self-knockup on earthen tremor.", NamedTextColor.LIGHT_PURPLE,
 				Material.HANGING_ROOTS, false)
 				.action((gui, event) -> {
@@ -231,29 +246,54 @@ public class PEBCustomInventory extends CustomInventory {
 					} else {
 						gui.mPlayer.sendMessage("Earthen Tremor self knockup enabled!");
 					}
-				}),
-			new PebItem(32, "Auto-abandon completed dungeons",
+				})
+		);
+
+		definePage(PebPage.TECHNICAL_OPTIONS,
+			new PebItem(4, "Technical Options",
+				"", NamedTextColor.LIGHT_PURPLE,
+				Material.COMPARATOR, false),
+			new PebItem(20, gui -> "Toggle display other player's gear (" +
+				(ScoreboardUtils.getScoreboardValue(gui.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1) == 1 ? "Enabled)" : "Disabled)"),
+				gui -> Component.text("Toggles if you want to see the gear on other players, which may improve performance ", NamedTextColor.LIGHT_PURPLE),
+				Material.LEATHER_HELMET, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear").orElse(1);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, "ShouldDisplayOtherPlayerGear", oldValue == 0 ? 1 : 0);
+			}),
+			new PebItem(21, "Compass Particles",
+				"Click to toggle a trail of guiding particles when following the quest compass.", NamedTextColor.LIGHT_PURPLE,
+				Material.COMPASS, false).playerCommand("clickable peb_comp_particles"),
+			new PebItem(22, "Show name on patron buff announcement.",
+				Component.text("Toggles whether the player has their IGN in the buff announcement when they activate ", NamedTextColor.LIGHT_PURPLE)
+					.append(Component.text("Patreon ", NamedTextColor.GOLD))
+					.append(Component.text("buffs.", NamedTextColor.LIGHT_PURPLE)),
+				Material.GLOWSTONE, false).playerCommand("clickable toggle_patron_buff_thank"),
+			new PebItem(23, "Auto-abandon completed dungeons",
 				"Click to disable or enable automatically abandoning completed dungeon instances when a new week starts.", NamedTextColor.LIGHT_PURPLE,
 				Material.DAYLIGHT_DETECTOR, false).serverCommand("execute as @S run function monumenta:mechanisms/auto_dungeon_abandon_toggle"),
-			new PebItem(33, "Spawner Equipment",
+			new PebItem(24, "Spawner Equipment",
 				"Click to toggle whether mob equipment is displayed in spawners (significantly decreases FPS in many areas)", NamedTextColor.LIGHT_PURPLE,
 				Material.SPAWNER, false).playerCommand("clickable peb_spawnerequipment"),
-			new PebItem(34, "Virtual Firmament",
+			new PebItem(29, "Virtual Firmament",
 				"Click to toggle Virtual Firmament, which visually turns your Firmament into a stack of blocks for faster placement.", NamedTextColor.LIGHT_PURPLE,
 				Material.PRISMARINE, false).playerCommand("virtualfirmament"),
-			new PebItem(37, "Spoof World Names",
+			new PebItem(30, "Spoof World Names",
 				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
-				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
-			new PebItem(38, "Toggle Darksight",
-				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
-				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
-			new PebItem(39, "Toggle Radiant",
-				"Click to toggle whether Radiant provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
-				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
-			new PebItem(40, "Block Interactions",
+				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames")
+		);
+
+		// Toggle-able Options
+		definePage(PebPage.INTERACTABLE_OPTIONS,
+			new PebItem(4, "Trigger/Interact-able Options",
+				"", NamedTextColor.LIGHT_PURPLE,
+				Material.LEVER, false),
+			new PebItem(29, "Filtered Pickup and Disabled Drop",
+				"Click to choose your pickup and disabled drop preferences.", NamedTextColor.LIGHT_PURPLE,
+				Material.DIRT, false).switchToPage(PebPage.PICKUP_AND_DISABLE_DROP),
+			new PebItem(30, "Block Interactions",
 				"Click to disable or enable interactions with blocks (looms, crafting tables, beds, etc.)", NamedTextColor.LIGHT_PURPLE,
 				Material.LOOM, false).playerCommand("blockinteractions"),
-			new PebItem(41, "Multitool Trigger",
+			new PebItem(31, "Multitool Trigger",
 				"""
 					Click to change the trigger of swapping a held Multitool item between one of the following possible values:
 					- Right Click
@@ -275,10 +315,10 @@ public class PEBCustomInventory extends CustomInventory {
 					};
 					event.getWhoClicked().sendMessage(Component.text(key != null ? "Multitool now swaps when pressing " + key : "Multitool swapping is now disabled in the main hand", NamedTextColor.GOLD, TextDecoration.BOLD));
 				}),
-			new PebItem(42, "Offhand Swapping",
+			new PebItem(32, "Offhand Swapping",
 				"Click to toggle whether pressing your swap key will be fully cancelled or only cancelled when a spellcast does so", NamedTextColor.LIGHT_PURPLE,
 				Material.SHIELD, false).playerCommand("toggleswap"),
-			new PebItem(43, "Offhand Swapping in Inventory",
+			new PebItem(33, "Offhand Swapping in Inventory",
 				"Click to toggle whether pressing your swap key in an inventory will perform its vanilla action", NamedTextColor.LIGHT_PURPLE,
 				Material.SHIELD, false).playerCommand("toggleinventoryswap")
 		);
@@ -380,7 +420,7 @@ public class PEBCustomInventory extends CustomInventory {
 		definePage(PebPage.PICKUP_AND_DISABLE_DROP,
 			new PebItem(0, "Back to Toggleable Options",
 				"", NamedTextColor.LIGHT_PURPLE,
-				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
+				Material.OBSERVER, false).switchToPage(PebPage.INTERACTABLE_OPTIONS),
 			new PebItem(4, "Pickup and Disable Drop Settings",
 				"Choose the appropriate level of pickup filter and drop filter below.", NamedTextColor.LIGHT_PURPLE,
 				Material.PRISMARINE_CRYSTALS, false),
@@ -433,7 +473,7 @@ public class PEBCustomInventory extends CustomInventory {
 		definePage(PebPage.GLOWING,
 			new PebItem(0, "Back to Toggleable Options",
 				"", NamedTextColor.LIGHT_PURPLE,
-				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
+				Material.OBSERVER, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
 			new PebItem(4, "Glowing Settings",
 				"Choose for which entity types the glowing effect may be shown. " +
 					"If an entity fits into more than one category (e.g. a boss matches both 'mobs' and 'bosses'), it will glow if any of the matching options are enabled.", NamedTextColor.LIGHT_PURPLE,
@@ -474,7 +514,7 @@ public class PEBCustomInventory extends CustomInventory {
 		definePage(PebPage.ROCKET_JUMP,
 			new PebItem(0, "Back to Toggleable Options",
 				"", NamedTextColor.LIGHT_PURPLE,
-				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
+				Material.OBSERVER, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
 			new PebItem(4, "Rocket Jump Settings",
 				"Choose how Unstable Amalgam should interact with you.", NamedTextColor.LIGHT_PURPLE,
 				Material.FIREWORK_ROCKET, false),
@@ -493,10 +533,10 @@ public class PEBCustomInventory extends CustomInventory {
 		definePage(PebPage.PARTIAL_PARTICLES,
 			new PebItem(0, "Back to Toggleable Options",
 				"", NamedTextColor.GRAY,
-				Material.OBSERVER, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
+				Material.OBSERVER, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
 			new PebItem(4, "Particle Settings",
 				"Choose how many particles are shown for abilities of various categories. These settings can also be changed using the /particles command.", NamedTextColor.GRAY,
-				Material.NETHER_STAR, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS),
+				Material.NETHER_STAR, false),
 			makePartialParticlePebItem(19, "Particle multiplier for your own active abilities", Material.PLAYER_HEAD, ParticleCategory.OWN_ACTIVE),
 			makePartialParticlePebItem(20, "Particle multiplier for your own passive abilities", Material.FIREWORK_STAR, ParticleCategory.OWN_PASSIVE),
 			makePartialParticlePebItem(21, "Particle multiplier for active effects on you, e.g. the Defensive Line buff", Material.ENDER_PEARL, ParticleCategory.OWN_BUFF),
@@ -508,13 +548,185 @@ public class PEBCustomInventory extends CustomInventory {
 			makePartialParticlePebItem(41, "Particle multiplier for non-boss enemies' abilities", Material.ZOMBIE_HEAD, ParticleCategory.ENEMY)
 		);
 
+		// Sound Controls
+		definePage(PebPage.SOUND_CONTROLS,
+			new PebItem(4, "Sound Options",
+				"Use the menus below to customize your audio experience within Monumenta.", NamedTextColor.LIGHT_PURPLE,
+				Material.JUKEBOX, false),
+			new PebItem(20, "Sound Categories",
+				"Control the settings related to categories such as boss music, strike music, and city music.", NamedTextColor.LIGHT_PURPLE,
+				Material.CHEST, false).switchToPage(PebPage.SOUND_CATEGORIES),
+			new PebItem(22, "Overworld and Plots",
+				"Toggle between original, custom, and disabled music for the overworlds and plots.", NamedTextColor.LIGHT_PURPLE,
+				Material.COMPASS, false).switchToPage(PebPage.SOUND_OVERWORLD_PLOTS),
+			new PebItem(24, "Sound Delays",
+				"Toggle whether music constantly plays in certain areas.", NamedTextColor.LIGHT_PURPLE,
+				Material.CLOCK, true).switchToPage(PebPage.SOUND_DELAYS)
+		);
+
+		// Sound Categories
+		definePage(PebPage.SOUND_CATEGORIES,
+			new PebItem(4, "Sound Categories",
+				"Use the options below to choose settings for certain categories of music.", NamedTextColor.LIGHT_PURPLE,
+				Material.CHEST, false),
+			new PebItem(20, "City Music",
+				"Enable or disable music while in cities.", NamedTextColor.LIGHT_PURPLE,
+				Material.STONE_BRICKS, false),
+			new PebItem(29, "Enable",
+				"Cities' themes will play when inside their borders.", NamedTextColor.LIGHT_PURPLE,
+				Material.CAMPFIRE, false).serverCommand("scoreboard players set @S MusicCity 0").playerMessage("Cities' themes now play when inside their borders."),
+			new PebItem(38, "Disable",
+				"City music will not play.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicCity 1").playerMessage("City music will now not play."),
+
+			new PebItem(21, "Boss Music",
+				"Enable or disable boss music.", NamedTextColor.LIGHT_PURPLE,
+				Material.DIAMOND_SWORD, false),
+			new PebItem(30, "Enable",
+				"A boss’ theme will play during the battle with them.", NamedTextColor.LIGHT_PURPLE,
+				Material.WITHER_SKELETON_SKULL, false).serverCommand("scoreboard players set @S MusicBoss 0").playerMessage("A boss’ theme will now play during the battle with them."),
+			new PebItem(39, "Disable",
+				"Boss music will not play.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicBoss 1").playerMessage("Boss music will now not play."),
+
+			new PebItem(22, "Dungeon Music",
+				"Enable or disable dungeon music.", NamedTextColor.LIGHT_PURPLE,
+				Material.WOODEN_PICKAXE, false),
+			new PebItem(31, "Enable",
+				"Ambient dungeon themes will play when inside the instance.", NamedTextColor.LIGHT_PURPLE,
+				Material.LANTERN, false).serverCommand("scoreboard players set @S MusicDungeon 0").playerMessage("Ambient dungeon themes will now play when inside the instance."),
+			new PebItem(40, "Disable",
+				"Dungeon music will not play aside from boss fights and certain cinematic moments.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicDungeon 1").playerMessage("Dungeon music will now not play aside from boss fights and certain cinematic moments."),
+
+			new PebItem(23, "Strike Music",
+				"Enable or disable strike music.", NamedTextColor.LIGHT_PURPLE,
+				Material.IRON_AXE, false),
+			new PebItem(32, "Enable",
+				"Strike music will play when inside the instance.", NamedTextColor.LIGHT_PURPLE,
+				Material.IRON_SWORD, false).serverCommand("scoreboard players set @S MusicStrike 0").playerMessage("Strike music will now play when inside the instance."),
+			new PebItem(41, "Disable",
+				"Strike music will not play aside from boss fights and certain cinematic moments.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicStrike 1").playerMessage("Strike music will now not play aside from boss fights and certain cinematic moments."),
+
+			new PebItem(24, "Miscellaneous Music",
+				"Enable or disable miscellaneous music.", NamedTextColor.LIGHT_PURPLE,
+				Material.ITEM_FRAME, false),
+			new PebItem(33, "Enable",
+				"Music that does not fit the other categories, (such as minigames and certain cinematic moments) will play.", NamedTextColor.LIGHT_PURPLE,
+				Material.SHEEP_SPAWN_EGG, false).serverCommand("scoreboard players set @S MusicMisc 0").playerMessage("Miscellaneous music will now play."),
+			new PebItem(42, "Disable",
+				"Miscellaneous music will not play.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicMisc 1").playerMessage("Miscellaneous music will no longer play.")
+		);
+
+		// Sound Overworld/Plots
+		definePage(PebPage.SOUND_OVERWORLD_PLOTS,
+			new PebItem(4, "Overworld and Plots",
+				"Use the options below to choose settings for certain categories of music.", NamedTextColor.LIGHT_PURPLE,
+				Material.COMPASS, false),
+			new PebItem(11, "King’s Valley Music",
+				"Choose what sounds to play in the King's Valley", NamedTextColor.LIGHT_PURPLE,
+				Material.JUNGLE_SAPLING, false),
+			new PebItem(20, "Official Theme",
+				"The official theme of the King’s Valley will play when in the wilderness of that region.", NamedTextColor.LIGHT_PURPLE,
+				Material.GOLD_INGOT, false).serverCommand("scoreboard players set @S MusicOverworldValley 0").playerMessage("The official theme of the King's Valley will play in wilderness."),
+			new PebItem(29, "Custom Theme",
+				"The \"customoverworldvalley.ogg\" file in your custom music resource pack will be played in the wilderness of the King’s Valley.", NamedTextColor.LIGHT_PURPLE,
+				Material.IRON_INGOT, false).serverCommand("scoreboard players set @S MusicOverworldValley 1").playerMessage("The custom music file you set will now play in the King's Valley wilderness."),
+			new PebItem(38, "No Theme",
+				"No music will be played in the wilderness of the King’s Valley.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldValley 2").playerMessage("No music will be played in the wilderness of King's Valley."),
+
+			new PebItem(12, "Celsian Isles Music",
+				"Choose what sounds to play in the Celsian Isles", NamedTextColor.LIGHT_PURPLE,
+				Material.SAND, false),
+			new PebItem(21, "Official Theme",
+				"The official theme of false Celsian Isles will play when in the wilderness of that region.", NamedTextColor.LIGHT_PURPLE,
+				Material.EMERALD, false).serverCommand("scoreboard players set @S MusicOverworldIsles 0").playerMessage("The official theme of the Celsian Isles will play in wilderness."),
+			new PebItem(30, "Custom Theme",
+				"The \"customoverworldisles.ogg\" file in your custom music resource pack will be played in the wilderness of the Celsian Isles.", NamedTextColor.LIGHT_PURPLE,
+				Material.AMETHYST_SHARD, false).serverCommand("scoreboard players set @S MusicOverworldIsles 1").playerMessage("The custom music file you set will now play in the Celsian Isles wilderness."),
+			new PebItem(39, "No Theme",
+				"No music will be played in the wilderness of the Celsian Isles", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldIsles 2").playerMessage("No music will be played in the wilderness of Celsian Isles."),
+
+			new PebItem(13, "Architect's Ring Music",
+				"Choose what sounds to play in the Architect's Ring", NamedTextColor.LIGHT_PURPLE,
+				Material.RED_MUSHROOM_BLOCK, false),
+			new PebItem(22, "Official Theme",
+				"The official theme of the Architect’s Ring will play when in the wilderness of that region.", NamedTextColor.LIGHT_PURPLE,
+				Material.DIAMOND, false).serverCommand("scoreboard players set @S MusicOverworldRing 0").playerMessage("The official theme of the Architect's Ring will play in wilderness."),
+			new PebItem(31, "Custom Theme",
+				"The \"customoverworldring.ogg\" file in your custom music resource pack will be played in the wilderness of the Architect’s Ring.", NamedTextColor.LIGHT_PURPLE,
+				Material.NETHER_STAR, false).serverCommand("scoreboard players set @S MusicOverworldRing 1").playerMessage("The custom music file you set will now play in the Architect's Ring wilderness."),
+			new PebItem(40, "No Theme",
+				"No music will be played in the wilderness of the Architect’s Ring.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldRing 2").playerMessage("No music will be played in the wilderness of Architect's Ring."),
+
+			new PebItem(15, "Plots and Playerplots Music",
+				"Enable or disable strike music.", NamedTextColor.LIGHT_PURPLE,
+				Material.CRAFTING_TABLE, false),
+			new PebItem(24, "Official Theme",
+				"The official Plots theme will be played when on the Plots and Playerplots shards.", NamedTextColor.LIGHT_PURPLE,
+				Material.RED_BED, false).serverCommand("scoreboard players set @S MusicPlots 0").playerMessage("The official Plots theme will now play on the Plots and Playerplots shards."),
+			new PebItem(33, "Shuffled Themes",
+				"A pre-selected playlist of peaceful music from Monumenta’s soundtrack will be played on shuffle when on the Plots and Playerplots shards", NamedTextColor.LIGHT_PURPLE,
+				Material.WHITE_BED, false).serverCommand("scoreboard players set @S MusicPlots 1").playerMessage("Pre-selected peaceful music from Monumenta's soundtrack will now be played on shuffle."),
+			new PebItem(42, "Custom Theme",
+				"The ‘customplots.ogg’ file in your custom music resource pack will be played when on the Plots and Playerplots shards.", NamedTextColor.LIGHT_PURPLE,
+				Material.BLUE_BED, false).serverCommand("scoreboard players set @S MusicPlots 2").playerMessage("Your custom music file will now be played while on Plots and Playerplots shards."),
+			new PebItem(51, "No Theme",
+				"No music will be played when on the Plots and Playerplots shards", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicPlots 3").playerMessage("No music will now be played on Plots and Playerplots shards.")
+		);
+
+		// Sound Delays
+		definePage(PebPage.SOUND_DELAYS,
+			new PebItem(4, "Sound Delays",
+				"Toggle whether music constantly plays in certain areas.", NamedTextColor.LIGHT_PURPLE,
+				Material.CLOCK, false),
+
+			new PebItem(21, "Overworld Music Delay",
+				"", NamedTextColor.LIGHT_PURPLE,
+				Material.BRICKS, false),
+			new PebItem(30, "Delay",
+				"There will be 10 minutes between the start of each play of overworld music.", NamedTextColor.LIGHT_PURPLE,
+				Material.GRASS_BLOCK, false).serverCommand("scoreboard players set @S MusicOverworldDelay 0").playerMessage("There will now be a delay at the start of each play of overworld music."),
+			new PebItem(39, "No Delay",
+				"There will be no delay between loops of the official theme. There will be 4 minutes between the start of each play of a custom theme.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicOverworldDelay 1").playerMessage("There will be no delay between loops of the official theme."),
+
+			new PebItem(22, "Dungeon Music Delay",
+				"", NamedTextColor.LIGHT_PURPLE,
+				Material.WOODEN_PICKAXE, false),
+			new PebItem(31, "Enable",
+				"There will be 10 minutes between the start of each play of dungeon music.", NamedTextColor.LIGHT_PURPLE,
+				Material.LANTERN, false).serverCommand("scoreboard players set @S MusicDungeonDelay 0").playerMessage("There will now be 10 minutes between the start of each play of dungeon music."),
+			new PebItem(40, "Disable",
+				"There will be no delay between dungeon music tracks.", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicDungeonDelay 1").playerMessage("There will now be no delay between dungeon music tracks."),
+
+			new PebItem(23, "Plots Music Delay",
+				"Enable or disable strike music.", NamedTextColor.LIGHT_PURPLE,
+				Material.CRAFTING_TABLE, false),
+			new PebItem(32, "Delay",
+				"There will be 10 minutes between the start of each play of plots music.", NamedTextColor.LIGHT_PURPLE,
+				Material.JUKEBOX, false).serverCommand("scoreboard players set @S MusicPlotsDelay 0").playerMessage("There will now be 10 minutes between the start of each play of plots music."),
+			new PebItem(41, "No Delay",
+				"There will be no delay between loops of the official track. There will be 4 minutes between the start of each play of a custom theme. ", NamedTextColor.LIGHT_PURPLE,
+				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicPlotsDelay 1").playerMessage("There will now be no delay between loops of the plots music.")
+		);
+
+
+
 	}
 
 	private static PebItem makePartialParticlePebItem(int slot, String description, Material material, ParticleCategory category) {
 		String objectiveName = Objects.requireNonNull(category.mObjectiveName);
 		return new PebItem(slot, gui -> category.mDisplayName + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
 			gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", NamedTextColor.GRAY,
-			material, false).switchToPage(PebPage.TOGGLEABLE_OPTIONS)
+			material, false).switchToPage(PebPage.GAMEPLAY_OPTIONS)
 			       .action((gui, event) -> {
 				       int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
 				       value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
@@ -550,16 +762,16 @@ public class PEBCustomInventory extends CustomInventory {
 			int chosenSlot = event.getSlot();
 			for (PebItem item : PEB_ITEMS.getOrDefault(mCurrentPage, List.of())) {
 				if (item.mSlot == chosenSlot) {
-					if (item.mAction != null) {
-						item.mAction.accept(this, event);
+					for (BiConsumer<PEBCustomInventory, InventoryClickEvent> action : item.mActions) {
+						action.accept(this, event);
 					}
 					return;
 				}
 			}
 			for (PebItem item : PEB_ITEMS.getOrDefault(PebPage.COMMON, List.of())) {
 				if (item.mSlot == chosenSlot) {
-					if (item.mAction != null) {
-						item.mAction.accept(this, event);
+					for (BiConsumer<PEBCustomInventory, InventoryClickEvent> action : item.mActions) {
+						action.accept(this, event);
 					}
 					return;
 				}
@@ -634,6 +846,9 @@ public class PEBCustomInventory extends CustomInventory {
 			if (mInventory.getItem(i) == null) {
 				mInventory.setItem(i, fillerItem);
 			}
+		}
+		if (page.equals(PebPage.MAIN)) {
+			mInventory.setItem(0, fillerItem);
 		}
 	}
 }
