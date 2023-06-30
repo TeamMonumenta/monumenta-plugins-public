@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -7,6 +8,7 @@ import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -51,6 +53,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 				if (mTicks == 0) {
 					new PartialParticle(Particle.REDSTONE, loc, 50, 0.5, 1, 0.5, WHITE).spawnAsPlayerActive(p);
 					mChicken = (Chicken) LibraryOfSoulsIntegration.summon(loc, "Poultry");
+					Objects.requireNonNull(mChicken).addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 					hurtChicken();
 				}
 
@@ -71,27 +74,21 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.BASE, Note.G4);
 									playNote(Instrument.BASE, Note.G3);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.G4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.A4);
 									playNote(Instrument.TREBLE, Note.E4);
 									playNote(Instrument.BASE, Note.A4);
 									playNote(Instrument.BASE, Note.A3);
 								}
-								case 3 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-								}
+								case 3 -> playNote(Instrument.TREBLE, Note.A4);
 								case 4 -> {
 									playNote(Instrument.TREBLE, Note.E4);
 									playNote(Instrument.TREBLE, Note.C4);
 									playNote(Instrument.BASE, Note.B4);
 									playNote(Instrument.BASE, Note.B3);
 								}
-								case 5 -> {
-									playNote(Instrument.TREBLE, Note.E4);
-								}
+								case 5 -> playNote(Instrument.TREBLE, Note.E4);
 								case 6 -> {
 									playNote(Instrument.TREBLE, Note.G4);
 									playNote(Instrument.TREBLE, Note.E4);
@@ -110,27 +107,21 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.E5);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.G4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.A4);
 									playNote(Instrument.TREBLE, Note.E4);
 									playNote(Instrument.BASE, Note.G4);
 									playNote(Instrument.BASE, Note.G3);
 								}
-								case 3 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-								}
+								case 3 -> playNote(Instrument.TREBLE, Note.A4);
 								case 4 -> {
 									playNote(Instrument.TREBLE, Note.E4);
 									playNote(Instrument.TREBLE, Note.C4);
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.E5);
 								}
-								case 5 -> {
-									playNote(Instrument.TREBLE, Note.E4);
-								}
+								case 5 -> playNote(Instrument.TREBLE, Note.E4);
 								case 6 -> {
 									playNote(Instrument.TREBLE, Note.G4);
 									playNote(Instrument.TREBLE, Note.E4);
@@ -149,27 +140,21 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.E5);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.G4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.A4);
 									playNote(Instrument.TREBLE, Note.E4);
 									playNote(Instrument.BASE, Note.G4);
 									playNote(Instrument.BASE, Note.G3);
 								}
-								case 3 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-								}
+								case 3 -> playNote(Instrument.TREBLE, Note.A4);
 								case 4 -> {
 									playNote(Instrument.TREBLE, Note.C5);
 									playNote(Instrument.TREBLE, Note.G4);
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.E5);
 								}
-								case 5 -> {
-									playNote(Instrument.TREBLE, Note.C5);
-								}
+								case 5 -> playNote(Instrument.TREBLE, Note.C5);
 								case 6 -> {
 									playNote(Instrument.TREBLE, Note.B4);
 									playNote(Instrument.TREBLE, Note.F4);
@@ -218,27 +203,21 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.F5);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.F4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.G4);
 									playNote(Instrument.TREBLE, Note.D4);
 									playNote(Instrument.BASE, Note.G4);
 									playNote(Instrument.BASE, Note.G3);
 								}
-								case 3 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-								}
+								case 3 -> playNote(Instrument.TREBLE, Note.G4);
 								case 4 -> {
 									playNote(Instrument.TREBLE, Note.D4);
 									playNote(Instrument.TREBLE, Note.B3);
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.F5);
 								}
-								case 5 -> {
-									playNote(Instrument.TREBLE, Note.D4);
-								}
+								case 5 -> playNote(Instrument.TREBLE, Note.D4);
 								case 6 -> {
 									playNote(Instrument.TREBLE, Note.F4);
 									playNote(Instrument.TREBLE, Note.D4);
@@ -257,27 +236,21 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.F5);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.F4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.F4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.G4);
 									playNote(Instrument.TREBLE, Note.D4);
 									playNote(Instrument.BASE, Note.G4);
 									playNote(Instrument.BASE, Note.G3);
 								}
-								case 3 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-								}
+								case 3 -> playNote(Instrument.TREBLE, Note.G4);
 								case 4 -> {
 									playNote(Instrument.TREBLE, Note.B4);
 									playNote(Instrument.TREBLE, Note.F4);
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.F5);
 								}
-								case 5 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-								}
+								case 5 -> playNote(Instrument.TREBLE, Note.B4);
 								case 6 -> {
 									playNote(Instrument.TREBLE, Note.A4);
 									playNote(Instrument.TREBLE, Note.E4);
@@ -326,27 +299,21 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.BASE, Note.G4);
 									playNote(Instrument.BASE, Note.G3);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.G4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.G4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.A4);
 									playNote(Instrument.TREBLE, Note.F4);
 									playNote(Instrument.BASE, Note.A4);
 									playNote(Instrument.BASE, Note.A3);
 								}
-								case 3 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-								}
+								case 3 -> playNote(Instrument.TREBLE, Note.A4);
 								case 4 -> {
 									playNote(Instrument.TREBLE, Note.B4);
 									playNote(Instrument.TREBLE, Note.F4);
 									playNote(Instrument.BASE, Note.B4);
 									playNote(Instrument.BASE, Note.B3);
 								}
-								case 5 -> {
-									playNote(Instrument.TREBLE, Note.B4);
-								}
+								case 5 -> playNote(Instrument.TREBLE, Note.B4);
 								case 6 -> {
 									playNote(Instrument.TREBLE, Note.C5);
 									playNote(Instrument.TREBLE, Note.E4);
@@ -365,9 +332,7 @@ public class PoultryficationFinisher implements EliteFinisher {
 									playNote(Instrument.TREBLE, Note.G3);
 									playNote(Instrument.BASE, Note.E5);
 								}
-								case 1 -> {
-									playNote(Instrument.TREBLE, Note.A4);
-								}
+								case 1 -> playNote(Instrument.TREBLE, Note.A4);
 								case 2 -> {
 									playNote(Instrument.TREBLE, Note.G4);
 									playNote(Instrument.TREBLE, Note.E4);

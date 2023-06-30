@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.bosses.CrowdControlImmunityBoss;
@@ -1430,7 +1431,7 @@ public class EntityUtils {
 	// Adds a Tag which Removes the entity on unload.
 	// See EntityListener, EntityRemoveFromWorldEvent
 	public static void setRemoveEntityOnUnload(Entity e) {
-		e.getScoreboardTags().add("REMOVE_ON_UNLOAD");
+		e.getScoreboardTags().add(Constants.Tags.REMOVE_ON_UNLOAD);
 	}
 
 	public static void disableBlockPlacement(FallingBlock fallingBlock) {

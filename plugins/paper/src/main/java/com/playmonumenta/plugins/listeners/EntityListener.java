@@ -1141,7 +1141,7 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(zoglin, 2.5);
 		} else if (event.getEntity() instanceof Hoglin hoglin) {
 			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 2.5);
-		} else if (event.getEntity().getScoreboardTags().contains("REMOVE_ON_UNLOAD") && event.getEntity().getTicksLived() > 20) {
+		} else if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
 			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
 			event.getEntity().remove();
 		} else if (event.getEntity() instanceof FallingBlock fallingBlock) {

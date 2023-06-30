@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.Collection;
@@ -61,6 +62,7 @@ public class CakeifyFinisher implements EliteFinisher {
 				.decoration(TextDecoration.ITALIC, false));
 			cake.setItemMeta(cakeMeta);
 			Item cakeItem = loc.getWorld().dropItem(loc, cake);
+			cakeItem.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 			cakeItem.setPickupDelay(Integer.MAX_VALUE);
 			cakeItem.addScoreboardTag(NAME);
 			int degrees = offset + (i * 90);

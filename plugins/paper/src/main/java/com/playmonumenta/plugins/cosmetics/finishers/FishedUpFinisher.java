@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 public class FishedUpFinisher implements EliteFinisher {
 	public static final String NAME = "Fished Up";
 	private static final Particle.DustOptions BROWN = new Particle.DustOptions(Color.fromRGB(92, 64, 51), 3.0f);
-	private static final Particle.DustOptions LINECOLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.75f);
-	private static final Particle.DustOptions REELCOLOR = new Particle.DustOptions(Color.fromRGB(83, 83, 83), 1.5f);
+	private static final Particle.DustOptions LINE_COLOR = new Particle.DustOptions(Color.fromRGB(0, 0, 0), 0.75f);
+	private static final Particle.DustOptions REEL_COLOR = new Particle.DustOptions(Color.fromRGB(83, 83, 83), 1.5f);
 	private static final float RADIUS = 1f;
 
 	@Override public void run(Player p, Entity killedMob, Location loc) {
@@ -30,7 +30,7 @@ public class FishedUpFinisher implements EliteFinisher {
 		Vector mDirection = mEyeLoc.getDirection();
 		Vector mLookDirection = new Vector(mDirection.getX(), 0, mDirection.getZ()).normalize();
 		int mRand = FastUtils.randomIntInRange(0, 1);
-		Vector mRotatedLookDirection = null;
+		Vector mRotatedLookDirection;
 		//Rotate it to the left or right side of the players screen
 		if (mRand == 0) {
 			mRotatedLookDirection = VectorUtils.rotateYAxis(mLookDirection.clone(), 90);
@@ -41,10 +41,10 @@ public class FishedUpFinisher implements EliteFinisher {
 		Vector finalMRotatedLookDirection = mRotatedLookDirection;
 		new BukkitRunnable() {
 			int mTicks = 0;
-			Location mFishingRodTopLocation = loc.clone().add(0, 10 + killedMob.getHeight(), 0);
-			Location mFishingRodEndLocation = loc.clone().add(finalMRotatedLookDirection.clone().multiply(7)).add(0, 3 + killedMob.getHeight(), 0);
-			Location mReelLocation = loc.clone().add(finalMRotatedLookDirection.clone().multiply(4)).add(0, 4 + killedMob.getHeight(), 0);
-			Location mHookLocation = mFishingRodTopLocation.clone();
+			final Location mFishingRodTopLocation = loc.clone().add(0, 10 + killedMob.getHeight(), 0);
+			final Location mFishingRodEndLocation = loc.clone().add(finalMRotatedLookDirection.clone().multiply(7)).add(0, 3 + killedMob.getHeight(), 0);
+			final Location mReelLocation = loc.clone().add(finalMRotatedLookDirection.clone().multiply(4)).add(0, 4 + killedMob.getHeight(), 0);
+			final Location mHookLocation = mFishingRodTopLocation.clone();
 			@Nullable LivingEntity mClonedKilledMob;
 
 			@Override public void run() {
@@ -60,7 +60,7 @@ public class FishedUpFinisher implements EliteFinisher {
 					mClonedKilledMob.setAI(false);
 					mClonedKilledMob.addScoreboardTag("SkillImmune");
 				}
-				new PPLine(Particle.REDSTONE, mFishingRodTopLocation, mHookLocation).data(LINECOLOR).count(15).spawnAsPlayerActive(p);
+				new PPLine(Particle.REDSTONE, mFishingRodTopLocation, mHookLocation).data(LINE_COLOR).count(15).spawnAsPlayerActive(p);
 				if (mTicks < 20) {
 					mFishingRodTopLocation.getWorld().playSound(mFishingRodTopLocation, Sound.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.PLAYERS, 1.6f, 2);
 					mHookLocation.subtract(0, 0.5, 0);
@@ -83,7 +83,7 @@ public class FishedUpFinisher implements EliteFinisher {
 					new PPLine(Particle.REDSTONE, mFishingRodEndLocation, mFishingRodTopLocation).data(BROWN).count(25).spawnAsBoss();
 					//Reel
 					for (int radian = 0; radian < 16; radian++) {
-						new PPLine(Particle.REDSTONE, mReelLocation.clone().add(finalMRotatedLookDirection.clone().multiply(FastUtils.cos((radian * Math.PI) / 16f) * RADIUS)).add(0, FastUtils.sin((Math.PI * radian) / 16f) * RADIUS, 0), mReelLocation.clone().add(finalMRotatedLookDirection.clone().multiply(FastUtils.cos((-radian * Math.PI) / 16f) * RADIUS)).add(0, FastUtils.sin((Math.PI * -radian) / 16f) * RADIUS, 0)).data(REELCOLOR).count(10).spawnAsPlayerActive(p);
+						new PPLine(Particle.REDSTONE, mReelLocation.clone().add(finalMRotatedLookDirection.clone().multiply(FastUtils.cos((radian * Math.PI) / 16f) * RADIUS)).add(0, FastUtils.sin((Math.PI * radian) / 16f) * RADIUS, 0), mReelLocation.clone().add(finalMRotatedLookDirection.clone().multiply(FastUtils.cos((-radian * Math.PI) / 16f) * RADIUS)).add(0, FastUtils.sin((Math.PI * -radian) / 16f) * RADIUS, 0)).data(REEL_COLOR).count(10).spawnAsPlayerActive(p);
 					}
 				}
 				if (mTicks >= 2 * 20) {

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Note;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -51,7 +52,7 @@ public class Woolerman implements EliteFinisher {
 
 		new BukkitRunnable() {
 			int mTicks = -1;
-			ArmorStand mLyrics = world.spawn(songLoc.clone().subtract(new Vector(0.0F, 0.8F, 0.0F)),
+			final ArmorStand mLyrics = world.spawn(songLoc.clone().subtract(new Vector(0.0F, 0.8F, 0.0F)),
 				ArmorStand.class,
 				armorStand -> {
 					armorStand.setSilent(true);
@@ -59,6 +60,7 @@ public class Woolerman implements EliteFinisher {
 					armorStand.setGravity(false);
 					armorStand.setMarker(true);
 					armorStand.setSmall(true);
+					armorStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 			});
 
 			@Override public void run() {

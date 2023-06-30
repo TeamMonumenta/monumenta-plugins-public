@@ -79,134 +79,113 @@ public class CornucopiaFinisher implements EliteFinisher {
 		World world = loc.getWorld();
 		if (variant == 1) {
 			switch (ticks) {
-				case 0:
+				case 0 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G1);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G1);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
-					break;
-				case 3:
+				}
+				case 3 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.B5);
-					break;
-				case 6:
+				case 6 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
-					break;
-				case 9:
+				case 9 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.A3);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
-					break;
-				case 12:
+				}
+				case 12 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
-					break;
-				case 15:
+				case 15 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
-					break;
-				case 18:
+				case 18 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.B5);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
-					break;
-				case 21:
+				}
+				case 21 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
-					break;
-				case 24:
+				case 24 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
-					break;
-				case 27:
+				case 27 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
-					break;
-				case 33:
+				case 33 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
-					break;
-				case 36:
+				case 36 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
-					break;
-				case 39:
+				}
+				case 39 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
-					break;
-				case 42:
+				case 42 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
-					break;
-				case 45:
+				case 45 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
-					break;
-				case 48:
+				}
+				case 48 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
-					break;
-				case 51:
+				case 51 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
-					break;
-				case 54:
+				case 54 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
-					break;
-				default:
-					break;
+				}
+				default -> {
+				}
 			}
 		} else {
 			switch (ticks) {
-				case 0:
+				case 0 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D20);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS4);
-					break;
-				case 3:
+				}
+				case 3 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS16);
-					break;
-				case 6:
+				case 6 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
-					break;
-				case 9:
+				case 9 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
-					break;
-				case 12:
+				}
+				case 12 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
-					break;
-				case 15:
+				case 15 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.AS4);
-					break;
-				case 18:
+				case 18 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C18);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS2);
-					break;
-				case 21:
+				}
+				case 21 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
-					break;
-				case 24:
+				case 24 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.DS9);
-					break;
-				case 36:
+				}
+				case 36 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.CS7);
-					break;
-				case 39:
+				}
+				case 39 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.CS7);
-					break;
-				case 42:
+				case 42 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS2);
-					break;
-				case 45:
+				case 45 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G1);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_GUITAR, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
-					break;
-				case 48:
+				}
+				case 48 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
-					break;
-				case 51:
+				case 51 ->
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.B5);
-					break;
-				case 54:
+				case 54 -> {
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
 					world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.PLAYERS, 1f, Constants.NotePitches.C6);
-					break;
-				default:
-					break;
+				}
+				default -> {
+				}
 			}
 		}
 	}
@@ -214,15 +193,16 @@ public class CornucopiaFinisher implements EliteFinisher {
 	public static void throwFood(int offset, Location loc) {
 		for (int i = 0; i < 4; i++) {
 			ItemStack food = new ItemStack(foodList[FastUtils.RANDOM.nextInt(foodList.length)]);
-			ItemMeta cakeMeta = food.getItemMeta();
-			cakeMeta.displayName(Component.text("Cornucopia Food " + offset + i + "!", NamedTextColor.WHITE)
+			ItemMeta foodMeta = food.getItemMeta();
+			foodMeta.displayName(Component.text("Cornucopia Food " + offset + i + "!", NamedTextColor.WHITE)
 				.decoration(TextDecoration.ITALIC, false));
-			food.setItemMeta(cakeMeta);
-			Item cakeItem = loc.getWorld().dropItem(loc, food);
-			cakeItem.setPickupDelay(Integer.MAX_VALUE);
-			cakeItem.addScoreboardTag(NAME);
+			food.setItemMeta(foodMeta);
+			Item foodItem = loc.getWorld().dropItem(loc, food);
+			foodItem.setPickupDelay(Integer.MAX_VALUE);
+			foodItem.addScoreboardTag(NAME);
+			foodItem.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 			int degrees = offset + (i * 90);
-			cakeItem.setVelocity(new Vector(0.2 * FastUtils.sinDeg(degrees), 0.6, 0.2 * FastUtils.cosDeg(degrees)));
+			foodItem.setVelocity(new Vector(0.2 * FastUtils.sinDeg(degrees), 0.6, 0.2 * FastUtils.cosDeg(degrees)));
 		}
 	}
 

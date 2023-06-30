@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.abilities.shaman;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
@@ -136,7 +137,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		stand.setMarker(false);
 		stand.setGravity(mAttachedMob == null);
 		stand.setDisabledSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.HAND, EquipmentSlot.OFF_HAND);
-		stand.addScoreboardTag("REMOVE_ON_UNLOAD");
+		stand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 
 		TotemicEmpowerment.addTotem(mPlayer, stand);
 

@@ -126,6 +126,7 @@ public class Constants {
 		public static final String NO_TRANSPOSING = "NoTransposing";
 		public static final String FORMATION = "Formation";
 		public static final String ENTROPIC = "Entropic";
+		public static final String REMOVE_ON_UNLOAD = "REMOVE_ON_UNLOAD";
 	}
 
 	// Note blocks

@@ -92,8 +92,8 @@ public class PaintSplashFinisher implements EliteFinisher {
 					new PartialParticle(Particle.REDSTONE, mConcretes[2].getLocation(), 15, 0.5, 0.5, 0.5, PARTICLE_SETS[2][2]).spawnAsPlayerActive(mPlayer);
 				}
 				if (mTicks > 100 || (mTicks > 50 && mConcretes[0].isOnGround() && mConcretes[1].isOnGround() && mConcretes[2].isOnGround())) {
-					Collection<Item> pottentialConcrete = loc.getWorld().getNearbyEntitiesByType(Item.class, loc, 20.0);
-					for (Item i : pottentialConcrete) {
+					Collection<Item> potentialConcrete = loc.getWorld().getNearbyEntitiesByType(Item.class, loc, 20.0);
+					for (Item i : potentialConcrete) {
 						if (i.getScoreboardTags().contains(NAME)) {
 							i.remove();
 						}

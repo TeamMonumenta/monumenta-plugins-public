@@ -119,337 +119,231 @@ public class ExcaliburFinisher implements EliteFinisher {
 
 	public void playSong(World world, Location loc, int ticks, int variant) {
 		switch (variant) {
-			case 1:
+			case 1 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.F11);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.A15);
-						break;
-					case 4:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A3);
-						break;
-					case 8:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
-						break;
-					case 12:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 16:
+					}
+					case 4 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A3);
+					case 8 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
+					case 12 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 16 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
-						break;
-					case 20:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
-						break;
-					case 24:
+					}
+					case 20 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
+					case 24 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.E22);
-						break;
-					case 28:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
-						break;
-					case 32:
+					}
+					case 28 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F23);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.F23);
-						break;
-					case 44:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
-						break;
-					case 46:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D20);
-						break;
-					case 48:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
-						break;
-					case 56:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
-						break;
-					default:
-						break;
+					}
+					case 44 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
+					case 46 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D20);
+					case 48 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
+					case 56 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
+					default -> {
+					}
 				}
-				break;
-			case 2:
+			}
+			case 2 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
-						break;
-					case 12:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
-						break;
-					case 14:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
-						break;
-					case 16:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
-						break;
-					case 20:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 24:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
-						break;
-					case 28:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
-						break;
-					case 32:
+					}
+					case 12 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
+					case 14 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
+					case 16 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
+					case 20 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 24 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
+					case 28 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
-						break;
-					case 40:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.B17);
-						break;
-					case 44:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
-						break;
-					case 48:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.CS19);
-						break;
-					default:
-						break;
+					}
+					case 40 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.B17);
+					case 44 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
+					case 48 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.CS19);
+					default -> {
+					}
 				}
-				break;
-			case 3:
+			}
+			case 3 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.F11);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.A15);
-						break;
-					case 4:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A3);
-						break;
-					case 8:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
-						break;
-					case 12:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 16:
+					}
+					case 4 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A3);
+					case 8 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
+					case 12 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 16 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
-						break;
-					case 20:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
-						break;
-					case 24:
+					}
+					case 20 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
+					case 24 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.E22);
-						break;
-					case 28:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
-						break;
-					case 32:
+					}
+					case 28 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F23);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.F23);
-						break;
-					case 44:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
-						break;
-					case 46:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D20);
-						break;
-					case 48:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
-						break;
-					case 56:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
-						break;
-					default:
-						break;
+					}
+					case 44 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
+					case 46 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D20);
+					case 48 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E22);
+					case 56 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
+					default -> {
+					}
 				}
-				break;
-			case 4:
+			}
+			case 4 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.D20);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.AS16);
-						break;
-					case 12:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
-						break;
-					case 14:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 16:
+					}
+					case 12 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.F11);
+					case 14 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 16 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.A15);
-						break;
-					case 20:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.CS7);
-						break;
-					case 24:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
-						break;
-					case 28:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 32:
+					}
+					case 20 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.CS7);
+					case 24 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
+					case 28 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.G13);
-						break;
-					case 40:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.E10);
-						break;
-					case 48:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.F11);
-						break;
-					default:
-						break;
+					}
+					case 40 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.E10);
+					case 48 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.F11);
+					default -> {
+					}
 				}
-				break;
-			case 5:
+			}
+			case 5 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.B17);
-						break;
-					case 4:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B5);
-						break;
-					case 8:
+					}
+					case 4 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B5);
+					case 8 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B5);
-						break;
-					case 12:
+					}
+					case 12 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
-						break;
-					case 16:
+					}
+					case 16 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.E22);
-						break;
-					case 20:
+					}
+					case 20 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
-						break;
-					case 24:
+					}
+					case 24 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D20);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.FS24);
-						break;
-					case 28:
+					}
+					case 28 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS24);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D20);
-						break;
-					case 32:
+					}
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.D8);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 0.5f, Constants.NotePitches.B17);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 0.5f, Constants.NotePitches.G13);
-						break;
-					case 44:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.FS12);
-						break;
-					case 46:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.E10);
-						break;
-					case 48:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.FS12);
-						break;
-					case 56:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.D8);
-						break;
-					default:
-						break;
+					}
+					case 44 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.FS12);
+					case 46 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.E10);
+					case 48 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.FS12);
+					case 56 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, Constants.NotePitches.D8);
+					default -> {
+					}
 				}
-				break;
-			case 6:
+			}
+			case 6 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.A15);
-						break;
-					case 12:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
-						break;
-					case 14:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
-						break;
-					case 16:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
-						break;
-					case 20:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
-						break;
-					case 24:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
-						break;
-					case 28:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 32:
+					}
+					case 12 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
+					case 14 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
+					case 16 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
+					case 20 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
+					case 24 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
+					case 28 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.B17);
-						break;
-					case 40:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.E22);
-						break;
-					case 48:
+					}
+					case 40 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.E22);
+					case 48 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.DS21);
-						break;
-					default:
-						break;
+					}
+					default -> {
+					}
 				}
-				break;
-			case 7:
+			}
+			case 7 -> {
 				switch (ticks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.E10);
-						break;
-					case 4:
+					}
+					case 4 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.FS12);
-						break;
-					case 8:
+					}
+					case 8 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.G13);
-						break;
-					case 20:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
-						break;
-					case 22:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
-						break;
-					case 24:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
-						break;
-					case 32:
+					}
+					case 20 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.FS12);
+					case 22 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.E10);
+					case 24 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.D8);
+					case 32 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 1f, Constants.NotePitches.D20);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 0.5f, Constants.NotePitches.B17);
-						break;
-					case 40:
+					}
+					case 40 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.C18);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.A15);
-						break;
-					case 52:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B17);
-						break;
-					case 54:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
-						break;
-					case 56:
+					}
+					case 52 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B17);
+					case 54 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
+					case 56 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.G13);
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_HARP, 0.5f, Constants.NotePitches.C18);
-						break;
-					case 64:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
-						break;
-					case 72:
-						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B17);
-						break;
-					default:
-						break;
+					}
+					case 64 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.A15);
+					case 72 -> world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_FLUTE, 1f, Constants.NotePitches.B17);
+					default -> {
+					}
 				}
-				break;
-			default:
-				break;
+			}
+			default -> {
+			}
 		}
 
 	}
@@ -462,6 +356,7 @@ public class ExcaliburFinisher implements EliteFinisher {
 		excalibur.setMarker(true);
 		excalibur.setCollidable(false);
 		excalibur.setRotation(0, 0);
+		excalibur.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 		return excalibur;
 	}
 

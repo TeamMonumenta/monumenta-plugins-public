@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.finishers;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -67,6 +68,7 @@ public class DragonsBreathFinisher implements EliteFinisher {
 		dragon.setVisible(false);
 		dragon.getEquipment().setHelmet(new ItemStack(Material.DRAGON_HEAD));
 		dragon.setRotation(270, 0);
+		dragon.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 		return dragon;
 	}
 }

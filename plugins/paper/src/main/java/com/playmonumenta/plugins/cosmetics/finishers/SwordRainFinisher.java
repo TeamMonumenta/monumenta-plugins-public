@@ -22,8 +22,8 @@ public class SwordRainFinisher implements EliteFinisher {
 	public static final String NAME = "Sword Rain";
 
 	public static class Weapon {
-		private String mName;
-		private Material mMaterial;
+		private final String mName;
+		private final Material mMaterial;
 
 		public Weapon(String name, Material material) {
 			this.mName = name;
@@ -402,8 +402,8 @@ public class SwordRainFinisher implements EliteFinisher {
 			int offset = 3 * (5 - i);
 			new BukkitRunnable() {
 				int mTicks = 0;
-				ArmorStand mSwordStand = createSword(loc);
-				double mFallSpeed = 0.8;
+				final ArmorStand mSwordStand = createSword(loc);
+				final double mFallSpeed = 0.8;
 				@Override
 				public void run() {
 					if (mTicks == 0) {
@@ -444,6 +444,7 @@ public class SwordRainFinisher implements EliteFinisher {
 		ItemUtils.setPlainTag(sword);
 		swordStand.getEquipment().setItemInMainHand(sword);
 		swordStand.setRightArmPose(new EulerAngle(Math.PI / 2.0, FastUtils.RANDOM.nextDouble() * Math.PI, 0));
+		swordStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 		return swordStand;
 	}
 }

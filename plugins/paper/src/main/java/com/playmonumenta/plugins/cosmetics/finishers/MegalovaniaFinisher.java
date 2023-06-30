@@ -64,71 +64,69 @@ public class MegalovaniaFinisher implements EliteFinisher {
 			@Override
 			public void run() {
 				switch (mTicks) {
-					case 0:
+					case 0 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 3:
+					}
+					case 3 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 6:
+					}
+					case 6 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D20);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 12:
+					}
+					case 12 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.A15);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 21:
+					}
+					case 21 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.GS14);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 27:
+					}
+					case 27 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 33:
+					}
+					case 33 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 39:
+					}
+					case 39 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.D8);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 42:
+					}
+					case 42 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.F11);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 45:
+					}
+					case 45 -> {
 						world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BANJO, SoundCategory.PLAYERS, 1f, Constants.NotePitches.G13);
 						new PartialParticle(Particle.NOTE, loc, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc2, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
 						new PartialParticle(Particle.NOTE, loc3, 1, 0, 0, 0, 1).minimumCount(1).spawnAsPlayerActive(p);
-						break;
-					case 46:
-						this.cancel();
-						break;
-					default:
-						break;
+					}
+					case 46 -> this.cancel();
+					default -> {
+					}
 				}
 				if (mTicks >= 46) {
 					this.cancel();
@@ -156,6 +154,7 @@ public class MegalovaniaFinisher implements EliteFinisher {
 		sans.setCollidable(false);
 		sans.getEquipment().setHelmet(new ItemStack(Material.SKELETON_SKULL));
 		sans.setRotation(0, 0);
+		sans.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 		return sans;
 	}
 }

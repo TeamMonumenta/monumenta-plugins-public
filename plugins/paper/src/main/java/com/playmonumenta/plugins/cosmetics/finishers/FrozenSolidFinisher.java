@@ -71,6 +71,7 @@ public class FrozenSolidFinisher implements EliteFinisher {
 						ice.setCollidable(false);
 						ice.getEquipment().setHelmet(new ItemStack(Material.ICE));
 						loc.getWorld().playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.25f, Constants.NotePitches.F11);
+						ice.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 						mArmorStands.add(ice);
 					}
 				} else if (mTicks == 29) {
