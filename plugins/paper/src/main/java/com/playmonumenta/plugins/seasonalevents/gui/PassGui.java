@@ -660,7 +660,7 @@ public class PassGui extends Gui {
 		if (weekMissions.size() <= missionIndex) {
 			ItemStack item = new ItemStack(Material.BARRIER);
 			ItemMeta meta = item.getItemMeta();
-			meta.displayName(Component.text("Mission " + (missionIndex + 1), NamedTextColor.GREEN, TextDecoration.BOLD)
+			meta.displayName(Component.text("Mission?", NamedTextColor.RED, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
 			GUIUtils.splitLoreLine(meta, "Failed to load mission", NamedTextColor.RED, 30, false);
 			item.setItemMeta(meta);
@@ -694,6 +694,8 @@ public class PassGui extends Gui {
 				.decoration(TextDecoration.ITALIC, false));
 
 			meta.lore(lore);
+			meta.displayName(Component.text("Mission " + (missionIndex + 1), NamedTextColor.GREEN, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false));
 			item.setItemMeta(meta);
 			setItem(y, x, item);
 			return;
@@ -736,6 +738,8 @@ public class PassGui extends Gui {
 
 		ItemStack item = new ItemStack(mat, missionIndex + 1);
 		ItemMeta meta = item.getItemMeta();
+		meta.displayName(Component.text("Mission " + (missionIndex + 1), NamedTextColor.GREEN, TextDecoration.BOLD)
+			.decoration(TextDecoration.ITALIC, false));
 		GUIUtils.splitLoreLine(meta, missionDescription, NamedTextColor.RED, 30, false);
 
 		List<Component> lore = meta.lore();
