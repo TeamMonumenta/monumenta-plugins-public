@@ -164,6 +164,7 @@ public class WormBoss extends BossAbilityGroup {
 
 	@Override
 	public void unload() {
+		super.unload();
 		if (!mBoss.isDead()) {
 			for (LivingEntity part : mParts) {
 				part.remove();

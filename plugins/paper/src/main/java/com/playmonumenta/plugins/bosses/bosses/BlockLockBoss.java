@@ -33,6 +33,7 @@ public class BlockLockBoss extends BossAbilityGroup {
 
 	@Override
 	public void unload() {
+		super.unload();
 		mLoc.getBlock().removeMetadata("Unbreakable", mPlugin);
 	}
 }

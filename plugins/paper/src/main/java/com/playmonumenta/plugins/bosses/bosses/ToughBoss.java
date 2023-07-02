@@ -44,6 +44,7 @@ public class ToughBoss extends BossAbilityGroup {
 
 	@Override
 	public void unload() {
+		super.unload();
 		mBannerHolder.remove();
 		EntityUtils.removeAttribute(mBoss, Attribute.GENERIC_MAX_HEALTH, "vengeance_modifier");
 	}
