@@ -466,6 +466,10 @@ public class AbilityManager {
 	}
 
 	public AbilityCollection updatePlayerAbilities(Player player, boolean resetAbsorption) {
+		if (!player.isOnline()) {
+			return new AbilityCollection(List.of());
+		}
+
 		// Clear self-given potions
 		mPlugin.mPotionManager.clearPotionIDType(player, PotionID.ABILITY_SELF);
 
@@ -821,6 +825,8 @@ public class AbilityManager {
 			}
 			mCustomTriggers.put(uuid, customTriggers);
 		}
+
+		updatePlayerAbilities(player, true);
 	}
 
 	public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {

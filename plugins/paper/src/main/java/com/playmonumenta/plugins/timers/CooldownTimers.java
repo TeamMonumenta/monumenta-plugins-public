@@ -50,6 +50,9 @@ public class CooldownTimers {
 	}
 
 	public void addCooldown(Player player, ClassAbility spell, Integer cooldownTime) {
+		if (!player.isOnline()) {
+			return;
+		}
 		UUID playerID = player.getUniqueId();
 		// First let's investigate whether this player already has existing cooldowns.
 		HashMap<ClassAbility, Integer> playerCooldowns = mTimers.get(playerID);
