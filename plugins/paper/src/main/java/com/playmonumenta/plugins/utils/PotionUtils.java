@@ -463,11 +463,14 @@ public class PotionUtils {
 	/**
 	 * Plays the particle and sound effect of a potion splash
 	 */
-	public static void splashPotionParticlesAndSound(Player player, Color color) {
+	public static void splashPotionParticlesAndSound(Player player, @Nullable Color color) {
+		if (color == null) {
+			color = Color.WHITE;
+		}
 		player.getWorld().playEffect(player.getLocation(), org.bukkit.Effect.POTION_BREAK, color.asRGB());
 	}
 
-	public static void instantDrinkParticles(Player player, Color color) {
+	public static void instantDrinkParticles(Player player, @Nullable Color color) {
 		if (color != null) {
 			double red = color.getRed() / 255D;
 			double green = color.getGreen() / 255D;
