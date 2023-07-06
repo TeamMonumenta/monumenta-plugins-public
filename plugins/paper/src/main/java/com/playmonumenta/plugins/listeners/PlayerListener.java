@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
@@ -176,6 +177,12 @@ public class PlayerListener implements Listener {
 
 		if (!ServerProperties.getJoinMessagesEnabled()) {
 			event.joinMessage(null);
+		}
+
+		if (!player.isOp() && player.getGameMode() == GameMode.CREATIVE) {
+			// PlayerTracking#addEntity will handle setting the gamemode to survival based on zone
+			player.setGameMode(GameMode.ADVENTURE);
+			MonumentaNetworkRelayIntegration.sendAdminMessage(player.getName() + " logged in in creative mode despite not being opped.");
 		}
 
 		/* This needs to stick around basically forever to remove this no-longer-needed tag */
