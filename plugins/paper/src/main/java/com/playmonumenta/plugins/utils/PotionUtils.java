@@ -68,6 +68,7 @@ public class PotionUtils {
 		PotionEffectType.CONFUSION,
 		PotionEffectType.SLOW,
 		PotionEffectType.SLOW_DIGGING,
+		PotionEffectType.SLOW_FALLING,
 		PotionEffectType.WITHER,
 		PotionEffectType.WEAKNESS,
 		PotionEffectType.HARM,
