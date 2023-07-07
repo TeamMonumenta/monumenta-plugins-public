@@ -39,11 +39,7 @@ public class Challenge extends Ability {
 	private static final int DURATION = 20 * 10;
 	private static final double PERCENT_DAMAGE_DEALT_EFFECT_1 = 0.15;
 	private static final double PERCENT_DAMAGE_DEALT_EFFECT_2 = 0.2;
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_SKILL,
-		DamageType.MELEE_ENCH
-	);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeTypes();
 
 	private static final int ABSORPTION_PER_MOB_1 = 1;
 	private static final int ABSORPTION_PER_MOB_2 = 2;

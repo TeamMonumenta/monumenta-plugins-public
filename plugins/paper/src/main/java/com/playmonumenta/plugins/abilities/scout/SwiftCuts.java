@@ -22,11 +22,7 @@ import org.bukkit.entity.Player;
 
 public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private static final int EFFECT_DURATION = 10 * 20;
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_SKILL,
-		DamageType.MELEE_ENCH
-	);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeTypes();
 
 	public static final double DAMAGE_AMPLIFIER = 0.05;
 	public static final int STACKS_CAP_1 = 4;

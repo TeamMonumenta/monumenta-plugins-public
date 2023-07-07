@@ -10,13 +10,12 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.EnumSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -133,7 +132,7 @@ public class DepthsAdvancingShadows extends DepthsAbility {
 			}
 			playerLoc = mPlayer.getLocation();
 
-			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], EnumSet.of(DamageType.MELEE, DamageType.MELEE_SKILL)));
+			EffectManager.getInstance().addEffect(mPlayer, ABILITY_NAME, new PercentDamageDealt(DAMAGE_DURATION, DAMAGE[mRarity - 1], DamageEvent.DamageType.getAllMeleeTypes()));
 
 			new PartialParticle(Particle.SPELL_WITCH, playerLoc.clone().add(0, 1.1, 0), 50, 0.35, 0.5, 0.35, 1.0).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.SMOKE_LARGE, playerLoc.clone().add(0, 1.1, 0), 12, 0.35, 0.5, 0.35, 0.05).spawnAsPlayerActive(mPlayer);

@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class StatTrackProjectile implements Infusion {
 
-	private static final EnumSet<DamageEvent.DamageType> TYPES = EnumSet.of(DamageEvent.DamageType.PROJECTILE, DamageEvent.DamageType.PROJECTILE_SKILL);
+	private static final EnumSet<DamageEvent.DamageType> TYPES = DamageEvent.DamageType.getAllProjectileTypes();
 
 	@Override
 	public String getName() {

@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class StatTrackMelee implements Infusion {
 
-	private static final EnumSet<DamageEvent.DamageType> TYPES = EnumSet.of(DamageEvent.DamageType.MELEE, DamageEvent.DamageType.MELEE_ENCH, DamageEvent.DamageType.MELEE_SKILL);
+	private static final EnumSet<DamageEvent.DamageType> TYPES = DamageEvent.DamageType.getAllMeleeTypes();
 
 	@Override
 	public String getName() {

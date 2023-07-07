@@ -120,6 +120,14 @@ public class DamageEvent extends Event implements Cancellable {
 			return EnumSet.of(DamageType.AILMENT, DamageType.POISON, DamageType.FALL, DamageType.OTHER, DamageType.TRUE);
 		}
 
+		public static EnumSet<DamageType> getAllMeleeTypes() {
+			return EnumSet.of(DamageType.MELEE, DamageType.MELEE_ENCH, DamageType.MELEE_SKILL);
+		}
+
+		public static EnumSet<DamageType> getAllProjectileTypes() {
+			return EnumSet.of(DamageType.PROJECTILE, DamageType.PROJECTILE_SKILL);
+		}
+
 		public static ParseResult<DamageType> fromReader(StringReader reader, String hoverDescription) {
 			DamageType type = reader.readEnum(DamageType.values());
 			if (type == null) {

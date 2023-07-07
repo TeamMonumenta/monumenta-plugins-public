@@ -123,15 +123,15 @@ public enum EffectType {
 
 	//Damage type of effects
 	DAMAGE("damage", "Strength", true, false, false),
-	MAGIC_DAMAGE("MagicDamage", "Magic Damage", true, false, false),
 	MELEE_DAMAGE("MeleeDamage", "Melee Damage", true, false, false),
 	PROJECTILE_DAMAGE("ProjectileDamage", "Projectile Damage", true, false, false),
+	MAGIC_DAMAGE("MagicDamage", "Magic Damage", true, false, false),
 
 	//Weakness type of effects
 	WEAKNESS("Weakness", "Strength", false, false, false),
-	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false),
 	MELEE_WEAKNESS("MeleeWeakness", "Melee Damage", false, false, false),
 	PROJECTILE_WEAKNESS("ProjectileWeakness", "Projectile Damage", false, false, false),
+	MAGIC_WEAKNESS("MagicWeakness", "Magic Damage", false, false, false),
 
 	INSTANT_HEALTH("InstantHealthPercent", "Instant Health", true, false, false),
 	INSTANT_DAMAGE("InstantDamagePercent", "Instant Damage", false, false, false),
@@ -363,38 +363,38 @@ public enum EffectType {
 			case MAX_HEALTH_DECREASE -> new PercentHealthBoost(duration, -strength, sourceString);
 
 			case RESISTANCE -> new PercentDamageReceived(duration, -strength);
-			case MELEE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE));
-			case PROJECTILE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MELEE_RESISTANCE -> new PercentDamageReceived(duration, -strength, DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_RESISTANCE -> new PercentDamageReceived(duration, -strength, DamageEvent.DamageType.getAllProjectileTypes());
 			case MAGIC_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
 			case BLAST_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.BLAST));
 			case FIRE_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FIRE));
 			case FALL_RESISTANCE -> new PercentDamageReceived(duration, -strength, EnumSet.of(DamageEvent.DamageType.FALL));
 
 			case DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength);
-			case MELEE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MELEE));
-			case PROJECTILE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MELEE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, DamageEvent.DamageType.getAllProjectileTypes());
 			case MAGIC_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
 			case BLAST_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.BLAST));
 			case FIRE_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FIRE));
 			case FALL_DAMAGE_NEGATE -> new NegateDamage(duration, (int) strength, EnumSet.of(DamageEvent.DamageType.FALL));
 
 			case VULNERABILITY -> new PercentDamageReceived(duration, strength);
-			case MELEE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE));
-			case PROJECTILE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MELEE_VULNERABILITY -> new PercentDamageReceived(duration, strength, DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_VULNERABILITY -> new PercentDamageReceived(duration, strength, DamageEvent.DamageType.getAllProjectileTypes());
 			case MAGIC_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
 			case BLAST_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.BLAST));
 			case FIRE_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FIRE));
 			case FALL_VULNERABILITY -> new PercentDamageReceived(duration, strength, EnumSet.of(DamageEvent.DamageType.FALL));
 
 			case DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getScalableDamageType());
-			case PROJECTILE_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MELEE_DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_DAMAGE -> new PercentDamageDealt(duration, strength, DamageEvent.DamageType.getAllProjectileTypes());
 			case MAGIC_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-			case MELEE_DAMAGE -> new PercentDamageDealt(duration, strength, EnumSet.of(DamageEvent.DamageType.MELEE));
 
 			case WEAKNESS -> new PercentDamageDealt(duration, -strength);
-			case PROJECTILE_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.PROJECTILE));
+			case MELEE_WEAKNESS -> new PercentDamageDealt(duration, -strength, DamageEvent.DamageType.getAllMeleeTypes());
+			case PROJECTILE_WEAKNESS -> new PercentDamageDealt(duration, -strength, DamageEvent.DamageType.getAllProjectileTypes());
 			case MAGIC_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MAGIC));
-			case MELEE_WEAKNESS -> new PercentDamageDealt(duration, -strength, EnumSet.of(DamageEvent.DamageType.MELEE));
 
 			case HEAL -> new PercentHeal(duration, strength);
 			case ANTI_HEAL -> new PercentHeal(duration, -strength);
