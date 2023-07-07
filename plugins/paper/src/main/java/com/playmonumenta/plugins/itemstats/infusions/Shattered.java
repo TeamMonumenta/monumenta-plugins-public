@@ -6,9 +6,11 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -61,8 +63,8 @@ public class Shattered implements Infusion {
 			plugin.mEffectManager.clearEffects(player, DAMAGE_DEALT_EFFECT);
 			plugin.mEffectManager.clearEffects(player, DAMAGE_TAKEN_EFFECT);
 		} else {
-			plugin.mEffectManager.addEffect(player, DAMAGE_DEALT_EFFECT, new PercentDamageDealt(40, -getMultiplier(level)));
-			plugin.mEffectManager.addEffect(player, DAMAGE_TAKEN_EFFECT, new PercentDamageReceived(40, getMultiplier(level)));
+			plugin.mEffectManager.addEffect(player, DAMAGE_DEALT_EFFECT, new PercentDamageDealt(40, -getMultiplier(level)).displaysTime(false));
+			plugin.mEffectManager.addEffect(player, DAMAGE_TAKEN_EFFECT, new PercentDamageReceived(40, getMultiplier(level)).displaysTime(false));
 		}
 	}
 
@@ -90,10 +92,10 @@ public class Shattered implements Infusion {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (oneHz) {
-			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM,
-				new PotionEffect(PotionEffectType.BAD_OMEN, 40, 0, false, false, true));
-
 			int shatterLevel = getShatteredLevelsEquipped(player);
+			if (shatterLevel > 0) {
+				MessagingUtils.sendActionBarMessage(player, "Your armor, offhand, or held item are Shattered!", NamedTextColor.RED);
+			}
 			updateEffects(plugin, player, shatterLevel);
 		}
 	}

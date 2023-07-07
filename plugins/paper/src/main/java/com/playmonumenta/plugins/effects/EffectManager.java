@@ -80,7 +80,7 @@ public final class EffectManager implements Listener {
 			if (effect.mUsed) {
 				// Each entity must have their own instance of an effect, they cannot be shared
 				MMLog.severe("Attempted to add an effect multiple times or to multiple entities! source="
-								 + source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
+						+ source + ", effectID=" + effect.mEffectID + ", entity=" + mEntity, new IllegalArgumentException());
 				return;
 			}
 			effect.mUsed = true;
@@ -242,6 +242,8 @@ public final class EffectManager implements Listener {
 					JsonArray inner = new JsonArray();
 					for (Effect effect : effects.getValue()) {
 						JsonObject serializedEffect = effect.serialize();
+						serializedEffect.addProperty("displaysTime", effect.doesDisplayTime());
+						serializedEffect.addProperty("displays", effect.doesDisplay());
 						if (serializedEffect.has("effectID")) {
 							inner.add(serializedEffect);
 						} else {
@@ -696,7 +698,16 @@ public final class EffectManager implements Listener {
 			MMLog.severe("Cannot deserialize effect with ID '" + effectID + "'");
 			return null;
 		}
-		return deserializer.deserialize(object, plugin);
+
+		Effect deserializedEffect = deserializer.deserialize(object, plugin);
+		if (deserializedEffect != null && object.has("displaysTime")) {
+			deserializedEffect.displaysTime(object.get("displaysTime").getAsBoolean());
+		}
+		if (deserializedEffect != null && object.has("displays")) {
+			deserializedEffect.displays(object.get("displays").getAsBoolean());
+		}
+
+		return deserializedEffect;
 	}
 
 	public void loadFromJsonObject(Player player, JsonObject object, Plugin plugin) throws Exception {

@@ -194,9 +194,17 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 		return this;
 	}
 
+	public boolean doesDisplay() {
+		return mDisplay;
+	}
+
 	public Effect displaysTime(boolean displayTime) {
 		mDisplayTime = displayTime;
 		return this;
+	}
+
+	public boolean doesDisplayTime() {
+		return mDisplayTime;
 	}
 
 	/* Must implement this method to print info about what the effect does for debug */
