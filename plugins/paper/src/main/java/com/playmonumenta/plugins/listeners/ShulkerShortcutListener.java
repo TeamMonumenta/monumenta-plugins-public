@@ -25,8 +25,11 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Container;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -348,23 +351,34 @@ public class ShulkerShortcutListener implements Listener {
 					lockStr = null;
 				}
 
-				// Get the new chest and update that
+				// define material + facing of chest/barrel
+				BlockData containerBlockData;
+				if (item.getType() == Material.YELLOW_SHULKER_BOX) {
+					containerBlockData = Material.BARREL.createBlockData();
+					float pitch = player.getLocation().getPitch();
+					((Directional) containerBlockData).setFacing(pitch > 45 ? BlockFace.DOWN : pitch < -45 ? BlockFace.UP : player.getFacing().getOppositeFace());
+				} else {
+					containerBlockData = Material.CHEST.createBlockData();
+					((Directional) containerBlockData).setFacing(player.getFacing().getOppositeFace());
+				}
+
+				// Get the new container and update that
 				Bukkit.getScheduler().runTask(mPlugin, () -> {
 					// Clears contents
-					block.setType(Material.CHEST);
+					block.setBlockData(containerBlockData);
 
-					if (block.getState() instanceof Chest chest) {
+					if (block.getState() instanceof Container container) {
 						if (lockStr != null) {
-							chest.setLock(null);
-							chest.customName(GsonComponentSerializer.gson().deserialize(lockStr));
+							container.setLock(null);
+							container.customName(GsonComponentSerializer.gson().deserialize(lockStr));
 						}
-						chest.update();
+						container.update();
 
-						chest = (Chest) block.getState();
-						chest.getInventory().setContents(contents);
+						container = (Container) block.getState();
+						container.getInventory().setContents(contents);
 
-						// Log CoreProtect data for chest placement
-						CoreProtectIntegration.logPlacement(player, chest.getLocation(), chest.getBlockData().getMaterial(), chest.getBlockData());
+						// Log CoreProtect data for container placement
+						CoreProtectIntegration.logPlacement(player, container.getLocation(), container.getBlockData().getMaterial(), container.getBlockData());
 					}
 				});
 
