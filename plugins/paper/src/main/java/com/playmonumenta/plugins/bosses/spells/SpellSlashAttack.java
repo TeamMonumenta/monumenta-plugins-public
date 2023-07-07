@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.ArrayList;
@@ -64,11 +65,11 @@ public class SpellSlashAttack extends Spell {
 	public static final int KNOCKBACK_IFRAMES = 5;
 
 	public SpellSlashAttack(Plugin plugin, LivingEntity boss, int cooldown, double damage, int telegraphDuration,
-							double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
-							double endAngle, double spacing, String startColorHex, String midColorHex, String endColorHex,
-							String xSlash, String horizontalColor, Vector knockback, String knockAway, double kbrEffectiveness,
-							String followCaster, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
-							SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd) {
+			double radius, double minAngle, double maxAngle, String attackName, int rings, double startAngle,
+			double endAngle, double spacing, String startColorHex, String midColorHex, String endColorHex,
+			String xSlash, String horizontalColor, Vector knockback, String knockAway, double kbrEffectiveness,
+			String followCaster, double hitboxSize, double forcedParticleSize, DamageEvent.DamageType damageType,
+			SoundsList soundsTelegraph, SoundsList soundsSlashStart, SoundsList soundsSlashTick, SoundsList soundsSlashEnd) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mCooldown = cooldown;
@@ -156,8 +157,7 @@ public class SpellSlashAttack extends Spell {
 		runnableSounds.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(runnableSounds);
 
-		Location startLoc = mBoss.getLocation().clone();
-		startLoc.add(0, mBoss.getHeight() / 2, 0);
+		Location startLoc = LocationUtils.getHalfHeightLocation(mBoss);
 		double maxAngleProgress = Math.abs(mEndAngle - mStartAngle) / 2;
 		mCurrAngleProgress = 0;
 		mSwitchedColor = false;
@@ -172,9 +172,9 @@ public class SpellSlashAttack extends Spell {
 		);
 		if (mXSlash) {
 			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-					(Location l, int ring) -> {
-						doSlash(l, ring, startLoc, maxAngleProgress, hitPlayers);
-					}
+				(Location l, int ring) -> {
+					doSlash(l, ring, startLoc, maxAngleProgress, hitPlayers);
+				}
 			);
 		}
 	}
@@ -182,7 +182,7 @@ public class SpellSlashAttack extends Spell {
 	private void doSlash(Location l, int ring, Location startLoc, double maxAngleProgress, List<Player> hitPlayers) {
 		Location finalLoc = l.clone();
 		if (mFollowCaster) {
-			finalLoc.add(mBoss.getLocation().toVector().subtract(startLoc.toVector()));
+			finalLoc.add(LocationUtils.getHalfHeightLocation(mBoss).toVector().subtract(startLoc.toVector()));
 		}
 		Particle.DustOptions data = calculateColorProgress(ring, maxAngleProgress);
 		new PartialParticle(Particle.REDSTONE, finalLoc, 1).extra(0)
@@ -219,22 +219,21 @@ public class SpellSlashAttack extends Spell {
 	}
 
 	private void telegraphSLash(double selectedAngle) {
-		Location startLoc = mBoss.getLocation().clone();
-		startLoc.add(0, mBoss.getHeight() / 2, 0);
+		Location startLoc = LocationUtils.getHalfHeightLocation(mBoss);
 		ParticleUtils.drawHalfArc(startLoc, mRadius, selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
+			(Location l, int ring) -> {
+				new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
+					.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
+					.spawnAsEntityActive(mBoss);
+			}
+		);
+		if (mXSlash) {
+			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
 				(Location l, int ring) -> {
 					new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
 						.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
 						.spawnAsEntityActive(mBoss);
 				}
-		);
-		if (mXSlash) {
-			ParticleUtils.drawHalfArc(startLoc, mRadius, 360 - selectedAngle, mStartAngle, mEndAngle, mRings, mSpacing,
-					(Location l, int ring) -> {
-						new PartialParticle(Particle.REDSTONE, l, 1).extra(0)
-							.data(new Particle.DustOptions(Color.WHITE, (mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)))
-							.spawnAsEntityActive(mBoss);
-					}
 			);
 		}
 		mSoundsTelegraph.play(mBoss.getLocation());
@@ -247,22 +246,22 @@ public class SpellSlashAttack extends Spell {
 			if (ring < halfRings) {
 				// Transition from start to mid
 				data = new Particle.DustOptions(
-						ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(ring / (double) halfRings, 1)),
-						(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
+					ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(ring / (double) halfRings, 1)),
+					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
 			} else {
 				// Transition from mid to end
 				data = new Particle.DustOptions(
-						ParticleUtils.getTransition(mMidColor, mEndColor, Math.min((ring - halfRings) / (double) halfRings, 1)),
-						(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
+					ParticleUtils.getTransition(mMidColor, mEndColor, Math.min((ring - halfRings) / (double) halfRings, 1)),
+					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
 			}
 		} else {
 			double progress = mCurrAngleProgress / maxAngleProgress;
 			if (!mSwitchedColor) {
 				data = new Particle.DustOptions(
-						ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(progress, 1)),
-						(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
+					ParticleUtils.getTransition(mStartColor, mMidColor, Math.min(progress, 1)),
+					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
 				if (mCurrAngleProgress >= maxAngleProgress) {
 					mCurrAngleProgress = 0;
@@ -270,8 +269,8 @@ public class SpellSlashAttack extends Spell {
 				}
 			} else {
 				data = new Particle.DustOptions(
-						ParticleUtils.getTransition(mMidColor, mEndColor, Math.min(progress, 1)),
-						(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
+					ParticleUtils.getTransition(mMidColor, mEndColor, Math.min(progress, 1)),
+					(mForcedParticleSize > 0) ? (float) mForcedParticleSize : 0.6f + (ring * 0.1f)
 				);
 			}
 		}
