@@ -70,6 +70,9 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 				if (isEnhanced()) {
 					multiplier += Math.min(enemy.getLocation().distance(mPlayer.getLocation()), MAX_DISTANCE) * DAMAGE_PER_BLOCK;
 				}
+			} else {
+				// half stack bonus for hunting companion
+				multiplier += mStacks * (PERCENT_DAMAGE_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_STACK_DAMAGE)) / 2;
 			}
 
 			event.setDamage(event.getDamage() * multiplier);

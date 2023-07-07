@@ -66,7 +66,7 @@ public class HuntingCompanion extends Ability {
 	private static final int TICK_INTERVAL = 5;
 	private static final int DETECTION_RANGE = 32;
 	private static final double DAMAGE_FRACTION_1 = 0.2;
-	private static final double DAMAGE_FRACTION_2 = 0.4;
+	private static final double DAMAGE_FRACTION_2 = 0.3;
 	private static final int STUN_TIME_1 = 2 * 20;
 	private static final int STUN_TIME_2 = 3 * 20;
 	private static final int BLEED_DURATION = 5 * 20;

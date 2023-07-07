@@ -107,7 +107,7 @@ public class Reverb implements Enchantment {
 							DamageUtils.damage(player,
 								hitMob,
 								DamageEvent.DamageType.OTHER,
-								Math.round((CharmManager.getLevelPercentDecimal(player, CHARM_DAMAGE) + value * DAMAGE_MULTIPLIER_PER_LEVEL) * overkill),
+								Math.round(CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_MULTIPLIER_PER_LEVEL) * value * overkill),
 								ClassAbility.REVERB,
 								true,
 								false);
