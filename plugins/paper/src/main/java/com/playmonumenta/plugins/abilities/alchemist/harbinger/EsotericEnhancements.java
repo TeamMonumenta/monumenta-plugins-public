@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -181,10 +182,16 @@ public class EsotericEnhancements extends Ability implements PotionAbility {
 	}
 
 	private @Nullable LivingEntity findTarget(LivingEntity aberration) {
-		return EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
-			       .filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
-			       .filter(mob -> isValidTarget(aberration, mob))
-			       .max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
+		List<LivingEntity> nearbyMobs = EntityUtils.getNearbyMobs(aberration.getLocation(), ABERRATION_TARGET_RADIUS, aberration).stream()
+			.filter(mob -> Math.abs(mob.getLocation().getY() - aberration.getLocation().getY()) <= MAX_TARGET_Y)
+			.filter(mob -> isValidTarget(aberration, mob)).toList();
+
+		List<LivingEntity> lineOfSightNearbyMobs = nearbyMobs.stream().filter(mob -> mob.hasLineOfSight(aberration)).toList();
+
+		if (lineOfSightNearbyMobs.size() > 0) {
+			return lineOfSightNearbyMobs.stream().max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
+		}
+		return nearbyMobs.stream().max(Comparator.comparingDouble(Damageable::getHealth)).orElse(null);
 	}
 
 }

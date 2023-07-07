@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +37,7 @@ public class ArcaneTabooCS extends TabooCS {
 	}
 
 	@Override
-	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks) {
+	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks, boolean inBurst) {
 		if (oneSecond) {
 			AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
 
@@ -48,6 +49,22 @@ public class ArcaneTabooCS extends TabooCS {
 				.count(3)
 				.spawnAsPlayerActive(player);
 		}
+	}
+
+	@Override
+	public void burstEffects(Player player) {
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 1, 1.6f);
+		player.getWorld().playSound(player.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 1, 1.2f);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
+		ArcanePotionsCS.drawAlchemyCircle(player, player.getLocation(), 6, 5, false, ArcanePotionsCS.BISMUTH, true);
+	}
+
+	@Override
+	public void unburstEffects(Player player) {
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1, 1.7f);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
 	}
 
 }

@@ -70,7 +70,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		List<Symbol> symbols = new ArrayList<>(LARGE_SYMBOLS);
 		symbols.remove(mLastSymbol);
 		mLastSymbol = FastUtils.getRandomElement(symbols);
-		drawAlchemyCircle(mPlayer, location, radius, isGruesome, mLastSymbol, false);
+		drawAlchemyCircle(mPlayer, location, radius, 3, isGruesome, mLastSymbol, false);
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 	/**
 	 * Draws an alchemy circle with a big symbol in the center, 3 small circles with fire or water symbols in them and connected by a triangle, and optionally 3 side symbols in the space between the triangle and big circle
 	 */
-	public static void drawAlchemyCircle(Player player, Location loc, double radius, boolean gruesome, Symbol centerSymbol, boolean withSideSymbols) {
+	public static void drawAlchemyCircle(Player player, Location loc, double radius, int numSmallCircles, boolean gruesome, Symbol centerSymbol, boolean withSideSymbols) {
 		Particle symbolParticle = gruesome ? Particle.SCRAPE : Particle.WAX_ON;
 		float rotation = loc.getYaw();
 		double startAngle = rotation + (gruesome ? -90 : 90);
@@ -105,12 +105,14 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 			Collections.shuffle(symbols, FastUtils.RANDOM);
 		}
 
-		drawSimpleAlchemyCircle(player, loc, radius, gruesome ? -90 : 90, 3, 0.2, gruesome ? WATER : FIRE, gruesome ? Particle.SCRAPE : Particle.WAX_ON, false, true);
+		drawSimpleAlchemyCircle(player, loc, radius, gruesome ? -90 : 90, numSmallCircles, 0.2, gruesome ? WATER : FIRE, gruesome ? Particle.SCRAPE : Particle.WAX_ON, false, true);
 
 		// side symbols
 		if (symbols != null) {
-			for (int i = 0; i < 3; i++) {
-				double currentAngle = startAngle + i * 120;
+			double angleStep = 360.0 / numSmallCircles;
+			double iterStartAngle = startAngle + (numSmallCircles % 2 == 0 ? (angleStep / 2) : 0);
+			for (int i = 0; i < numSmallCircles; i++) {
+				double currentAngle = iterStartAngle + i * angleStep;
 				Vector dir = VectorUtils.rotateYAxis(new Vector(1, 0, 0), currentAngle);
 				Location symbolLoc = loc.clone().add(dir.clone().multiply(-0.75 * radius));
 				double sideSymbolSize = radius * 0.15;
@@ -468,6 +470,28 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 		// cross
 		drawLine(particle, player, transform, transform.apply(-1, -0.5), transform.apply(1, -0.5));
 		drawRay(particle, player, transform, transform.apply(0, 0), transform.apply(0, -1));
+	};
+
+	// Bismuth ♆ - reserved for Taboo
+	public static final Symbol BISMUTH = (transform, particle, player) -> {
+		// cross
+		drawLine(particle, player, transform, transform.apply(0, -1), transform.apply(0, 1));
+		drawLine(particle, player, transform, transform.apply(-0.25, -0.8), transform.apply(0.25, -0.8));
+
+		// "arms"
+		drawArc(particle, player, transform, 0, 0.85, 0.85, 180, 360, true);
+
+		// middle arrow
+		drawLine(particle, player, transform, transform.apply(0, 1), transform.apply(-0.15, 0.85));
+		drawLine(particle, player, transform, transform.apply(0, 1), transform.apply(0.15, 0.85));
+
+		// left arrow
+		drawLine(particle, player, transform, transform.apply(-0.85, 0.85), transform.apply(-1, 0.7));
+		drawLine(particle, player, transform, transform.apply(-0.85, 0.85), transform.apply(-0.7, 0.7));
+
+		// right arrow
+		drawLine(particle, player, transform, transform.apply(0.85, 0.85), transform.apply(1, 0.7));
+		drawLine(particle, player, transform, transform.apply(0.85, 0.85), transform.apply(0.7, 0.7));
 	};
 
 	public static ImmutableList<Symbol> LARGE_SYMBOLS = ImmutableList.of(SULPHUR, PHILOSOPHERS_SULPHUR, AQUA_VITAE, SALT_OF_ANTIMONY, CROCUS_OF_IRON, AIR, EARTH, VINEGAR_ALT, GOLD_SUN, TIN, LEAD);

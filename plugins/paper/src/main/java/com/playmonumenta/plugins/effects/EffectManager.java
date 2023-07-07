@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -752,6 +753,18 @@ public final class EffectManager implements Listener {
 						event.setCancelled(true);
 						return;
 					}
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void entityGainAbsorptionEvent(EntityGainAbsorptionEvent event) {
+		Effects effects = mEntities.get(event.getEntity());
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					effectGroup.last().entityGainAbsorptionEvent(event);
 				}
 			}
 		}

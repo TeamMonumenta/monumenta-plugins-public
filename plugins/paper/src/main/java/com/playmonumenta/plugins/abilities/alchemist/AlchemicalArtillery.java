@@ -14,7 +14,6 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -43,11 +42,13 @@ public class AlchemicalArtillery extends Ability {
 	private static final double ARTILLERY_2_DAMAGE_MULTIPLIER = 2.5;
 	private static final double ARTILLERY_RANGE_MULTIPLIER = 1.5;
 	private static final int ARTILLERY_POTION_COST = 2;
-	private static final double ENHANCEMENT_REFUND_CHANCE = 0.5;
+	private static final int AFTERSHOCK_DELAY = 20;
+	private static final double AFTERSHOCK_DAMAGE_MULTIPLIER = 0.1;
 	public static final String CHARM_DAMAGE = "Alchemical Artillery Damage";
 	public static final String CHARM_RADIUS = "Alchemical Artillery Radius";
 	public static final String CHARM_VELOCITY = "Alchemical Artillery Velocity";
-	public static final String CHARM_EXPLOSION_MULTIPLIER = "Alchemical Artillery Explosion Damage Multiplier";
+	public static final String CHARM_AFTERSHOCK_DAMAGE = "Alchemical Artillery Aftershock Damage";
+	public static final String CHARM_AFTERSHOCK_DELAY = "Alchemical Artillery Aftershock Delay";
 
 	public static final AbilityInfo<AlchemicalArtillery> INFO =
 		new AbilityInfo<>(AlchemicalArtillery.class, "Alchemical Artillery", AlchemicalArtillery::new)
@@ -61,14 +62,19 @@ public class AlchemicalArtillery extends Ability {
 				"potion's damage and applying your selected potion's effects, in an area that is %s%% of your potion's radius. " +
 				"The initial speed of the bomb scales with your projectile speed. This costs you %s potions. %ss cooldown.")
 					.formatted(
-							StringUtils.multiplierToPercentage(ARTILLERY_1_DAMAGE_MULTIPLIER),
-							StringUtils.multiplierToPercentage(ARTILLERY_RANGE_MULTIPLIER),
-							ARTILLERY_POTION_COST,
-							StringUtils.ticksToSeconds(COOLDOWN)
+						StringUtils.multiplierToPercentage(ARTILLERY_1_DAMAGE_MULTIPLIER),
+						StringUtils.multiplierToPercentage(ARTILLERY_RANGE_MULTIPLIER),
+						ARTILLERY_POTION_COST,
+						StringUtils.ticksToSeconds(COOLDOWN)
 					),
 				"The damage of the bomb is increased to %s%%"
 					.formatted(StringUtils.multiplierToPercentage(ARTILLERY_2_DAMAGE_MULTIPLIER)),
-				"After launching the bomb, you have a 50% chance to be refunded 1 potion."
+				("Add an aftershock to the explosion, which happens %ss after it, and deals %s%% of the original explosion damage. " +
+				"If possible, the aftershock also applies the potion effect opposite of the one that you have selected.")
+					.formatted(
+						StringUtils.ticksToSeconds(AFTERSHOCK_DELAY),
+						StringUtils.multiplierToPercentage(AFTERSHOCK_DAMAGE_MULTIPLIER)
+					)
 			)
 			.simpleDescription("Launch a bomb in the direction you're looking, which applies your selected potion's effects on impact.")
 			.cooldown(COOLDOWN)
@@ -85,8 +91,8 @@ public class AlchemicalArtillery extends Ability {
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new AlchemicalArtilleryCS());
 
-		Bukkit.getScheduler().runTask(plugin, () ->
-			                                      mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
+		Bukkit.getScheduler().runTask(plugin,
+			() -> mAlchemistPotions = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class));
 	}
 
 	public void cast() {
@@ -98,17 +104,11 @@ public class AlchemicalArtillery extends Ability {
 		if (mAlchemistPotions.decrementCharges(ARTILLERY_POTION_COST)) {
 			putOnCooldown();
 			Location loc = mPlayer.getEyeLocation();
-			spawnGrenade(loc);
-			// If enhanced, chance to refund a potion when cast.
-			if (isEnhanced() && FastUtils.RANDOM.nextDouble() <= ENHANCEMENT_REFUND_CHANCE) {
-				mAlchemistPotions.incrementCharge();
-				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
-				mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1, 1);
-			}
+			spawnGrenade(loc, mAlchemistPotions.isGruesomeMode());
 		}
 	}
 
-	private void spawnGrenade(Location loc) {
+	private void spawnGrenade(Location loc, boolean isGruesome) {
 		if (mAlchemistPotions == null) {
 			return;
 		}
@@ -144,6 +144,8 @@ public class AlchemicalArtillery extends Ability {
 				final ItemStatManager.PlayerItemStats mPlayerItemStats = playerItemStats;
 				private final MagmaCube mGrenade = grenade;
 				private final Item mPhysicsItem = physicsItem;
+				private final boolean mIsGruesome = isGruesome;
+
 				@Override
 				public void run() {
 					if (!mPlayer.isOnline()) {
@@ -160,7 +162,7 @@ public class AlchemicalArtillery extends Ability {
 					// - If the grenade has collided with any enemy
 					// - If 6 seconds have passed (probably stuck in webs)
 					if (!mGrenade.isValid() || mPhysicsItem.isOnGround() || mTicks > 120 || mGrenade.isInLava() || hasCollidedWithEnemy(mGrenade)) {
-						explode(mGrenade.getLocation().subtract(0, 0.1, 0), mPlayerItemStats);
+						explode(mGrenade.getLocation().subtract(0, 0.1, 0), mPlayerItemStats, mIsGruesome);
 						mGrenade.remove();
 						mPhysicsItem.remove();
 						this.cancel();
@@ -180,7 +182,7 @@ public class AlchemicalArtillery extends Ability {
 		return hitbox.getHitMobs().size() > 0;
 	}
 
-	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats) {
+	private void explode(Location loc, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome) {
 		if (!mPlayer.isOnline() || mAlchemistPotions == null) {
 			return;
 		}
@@ -197,18 +199,48 @@ public class AlchemicalArtillery extends Ability {
 
 		for (LivingEntity mob : mobs) {
 			DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, true, false);
-			applyEffects(mob, playerItemStats);
+			applyEffects(mob, playerItemStats, isGruesome, false);
 
 			if (!EntityUtils.isBoss(mob)) {
 				MovementUtils.knockAwayRealistic(loc, mob, 1f, 0.5f, true);
 			}
 		}
+
+		if (isEnhanced()) {
+			aftershock(loc, radius, finalDamage, playerItemStats, isGruesome);
+		}
 	}
 
-	private void applyEffects(LivingEntity entity, ItemStatManager.PlayerItemStats playerItemStats) {
+	private void aftershock(Location loc, double radius, double damage, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome) {
+		int delay = (int) Math.ceil(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AFTERSHOCK_DELAY, AFTERSHOCK_DELAY));
+		double damageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AFTERSHOCK_DAMAGE, AFTERSHOCK_DAMAGE_MULTIPLIER);
+		double finalDamage = damage * damageMultiplier;
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			Hitbox hitbox = new Hitbox.SphereHitbox(loc, radius);
+			List<LivingEntity> mobs = hitbox.getHitMobs();
+
+			mCosmetic.aftershockEffect(mPlayer, loc, radius, mobs);
+
+			for (LivingEntity mob : mobs) {
+				DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), finalDamage, true, false, false);
+				applyEffects(mob, playerItemStats, isGruesome, true);
+			}
+		}, delay);
+	}
+
+	private void applyEffects(LivingEntity entity, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome, boolean invert) {
 		if (mAlchemistPotions == null) {
 			return;
 		}
-		mAlchemistPotions.applyEffects(entity, mAlchemistPotions.isGruesomeMode(), playerItemStats);
+
+		boolean isGruesomeFinal = isGruesome ^ invert;
+
+		// Return if isGruesome and doesn't have gruesome selected.
+		GruesomeAlchemy gruesome = Plugin.getInstance().mAbilityManager.getPlayerAbilities(mPlayer).getAbilityIgnoringSilence(GruesomeAlchemy.class);
+		if (isGruesomeFinal && gruesome == null) {
+			return;
+		}
+
+		mAlchemistPotions.applyEffects(entity, isGruesomeFinal, playerItemStats);
 	}
 }

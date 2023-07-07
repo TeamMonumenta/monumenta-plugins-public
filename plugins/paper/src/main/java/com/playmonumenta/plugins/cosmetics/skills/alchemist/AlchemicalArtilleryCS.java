@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +18,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -109,6 +111,22 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 1.25f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1.5f, 2f);
+	}
+
+	public void aftershockEffect(Player caster, Location loc, double radius, List<LivingEntity> hitMobs) {
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1.75f);
+
+		if (hitMobs.size() == 0) {
+			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(caster);
+			return;
+		}
+
+		for (LivingEntity mob : hitMobs) {
+			Location mobLoc = mob.getLocation();
+			new PartialParticle(Particle.BLOCK_CRACK, mobLoc, 25, 0, 0, 0, 1, world.getBlockData(mobLoc.clone().subtract(0, 1, 0))).spawnAsPlayerActive(caster);
+			new PartialParticle(Particle.EXPLOSION_LARGE, mobLoc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(caster);
+		}
 	}
 
 }

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.AbstractArrow;
@@ -70,6 +71,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	public boolean entityRegainHealthEvent(EntityRegainHealthEvent event) {
 		return true;
+	}
+
+	public void entityGainAbsorptionEvent(EntityGainAbsorptionEvent event) {
+
 	}
 
 	public void onDamage(LivingEntity entity, DamageEvent event, LivingEntity enemy) {

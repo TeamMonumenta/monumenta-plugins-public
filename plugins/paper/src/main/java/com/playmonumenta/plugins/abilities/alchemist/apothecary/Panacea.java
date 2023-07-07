@@ -50,13 +50,14 @@ public class Panacea extends Ability implements AbilityWithDuration {
 	private static final int PANACEA_1_SLOW_TICKS = (int) (1.5 * 20);
 	private static final int PANACEA_2_SLOW_TICKS = 2 * 20;
 	private static final int COOLDOWN = 20 * 20;
-	private static final double PANACEA_LEVEL_1_DOT_MULTIPLIER = 0.20;
-	private static final double PANACEA_LEVEL_2_DOT_MULTIPLIER = 0.35;
+	private static final double PANACEA_LEVEL_1_DOT_MULTIPLIER = 0.15;
+	private static final double PANACEA_LEVEL_2_DOT_MULTIPLIER = 0.30;
 	private static final String PANACEA_DOT_EFFECT_NAME = "PanaceaDamageOverTimeEffect";
 	private static final int PANACEA_DOT_PERIOD = 10;
 	private static final int PANACEA_DOT_DURATION = 20 * 9;
 
 	public static final String CHARM_DAMAGE = "Panacea Damage";
+	public static final String CHARM_DOT_DAMAGE = "Panacea DoT Damage";
 	public static final String CHARM_ABSORPTION = "Panacea Absorption Health";
 	public static final String CHARM_ABSORPTION_MAX = "Panacea Max Absorption Health";
 	public static final String CHARM_ABSORPTION_DURATION = "Panacea Absorption Duration";
@@ -142,7 +143,7 @@ public class Panacea extends Ability implements AbilityWithDuration {
 		mCosmetic.castEffects(mPlayer, radius);
 
 		double damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, mAlchemistPotions.getDamage() * PANACEA_DAMAGE_FRACTION);
-		double dotDamage = mAlchemistPotions.getDamage() * (isLevelOne() ? PANACEA_LEVEL_1_DOT_MULTIPLIER : PANACEA_LEVEL_2_DOT_MULTIPLIER);
+		double dotDamage = mAlchemistPotions.getDamage() * CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DOT_DAMAGE, isLevelOne() ? PANACEA_LEVEL_1_DOT_MULTIPLIER : PANACEA_LEVEL_2_DOT_MULTIPLIER);
 
 		mCurrDuration = 0;
 		ClientModHandler.updateAbility(mPlayer, this);

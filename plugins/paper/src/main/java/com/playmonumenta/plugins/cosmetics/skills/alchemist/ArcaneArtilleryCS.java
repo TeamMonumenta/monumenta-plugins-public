@@ -1,9 +1,11 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -131,6 +134,23 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 			ArcanePotionsCS.SULPHUR.draw(new ArcanePotionsCS.Transform(l, radius * 0.3, rot + 90), Particle.WAX_ON, caster);
 		}
 
+	}
+
+	@Override
+	public void aftershockEffect(Player caster, Location loc, double radius, List<LivingEntity> hitMobs) {
+		World world = loc.getWorld();
+		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1.3f);
+		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1.3f);
+		double scale = radius * 0.3;
+
+		ArcanePotionsCS.SMALL_SYMBOLS.get(FastUtils.randomIntInRange(0, ArcanePotionsCS.SMALL_SYMBOLS.size() - 1))
+			.draw(new ArcanePotionsCS.Transform(loc, scale, 0), Particle.FLAME, caster);
+
+		for (LivingEntity mob : hitMobs) {
+			new PPCircle(Particle.ELECTRIC_SPARK, LocationUtils.getHalfHeightLocation(mob), mob.getWidth())
+				.ringMode(true).countPerMeter(2).delta(0, LocationUtils.getHeightLocation(mob, 0.25).getY(), 0)
+				.extra(0.5).spawnAsPlayerActive(caster);
+		}
 	}
 
 }

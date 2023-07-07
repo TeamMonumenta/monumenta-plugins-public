@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.DisplayableEffect;
+import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -61,12 +63,22 @@ public class AbsorptionUtils {
 	// Doesn't work for subtracting absorption because newAbsorption makes sure it never drops (in case absorption is higher than maxAmount)
 	public static void addAbsorption(LivingEntity entity, double amount, double maxAmount, int duration) {
 		double absorption = getAbsorption(entity);
-		double newAbsorption = Math.min(absorption + amount, maxAmount);
+		EntityGainAbsorptionEvent event = new EntityGainAbsorptionEvent(entity, amount, maxAmount, duration);
+		Bukkit.getPluginManager().callEvent(event);
+
+		if (event.isCancelled()) {
+			return;
+		}
+
+		double finalAbsorption = event.getAmount();
+		double finalMaxAmount = event.getMaxAmount();
+		double newAbsorption = Math.min(absorption + finalAbsorption, finalMaxAmount);
+
 		if (newAbsorption >= absorption) {
 			setAbsorption(entity, newAbsorption, duration);
 		} else {
 			// Even if we don't set absorption, update the tracker to get proper amount/duration stacking
-			addAbsorptionInstance(entity, maxAmount, duration);
+			addAbsorptionInstance(entity, finalMaxAmount, duration);
 		}
 	}
 

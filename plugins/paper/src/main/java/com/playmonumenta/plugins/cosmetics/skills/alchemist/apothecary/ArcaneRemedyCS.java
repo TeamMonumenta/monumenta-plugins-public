@@ -46,7 +46,7 @@ public class ArcaneRemedyCS extends WardingRemedyCS {
 		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.75f, 1.5f);
 
 		// big circle on the ground
-		ArcanePotionsCS.drawAlchemyCircle(player, loc.add(0, 0.25, 0), radius, true, ArcanePotionsCS.BISMUTH_ORE, true);
+		ArcanePotionsCS.drawAlchemyCircle(player, loc.add(0, 0.25, 0), radius, 3, true, ArcanePotionsCS.BISMUTH_ORE, true);
 
 	}
 
