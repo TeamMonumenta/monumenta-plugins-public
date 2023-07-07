@@ -271,11 +271,12 @@ public class CustomContainerItemManager implements Listener {
 			return;
 		}
 
+		int deposited = config.mTotalItemsLimit <= 0 ? item.getAmount() : (int) Math.min(item.getAmount(), config.mTotalItemsLimit - totalCount);
 		NBTCompound addedItem = NBTItem.convertItemtoNBT(item);
-		ItemStatUtils.addPlayerModified(addedItem.addCompound("tag")).setLong(AMOUNT_KEY, (long) item.getAmount());
+		ItemStatUtils.addPlayerModified(addedItem.addCompound("tag")).setLong(AMOUNT_KEY, (long) deposited);
 		addedItem.setByte("Count", (byte) 1);
 		itemsList.addCompound(addedItem);
-		item.setAmount(0);
+		item.setAmount(item.getAmount() - deposited);
 		if (generateItemStats) {
 			ItemStatUtils.generateItemStats(container);
 		}
