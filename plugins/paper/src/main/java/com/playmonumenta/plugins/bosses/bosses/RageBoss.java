@@ -29,6 +29,8 @@ public class RageBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Buff mobs with CCImmune. Defaults false.")
 		public boolean CC_IMMUNE_BUFF = false;
+		@BossParam(help = "whether the mob can move while charging the nova or not")
+		public boolean CAN_MOVE = false;
 	}
 
 	public RageBoss(Plugin plugin, LivingEntity boss) {
@@ -36,7 +38,7 @@ public class RageBoss extends BossAbilityGroup {
 
 		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
 
-		Spell spell = new SpellRage(plugin, boss, p.RADIUS, p.DELAY, p.COOLDOWN, p.BUFF_DURATION, p.STRENGTH_POWER, p.SPEED_POWER, p.KBR_POWER, p.CC_IMMUNE_BUFF);
+		Spell spell = new SpellRage(plugin, boss, p.RADIUS, p.DELAY, p.COOLDOWN, p.BUFF_DURATION, p.STRENGTH_POWER, p.SPEED_POWER, p.KBR_POWER, p.CC_IMMUNE_BUFF, p.CAN_MOVE);
 
 		super.constructBoss(spell, detectionRange);
 	}

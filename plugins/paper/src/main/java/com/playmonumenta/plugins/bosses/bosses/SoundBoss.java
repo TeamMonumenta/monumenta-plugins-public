@@ -25,7 +25,7 @@ public class SoundBoss extends BossAbilityGroup {
 		public SoundsList AMBIENT_SOUND = SoundsList.EMPTY;
 
 		@BossParam(help = "timer to play the sound AMBIENT_SOUND")
-		public int AMBIENT_SOUND_TIMER = 20 * 2;
+		public int AMBIENT_SOUND_TIMER = 20 * 10;
 
 		@BossParam(help = "sounds played when hurt by a player")
 		public SoundsList PLAYER_HURT = SoundsList.EMPTY;
@@ -83,7 +83,7 @@ public class SoundBoss extends BossAbilityGroup {
 			}
 		});
 
-		super.constructBoss(SpellManager.EMPTY, spellList, -1, null, 1);
+		super.constructBoss(SpellManager.EMPTY, spellList, -1, null, 0, 1);
 	}
 
 	@Override

@@ -98,6 +98,8 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 		@BossParam(help = "Name of the mob spawned when the grenade explodes")
 		public String SPAWNEDMOB = "";
 
+		public float Y_VELOCITY = 0.7f;
+
 	}
 
 	public GrenadeLauncherBoss(Plugin plugin, LivingEntity boss) {
@@ -176,7 +178,7 @@ public class GrenadeLauncherBoss extends BossAbilityGroup {
 
 				p.LINGERING_EFFECTS.apply(target, boss);
 			},
-			p.SPAWNEDMOB
+			p.SPAWNEDMOB, p.Y_VELOCITY
 		);
 		super.constructBoss(spell, p.DETECTION, null, p.DELAY);
 

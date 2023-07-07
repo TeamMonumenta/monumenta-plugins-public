@@ -21,6 +21,7 @@ public final class TpBehindBoss extends BossAbilityGroup {
 		public boolean RANDOM = true;
 
 		public int COOLDOWN = 12 * 20;
+		public int INIT_DELAY = 100;
 
 	}
 
@@ -40,6 +41,6 @@ public final class TpBehindBoss extends BossAbilityGroup {
 			));
 		}
 
-		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null);
+		super.constructBoss(activeSpells, Collections.emptyList(), p.DETECTION, null, p.INIT_DELAY);
 	}
 }

@@ -43,6 +43,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	private final LingeringCenterAesthetics mLingeringCenterAesthetics;
 
 	private final String mSummonName;
+	private final float mGrenadeVelocity;
 
 	public SpellBaseGrenadeLauncher(
 		Plugin plugin,
@@ -73,7 +74,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 	) {
 		this(plugin, boss, grenadeMaterial, explodeOnTouch, explodeDelay, lobs, lobsDelay, duration, cooldown,
 			lingeringDuration, lingeringRadius, grenadeTargets, explosionTargets, aestheticsBoss, grenadeAesthetics,
-			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, "");
+			explosionAesthetics, hitAction, ringAesthetics, cencterAesthetics, lingeringHitAction, "", 0.7f);
 	}
 
 	/**
@@ -145,7 +146,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		LingeringCenterAesthetics cencterAesthetics,
 		HitAction lingeringHitAction,
 
-		String spawnedmob
+		String spawnedmob,
+		float yVelocity
 	) {
 		mPlugin = plugin;
 		mBoss = boss;
@@ -171,6 +173,8 @@ public class SpellBaseGrenadeLauncher extends Spell {
 		mLingeringHit = lingeringHitAction;
 
 		mSummonName = spawnedmob;
+		mGrenadeVelocity = yVelocity;
+
 	}
 
 
@@ -214,19 +218,27 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			Location pLoc = target.getLocation();
 			Location tLoc = fallingBlock.getLocation();
 
+			// approximate formula for the max height of a falling block's trajectory given its initial y-velocity
+			double maxHeight = -0.453758*mGrenadeVelocity + 12.6052*Math.pow(mGrenadeVelocity, 2) +
+							   -3.75027*Math.pow(mGrenadeVelocity, 3) + 0.906156*Math.pow(mGrenadeVelocity, 4) +
+							   -0.114669*Math.pow(mGrenadeVelocity, 5);
+
 			// h = 0.5 * g * t^2
 			// t^2 = 0.5 * g / h
 			// t = sqrt(0.5 * g / h)
-			// h = 5.8 blocks with a 0.7 y velocity component
-			double timeOfFlight = Math.sqrt(0.5 * 16 / 5.8);
+			double timeOfFlight = Math.sqrt(0.5 * 16 / maxHeight);
+
 			Location endPoint = pLoc.clone();
 			endPoint.setY(tLoc.getY());
 			double distance = endPoint.distance(tLoc);
 			double velocity = distance * timeOfFlight;
 
+			// lessen velocity if the y-velocity is very low as to avoid overshooting, and vice versa
+			velocity *= 1 + 0.6 * (mGrenadeVelocity - 0.7);
+
 			// Divide the actual velocity by 32 (speed at which things fall in minecraft; don't ask me why, but it works)
 			Vector vel = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ()).normalize().multiply(velocity / 32);
-			vel.setY(0.7f);
+			vel.setY(mGrenadeVelocity);
 
 			if (!Double.isFinite(vel.getX())) {
 				vel = new Vector(0, 1, 0);

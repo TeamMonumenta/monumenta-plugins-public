@@ -30,8 +30,8 @@ public class SpellRage extends SpellBaseAoE {
 	public double mKBRAmount;
 	public boolean mCCImmuneBuff;
 
-	public SpellRage(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, int buffDuration, double strengthAmount, double speedAmount, double kbrAmount, boolean ccImmune) {
-		super(plugin, launcher, radius, time, cooldown, false, Sound.UI_TOAST_OUT);
+	public SpellRage(Plugin plugin, LivingEntity launcher, int radius, int time, int cooldown, int buffDuration, double strengthAmount, double speedAmount, double kbrAmount, boolean ccImmune, boolean canMoveWhileCasting) {
+		super(plugin, launcher, radius, time, cooldown, canMoveWhileCasting, Sound.UI_TOAST_OUT);
 		mBuffDuration = buffDuration;
 		mSpeedAmount = speedAmount;
 		mStrengthAmount = strengthAmount;
