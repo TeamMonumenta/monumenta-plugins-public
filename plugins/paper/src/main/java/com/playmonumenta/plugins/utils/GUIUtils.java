@@ -174,7 +174,12 @@ public class GUIUtils {
 	}
 
 	public static ItemStack createBasicItem(Material mat, int amount, Component name, List<Component> desc, boolean setPlainTag) {
-		ItemStack item = new ItemStack(mat, amount);
+		return createBasicItem(new ItemStack(mat, amount), amount, name, desc, setPlainTag);
+	}
+
+	public static ItemStack createBasicItem(ItemStack base, int amount, Component name, List<Component> desc, boolean setPlainTag) {
+		ItemStack item = ItemUtils.clone(base);
+		item.setAmount(amount);
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(name);
 		meta.lore(desc.stream().map(GUIUtils::fixLoreFormatting).toList());

@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.managers;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,6 +21,7 @@ import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -39,6 +41,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -75,6 +78,30 @@ public class LoadoutManager implements Listener {
 	public static final int MAX_SHULKERS_IN_STORAGE_SHULKER = 5;
 
 	private static final int[] EQUIPMENT_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 36, 37, 38, 39, 40};
+
+	/**
+	 * Set of locations that are to be considered "exalted" in r3, i.e. such items will only be selected by the armory if the {@link LoadoutItem#mIsExalted exalted} flag is set.
+	 */
+	private static final ImmutableSet<ItemStatUtils.Location> EXALTED_LOCATIONS = ImmutableSet.of(
+		// Region 1
+		ItemStatUtils.Location.LABS, ItemStatUtils.Location.WHITE, ItemStatUtils.Location.ORANGE, ItemStatUtils.Location.MAGENTA,
+		ItemStatUtils.Location.LIGHTBLUE, ItemStatUtils.Location.YELLOW, ItemStatUtils.Location.REVERIE,
+		ItemStatUtils.Location.WILLOWS, ItemStatUtils.Location.WILLOWSKIN, ItemStatUtils.Location.EPHEMERAL, ItemStatUtils.Location.EPHEMERAL_ENHANCEMENTS,
+		ItemStatUtils.Location.SANCTUM, ItemStatUtils.Location.VERDANT, ItemStatUtils.Location.VERDANTSKIN,
+		ItemStatUtils.Location.AZACOR, ItemStatUtils.Location.KAUL, ItemStatUtils.Location.DIVINE, ItemStatUtils.Location.ROYAL,
+
+		// Region 2
+		ItemStatUtils.Location.LIME, ItemStatUtils.Location.PINK, ItemStatUtils.Location.GRAY, ItemStatUtils.Location.LIGHTGRAY,
+		ItemStatUtils.Location.CYAN, ItemStatUtils.Location.PURPLE, ItemStatUtils.Location.TEAL, ItemStatUtils.Location.SHIFTING,
+		ItemStatUtils.Location.FORUM,
+		ItemStatUtils.Location.MIST, ItemStatUtils.Location.HOARD, ItemStatUtils.Location.GREEDSKIN,
+		ItemStatUtils.Location.REMORSE, ItemStatUtils.Location.REMORSEFULSKIN, ItemStatUtils.Location.VIGIL,
+		ItemStatUtils.Location.DEPTHS,
+		ItemStatUtils.Location.HORSEMAN, ItemStatUtils.Location.HALLOWEENSKIN,
+		ItemStatUtils.Location.FROSTGIANT, ItemStatUtils.Location.TITANICSKIN,
+		ItemStatUtils.Location.LICH, ItemStatUtils.Location.ETERNITYSKIN,
+		ItemStatUtils.Location.RUSH, ItemStatUtils.Location.TREASURE, ItemStatUtils.Location.INTELLECT
+	);
 
 	private final Map<UUID, LoadoutData> mData = new HashMap<>();
 
@@ -422,7 +449,9 @@ public class LoadoutManager implements Listener {
 			return false;
 		}
 		return loadoutItem.mIdentifier.isIdentifierFor(item, !matchInfusion)
-			       && (!matchInfusion || loadoutItem.mInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mInfusionType));
+			       && (!EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) || loadoutItem.mIsExalted == (ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING))
+			       && (!matchInfusion || loadoutItem.mInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mInfusionType))
+			       && (!matchInfusion || loadoutItem.mDelveInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mDelveInfusionType));
 	}
 
 	private static boolean canPutMoreShulkersIntoEquipmentBox(Inventory inventory) {
@@ -586,7 +615,7 @@ public class LoadoutManager implements Listener {
 		public int mIndex;
 
 		public String mName;
-		public ItemUtils.ItemIdentifier mDisplayItem = new ItemUtils.ItemIdentifier(Material.ARMOR_STAND, null);
+		public ItemStack mDisplayItem = new ItemStack(Material.ARMOR_STAND);
 
 		public boolean mIncludeEquipment = true;
 		public boolean mIncludeVanity = true;
@@ -622,7 +651,10 @@ public class LoadoutManager implements Listener {
 			for (int i : EQUIPMENT_SLOTS) {
 				ItemStack item = contents[i];
 				if (item != null && !item.getType().isAir() && !isEquipmentStorageBox(item)) {
-					mEquipment.add(new LoadoutItem(i, ItemUtils.getIdentifier(item, false), InfusionUtils.getCurrentInfusion(item).getInfusionType()));
+					mEquipment.add(new LoadoutItem(i, ItemUtils.getIdentifier(item, false),
+						EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) && ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING,
+						InfusionUtils.getCurrentInfusion(item).getInfusionType(),
+						Objects.requireNonNullElse(DelveInfusionUtils.getCurrentInfusion(item), DelveInfusionUtils.DelveInfusionSelection.REFUND).getInfusionType()));
 				}
 			}
 		}
@@ -687,8 +719,7 @@ public class LoadoutManager implements Listener {
 			json.addProperty("index", mIndex);
 			json.addProperty("name", mName);
 
-			json.addProperty("displayItemType", mDisplayItem.mType.name());
-			json.addProperty("displayItemName", mDisplayItem.mName);
+			json.addProperty("displayItem", ItemUtils.serializeItemStack(mDisplayItem));
 
 			json.addProperty("includeEquipment", mIncludeEquipment);
 			json.addProperty("includeVanity", mIncludeVanity);
@@ -731,7 +762,23 @@ public class LoadoutManager implements Listener {
 			int index = json.getAsJsonPrimitive("index").getAsInt();
 			String name = json.getAsJsonPrimitive("name").getAsString();
 			Loadout loadout = new Loadout(index, name);
-			loadout.mDisplayItem = parseItemIdentifier(json, "displayItemType", "displayItemName");
+			if (json.has("displayItemType")) { // old data format
+				ItemUtils.ItemIdentifier itemIdentifier = parseItemIdentifier(json, "displayItemType", "displayItemName");
+				loadout.mDisplayItem = new ItemStack(itemIdentifier.mType);
+				if (itemIdentifier.mName != null) {
+					loadout.mDisplayItem.editMeta(meta -> meta.displayName(itemIdentifier.getDisplayName()));
+					ItemUtils.setPlainName(loadout.mDisplayItem, itemIdentifier.mName);
+				}
+			} else {
+				ItemStack item = ItemUtils.parseItemStack(json.getAsJsonPrimitive("displayItem").getAsString());
+				if (!ItemStatUtils.isClean(item)) {
+					ItemUtils.setPlainTag(item);
+					ItemStatUtils.generateItemStats(item);
+					ItemStatUtils.markClean(item);
+					item = VanityManager.cleanCopyForDisplay(item);
+				}
+				loadout.mDisplayItem = item;
+			}
 
 			loadout.mIncludeEquipment = json.getAsJsonPrimitive("includeEquipment").getAsBoolean();
 			loadout.mIncludeVanity = json.getAsJsonPrimitive("includeVanity").getAsBoolean();
@@ -771,13 +818,17 @@ public class LoadoutManager implements Listener {
 
 	public static class LoadoutItem {
 		public int mSlot;
-		public ItemUtils.ItemIdentifier mIdentifier;
+		public ItemUtils.ItemIdentifier mIdentifier; // TODO r3 exalted items
+		public boolean mIsExalted;
 		public @Nullable ItemStatUtils.InfusionType mInfusionType;
+		public @Nullable ItemStatUtils.InfusionType mDelveInfusionType;
 
-		public LoadoutItem(int slot, ItemUtils.ItemIdentifier identifier, @Nullable ItemStatUtils.InfusionType infusionType) {
+		public LoadoutItem(int slot, ItemUtils.ItemIdentifier identifier, boolean isExalted, @Nullable ItemStatUtils.InfusionType infusionType, @Nullable ItemStatUtils.InfusionType delveInfusionType) {
 			mSlot = slot;
 			mIdentifier = identifier;
+			mIsExalted = isExalted;
 			mInfusionType = infusionType;
+			mDelveInfusionType = delveInfusionType;
 		}
 
 		public JsonObject toJson() {
@@ -785,13 +836,16 @@ public class LoadoutManager implements Listener {
 			json.addProperty("slot", mSlot);
 			json.addProperty("type", mIdentifier.mType.name());
 			json.addProperty("name", mIdentifier.mName);
+			json.addProperty("exalted", mIsExalted);
 			json.addProperty("infusion", mInfusionType == null ? null : mInfusionType.name());
+			json.addProperty("delveInfusion", mDelveInfusionType == null ? null : mDelveInfusionType.name());
 			return json;
 		}
 
 		public static LoadoutItem fromJson(JsonObject json) {
 			int slot = json.getAsJsonPrimitive("slot").getAsInt();
 			ItemUtils.ItemIdentifier identifier = parseItemIdentifier(json, "type", "name");
+			boolean exalted = json.has("exalted") && json.getAsJsonPrimitive("exalted").getAsBoolean();
 			ItemStatUtils.InfusionType infusion;
 			try {
 				JsonPrimitive infusionElement = json.getAsJsonPrimitive("infusion");
@@ -799,7 +853,14 @@ public class LoadoutManager implements Listener {
 			} catch (IllegalArgumentException e) {
 				infusion = null;
 			}
-			return new LoadoutItem(slot, identifier, infusion);
+			ItemStatUtils.InfusionType delveInfusion;
+			try {
+				JsonPrimitive infusionElement = json.getAsJsonPrimitive("delveInfusion");
+				delveInfusion = infusionElement == null ? null : ItemStatUtils.InfusionType.valueOf(infusionElement.getAsString());
+			} catch (IllegalArgumentException e) {
+				delveInfusion = null;
+			}
+			return new LoadoutItem(slot, identifier, exalted, infusion, delveInfusion);
 		}
 	}
 

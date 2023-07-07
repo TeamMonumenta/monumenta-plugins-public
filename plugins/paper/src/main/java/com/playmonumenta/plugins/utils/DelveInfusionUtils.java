@@ -91,6 +91,15 @@ public class DelveInfusionUtils {
 			return null;
 		}
 
+		public static DelveInfusionSelection getByType(InfusionType infusionType) {
+			for (DelveInfusionSelection infusionSelection : values()) {
+				if (infusionSelection.mInfusionType == infusionType) {
+					return infusionSelection;
+				}
+			}
+			return REFUND;
+		}
+
 		public String getLabel() {
 			return mLabel;
 		}

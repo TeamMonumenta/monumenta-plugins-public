@@ -5,9 +5,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
+import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.managers.LoadoutManager;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -181,7 +183,7 @@ public class LoadoutManagerGui extends Gui {
 			for (int i = 0; i < MAX_LOADOUTS; i++) {
 				for (LoadoutManager.Loadout loadout : mLoadoutData.mLoadouts) {
 					if (loadout.mIndex == i) {
-						ItemStack icon = new ItemStack(loadout.mDisplayItem.mType);
+						ItemStack icon = ItemUtils.clone(loadout.mDisplayItem);
 						ItemUtils.modifyMeta(icon, meta -> {
 							meta.displayName(Component.text(loadout.mName, NamedTextColor.GOLD, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
 							List<Component> lore = new ArrayList<>();
@@ -217,7 +219,6 @@ public class LoadoutManagerGui extends Gui {
 							meta.lore(lore);
 							meta.addItemFlags(ItemFlag.values());
 						});
-						ItemUtils.setPlainName(icon, loadout.mDisplayItem.mName);
 						setItem(LOADOUTS_START + i, new GuiItem(icon, false))
 							.onLeftClick(() -> {
 								mSelectedLoadout = loadout;
@@ -263,9 +264,9 @@ public class LoadoutManagerGui extends Gui {
 								}
 								LoadoutManager.Loadout loadout = new LoadoutManager.Loadout(finalI, name);
 								loadout.setFromPlayer(mTarget);
-								loadout.mDisplayItem = ItemUtils.getIdentifier(player.getInventory().getItem(0), false);
-								if (loadout.mDisplayItem.mType == null || loadout.mDisplayItem.mType.isAir()) {
-									loadout.mDisplayItem = new ItemUtils.ItemIdentifier(Material.ARMOR_STAND, null);
+								loadout.mDisplayItem = VanityManager.cleanCopyForDisplay(player.getInventory().getItem(0));
+								if (loadout.mDisplayItem == null || loadout.mDisplayItem.getType().isAir()) {
+									loadout.mDisplayItem = new ItemStack(Material.ARMOR_STAND);
 								}
 								loadout.mIncludeVanity = Plugin.getInstance().mVanityManager.getData(player).mLockboxSwapEnabled;
 								mLoadoutData.mLoadouts.add(loadout);
@@ -287,10 +288,13 @@ public class LoadoutManagerGui extends Gui {
 				});
 
 			// info icon; is also button to change name
-			ItemStack loadoutIcon = GUIUtils.createBasicItem(selectedLoadout.mDisplayItem.mType, selectedLoadout.mName, NamedTextColor.GOLD, true,
-				"Click to change the name of this loadout.\n" +
-					"Shift left click an item in your inventory to use it as display icon for this loadout.");
-			ItemUtils.setPlainName(loadoutIcon, selectedLoadout.mDisplayItem.mName);
+			ItemStack loadoutIcon = GUIUtils.createBasicItem(selectedLoadout.mDisplayItem, 1,
+				Component.text(selectedLoadout.mName, NamedTextColor.GOLD, TextDecoration.BOLD),
+				List.of(
+					Component.text("Click to change the name of this loadout.", NamedTextColor.GRAY),
+					Component.text("Shift left click an item in your inventory", NamedTextColor.GRAY),
+					Component.text("to use it as display icon for this loadout.", NamedTextColor.GRAY)
+				), false);
 			setItem(0, 4, new GuiItem(loadoutIcon, false))
 				.onLeftClick(() -> {
 					close();
@@ -387,10 +391,18 @@ public class LoadoutManagerGui extends Gui {
 						meta.displayName((loadoutItem.mIdentifier.mName != null ? Component.text(loadoutItem.mIdentifier.mName, NamedTextColor.WHITE, TextDecoration.BOLD)
 							                  : Component.translatable(loadoutItem.mIdentifier.mType.translationKey(), NamedTextColor.WHITE, TextDecoration.BOLD)).decoration(TextDecoration.ITALIC, false));
 						List<Component> lore = new ArrayList<>();
+						if (loadoutItem.mIsExalted) {
+							lore.add(Component.text("Exalted version", NamedTextColor.GRAY, TextDecoration.ITALIC));
+						}
 						lore.add(Component.text("Preferred Infusion: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
 							         .append(loadoutItem.mInfusionType != null ? Component.text(loadoutItem.mInfusionType.getName(), InfusionUtils.InfusionSelection.getByType(loadoutItem.mInfusionType).getColor()) : Component.text("any")));
 						if (loadoutItem.mInfusionType != null) {
-							lore.add(Component.text("(right click to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+							lore.add(Component.text("  (right click to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+						}
+						lore.add(Component.text("Preferred Delve Infusion: ", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+							         .append(loadoutItem.mDelveInfusionType != null ? Component.text(loadoutItem.mDelveInfusionType.getName(), DelveInfusionUtils.DelveInfusionSelection.getByType(loadoutItem.mDelveInfusionType).getColor()) : Component.text("any")));
+						if (loadoutItem.mDelveInfusionType != null) {
+							lore.add(Component.text("  (left click to clear)", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 						}
 						meta.lore(lore);
 						meta.addItemFlags(ItemFlag.values());
@@ -398,6 +410,10 @@ public class LoadoutManagerGui extends Gui {
 					setItem(targetSlot, icon)
 						.onRightClick(() -> {
 							loadoutItem.mInfusionType = null;
+							update();
+						})
+						.onLeftClick(() -> {
+							loadoutItem.mDelveInfusionType = null;
 							update();
 						});
 				}
@@ -549,7 +565,7 @@ public class LoadoutManagerGui extends Gui {
 	protected void onPlayerInventoryClick(InventoryClickEvent event) {
 		ItemStack currentItem = event.getCurrentItem();
 		if (mSelectedLoadout != null && event.getClick() == ClickType.SHIFT_LEFT && currentItem != null && !currentItem.getType().isAir()) {
-			mSelectedLoadout.mDisplayItem = ItemUtils.getIdentifier(currentItem, false);
+			mSelectedLoadout.mDisplayItem = VanityManager.cleanCopyForDisplay(currentItem);
 			update();
 		}
 	}
