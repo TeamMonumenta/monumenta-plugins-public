@@ -7,11 +7,11 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.FrostNovaCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PPCircle;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -19,15 +19,10 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class FrostNova extends Ability {
 
@@ -95,11 +90,14 @@ public class FrostNova extends Ability {
 	private final float mLevelDamage;
 	private final double mLevelSlowMultiplier;
 
+	private final FrostNovaCS mCosmetic;
+
 	public FrostNova(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		int damage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isEnhanced() ? (int) (damage * ENHANCED_DAMAGE_MODIFIER) : damage);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FrostNovaCS());
 	}
 
 	public void cast() {
@@ -148,30 +146,7 @@ public class FrostNova extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		new BukkitRunnable() {
-			double mRadius = 0;
-			final Location mLoc = mPlayer.getLocation().add(0, 0.15, 0);
-
-			@Override
-			public void run() {
-				mRadius += 1.25;
-
-				new PPCircle(Particle.CLOUD, mLoc, mRadius).count(20).extra(0.1).spawnAsPlayerActive(mPlayer);
-				new PPCircle(Particle.CRIT_MAGIC, mLoc, mRadius).count(160).extra(0.65).spawnAsPlayerActive(mPlayer);
-
-				if (mRadius >= size + 1) {
-					this.cancel();
-				}
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-		Location loc = mPlayer.getLocation().add(0, 1, 0);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.65f);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.45f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.25f);
-		new PartialParticle(Particle.CLOUD, loc, 25, 0, 0, 0, 0.35).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SPIT, loc, 35, 0, 0, 0, 0.45).spawnAsPlayerActive(mPlayer);
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1f);
+		mCosmetic.onCast(mPlugin, mPlayer, world, size);
 	}
 
 }

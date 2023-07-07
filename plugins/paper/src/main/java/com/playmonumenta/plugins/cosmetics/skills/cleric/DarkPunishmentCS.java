@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -31,8 +28,8 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 
 	public static final String NAME = "Dark Punishment";
 
-	private final float HEAL_PITCH_SELF = 1.5f;
-	private final float HEAL_PITCH_OTHER = 1.75f;
+	private static final float HEAL_PITCH_SELF = 1.5f;
+	private static final float HEAL_PITCH_OTHER = 1.75f;
 
 	private static final Color TIP_COLOR = Color.fromRGB(40, 19, 102);
 	private static final Color TIP_COLOR_TRANSITION = Color.fromRGB(63, 63, 63);
@@ -78,28 +75,28 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 	}
 
 	@Override
-	public void justiceOnDamage(Player mPlayer, LivingEntity enemy, double widerWidthDelta, int combo) {
-		mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.6f, 1.65f);
-		mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, SWEEP_PITCH[combo]);
-		mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, TRIDENT_PITCH[combo]);
-		mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1, 0.75f);
+	public void justiceOnDamage(Player player, LivingEntity enemy, World world, Location enemyLoc, double widerWidthDelta, int combo) {
+		world.playSound(enemyLoc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.6f, 1.65f);
+		world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, SWEEP_PITCH[combo]);
+		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, TRIDENT_PITCH[combo]);
+		world.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1, 0.75f);
 		if (combo >= 2) {
-			mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
-			mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1, 0.8f);
+			world.playSound(enemyLoc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 1f, 0.5f);
+			world.playSound(enemyLoc, Sound.ENTITY_PHANTOM_DEATH, SoundCategory.PLAYERS, 1, 0.8f);
 		} else {
-			mPlayer.getWorld().playSound(enemy.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1, 0.5f);
+			world.playSound(enemyLoc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1, 0.5f);
 		}
 
 		PartialParticle partialParticle = new PartialParticle(
 			Particle.DRAGON_BREATH,
 			LocationUtils.getHalfHeightLocation(enemy), 15,
 			0, 0, 0, 0.1
-		).spawnAsPlayerActive(mPlayer);
+		).spawnAsPlayerActive(player);
 		partialParticle.mParticle = Particle.SPELL_WITCH;
 		partialParticle
-			.spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(player);
 
-		Location loc = mPlayer.getLocation().add(0, 1, 0);
+		Location loc = player.getLocation().add(0, 1, 0);
 		ParticleUtils.drawHalfArc(loc, 2.1, ANGLE[combo], -20, 140, 7, 0.2,
 			(Location l, int ring) -> {
 				new PartialParticle(Particle.DUST_COLOR_TRANSITION, l, 1, 0, 0, 0, 0,
@@ -108,17 +105,17 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 						ParticleUtils.getTransition(BASE_COLOR_TRANSITION, TIP_COLOR_TRANSITION, ring / 7D),
 						0.6f + (ring * 0.1f)
 					))
-					.spawnAsPlayerActive(mPlayer);
+					.spawnAsPlayerActive(player);
 		});
 	}
 
 	@Override
-	public void justiceKill(Player mPlayer, Location loc) {
+	public void justiceKill(Player player, Location loc) {
 		loc.add(0, 0.125, 0);
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.5f, 1.65f);
 		new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.175)
-			.spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(player);
 
 		new BukkitRunnable() {
 
@@ -140,7 +137,7 @@ public class DarkPunishmentCS extends DivineJusticeCS implements DepthsCS {
 								ParticleUtils.getTransition(BASE_COLOR, TIP_COLOR, mRadius / RADIUS),
 								ParticleUtils.getTransition(BASE_COLOR_TRANSITION, TIP_COLOR_TRANSITION, mRadius / RADIUS),
 								0.65f
-							)).spawnAsPlayerActive(mPlayer);
+							)).spawnAsPlayerActive(player);
 					}
 				}
 

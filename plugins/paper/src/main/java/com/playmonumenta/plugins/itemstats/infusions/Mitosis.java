@@ -40,7 +40,7 @@ public class Mitosis implements Infusion {
 		//If we break a spawner with a pickaxe
 		if (ItemUtils.isPickaxe(item) && event.getBlock().getType() == Material.SPAWNER) {
 			double percentWeaken = PERCENT_WEAKEN_PER_LEVEL * value;
-			player.playSound(player.getLocation(), Sound.ENTITY_SLIME_SQUISH, SoundCategory.BLOCKS, 0.7f, 0.7f);
+			player.playSound(player.getLocation(), Sound.ENTITY_SILVERFISH_HURT, SoundCategory.PLAYERS, 0.8f, 0.6f);
 			new PartialParticle(Particle.REDSTONE, event.getBlock().getLocation(), 25, 1.5, 1.5, 1.5, COLOR).spawnAsPlayerActive(player);
 			List<LivingEntity> mobs = EntityUtils.getNearbyMobs(event.getBlock().getLocation(), RADIUS);
 			for (LivingEntity mob : mobs) {

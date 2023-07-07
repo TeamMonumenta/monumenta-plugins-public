@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.ArcaneStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -12,12 +14,10 @@ import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -30,15 +30,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 
 public class ArcaneStrike extends Ability {
-
-	private static final Particle.DustOptions COLOR_1 = new Particle.DustOptions(Color.fromRGB(220, 147, 249), 1.0f);
-	private static final Particle.DustOptions COLOR_2 = new Particle.DustOptions(Color.fromRGB(217, 122, 255), 1.0f);
-
 	private static final float RADIUS = 4.0f;
 	private static final int DAMAGE_1 = 4;
 	private static final int DAMAGE_2 = 7;
@@ -77,10 +71,13 @@ public class ArcaneStrike extends Ability {
 	private final float mDamageBonus;
 	private final float mDamageBonusAffected;
 
+	private final ArcaneStrikeCS mCosmetic;
+
 	public ArcaneStrike(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamageBonus = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamageBonusAffected = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_BONUS, isLevelOne() ? BONUS_DAMAGE_1 : BONUS_DAMAGE_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ArcaneStrikeCS());
 	}
 
 	@Override
@@ -91,7 +88,8 @@ public class ArcaneStrike extends Ability {
 			    && mPlugin.mItemStatManager.getPlayerItemStats(mPlayer).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0) {
 			putOnCooldown();
 
-			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS));
+			double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS);
+			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(enemy), radius);
 			for (LivingEntity mob : hitbox.getHitMobs()) {
 				float preSpellPowerDamage = mDamageBonus;
 
@@ -117,16 +115,11 @@ public class ArcaneStrike extends Ability {
 
 			}
 
-			Location locD = enemy.getLocation().add(0, 1, 0);
+			Location enemyLoc = enemy.getLocation().add(0, 1, 0);
 			World world = mPlayer.getWorld();
-			new PartialParticle(Particle.DRAGON_BREATH, locD, 75, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, locD, 35, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.SPELL_WITCH, locD, 150, 2.5, 1, 2.5, 0.001).spawnAsPlayerActive(mPlayer);
-			world.playSound(locD, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.75f, 1.5f);
-
 			Location loc = mPlayer.getLocation().add(mPlayer.getLocation().getDirection().multiply(0.5));
-			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, 1.65f);
-			world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.5f);
+
+			mCosmetic.onStrike(mPlugin, mPlayer, world, enemyLoc, loc, radius);
 
 			if (isEnhanced()) {
 				//Visual feedback
@@ -140,8 +133,6 @@ public class ArcaneStrike extends Ability {
 				int decay = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.DECAY);
 				int bleed = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.BLEEDING);
 				int wind = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.WIND_ASPECT);
-
-				double radius = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RADIUS, RADIUS);
 
 				if (ice > 0) {
 					mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.6f, 1.3f);
@@ -169,34 +160,6 @@ public class ArcaneStrike extends Ability {
 					new PartialParticle(Particle.LAVA, loc, 20, radius, radius, radius).spawnAsPlayerActive(mPlayer);
 				}
 			}
-
-			new BukkitRunnable() {
-				double mD = 30;
-
-				@Override
-				public void run() {
-					Vector vec;
-					for (double degree = mD; degree < mD + 30; degree += 8) {
-						double radian1 = Math.toRadians(degree);
-						double cos = FastUtils.cos(radian1);
-						double sin = FastUtils.sin(radian1);
-						for (double r = 1; r < 4; r += 0.5) {
-							vec = new Vector(cos * r, 1, sin * r);
-							vec = VectorUtils.rotateXAxis(vec, loc.getPitch());
-							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
-
-							Location l = loc.clone().add(vec);
-							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_1).spawnAsPlayerActive(mPlayer);
-							new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, COLOR_2).spawnAsPlayerActive(mPlayer);
-						}
-					}
-					mD += 30;
-					if (mD >= 150) {
-						this.cancel();
-					}
-				}
-
-			}.runTaskTimer(mPlugin, 0, 1);
 		}
 		return false;
 	}

@@ -6,14 +6,14 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.scout.WindBombCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -22,12 +22,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Triple;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -95,9 +91,12 @@ public class WindBomb extends Ability {
 
 	private final List<Triple<Snowball, Double, ItemStatManager.PlayerItemStats>> mProjectiles = new ArrayList<>();
 
+	private final WindBombCS mCosmetic;
+
 	public WindBomb(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamageFraction = isLevelOne() ? DAMAGE_FRACTION_1 : DAMAGE_FRACTION_2;
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new WindBombCS());
 	}
 
 	public void cast() {
@@ -107,8 +106,8 @@ public class WindBomb extends Ability {
 
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getLocation();
-		world.playSound(loc, Sound.ENTITY_HORSE_BREATHE, SoundCategory.PLAYERS, 1.0f, 0.25f);
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, "Wind Bomb", Particle.CLOUD);
+		mCosmetic.onThrow(world, loc);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, VELOCITY, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle());
 
 		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
 		double damage = ItemStatUtils.getAttributeAmount(mainhand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
@@ -140,21 +139,10 @@ public class WindBomb extends Ability {
 			double damage = triple.getMiddle();
 			ItemStatManager.PlayerItemStats playerItemStats = triple.getRight();
 
+			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
-
-			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.25f);
-
-			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-
-			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-				for (double j = 0; j < 360; j += 6) {
-					double radian1 = Math.toRadians(j);
-					loc.add(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
-					new PartialParticle(Particle.CLOUD, loc, 3, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-					loc.subtract(FastUtils.cos(radian1) * radius, 0.15, FastUtils.sin(radian1) * radius);
-				}
-			}, 1);
+			mCosmetic.onLand(mPlugin, mPlayer, world, loc, radius);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			double weaken = WEAKEN_EFFECT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WEAKNESS);
@@ -176,10 +164,7 @@ public class WindBomb extends Ability {
 
 			if (isEnhanced()) {
 				loc.add(0, 2, 0);
-				new PartialParticle(Particle.CLOUD, loc, 35, 4, 4, 4, 0.125).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 25, 2, 2, 2, 0.125).spawnAsPlayerActive(mPlayer);
-				world.playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1f);
-				world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.8f, 1);
+				mCosmetic.onVortexSpawn(mPlayer, world, loc);
 
 				double pullVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PULL, PULL_VELOCITY);
 				double pullRadius = CharmManager.getRadius(mPlayer, CHARM_VORTEX_RADIUS, PULL_RADIUS);
@@ -206,9 +191,7 @@ public class WindBomb extends Ability {
 								}
 							}
 						}
-						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 6, 2, 2, 2, 0.1).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
+						mCosmetic.onVortexTick(mPlayer, loc);
 						if (mTicks >= pullDuration) {
 							this.cancel();
 						}

@@ -50,7 +50,7 @@ public class BruteForce extends Ability {
 			.descriptions(
 				"Attacking an enemy with a critical attack passively deals 2 more damage to the mob and 2 damage to all enemies in a 2 block radius around it, " +
 					"and knocks all non-boss enemies away from you.",
-				"Damage is increased to 10 percent of the attack's damage plus 2.",
+				"Damage is increased to 10% of the attack's damage plus 2.",
 				"Half a second after triggering this ability, it triggers another wave centered on the same mob, with 75% of the damage and all of the knockback.")
 			.simpleDescription("Critical hits deal extra damage and knock back nearby mobs.")
 			.displayItem(Material.STONE_AXE);
@@ -133,7 +133,7 @@ public class BruteForce extends Ability {
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BRUTE_FORCE_RADIUS);
 		List<LivingEntity> mobs = new Hitbox.SphereHitbox(loc, radius).getHitMobs();
 
-		mCosmetic.bruteOnDamage(mPlayer, loc, radius, mComboNumber);
+		mCosmetic.bruteOnDamage(mPlayer, loc.getWorld(), loc, radius, mComboNumber);
 
 		float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, BRUTE_FORCE_KNOCKBACK_SPEED);
 

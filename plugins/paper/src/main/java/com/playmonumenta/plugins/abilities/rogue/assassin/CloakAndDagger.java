@@ -147,4 +147,9 @@ public class CloakAndDagger extends Ability implements KillTriggeredAbility, Abi
 		return mMaxStacks;
 	}
 
+	@Override
+	public ChargeType getChargeType() {
+		return ChargeType.STACKS;
+	}
+
 }

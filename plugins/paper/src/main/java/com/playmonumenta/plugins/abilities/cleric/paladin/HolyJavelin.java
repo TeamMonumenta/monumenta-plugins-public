@@ -8,33 +8,26 @@ import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.HolyJavelinCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 
 public class HolyJavelin extends Ability {
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 50), 1.0f);
-
 	private static final int RANGE = 12;
 	private static final int UNDEAD_DAMAGE_1 = 22;
 	private static final int UNDEAD_DAMAGE_2 = 36;
@@ -73,11 +66,14 @@ public class HolyJavelin extends Ability {
 	private @Nullable DivineJustice mDivineJustice;
 	private @Nullable LuminousInfusion mLuminousInfusion;
 
+	private final HolyJavelinCS mCosmetic;
+
 	public HolyJavelin(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mUndeadDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? UNDEAD_DAMAGE_1 : UNDEAD_DAMAGE_2);
 
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HolyJavelinCS());
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			mCrusade = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class);
 			mDivineJustice = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, DivineJustice.class);
@@ -117,20 +113,12 @@ public class HolyJavelin extends Ability {
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1, 1.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 0.9f);
+		mCosmetic.javelinSound(world, mPlayer.getLocation());
 		Location startLoc = mPlayer.getEyeLocation();
-		Vector dir = startLoc.getDirection();
-		new PartialParticle(Particle.EXPLOSION_NORMAL, startLoc.clone().add(dir), 10, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
 
-		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, range, loc -> {
-			new PartialParticle(Particle.CLOUD, loc, 30, 0, 0, 0, 0.125f).spawnAsPlayerActive(mPlayer);
-			world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 1.65f);
-			world.playSound(loc, Sound.ENTITY_ARROW_HIT, SoundCategory.PLAYERS, 1, 0.9f);
-		});
+		Location endLoc = LocationUtils.rayTraceToBlock(mPlayer, range, loc -> mCosmetic.javelinHitBlock(mPlayer, loc, world));
 
-		new PPLine(Particle.EXPLOSION_NORMAL, startLoc, endLoc).shiftStart(0.75).countPerMeter(2).minParticlesPerMeter(0).delta(0).extra(0.025).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, startLoc, endLoc).shiftStart(0.75).countPerMeter(22).delta(0.25).data(COLOR).spawnAsPlayerActive(mPlayer);
+		mCosmetic.javelinParticle(mPlayer, startLoc, endLoc);
 
 		for (LivingEntity enemy : Hitbox.approximateCylinder(startLoc, endLoc, 0.95, true).accuracy(0.5).getHitMobs()) {
 			double damage = Crusade.enemyTriggersAbilities(enemy, mCrusade) ? mUndeadDamage : mDamage;

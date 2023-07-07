@@ -139,7 +139,7 @@ public class DivineJustice extends Ability {
 			DamageUtils.damage(mPlayer, enemy, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, false);
 
 			double widerWidthDelta = PartialParticle.getWidthDelta(enemy) * 1.5;
-			mCosmetic.justiceOnDamage(mPlayer, enemy, widerWidthDelta, mComboNumber);
+			mCosmetic.justiceOnDamage(mPlayer, enemy, mPlayer.getWorld(), enemy.getLocation(), widerWidthDelta, mComboNumber);
 
 			if (mComboNumber == 0 || mComboRunnable != null) {
 				if (mComboRunnable != null) {
@@ -152,7 +152,7 @@ public class DivineJustice extends Ability {
 						mComboRunnable = null;
 					}
 				};
-				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / mPlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getValue()) * 20) + 15);
+				mComboRunnable.runTaskLater(mPlugin, (long) ((1D / EntityUtils.getAttributeOrDefault(mPlayer, Attribute.GENERIC_ATTACK_SPEED, 4)) * 20) + 15);
 			}
 			mComboNumber++;
 

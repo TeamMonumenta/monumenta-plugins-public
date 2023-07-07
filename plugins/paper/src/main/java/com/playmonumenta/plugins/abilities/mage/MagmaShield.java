@@ -122,7 +122,7 @@ public class MagmaShield extends Ability {
 				mPlugin.mEffectManager.addEffect(target, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS_EFFECT_NAME,
 					new PercentAbilityDamageReceived(ENHANCEMENT_BONUS_DURATION, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS,
 						EnumSet.of(ClassAbility.MAGMA_SHIELD, ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.ELEMENTAL_SPIRIT_FIRE,
-							ClassAbility.STARFALL, ClassAbility.CHOLERIC_FLAMES)));
+							ClassAbility.STARFALL, ClassAbility.CHOLERIC_FLAMES, ClassAbility.FLAME_TOTEM)));
 			}
 		}
 

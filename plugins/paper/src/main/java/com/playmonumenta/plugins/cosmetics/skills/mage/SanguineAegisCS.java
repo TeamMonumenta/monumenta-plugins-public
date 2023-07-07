@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.GalleryCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -60,9 +57,9 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			|| mPlayer.getGameMode() == GameMode.CREATIVE;
+	public boolean isUnlocked(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, GALLERY_COMPLETE_SCB).orElse(0) >= 1
+			|| player.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -71,11 +68,10 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 	}
 
 	@Override
-	public void prismaEffect(World world, Player mPlayer, double radius) {
-		Location location = mPlayer.getLocation();
-		new PartialParticle(Particle.SOUL, location.clone().add(0, 1.15, 0), 25, 0.35, 0.45, 0.35, 0.5).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SOUL_FIRE_FLAME, location.clone().add(0, 1.15, 0), 50, 0.35, 0.45, 0.35, 0.5).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIMSON_SPORE, location.clone().add(0, 1.15, 0), 100, 0, 0.2, 0, 0).spawnAsPlayerActive(mPlayer);
+	public void prismaEffect(World world, Player player, Location location, double radius) {
+		new PartialParticle(Particle.SOUL, location.clone().add(0, 1.15, 0), 25, 0.35, 0.45, 0.35, 0.5).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SOUL_FIRE_FLAME, location.clone().add(0, 1.15, 0), 50, 0.35, 0.45, 0.35, 0.5).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIMSON_SPORE, location.clone().add(0, 1.15, 0), 100, 0, 0.2, 0, 0).spawnAsPlayerActive(player);
 		world.playSound(location, Sound.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 3.5f, 0.9f);
 		world.playSound(location, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 7.5f, 0.5f);
 		world.playSound(location, Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, SoundCategory.PLAYERS, 5.5f, 0.5f);
@@ -84,8 +80,8 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 
 		PPCircle flame = new PPCircle(Particle.SOUL_FIRE_FLAME, location.clone().add(0, 0.125, 0), radius);
 		flame.delta(0.05).extra(0.01);
-		flame.count((int) Math.ceil(20 * radius)).spawnAsPlayerActive(mPlayer);
-		flame.count((int) Math.ceil(16 * radius)).radius(0.8 * radius).spawnAsPlayerActive(mPlayer);
+		flame.count((int) Math.ceil(20 * radius)).spawnAsPlayerActive(player);
+		flame.count((int) Math.ceil(16 * radius)).radius(0.8 * radius).spawnAsPlayerActive(player);
 
 		Vector front = VectorUtils.rotateYAxis(new Vector(0, 0, radius), 45 + location.clone().getYaw());
 		final int units = (int) Math.ceil(radius * 3.1416);
@@ -93,28 +89,28 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> 0.96 * t / units,
 				t -> 0, t -> 0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(mPlayer)
+				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> 0.96 * t / units,
 				t -> 0, t -> -0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(mPlayer)
+				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> 0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
 				t -> 0, t -> 0.96 * t / units,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(mPlayer)
+				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -units, units, front,
 			t -> -0.32 * FastUtils.cos(t * Math.PI / 2 / units) + 0.04,
 				t -> 0, t -> 0.96 * t / units,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(mPlayer)
+				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0, BLOOD).spawnAsPlayerActive(player)
 		);
 
 	}
 
 	@Override
-	public void prismaOnStun(LivingEntity mob, int stunTime, Player mPlayer) {
+	public void prismaOnStun(LivingEntity mob, int stunTime, Player player) {
 		new BukkitRunnable() {
 			int mTicks = 0;
 			@Override
@@ -122,15 +118,15 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 				if (mTicks++ >= stunTime) {
 					this.cancel();
 				}
-				new PartialParticle(Particle.REDSTONE, mob.getEyeLocation(), 5, 0.2, 0.4, 0.2, 0, DARK_BLOOD).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, mob.getEyeLocation(), 5, 0.2, 0.4, 0.2, 0, DARK_BLOOD).spawnAsPlayerActive(player);
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	@Override
-	public void prismaOnHeal(Player mPlayer) {
-		Location location = mPlayer.getLocation();
-		mPlayer.getWorld().playSound(location.clone(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, SoundCategory.PLAYERS, 3f, 0.6f);
+	public void prismaOnHeal(Player player) {
+		Location location = player.getLocation();
+		player.getWorld().playSound(location.clone(), Sound.BLOCK_BUBBLE_COLUMN_UPWARDS_INSIDE, SoundCategory.PLAYERS, 3f, 0.6f);
 
 		Vector front = VectorUtils.rotateYAxis(new Vector(0, 0, 2), location.clone().getYaw());
 		ParticleUtils.drawCurve(location.clone().add(0, 0.125, 0), -HEAL_UNIT, HEAL_UNIT, front,
@@ -139,7 +135,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 				(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), (HEAL_UNIT - Math.abs(t)) / 2)
 		);
@@ -149,7 +145,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 				(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), (HEAL_UNIT - Math.abs(t)) / 2)
 		);
@@ -160,7 +156,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 				(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), (HEAL_UNIT - Math.abs(t)) / 2)
 		);
@@ -170,7 +166,7 @@ public class SanguineAegisCS extends PrismaticShieldCS implements GalleryCS {
 				(loc, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 2, 0.01, 0.01, 0.01, 0, DARK_BLOOD).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), (HEAL_UNIT - Math.abs(t)) / 2)
 		);

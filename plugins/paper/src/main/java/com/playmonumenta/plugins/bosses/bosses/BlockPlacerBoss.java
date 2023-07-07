@@ -177,7 +177,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 									if (!event.isCancelled() && !event.blockList().isEmpty()) {
 										/* Only allow bosses to break blocks in areas where explosions are allowed */
 										testloc.getBlock().setType(Material.AIR);
-										loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.2f, 0.6f);
+										loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.2f, 0.6f);
 										new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 										destroyedBlock = true;
 									}
@@ -202,7 +202,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 							block.setType(Material.AIR);
 						}
 						if (badBlockList.size() > 0) {
-							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.HOSTILE, 0.3f, 0.9f);
+							loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, SoundCategory.BLOCKS, 0.3f, 0.9f);
 							new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 6, 1, 1, 1, 0.03).spawnAsEntityActive(boss);
 							destroyedBlock = true;
 						}
@@ -257,7 +257,7 @@ public class BlockPlacerBoss extends BossAbilityGroup {
 						}
 
 						block.setType(Material.POLISHED_BLACKSTONE_BRICKS);
-						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, SoundCategory.HOSTILE, 1f, 0.7f);
+						loc.getWorld().playSound(loc, Sound.BLOCK_NETHER_BRICKS_PLACE, SoundCategory.BLOCKS, 1f, 0.7f);
 						pathfinder.moveTo(loc.clone().add(0, 1, 0));
 						Bukkit.getScheduler().runTaskLater(com.playmonumenta.plugins.Plugin.getInstance(), () -> pathfinder.moveTo(loc.clone().add(0, 1, 0)), 5);
 					}

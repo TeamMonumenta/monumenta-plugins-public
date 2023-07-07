@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage.arcanist;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
@@ -70,27 +67,27 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 	}
 
 	@Override
-	public void moonbladeSwingEffect(World world, Player mPlayer, Location origin, double range, int mSwings, int maxSwing) {
-		float mPitch = maxSwing <= 1 ? 1.25f : ((mSwings - 1) * 0.85f + (maxSwing - mSwings) * 0.6f) / (maxSwing - 1);
+	public void moonbladeSwingEffect(World world, Player player, Location origin, double range, int swings, int maxSwing) {
+		float pitch = maxSwing <= 1 ? 1.25f : ((swings - 1) * 0.85f + (maxSwing - swings) * 0.6f) / (maxSwing - 1);
 		world.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.6f, 0.7f);
-		world.playSound(origin, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.4f, mPitch);
-		world.playSound(origin, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.1f, mPitch + 0.06f);
-		world.playSound(origin, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.8f, mPitch + 0.12f);
+		world.playSound(origin, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.4f, pitch);
+		world.playSound(origin, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.1f, pitch + 0.06f);
+		world.playSound(origin, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.8f, pitch + 0.12f);
 		world.playSound(origin, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.45f, 1.6f);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				world.playSound(origin, Sound.BLOCK_DISPENSER_DISPENSE, SoundCategory.PLAYERS, 2.8f, mPitch);
-				world.playSound(origin, Sound.BLOCK_DISPENSER_DISPENSE, SoundCategory.PLAYERS, 2.4f, mPitch + 0.2f);
+				world.playSound(origin, Sound.BLOCK_DISPENSER_DISPENSE, SoundCategory.PLAYERS, 2.8f, pitch);
+				world.playSound(origin, Sound.BLOCK_DISPENSER_DISPENSE, SoundCategory.PLAYERS, 2.4f, pitch + 0.2f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 3);
 
 		Location mCenter = origin.clone().add(0, 0.125, 0);
 		new PPCircle(Particle.REDSTONE, mCenter, 0.8 * range).data(LIGHT_COLOR)
-			.count((int) Math.ceil(4.8 * 3.1416 * range)).spawnAsPlayerActive(mPlayer);
+			.count((int) Math.ceil(4.8 * 3.1416 * range)).spawnAsPlayerActive(player);
 		new PPCircle(Particle.REDSTONE, mCenter, 0.7 * range).data(GOLD_COLOR3)
-			.count((int) Math.ceil(3 * 3.1416 * range * range)).ringMode(false).spawnAsPlayerActive(mPlayer);
-		if (mSwings <= 1) {
+			.count((int) Math.ceil(3 * 3.1416 * range * range)).ringMode(false).spawnAsPlayerActive(player);
+		if (swings <= 1) {
 			world.playSound(origin, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 5f, 0.8f);
 			mLongAngle = FastUtils.RANDOM.nextDouble(2 * 3.1416);
 			mDLongAngle = FastUtils.RANDOM.nextDouble(0.48 * 3.1416) + 0.2 * 3.1416;
@@ -101,18 +98,18 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 		int uLong = (int) Math.ceil(2.8 * range);
 		int uShort = (int) Math.ceil(1.6 * range);
 		ParticleUtils.drawCurve(mCenter, 0, uShort, mFront,
-			t -> 0.55 * t / uShort * FastUtils.cos(mShortAngle - (mSwings - 1) * mDShortAngle),
-				t -> 0, t -> 0.55 * t / uShort * FastUtils.sin(mShortAngle - (mSwings - 1) * mDShortAngle),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.12, 0.12, 0.12, 0, GOLD_COLOR1).spawnAsPlayerActive(mPlayer)
+			t -> 0.55 * t / uShort * FastUtils.cos(mShortAngle - (swings - 1) * mDShortAngle),
+				t -> 0, t -> 0.55 * t / uShort * FastUtils.sin(mShortAngle - (swings - 1) * mDShortAngle),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.12, 0.12, 0.12, 0, GOLD_COLOR1).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(mCenter, 0, uLong, mFront,
-			t -> 0.95 * t / uLong * FastUtils.cos(mLongAngle - (mSwings - 1) * mDLongAngle),
-				t -> 0, t -> 0.95 * t / uLong * FastUtils.sin(mLongAngle - (mSwings - 1) * mDLongAngle),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.05, 0.05, 0.05, 0, GOLD_COLOR2).spawnAsPlayerActive(mPlayer)
+			t -> 0.95 * t / uLong * FastUtils.cos(mLongAngle - (swings - 1) * mDLongAngle),
+				t -> 0, t -> 0.95 * t / uLong * FastUtils.sin(mLongAngle - (swings - 1) * mDLongAngle),
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 3, 0.05, 0.05, 0.05, 0, GOLD_COLOR2).spawnAsPlayerActive(player)
 		);
 
 		new BukkitRunnable() {
-			final int mI = mSwings;
+			final int mI = swings;
 			double mRoll;
 			double mD = 45;
 			boolean mInit = false;
@@ -136,10 +133,10 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 					for (double r = 1; r < range; r += (mI % 4 == 0) ? 0.45 : 0.4) {
 						for (double degree = mD; degree < mD + 30; degree += 5) {
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
-							mParticle1.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 40) / 90.0)).spawnAsPlayerActive(mPlayer);
-							mParticle2.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 40) / 120.0)).spawnAsPlayerActive(mPlayer);
+							mParticle1.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 40) / 90.0)).spawnAsPlayerActive(player);
+							mParticle2.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 40) / 120.0)).spawnAsPlayerActive(player);
 							if (FastUtils.RANDOM.nextDouble() < r * 0.125) {
-								mParticle3.location(l).spawnAsPlayerActive(mPlayer);
+								mParticle3.location(l).spawnAsPlayerActive(player);
 							}
 						}
 					}
@@ -150,10 +147,10 @@ public class PrestigiousMoonbladeCS extends CosmicMoonbladeCS implements Prestig
 						for (double degree = mD; degree > mD - 30; degree -= 5) {
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
 							l.setPitch(-l.getPitch());
-							mParticle1.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 140) / -90.0)).spawnAsPlayerActive(mPlayer);
-							mParticle2.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 140) / -120.0)).spawnAsPlayerActive(mPlayer);
+							mParticle1.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 140) / -90.0)).spawnAsPlayerActive(player);
+							mParticle2.location(l).data(ParticleUtils.getTransition(GOLD_COLOR1, GOLD_COLOR2, (degree - 140) / -120.0)).spawnAsPlayerActive(player);
 							if (FastUtils.RANDOM.nextDouble() < r * 0.125) {
-								mParticle3.location(l).spawnAsPlayerActive(mPlayer);
+								mParticle3.location(l).spawnAsPlayerActive(player);
 							}
 						}
 					}

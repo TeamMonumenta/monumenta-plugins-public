@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
@@ -13,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -49,11 +49,11 @@ public class ColossalBruteCS extends BruteForceCS {
 	}
 
 	@Override
-	public void bruteOnDamage(Player mPlayer, Location loc, double radius, int combo) {
-		mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
-		mPlayer.getWorld().playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, PITCHES[combo]);
-		mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
-		Location pLoc = mPlayer.getLocation().add(0, 1, 0);
+	public void bruteOnDamage(Player player, World world, Location loc, double radius, int combo) {
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, PITCHES[combo]);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
+		Location pLoc = player.getLocation().add(0, 1, 0);
 		ParticleUtils.drawHalfArc(pLoc, 2.15, ANGLE[combo], -40, 140, 8, 0.2,
 			(Location l, int ring) -> {
 				new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
@@ -61,22 +61,22 @@ public class ColossalBruteCS extends BruteForceCS {
 						ParticleUtils.getTransition(COLO_COLOR_BASE, COLO_COLOR_TIP, ring / 8D),
 						0.6f + (ring * 0.1f)
 					))
-					.spawnAsPlayerActive(mPlayer);
+					.spawnAsPlayerActive(player);
 			});
-		mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1f, GOLEM_PITCHES[combo]);
-		mPlayer.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.65f);
-		mPlayer.getWorld().playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1f, 0.75f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1f, GOLEM_PITCHES[combo]);
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1f, 0.65f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 1f, 0.75f);
 		if (combo == 2) {
-			mPlayer.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1f, 0.55f);
+			world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 1f, 0.55f);
 			new PartialParticle(Particle.SMOKE_LARGE, loc, 16, 0, 0, 0, 0.125)
-				.spawnAsPlayerActive(mPlayer);
+				.spawnAsPlayerActive(player);
 			new PartialParticle(Particle.SMOKE_NORMAL, loc, 40, 0, 0, 0, 0.15)
-				.spawnAsPlayerActive(mPlayer);
+				.spawnAsPlayerActive(player);
 		}
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 55, 0, 0, 0, 0.15)
-			.spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, loc, 50, 0, 0, 0, 0.75)
-			.spawnAsPlayerActive(mPlayer);
+			.spawnAsPlayerActive(player);
 		new BukkitRunnable() {
 
 			double mRadius = 0;
@@ -99,7 +99,7 @@ public class ColossalBruteCS extends BruteForceCS {
 								ParticleUtils.getTransition(TWIST_COLOR_BASE, TWIST_COLOR_TIP, mRadius / RADIUS),
 								0.8f
 							))
-							.spawnAsPlayerActive(mPlayer);
+							.spawnAsPlayerActive(player);
 					}
 				}
 

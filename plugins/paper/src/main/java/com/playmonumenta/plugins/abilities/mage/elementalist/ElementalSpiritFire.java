@@ -2,42 +2,28 @@ package com.playmonumenta.plugins.abilities.mage.elementalist;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PPPeriodic;
-import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.particle.AbstractPartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class ElementalSpiritFire extends Ability {
+public class ElementalSpiritFire extends BaseElementalSpirit {
 	public static final String NAME = "Elemental Spirits";
 
 	public static final int DAMAGE_1 = 10;
@@ -45,7 +31,8 @@ public class ElementalSpiritFire extends Ability {
 	public static final double BOW_MULTIPLIER_1 = 0.25;
 	public static final double BOW_MULTIPLIER_2 = 0.4;
 	public static final double HITBOX = 1.5;
-	public static final int COOLDOWN_TICKS = 10 * Constants.TICKS_PER_SECOND;
+	public static final int COOLDOWN_TICKS = 8 * Constants.TICKS_PER_SECOND;
+	public static final EnumSet<ClassAbility> FIRE_ABILITIES = EnumSet.of(ClassAbility.ELEMENTAL_ARROWS_FIRE, ClassAbility.STARFALL, ClassAbility.MAGMA_SHIELD);
 
 	public static final String CHARM_DAMAGE = "Elemental Spirits Damage";
 	public static final String CHARM_COOLDOWN = "Elemental Spirits Cooldown";
@@ -93,168 +80,75 @@ public class ElementalSpiritFire extends Ability {
 			.cooldown(COOLDOWN_TICKS, CHARM_COOLDOWN)
 			.displayItem(Material.SUNFLOWER);
 
-	private final float mLevelDamage;
-	private final double mLevelBowMultiplier;
-	private final Set<LivingEntity> mEnemiesAffected = new HashSet<>();
-
-	private @Nullable ElementalArrows mElementalArrows;
-	private @Nullable BukkitTask mPlayerParticlesGenerator;
-	private @Nullable BukkitTask mEnemiesAffectedProcessor;
-
 	public ElementalSpiritFire(Plugin plugin, Player player) {
-		super(plugin, player, INFO);
-		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mLevelBowMultiplier = isLevelOne() ? BOW_MULTIPLIER_1 : BOW_MULTIPLIER_2;
-
-		// Task runs on the next server tick. Need to wait for entire AbilityCollection to be initialised to properly getPlayerAbility()
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			mElementalArrows = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, ElementalArrows.class);
-		});
+		super(plugin, player, INFO, FIRE_ABILITIES, DAMAGE_1, DAMAGE_2, BOW_MULTIPLIER_1, BOW_MULTIPLIER_2);
 	}
 
 	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		ClassAbility ability = event.getAbility();
-		if (ability != null && !isOnCooldown() && (ability.equals(ClassAbility.ELEMENTAL_ARROWS_FIRE) || ability.equals(ClassAbility.STARFALL) || ability.equals(ClassAbility.MAGMA_SHIELD))) {
-			mEnemiesAffected.add(event.getDamagee());
-			// 1 runnable processes everything 1 tick later, so all enemies to affect are in
-			if (mEnemiesAffectedProcessor == null) {
-				mEnemiesAffectedProcessor = new BukkitRunnable() {
-					@Override
-					public void run() {
-						mEnemiesAffectedProcessor = null;
+	protected @Nullable LivingEntity getTargetEntity() {
+		Location playerLocation = mPlayer.getLocation();
+		@Nullable LivingEntity farthestEnemy = null;
+		double farthestDistanceSquared = 0;
 
-						Location playerLocation = mPlayer.getLocation();
-						@Nullable LivingEntity farthestEnemy = null;
-						double farthestDistanceSquared = 0;
-
-						for (LivingEntity enemy : mEnemiesAffected) {
-							if (enemy.isValid()) { // If neither dead nor despawned
-								double distanceSquared = playerLocation.distanceSquared(enemy.getLocation());
-								if (distanceSquared > farthestDistanceSquared) {
-									farthestEnemy = enemy;
-									farthestDistanceSquared = distanceSquared;
-								}
-							}
-						}
-						mEnemiesAffected.clear();
-
-						if (farthestEnemy != null) {
-							putOnCooldown();
-
-							Location startLocation = LocationUtils.getHalfHeightLocation(mPlayer);
-							Location endLocation = LocationUtils.getHalfHeightLocation(farthestEnemy);
-
-							World world = mPlayer.getWorld();
-							double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, HITBOX);
-							BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), size, size, size);
-							double maxDistanceSquared = startLocation.distanceSquared(endLocation);
-							double maxDistance = Math.sqrt(maxDistanceSquared);
-							Vector vector = endLocation.clone().subtract(startLocation).toVector();
-							double increment = 0.2;
-
-							List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + size);
-							float spellDamage = ClassAbility.ELEMENTAL_ARROWS_FIRE == ability ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-							Vector vectorIncrement = vector.normalize().multiply(increment);
-
-							// Fire spirit sound
-							world.playSound(playerLocation, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 1, 0.5f);
-
-							// Damage action & particles
-							double maxIterations = maxDistance / increment * 1.1;
-							for (int i = 0; i < maxIterations; i++) {
-								Iterator<LivingEntity> iterator = potentialTargets.iterator();
-								while (iterator.hasNext()) {
-									LivingEntity potentialTarget = iterator.next();
-									if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
-										double finalDamage = spellDamage;
-										if (
-											ClassAbility.ELEMENTAL_ARROWS_FIRE.equals(ability)
-												&& mElementalArrows != null
-										) {
-											finalDamage += mElementalArrows.getLastDamage() * mLevelBowMultiplier;
-										}
-
-										DamageUtils.damage(mPlayer, potentialTarget, DamageType.MAGIC, finalDamage, mInfo.getLinkedSpell(), true);
-										iterator.remove();
-									}
-								}
-
-								// The first shift happens after the first damage attempt,
-								// unlike something like LocationUtils.travelTillObstructed().
-								// The spirit starts at the player's eyes so this could damage enemies right beside/behind them
-								movingSpiritBox.shift(vectorIncrement);
-								Location newPotentialLocation = movingSpiritBox.getCenter().toLocation(world);
-								if (playerLocation.distanceSquared(newPotentialLocation) > maxDistanceSquared) {
-									break;
-								} else {
-									// Else spawn particles at the new location and continue doing damage at this place the next tick
-									// These particles skip the first damage attempt
-									PartialParticle partialParticle = new PartialParticle(Particle.FLAME, newPotentialLocation)
-										                                  .count(4)
-										                                  .delta(PartialParticle.getWidthDelta(HITBOX))
-										                                  .extra(0.05)
-
-										                                  .spawnAsPlayerActive(mPlayer);
-									partialParticle
-										.particle(Particle.SMOKE_LARGE)
-										.spawnAsPlayerActive(mPlayer);
-								}
-							}
-						}
-					}
-				}.runTaskLater(mPlugin, 2);
+		for (LivingEntity enemy : mEnemiesAffected) {
+			if (enemy.isValid()) { // If neither dead nor despawned
+				double distanceSquared = playerLocation.distanceSquared(enemy.getLocation());
+				if (distanceSquared > farthestDistanceSquared) {
+					farthestEnemy = enemy;
+					farthestDistanceSquared = distanceSquared;
+				}
 			}
 		}
-		return false;
+		return farthestEnemy;
 	}
 
 	@Override
-	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
-		// Periodic trigger starts running again when the skill is off cooldown,
-		// which restarts these passive particles
-		if (mPlayerParticlesGenerator == null) {
-			cancelOnDeath(mPlayerParticlesGenerator = new BukkitRunnable() {
-				double mVerticalAngle = 0;
-				double mRotationAngle = 0;
-				final PPPeriodic mParticle = new PPPeriodic(Particle.FLAME, mPlayer.getLocation()).extra(0.01);
+	protected void activate(LivingEntity target, World world, double spellDamage, ItemStatManager.PlayerItemStats playerItemStats, boolean isElementalArrows) {
+		Location startLocation = LocationUtils.getHalfHeightLocation(mPlayer);
+		Location endLocation = LocationUtils.getHalfHeightLocation(target);
+		Location playerLocation = mPlayer.getLocation();
 
-				@Override
-				public void run() {
-					if (isOnCooldown()
-						    || !mPlayer.isValid() // Ensure player is not dead, is still online?
-						    || PremiumVanishIntegration.isInvisibleOrSpectator(mPlayer)) {
-						this.cancel();
-						mPlayerParticlesGenerator = null;
-					}
+		double size = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, HITBOX);
+		BoundingBox movingSpiritBox = BoundingBox.of(mPlayer.getEyeLocation(), size, size, size);
+		double maxDistanceSquared = startLocation.distanceSquared(endLocation);
+		double maxDistance = Math.sqrt(maxDistanceSquared);
+		Vector vector = endLocation.clone().subtract(startLocation).toVector();
+		double increment = 0.2;
 
-					mVerticalAngle += 5.5;
-					mRotationAngle += 10;
-					mVerticalAngle %= 360;
-					mRotationAngle %= 360;
+		List<LivingEntity> potentialTargets = EntityUtils.getNearbyMobs(playerLocation, maxDistance + size);
+		Vector vectorIncrement = vector.normalize().multiply(increment);
 
-					mParticle.location(
-							LocationUtils
-								.getHalfHeightLocation(mPlayer)
-								.add(
-									FastUtils.cos(Math.toRadians(mRotationAngle)),
-									FastUtils.sin(Math.toRadians(mVerticalAngle)) * 0.5,
-									FastUtils.sin(Math.toRadians(mRotationAngle))
-								))
-						.spawnAsPlayerPassive(mPlayer);
+		mCosmetic.fireSpiritActivate(world, playerLocation);
+
+		// Damage action & particles
+		double maxIterations = maxDistance / increment * 1.1;
+		for (int i = 0; i < maxIterations; i++) {
+			Iterator<LivingEntity> iterator = potentialTargets.iterator();
+			while (iterator.hasNext()) {
+				LivingEntity potentialTarget = iterator.next();
+				if (potentialTarget.getBoundingBox().overlaps(movingSpiritBox)) {
+					damage(potentialTarget, spellDamage, playerItemStats, isElementalArrows);
+					iterator.remove();
 				}
-			}.runTaskTimer(mPlugin, 0, 1));
+			}
+
+			// The first shift happens after the first damage attempt,
+			// unlike something like LocationUtils.travelTillObstructed().
+			// The spirit starts at the player's eyes so this could damage enemies right beside/behind them
+			movingSpiritBox.shift(vectorIncrement);
+			Location newPotentialLocation = movingSpiritBox.getCenter().toLocation(world);
+			if (playerLocation.distanceSquared(newPotentialLocation) > maxDistanceSquared) {
+				break;
+			} else {
+				// Else spawn particles at the new location and continue doing damage at this place the next tick
+				// These particles skip the first damage attempt
+				mCosmetic.fireSpiritTravel(mPlayer, newPotentialLocation, HITBOX);
+			}
 		}
 	}
 
 	@Override
-	public void invalidate() {
-		if (mPlayerParticlesGenerator != null) {
-			mPlayerParticlesGenerator.cancel();
-		}
-
-		if (mEnemiesAffectedProcessor != null) {
-			mEnemiesAffectedProcessor.cancel();
-		}
+	protected AbstractPartialParticle<?> getPeriodicParticle() {
+		return mCosmetic.getFirePeriodicParticle(mPlayer);
 	}
 }

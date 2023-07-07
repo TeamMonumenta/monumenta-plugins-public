@@ -150,7 +150,7 @@ public class TotemOfSalvation extends DepthsAbility {
 			.append(Component.text(StringUtils.to2DP(TICK_FREQUENCY[rarity - 1] / 20.0), color))
 			.append(Component.text(" second"))
 			.append(s)
-			.append(Component.text(". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION / 2 + " hearts. Healing from the totem is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s."));
+			.append(Component.text(". If a player has full health, the healing will be converted into absorption that lasts " + ABSORPTION_DURATION / 20 + " seconds and caps at " + MAX_ABSORPTION + " health. Healing from the totem is 50% more effective on allies. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 }

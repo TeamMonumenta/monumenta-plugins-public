@@ -23,23 +23,28 @@ public class ShieldWallCS implements CosmeticSkill {
 		return Material.COBBLESTONE_WALL;
 	}
 
-	public void shieldStartEffect(World world, Player mPlayer, double radius) {
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1.5f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 1, 0.8f);
-		new PartialParticle(Particle.FIREWORKS_SPARK, mPlayer.getLocation(), 70, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
+	public void shieldStartEffect(World world, Player player, Location loc, double radius) {
+		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 0.6f, 0.1f);
+		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.2f, 0.1f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.2f, 2.0f);
+		world.playSound(loc, Sound.BLOCK_GRINDSTONE_USE, SoundCategory.PLAYERS, 0.3f, 0.1f);
+		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.7f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.4f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 0.4f, 0.1f);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc, 70, 0, 0, 0, 0.3f).spawnAsPlayerActive(player);
 	}
 
-	public void shieldWallDot(Player mPlayer, Location l, double degree, double angle, int y, int height) {
-		new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsPlayerActive(mPlayer);
+	public void shieldWallDot(Player player, Location l, double degree, double angle, int y, int height) {
+		new PartialParticle(Particle.SPELL_INSTANT, l, 1, 0.1, 0.2, 0.1, 0).spawnAsPlayerActive(player);
 	}
 
-	public void shieldOnBlock(World world, Location eLoc, Player mPlayer) {
+	public void shieldOnBlock(World world, Location eLoc, Player player) {
 		world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 1.5f);
-		new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 5, 0, 0, 0, 0.25f).spawnAsPlayerActive(player);
 	}
 
-	public void shieldOnHit(World world, Location eLoc, Player mPlayer) {
+	public void shieldOnHit(World world, Location eLoc, Player player) {
 		world.playSound(eLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 1f);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, eLoc, 50, 0, 0, 0, 0.35f).spawnAsPlayerActive(player);
 	}
 }

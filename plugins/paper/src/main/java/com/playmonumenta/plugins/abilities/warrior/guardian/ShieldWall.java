@@ -100,14 +100,14 @@ public class ShieldWall extends Ability {
 		double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, SHIELD_WALL_ANGLE);
 
 		World world = mPlayer.getWorld();
-		mCosmetic.shieldStartEffect(world, mPlayer, SHIELD_WALL_RADIUS);
+		Location loc = mPlayer.getLocation();
+		mCosmetic.shieldStartEffect(world, mPlayer, loc, SHIELD_WALL_RADIUS);
 		putOnCooldown();
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 		new BukkitRunnable() {
 			int mT = 0;
-			final Location mLoc = mPlayer.getLocation();
 			final List<BoundingBox> mBoxes = new ArrayList<>();
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
@@ -121,9 +121,9 @@ public class ShieldWall extends Ability {
 					for (double degree = 0; degree < angle; degree += 10) {
 						double radian1 = Math.toRadians(degree - 0.5 * angle);
 						vec = new Vector(-FastUtils.sin(radian1) * SHIELD_WALL_RADIUS, y, FastUtils.cos(radian1) * SHIELD_WALL_RADIUS);
-						vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
+						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
-						Location l = mLoc.clone().add(vec);
+						Location l = loc.clone().add(vec);
 						if (mT % 4 == 0) {
 							mCosmetic.shieldWallDot(mPlayer, l, degree, angle, y, mHeight);
 						}
@@ -155,7 +155,7 @@ public class ShieldWall extends Ability {
 
 								//Bosses should not be affected by slowness or knockback.
 								if (shouldKnockback) {
-									MovementUtils.knockAway(mLoc, le, knockback, true);
+									MovementUtils.knockAway(loc, le, knockback, true);
 									mCosmetic.shieldOnHit(world, eLoc, mPlayer);
 								}
 							} else if (shouldKnockback && le.getNoDamageTicks() + 5 < le.getMaximumNoDamageTicks()) {

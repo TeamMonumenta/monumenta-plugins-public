@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage.arcanist;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -18,7 +16,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class CosmicMoonbladeCS implements CosmeticSkill {
 
@@ -35,18 +32,24 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 		return Material.DIAMOND_SWORD;
 	}
 
-	public void moonbladeSwingEffect(World world, Player mPlayer, Location origin, double range, int mSwings, int maxSwing) {
-		float mPitch = mSwings >= maxSwing ? 1.45f : 1.2f;
-		world.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.8f);
-		world.playSound(origin, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, mPitch);
+	public void moonbladeSwingEffect(World world, Player player, Location origin, double range, int swings, int maxSwing) {
+		float pitch = swings >= maxSwing ? 1.45f : 1.2f;
+		world.playSound(origin, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 0.1f, 2.0f);
+		world.playSound(origin, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.2f);
+		world.playSound(origin, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.3f, 2.0f);
+		world.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.0f, 0.7f);
+		world.playSound(origin, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 0.1f, 2.0f);
+		world.playSound(origin, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.75f, pitch);
+		world.playSound(origin, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.7f, 2.0f);
+		world.playSound(origin, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.8f, 2.0f);
 
 		new BukkitRunnable() {
-			final int mI = mSwings;
+			final int mI = swings;
 			double mRoll;
 			double mD = 45;
 			boolean mInit = false;
-			PPPeriodic mParticle1 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR1);
-			PPPeriodic mParticle2 = new PPPeriodic(Particle.REDSTONE, mPlayer.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR2);
+			PPPeriodic mParticle1 = new PPPeriodic(Particle.REDSTONE, player.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR1);
+			PPPeriodic mParticle2 = new PPPeriodic(Particle.REDSTONE, player.getLocation()).count(1).delta(0.1, 0.1, 0.1).data(FSWORD_COLOR2);
 
 			@Override
 			public void run() {
@@ -64,8 +67,8 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 					for (double r = 1; r < range; r += 0.5) {
 						for (double degree = mD; degree < mD + 30; degree += 5) {
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
-							mParticle1.location(l).spawnAsPlayerActive(mPlayer);
-							mParticle2.location(l).spawnAsPlayerActive(mPlayer);
+							mParticle1.location(l).spawnAsPlayerActive(player);
+							mParticle2.location(l).spawnAsPlayerActive(player);
 						}
 					}
 
@@ -75,8 +78,8 @@ public class CosmicMoonbladeCS implements CosmeticSkill {
 						for (double degree = mD; degree > mD - 30; degree -= 5) {
 							Location l = origin.clone().add(0, 1.25, 0).add(moonbladeOffset(r, degree, mRoll, origin));
 							l.setPitch(-l.getPitch());
-							mParticle1.location(l).spawnAsPlayerActive(mPlayer);
-							mParticle2.location(l).spawnAsPlayerActive(mPlayer);
+							mParticle1.location(l).spawnAsPlayerActive(player);
+							mParticle2.location(l).spawnAsPlayerActive(player);
 						}
 					}
 					mD -= 30;

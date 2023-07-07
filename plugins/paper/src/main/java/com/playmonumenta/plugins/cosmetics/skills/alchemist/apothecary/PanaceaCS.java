@@ -32,16 +32,20 @@ public class PanaceaCS implements CosmeticSkill {
 		return Material.TRIDENT;
 	}
 
-	public void castEffects(Player mPlayer, double radius) {
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 1, 1.75f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 1, 0.75f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1, 1.25f);
-		new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SPELL_WITCH, mPlayer.getLocation(), 25, 0.2, 0, 0.2, 1).spawnAsPlayerActive(mPlayer);
+	public void castEffects(Player player, double radius) {
+		Location loc = player.getLocation();
+		World world = player.getWorld();
+		world.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_UP, SoundCategory.PLAYERS, 1.0f, 0.1f);
+		world.playSound(loc, Sound.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.PLAYERS, 1.6f, 0.8f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.4f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_WITHER_AMBIENT, SoundCategory.PLAYERS, 0.2f, 0.7f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 2.0f, 0.7f);
+		new PartialParticle(Particle.SPELL_INSTANT, loc, 25, 0.2, 0, 0.2, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SPELL_WITCH, loc, 25, 0.2, 0, 0.2, 1).spawnAsPlayerActive(player);
 	}
 
-	public void projectileEffects(Player mPlayer, Location loc, double radius, int totalTicks, double moveSpeed, Vector increment) {
+	public void projectileEffects(Player player, Location loc, double radius, int totalTicks, double moveSpeed, Vector increment) {
 		double degrees = totalTicks * 12;
 		Vector vec;
 		double ratio = radius / Panacea.PANACEA_RADIUS;
@@ -52,25 +56,25 @@ public class PanaceaCS implements CosmeticSkill {
 			vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 			Location l = loc.clone().add(vec);
-			new PartialParticle(Particle.REDSTONE, l, (int) (5 * ratio * ratio), 0.1 * ratio, 0.1, 0.1 * ratio, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, l, (int) (5 * ratio * ratio), 0.1 * ratio, 0.1, 0.1 * ratio, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, (int) (5 * ratio * ratio), 0.1 * ratio, 0.1, 0.1 * ratio, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(player);
+			new PartialParticle(Particle.REDSTONE, l, (int) (5 * ratio * ratio), 0.1 * ratio, 0.1, 0.1 * ratio, APOTHECARY_DARK_COLOR).spawnAsPlayerActive(player);
 		}
-		new PartialParticle(Particle.SPELL_INSTANT, loc, (int) (5 * ratio * ratio), 0.35 * ratio, 0.35, 0.35 * ratio, 1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SPELL_WITCH, loc, (int) (5 * ratio * ratio), 0.35 * ratio, 0.35, 0.35 * ratio, 1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, loc, (int) (5 * ratio * ratio), 0.35 * ratio, 0.35, 0.35 * ratio, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SPELL_WITCH, loc, (int) (5 * ratio * ratio), 0.35 * ratio, 0.35, 0.35 * ratio, 1).spawnAsPlayerActive(player);
 	}
 
-	public void projectileReverseEffects(Player mPlayer, Location loc, double radius) {
+	public void projectileReverseEffects(Player player, Location loc, double radius) {
 	}
 
-	public void projectileEndEffects(Player mPlayer, Location loc, double radius) {
+	public void projectileEndEffects(Player player, Location loc, double radius) {
 		double ratio = radius / Panacea.PANACEA_RADIUS;
-		mPlayer.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.2f, 2.4f);
-		new PartialParticle(Particle.SPELL_INSTANT, mPlayer.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.25 * ratio, 0.5, 0.25 * ratio, 0.5).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SPELL, mPlayer.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), (int) (25 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+		player.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.2f, 2.4f);
+		new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.25 * ratio, 0.5, 0.25 * ratio, 0.5).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), (int) (25 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio, APOTHECARY_LIGHT_COLOR).spawnAsPlayerActive(player);
 	}
 
-	public void projectileHitEffects(Player mPlayer, LivingEntity hitEntity, double radius) {
+	public void projectileHitEffects(Player player, LivingEntity hitEntity, double radius) {
 	}
 
 	public void damageOverTimeEffects(LivingEntity target) {

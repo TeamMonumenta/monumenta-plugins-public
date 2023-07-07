@@ -7,12 +7,13 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.BlizzardCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -21,9 +22,6 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -80,12 +78,17 @@ public class Blizzard extends Ability {
 	private final float mLevelDamage;
 	private final float mLevelSize;
 	private final double mLevelSlowMultiplier;
+	private final int mDuration;
+
+	private final BlizzardCS mCosmetic;
 
 	public Blizzard(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mLevelSize = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_RANGE, isLevelOne() ? SIZE_1 : SIZE_2);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BlizzardCS());
 	}
 
 	public void cast() {
@@ -93,13 +96,13 @@ public class Blizzard extends Ability {
 			return;
 		}
 		putOnCooldown();
-		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 2);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.75f);
+		mCosmetic.onCast(world, mPlayer.getLocation());
 
+		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
+
 		cancelOnDeath(new BukkitRunnable() {
 			int mTicks = 0;
 
@@ -127,12 +130,9 @@ public class Blizzard extends Ability {
 					}
 				}
 
-				new PartialParticle(Particle.SNOWBALL, loc, 6, 2, 2, 2, 0.1).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CLOUD, loc, 4, 2, 2, 2, 0.05).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CLOUD, loc, 3, 0.1, 0.1, 0.1, 0.15).spawnAsPlayerActive(mPlayer);
-				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION_TICKS)
-					    || mPlugin.mAbilityManager.getPlayerAbility(mPlayer, Blizzard.class) == null
-					    || !mPlayer.isValid()) { // Ensure player is not dead, is still online?
+				mCosmetic.tick(mPlayer, loc);
+
+				if (mTicks >= mDuration) {
 					this.cancel();
 				}
 			}

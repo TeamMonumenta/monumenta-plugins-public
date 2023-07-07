@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.skills.warrior.guardian;
 
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -61,8 +58,7 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldStartEffect(World world, Player mPlayer, double radius) {
-		Location loc = mPlayer.getLocation();
+	public void shieldStartEffect(World world, Player player, Location loc, double radius) {
 		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1f, 1.35f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.6f, 0.6f);
 		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.9f, 0.75f);
@@ -73,7 +69,7 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 		PPCircle ppc = new PPCircle(Particle.REDSTONE, mCenter, 0).data(LIGHT_COLOR);
 		int rings = (int) Math.ceil(radius * 1.25);
 		for (int i = 1; i <= rings; i++) {
-			ppc.count(i * 15).radius(radius * i / rings).spawnAsPlayerActive(mPlayer);
+			ppc.count(i * 15).radius(radius * i / rings).spawnAsPlayerActive(player);
 		}
 
 		// Draw 土
@@ -83,30 +79,30 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 		ParticleUtils.drawCurve(mCenter, -units1, units1, mFront,
 			t -> 0.125,
 				t -> 0, t -> 0.625 * t / units1,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(mCenter, -units2, units2, mFront,
 			t -> -0.8,
 				t -> 0, t -> 0.75 * t / units1,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 		ParticleUtils.drawCurve(mCenter, -units2, units2, mFront,
 			t -> 0.8 * t / units2,
 				t -> 0, t -> 0,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.2, 0, 0.2, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 		);
 
 	}
 
 	@Override
-	public void shieldWallDot(Player mPlayer, Location l, double degree, double angle, int y, int height) {
+	public void shieldWallDot(Player player, Location l, double degree, double angle, int y, int height) {
 		if (goldCheck(degree / angle, 1.0 * y / height)) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(player);
 		} else {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.2, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
 		}
 		if (FastUtils.RANDOM.nextDouble() < 0.3) {
-			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
 		}
 	}
 
@@ -115,17 +111,17 @@ public class PrestigiousShieldCS extends ShieldWallCS implements PrestigeCS {
 	}
 
 	@Override
-	public void shieldOnBlock(World world, Location eLoc, Player mPlayer) {
-		new PartialParticle(Particle.SPELL_INSTANT, eLoc, 5, 0, 0, 0, 0.3f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, eLoc, 3, 0.1, 0.1, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+	public void shieldOnBlock(World world, Location eLoc, Player player) {
+		new PartialParticle(Particle.SPELL_INSTANT, eLoc, 5, 0, 0, 0, 0.3f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, eLoc, 3, 0.1, 0.1, 0.1, 0, GOLD_COLOR).spawnAsPlayerActive(player);
 		world.playSound(eLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 1.25f);
 		world.playSound(eLoc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.85f, 0.75f);
 	}
 
 	@Override
-	public void shieldOnHit(World world, Location eLoc, Player mPlayer) {
-		new PartialParticle(Particle.CLOUD, eLoc, 30, 0.2, 0.2, 0.2, 0.35f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, eLoc, 15, 0.5, 0.8, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+	public void shieldOnHit(World world, Location eLoc, Player player) {
+		new PartialParticle(Particle.CLOUD, eLoc, 30, 0.2, 0.2, 0.2, 0.35f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, eLoc, 15, 0.5, 0.8, 0.5, 0, GOLD_COLOR).spawnAsPlayerActive(player);
 		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.8f, 1.4f);
 		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.9f, 1.6f);
 		world.playSound(eLoc, Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.PLAYERS, 0.95f, 1.75f);

@@ -25,8 +25,6 @@ import com.playmonumenta.plugins.cosmetics.skills.cleric.DarkPunishmentCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.TouchOfEntropyCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.hierophant.PrestigiousBeamCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.paladin.PrestigiousInfusionCS;
-import com.playmonumenta.plugins.cosmetics.skills.mage.DarkLanceCS;
-import com.playmonumenta.plugins.cosmetics.skills.mage.HallowedLanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SanguineAegisCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.TwistedLanceCS;
 import com.playmonumenta.plugins.cosmetics.skills.mage.VolcanicBurstCS;
@@ -148,11 +146,7 @@ public class CosmeticSkills {
 		ColossalBruteCS::new,
 		GloryExecutionCS::new,
 		PrestigiousSlamCS::new,
-		PrestigiousShieldCS::new,
-
-		//Deprecated or test only
-		DarkLanceCS::new,
-		HallowedLanceCS::new
+		PrestigiousShieldCS::new
 	);
 
 	private static final ImmutableMap<String, Supplier<CosmeticSkill>> COSMETIC_SKILLS_BY_NAME = COSMETIC_SKILLS.stream()

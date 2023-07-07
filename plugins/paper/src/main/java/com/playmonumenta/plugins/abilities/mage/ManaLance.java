@@ -101,7 +101,7 @@ public class ManaLance extends MultipleChargeAbility {
 		}
 
 		mCosmetic.lanceParticle(mPlayer, startLoc, endLoc);
-		mCosmetic.lanceSound(world, mPlayer);
+		mCosmetic.lanceSound(world, mPlayer, mPlayer.getLocation());
 	}
 
 }

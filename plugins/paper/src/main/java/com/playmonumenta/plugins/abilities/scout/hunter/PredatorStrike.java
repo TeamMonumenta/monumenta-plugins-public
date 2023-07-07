@@ -81,7 +81,7 @@ public class PredatorStrike extends Ability {
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.SPECTRAL_ARROW);
 
-	private boolean mActive = false;
+	private @Nullable BukkitRunnable mDeactivationRunnable = null;
 	private final double mDistanceScale;
 	private final double mExplodeRadius;
 	private @Nullable SwiftCuts mSwiftCuts;
@@ -100,13 +100,19 @@ public class PredatorStrike extends Ability {
 	}
 
 	public void cast() {
-		if (mActive || isOnCooldown()) {
+		if (isOnCooldown()) {
 			return;
 		}
-		mActive = true;
+
+		if (mDeactivationRunnable == null) {
+			mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
+		} else {
+			mDeactivationRunnable.cancel();
+		}
+
 		ClientModHandler.updateAbility(mPlayer, this);
-		mCosmetic.strikeSoundReady(mPlayer.getWorld(), mPlayer);
-		cancelOnDeath(new BukkitRunnable() {
+
+		mDeactivationRunnable = new BukkitRunnable() {
 			int mTicks = 0;
 
 			@Override
@@ -114,21 +120,27 @@ public class PredatorStrike extends Ability {
 				mTicks++;
 				mCosmetic.strikeTick(mPlayer, mTicks);
 
-				if (!mActive || mTicks >= 20 * 5) {
-					mActive = false;
+				if (mTicks >= 20 * 5) {
 					this.cancel();
-					ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
 				}
 			}
-		}.runTaskTimer(mPlugin, 0, 1));
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mDeactivationRunnable = null;
+				ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
+			}
+		};
+		cancelOnDeath(mDeactivationRunnable.runTaskTimer(mPlugin, 0, 1));
 	}
 
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (!mActive || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
+		if (mDeactivationRunnable == null || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
 			return true;
 		}
-		mActive = false;
+		mDeactivationRunnable.cancel();
 		putOnCooldown();
 
 		if (mSwiftCuts != null && mSwiftCuts.isEnhancementActive()) {
@@ -232,6 +244,6 @@ public class PredatorStrike extends Ability {
 
 	@Override
 	public @Nullable String getMode() {
-		return mActive ? "active" : null;
+		return mDeactivationRunnable != null ? "active" : null;
 	}
 }

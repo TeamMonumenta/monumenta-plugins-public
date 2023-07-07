@@ -23,14 +23,19 @@ public class AmplifyingHexCS implements CosmeticSkill {
 		return Material.DRAGON_BREATH;
 	}
 
-	public void amplifyingParticle(Player mPlayer, Location l) {
-		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
+	public void amplifyingParticle(Player player, Location l) {
+		new PartialParticle(Particle.DRAGON_BREATH, l, 2, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(player);
 	}
 
-	public void amplifyingEffects(Player mPlayer, World world, Location soundLoc) {
-		world.playSound(soundLoc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 1.3f, 0.7f);
-		world.playSound(soundLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.3f, 0.65f);
+	public void amplifyingEffects(Player player, World world, Location soundLoc) {
+		world.playSound(soundLoc, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.4f, 0.7f);
+		world.playSound(soundLoc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 0.3f, 0.9f);
+		world.playSound(soundLoc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 2.0f, 0.6f);
+		world.playSound(soundLoc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 2.0f, 0.6f);
+		world.playSound(soundLoc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.3f, 1.4f);
+		world.playSound(soundLoc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 1.4f, 0.6f);
+		world.playSound(soundLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.6f, 0.7f);
 	}
 
 	public double amplifyingAngle(double angle, double radius) {

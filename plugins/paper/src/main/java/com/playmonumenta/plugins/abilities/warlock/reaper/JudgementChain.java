@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.JudgementChainCS;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.JudgementChainMobEffect;
@@ -20,8 +22,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -38,12 +38,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -89,9 +85,6 @@ public class JudgementChain extends Ability {
 	public static final String CHARM_RANGE = "Judgement Chain Range";
 	public static final String CHARM_DURATION = "Judgement Chain Buff Duration";
 
-	public static final Particle.DustOptions LIGHT_COLOR = new Particle.DustOptions(Color.fromRGB(217, 217, 217), 1.0f);
-	public static final Particle.DustOptions DARK_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
-
 	public static final AbilityInfo<JudgementChain> INFO =
 		new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
 			.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
@@ -121,9 +114,12 @@ public class JudgementChain extends Ability {
 	private @Nullable LivingEntity mTarget = null;
 	private boolean mChainActive = false;
 
+	private final JudgementChainCS mCosmetic;
+
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mAmplifier = BUFF_AMOUNT;
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new JudgementChainCS());
 	}
 
 	public void cast() {
@@ -190,8 +186,7 @@ public class JudgementChain extends Ability {
 						});
 					}
 				}
-				new PartialParticle(Particle.REDSTONE, selectedEnemy.getLocation(), 15, 0.5, 0.5, 0.5, 0, JudgementChain.LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.REDSTONE, selectedEnemy.getLocation(), 15, 0.5, 0.5, 0.5, 0, JudgementChain.LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+				mCosmetic.onPassDamage(mPlayer, selectedEnemy.getLocation());
 			}
 		}
 	}
@@ -205,10 +200,9 @@ public class JudgementChain extends Ability {
 
 		if (e != null) {
 			mTarget = e;
-			world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.25f);
-			world.playSound(loc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 1.75f, 1.0f);
 			mPlugin.mEffectManager.addEffect(mTarget, EFFECT_NAME, new JudgementChainMobEffect(DURATION, mPlayer, EFFECT_NAME));
 			EntityUtils.applyTaunt(mTarget, mPlayer);
+			mCosmetic.onSummonChain(world, loc);
 
 			cancelOnDeath(new BukkitRunnable() {
 				final int mRunnableDuration = DURATION;
@@ -220,24 +214,19 @@ public class JudgementChain extends Ability {
 					Location l = LocationUtils.getHalfHeightLocation(mPlayer);
 					mT++;
 					if (mTarget != null) {
-						Location mLoc = mTarget.getLocation().add(0, mTarget.getHeight() / 2, 0);
-						Vector chainVector = new Vector(mLoc.getX() - l.getX(), mLoc.getY() - l.getY(), mLoc.getZ() - l.getZ()).normalize().multiply(0.5);
-
-						new PartialParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.REDSTONE, mLoc, 1, mWidth, mWidth, mWidth, 0, DARK_COLOR).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.CRIT, mLoc, 1, mWidth, mWidth, mWidth, 0).spawnAsPlayerActive(mPlayer);
-
-						// actual chain - 1 particle per meter, and particles slowly inch towards the player
-						new PPLine(Particle.REDSTONE, l, mLoc).shift((20 - (mT % 20)) / 20.0).countPerMeter(1).delta(0.05).extra(0.075).data(DARK_COLOR).spawnAsPlayerActive(mPlayer);
+						Location targetLoc = mTarget.getLocation().add(0, mTarget.getHeight() / 2, 0);
+						mCosmetic.chain(mPlayer, l, targetLoc, mWidth, mT);
 
 						List<LivingEntity> hostiles = new ArrayList<>();
 						List<Player> players = new ArrayList<>();
 						if (isLevelTwo()) {
 							mPlugin.mEffectManager.addEffect(mPlayer, L2_RESIST_NAME, new PercentDamageReceived(20, L2_RESIST_AMOUNT));
 
-							hostiles = EntityUtils.getMobsInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH);
+							Vector chainVector = LocationUtils.getDirectionTo(targetLoc, l).multiply(0.5);
+							double dist = l.distance(targetLoc);
+							hostiles = EntityUtils.getMobsInLine(l, chainVector, dist, HITBOX_LENGTH);
 							hostiles.remove(mTarget);
-							players = EntityUtils.getPlayersInLine(l, chainVector, l.distance(mLoc), HITBOX_LENGTH, mPlayer);
+							players = EntityUtils.getPlayersInLine(l, chainVector, dist, HITBOX_LENGTH, mPlayer);
 
 						}
 						players.add(mPlayer);
@@ -263,7 +252,6 @@ public class JudgementChain extends Ability {
 
 			}.runTaskTimer(mPlugin, 0, 1));
 
-			// This loop only runs at most once!
 			putOnCooldown();
 		}
 	}
@@ -273,17 +261,13 @@ public class JudgementChain extends Ability {
 			mPlugin.mEffectManager.clearEffects(mTarget, EFFECT_NAME);
 
 			Location loc = mPlayer.getEyeLocation();
-			Location mLoc = mTarget.getLocation();
+			Location targetLoc = mTarget.getLocation();
 			World world = mPlayer.getWorld();
 
 			double effectRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_EFFECT_RANGE);
 			double damageRadius = CharmManager.getRadius(mPlayer, CHARM_RANGE, CHAIN_BREAK_DAMAGE_RANGE);
 
-			new PartialParticle(Particle.REDSTONE, loc.add(0, mPlayer.getHeight() / 2, 0), 15, effectRadius, effectRadius, effectRadius, 0.125, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.REDSTONE, loc.add(0, mPlayer.getHeight() / 2, 0), 15, effectRadius, effectRadius, effectRadius, 0.125, DARK_COLOR).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT, loc.add(0, mPlayer.getHeight() / 2, 0), 30, damageRadius, damageRadius, damageRadius, 0.125).spawnAsPlayerActive(mPlayer);
-			world.playSound(mLoc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.7f, 0.6f);
-			world.playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.6f, 0.6f);
+			mCosmetic.onBreakChain(mPlayer, world, loc, targetLoc, effectRadius, damageRadius);
 
 			List<LivingEntity> hostiles = new ArrayList<>();
 			List<Player> players = new ArrayList<>();

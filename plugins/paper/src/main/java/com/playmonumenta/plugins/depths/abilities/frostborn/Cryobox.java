@@ -135,8 +135,8 @@ public class Cryobox extends DepthsAbility {
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("When your health drops below " + StringUtils.multiplierToPercentage(TRIGGER_HEALTH) + "%, gain ")
-			.append(Component.text(ABSORPTION_HEALTH[rarity - 1] / 2, color))
-			.append(Component.text(" absorption hearts for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
+			.append(Component.text(ABSORPTION_HEALTH[rarity - 1], color))
+			.append(Component.text(" absorption health for " + DURATION / 20 + " seconds, knock enemies away, and encase yourself in a cage of ice for " + ICE_DURATION / 20 + " seconds. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

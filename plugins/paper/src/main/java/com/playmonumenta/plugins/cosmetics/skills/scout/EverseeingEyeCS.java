@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.GalleryCS;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -37,9 +34,9 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	private static final Particle.DustOptions OUTER = new Particle.DustOptions(Color.fromRGB(255, 242, 248), 1.25f);
 	private static final Particle.DustOptions BLOOD = new Particle.DustOptions(Color.fromRGB(71, 0, 2), 1.2f);
 
-	private static double EYE_ANIM_RADIUS = 2.4;
-	private static int EYE_ANIM_UNITS = 16;
-	private static int EYE_ANIM_FRAMES = 4;
+	private static final double EYE_ANIM_RADIUS = 2.4;
+	private static final int EYE_ANIM_UNITS = 16;
+	private static final int EYE_ANIM_FRAMES = 4;
 
 	@Override
 	public @Nullable List<String> getDescription() {
@@ -66,9 +63,9 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			|| mPlayer.getGameMode() == GameMode.CREATIVE;
+	public boolean isUnlocked(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, GALLERY_COMPLETE_SCB).orElse(0) >= 1
+			|| player.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -77,18 +74,18 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	}
 
 	@Override
-	public void eyeStart(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.6f, 0.6f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 1.5f, 0.5f);
-		world.playSound(mPlayer.getLocation(), Sound.AMBIENT_CRIMSON_FOREST_MOOD, SoundCategory.PLAYERS, 1.25f, 2f);
-		world.playSound(mPlayer.getLocation(), Sound.AMBIENT_WARPED_FOREST_MOOD, SoundCategory.PLAYERS, 0.75f, 2f);
+	public void eyeStart(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.6f, 0.6f);
+		world.playSound(loc, Sound.BLOCK_CONDUIT_ACTIVATE, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		world.playSound(loc, Sound.AMBIENT_CRIMSON_FOREST_MOOD, SoundCategory.PLAYERS, 1.25f, 2f);
+		world.playSound(loc, Sound.AMBIENT_WARPED_FOREST_MOOD, SoundCategory.PLAYERS, 0.75f, 2f);
 
 		new BukkitRunnable() {
 			int mFrame = 0;
 			final Vector mFront = VectorUtils.rotateTargetDirection(
-				VectorUtils.rotationToVector(mPlayer.getLocation().getYaw(), mPlayer.getLocation().getPitch()), 0, 24);
+				VectorUtils.rotationToVector(loc.getYaw(), loc.getPitch()), 0, 24);
 			final Vector mOffset = VectorUtils.rotateTargetDirection(mFront.clone(), 0, -90).multiply(3);
-			final Location mCenter = mPlayer.getEyeLocation().clone().add(mFront.clone().add(mOffset));
+			final Location mCenter = player.getEyeLocation().clone().add(mFront.clone().add(mOffset));
 
 			@Override
 			public void run() {
@@ -99,24 +96,24 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 				ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 					t -> 0,
 						t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.6, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS,
-						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(mPlayer)
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(player)
 				);
 				ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 					t -> 0,
 						t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.6, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS,
-						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(mPlayer)
+						(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, BLOOD).spawnAsPlayerActive(player)
 				);
 				if (mFrame > 0) {
 					// White part, outer
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
 							t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.45, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.8,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(mPlayer)
+							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(player)
 					);
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
 							t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.45, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.8,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(mPlayer)
+							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 3, 0, 0, 0, 0, OUTER).spawnAsPlayerActive(player)
 					);
 				}
 				if (mFrame > 1) {
@@ -124,26 +121,26 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
 							t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.3, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.55,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(mPlayer)
+							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
 							t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.3, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.55,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(mPlayer)
+							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
 							t -> FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.2, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.35,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(mPlayer)
+							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 					ParticleUtils.drawCurve(mCenter, 0, EYE_ANIM_UNITS, mFront,
 						t -> 0,
 							t -> -FastUtils.sin(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * mFrame / EYE_ANIM_FRAMES * 0.2, t -> FastUtils.cos(t * Math.PI / EYE_ANIM_UNITS) * EYE_ANIM_RADIUS * 0.35,
-							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(mPlayer)
+							(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, MIDDLE).spawnAsPlayerActive(player)
 					);
 					// Black part, inner
-					new PartialParticle(Particle.REDSTONE, mCenter, 15, 0.2, 0.2, 0.2, 0.1, INNER).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, mCenter, 15, 0.2, 0.2, 0.2, 0.1, INNER).spawnAsPlayerActive(player);
 				}
 			}
 
@@ -152,23 +149,23 @@ public class EverseeingEyeCS extends EagleEyeCS implements GalleryCS {
 	}
 
 	@Override
-	public void eyeOnTarget(World world, Player mPlayer, LivingEntity mob) {
+	public void eyeOnTarget(World world, Player player, LivingEntity mob) {
 		world.playSound(mob.getLocation(), Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.15f, 0.6f);
 		world.playSound(mob.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.PLAYERS, 0.2f, 1.5f);
-		new PartialParticle(Particle.REDSTONE, mob.getLocation().add(0, 1, 0), 25, 0.7, 0.7, 0.7, 0.05, BLOOD).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIMSON_SPORE, mob.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.005).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, mob.getLocation().add(0, 1, 0), 25, 0.7, 0.7, 0.7, 0.05, BLOOD).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIMSON_SPORE, mob.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.005).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void eyeFirstStrike(World world, Player mPlayer, LivingEntity mob) {
+	public void eyeFirstStrike(World world, Player player, LivingEntity mob) {
 		Vector offset = new Vector(0, 0.25, 2.5);
 		Location loc = mob.getLocation();
-		Location loc1 = loc.clone().add(VectorUtils.rotateYAxis(offset, mPlayer.getLocation().getYaw() + 45));
-		Location loc2 = loc.clone().add(VectorUtils.rotateYAxis(offset, mPlayer.getLocation().getYaw() + 135));
-		Location loc3 = loc.clone().add(VectorUtils.rotateYAxis(offset, mPlayer.getLocation().getYaw() + 225));
-		Location loc4 = loc.clone().add(VectorUtils.rotateYAxis(offset, mPlayer.getLocation().getYaw() + 315));
-		new PPLine(Particle.REDSTONE, loc1, loc3).shiftStart(0.25).countPerMeter(10).delta(0.125).extra(0.05).data(BLOOD).spawnAsPlayerActive(mPlayer);
-		new PPLine(Particle.REDSTONE, loc2, loc4).shiftStart(0.25).countPerMeter(10).delta(0.125).extra(0.05).data(BLOOD).spawnAsPlayerActive(mPlayer);
+		Location loc1 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 45));
+		Location loc2 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 135));
+		Location loc3 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 225));
+		Location loc4 = loc.clone().add(VectorUtils.rotateYAxis(offset, player.getLocation().getYaw() + 315));
+		new PPLine(Particle.REDSTONE, loc1, loc3).shiftStart(0.25).countPerMeter(10).delta(0.125).extra(0.05).data(BLOOD).spawnAsPlayerActive(player);
+		new PPLine(Particle.REDSTONE, loc2, loc4).shiftStart(0.25).countPerMeter(10).delta(0.125).extra(0.05).data(BLOOD).spawnAsPlayerActive(player);
 		world.playSound(mob.getLocation(), Sound.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS, 1.25f, 0.5f);
 	}
 

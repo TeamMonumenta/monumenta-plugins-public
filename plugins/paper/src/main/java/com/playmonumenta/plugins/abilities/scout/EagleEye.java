@@ -68,11 +68,9 @@ public class EagleEye extends Ability {
 
 	public EagleEye(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		// lmao
 		mVulnLevel = (isLevelOne() ? EAGLE_EYE_1_VULN_LEVEL : EAGLE_EYE_2_VULN_LEVEL) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_VULN);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new EagleEyeCS());
 		mEagleEyeTeam = mCosmetic.createTeams();
-
 	}
 
 
@@ -82,7 +80,7 @@ public class EagleEye extends Ability {
 		}
 
 		World world = mPlayer.getWorld();
-		mCosmetic.eyeStart(world, mPlayer);
+		mCosmetic.eyeStart(world, mPlayer, mPlayer.getLocation());
 
 		mEntitiesAffected = new Hitbox.SphereHitbox(mPlayer.getEyeLocation(), CharmManager.getRadius(mPlayer, CHARM_RADIUS, EAGLE_EYE_RADIUS)).getHitMobs();
 

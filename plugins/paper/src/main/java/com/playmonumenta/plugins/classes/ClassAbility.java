@@ -85,6 +85,7 @@ public enum ClassAbility {
 	VOLLEY("Volley"),
 	WIND_BOMB("Wind Bomb"),
 	HUNTING_COMPANION("Hunting Companion"),
+	SWIFT_CUTS("Swift Cuts"), //placeholder for cosmetic
 	SWIFTNESS("Swiftness"),
 
 	// Hunter

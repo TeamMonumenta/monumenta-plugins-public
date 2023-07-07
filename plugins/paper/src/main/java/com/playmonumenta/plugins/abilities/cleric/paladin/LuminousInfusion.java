@@ -90,7 +90,7 @@ public class LuminousInfusion extends Ability {
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();
-		mCosmetic.infusionStartEffect(world, mPlayer);
+		mCosmetic.infusionStartEffect(world, mPlayer, mPlayer.getLocation());
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
@@ -123,7 +123,6 @@ public class LuminousInfusion extends Ability {
 
 		boolean enemyTriggersAbilities = Crusade.enemyTriggersAbilities(enemy, mCrusade);
 
-		// Do explosion first, then bypass iframes for passive
 		if (mActive && enemyTriggersAbilities) {
 			execute(enemy);
 		}
@@ -148,7 +147,7 @@ public class LuminousInfusion extends Ability {
 		mActive = false;
 		ClientModHandler.updateAbility(mPlayer, this);
 
-		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell());
+		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell(), true);
 
 		Location loc = damagee.getLocation();
 		World world = mPlayer.getWorld();
@@ -178,9 +177,9 @@ public class LuminousInfusion extends Ability {
 				if (mDoMultiplierAndFire) {
 					EntityUtils.applyFire(Plugin.getInstance(), FIRE_DURATION_2, e, mPlayer);
 				}
-				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell());
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell(), true);
 			} else {
-				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1), mInfo.getLinkedSpell());
+				DamageUtils.damage(mPlayer, e, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_1), mInfo.getLinkedSpell(), true);
 				Crusade.addCrusadeTag(e, mCrusade);
 			}
 			MovementUtils.knockAway(loc, e, KNOCKBACK_SPEED, KNOCKBACK_SPEED / 2, true);

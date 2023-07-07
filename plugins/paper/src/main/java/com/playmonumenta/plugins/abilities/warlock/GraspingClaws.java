@@ -6,11 +6,12 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.GraspingClawsCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -24,13 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -55,7 +53,6 @@ public class GraspingClaws extends Ability {
 	private static final int CAGE_DURATION = 6 * 20;
 	private static final double HEAL_AMOUNT = 0.05;
 	private static final int CAGE_DELAY = 1 * 20;
-	private static final BlockData CHAIN_PARTICLE = Material.CHAIN.createBlockData();
 
 	public static final String CHARM_DAMAGE = "Grasping Claws Damage";
 	public static final String CHARM_COOLDOWN = "Grasping Claws Cooldown";
@@ -93,10 +90,13 @@ public class GraspingClaws extends Ability {
 	private final double mDamage;
 	private final Map<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
 
+	private final GraspingClawsCS mCosmetic;
+
 	public GraspingClaws(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mAmplifier = CharmManager.getLevelPercentDecimal(player, CHARM_SLOW) + (isLevelOne() ? AMPLIFIER_1 : AMPLIFIER_2);
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GraspingClawsCS());
 	}
 
 	public void cast() {
@@ -105,7 +105,7 @@ public class GraspingClaws extends Ability {
 		}
 		World world = mPlayer.getWorld();
 		double speed = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PROJ_SPEED, 1.5);
-		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, speed, "Grasping Claws Projectile", Particle.SPELL_WITCH);
+		Snowball proj = AbilityUtils.spawnAbilitySnowball(mPlugin, mPlayer, world, speed, mCosmetic.getProjectileName(), mCosmetic.getProjectileParticle());
 		mPlayerItemStatsMap.put(proj, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
 		putOnCooldown();
 	}
@@ -116,14 +116,7 @@ public class GraspingClaws extends Ability {
 		if (playerItemStats != null) {
 			Location loc = proj.getLocation();
 			World world = proj.getWorld();
-
-			world.playSound(loc, Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.25f, 1.25f);
-			world.playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, SoundCategory.PLAYERS, 1.25f, 1.45f);
-			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 1.25f, 0.65f);
-			new PartialParticle(Particle.PORTAL, loc, 125, 2, 2, 2, 0.25).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.PORTAL, loc, 400, 0, 0, 0, 1.45).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.DRAGON_BREATH, loc, 85, 0, 0, 0, 0.125).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.FALLING_DUST, loc, 150, 2, 2, 2, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
+			mCosmetic.onLand(mPlayer, world, loc);
 
 			int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 			for (LivingEntity mob : EntityUtils.getNearbyMobs(loc, CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS), mPlayer)) {
@@ -133,13 +126,7 @@ public class GraspingClaws extends Ability {
 			}
 
 			if (isEnhanced()) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						createCage(loc);
-						loc.getWorld().playSound(loc, Sound.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.8f, 0.9f);
-					}
-				}.runTaskLater(mPlugin, CAGE_DELAY);
+				Bukkit.getScheduler().runTaskLater(mPlugin, () -> createCage(loc), CAGE_DELAY);
 			}
 
 			proj.remove();
@@ -147,13 +134,15 @@ public class GraspingClaws extends Ability {
 	}
 
 	private void createCage(Location loc) {
+		World world = loc.getWorld();
+		mCosmetic.onCageCreation(world, loc);
+
 		new BukkitRunnable() {
 			int mT = 0;
 			final List<BoundingBox> mBoxes = new ArrayList<>();
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
 			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
 			boolean mHitboxes = false;
-			final World mWorld = loc.getWorld();
 			final double mRadius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 
 			List<Integer> mDegrees1 = new ArrayList<>();
@@ -165,49 +154,43 @@ public class GraspingClaws extends Ability {
 				mT++;
 
 				// Wall Portion (Particles + Hitbox Definition)
-				Vector vec;
-				for (int y = 0; y < 5; y++) {
-					for (double degree = 0; degree < 360; degree += 20) {
-						double radian1 = Math.toRadians(degree);
-						vec = new Vector(FastUtils.cos(radian1) * mRadius, y, FastUtils.sin(radian1) * mRadius);
-						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+				if (mT % 4 == 0) {
+					for (int y = 0; y < 5; y++) {
+						for (double degree = 0; degree < 360; degree += 20) {
+							double radian1 = Math.toRadians(degree);
+							Vector vec = new Vector(FastUtils.cos(radian1) * mRadius, y, FastUtils.sin(radian1) * mRadius);
+							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
-						Location l = loc.clone().add(vec);
-						if (mT % 4 == 0) {
-							new PartialParticle(Particle.FALLING_DUST, l, 1, 0.1, 0.2, 0.1, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
+							Location l = loc.clone().add(vec);
+							mCosmetic.cageParticle(mPlayer, loc);
+
+							if (!mHitboxes) {
+								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
+									l.clone().add(0.6, 5, 0.6)));
+							}
 						}
-						if (!mHitboxes) {
-							mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
-								l.clone().add(0.6, 5, 0.6)));
-						}
+						mHitboxes = true;
 					}
-					mHitboxes = true;
 				}
 
 				// Hitbox Detection + Knocback
 				for (BoundingBox box : mBoxes) {
-					for (Entity e : mWorld.getNearbyEntities(box)) {
-						Location eLoc = e.getLocation();
+					for (Entity e : world.getNearbyEntities(box)) {
 						if (e instanceof LivingEntity le && EntityUtils.isHostileMob(e)) {
 							// Stores mobs hit this tick
 							mMobsHitThisTick.add(le);
 							// This list does not update to the mobs hit this tick until after everything runs
 							if (!mMobsAlreadyHit.contains(le)) {
 								mMobsAlreadyHit.add(le);
-								Vector v = le.getVelocity();
 
 								if (!EntityUtils.isCCImmuneMob(e)) {
+									Location eLoc = e.getLocation();
 									if (loc.distance(eLoc) > mRadius) {
 										MovementUtils.knockAway(loc, le, 0.3f, true);
 									} else {
 										MovementUtils.pullTowards(loc, le, 0.15f);
 									}
-									mWorld.playSound(eLoc, Sound.BLOCK_CHAIN_BREAK, SoundCategory.PLAYERS, .75f, 0.8f);
-									new PartialParticle(Particle.FALLING_DUST, le.getLocation().add(0, le.getHeight() / 2, 0), 3,
-										le.getWidth() / 2, (le.getHeight() / 2) + 0.1, le.getWidth() / 2, CHAIN_PARTICLE)
-										.spawnAsPlayerActive(mPlayer);
-								} else {
-									le.setVelocity(v);
+									mCosmetic.onCagedMob(mPlayer, world, eLoc, le);
 								}
 							}
 						}
@@ -241,33 +224,7 @@ public class GraspingClaws extends Ability {
 						}
 					}
 
-					List<Integer> degreesToKeep = new ArrayList<>();
-					for (int d = 0; d < 360; d += 3) {
-						new PartialParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 0, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 5, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
-
-						if (mDegrees1.contains(d)) {
-							new PartialParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 5.5, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
-							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
-								mDegrees1.remove((Integer) d);
-							}
-						}
-
-						if (mDegrees2.contains(d)) {
-							new PartialParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 6, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
-							if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
-								mDegrees2.remove((Integer) d);
-							}
-						}
-
-						if (mDegrees3.contains(d)) {
-							new PartialParticle(Particle.FALLING_DUST, loc.clone().add(mRadius * FastUtils.cosDeg(d), 6.75, mRadius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(mPlayer);
-						}
-
-						if (FastUtils.randomDoubleInRange(0, 1) < 0.25) {
-							degreesToKeep.add(d);
-						}
-					}
+					List<Integer> degreesToKeep = mCosmetic.cageTick(mPlayer, loc, mRadius, mDegrees1, mDegrees2, mDegrees3);
 
 					mDegrees3 = new ArrayList<>(mDegrees2);
 					mDegrees2 = new ArrayList<>(mDegrees1);

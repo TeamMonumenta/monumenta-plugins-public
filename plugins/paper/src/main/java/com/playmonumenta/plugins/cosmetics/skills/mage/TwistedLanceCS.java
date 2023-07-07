@@ -42,11 +42,11 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceHitBlock(Player player, Location bLoc, World world) {
-		new PartialParticle(Particle.SMOKE_LARGE, bLoc, 25, 0, 0, 0, 0.1)
+	public void lanceHitBlock(Player player, Location loc, World world) {
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 25, 0, 0, 0, 0.1)
 			.spawnAsPlayerActive(player);
-		world.playSound(bLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
-		world.playSound(bLoc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1, 0.85f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1, 0.75f);
 	}
 
 	@Override
@@ -77,11 +77,11 @@ public class TwistedLanceCS extends ManaLanceCS {
 	}
 
 	@Override
-	public void lanceSound(World world, Player player) {
-		world.playSound(player.getLocation(), Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.3f, 0.9f);
-		world.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.75f);
-		world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.3f, 0.7f);
-		world.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.3f, 0.7f);
+	public void lanceSound(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.3f, 0.9f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.3f, 1.75f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.3f, 0.7f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.3f, 0.7f);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
-import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -46,20 +45,20 @@ public class AvalanchexCS extends AmplifyingHexCS implements DepthsCS {
 	}
 
 	@Override
-	public void amplifyingParticle(Player mPlayer, Location l) {
-		new PartialParticle(Particle.REDSTONE, l, 10, 0.25, 0.25, 0.25, 0.1, ICE_PARTICLE_COLOR).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, l, 1, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SNOWFLAKE, l, 3, 0.25, 0.25, 0.25, 0.05).spawnAsPlayerActive(mPlayer);
+	public void amplifyingParticle(Player player, Location l) {
+		new PartialParticle(Particle.REDSTONE, l, 10, 0.25, 0.25, 0.25, 0.1, ICE_PARTICLE_COLOR).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, l, 1, 0.05, 0.05, 0.05, 0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SNOWFLAKE, l, 3, 0.25, 0.25, 0.25, 0.05).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void amplifyingEffects(Player mPlayer, World world, Location soundLoc) {
+	public void amplifyingEffects(Player player, World world, Location soundLoc) {
 		world.playSound(soundLoc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.25f, 0.7f);
 		world.playSound(soundLoc, Sound.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 1.25f, 0.6f);
 		world.playSound(soundLoc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1.25f, 0.65f);
 		world.playSound(soundLoc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 1.25f, 0.65f);
 
-		ParticleUtils.drawParticleCircleExplosion(mPlayer, soundLoc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 75, 0.5f,
+		ParticleUtils.drawParticleCircleExplosion(player, soundLoc.clone().add(0, 0.15, 0), 0, 1, 0, 0, 75, 0.5f,
 			true, 0, 0, Particle.EXPLOSION_NORMAL);
 	}
 

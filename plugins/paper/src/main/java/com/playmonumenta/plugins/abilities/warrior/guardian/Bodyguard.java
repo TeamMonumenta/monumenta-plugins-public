@@ -50,9 +50,9 @@ public class Bodyguard extends Ability {
 			.shorthandName("Bg")
 			.descriptions(
 				"Left-click the air twice while looking directly at another player within 25 blocks to charge to them (cannot be used in safezones). " +
-					"Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 4 Absorption hearts for 10 seconds. " +
+					"Upon arriving, knock away all mobs within 4 blocks. Both you and the other player gain 8 absorption health for 10 seconds. " +
 					"Left-click twice while looking down to cast on yourself. Cooldown: 30s.",
-				"Absorption increased to 6 hearts. Additionally, affected mobs are stunned for 3 seconds.")
+				"Absorption increased to 12 health. Additionally, affected mobs are stunned for 3 seconds.")
 			.simpleDescription("Teleport to another player, giving them and yourself absorption and stunning nearby mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("castSelf", "cast on self or others", bg -> bg.cast(true),

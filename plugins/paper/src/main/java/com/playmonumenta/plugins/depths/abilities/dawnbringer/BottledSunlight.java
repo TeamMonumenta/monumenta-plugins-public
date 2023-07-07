@@ -172,8 +172,8 @@ public class BottledSunlight extends DepthsAbility {
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("Right click while sneaking to throw a luminescent bottle. If you or an ally walk over it, you both gain ")
-			.append(Component.text(ABSORPTION[rarity - 1] / 2, color))
-			.append(Component.text(" absorption hearts for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle is destroyed or not grabbed, it quickly comes off cooldown. Cooldown: " + COOLDOWN / 20 + "s."));
+			.append(Component.text(ABSORPTION[rarity - 1], color))
+			.append(Component.text(" absorption health for " + BOTTLE_ABSORPTION_DURATION / 20 + " seconds and the durations of negative potion effects get reduced by " + EFFECT_DURATION_REDUCTION / 20 + " seconds. If the bottle is destroyed or not grabbed, it quickly comes off cooldown. Cooldown: " + COOLDOWN / 20 + "s."));
 	}
 
 

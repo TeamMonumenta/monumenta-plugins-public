@@ -6,11 +6,12 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warlock.MelancholicLamentCS;
 import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -18,12 +19,8 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.EnumSet;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -52,8 +49,6 @@ public class MelancholicLament extends Ability {
 	public static final String CHARM_WEAKNESS = "Melancholic Lament Weakness Amplifier";
 	public static final String CHARM_RECOVERY = "Melancholic Lament Negative Effect Recovery";
 
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(235, 235, 224), 1.0f);
-
 	public static final AbilityInfo<MelancholicLament> INFO =
 		new AbilityInfo<>(MelancholicLament.class, "Melancholic Lament", MelancholicLament::new)
 			.linkedSpell(ClassAbility.MELANCHOLIC_LAMENT)
@@ -78,9 +73,12 @@ public class MelancholicLament extends Ability {
 
 	private int mEnhancementBonusDamage;
 
+	private final MelancholicLamentCS mCosmetic;
+
 	public MelancholicLament(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mWeakenEffect = CharmManager.getLevelPercentDecimal(player, CHARM_WEAKNESS) + (isLevelOne() ? WEAKEN_EFFECT_1 : WEAKEN_EFFECT_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MelancholicLamentCS());
 	}
 
 	public void cast() {
@@ -90,13 +88,7 @@ public class MelancholicLament extends Ability {
 
 		Location loc = mPlayer.getLocation();
 		World world = mPlayer.getWorld();
-
-		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.2f);
-		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.4f);
-		world.playSound(loc, Sound.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 0.6f, 0.6f);
-
-		new PartialParticle(Particle.REDSTONE, loc, 300, 8, 8, 8, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 300, 8, 8, 8, 0.125).spawnAsPlayerActive(mPlayer);
+		mCosmetic.onCast(mPlayer, world, loc);
 
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
 		Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
@@ -127,8 +119,7 @@ public class MelancholicLament extends Ability {
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_NAME, new PercentDamageDealt(ENHANCE_EFFECT_DURATION, ENHANCE_DAMAGE * numTargeting, AFFECTED_DAMAGE_TYPES));
 						mPlugin.mEffectManager.addEffect(player, ENHANCE_EFFECT_PARTICLE_NAME, new Aesthetics(ENHANCE_EFFECT_DURATION,
 								(entity, fourHertz, twoHertz, oneHertz) -> {
-									Location loc = player.getLocation().add(0, 1, 0);
-									new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 20, 0.5, 0, 0.5, 0.125).spawnAsPlayerActive(mPlayer);
+									mCosmetic.enhancementTick(player, mPlayer);
 								}, (entity) -> {
 							})
 						);
@@ -146,8 +137,7 @@ public class MelancholicLament extends Ability {
 		if (isLevelTwo()) {
 			int reductionTime = CharmManager.getDuration(mPlayer, CHARM_RECOVERY, CLEANSE_REDUCTION);
 			for (Player player : hitbox.getHitPlayers(true)) {
-				new PartialParticle(Particle.REDSTONE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125, COLOR).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.ENCHANTMENT_TABLE, player.getLocation(), 13, 0.25, 2, 0.25, 0.125).spawnAsPlayerActive(mPlayer);
+				mCosmetic.onCleanse(player, mPlayer);
 				for (PotionEffectType effectType : PotionUtils.getNegativeEffects(mPlugin, player)) {
 					PotionEffect effect = player.getPotionEffect(effectType);
 					if (effect != null) {

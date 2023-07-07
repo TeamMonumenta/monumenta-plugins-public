@@ -42,7 +42,7 @@ public class Agility extends Ability {
 			.scoreboardId("Agility")
 			.shorthandName("Agl")
 			.descriptions(
-				String.format("You gain permanent Haste %s. Your melee attacks deal +%d extra damage.", StringUtils.toRoman(AGILITY_1_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE),
+				String.format("You gain permanent Haste %s. Your melee damage is increased by +%d.", StringUtils.toRoman(AGILITY_1_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE),
 				String.format("You gain permanent Haste %s. Increase melee damage by +%d plus %d%% of final damage done.", StringUtils.toRoman(AGILITY_2_EFFECT_LVL + 1), AGILITY_BONUS_DAMAGE, (int) (SCALING_DAMAGE * 100)),
 				String.format("Breaking a spawner refreshes the cooldown of all your skills by %s%%.",
 					StringUtils.multiplierToPercentage(ENHANCEMENT_COOLDOWN_REFRESH)))

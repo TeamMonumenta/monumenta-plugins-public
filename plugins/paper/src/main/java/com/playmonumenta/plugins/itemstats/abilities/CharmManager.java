@@ -277,6 +277,7 @@ public class CharmManager {
 			PrismaticShield.CHARM_ABSORPTION,
 			PrismaticShield.CHARM_TRIGGER,
 			PrismaticShield.CHARM_COOLDOWN,
+			PrismaticShield.CHARM_RADIUS,
 			FrostNova.CHARM_DAMAGE,
 			FrostNova.CHARM_DURATION,
 			FrostNova.CHARM_RANGE,

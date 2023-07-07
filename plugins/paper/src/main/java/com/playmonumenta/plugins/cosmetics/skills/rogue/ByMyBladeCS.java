@@ -24,19 +24,27 @@ public class ByMyBladeCS implements CosmeticSkill {
 		return Material.SKELETON_SKULL;
 	}
 
-	public void bmbDamage(World world, Player mPlayer, LivingEntity enemy, int level) {
+	public void bmbDamage(World world, Player player, LivingEntity enemy, int level) {
 		Location loc = enemy.getLocation();
-		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 2.0f, 0.5f);
-		new PartialParticle(Particle.SPELL_MOB, loc, level * 15, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(mPlayer);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.1f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 2.0f, 0.1f);
+		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.7f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2.0f, 0.3f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 0.7f, 0.6f);
+		new PartialParticle(Particle.SPELL_MOB, loc, level * 15, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 	}
 
-	public void bmbDamageLv2(Player mPlayer, LivingEntity enemy) {
-		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 45, 0.2, 0.65, 0.2, 1.0).spawnAsPlayerActive(mPlayer);
+	public void bmbDamageLv2(Player player, LivingEntity enemy) {
+		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 45, 0.2, 0.65, 0.2, 1.0).spawnAsPlayerActive(player);
 	}
 
-	public void bmbHeal(Player mPlayer, Location loc) {
-		new PartialParticle(Particle.HEART, mPlayer.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(mPlayer);
+	public void bmbHeal(Player player, Location loc) {
+		new PartialParticle(Particle.HEART, player.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsPlayerActive(player);
 	}
 }
 

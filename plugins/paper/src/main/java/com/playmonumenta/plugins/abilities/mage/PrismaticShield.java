@@ -49,6 +49,7 @@ public class PrismaticShield extends Ability {
 	public static final String CHARM_STUN = "Prismatic Shield Stun Duration";
 	public static final String CHARM_DURATION = "Prismatic Shield Absorption Duration";
 	public static final String CHARM_TRIGGER = "Prismatic Shield Trigger Health";
+	public static final String CHARM_RADIUS = "Prismatic Shield Radius";
 
 	public static final AbilityInfo<PrismaticShield> INFO =
 		new AbilityInfo<>(PrismaticShield.class, "Prismatic Shield", PrismaticShield::new)
@@ -56,18 +57,18 @@ public class PrismaticShield extends Ability {
 			.scoreboardId("Prismatic")
 			.shorthandName("PS")
 			.descriptions(
-				String.format("When your health drops below %s hearts you receive %s Absorption hearts which lasts up to %ss." +
+				String.format("When your health drops below %s hearts you receive %s absorption health which lasts up to %ss." +
 					              " If damage taken would kill you but could have been prevented by up to %s times this skill's absorption, it will save you from death." +
 					              " In addition enemies within %s blocks are knocked back. Cooldown: %ss.",
 					TRIGGER_HEALTH / 2,
-					ABSORPTION_HEALTH_1 / 2,
+					ABSORPTION_HEALTH_1,
 					DURATION / 20,
 					OVERKILL_PROTECTION_MULTIPLIER,
 					(int) RADIUS,
 					COOLDOWN / 20
 				),
-				String.format("The shield is improved to %s Absorption hearts. Enemies within %s blocks are knocked back and stunned for %ss.",
-					ABSORPTION_HEALTH_2 / 2,
+				String.format("The shield is improved to %s absorption health. Enemies within %s blocks are knocked back and stunned for %ss.",
+					ABSORPTION_HEALTH_2,
 					(int) RADIUS,
 					STUN_DURATION / 20),
 				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
@@ -80,7 +81,8 @@ public class PrismaticShield extends Ability {
 			.displayItem(Material.SHIELD)
 			.priorityAmount(10000);
 
-	private final int mAbsorptionHealth;
+	private final double mAbsorptionHealth;
+	private final double mRadius;
 
 	private int mLastActivation = -1;
 	private final Set<ClassAbility> mHealedFromAbilitiesThisTick = new HashSet<>();
@@ -90,7 +92,8 @@ public class PrismaticShield extends Ability {
 
 	public PrismaticShield(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mAbsorptionHealth = (int) CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
+		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(player, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
+		mRadius = CharmManager.getRadius(player, CHARM_RADIUS, RADIUS);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new PrismaticShieldCS());
 	}
 
@@ -122,7 +125,7 @@ public class PrismaticShield extends Ability {
 				mHealedFromBlizzard = false;
 
 				// Conditions match - prismatic shield
-				Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), RADIUS);
+				Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mRadius);
 				for (LivingEntity mob : hitbox.getHitMobs()) {
 					float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK_SPEED);
 					MovementUtils.knockAway(mPlayer, mob, knockback, true);
@@ -134,7 +137,7 @@ public class PrismaticShield extends Ability {
 
 				AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionHealth, mAbsorptionHealth, CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION));
 				World world = mPlayer.getWorld();
-				mCosmetic.prismaEffect(world, mPlayer, RADIUS);
+				mCosmetic.prismaEffect(world, mPlayer, mPlayer.getLocation(), mRadius);
 				sendActionBarMessage("Prismatic Shield has been activated");
 
 				if (dealDamageLater) {

@@ -1,9 +1,7 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -13,9 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class DivineJusticeCS implements CosmeticSkill {
 
@@ -40,7 +38,7 @@ public class DivineJusticeCS implements CosmeticSkill {
 		return HEAL_PITCH_OTHER;
 	}
 
-	public void justiceOnDamage(Player mPlayer, LivingEntity enemy, double widerWidthDelta, int combo) {
+	public void justiceOnDamage(Player player, LivingEntity enemy, World world, Location enemyLoc, double widerWidthDelta, int combo) {
 		PartialParticle partialParticle = new PartialParticle(
 			Particle.END_ROD,
 			LocationUtils.getHalfHeightLocation(enemy),
@@ -49,20 +47,17 @@ public class DivineJusticeCS implements CosmeticSkill {
 			PartialParticle.getHeightDelta(enemy),
 			widerWidthDelta,
 			0.05
-		).spawnAsPlayerActive(mPlayer);
+		).spawnAsPlayerActive(player);
 		partialParticle.mParticle = Particle.FLAME;
-		partialParticle.spawnAsPlayerActive(mPlayer);
+		partialParticle.spawnAsPlayerActive(player);
 
-		mPlayer.getWorld().playSound(
-			enemy.getLocation(),
-			Sound.BLOCK_ANVIL_LAND,
-			SoundCategory.PLAYERS,
-			0.15f,
-			1.5f
-		);
+		world.playSound(enemyLoc, Sound.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 0.2f, 1.5f);
+		world.playSound(enemyLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 0.5f, 2.0f);
+		world.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.0f, 0.8f);
+		world.playSound(enemyLoc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 0.5f, 1.2f);
 	}
 
-	public void justiceKill(Player mPlayer, Location loc) {
+	public void justiceKill(Player player, Location loc) {
 
 	}
 
