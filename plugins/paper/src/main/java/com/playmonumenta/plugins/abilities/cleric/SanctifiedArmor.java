@@ -15,6 +15,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -33,6 +36,8 @@ public class SanctifiedArmor extends Ability {
 
 	private static final double MAX_PERCENT_DAMAGE_1 = 0.15;
 	private static final double MAX_PERCENT_DAMAGE_2 = 0.25;
+	private static final double MIN_HEALTH_PERCENT_1 = 0.7;
+	private static final double MIN_HEALTH_PERCENT_2 = 0.6;
 	private static final int DAMAGE_COOLDOWN_1 = 3 * 20;
 	private static final int DAMAGE_COOLDOWN_2 = 2 * 20;
 	private static final double SLOWNESS_AMPLIFIER_2 = 0.2;
@@ -40,13 +45,13 @@ public class SanctifiedArmor extends Ability {
 	private static final float KNOCKBACK_SPEED = 0.4f;
 	private static final String ENHANCEMENT_EFFECT_NAME = "SanctifiedArmorHealEffect";
 
-	private static final double L1_DAMAGE_CAP_R1 = 30;
-	private static final double L1_DAMAGE_CAP_R2 = 60;
-	private static final double L1_DAMAGE_CAP_R3 = 120;
+	private static final int L1_DAMAGE_CAP_R1 = 30;
+	private static final int L1_DAMAGE_CAP_R2 = 60;
+	private static final int L1_DAMAGE_CAP_R3 = 120;
 
-	private static final double L2_DAMAGE_CAP_R1 = 50;
-	private static final double L2_DAMAGE_CAP_R2 = 100;
-	private static final double L2_DAMAGE_CAP_R3 = 200;
+	private static final int L2_DAMAGE_CAP_R1 = 50;
+	private static final int L2_DAMAGE_CAP_R2 = 100;
+	private static final int L2_DAMAGE_CAP_R3 = 200;
 
 	public static final String CHARM_DAMAGE = "Sanctified Armor Damage";
 	public static final String CHARM_SLOW = "Sanctified Armor Slowness Amplifier";
@@ -58,21 +63,41 @@ public class SanctifiedArmor extends Ability {
 			.scoreboardId("Sanctified")
 			.shorthandName("Sa")
 			.descriptions(
-				"Whenever you are damaged by melee or projectile hits from an undead enemy, deals up to a maximum of 15% of the undead's max health." +
-					" For every 1% health you are missing, Sanctified Armor deals 1% less max health damage." +
-					" Damage is capped based on current region (R1 30/R2 60/R3 120 damage)." +
-					" Cooldown: 3s",
-				"Deals up to 25% of the undead's max health as true damage (Capped at R1 50/R2 100/R3 200 damage) instead," +
-					" and the undead enemy is also afflicted with 20% Slowness for 3 seconds." +
-					" Cooldown: 2s",
+				("Whenever you are damaged by melee or projectile hits from an undead enemy, deal true damage to the undead based on its max health." +
+					" For every 1%% health the Cleric has above %s%% max health, deal 1%% of the undead's max health, up to a maximum of %s%%." +
+					" Damage is capped based on current region (R1 %d/R2 %d/R3 %d damage)." +
+					" This can only affect each mob once every %ss.")
+					.formatted(
+						StringUtils.multiplierToPercentage(MIN_HEALTH_PERCENT_1),
+						StringUtils.multiplierToPercentage(MAX_PERCENT_DAMAGE_1),
+						L1_DAMAGE_CAP_R1,
+						L1_DAMAGE_CAP_R2,
+						L1_DAMAGE_CAP_R3,
+						StringUtils.ticksToSeconds(DAMAGE_COOLDOWN_1)
+					),
+				("The Cleric's health threshold is reduced to %s%%, and up to %s%% of the undead's max health can be dealt" +
+					" (Capped at R1 %d/R2 %d/R3 %d damage). The undead enemy is also afflicted with %s%% Slowness for" +
+					" %ss. This can only affect each mob once every %ss.")
+					.formatted(
+						StringUtils.multiplierToPercentage(MIN_HEALTH_PERCENT_2),
+						StringUtils.multiplierToPercentage(MAX_PERCENT_DAMAGE_2),
+						L2_DAMAGE_CAP_R1,
+						L2_DAMAGE_CAP_R2,
+						L2_DAMAGE_CAP_R3,
+						StringUtils.multiplierToPercentage(SLOWNESS_AMPLIFIER_2),
+						StringUtils.ticksToSeconds(SLOWNESS_DURATION),
+						StringUtils.ticksToSeconds(DAMAGE_COOLDOWN_2)
+					),
 				"If the most recently affected mob is killed by any means other than Sanctified Armor or Thorns damage, regain half the health lost from the last damage taken.")
 			.simpleDescription("When taking damage from an Undead enemy, deal damage back based on your current health.")
-			.cooldown(DAMAGE_COOLDOWN_1, DAMAGE_COOLDOWN_2)
 			.displayItem(Material.IRON_CHESTPLATE)
 			.priorityAmount(5000); // after all damage modifiers, but before lifelines, to get the proper final damage
 
 	private final double mMaxPercentDamage;
+	private final double mMinHealthPercent;
 	private final double mDamageCap;
+	private final double mCooldown;
+	private final Map<UUID, Integer> mMobsIframeMap;
 
 	private @Nullable UUID mLastAffectedMob = null;
 	private double mLastDamage;
@@ -84,11 +109,14 @@ public class SanctifiedArmor extends Ability {
 	public SanctifiedArmor(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mMaxPercentDamage = isLevelOne() ? MAX_PERCENT_DAMAGE_1 : MAX_PERCENT_DAMAGE_2;
+		mMinHealthPercent = isLevelOne() ? MIN_HEALTH_PERCENT_1 : MIN_HEALTH_PERCENT_2;
+		mCooldown = isLevelOne() ? DAMAGE_COOLDOWN_1 : DAMAGE_COOLDOWN_2;
 		if (isLevelOne()) {
 			mDamageCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? L1_DAMAGE_CAP_R3 : (ServerProperties.getClassSpecializationsEnabled(player) ? L1_DAMAGE_CAP_R2 : L1_DAMAGE_CAP_R1);
 		} else {
 			mDamageCap = ServerProperties.getAbilityEnhancementsEnabled(player) ? L2_DAMAGE_CAP_R3 : (ServerProperties.getClassSpecializationsEnabled(player) ? L2_DAMAGE_CAP_R2 : L2_DAMAGE_CAP_R1);
 		}
+		mMobsIframeMap = new HashMap<>();
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new SanctifiedArmorCS());
 
@@ -113,11 +141,23 @@ public class SanctifiedArmor extends Ability {
 			}
 
 			if (!event.isBlocked()) {
+				// iframes
+				mMobsIframeMap.values().removeIf(tick -> tick + mCooldown < Bukkit.getServer().getCurrentTick());
+
+				if (mMobsIframeMap.containsKey(source.getUniqueId())) {
+					return;
+				}
+
 				processDamage(event, source);
 
 				// Update this separately as this is based on any last damage taken. Cooldowns does make this skill a bit weirder.
 				if (isEnhanced() && source.isValid()) {
 					mLastDamage = event.getFinalDamage(false);
+				}
+
+				// add mob to iframe map after all damage stuff
+				if (!source.isDead() && source.isValid()) {
+					mMobsIframeMap.put(source.getUniqueId(), Bukkit.getServer().getCurrentTick());
 				}
 			}
 		}
@@ -135,13 +175,9 @@ public class SanctifiedArmor extends Ability {
 	}
 
 	public void processDamage(DamageEvent event, LivingEntity entity) {
-		if (isOnCooldown()) {
-			return;
-		}
-
 		double maxHealth = EntityUtils.getMaxHealth(entity);
-		double playerMissingHPPercent = (EntityUtils.getMaxHealth(mPlayer) - mPlayer.getHealth()) / EntityUtils.getMaxHealth(mPlayer);
-		double percentDamage = Math.max(0, mMaxPercentDamage - playerMissingHPPercent);
+		double playerHPPercent = mPlayer.getHealth() / EntityUtils.getMaxHealth(mPlayer);
+		double percentDamage = Math.min(mMaxPercentDamage, Math.max(0, playerHPPercent - mMinHealthPercent));
 		double charmDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, percentDamage * maxHealth);
 		double damage = Math.min(charmDamage, mDamageCap);
 
@@ -158,8 +194,6 @@ public class SanctifiedArmor extends Ability {
 				}
 				mLastAffectedMob = entity.getUniqueId();
 			}
-
-			putOnCooldown();
 		}
 	}
 }
