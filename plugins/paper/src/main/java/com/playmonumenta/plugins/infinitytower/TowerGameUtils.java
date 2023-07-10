@@ -319,7 +319,7 @@ public class TowerGameUtils {
 		}
 
 		if (floor >= 50) {
-			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [{\"text\":\"" + game.mPlayer.mPlayer.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":false},{\"text\":\" has beaten Plunderer's Blitz (round reached: " + (floor + 1) + ")\",\"color\":\"white\",\"italic\":\"true\",\"bold\":false}]");
+			MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [{\"text\":\"" + game.mPlayer.mPlayer.getName() + "\",\"color\":\"gold\",\"bold\":true,\"italic\":false},{\"text\":\" has beaten Plunderer's Blitz (round reached: " + (floor + 1) + ")\",\"color\":\"white\",\"italic\":\"true\",\"bold\":false}]");
 		}
 
 		if (floor > 50) {

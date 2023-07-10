@@ -1335,7 +1335,7 @@ public class DepthsManager {
 						party.populateLootRoom(player, false);
 						int depthsWins = ScoreboardUtils.getScoreboardValue(player, "Depths").orElse(0);
 						if (depthsWins == 0) {
-							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
+							MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"" + player.getName() + "\",\"color\":\"gold\",\"bold\":false,\"italic\":true},{\"text\":\" defeated the Darkest Depths for the first time!\",\"color\":\"white\",\"italic\":true,\"bold\":false}]");
 						} else {
 							Bukkit.getServer().sendMessage(Component.empty()
 								.append(Component.text(player.getName(), NamedTextColor.GOLD, TextDecoration.ITALIC))

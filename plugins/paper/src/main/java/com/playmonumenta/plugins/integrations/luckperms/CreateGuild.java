@@ -148,7 +148,7 @@ public class CreateGuild {
 					}
 
 					try {
-						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
+						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
 					} catch (Exception e) {
 						sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
 					}
