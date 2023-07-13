@@ -726,7 +726,7 @@ public class PEBCustomInventory extends CustomInventory {
 		String objectiveName = Objects.requireNonNull(category.mObjectiveName);
 		return new PebItem(slot, gui -> category.mDisplayName + ": " + ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100) + "%",
 			gui -> description + ". Left click to increase, right click to decrease. Hold shift to increase/decrease in smaller steps.", NamedTextColor.GRAY,
-			material, false).switchToPage(PebPage.GAMEPLAY_OPTIONS)
+			material, false).switchToPage(PebPage.PARTIAL_PARTICLES)
 			       .action((gui, event) -> {
 				       int value = ScoreboardUtils.getScoreboardValue(gui.mPlayer, objectiveName).orElse(100);
 				       value += (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 5 : 20);
