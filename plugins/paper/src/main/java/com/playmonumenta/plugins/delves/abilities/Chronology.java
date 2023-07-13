@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.delves.abilities;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.utils.FastUtils;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -21,8 +22,8 @@ public class Chronology {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					spawner.setDelay(Math.max(1, (spawner.getMaxSpawnDelay() + spawner.getMinSpawnDelay()) / 4 - 5));
-					spawner.update();
+					spawner.setDelay(Math.max(1, FastUtils.RANDOM.nextInt(spawner.getMinSpawnDelay(), spawner.getMaxSpawnDelay() + 1) / 2 - 5));
+					spawner.update(false, false);
 				}
 			}.runTaskLater(Plugin.getInstance(), 5);
 

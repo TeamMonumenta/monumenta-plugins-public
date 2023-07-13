@@ -286,6 +286,7 @@ public class Plugin extends JavaPlugin {
 		ChargeUpBarCommand.register(this);
 		BoatUtilsCommand.register();
 		AttributeModifierCommand.register();
+		RegisterTorch.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -460,6 +461,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(StatTrackManager.getInstance(), this);
 		manager.registerEvents(new PotionBarrelListener(), this);
 		manager.registerEvents(TemporaryBlockChangeManager.INSTANCE, this);
+		manager.registerEvents(new TorchListener(), this);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);

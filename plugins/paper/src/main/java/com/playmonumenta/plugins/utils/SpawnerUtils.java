@@ -9,17 +9,28 @@ import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
 import de.tr7zw.nbtapi.NBTTileEntity;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Marker;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,6 +62,16 @@ public class SpawnerUtils {
 	public static final String SHIELDS_ATTRIBUTE = "Shields";
 	public static final String LOS_POOL_ATTRIBUTE = "LoSPool";
 	public static final String BREAK_ACTIONS_ATTRIBUTE = "BreakActions";
+
+	private static final NamespacedKey ORIGINAL_MAX_DELAY = NamespacedKeyUtils.fromString("original_max_delay");
+	private static final NamespacedKey ORIGINAL_MIN_DELAY = NamespacedKeyUtils.fromString("original_min_delay");
+	private static final NamespacedKey LAST_MULTIPLIER = NamespacedKeyUtils.fromString("last_multiplier");
+	private static final NamespacedKey TORCH_LOCATIONS = NamespacedKeyUtils.fromString("spawner_torches");
+	private static final NamespacedKey X = NamespacedKeyUtils.fromString("x");
+	private static final NamespacedKey Y = NamespacedKeyUtils.fromString("y");
+	private static final NamespacedKey Z = NamespacedKeyUtils.fromString("z");
+	private static final int MAX_TORCH_TAXICAB_DISTANCE = 8;
+	private static final double SPAWNER_DELAY_MULTIPLIER_CAP = 10;
 
 	/**
 	 * Returns true if the damage is enough to break the spawner.
@@ -420,5 +441,129 @@ public class SpawnerUtils {
 				marker.remove();
 			}
 		});
+	}
+
+	public static void addTorch(Block block) {
+		List<CreatureSpawner> spawners = getNearbySpawners(block);
+		for (CreatureSpawner spawner : spawners) {
+			if (addTorchToSpawner(spawner, block)) {
+				updateSpawnDelay(spawner);
+			}
+		}
+	}
+
+	public static void removeTorch(Block block) {
+		List<CreatureSpawner> spawners = getNearbySpawners(block);
+		for (CreatureSpawner spawner : spawners) {
+			if (filterTorchesFromSpawner(spawner)) {
+				updateSpawnDelay(spawner);
+			}
+		}
+	}
+
+	private static List<CreatureSpawner> getNearbySpawners(Block block) {
+		List<CreatureSpawner> spawners = new ArrayList<>();
+		for (int x = -16; x <= 16; x += 16) {
+			for (int z = -16; z <= 16; z += 16) {
+				Chunk chunk = block.getLocation().clone().add(x, 0, z).getChunk();
+				if (!chunk.isLoaded()) {
+					continue;
+				}
+				chunk.getTileEntities();
+				spawners.addAll(chunk.getTileEntities(b -> BlockUtils.taxiCabDistance(block, b) <= MAX_TORCH_TAXICAB_DISTANCE, true).stream().filter(b -> b instanceof CreatureSpawner).map(b -> (CreatureSpawner) b).toList());
+			}
+		}
+		return spawners;
+	}
+
+	private static boolean addTorchToSpawner(CreatureSpawner spawner, Block torch) {
+		if (BlockUtils.findNonOccludingTaxicabDistance(torch, spawner.getBlock(), MAX_TORCH_TAXICAB_DISTANCE) >= 0) {
+			List<Block> torches = getTorches(spawner);
+			torches.add(torch);
+			setTorches(spawner, torches);
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean filterTorchesFromSpawner(CreatureSpawner spawner) {
+		List<Block> torches = getTorches(spawner);
+		int count = torches.size();
+		torches.removeIf(b -> !BlockUtils.isTorch(b));
+		if (torches.size() < count) {
+			setTorches(spawner, torches);
+			return true;
+		}
+		return false;
+	}
+
+	private static List<Block> getTorches(CreatureSpawner spawner) {
+		World world = spawner.getWorld();
+		PersistentDataContainer[] containers = getTorchContainers(spawner);
+		return new ArrayList<>(Arrays.stream(containers).map(c -> getBlockFromContainer(c, world)).toList());
+	}
+
+	private static PersistentDataContainer[] getTorchContainers(CreatureSpawner spawner) {
+		return spawner.getPersistentDataContainer().getOrDefault(TORCH_LOCATIONS, PersistentDataType.TAG_CONTAINER_ARRAY, new PersistentDataContainer[]{});
+	}
+
+	private static void setTorches(CreatureSpawner spawner, List<Block> torches) {
+		PersistentDataContainer persistentDataContainer = spawner.getPersistentDataContainer();
+		PersistentDataAdapterContext context = persistentDataContainer.getAdapterContext();
+		persistentDataContainer.set(TORCH_LOCATIONS, PersistentDataType.TAG_CONTAINER_ARRAY,
+			torches.stream().map(b -> getContainerFromBlock(b, context)).toArray(PersistentDataContainer[]::new));
+	}
+
+	private static Block getBlockFromContainer(PersistentDataContainer c, World world) {
+		return new Location(world, Objects.requireNonNull(c.get(X, PersistentDataType.INTEGER)), Objects.requireNonNull(c.get(Y, PersistentDataType.INTEGER)), Objects.requireNonNull(c.get(Z, PersistentDataType.INTEGER))).getBlock();
+	}
+
+	private static PersistentDataContainer getContainerFromBlock(Block b, PersistentDataAdapterContext context) {
+		PersistentDataContainer container = context.newPersistentDataContainer();
+		container.set(X, PersistentDataType.INTEGER, b.getX());
+		container.set(Y, PersistentDataType.INTEGER, b.getY());
+		container.set(Z, PersistentDataType.INTEGER, b.getZ());
+		return container;
+	}
+
+	private static void updateSpawnDelay(CreatureSpawner spawner) {
+		PersistentDataContainer persistentDataContainer = spawner.getPersistentDataContainer();
+		// Initialize the default values of the max and min delay
+		int originalMaxDelay;
+		if (!persistentDataContainer.has(ORIGINAL_MAX_DELAY)) {
+			originalMaxDelay = spawner.getMaxSpawnDelay();
+			persistentDataContainer.set(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER, originalMaxDelay);
+		} else {
+			originalMaxDelay = Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MAX_DELAY, PersistentDataType.INTEGER));
+		}
+
+		int originalMinDelay;
+		if (!persistentDataContainer.has(ORIGINAL_MIN_DELAY)) {
+			originalMinDelay = spawner.getMinSpawnDelay();
+			persistentDataContainer.set(ORIGINAL_MIN_DELAY, PersistentDataType.INTEGER, originalMinDelay);
+		} else {
+			originalMinDelay = Objects.requireNonNull(persistentDataContainer.get(ORIGINAL_MIN_DELAY, PersistentDataType.INTEGER));
+		}
+
+		double lastMultiplier = !persistentDataContainer.has(LAST_MULTIPLIER) ? 1 : Objects.requireNonNull(persistentDataContainer.get(LAST_MULTIPLIER, PersistentDataType.DOUBLE));
+
+		Block spawnerBlock = spawner.getBlock();
+		double multiplier = 1;
+		List<Block> torches = getTorches(spawner);
+		for (Block torch : torches) {
+			int distance = BlockUtils.findNonOccludingTaxicabDistance(torch, spawnerBlock, MAX_TORCH_TAXICAB_DISTANCE);
+			if (distance <= 0) {
+				continue;
+			}
+			multiplier = Math.min(SPAWNER_DELAY_MULTIPLIER_CAP, (multiplier * (distance + 1)) / distance);
+		}
+
+		double multiplierRatio = multiplier / lastMultiplier;
+		persistentDataContainer.set(LAST_MULTIPLIER, PersistentDataType.DOUBLE, multiplier);
+
+		spawner.setMaxSpawnDelay((int) (originalMaxDelay * multiplier));
+		spawner.setMinSpawnDelay((int) (originalMinDelay * multiplier));
+		spawner.setDelay((int) (spawner.getDelay() * multiplierRatio));
+		spawner.update(false, false);
 	}
 }

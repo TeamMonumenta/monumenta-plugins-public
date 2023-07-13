@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.utils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.bukkit.Location;
@@ -15,6 +19,7 @@ import org.bukkit.block.data.Rail;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockUtils {
 	private static final Set<Material> ALT_WATER_SOURCES = Set.of(
@@ -102,6 +107,15 @@ public class BlockUtils {
 		Material.DAMAGED_ANVIL
 	);
 
+	public static final EnumSet<Material> TORCHES = EnumSet.of(
+		Material.TORCH,
+		Material.WALL_TORCH
+	);
+
+	public static boolean isLosBlockingBlock(Block block) {
+		return isLosBlockingBlock(block.getType());
+	}
+
 	public static boolean isLosBlockingBlock(Material mat) {
 		return mat.isOccluding();
 	}
@@ -168,6 +182,10 @@ public class BlockUtils {
 		return data instanceof Rail;
 	}
 
+	public static boolean isTorch(Block block) {
+		return TORCHES.contains(block.getType());
+	}
+
 	public static BlockFace getCardinalBlockFace(Entity entity) {
 		return getCardinalBlockFace(entity.getLocation().getDirection());
 	}
@@ -181,5 +199,78 @@ public class BlockUtils {
 
 	public static Location getCenterBlockLocation(Block block) {
 		return block.getLocation().add(0.5, 0.5, 0.5);
+	}
+
+	public static int taxiCabDistance(Block block1, Block block2) {
+		return Math.abs(block2.getX() - block1.getX()) + Math.abs(block2.getY() - block1.getY()) + Math.abs(block2.getZ() - block1.getZ());
+	}
+
+	private static class Node {
+		private final Block mBlock;
+		private int mDistanceTo;
+		private final int mDistanceFrom;
+
+		private Node(Block block, @Nullable Node parent, Block end) {
+			mBlock = block;
+			if (parent == null) {
+				mDistanceTo = 0;
+			} else {
+				mDistanceTo = parent.mDistanceTo + 1;
+			}
+			mDistanceFrom = taxiCabDistance(block, end);
+		}
+
+		private int getHeuristic() {
+			return mDistanceTo + mDistanceFrom;
+		}
+
+		private void updateParentIfImprovement(Node newParent) {
+			if (newParent.mDistanceTo + 1 < mDistanceTo) {
+				mDistanceTo = newParent.mDistanceTo + 1;
+			}
+		}
+	}
+
+	public static int findNonOccludingTaxicabDistance(Block start, Block end, int maxTaxiCabDistance) {
+		Map<Block, Node> evaluatedNodes = new HashMap<>();
+		evaluatedNodes.put(start, new Node(start, null, end));
+		List<Block> visitedBlocks = new ArrayList<>();
+
+		// In theory there can be many more, but it's unlikely we can't find a path in n^2 iterations if one exists
+		for (int i = 0; i < maxTaxiCabDistance * maxTaxiCabDistance; i++) {
+			if (evaluatedNodes.isEmpty()) {
+				return -1;
+			}
+			Node current = evaluatedNodes.values().stream().min(Comparator.comparingInt(Node::getHeuristic)).get();
+			if (current.mBlock.equals(end)) {
+				return current.getHeuristic();
+			}
+			if (current.getHeuristic() > maxTaxiCabDistance) {
+				// The best path is not short enough in the best case scenario
+				return -1;
+			}
+			evaluatedNodes.remove(current.mBlock);
+			visitedBlocks.add(current.mBlock);
+
+			for (BlockFace bf : List.of(BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN)) {
+				Block check = current.mBlock.getRelative(bf);
+				if (check.equals(end)) {
+					// The heuristic at the end will always be equal to the penultimate block
+					return current.getHeuristic();
+				}
+				if (isLosBlockingBlock(check) || visitedBlocks.contains(check)) {
+					continue;
+				}
+
+				Node node = evaluatedNodes.get(check);
+				if (node == null) {
+					evaluatedNodes.put(check, new Node(check, current, end));
+				} else {
+					node.updateParentIfImprovement(current);
+				}
+			}
+		}
+
+		return -1;
 	}
 }
