@@ -14,13 +14,12 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 public class ProjectileBoss extends BossAbilityGroup {
@@ -80,6 +79,9 @@ public class ProjectileBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Delay on each single cast between sound_start and the actual cast of the projectile")
 		public int SPELL_DELAY = Integer.MAX_VALUE;
+
+		@BossParam(help = "The glowing color")
+		public String COLOR = "red";
 
 		@BossParam(help = "Let you choose the targets of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
@@ -177,7 +179,7 @@ public class ProjectileBoss extends BossAbilityGroup {
 				},
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.SPELL_DELAY, 0));
+					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.SPELL_DELAY);
 					p.SOUND_START.play(loc);
 				},
 				// Launch Aesthetic

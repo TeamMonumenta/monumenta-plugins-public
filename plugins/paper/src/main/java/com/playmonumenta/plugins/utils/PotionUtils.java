@@ -4,10 +4,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.events.PotionEffectApplyEvent;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
@@ -34,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PotionUtils {
 	private static final int SECONDS_1 = 20;
-	private static final int SECONDS_22_HALF = (int)(22.5 * SECONDS_1);
+	private static final int SECONDS_22_HALF = (int) (22.5 * SECONDS_1);
 	private static final int SECONDS_30 = 30 * SECONDS_1;
 	private static final int SECONDS_45 = 45 * SECONDS_1;
 	private static final int MINUTES_1 = 60 * SECONDS_1;
@@ -44,37 +46,37 @@ public class PotionUtils {
 	private static final int MINUTES_8 = MINUTES_1 * 8;
 
 	private static final ImmutableSet<PotionEffectType> POSITIVE_EFFECTS = ImmutableSet.of(
-		PotionEffectType.ABSORPTION,
-		PotionEffectType.DAMAGE_RESISTANCE,
-		PotionEffectType.FAST_DIGGING,
-		PotionEffectType.FIRE_RESISTANCE,
-		PotionEffectType.HEAL,
-		PotionEffectType.HEALTH_BOOST,
-		PotionEffectType.INCREASE_DAMAGE,
-		PotionEffectType.INVISIBILITY,
-		PotionEffectType.JUMP,
-		PotionEffectType.NIGHT_VISION,
-		PotionEffectType.REGENERATION,
-		PotionEffectType.SATURATION,
-		PotionEffectType.SPEED,
-		PotionEffectType.LUCK,
-		PotionEffectType.WATER_BREATHING,
-		PotionEffectType.CONDUIT_POWER
+			PotionEffectType.ABSORPTION,
+			PotionEffectType.DAMAGE_RESISTANCE,
+			PotionEffectType.FAST_DIGGING,
+			PotionEffectType.FIRE_RESISTANCE,
+			PotionEffectType.HEAL,
+			PotionEffectType.HEALTH_BOOST,
+			PotionEffectType.INCREASE_DAMAGE,
+			PotionEffectType.INVISIBILITY,
+			PotionEffectType.JUMP,
+			PotionEffectType.NIGHT_VISION,
+			PotionEffectType.REGENERATION,
+			PotionEffectType.SATURATION,
+			PotionEffectType.SPEED,
+			PotionEffectType.LUCK,
+			PotionEffectType.WATER_BREATHING,
+			PotionEffectType.CONDUIT_POWER
 	);
 
 	private static final ImmutableSet<PotionEffectType> NEGATIVE_EFFECTS = ImmutableSet.of(
-		PotionEffectType.BLINDNESS,
-		PotionEffectType.POISON,
-		PotionEffectType.CONFUSION,
-		PotionEffectType.SLOW,
-		PotionEffectType.SLOW_DIGGING,
-		PotionEffectType.SLOW_FALLING,
-		PotionEffectType.WITHER,
-		PotionEffectType.WEAKNESS,
-		PotionEffectType.HARM,
-		PotionEffectType.HUNGER,
-		PotionEffectType.LEVITATION,
-		PotionEffectType.UNLUCK
+			PotionEffectType.BLINDNESS,
+			PotionEffectType.POISON,
+			PotionEffectType.CONFUSION,
+			PotionEffectType.SLOW,
+			PotionEffectType.SLOW_DIGGING,
+			PotionEffectType.SLOW_FALLING,
+			PotionEffectType.WITHER,
+			PotionEffectType.WEAKNESS,
+			PotionEffectType.HARM,
+			PotionEffectType.HUNGER,
+			PotionEffectType.LEVITATION,
+			PotionEffectType.UNLUCK
 	);
 
 	// This map only notes any "useful" effect pairs, i.e. effects that would be non-annoying and balanced to invert
@@ -142,7 +144,7 @@ public class PotionUtils {
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
-		                  boolean showParticles, boolean showIcon) {
+						  boolean showParticles, boolean showIcon) {
 			mType = type;
 			mDuration = duration;
 			mAmplifier = amplifier;
@@ -224,7 +226,7 @@ public class PotionUtils {
 
 	public static List<PotionEffect> getEffects(ItemStack item) {
 		if (item != null && item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta) {
-			return getEffects((PotionMeta)item.getItemMeta());
+			return getEffects((PotionMeta) item.getItemMeta());
 		}
 		// Not a potion - return an empty list to simplify callers iterating the result
 		return new ArrayList<PotionEffect>(0);
@@ -238,7 +240,7 @@ public class PotionUtils {
 			PotionUtils.PotionInfo info = PotionUtils.getPotionInfo(data, 1);
 			if (info != null) {
 				PotionEffect effect = new PotionEffect(info.mType, info.mDuration, info.mAmplifier, info.mAmbient,
-				                                       info.mShowParticles);
+						info.mShowParticles);
 				effectsList.add(effect);
 			}
 		}
@@ -334,12 +336,12 @@ public class PotionUtils {
 		if (applied.hasPotionEffect(effect.getType())) {
 			PotionEffect targetPotionEffect = applied.getPotionEffect(effect.getType());
 			if (
-				targetPotionEffect != null && (
-					targetPotionEffect.getAmplifier() < effect.getAmplifier()
-						|| (
-						targetPotionEffect.getAmplifier() == effect.getAmplifier()
-							&& targetPotionEffect.getDuration() < effect.getDuration()
-					))
+					targetPotionEffect != null && (
+							targetPotionEffect.getAmplifier() < effect.getAmplifier()
+									|| (
+									targetPotionEffect.getAmplifier() == effect.getAmplifier()
+											&& targetPotionEffect.getDuration() < effect.getDuration()
+							))
 			) {
 				PotionEffectApplyEvent event = new PotionEffectApplyEvent(applier, applied, effect);
 				Bukkit.getPluginManager().callEvent(event);
@@ -431,7 +433,7 @@ public class PotionUtils {
 	/**
 	 * This directly applies the splash potion effect to the player and surrounding entities by using the PotionSplashEvent.
 	 * Doesn't play splash potion break sound (Sound.ENTITY_SPLASH_POTION_BREAK) or particles
-
+	 *
 	 * @param player - The player that splashed the potion
 	 * @param potion - The thrown potion entity to splash
 	 */
@@ -479,10 +481,17 @@ public class PotionUtils {
 			for (int i = 0; i < 30; i++) {
 				double y = FastUtils.randomDoubleInRange(0.25, 1.75);
 				new PartialParticle(Particle.SPELL_MOB, player.getLocation().add(0, y, 0), 1, red, green, blue, 1)
-					.directionalMode(true).spawnAsPlayerActive(player);
+						.directionalMode(true).spawnAsPlayerActive(player);
 			}
 		} else {
 			new PartialParticle(Particle.SPELL, player.getLocation().add(0, 0.75, 0), 30, 0, 0.45, 0, 1).spawnAsPlayerActive(player);
 		}
+	}
+
+	/**
+	 * Apply the glowing effect along with a color to a given entity.
+	 */
+	public static void applyColoredGlowing(String source, Entity entity, @Nullable NamedTextColor color, int duration) {
+		Plugin.getInstance().mEffectManager.addEffect(entity, source, new ColoredGlowingEffect(duration, color));
 	}
 }
