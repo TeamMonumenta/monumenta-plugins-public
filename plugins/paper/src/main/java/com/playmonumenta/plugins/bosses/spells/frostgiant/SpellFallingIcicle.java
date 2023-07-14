@@ -18,6 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -46,10 +47,15 @@ public class SpellFallingIcicle extends Spell {
 		Collection<Entity> projectiles = world.getNearbyEntities(mBox, (proj) -> proj instanceof Projectile);
 		for (Entity entity : projectiles) {
 			Projectile proj = (Projectile) entity;
-			proj.setShooter(mBoss);
-			if (proj instanceof AbstractArrow) {
+			if (proj instanceof AbstractArrow) { // check if it is an arrow or a trident
+				// tridents inherit from ThrowableProjectile and AbstractArrow
 				if (((AbstractArrow) proj).getAttachedBlock() != null) {
+					proj.setShooter(mBoss);
 					runIcicleFall(proj);
+				}
+			} else if (proj instanceof ThrowableProjectile) { // otherwise check for any other throwable projectile
+				if (((ThrowableProjectile) proj).getBoundingBox().overlaps(mBox)) {
+					proj.setShooter(mBoss);
 				}
 			}
 		}
