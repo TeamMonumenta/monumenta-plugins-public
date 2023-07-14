@@ -417,7 +417,7 @@ public class ShulkerShortcutListener implements Listener {
 
 	public static boolean isPurpleTesseract(ItemStack item) {
 		return item != null
-			       && ((item.getType() == Material.PURPLE_STAINED_GLASS && InventoryUtils.testForItemWithName(item, "Tesseract of Emotions", true))
+			       && ((item.getType() == Material.PURPLE_STAINED_GLASS && InventoryUtils.testForItemWithName(item, "Tesseract of Emotions", false))
 				           || isFestivePurpleTesseract(item));
 	}
 
