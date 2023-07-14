@@ -37,6 +37,9 @@ public class OnHitBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Executes a Command as the Player")
 		public String COMMAND_AS_PLAYER = "";
+
+		@BossParam(help = "if set, makes boss_onhit only trigger when the spell with this name deals damage")
+		public String SPELL_NAME = "";
 	}
 
 	private final Parameters mParams;
@@ -52,6 +55,10 @@ public class OnHitBoss extends BossAbilityGroup {
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		if (mParams.CAN_BLOCK && event.isBlockedByShield()) {
 			// Attack was blocked
+			return;
+		}
+		if (!mParams.SPELL_NAME.equals("") && event.getBossSpellName() != null && !event.getBossSpellName().equals(mParams.SPELL_NAME)) {
+			// If it isn't the spell that we want, don't trigger anything
 			return;
 		}
 

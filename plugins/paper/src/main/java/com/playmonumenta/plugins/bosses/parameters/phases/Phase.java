@@ -154,6 +154,22 @@ public class Phase {
 
 	}
 
+	public boolean onFlag(LivingEntity boss, String key, boolean state) {
+		List<Trigger> temp = new ArrayList<>();
+		for (Trigger trigger : mTriggers) {
+			if (trigger.flag(boss, key, state)) {
+				temp.add(trigger);
+			}
+		}
+
+		if (!temp.isEmpty()) {
+			runTest(temp, boss);
+			return true;
+		}
+		return false;
+
+	}
+
 
 	private void runTest(List<Trigger> triggers, LivingEntity boss) {
 		boolean runActions = true;
@@ -216,6 +232,7 @@ public class Phase {
 		TRIGGER_BUILDER_MAP.put("NEARBY_PLAYERS", NearbyPlayersTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("HEALTH", HealthTrigger::fromReader);
 		TRIGGER_BUILDER_MAP.put("CUSTOM", CustomTrigger::fromReader);
+		TRIGGER_BUILDER_MAP.put("FLAG", FlagTrigger::fromReader);
 
 
 		ACTION_BUILDER_MAP.put("ADD_ABILITY", AddAbilityAction::fromReader);
@@ -224,6 +241,8 @@ public class Phase {
 		ACTION_BUILDER_MAP.put("CUSTOM", CustomTriggerAction::fromReader);
 		ACTION_BUILDER_MAP.put("DELAY_ACTION", DelayAction::fromReader);
 		ACTION_BUILDER_MAP.put("COMMAND", CommandAction::fromReader);
+		ACTION_BUILDER_MAP.put("RANDOM", RandomAction::fromReader);
+		ACTION_BUILDER_MAP.put("FLAG", FlagSetAction::fromReader);
 	}
 
 

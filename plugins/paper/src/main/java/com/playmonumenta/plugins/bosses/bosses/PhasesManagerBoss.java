@@ -67,4 +67,8 @@ public class PhasesManagerBoss extends BossAbilityGroup {
 		mParam.PHASES.onCustom(mBoss, key);
 	}
 
+	public void onFlagTrigger(String key, boolean state) {
+		mParam.PHASES.onFlag(mBoss, key, state);
+	}
+
 }

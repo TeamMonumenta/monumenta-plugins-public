@@ -83,6 +83,14 @@ public class BossPhasesList {
 		}
 	}
 
+	public void onFlag(LivingEntity boss, String key, boolean state) {
+		for (Phase phase : getClonePhaseList()) {
+			if (phase.onFlag(boss, key, state) && !phase.isReusable()) {
+				mPhases.remove(phase);
+			}
+		}
+	}
+
 
 	public static BossPhasesList emptyPhaseList() {
 		return new BossPhasesList(new ArrayList<>());

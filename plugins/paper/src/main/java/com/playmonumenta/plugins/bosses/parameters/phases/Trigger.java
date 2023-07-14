@@ -67,6 +67,10 @@ public abstract class Trigger {
 		return false;
 	}
 
+	public boolean flag(LivingEntity boss, String key, boolean state) {
+		return false;
+	}
+
 
 
 	public enum TriggerOperation {
