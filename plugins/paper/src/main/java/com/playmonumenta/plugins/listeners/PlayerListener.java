@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Constants.Colors;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.ToggleSwap;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
@@ -628,6 +630,11 @@ public class PlayerListener implements Listener {
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 			return;
+		}
+
+		// Apply Gear Changed effect briefly if the clicked slot is one of armor.
+		if (event.getSlot() >= 36) {
+			EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 		}
 
 		if (player.getGameMode() != GameMode.CREATIVE

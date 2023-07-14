@@ -12,6 +12,8 @@ import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
@@ -197,6 +199,7 @@ public class LoadoutManager implements Listener {
 								ItemStack newItem = inventory.mInventory.getItem(i);
 								if (newItem != null && isLoadoutItem(loadoutItem, matchInfusion, newItem)) {
 									swappedEquipment.set(true);
+									EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 
 									ItemStatUtils.cleanIfNecessary(newItem);
 

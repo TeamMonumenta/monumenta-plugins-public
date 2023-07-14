@@ -137,21 +137,21 @@ public class Shattered implements Infusion {
 	/**
 	 * Shatters an item by a given amount of levels.
 	 *
-	 * @return Whether the item now has more Shattered levels than before
+	 * @return The new level of shatter of the item. Returns MAX_LEVEL + 1 if it attempts to shatter an item with MAX_LEVEL shatter.
 	 */
-	public static boolean shatter(ItemStack item, int numLevels) {
+	public static int shatter(ItemStack item, int numLevels) {
 		if (ItemStatUtils.hasEnchantment(item, ItemStatUtils.EnchantmentType.DELETE_ON_SHATTER)) {
 			item.setAmount(0);
-			return false;
+			return 0;
 		}
 		int oldLevel = ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED);
 		if (oldLevel >= MAX_LEVEL) {
-			return false;
+			return MAX_LEVEL + 1;
 		}
 		int newLevel = Math.min(oldLevel + numLevels, MAX_LEVEL);
 		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SHATTERED, newLevel, NULL_UUID);
 		ItemStatUtils.generateItemStats(item);
-		return true;
+		return newLevel;
 	}
 
 	/**

@@ -4,6 +4,8 @@ import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.GraveCommand;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.graves.GraveManager;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -15,6 +17,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.scriptedquests.managers.TranslationsManager;
 import de.tr7zw.nbtapi.NBTEntity;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -230,7 +234,7 @@ public class GraveListener implements Listener {
 			event.setCancelled(true);
 			meta.setDamage(item.getType().getMaxDurability());
 			item.setItemMeta(meta);
-			if (Shattered.shatter(item, Shattered.DURABILITY_SHATTER)) {
+			if (Shattered.shatter(item, Shattered.DURABILITY_SHATTER) == Shattered.MAX_LEVEL) {
 				Component itemName = ItemUtils.getDisplayName(item).decoration(TextDecoration.UNDERLINED, false);
 				String translatedMessage = TranslationsManager.translate(event.getPlayer(), "Your %s shattered because it ran out of durability!");
 				Component message = Component.text(translatedMessage).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)
@@ -318,12 +322,53 @@ public class GraveListener implements Listener {
 				                    : EntityUtils.touchesLava(player) || lastDamageCause == EntityDamageEvent.DamageCause.LAVA
 					                      ? Shattered.DEATH_LAVA_SHATTER
 					                      : Shattered.DEATH_SHATTER;
+
+			int extraEquipmentShatter = 0;
 			for (int i = 36; i <= 40; i++) {
 				ItemStack item = items[i];
 				if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
+					if (item == null) {
+						extraEquipmentShatter++;
+					}
 					continue;
 				}
-				Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
+
+				int shatteredLevel = Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
+				if (shatteredLevel > Shattered.MAX_LEVEL && EffectManager.getInstance().hasEffect(player, GearChanged.effectID)) {
+					extraEquipmentShatter++;
+				}
+			}
+
+			// Handle extra shattering if a player deserves it. (Either empty armor slots or recently (15s) changed their gear into Shattered III.)
+			if (extraEquipmentShatter > 0) {
+				player.sendMessage(Component.text("Some items in your inventory have been shattered!", NamedTextColor.RED));
+				ArrayList<ItemStack> hotbarItems = new ArrayList<>();
+				ArrayList<ItemStack> inventoryItems = new ArrayList<>();
+				for (int i = 0; i <= 35; i++) {
+					ItemStack item = items[i];
+					if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE || Shattered.isMaxShatter(item)) {
+						continue;
+					} else if (i <= 8) {
+						hotbarItems.add(item);
+					} else {
+						inventoryItems.add(item);
+					}
+				}
+				Collections.shuffle(hotbarItems);
+				int hotbarSize = hotbarItems.size();
+				Collections.shuffle(inventoryItems);
+
+				for (int shatteredItems = 0; shatteredItems < extraEquipmentShatter; shatteredItems++) {
+					ItemStack item;
+					if (shatteredItems < hotbarSize) {
+						item = hotbarItems.get(shatteredItems);
+					} else if (shatteredItems - hotbarSize < inventoryItems.size()) {
+						item = inventoryItems.get(shatteredItems - hotbarSize);
+					} else {
+						break;
+					}
+					Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
+				}
 			}
 
 			// Generate a new grave if necessary

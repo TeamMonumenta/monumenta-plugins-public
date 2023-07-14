@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.effects.EffectManager;
+import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
@@ -298,6 +300,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Equipment Swapped");
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);
+		EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 		Inventory sInv = sbox.getInventory();
 
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
