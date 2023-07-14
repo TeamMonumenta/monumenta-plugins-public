@@ -6,12 +6,13 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.ChallengeCS;
 import com.playmonumenta.plugins.effects.ChallengeMobEffect;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -23,9 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -86,12 +85,15 @@ public class Challenge extends Ability {
 	private List<LivingEntity> mAffectedEntities = new ArrayList<>();
 	private int mKillCount = 0;
 
+	private final ChallengeCS mCosmetic;
+
 	public Challenge(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mPercentDamageDealtEffect = (isLevelOne() ? PERCENT_DAMAGE_DEALT_EFFECT_1 : PERCENT_DAMAGE_DEALT_EFFECT_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
 		mAbsorptionPerMob = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PER, isLevelOne() ? ABSORPTION_PER_MOB_1 : ABSORPTION_PER_MOB_2);
 		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChallengeCS());
 	}
 
 	public void cast() {
@@ -113,12 +115,7 @@ public class Challenge extends Ability {
 			}
 
 			World world = mPlayer.getWorld();
-			world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 2, 1);
-			new PartialParticle(Particle.FLAME, loc, 25, 0.4, 1, 0.4, 0.7f).spawnAsPlayerActive(mPlayer);
-			loc.add(0, 1.25, 0);
-			new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 250, 0, 0, 0, 0.425).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
-			new PartialParticle(Particle.CRIT_MAGIC, loc, 300, 0, 0, 0, 1).spawnAsPlayerActive(mPlayer);
+			mCosmetic.onCast(mPlayer, world, loc);
 
 			putOnCooldown();
 		}

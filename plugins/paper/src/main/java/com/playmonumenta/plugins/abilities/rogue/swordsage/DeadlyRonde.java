@@ -112,7 +112,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		cancelOnDeath(mActiveRunnable.runTaskLater(mPlugin, RONDE_DECAY_TIMER));
 
 		if (mRondeStacks < mMaxStacks) {
-			mCosmetic.rondeGainStackEffect(mPlayer);
+			mCosmetic.rondeGainStackEffect(mPlayer, mPlayer.getLocation());
 			mRondeStacks++;
 			ClientModHandler.updateAbility(mPlayer, this);
 		}

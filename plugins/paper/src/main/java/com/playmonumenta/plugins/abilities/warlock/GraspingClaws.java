@@ -162,7 +162,7 @@ public class GraspingClaws extends Ability {
 							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
 
 							Location l = loc.clone().add(vec);
-							mCosmetic.cageParticle(mPlayer, loc);
+							mCosmetic.cageParticle(mPlayer, l);
 
 							if (!mHitboxes) {
 								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
@@ -217,9 +217,9 @@ public class GraspingClaws extends Ability {
 
 				// Player Effect + Outline Particles
 				if (mT % 5 == 0) {
-					List<Player> affectedPlayers = PlayerUtils.playersInRange(loc, CAGE_RADIUS, true);
-					for (Player p : affectedPlayers) {
-						if (mT % 20 == 0) {
+					if (mT % 20 == 0) {
+						List<Player> affectedPlayers = PlayerUtils.playersInRange(loc, mRadius, true);
+						for (Player p : affectedPlayers) {
 							PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * HEAL_AMOUNT, mPlayer);
 						}
 					}

@@ -98,7 +98,7 @@ public class Blizzard extends Ability {
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();
-		mCosmetic.onCast(world, mPlayer.getLocation());
+		mCosmetic.onCast(mPlayer, world, mPlayer.getLocation());
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		float spellDamage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);

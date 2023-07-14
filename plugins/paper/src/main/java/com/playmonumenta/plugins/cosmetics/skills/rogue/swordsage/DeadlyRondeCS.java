@@ -26,27 +26,32 @@ public class DeadlyRondeCS implements CosmeticSkill {
 		return Material.BLAZE_ROD;
 	}
 
-	public void rondeHitEffect(World world, Player mPlayer, double radius, double rondeBaseRadius, boolean lv2) {
-		Location particleLoc = mPlayer.getEyeLocation().add(mPlayer.getEyeLocation().getDirection().multiply(3));
+	public void rondeHitEffect(World world, Player player, double radius, double rondeBaseRadius, boolean lv2) {
+		Location particleLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(3));
 		double multiplier = radius / rondeBaseRadius;
 		double delta = 1.5 * multiplier;
-		new PartialParticle(Particle.SWEEP_ATTACK, particleLoc, (int) (10 * multiplier), delta, 0.5, delta).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT, particleLoc, (int) (50 * multiplier), delta, 0.5, delta, 0.2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, particleLoc, (int) (20 * multiplier), delta, 0.5, delta, 0.3).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, particleLoc, (int) (45 * multiplier), delta, 0.5, delta, SWORDSAGE_COLOR).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SWEEP_ATTACK, particleLoc, (int) (10 * multiplier), delta, 0.5, delta).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, particleLoc, (int) (50 * multiplier), delta, 0.5, delta, 0.2).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, particleLoc, (int) (20 * multiplier), delta, 0.5, delta, 0.3).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, particleLoc, (int) (45 * multiplier), delta, 0.5, delta, SWORDSAGE_COLOR).spawnAsPlayerActive(player);
 
-		world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1, 1.25f);
-		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.8f, 0.75f);
-		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1, 0.75f);
-		world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
+		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.0f, 0.1f);
+		world.playSound(particleLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.4f);
+		world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2.0f, 0.7f);
+		world.playSound(particleLoc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.5f, 1.6f);
+		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		world.playSound(particleLoc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.4f, 2.0f);
+		world.playSound(particleLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 2.0f);
+		world.playSound(particleLoc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.5f, 1.2f);
+		world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.1f);
 	}
 
-	public void rondeGainStackEffect(Player mPlayer) {
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 1, 1f);
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 0.7f, 1.5f);
+	public void rondeGainStackEffect(Player player, Location loc) {
+		player.playSound(loc, Sound.ENTITY_PUFFER_FISH_BLOW_OUT, SoundCategory.PLAYERS, 0.7f, 0.8f);
+		player.playSound(loc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.3f, 1.6f);
 	}
 
-	public void rondeTickEffect(Player mPlayer, int charges, int mTicks) {
-		new PartialParticle(Particle.REDSTONE, mPlayer.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR).spawnAsPlayerBuff(mPlayer);
+	public void rondeTickEffect(Player player, int charges, int mTicks) {
+		new PartialParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), 3, 0.25, 0.45, 0.25, SWORDSAGE_COLOR).spawnAsPlayerBuff(player);
 	}
 }

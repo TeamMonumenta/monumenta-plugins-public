@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.cosmetics.skills.mage.elementalist;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -23,20 +24,20 @@ public class BlizzardCS implements CosmeticSkill {
 		return Material.SNOWBALL;
 	}
 
-	public void onCast(World world, Location loc) {
+	public void onCast(Player player, World world, Location loc) {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 2.0f, 0.1f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_PHANTOM_FLAP, SoundCategory.PLAYERS, 2.0f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 2.0f, 0.7f);
 		world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 2.0f, 0.1f);
 		world.playSound(loc, Sound.ENTITY_SNOW_GOLEM_DEATH, SoundCategory.PLAYERS, 2.0f, 0.1f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.7f, 1.2f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.7f, 1.1f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.6f, 1.0f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.5f, 0.9f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.3f, 0.8f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.2f, 0.7f);
-		world.playSound(loc, Sound.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS, 0.1f, 0.6f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.7f, 1.2f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.7f, 1.1f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.6f, 1.0f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.5f, 0.9f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.3f, 0.8f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.2f, 0.7f);
+		AbilityUtils.playPassiveAbilitySound(player, loc, Sound.ITEM_ELYTRA_FLYING, 0.1f, 0.6f);
 	}
 
 	public void tick(Player player, Location loc) {

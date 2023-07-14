@@ -70,14 +70,14 @@ public class GraspingClawsCS implements CosmeticSkill {
 
 			if (degrees1.contains(d)) {
 				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 5.5, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-				if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
+				if (FastUtils.RANDOM.nextBoolean()) {
 					degrees1.remove((Integer) d);
 				}
 			}
 
 			if (degrees2.contains(d)) {
 				new PartialParticle(Particle.FALLING_DUST, loc.clone().add(radius * FastUtils.cosDeg(d), 6, radius * FastUtils.sinDeg(d)), 1, CHAIN_PARTICLE).spawnAsPlayerActive(player);
-				if (FastUtils.randomDoubleInRange(0, 1) < 0.5) {
+				if (FastUtils.RANDOM.nextBoolean()) {
 					degrees2.remove((Integer) d);
 				}
 			}

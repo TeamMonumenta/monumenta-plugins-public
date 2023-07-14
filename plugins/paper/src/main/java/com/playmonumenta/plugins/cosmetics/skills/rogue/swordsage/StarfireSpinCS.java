@@ -43,18 +43,16 @@ public class StarfireSpinCS extends BladeDanceCS {
 	}
 
 	@Override
-	public void danceStart(Player player) {
-		World world = player.getWorld();
-		world.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.7f, 1.9f);
-		world.playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.7f, 1.2f);
-		new PartialParticle(Particle.VILLAGER_ANGRY, player.getLocation().clone().add(0, 1, 0), 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.REDSTONE, player.getLocation().clone().add(0, 1, 0), 12, 0.55, 0.5, 0.55, 0, FIRE_COLOR).spawnAsPlayerActive(player);
+	public void danceStart(Player player, World world, Location loc) {
+		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.7f, 1.9f);
+		world.playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 0.7f, 1.2f);
+		Location modifiedLoc = loc.clone().add(0, 1, 0);
+		new PartialParticle(Particle.VILLAGER_ANGRY, modifiedLoc, 6, 0.45, 0.5, 0.45, 0).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, modifiedLoc, 12, 0.55, 0.5, 0.55, 0, FIRE_COLOR).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void danceTick(Player player, int tick, double radius) {
-		Location centre = player.getLocation();
-
+	public void danceTick(Player player, World world, Location centre, int tick, double radius) {
 		for (Vector v : TRI_UNIT_VECTORS) {
 			for (double i = 1; i <= PARTICLES_PER_LINE; i++) {
 				Location location = centre.clone()
@@ -77,29 +75,25 @@ public class StarfireSpinCS extends BladeDanceCS {
 
 		if (tick % 2 == 0) {
 			float pitch = 0.7f + 0.1f * tick / 2;
-			player.getWorld().playSound(centre, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.8f, pitch + 0.3f);
+			world.playSound(centre, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.8f, pitch + 0.3f);
 		}
 	}
 
 	@Override
-	public void danceEnd(Player player, double radius) {
-		Location centre = player.getLocation();
-
+	public void danceEnd(Player player, World world, Location centre, double radius) {
 		for (double p = 0; p < Math.PI * 2; p += 2 * Math.PI / 30) {
 			drawFlame(centre.clone().add(new Vector(1, 0, 0).rotateAroundY(p).multiply(radius).add(new Vector(0, 0.5, 0))), player, new Vector(0, 0, 0));
 		}
 		new PartialParticle(Particle.END_ROD, centre.clone().add(0, 0.5, 0), 100, 2, 0.2, 2, 0)
 			.spawnAsPlayerActive(player);
 
-		World world = player.getWorld();
 		world.playSound(centre, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1f, 1.5f);
 		world.playSound(centre, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.6f, 0.8f);
 		world.playSound(centre, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.PLAYERS, 1f, 1.4f);
 	}
 
 	@Override
-	public void danceHit(Player player, LivingEntity mob) {
-		Location mobLoc = mob.getLocation().add(0, 1, 0);
+	public void danceHit(Player player, World world, LivingEntity mob, Location mobLoc) {
 		new PartialParticle(Particle.END_ROD, mobLoc, 5, 0.35, 0.5, 0.35, 0).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, mobLoc, 10, 0.25, 0.5, 0.25, 0.3).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.REDSTONE, mobLoc, 15, 0.35, 0.5, 0.35, 0, FIRE_COLOR).spawnAsPlayerActive(player);

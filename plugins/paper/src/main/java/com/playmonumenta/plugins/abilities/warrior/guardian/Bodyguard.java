@@ -6,10 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.BodyguardCS;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PPExplosion;
-import com.playmonumenta.plugins.particle.PPLine;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
@@ -17,9 +16,6 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -65,9 +61,12 @@ public class Bodyguard extends Ability {
 
 	private final double mAbsorptionHealth;
 
+	private final BodyguardCS mCosmetic;
+
 	public Bodyguard(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mAbsorptionHealth = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION, isLevelOne() ? ABSORPTION_HEALTH_1 : ABSORPTION_HEALTH_2);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new BodyguardCS());
 	}
 
 	public void cast(boolean allowSelfCast) {
@@ -81,30 +80,10 @@ public class Bodyguard extends Ability {
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, RANGE);
 		Player targetPlayer = EntityUtils.getPlayerAtCursor(mPlayer, range);
 		if (targetPlayer != null) {
-			new PPLine(Particle.FLAME, mPlayer.getEyeLocation(), targetPlayer.getEyeLocation())
-				.countPerMeter(12)
-				.delta(0.25)
-				.spawnAsPlayerActive(mPlayer);
-
-			new PPExplosion(Particle.FLAME, targetPlayer.getLocation().add(0, 0.15, 0))
-				.flat(true)
-				.speed(1)
-				.count(120)
-				.extraRange(0.1, 0.4)
-				.spawnAsPlayerActive(mPlayer);
-
-			new PPExplosion(Particle.EXPLOSION_NORMAL, targetPlayer.getLocation().add(0, 0.15, 0))
-				.flat(true)
-				.speed(1)
-				.count(60)
-				.extraRange(0.15, 0.5)
-				.spawnAsPlayerActive(mPlayer);
+			mCosmetic.onBodyguardOther(mPlayer, targetPlayer, world);
 
 			Vector dir = userLoc.getDirection();
 			Location targetLoc = targetPlayer.getLocation().setDirection(mPlayer.getEyeLocation().getDirection()).subtract(dir.clone().multiply(0.5)).add(0, 0.5, 0);
-
-			world.playSound(targetLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.75f, 0.75f);
-			world.playSound(targetLoc, Sound.ENTITY_ENDER_DRAGON_HURT, SoundCategory.PLAYERS, 0.75f, 0.9f);
 
 			giveAbsorption(targetPlayer);
 
@@ -119,8 +98,7 @@ public class Bodyguard extends Ability {
 
 		putOnCooldown();
 
-		world.playSound(userLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.75f);
-		new PartialParticle(Particle.FLAME, userLoc.add(0, 0.15, 0), 25, 0.2, 0, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
+		mCosmetic.onBodyguard(mPlayer, world, userLoc);
 
 		giveAbsorption(mPlayer);
 

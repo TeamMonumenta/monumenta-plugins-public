@@ -3,12 +3,12 @@ package com.playmonumenta.plugins.abilities.scout.hunter;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
-import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.FireworkStrikeCS;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PredatorStrikeCS;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
@@ -77,7 +77,13 @@ public class PredatorStrike extends Ability {
 					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER), COOLDOWN_2 / 20))
 			.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", PredatorStrike::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
+			// Put this trigger first so that they can be made the same for convenience
+			.addTrigger(new AbilityTriggerInfo<>("unprime", "unprime", PredatorStrike::unprime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false).sneaking(false),
+				new AbilityTriggerInfo.TriggerRestriction("Predator Strike is primed", player -> {
+					PredatorStrike predatorStrike = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PredatorStrike.class);
+					return predatorStrike != null && predatorStrike.mDeactivationRunnable != null;
+				})))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "prime", PredatorStrike::prime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.SPECTRAL_ARROW);
 
@@ -99,7 +105,7 @@ public class PredatorStrike extends Ability {
 		});
 	}
 
-	public void cast() {
+	public void prime() {
 		if (isOnCooldown()) {
 			return;
 		}
@@ -135,6 +141,13 @@ public class PredatorStrike extends Ability {
 		cancelOnDeath(mDeactivationRunnable.runTaskTimer(mPlugin, 0, 1));
 	}
 
+	public void unprime() {
+		if (mDeactivationRunnable != null) {
+			mDeactivationRunnable.cancel();
+			mCosmetic.onUnprime(mPlayer, mPlayer.getLocation());
+		}
+	}
+
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (mDeactivationRunnable == null || !EntityUtils.isAbilityTriggeringProjectile(projectile, true)) {
@@ -166,15 +179,13 @@ public class PredatorStrike extends Ability {
 		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
 			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
+		Location endLoc;
 		if (result == null) {
-			if (mCosmetic instanceof FireworkStrikeCS) {
-				Location endLoc = loc.clone().add(direction.multiply(range));
-				mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
-			}
-			return true;
+			endLoc = loc.clone().add(direction.multiply(range));
+		} else {
+			endLoc = result.getHitPosition().toLocation(world);
 		}
 
-		Location endLoc = result.getHitPosition().toLocation(world);
 		mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
 		explode(endLoc);
 		mCosmetic.strikeParticleLine(mPlayer, loc, endLoc);

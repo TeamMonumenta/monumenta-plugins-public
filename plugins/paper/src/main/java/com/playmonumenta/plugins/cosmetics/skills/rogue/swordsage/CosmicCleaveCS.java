@@ -83,9 +83,8 @@ public class CosmicCleaveCS extends DeadlyRondeCS {
 	}
 
 	@Override
-	public void rondeGainStackEffect(Player player) {
+	public void rondeGainStackEffect(Player player, Location loc) {
 		World world = player.getWorld();
-		Location loc = player.getLocation();
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 0.8f, 2.0f);
 		new PartialParticle(Particle.REDSTONE, loc.add(0, 1, 0), 50, 0.35, 0.5, 0.35, 0, new Particle.DustOptions(rollCosmicColor(), 0.75f)).spawnAsPlayerActive(player);
 	}

@@ -4,19 +4,17 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.ShieldBashCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -34,12 +32,15 @@ public class ShieldBash extends Ability {
 	private static final int SHIELD_BASH_2_RADIUS = 3;
 	private static final int SHIELD_BASH_RANGE = 4;
 	private static final int ENHANCEMENT_BLOCKING_DURATION = 20;
+	private static final double ENHANCEMENT_CDR = 0.5;
 
 	public static final String CHARM_DAMAGE = "Shield Bash Damage";
 	public static final String CHARM_DURATION = "Shield Bash Duration";
 	public static final String CHARM_COOLDOWN = "Shield Bash Cooldown";
 	public static final String CHARM_RADIUS = "Shield Bash Radius";
 	public static final String CHARM_RANGE = "Shield Bash Range";
+	public static final String CHARM_PARRY_DURATION = "Shield Bash Parry Duration";
+	public static final String CHARM_CDR = "Shield Bash Cooldown Reduction";
 
 	public static final AbilityInfo<ShieldBash> INFO =
 		new AbilityInfo<>(ShieldBash.class, "Shield Bash", ShieldBash::new)
@@ -57,8 +58,11 @@ public class ShieldBash extends Ability {
 
 	private boolean mIsEnhancementUsed = true;
 
+	private final ShieldBashCS mCosmetic;
+
 	public ShieldBash(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldBashCS());
 	}
 
 	@Override
@@ -77,11 +81,7 @@ public class ShieldBash extends Ability {
 		Location mobLoc = mob.getEyeLocation();
 		Location eyeLoc = mPlayer.getEyeLocation();
 		World world = eyeLoc.getWorld();
-		new PartialParticle(Particle.CRIT, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT_MAGIC, mobLoc, 50, 0, 0.25, 0, 0.25).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, mobLoc, 5, 0.15, 0.5, 0.15, 0).spawnAsPlayerActive(mPlayer);
-		world.playSound(eyeLoc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 2.0f, 1);
-		world.playSound(eyeLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 0.5f);
+		mCosmetic.onCast(mPlayer, world, eyeLoc, mobLoc);
 
 		bash(mob, ClassAbility.SHIELD_BASH);
 		if (isLevelTwo()) {
@@ -101,16 +101,15 @@ public class ShieldBash extends Ability {
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		// If:
 		// isEnhanced,
-		// Player has blocked within the parry (0.5 seconds)
+		// Player has blocked within the parry
 		// Event has been successfully blockedbyshield
 		// And ShieldBash is on CD...
-		if (isEnhanced() && mPlayer.getHandRaisedTime() < ENHANCEMENT_BLOCKING_DURATION && event.isBlockedByShield() && isOnCooldown() && !mIsEnhancementUsed) {
-			// Reduce cooldown by half of shield bash's CD.
-			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.SHIELD_BASH, getModifiedCooldown() / 2);
-			mPlayer.getWorld().playSound(mPlayer.getLocation(), Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1, 2);
+		if (isEnhanced() && !mIsEnhancementUsed && event.isBlockedByShield() && isOnCooldown() && mPlayer.getHandRaisedTime() < CharmManager.getDuration(mPlayer, CHARM_PARRY_DURATION, ENHANCEMENT_BLOCKING_DURATION)) {
+			int newCooldown = (int) (getModifiedCooldown() * (ENHANCEMENT_CDR + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CDR)));
+			mPlugin.mTimers.updateCooldown(mPlayer, ClassAbility.SHIELD_BASH, newCooldown);
+			mCosmetic.onParry(mPlayer.getWorld(), mPlayer.getLocation());
 
 			mIsEnhancementUsed = true;
-			// mPlayer.sendMessage("Shield bash CD reduced!");
 		}
 	}
 

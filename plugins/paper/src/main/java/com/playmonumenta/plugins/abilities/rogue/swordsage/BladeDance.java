@@ -16,7 +16,9 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -86,7 +88,8 @@ public class BladeDance extends Ability {
 		}
 		double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, DANCE_RADIUS);
 
-		mCosmetic.danceStart(mPlayer);
+		World world = mPlayer.getWorld();
+		mCosmetic.danceStart(mPlayer, world, mPlayer.getLocation());
 
 		mPlayer.setInvulnerable(true);
 		cancelOnDeath(new BukkitRunnable() {
@@ -95,12 +98,13 @@ public class BladeDance extends Ability {
 			@Override
 			public void run() {
 				mTicks += 1;
-				mCosmetic.danceTick(mPlayer, mTicks, radius);
+				Location loc = mPlayer.getLocation();
+				mCosmetic.danceTick(mPlayer, world, loc, mTicks, radius);
 
 				if (mTicks >= CharmManager.getDuration(mPlayer, CHARM_RESIST, INVULN_DURATION)) {
 					mPlayer.setInvulnerable(false);
 
-					mCosmetic.danceEnd(mPlayer, radius);
+					mCosmetic.danceEnd(mPlayer, world, loc, radius);
 
 					Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), radius);
 					for (LivingEntity mob : hitbox.getHitMobs()) {
@@ -111,7 +115,7 @@ public class BladeDance extends Ability {
 							EntityUtils.applySlow(mPlugin, mSlowDuration, SLOWNESS_AMPLIFIER, mob);
 						}
 
-						mCosmetic.danceHit(mPlayer, mob);
+						mCosmetic.danceHit(mPlayer, world, mob, mob.getLocation().add(0, 1, 0));
 					}
 
 					this.cancel();

@@ -86,7 +86,7 @@ public class HauntingShades extends Ability {
 		box.shift(direction);
 
 		World world = mPlayer.getWorld();
-		mCosmetic.shadesStartSound(world, mPlayer);
+		mCosmetic.shadesStartSound(world, mPlayer, mPlayer.getLocation());
 
 		Set<LivingEntity> nearbyMobs = new HashSet<>(EntityUtils.getNearbyMobs(loc, RANGE));
 

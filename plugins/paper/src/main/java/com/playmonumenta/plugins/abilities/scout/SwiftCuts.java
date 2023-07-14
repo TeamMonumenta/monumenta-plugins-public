@@ -80,13 +80,11 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		if (event.getType() == DamageType.MELEE && mPlayer.getCooledAttackStrength(0.5f) > 0.9) {
+			Location loc = enemy.getLocation();
+			World world = mPlayer.getWorld();
+			mCosmetic.onHit(mPlayer, loc, world);
 			if (mStacks < mMaxStacks) {
 				mStacks += 1;
-
-				Location loc = enemy.getLocation();
-				World world = mPlayer.getWorld();
-				mCosmetic.onHit(mPlayer, loc, world);
-
 				//send stack update to client
 				ClientModHandler.updateAbility(mPlayer, this);
 			}

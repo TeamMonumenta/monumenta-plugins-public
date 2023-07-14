@@ -170,7 +170,7 @@ public class SanctifiedArmor extends Ability {
 			&& entity.getLastDamageCause() != null
 			&& entity.getLastDamageCause().getCause() != EntityDamageEvent.DamageCause.THORNS) {
 			PlayerUtils.healPlayer(mPlugin, mPlayer, mLastDamage / 2.0);
-			mCosmetic.sanctOnHeal(mPlayer, entity);
+			mCosmetic.sanctOnHeal(mPlayer, mPlayer.getLocation(), entity);
 		}
 	}
 

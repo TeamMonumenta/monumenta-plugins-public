@@ -484,6 +484,8 @@ public class CharmManager {
 			ShieldBash.CHARM_RANGE,
 			ShieldBash.CHARM_RADIUS,
 			ShieldBash.CHARM_DURATION,
+			ShieldBash.CHARM_PARRY_DURATION,
+			ShieldBash.CHARM_CDR,
 			Toughness.CHARM_HEALTH,
 			Toughness.CHARM_REDUCTION,
 			Toughness.CHARM_HEALING,

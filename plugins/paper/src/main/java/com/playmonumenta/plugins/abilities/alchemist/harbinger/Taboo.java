@@ -162,7 +162,7 @@ public class Taboo extends Ability {
 		applySicknessEffects();
 		double absorptionLostMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_PENALTY, PERCENT_ABSORPTION_PENALTY);
 		AbsorptionUtils.subtractAbsorption(mPlayer, AbsorptionUtils.getAbsorption(mPlayer) * absorptionLostMultiplier);
-		mCosmetic.toggle(mPlayer, true);
+		mCosmetic.toggle(mPlayer.getWorld(), mPlayer.getLocation(), true);
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -174,7 +174,7 @@ public class Taboo extends Ability {
 		mBurstTimer = 0;
 		mCurrentState = TabooState.INACTIVE;
 		mAlchemistPotions.increaseChargeTime(mRechargeRateDecrease);
-		mCosmetic.toggle(mPlayer, false);
+		mCosmetic.toggle(mPlayer.getWorld(), mPlayer.getLocation(), false);
 		clearSicknessEffects();
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
@@ -183,7 +183,7 @@ public class Taboo extends Ability {
 		if (!isOnCooldown() && mCurrentState == TabooState.ACTIVE && mAlchemistPotions != null && mAlchemistPotions.decrementCharges(1)) {
 			mBurstTimer = BURST_SECONDS;
 			mCurrentState = TabooState.BURST;
-			mCosmetic.burstEffects(mPlayer);
+			mCosmetic.burstEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
 	}
@@ -192,7 +192,7 @@ public class Taboo extends Ability {
 		mBurstTimer = 0;
 		mCurrentState = TabooState.ACTIVE;
 		putOnCooldown(getModifiedCooldown(BURST_COOLDOWN));
-		mCosmetic.unburstEffects(mPlayer);
+		mCosmetic.unburstEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation());
 		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
@@ -214,7 +214,7 @@ public class Taboo extends Ability {
 			}
 
 			mPlugin.mEffectManager.addEffect(mPlayer, KNOCKBACK_RESIST_EFFECT_NAME, new PercentKnockbackResist(20, PERCENT_KNOCKBACK_RESIST + CharmManager.getLevel(mPlayer, CHARM_KNOCKBACK_RESISTANCE) / 10, KNOCKBACK_RESIST_EFFECT_NAME).displaysTime(false));
-			mCosmetic.periodicEffects(mPlayer, twoHertz, true, ticks, mCurrentState == TabooState.BURST);
+			mCosmetic.periodicEffects(mPlayer, mPlayer.getWorld(), mPlayer.getLocation(), twoHertz, true, ticks, mCurrentState == TabooState.BURST);
 			applySicknessEffects();
 		}
 	}

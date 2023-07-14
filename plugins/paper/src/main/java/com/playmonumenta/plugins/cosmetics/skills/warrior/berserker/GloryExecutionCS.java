@@ -58,9 +58,9 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			|| mPlayer.getGameMode() == GameMode.CREATIVE;
+	public boolean isUnlocked(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, GALLERY_COMPLETE_SCB).orElse(0) >= 1
+			|| player.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 	}
 
 	@Override
-	public void gloryStart(World world, Player mPlayer, Location location, int duration) {
+	public void gloryStart(World world, Player player, Location location, int duration) {
 		world.playSound(location, Sound.ENTITY_HORSE_JUMP, SoundCategory.PLAYERS, 5.5f, 0.85f);
 		world.playSound(location, Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 3f, 0.75f);
 		world.playSound(location, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 4f, 0.5f);
@@ -88,47 +88,47 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 					this.cancel();
 					return;
 				}
-				ring1.radius(3.6 * (mTimes - 1) / mTimes).spawnAsPlayerActive(mPlayer);
-				ring2.radius(3.2 * (mTimes - 1) / mTimes).spawnAsPlayerActive(mPlayer);
+				ring1.radius(3.6 * (mTimes - 1) / mTimes).spawnAsPlayerActive(player);
+				ring2.radius(3.2 * (mTimes - 1) / mTimes).spawnAsPlayerActive(player);
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 2);
 	}
 
 	@Override
-	public void gloryTick(Player mPlayer, int tick) {
-		Vector mFront = mPlayer.getLocation().getDirection();
-		Location loc = mPlayer.getLocation().add(0, mPlayer.getHeight() / 2, 0);
+	public void gloryTick(Player player, int tick) {
+		Vector mFront = player.getLocation().getDirection();
+		Location loc = player.getLocation().add(0, player.getHeight() / 2, 0);
 
 		ParticleUtils.drawCurve(loc, tick, tick + 2, mFront,
 			t -> 0.5 * (t - tick - 1),
 				t -> 1.25 * FastUtils.sin(t * 3.1416 / 12), t -> 1.25 * FastUtils.cos(t * 3.1416 / 12),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
 		);
 
 		ParticleUtils.drawCurve(loc, tick, tick + 2, mFront,
 			t -> 0.5 * (t - tick - 1),
 				t -> 1.25 * FastUtils.sin((t + 8) * 3.1416 / 12), t -> 1.25 * FastUtils.cos((t + 8) * 3.1416 / 12),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
 		);
 
 		ParticleUtils.drawCurve(loc, tick, tick + 2, mFront,
 			t -> 0.5 * (t - tick - 1),
 				t -> 1.25 * FastUtils.sin((t - 8) * 3.1416 / 12), t -> 1.25 * FastUtils.cos((t - 8) * 3.1416 / 12),
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0.1, 0.1, 0.1, 0, BLOODY_COLOR1).spawnAsPlayerActive(player)
 		);
 	}
 
 	@Override
-	public void gloryOnDamage(World world, Player mPlayer, LivingEntity target) {
-		Location loc1 = mPlayer.getEyeLocation();
+	public void gloryOnDamage(World world, Player player, LivingEntity target) {
+		Location loc1 = player.getEyeLocation();
 		Location loc2 = target.getLocation();
 		Location loc3 = target.getEyeLocation();
-		mPlayer.getWorld().playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
-		mPlayer.getWorld().playSound(loc2, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, 0.8f);
-		mPlayer.getWorld().playSound(loc2, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
+		player.getWorld().playSound(loc2, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.75f, 0.75f);
+		player.getWorld().playSound(loc2, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.75f, 0.8f);
+		player.getWorld().playSound(loc2, Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.PLAYERS, 1f, 0.65f);
 
-		new PartialParticle(Particle.REDSTONE, loc3, 25, 0.75, 0.75, 0.75, 0.1, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_NORMAL, loc3, 10, 0.5, 0.5, 0.5, 0.25).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.REDSTONE, loc3, 25, 0.75, 0.75, 0.75, 0.1, BLOODY_COLOR2).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc3, 10, 0.5, 0.5, 0.5, 0.25).spawnAsPlayerActive(player);
 
 		Vector mFront = loc3.clone().subtract(loc1).toVector();
 		if (EntityUtils.isHumanlike(target)) {
@@ -137,12 +137,12 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 			ParticleUtils.drawCurve(loc3, -8, 8, dir,
 				t -> 0,
 					t -> 0.16 * t, t -> 0.24 * t,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer)
+					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -8, 8, dir,
 				t -> 0,
 					t -> -0.16 * t, t -> 0.24 * t,
-					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer)
+					(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.01, 0.01, 0.01, 0, BLOODY_COLOR2).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -8, 4, dir,
 				t -> 0.25 * t,
@@ -151,7 +151,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 					@Override
 					public void run() {
 						new PartialParticle(Particle.REDSTONE, l, (6 - t) * 2, (4 - t) * 0.025, (4 - t) * 0.025, (4 - t) * 0.025, 0,
-							ParticleUtils.getTransition(BLOODY_COLOR2, BLOODY_COLOR1, (4 - t) / 12.0)).spawnAsPlayerActive(mPlayer);
+							ParticleUtils.getTransition(BLOODY_COLOR2, BLOODY_COLOR1, (4 - t) / 12.0)).spawnAsPlayerActive(player);
 					}
 				}.runTaskLater(Plugin.getInstance(), (t + 8) / 4)
 			);
@@ -168,8 +168,8 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 					public void run() {
 						new PPLine(Particle.REDSTONE, l, l.clone().add(delta))
 							.data(ParticleUtils.getTransition(BLOODY_COLOR2, BLOODY_COLOR1, (12 - t) / 10.0))
-							.countPerMeter(16).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.SMALL_FLAME, l.clone().add(delta.clone().multiply(0.5)), 1, 0, 0.1, 0, 0.1).spawnAsPlayerActive(mPlayer);
+							.countPerMeter(16).spawnAsPlayerActive(player);
+						new PartialParticle(Particle.SMALL_FLAME, l.clone().add(delta.clone().multiply(0.5)), 1, 0, 0.1, 0, 0.1).spawnAsPlayerActive(player);
 					}
 				}.runTaskLater(Plugin.getInstance(), (t - 2) / 3)
 			);
@@ -185,13 +185,13 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 							ParticleUtils.drawCurve(l, 0, 15, mFront.clone().normalize(),
 								t -> 0,
 									t -> tick * 0.3 * FastUtils.sin(t * 3.1416 * 2 / 16), t -> tick * 0.3 * FastUtils.cos(t * 3.1416 * 2 / 16),
-									(loc, t) -> new PartialParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer)
+									(loc, t) -> new PartialParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player)
 							);
 						} else {
 							ParticleUtils.drawCurve(l, -8, 8, mFront.clone().normalize(),
 								t -> 0.25 * t,
 									t -> 0, t -> 0,
-									(loc, t) -> new PartialParticle(Particle.CLOUD, loc, 3, 0.01, 0.01, 0.01, 0.2).spawnAsPlayerActive(mPlayer)
+									(loc, t) -> new PartialParticle(Particle.CLOUD, loc, 3, 0.01, 0.01, 0.01, 0.2).spawnAsPlayerActive(player)
 							);
 						}
 					}
@@ -205,35 +205,35 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 				new BukkitRunnable() {
 					@Override
 					public void run() {
-						new PartialParticle(Particle.WATER_SPLASH, l, t * 12, t * 0.125, t * 0.125, t * 0.125, 1).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.WATER_DROP, l, t * 6, t * 0.15, t * 0.15, t * 0.15, 1).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.WATER_SPLASH, l, t * 12, t * 0.125, t * 0.125, t * 0.125, 1).spawnAsPlayerActive(player);
+						new PartialParticle(Particle.WATER_DROP, l, t * 6, t * 0.15, t * 0.15, t * 0.15, 1).spawnAsPlayerActive(player);
 					}
 				}.runTaskLater(Plugin.getInstance(), t - 5);
 			}
 		} else {
 			// Default -> X flame
-			new PartialParticle(Particle.DRIP_LAVA, loc3, 80, 0.75, 0.75, 0.75, 0.5).spawnAsPlayerActive(mPlayer);
+			new PartialParticle(Particle.DRIP_LAVA, loc3, 80, 0.75, 0.75, 0.75, 0.5).spawnAsPlayerActive(player);
 			ParticleUtils.drawCurve(loc3, -12, 12, mFront.clone().normalize(),
 				t -> 0,
 					t -> t * 0.15, t -> t * 0.075,
-					(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer)
+					(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawCurve(loc3, -12, 12, mFront.clone().normalize(),
 				t -> 0,
 					t -> t * -0.15, t -> t * 0.075,
-					(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(mPlayer)
+					(l, t) -> new PartialParticle(Particle.FLAME, l, 2, 0, 0, 0, 0.1).spawnAsPlayerActive(player)
 			);
 
 		}
 	}
 
 	@Override
-	public void gloryOnLand(World world, Player mPlayer, Location loc, double radius) {
+	public void gloryOnLand(World world, Player player, Location loc, double radius) {
 		world.playSound(loc, Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.PLAYERS, 0.35f, 0.55f);
 		world.playSound(loc, Sound.ENTITY_HORSE_GALLOP, SoundCategory.PLAYERS, 4.5F, 0.5F);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0.6f);
 
-		Vector mFront = mPlayer.getLocation().getDirection().setY(0).normalize().multiply(radius);
+		Vector mFront = player.getLocation().getDirection().setY(0).normalize().multiply(radius);
 		final int units = (int) Math.ceil(LAND_ANIM_FRAMES * radius * 3);
 		ParticleUtils.drawCurve(loc.clone().add(0, 0.5, 0), 0, units, mFront,
 			t -> FastUtils.cos(t * 3.1416 / 13) * t / units,
@@ -241,7 +241,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 				(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES * t / units)
 		);
@@ -251,7 +251,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 				(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES * t / units)
 		);
@@ -261,7 +261,7 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 				(l, t) -> new BukkitRunnable() {
 				@Override
 				public void run() {
-					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, l, 2, 0.05, 0, 0.05, 0, BLOODY_COLOR1).spawnAsPlayerActive(player);
 				}
 			}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES * t / units)
 		);
@@ -269,9 +269,9 @@ public class GloryExecutionCS extends GloriousBattleCS implements GalleryCS {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				new PPCircle(Particle.CRIT_MAGIC, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 11)).spawnAsPlayerActive(mPlayer);
-				new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 7)).data(BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.SWEEP_ATTACK, loc, (int) Math.ceil(radius * 3), radius / 3, 0, radius / 3, 0).spawnAsPlayerActive(mPlayer);
+				new PPCircle(Particle.CRIT_MAGIC, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 11)).spawnAsPlayerActive(player);
+				new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.5, 0), 0).count((int) Math.ceil(radius * 7)).data(BLOODY_COLOR1).spawnAsPlayerActive(player);
+				new PartialParticle(Particle.SWEEP_ATTACK, loc, (int) Math.ceil(radius * 3), radius / 3, 0, radius / 3, 0).spawnAsPlayerActive(player);
 			}
 		}.runTaskLater(Plugin.getInstance(), LAND_ANIM_FRAMES);
 	}

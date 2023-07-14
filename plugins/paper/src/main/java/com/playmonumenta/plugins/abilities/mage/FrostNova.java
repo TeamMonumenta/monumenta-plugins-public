@@ -94,8 +94,8 @@ public class FrostNova extends Ability {
 
 	public FrostNova(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		int damage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isEnhanced() ? (int) (damage * ENHANCED_DAMAGE_MODIFIER) : damage);
+		double damage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mLevelDamage = (float) CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isEnhanced() ? damage * ENHANCED_DAMAGE_MODIFIER : damage);
 		mLevelSlowMultiplier = (isLevelOne() ? SLOW_MULTIPLIER_1 : SLOW_MULTIPLIER_2) + CharmManager.getLevelPercentDecimal(player, CHARM_SLOW);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new FrostNovaCS());
 	}

@@ -67,14 +67,14 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 	}
 
 	@Override
-	public void shadesStartSound(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.PLAYERS, 0.9f, 0.8f);
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_POLAR_BEAR_AMBIENT, SoundCategory.PLAYERS, 1.25f, 0.6f);
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.75f);
+	public void shadesStartSound(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.PLAYERS, 0.9f, 0.8f);
+		world.playSound(loc, Sound.ENTITY_POLAR_BEAR_AMBIENT, SoundCategory.PLAYERS, 1.25f, 0.6f);
+		world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.75f);
 	}
 
 	@Override
-	public void shadesTrailParticle(Player mPlayer, Location bLoc, Vector dir, double distance) {
+	public void shadesTrailParticle(Player player, Location bLoc, Vector dir, double distance) {
 		double radius = distance / 6.4;
 		int units = (int) Math.ceil(distance * 2.4);
 		ParticleUtils.drawCurve(bLoc, 1, units, dir,
@@ -82,16 +82,16 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 				t -> radius * FastUtils.sin(3.1416 * 2 * t / units), t -> radius * FastUtils.cos(3.1416 * 2 * t / units),
 				(loc, t) -> {
 				if (t % 2 == 0) {
-					new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player);
 				} else {
-					new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
+					new PartialParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(player);
 				}
 			}
 		);
 	}
 
 	@Override
-	public void shadesTickEffect(Plugin mPlugin, World world, Player mPlayer, Location bLoc, double mAoeRadius, int mT) {
+	public void shadesTickEffect(Plugin plugin, World world, Player player, Location bLoc, double mAoeRadius, int mT) {
 		if (mT % 10 == 0) {
 			new BukkitRunnable() {
 				double mRadius = 0;
@@ -100,13 +100,13 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 				@Override
 				public void run() {
 					mRadius += 1.05;
-					new PPCircle(Particle.REDSTONE, mLoc, mRadius).count(40).delta(0.2).extra(0.1).data(LIGHT_COLOR).spawnAsPlayerActive(mPlayer);
-					new PPCircle(Particle.CLOUD, mLoc, mRadius + 0.15).count(10).delta(0.05).extra(0.01).spawnAsPlayerActive(mPlayer);
+					new PPCircle(Particle.REDSTONE, mLoc, mRadius).count(40).delta(0.2).extra(0.1).data(LIGHT_COLOR).spawnAsPlayerActive(player);
+					new PPCircle(Particle.CLOUD, mLoc, mRadius + 0.15).count(10).delta(0.05).extra(0.01).spawnAsPlayerActive(player);
 					if (mRadius >= mAoeRadius + 1) {
 						this.cancel();
 					}
 				}
-			}.runTaskTimer(mPlugin, 0, 1);
+			}.runTaskTimer(plugin, 0, 1);
 
 			int units = 4 * (int) Math.ceil(mAoeRadius * 3.2);
 			ParticleUtils.drawCurve(bLoc.clone().add(0, 0.125, 0), 1, units,
@@ -116,7 +116,7 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 				t -> Math.pow(FastUtils.cos(3.1416 * 2 * t / units), 3),
 				t -> Math.pow(FastUtils.sin(3.1416 * 2 * t / units), 3),
 				t -> 0,
-				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0.1, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				(loc, t) -> new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0.1, GOLD_COLOR).spawnAsPlayerActive(player)
 			);
 		}
 
@@ -127,7 +127,7 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 	}
 
 	@Override
-	public void shadesEndEffect(World world, Player mPlayer, Location bLoc, double radius) {
+	public void shadesEndEffect(World world, Player player, Location bLoc, double radius) {
 		for (int i = 0; i < 3; i++) {
 			radius *= 0.6;
 			final int frame = i + 1;
@@ -142,7 +142,7 @@ public class PrestigiousShadesCS extends HauntingShadesCS implements PrestigeCS 
 				(loc, t) -> new BukkitRunnable() {
 					@Override
 					public void run() {
-						new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0.1, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+						new PartialParticle(Particle.REDSTONE, loc, 2, 0.05, 0.05, 0.05, 0.1, GOLD_COLOR).spawnAsPlayerActive(player);
 					}
 				}.runTaskLater(Plugin.getInstance(), 2 * frame)
 			);

@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.cleric;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -13,7 +11,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class SanctifiedArmorCS implements CosmeticSkill {
 
@@ -27,16 +24,20 @@ public class SanctifiedArmorCS implements CosmeticSkill {
 		return Material.IRON_CHESTPLATE;
 	}
 
-	public void sanctOnTrigger1(World world, Player mPlayer, Location loc, LivingEntity source) {
-		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, SoundCategory.PLAYERS, 0.7f, 1.2f);
-		new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(mPlayer);
+	public void sanctOnTrigger1(World world, Player player, Location loc, LivingEntity source) {
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.1f, 1.6f);
+		world.playSound(loc, Sound.ENTITY_GUARDIAN_HURT, SoundCategory.PLAYERS, 1.2f, 1.4f);
+		world.playSound(loc, Sound.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1.4f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 0.9f, 1.4f);
+		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1.2f, 0.1f);
+		new PartialParticle(Particle.FIREWORKS_SPARK, loc.add(0, source.getHeight() / 2, 0), 7, 0.35, 0.35, 0.35, 0.125).spawnAsPlayerPassive(player);
 	}
 
-	public void sanctOnTrigger2(World world, Player mPlayer, Location loc, LivingEntity source) {
-		sanctOnTrigger1(world, mPlayer, loc, source);
+	public void sanctOnTrigger2(World world, Player player, Location loc, LivingEntity source) {
+		sanctOnTrigger1(world, player, loc, source);
 	}
 
-	public void sanctOnHeal(Player mPlayer, LivingEntity enemy) {
-		mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.65f, 1.25f);
+	public void sanctOnHeal(Player player, Location loc, LivingEntity enemy) {
+		player.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.65f, 1.25f);
 	}
 }

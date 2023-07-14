@@ -4,10 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
+import com.playmonumenta.plugins.cosmetics.skills.warrior.RiposteCS;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -18,15 +19,11 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class Riposte extends Ability {
@@ -50,6 +47,8 @@ public class Riposte extends Ability {
 	public static final String CHARM_RADIUS = "Riposte Range";
 	public static final String CHARM_ROOT_DURATION = "Riposte Root Duration";
 
+	private final RiposteCS mCosmetic;
+
 	public static final AbilityInfo<Riposte> INFO =
 		new AbilityInfo<>(Riposte.class, "Riposte", Riposte::new)
 			.linkedSpell(ClassAbility.RIPOSTE)
@@ -71,6 +70,7 @@ public class Riposte extends Ability {
 
 	public Riposte(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
+		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new RiposteCS());
 	}
 
 	@Override
@@ -82,24 +82,21 @@ public class Riposte extends Ability {
 			ItemStack mainHand = mPlayer.getInventory().getItemInMainHand();
 			if (ItemUtils.isAxe(mainHand) || ItemUtils.isSword(mainHand)) {
 				MovementUtils.knockAway(mPlayer, source, (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, RIPOSTE_KNOCKBACK_SPEED), true);
+
+				World world = mPlayer.getWorld();
+				Location playerLoc = mPlayer.getLocation();
+
 				if (isLevelTwo()) {
 					if (ItemUtils.isSword(mainHand)) {
 						int duration = CharmManager.getDuration(mPlayer, CHARM_DAMAGE_DURATION, RIPOSTE_SWORD_DURATION);
 						mSwordTimer = Bukkit.getServer().getCurrentTick() + duration;
 					} else if (ItemUtils.isAxe(mainHand)) {
 						EntityUtils.applyStun(mPlugin, CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, RIPOSTE_AXE_DURATION), source);
+						mCosmetic.onAxeStun(world, playerLoc);
 					}
 				}
 
-				World world = mPlayer.getWorld();
-				Location playerLoc = mPlayer.getLocation();
-				world.playSound(playerLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 1.2f);
-				world.playSound(playerLoc, Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.PLAYERS, 0.75f, 1.8f);
-				Vector dir = LocationUtils.getDirectionTo(playerLoc.clone().add(0, 1, 0), source.getLocation().add(0, source.getHeight() / 2, 0));
-				Location loc = mPlayer.getLocation().add(0, 1, 0).subtract(dir);
-				new PartialParticle(Particle.SWEEP_ATTACK, loc, 8, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.CRIT, loc, 75, 0.1, 0.1, 0.1, 0.6).spawnAsPlayerActive(mPlayer);
+				mCosmetic.onParry(mPlayer, world, playerLoc, source);
 				putOnCooldown();
 				event.setCancelled(true);
 				mPlayer.setNoDamageTicks(20);
@@ -112,7 +109,7 @@ public class Riposte extends Ability {
 						DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, ClassAbility.RIPOSTE, true, true);
 						EntityUtils.applySlow(mPlugin, duration, 1.0f, mob);
 					}
-					world.playSound(playerLoc, Sound.BLOCK_ANVIL_FALL, SoundCategory.PLAYERS, 0.5f, 0.5f);
+					mCosmetic.onEnhancedParry(world, playerLoc);
 				}
 			}
 		}
@@ -125,6 +122,7 @@ public class Riposte extends Ability {
 			    && Bukkit.getServer().getCurrentTick() <= mSwordTimer) {
 			event.setDamage(event.getDamage() * (1 + RIPOSTE_SWORD_BONUS_DAMAGE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BONUS_DAMAGE)));
 			mSwordTimer = Integer.MIN_VALUE;
+			mCosmetic.onSwordAttack(mPlayer.getWorld(), mPlayer.getLocation());
 		}
 		return false; // prevents multiple applications itself by clearing mSwordTimer
 	}

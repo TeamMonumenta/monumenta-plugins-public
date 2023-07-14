@@ -26,15 +26,15 @@ public class ByMyBladeCS implements CosmeticSkill {
 
 	public void bmbDamage(World world, Player player, LivingEntity enemy, int level) {
 		Location loc = enemy.getLocation();
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.1f, 0.7f);
-		world.playSound(loc, Sound.ENTITY_PLAYER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.2f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_DEATH, SoundCategory.PLAYERS, 1.2f, 1.0f);
 		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 1.0f, 1.5f);
 		world.playSound(loc, Sound.ITEM_SHIELD_BREAK, SoundCategory.PLAYERS, 2.0f, 0.1f);
-		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.5f);
-		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.7f, 2.0f);
+		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.2f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.9f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2.0f, 0.3f);
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 1.0f);
-		world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 0.7f, 0.6f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 0.9f, 0.6f);
 		new PartialParticle(Particle.SPELL_MOB, loc, level * 15, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIT, loc, 30, 0.25, 0.5, 0.5, 0.001).spawnAsPlayerActive(player);
 	}
