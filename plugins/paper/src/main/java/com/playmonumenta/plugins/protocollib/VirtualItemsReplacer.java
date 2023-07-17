@@ -19,20 +19,16 @@ import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
-import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
-import java.util.Arrays;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -40,12 +36,10 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
 public class VirtualItemsReplacer extends PacketAdapter {
@@ -83,7 +77,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			List<ItemStack> items = handle.getItems();
 			for (int i = 0; i < items.size(); i++) {
 				ItemStack item = items.get(i);
-				processItem(item, i, player, isPlayerInventory);
+				processItemWindow(item, i, player, isPlayerInventory);
 			}
 		} else if (packet.getType().equals(PacketType.Play.Server.OPEN_WINDOW_MERCHANT)) {
 			List<MerchantRecipe> recipeList = packet.getMerchantRecipeLists().read(0);
@@ -91,10 +85,10 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				MerchantRecipe recipe = recipeList.get(i);
 				List<ItemStack> ingredients = recipe.getIngredients();
 				for (ItemStack ingredient : ingredients) {
-					processItem(ingredient, -1, player, false);
+					processTradeMenu(ingredient, -1, player, false);
 				}
 				ItemStack result = recipe.getResult();
-				processItem(result, -1, player, false);
+				processTradeMenu(result, -1, player, false);
 				MerchantRecipe recipeCopy = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(),
 					recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice(), recipe.shouldIgnoreDiscounts());
 				recipeCopy.setIngredients(ingredients);
@@ -104,10 +98,25 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		} else { // PacketType.Play.Server.SET_SLOT
 			PacketPlayOutSetSlotHandle handle = PacketPlayOutSetSlotHandle.createHandle(packet.getHandle());
 			boolean isPlayerInventory = handle.getWindowId() == 0;
-			processItem(handle.getItem(), handle.getSlot(), player, isPlayerInventory);
+			processSetSlot(handle.getItem(), handle.getSlot(), player, isPlayerInventory);
 		}
 	}
 
+	// these methods is to determine what packet lags the most/gets called more often in spark
+	// this may get reworked in the future
+	private void processSetSlot(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+		processItem(itemStack, slot, player, isPlayerInventory);
+	}
+
+	private void processItemWindow(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+		processItem(itemStack, slot, player, isPlayerInventory);
+	}
+
+	private void processTradeMenu(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
+		processItem(itemStack, slot, player, isPlayerInventory);
+	}
+
+	// the actual processing event
 	private void processItem(ItemStack itemStack, int slot, Player player, boolean isPlayerInventory) {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return;
@@ -117,41 +126,60 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			boolean isArmorOrOffhandSlot = (5 <= slot && slot <= 8) || slot == 45;
 			boolean isHotbarOrOffhandSlot = 36 <= slot && slot < 46;
 
-			// Virtual Firmament
-			if (isHotbarOrOffhandSlot
-				    && ItemUtils.isShulkerBox(itemStack.getType())
+			if (isHotbarOrOffhandSlot) {
+				// Virtual Firmament
+				if (ItemUtils.isShulkerBox(itemStack.getType())
 				    && VirtualFirmament.isEnabled(player)) {
-				String plainName = ItemUtils.getPlainNameIfExists(itemStack);
-				if ("Firmament".equals(plainName) || "Doorway from Eternity".equals(plainName)) {
-					if (itemStack.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulkerBox) {
-						new NBTItem(itemStack, true).setString("FirmamentColor", shulkerBox.getColor() == null ? "undyed" : shulkerBox.getColor().name().toLowerCase(Locale.ROOT));
-						int count = Arrays.stream(shulkerBox.getInventory().getContents())
-							            .filter(Objects::nonNull)
-							            .mapToInt(ItemStack::getAmount).sum();
+					String plainName = ItemUtils.getPlainNameIfExists(itemStack);
+					if ("Firmament".equals(plainName) || "Doorway from Eternity".equals(plainName)) {
+						ReadableNBTList<ReadWriteNBT> items = NBT.get(itemStack, ItemUtils::getContainerItems);
+						int count = 0;
+						if (items != null) {
+							for (ReadWriteNBT itemNBT : items) {
+								if (itemNBT.hasTag("tag")) { // probably has lore
+									continue;
+								}
+								String id = itemNBT.getString("id"); // minecraft:tag
+								Byte amount = itemNBT.getByte("Count"); // count
+								Material mat = Material.matchMaterial(id); // use bukkit's material system to check if it is a block
+								// check copied from FirmanentOverride
+								if (mat == null
+									|| mat.isAir()
+									|| ItemUtils.notAllowedTreeReplace.contains(mat)
+									|| (!mat.isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(mat))) {
+									continue;
+								}
+								if (mat.isBlock()) {
+									count += amount;
+								}
+								if (count >= 64) { // if above 64, we know we have enough blocks
+									break;
+								}
+							}
+						}
 						itemStack.setAmount(Math.max(1, Math.min(count, 64)));
+						// ? Add shulker box id here for resourcepack team when they need dyed support
+						itemStack.setType("Firmament".equals(plainName) ? Material.PRISMARINE : Material.BLACKSTONE);
+						markVirtual(itemStack);
+						return;
 					}
-					itemStack.setType("Firmament".equals(plainName) ? Material.PRISMARINE : Material.BLACKSTONE);
+				}
+
+				// Virtual cooldown items for Infinity food
+				for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
+					if (mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey())) && ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0) {
+						itemStack.setType(entry.getValue());
+						markVirtual(itemStack);
+						return;
+					}
+				}
+
+				// Worldshaper's Loom cooldown item
+				if (mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE) && WorldshaperOverride.isWorldshaperItem(itemStack)) {
+					itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
 					markVirtual(itemStack);
 					return;
 				}
-			}
-
-			// Virtual cooldown items for Infinity food
-			for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
-				if (ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0
-					    && mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey()))) {
-					itemStack.setType(entry.getValue());
-					markVirtual(itemStack);
-					return;
-				}
-			}
-
-			// Worldshaper's Loom cooldown item
-			if (WorldshaperOverride.isWorldshaperItem(itemStack)
-				    && mPlugin.mEffectManager.hasEffect(player, WorldshaperOverride.COOLDOWN_SOURCE)) {
-				itemStack.setType(WorldshaperOverride.COOLDOWN_ITEM);
-				markVirtual(itemStack);
-				return;
 			}
 
 			// Vanity
@@ -166,16 +194,18 @@ public class VirtualItemsReplacer extends PacketAdapter {
 						default -> EquipmentSlot.OFF_HAND;
 					};
 					VanityManager.applyVanity(itemStack, vanityData, equipmentSlot, true);
+					return;
 				}
 			}
 
 			// Quivers: fake a larger stack size to not have them disappear from the inventory on the client when a bow is shot (until the next inventory update happens)
 			if (ItemStatUtils.isQuiver(itemStack)) {
 				if (itemStack.getAmount() == 1) {
-					NBTCompoundList items = ItemStatUtils.addPlayerModified(new NBTItem(itemStack)).getCompoundList(ItemStatUtils.ITEMS_KEY);
+					ReadableNBTList<ReadWriteNBT> items = NBT.get(itemStack, ItemStatUtils::getItemList);
 					long amount = 0;
-					for (NBTListCompound compound : items) {
-						amount += ItemStatUtils.addPlayerModified(compound.addCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
+					for (ReadWriteNBT compound : items) {
+						// this can be null
+						amount += ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
 						if (amount >= 64) {
 							break;
 						}
@@ -187,7 +217,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			}
 
 			// Alchemical Utensils
-			if (isHotbarOrOffhandSlot && ItemUtils.isAlchemistItem(itemStack) && PlayerUtils.isAlchemist(player)) {
+			if (isHotbarOrOffhandSlot && PlayerUtils.isAlchemist(player) && ItemUtils.isAlchemistItem(itemStack)) {
 				AlchemistPotions potionsAbility = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, AlchemistPotions.class);
 
 				if (potionsAbility == null) {
@@ -195,77 +225,72 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				}
 
 				int count = potionsAbility.getCharges();
-				new NBTItem(itemStack, true).setInteger("CHARGES", count);
 				itemStack.setAmount(Math.max(1, count));
 
-				ItemUtils.modifyMeta(itemStack, meta -> {
-					if (meta instanceof PotionMeta potionMeta) {
-						double ratio = ((double) count) / potionsAbility.getMaxCharges();
-						int color = (int) (ratio * 255);
-						if (potionsAbility.isGruesomeMode()) {
-							potionMeta.setColor(Color.fromRGB(color, 0, 0));
-						} else {
-							potionMeta.setColor(Color.fromRGB(0, color, 0));
+				NBT.modify(itemStack, nbt -> {
+					nbt.modifyMeta((nbtr, meta) -> {
+						if (meta instanceof PotionMeta potionMeta) {
+							double ratio = ((double) count) / potionsAbility.getMaxCharges();
+							int color = (int) (ratio * 255);
+							if (potionsAbility.isGruesomeMode()) {
+								potionMeta.setColor(Color.fromRGB(color, 0, 0));
+							} else {
+								potionMeta.setColor(Color.fromRGB(0, color, 0));
+							}
 						}
-					}
-					meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
+						meta.displayName(ItemUtils.getDisplayName(itemStack).append(Component.text(" (" + count + ")")));
+					});
+					nbt.setInteger("CHARGES", count);
+					markVirtual(nbt);
 				});
-				markVirtual(itemStack);
 				return;
-			}
-		}
-
-		// Lootboxes: don't send stored items to prevent NBT banning
-		if (LootboxManager.isLootbox(itemStack)) {
-			NBTCompound monumenta = new NBTItem(itemStack, true).getCompound(ItemStatUtils.MONUMENTA_KEY);
-			if (monumenta != null) {
-				NBTCompound playerModified = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-				if (playerModified != null) {
-					// old lootbox format (needed for legacy reasons)
-					playerModified.removeKey(ItemStatUtils.ITEMS_KEY);
-					// new lootbox format
-					// playerModified.removeKey(LootboxManager.LOOTBOX_INDEX_KEY);
-					// playerModified.removeKey(LootboxManager.LOOTBOX_SHARES_KEY);
-					markVirtual(itemStack);
-				}
 			}
 		}
 
 		// Custom shulker names
 		if (ItemUtils.isShulkerBox(itemStack.getType())) {
-			nestedShulkerCheck(itemStack);
-			String prefix;
-			String suffix;
-			if (ItemStatUtils.getRegion(itemStack) == ItemStatUtils.Region.SHULKER_BOX) {
-				prefix = "`";
-				suffix = "´";
-			} else if (ShulkerEquipmentListener.isOmnilockbox(itemStack)) {
-				prefix = "Omnilockbox: ";
-				suffix = "";
-			} else if (ShulkerEquipmentListener.isEquipmentBox(itemStack)) {
-				prefix = "Loadout: ";
-				suffix = "";
-			} else if (ShulkerEquipmentListener.isCharmBox(itemStack)) {
-				prefix = "C.H.A.R.M.: ";
-				suffix = "";
-			} else {
-				prefix = null;
-				suffix = null;
-			}
-			if (prefix != null) {
-				NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(itemStack));
+			String customName = NBT.get(itemStack, nbt -> {
+				ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
 				if (playerModified != null) {
-					String customName = playerModified.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-					if (customName != null && !customName.isEmpty()) {
-						ItemUtils.modifyMeta(itemStack, meta -> {
+					return playerModified.getString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
+				}
+				return null;
+			});
+			if (customName != null) {
+				String prefix;
+				String suffix;
+				if (ItemStatUtils.getRegion(itemStack) == ItemStatUtils.Region.SHULKER_BOX) {
+					prefix = "`";
+					suffix = "´";
+				} else {
+					String lock = NBT.get(itemStack, ItemUtils::getContainerLock);
+					if (lock == null || lock.isBlank()) {
+						prefix = null;
+						suffix = null;
+					} else if (lock.equals(ShulkerEquipmentListener.LOCK_STRING)) { // loadout lockboxes
+						prefix = "Loadout: ";
+						suffix = "";
+					} else if (lock.equals(ShulkerEquipmentListener.CHARM_STRING)) { // charm boxes
+						prefix = "C.H.A.R.M.: ";
+						suffix = "";
+					} else {
+						prefix = null;
+						suffix = null;
+					}
+				}
+				if (prefix != null && customName != null && !customName.isEmpty()) {
+					NBT.modify(itemStack, nbt -> {
+						nbt.modifyMeta((nbtr, meta) -> {
 							Component existingName = meta.displayName();
 							meta.displayName(Component.text(prefix + customName + suffix,
 								existingName == null ? Style.style(NamedTextColor.WHITE, TextDecoration.BOLD, TextDecoration.ITALIC) : existingName.style()));
 						});
-						markVirtual(itemStack);
-					}
+						markVirtual(nbt);
+					});
+					return;
 				}
 			}
+
 		}
 	}
 
@@ -276,44 +301,20 @@ public class VirtualItemsReplacer extends PacketAdapter {
 		if (itemStack == null || itemStack.getType() == Material.AIR) {
 			return false;
 		}
-		NBTCompound monumenta = new NBTItem(itemStack).getCompound(ItemStatUtils.MONUMENTA_KEY);
-		return monumenta != null && Boolean.TRUE.equals(monumenta.getBoolean(IS_VIRTUAL_ITEM_NBT_KEY));
+		return NBT.get(itemStack, nbt -> {
+			ReadableNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
+			return monumenta != null && Boolean.TRUE.equals(monumenta.getBoolean(IS_VIRTUAL_ITEM_NBT_KEY));
+		});
 	}
 
 	public static void markVirtual(ItemStack item) {
-		new NBTItem(item, true).addCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(IS_VIRTUAL_ITEM_NBT_KEY, true);
+		NBT.modify(item, nbt -> {
+			markVirtual(nbt);
+		});
 	}
 
-	/**
-	 * Purge "Items" key in nested "BlockEntityTag" for shulker boxes
-	 * Ensures mods such as Shulker Tooltip can still operate properly
-	 */
-	private static void nestedShulkerCheck(ItemStack itemStack) {
-		// all shulkers should have a BlockEntityTag but check anyway
-		NBTCompound blockEntityTag = new NBTItem(itemStack, true).getCompound("BlockEntityTag");
-		if (blockEntityTag == null) {
-			return;
-		}
-		NBTCompoundList items = blockEntityTag.getCompoundList("Items"); // this probably could be changed to ItemStatUtils.ITEMS_KEY but this is for vanilla
-		if (items == null) {
-			return;
-		}
-		Boolean foundNested = false;
-		for (NBTCompound item : items) {
-			NBTCompound tag = item.getCompound("tag");
-			if (tag == null) {
-				continue;
-			}
-			// we don't know if this is a container with a loottable! so check it
-			NBTCompound nestedBlockEntityTag = tag.getCompound("BlockEntityTag");
-			if (nestedBlockEntityTag == null) {
-				continue;
-			}
-			foundNested = true;
-			tag.removeKey("BlockEntityTag");
-		}
-		if (foundNested) {
-			markVirtual(itemStack);
-		}
+	public static void markVirtual(ReadWriteNBT nbt) {
+		nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).setBoolean(IS_VIRTUAL_ITEM_NBT_KEY, true);
 	}
+
 }

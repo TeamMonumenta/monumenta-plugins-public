@@ -11,10 +11,12 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import de.jeff_media.chestsort.api.ChestSortAPI;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -419,7 +421,7 @@ public class LootboxManager implements Listener {
 		// loop through specified number of shares
 		for (int i = 0; i < count; i++) {
 			// we don't want to use the count here as we are actively removing items
-			NBTCompound lootShare = shares.remove(0);
+			ReadWriteNBT lootShare = shares.remove(0);
 			// no more shares
 			if (lootShare == null) {
 				break;
@@ -673,7 +675,7 @@ public class LootboxManager implements Listener {
 		NBTCompound monumenta = nbt.addCompound(ItemStatUtils.MONUMENTA_KEY);
 		NBTCompound playerModified = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 		NBTCompound lootboxKey = playerModified.addCompound(LOOTBOX_KEY);
-		if (lootboxKey.hasKey(LOOTBOX_INDEX_KEY) || lootboxKey.hasKey(LOOTBOX_SHARES_KEY)) {
+		if (lootboxKey.hasTag(LOOTBOX_INDEX_KEY) || lootboxKey.hasTag(LOOTBOX_SHARES_KEY)) {
 			return false;
 		}
 		NBTCompound index = lootboxKey.addCompound(LOOTBOX_INDEX_KEY);
@@ -681,8 +683,8 @@ public class LootboxManager implements Listener {
 		if (isEpicLootbox(lootbox)) {
 			NBTCompoundList items = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 			if (items != null) {
-				for (NBTCompound share : items) {
-					ItemStack lootShare = NBTItem.convertNBTtoItem(share);
+				for (ReadWriteNBT share : items) {
+					ItemStack lootShare = NBT.itemStackFromNBT(share);
 					if (lootShare == null) {
 						continue;
 					}
@@ -739,8 +741,7 @@ public class LootboxManager implements Listener {
 	}
 
 	public static boolean isLootbox(ItemStack item) {
-		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta()
-				|| !item.getItemMeta().hasDisplayName()) {
+		if (item == null || !ItemUtils.isShulkerBox(item.getType()) || !item.hasItemMeta()) {
 			return false;
 		}
 

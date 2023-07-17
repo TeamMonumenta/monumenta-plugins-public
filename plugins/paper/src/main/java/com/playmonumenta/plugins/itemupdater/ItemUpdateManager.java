@@ -6,11 +6,12 @@ import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -245,20 +246,20 @@ public class ItemUpdateManager implements Listener {
 
 			// Only generate item stats on items with Monumenta tag
 			NBTItem nbt = new NBTItem(item);
-			if (nbt.hasKey(ItemStatUtils.MONUMENTA_KEY)) {
+			if (nbt.hasTag(ItemStatUtils.MONUMENTA_KEY)) {
 				ItemStatUtils.generateItemStats(item);
 
 				// Update arrows in quivers immediately - otherwise, they would need updating every time an arrow is shot or picked up
 				if (ItemStatUtils.isQuiver(item)) {
-					NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item, true));
+					NBTCompound playerModified = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY).getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 					if (playerModified != null) {
 						NBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
 						if (arrowNBTs != null) {
 							List<String> arrowPath = new ArrayList<>(path);
 							arrowPath.add("in quiver");
 							List<NBTContainer> arrows = new ArrayList<>(arrowNBTs.size());
-							for (NBTListCompound arrowNBT : arrowNBTs) {
-								ItemStack arrow = NBTItem.convertNBTtoItem(arrowNBT);
+							for (ReadWriteNBT arrowNBT : arrowNBTs) {
+								ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
 								updateNested(arrowPath, arrow);
 								arrows.add(NBTItem.convertItemtoNBT(arrow));
 							}

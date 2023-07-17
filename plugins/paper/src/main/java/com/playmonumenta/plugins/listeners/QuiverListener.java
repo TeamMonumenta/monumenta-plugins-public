@@ -11,14 +11,14 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import io.papermc.paper.event.block.BlockPreDispenseEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -93,7 +93,7 @@ public class QuiverListener implements Listener {
 			@Override
 			public boolean canPutIntoContainer(ItemStack item) {
 				return ItemUtils.isArrow(item)
-					       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
+					       && NBT.get(item, ItemStatUtils::getPlayerModified) == null
 					       && !ItemStatUtils.isQuiver(item)
 					       && !InventoryUtils.containsSpecialLore(item);
 			}
@@ -109,12 +109,12 @@ public class QuiverListener implements Listener {
 			}
 
 			@Override
-			public void generateDescription(NBTCompound monumenta, Consumer<Component> addLore) {
-				NBTCompoundList items = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY)
+			public void generateDescription(ReadableNBT monumenta, Consumer<Component> addLore) {
+				ReadableNBTList<ReadWriteNBT> items = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY)
 					                        .getCompoundList(ItemStatUtils.ITEMS_KEY);
 				long amount = 0;
-				for (NBTListCompound compound : items) {
-					amount += ItemStatUtils.addPlayerModified(compound.addCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
+				for (ReadWriteNBT compound : items) {
+					amount += ItemStatUtils.addPlayerModified(compound.getCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
 				}
 				addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 					               .append(Component.text(amount + (mTotalItemsLimit > 0 ? "/" + mTotalItemsLimit : ""), NamedTextColor.WHITE))
@@ -162,30 +162,35 @@ public class QuiverListener implements Listener {
 								gui.update();
 							} else if (event.getClick() == ClickType.SWAP_OFFHAND && mode.mItemStack != null) {
 								// Swap: transform all applicable arrows in the quiver
-								NBTCompoundList itemsList = ItemStatUtils.addPlayerModified(new NBTItem(quiver, true)).getCompoundList(ItemStatUtils.ITEMS_KEY);
-								NBTCompound firstArrowPlayerModified = null;
-								for (Iterator<NBTListCompound> iterator = itemsList.iterator(); iterator.hasNext(); ) {
-									NBTListCompound compound = iterator.next();
-									ItemStack containedItem = NBTItem.convertNBTtoItem(compound);
-									ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
-									if (Arrays.stream(ArrowTransformMode.values()).anyMatch(m -> containedItem.isSimilar(m.mItemStack))) {
-										if (firstArrowPlayerModified == null) {
-											// Modify the item in the quiver by modifying the transformed item copy, then overwriting the whole NBT
-											ItemStack transformed = ItemUtils.clone(mode.mItemStack);
-											ItemStatUtils.addPlayerModified(new NBTItem(transformed, true))
-												.mergeCompound(ItemStatUtils.addPlayerModified(compound.addCompound("tag")));
-											compound.removeKey("tag");
-											compound.mergeCompound(NBTItem.convertItemtoNBT(transformed));
-											firstArrowPlayerModified = ItemStatUtils.addPlayerModified(compound.addCompound("tag"));
-										} else {
-											// An arrow was transformed already: remove this item and increase the count of the transformed item
-											iterator.remove();
-											firstArrowPlayerModified.setLong(CustomContainerItemManager.AMOUNT_KEY,
-												firstArrowPlayerModified.getLong(CustomContainerItemManager.AMOUNT_KEY)
-													+ ItemStatUtils.addPlayerModified(compound.addCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY));
+								NBT.modify(quiver, nbt -> {
+									ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
+									List<ReadWriteNBT> itemsListCopy = itemsList.toListCopy();
+									ReadWriteNBT firstArrowPlayerModified = null;
+									for (int i = 0; i < itemsListCopy.size(); i++) {
+										ReadWriteNBT compound = itemsList.get(i);
+										ItemStack containedItem = NBT.itemStackFromNBT(compound);
+										NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
+										if (Arrays.stream(ArrowTransformMode.values()).anyMatch(m -> containedItem.isSimilar(m.mItemStack))) {
+											if (firstArrowPlayerModified == null) {
+												// Modify the item in the quiver by modifying the transformed item copy, then overwriting the whole NBT
+												ItemStack transformed = ItemUtils.clone(mode.mItemStack);
+												NBT.modify(transformed, inbt -> {
+													ItemStatUtils.addPlayerModified(inbt).mergeCompound(ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag")));
+												});
+												compound.removeKey("tag");
+												compound.mergeCompound(NBT.itemStackToNBT(transformed));
+												firstArrowPlayerModified = ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag"));
+											} else {
+												// An arrow was transformed already: remove this item and increase the count of the transformed item
+												itemsList.remove(i);
+												firstArrowPlayerModified.setLong(CustomContainerItemManager.AMOUNT_KEY,
+													firstArrowPlayerModified.getLong(CustomContainerItemManager.AMOUNT_KEY)
+														+ ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY));
+											}
 										}
 									}
-								}
+									return; // why is this needed
+								});
 								gui.mPlayer.playSound(gui.mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);
 								gui.update();
 							}

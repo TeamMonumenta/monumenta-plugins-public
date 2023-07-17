@@ -7,8 +7,8 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
 import de.tr7zw.nbtapi.NBTTileEntity;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,7 +165,7 @@ public class SpawnerUtils {
 
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() == 0) {
 			// Create a new container for the action, add the identifier,
 			// and add the compound containing the parameters and their default values.
@@ -185,7 +185,7 @@ public class SpawnerUtils {
 
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() == 0) {
 			// Create a new container for the action, add the identifier,
 			// and add the compound containing the parameters and their default values.
@@ -216,7 +216,7 @@ public class SpawnerUtils {
 
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() > 0) {
 			// Remove the action
 			breakActions.remove(wantedAction.get(0));
@@ -232,12 +232,12 @@ public class SpawnerUtils {
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() > 0) {
 			// Set the requested parameter
-			NBTCompound actionCompound = wantedAction.get(0);
-			NBTCompound parameters = actionCompound.getCompound("parameters");
-			parameters.setObject(parameterName, value);
+			ReadWriteNBT actionCompound = wantedAction.get(0);
+			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value));
 			spawnerItem.setItemMeta(item.getItem().getItemMeta());
 		}
 	}
@@ -250,12 +250,12 @@ public class SpawnerUtils {
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() > 0) {
 			// Set the requested parameter
-			NBTCompound actionCompound = wantedAction.get(0);
-			NBTCompound parameters = actionCompound.getCompound("parameters");
-			parameters.setObject(parameterName, value);
+			ReadWriteNBT actionCompound = wantedAction.get(0);
+			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value));
 		}
 	}
 
@@ -267,13 +267,17 @@ public class SpawnerUtils {
 		NBTItem item = new NBTItem(spawnerItem);
 		NBTCompoundList breakActions = item.getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() > 0) {
 			// Try to find the requested parameter
-			NBTCompound actionCompound = wantedAction.get(0);
-			NBTCompound parameters = actionCompound.getCompound("parameters");
-			if (parameters.hasKey(parameterName)) {
-				return parameters.getObject(parameterName, parameters.getType(parameterName).getDeclaringClass());
+			ReadWriteNBT actionCompound = wantedAction.get(0);
+			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			if (parameters.hasTag(parameterName)) {
+				String json = parameters.getOrDefault(parameterName, null);
+				if (json == null) {
+					return null;
+				}
+				return MessagingUtils.GSON.fromJson(json, parameters.getType(parameterName).getDeclaringClass());
 			}
 		}
 
@@ -288,13 +292,17 @@ public class SpawnerUtils {
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
 		// Try to find the requested action
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() > 0) {
 			// Try to find the requested parameter
-			NBTCompound actionCompound = wantedAction.get(0);
-			NBTCompound parameters = actionCompound.getCompound("parameters");
-			if (parameters.hasKey(parameterName)) {
-				return parameters.getObject(parameterName, parameters.getType(parameterName).getDeclaringClass());
+			ReadWriteNBT actionCompound = wantedAction.get(0);
+			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			if (parameters.hasTag(parameterName)) {
+				String json = parameters.getOrDefault(parameterName, null);
+				if (json == null) {
+					return null;
+				}
+				return MessagingUtils.GSON.fromJson(json, parameters.getType(parameterName).getDeclaringClass());
 			}
 		}
 
@@ -308,15 +316,15 @@ public class SpawnerUtils {
 
 		NBTTileEntity tileEntity = new NBTTileEntity(spawnerBlock.getState());
 		NBTCompoundList breakActions = tileEntity.getPersistentDataContainer().getCompoundList(BREAK_ACTIONS_ATTRIBUTE);
-		List<NBTListCompound> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
+		List<ReadWriteNBT> wantedAction = breakActions.stream().filter(action -> action.getString("identifier").equals(actionIdentifier)).toList();
 		if (wantedAction.size() > 0) {
 			HashMap<String, Object> parameterMap = new HashMap<>(SpawnerActionManager.getActionParameters(actionIdentifier));
-			NBTCompound actionCompound = wantedAction.get(0);
-			NBTCompound parameters = actionCompound.getCompound("parameters");
+			ReadWriteNBT actionCompound = wantedAction.get(0);
+			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
 			// Start from base parameters map and replace the values with the ones stored on the block.
 			parameterMap.forEach((key, value) -> {
-				Object currParam = parameters.getObject(key, value.getClass());
-				parameterMap.replace(key, currParam);
+				Object currParam = parameters.getString(key);
+				parameterMap.replace(key, MessagingUtils.GSON.toJson(currParam, parameters.getType(key).getDeclaringClass()));
 			});
 
 			return parameterMap;

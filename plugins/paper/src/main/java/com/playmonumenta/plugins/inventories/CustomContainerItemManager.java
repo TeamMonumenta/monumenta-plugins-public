@@ -7,12 +7,12 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
-import java.util.ArrayList;
-import java.util.Iterator;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -83,12 +83,17 @@ public class CustomContainerItemManager implements Listener {
 			return true;
 		}
 
-		public void generateDescription(NBTCompound monumenta, Consumer<Component> addLore) {
-			NBTCompoundList items = monumenta.addCompound(ItemStatUtils.PLAYER_MODIFIED_KEY)
+		public void generateDescription(ReadableNBT monumenta, Consumer<Component> addLore) {
+			ReadableNBTList<ReadWriteNBT> items = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY)
 				                        .getCompoundList(ItemStatUtils.ITEMS_KEY);
 			long amount = 0;
-			for (NBTListCompound compound : items) {
-				amount += ItemStatUtils.addPlayerModified(compound.addCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
+			for (ReadWriteNBT compound : items) {
+				ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
+				if (playerModified == null) {
+					continue;
+				}
+				long tempAmount = playerModified.getLong(CustomContainerItemManager.AMOUNT_KEY);
+				amount += tempAmount;
 			}
 			addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 				               .append(Component.text(amount, NamedTextColor.WHITE))
@@ -183,7 +188,7 @@ public class CustomContainerItemManager implements Listener {
 	}
 
 	// Generates the container's lore text based on contents
-	public static void generateDescription(ItemStack item, NBTCompound monumenta, Consumer<Component> addLore) {
+	public static void generateDescription(ItemStack item, ReadableNBT monumenta, Consumer<Component> addLore) {
 		CustomContainerItemConfiguration configuration = getConfiguration(item);
 		if (configuration != null) {
 			configuration.generateDescription(monumenta, addLore);
@@ -219,65 +224,73 @@ public class CustomContainerItemManager implements Listener {
 			throw new IllegalArgumentException("Tried to add air to a container");
 		}
 
-		NBTCompoundList itemsList = ItemStatUtils.addPlayerModified(new NBTItem(container, true)).getCompoundList(ItemStatUtils.ITEMS_KEY);
-
-		long totalCount = 0;
-		NBTListCompound foundCompound = null;
-		for (NBTListCompound compound : itemsList) {
-			ItemStack containedItem = NBTItem.convertNBTtoItem(compound);
-			ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
-			NBTCompound playerModified = ItemStatUtils.addPlayerModified(compound.addCompound("tag"));
-			totalCount += playerModified.getLong(AMOUNT_KEY);
-			if (containedItem.isSimilar(item)) {
-				foundCompound = compound;
-			}
-		}
-
-		if (foundCompound == null && config.mTotalItemsLimit > 0 && totalCount >= config.mTotalItemsLimit) {
-			if (!silent) {
-				player.sendMessage(Component.text("Cannot store any more items in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			}
-			return;
-		}
-
-		if (foundCompound != null) {
-			NBTCompound playerModified = ItemStatUtils.addPlayerModified(foundCompound.addCompound("tag"));
-			Long existingAmount = playerModified.getLong(AMOUNT_KEY);
-			int deposited = config.mTotalItemsLimit <= 0 ? item.getAmount() : (int) Math.min(item.getAmount(), config.mTotalItemsLimit - totalCount);
-			if (config.mItemsPerTypeLimit > 0) {
-				if (existingAmount >= config.mItemsPerTypeLimit) {
-					if (!silent) {
-						player.sendMessage(Component.text("Cannot store any more items of this type in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
-						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-					}
-					return;
+		boolean updateItem = NBT.modify(container, nbt -> {
+			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
+			long totalCount = 0;
+			ReadWriteNBT foundCompound = null;
+			for (ReadWriteNBT compound : itemsList) {
+				ItemStack containedItem = NBT.itemStackFromNBT(compound);
+				ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
+				ReadableNBT playerModified = ItemStatUtils.addPlayerModified(compound.getCompound("tag"));
+				if (playerModified == null) {
+					continue;
 				}
-				deposited = (int) Math.min(deposited, config.mItemsPerTypeLimit - existingAmount);
+				// this can be null
+				totalCount += playerModified.getLong(AMOUNT_KEY);
+				if (containedItem.isSimilar(item)) {
+					foundCompound = compound;
+				}
 			}
-			playerModified.setLong(AMOUNT_KEY, existingAmount + deposited);
-			item.setAmount(item.getAmount() - deposited);
-			if (generateItemStats) {
-				ItemStatUtils.generateItemStats(container);
-			}
-			return;
-		}
 
-		if (config.mTypesLimit > 0 && itemsList.size() >= config.mTypesLimit) {
-			if (!silent) {
-				player.sendMessage(Component.text("Cannot store any more different item types in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+			if (foundCompound == null && config.mTotalItemsLimit > 0 && totalCount >= config.mTotalItemsLimit) {
+				if (!silent) {
+					player.sendMessage(Component.text("Cannot store any more items in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				}
+				return false;
 			}
-			return;
-		}
 
-		int deposited = config.mTotalItemsLimit <= 0 ? item.getAmount() : (int) Math.min(item.getAmount(), config.mTotalItemsLimit - totalCount);
-		NBTCompound addedItem = NBTItem.convertItemtoNBT(item);
-		ItemStatUtils.addPlayerModified(addedItem.addCompound("tag")).setLong(AMOUNT_KEY, (long) deposited);
-		addedItem.setByte("Count", (byte) 1);
-		itemsList.addCompound(addedItem);
-		item.setAmount(item.getAmount() - deposited);
-		if (generateItemStats) {
+			if (foundCompound != null) {
+				ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(foundCompound.getCompound("tag"));
+				if (playerModified == null) {
+					return false;
+				}
+				// this can be null
+				Long existingAmount = playerModified.getLong(AMOUNT_KEY);
+				int deposited = config.mTotalItemsLimit <= 0 ? item.getAmount() : (int) Math.min(item.getAmount(), config.mTotalItemsLimit - totalCount);
+				if (config.mItemsPerTypeLimit > 0) {
+					if (existingAmount >= config.mItemsPerTypeLimit) {
+						if (!silent) {
+							player.sendMessage(Component.text("Cannot store any more items of this type in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
+							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+						}
+						return false;
+					}
+					deposited = (int) Math.min(deposited, config.mItemsPerTypeLimit - existingAmount);
+				}
+				playerModified.setLong(AMOUNT_KEY, existingAmount + deposited);
+				item.setAmount(item.getAmount() - deposited);
+				return true;
+			}
+
+			if (config.mTypesLimit > 0 && itemsList.size() >= config.mTypesLimit) {
+				if (!silent) {
+					player.sendMessage(Component.text("Cannot store any more different item types in this " + ItemUtils.getPlainName(container) + ".", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+				}
+				return false;
+			}
+
+			ReadWriteNBT newCompound = itemsList.addCompound();
+			ReadWriteNBT addedItem = NBT.itemStackToNBT(item);
+			ItemStatUtils.addPlayerModified(addedItem.getOrCreateCompound("tag")).setLong(AMOUNT_KEY, (long) item.getAmount());
+			addedItem.setByte("Count", (byte) 1);
+			newCompound.mergeCompound(addedItem);
+			item.setAmount(0);
+			return true;
+		});
+
+		if (updateItem && generateItemStats) {
 			ItemStatUtils.generateItemStats(container);
 		}
 
@@ -288,13 +301,19 @@ public class CustomContainerItemManager implements Listener {
 			throw new IllegalStateException("Container not valid in countInContainer");
 		}
 
-		NBTCompoundList itemsList = ItemStatUtils.addPlayerModified(new NBTItem(container, true)).getCompoundList(ItemStatUtils.ITEMS_KEY);
-
-		for (NBTListCompound compound : itemsList) {
-			ItemStack containedItem = NBTItem.convertNBTtoItem(compound);
-			ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
+		ReadableNBTList<ReadWriteNBT> itemsList = NBT.get(container, nbt -> {
+			return ItemStatUtils.getItemList(nbt);
+		});
+		for (ReadWriteNBT compound : itemsList) {
+			ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
+			if (playerModified == null) {
+				continue;
+			}
+			ItemStack containedItem = NBT.itemStackFromNBT(compound);
+			NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
 			if (containedItem.isSimilar(currency)) {
-				return ItemStatUtils.addPlayerModified(compound.addCompound("tag")).getLong(AMOUNT_KEY);
+				// this can be null
+				return playerModified.getLong(AMOUNT_KEY);
 			}
 		}
 		return 0;
@@ -308,24 +327,33 @@ public class CustomContainerItemManager implements Listener {
 			throw new IllegalStateException("Container not valid in removeFromContainer");
 		}
 
-		NBTCompoundList itemsList = ItemStatUtils.addPlayerModified(new NBTItem(container, true)).getCompoundList(ItemStatUtils.ITEMS_KEY);
-
-		for (int i = 0; i < itemsList.size(); i++) {
-			NBTListCompound compound = itemsList.get(i);
-			ItemStack containedItem = NBTItem.convertNBTtoItem(compound);
-			ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
-			if (containedItem.isSimilar(item)) {
-				NBTCompound playerModified = ItemStatUtils.addPlayerModified(compound.addCompound("tag"));
-				long containedAmount = playerModified.getLong(AMOUNT_KEY);
-				if (item.getAmount() >= containedAmount) {
-					item.setAmount((int) containedAmount);
-					itemsList.remove(i);
-				} else {
-					playerModified.setLong(AMOUNT_KEY, containedAmount - item.getAmount());
+		boolean found = NBT.modify(container, nbt -> {
+			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
+			for (int i = 0; i < itemsList.size(); i++) {
+				ReadWriteNBT compound = itemsList.get(i);
+				ItemStack containedItem = NBT.itemStackFromNBT(compound);
+				NBT.modify(containedItem, inbt -> {
+					ItemStatUtils.removePlayerModified(inbt);
+				});
+				if (containedItem.isSimilar(item)) {
+					ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag"));
+					// this can be null
+					long containedAmount = playerModified.getLong(AMOUNT_KEY);
+					if (item.getAmount() >= containedAmount) {
+						item.setAmount((int) containedAmount);
+						itemsList.remove(i);
+					} else {
+						playerModified.setLong(AMOUNT_KEY, containedAmount - item.getAmount());
+					}
+					return true;
 				}
-				ItemStatUtils.generateItemStats(container);
-				return;
 			}
+			return false;
+		});
+
+		if (found) {
+			ItemStatUtils.generateItemStats(container);
+			return;
 		}
 
 		item.setAmount(0);
@@ -336,35 +364,47 @@ public class CustomContainerItemManager implements Listener {
 			throw new IllegalStateException("Container not valid in removeFirstFromContainer");
 		}
 
-		NBTCompoundList itemsList = ItemStatUtils.addPlayerModified(new NBTItem(container, true)).getCompoundList(ItemStatUtils.ITEMS_KEY);
-		for (Iterator<NBTListCompound> iterator = itemsList.iterator(); iterator.hasNext(); ) {
-			NBTListCompound compound = iterator.next();
-			ItemStack removedItem = NBTItem.convertNBTtoItem(compound);
-			ItemStatUtils.removePlayerModified(new NBTItem(removedItem, true));
-			if (!testPredicate.test(removedItem)) {
-				continue;
-			}
-			NBTCompound playerModified = ItemStatUtils.addPlayerModified(compound.addCompound("tag"));
-			long containedAmount = playerModified.getLong(AMOUNT_KEY);
-			boolean consumed;
-			if (maxAmount >= containedAmount) {
-				removedItem.setAmount((int) containedAmount);
-				consumed = consumePredicate.test(removedItem);
-				if (consumed) {
-					iterator.remove();
-					ItemStatUtils.generateItemStats(container);
+		@Nullable Pair<ItemStack, Boolean> result = NBT.modify(container, nbt -> {
+			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
+			List<ReadWriteNBT> itemsListCopy = itemsList.toListCopy();
+			for (int i = 0; i < itemsListCopy.size(); i++) {
+				ReadWriteNBT compound = itemsList.get(i);
+				ItemStack removedItem = NBT.itemStackFromNBT(compound);
+				NBT.modify(removedItem, ItemStatUtils::removePlayerModified);
+				if (!testPredicate.test(removedItem)) {
+					continue;
 				}
-			} else {
-				removedItem.setAmount(maxAmount);
-				consumed = consumePredicate.test(removedItem);
-				if (consumed) {
-					playerModified.setLong(AMOUNT_KEY, containedAmount - removedItem.getAmount());
-					ItemStatUtils.generateItemStats(container);
+				ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(compound.getCompound("tag"));
+				if (playerModified == null) {
+					continue;
 				}
+				// this can be null
+				long containedAmount = playerModified.getLong(AMOUNT_KEY);
+				boolean consumed;
+				if (maxAmount >= containedAmount) {
+					removedItem.setAmount((int) containedAmount);
+					consumed = consumePredicate.test(removedItem);
+					if (consumed) {
+						itemsList.remove(i);
+					}
+				} else {
+					removedItem.setAmount(maxAmount);
+					consumed = consumePredicate.test(removedItem);
+					if (consumed) {
+						playerModified.setLong(AMOUNT_KEY, containedAmount - removedItem.getAmount());
+					}
+				}
+				return Pair.of(removedItem, consumed);
 			}
-			return Pair.of(removedItem, consumed);
+			return null;
+		});
+
+		// only generate if consumed is true
+		if (result != null && result.getValue()) {
+			ItemStatUtils.generateItemStats(container);
 		}
-		return null;
+
+		return result;
 	}
 
 	static void reorderInContainer(Player player, ItemStack container, ItemStack item, int newIndex) {
@@ -372,22 +412,27 @@ public class CustomContainerItemManager implements Listener {
 			throw new IllegalStateException("Container not valid in reorderInContainer");
 		}
 
-		NBTCompoundList itemsList = ItemStatUtils.addPlayerModified(new NBTItem(container, true)).getCompoundList(ItemStatUtils.ITEMS_KEY);
+		NBT.modify(container, nbt -> {
+			ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
 
-		for (int i = 0; i < itemsList.size(); i++) {
-			NBTListCompound compound = itemsList.get(i);
-			ItemStack containedItem = NBTItem.convertNBTtoItem(compound);
-			ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
-			if (containedItem.isSimilar(item)) {
-				// NBTCompoundList does not support inserting elements in the middle - so make an ArrayList and modify that, then copy the contents back
-				List<NBTListCompound> list = new ArrayList<>(itemsList);
-				list.remove(i);
-				list.add(Math.min(Math.max(0, newIndex), list.size()), compound);
-				itemsList.clear();
-				itemsList.addAll(list);
-				return;
+			for (int i = 0; i < itemsList.size(); i++) {
+				ReadWriteNBT compound = itemsList.get(i);
+				ItemStack containedItem = NBT.itemStackFromNBT(compound);
+				NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
+				if (containedItem.isSimilar(item)) {
+					// NBTCompoundList does not support inserting elements in the middle - so make an ArrayList and modify that, then copy the contents back
+					List<ReadWriteNBT> list = itemsList.toListCopy();
+					list.remove(i);
+					list.add(Math.min(Math.max(0, newIndex), list.size()), compound);
+					itemsList.clear();
+					for (ReadWriteNBT newCompound : list) {
+						itemsList.addCompound().mergeCompound(newCompound);
+					}
+					return;
+				}
 			}
-		}
+		});
+
 	}
 
 	// When buying a container, it may get soulbound to the player that buys it (depending on the container config)

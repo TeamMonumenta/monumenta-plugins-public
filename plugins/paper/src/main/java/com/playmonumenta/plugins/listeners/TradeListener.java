@@ -8,9 +8,12 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -175,7 +178,7 @@ public class TradeListener implements Listener {
 				// Modify the result item to carry over player modifications (infusions etc.)
 				NBTItem playerItemNbt = new NBTItem(playerItem);
 				NBTItem newResultNbt = new NBTItem(newResult);
-				NBTCompound playerModified = ItemStatUtils.getPlayerModified(playerItemNbt);
+				NBTCompound playerModified = playerItemNbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 				if (playerModified == null) { // no modifications, skip this item
 					continue;
 				}
@@ -326,9 +329,6 @@ public class TradeListener implements Listener {
 	 * Checks if two items have the same stats (enchantments, attributes) as far as is relevant for re-skin trades
 	 */
 	private static boolean haveSameStats(ItemStack i1, ItemStack i2) {
-		NBTItem nbt1 = new NBTItem(i1);
-		NBTItem nbt2 = new NBTItem(i2);
-
 		// alchemist bags trades
 		if (ItemUtils.isAlchemistItem(i1) && ItemUtils.isAlchemistItem(i2)) {
 			return true;
@@ -348,8 +348,8 @@ public class TradeListener implements Listener {
 
 		// custom enchantments
 		// cannot compare NBT directly due to Divine Aura
-		NBTCompound enchantments1 = ItemStatUtils.getEnchantments(nbt1);
-		NBTCompound enchantments2 = ItemStatUtils.getEnchantments(nbt2);
+		ReadableNBT enchantments1 = NBT.get(i1, ItemStatUtils::getEnchantments);
+		ReadableNBT enchantments2 = NBT.get(i2, ItemStatUtils::getEnchantments);
 		for (EnchantmentType ench : EnchantmentType.values()) {
 			// Divine Aura is a bonus enchantment for Kaul reskins, so ignore it
 			if (ench == EnchantmentType.DIVINE_AURA || ench == EnchantmentType.UNBREAKABLE) {
@@ -384,14 +384,14 @@ public class TradeListener implements Listener {
 		}
 
 		// custom attributes - compare NBT directly, ignoring order
-		NBTCompoundList attrs1 = ItemStatUtils.getAttributes(nbt1);
-		NBTCompoundList attrs2 = ItemStatUtils.getAttributes(nbt2);
+		ReadableNBTList<ReadWriteNBT> attrs1 = NBT.get(i1, ItemStatUtils::getAttributes);
+		ReadableNBTList<ReadWriteNBT> attrs2 = NBT.get(i2, ItemStatUtils::getAttributes);
 		if ((attrs1 == null) != (attrs2 == null)) {
 			// Different nullness - objects are different
 			return false;
 		} else if (attrs1 != null && attrs2 != null) {
 			// Both are non-null, compare contents without order
-			return Set.copyOf(attrs1).equals(Set.copyOf(attrs2));
+			return Set.copyOf(attrs1.toListCopy()).equals(Set.copyOf(attrs2.toListCopy()));
 		}
 
 		// if we get here, the items have the same stats

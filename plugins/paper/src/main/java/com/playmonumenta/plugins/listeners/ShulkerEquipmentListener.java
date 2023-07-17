@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;
@@ -57,9 +58,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 public class ShulkerEquipmentListener implements Listener {
-	private static final String LOCK_STRING = "AdminEquipmentTool";
-	private static final String CHARM_STRING = "CharmLockBox";
-	private static final String PORTAL_EPIC_STRING = "PortalEpicBox";
+	public static final String LOCK_STRING = "AdminEquipmentTool";
+	public static final String CHARM_STRING = "CharmLockBox";
+	public static final String PORTAL_EPIC_STRING = "PortalEpicBox";
 
 	private static final ImmutableMap<Integer, Integer> SWAP_SLOTS = ImmutableMap.<Integer, Integer>builder()
 		.put(0, 0)
@@ -242,13 +243,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 	private static @Nullable String getShulkerLock(@Nullable ItemStack sboxItem) {
 		if (sboxItem != null && ItemUtils.isShulkerBox(sboxItem.getType()) && sboxItem.hasItemMeta()) {
-			if (sboxItem.getItemMeta() instanceof BlockStateMeta sMeta) {
-				if (sMeta.getBlockState() instanceof ShulkerBox sbox) {
-					if (sbox.isLocked()) {
-						return sbox.getLock();
-					}
-				}
-			}
+			return NBT.get(sboxItem, ItemUtils::getContainerLock);
 		}
 		return null;
 	}
@@ -332,7 +327,7 @@ public class ShulkerEquipmentListener implements Listener {
 			return;
 		}
 		NBTItem nbt = new NBTItem(shulkerBox, true);
-		NBTCompound vanityItems = ItemStatUtils.addPlayerModified(nbt).addCompound(ItemStatUtils.VANITY_ITEMS_KEY);
+		NBTCompound vanityItems = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY).getOrCreateCompound(ItemStatUtils.VANITY_ITEMS_KEY);
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			if (slot == EquipmentSlot.HAND) {
 				continue;

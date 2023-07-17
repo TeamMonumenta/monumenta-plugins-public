@@ -8,7 +8,10 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -48,11 +51,14 @@ public class CustomContainerItemGui extends Gui {
 			return;
 		}
 
-		List<ItemStack> items = new ArrayList<>(
-			ItemStatUtils.addPlayerModified(new NBTItem(mContainer))
-				.getCompoundList(ItemStatUtils.ITEMS_KEY).stream()
-				.map(NBTItem::convertNBTtoItem)
-				.toList());
+		List<ItemStack> items = NBT.get(mContainer, nbt -> {
+			ReadableNBTList<ReadWriteNBT> list = ItemStatUtils.getItemList(nbt);
+			if (list == null) {
+				return new ArrayList<>();
+			}
+			return list.toListCopy()
+				.stream().map(NBT::itemStackFromNBT).toList();
+		});
 
 		// Fill GUI with items
 		boolean showAmounts = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_TAG);

@@ -10,8 +10,9 @@ import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
-import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
@@ -113,12 +114,14 @@ public class RenameItemCommand {
 
 	private static void rename(Player player, String name) {
 		ItemStack itemStack = player.getInventory().getItemInMainHand();
-		NBTCompound playerModified = ItemStatUtils.addPlayerModified(new NBTItem(itemStack, true));
-		if (!name.isEmpty()) {
-			playerModified.setString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY, name);
-		} else {
-			playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
-		}
+		NBT.modify(itemStack, nbt -> {
+			ReadWriteNBT playerModified = ItemStatUtils.addPlayerModified(nbt);
+			if (!name.isEmpty()) {
+				playerModified.setString(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY, name);
+			} else {
+				playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
+			}
+		});
 		ItemStatUtils.generateItemStats(itemStack);
 		player.updateInventory();
 		String baseName = ItemUtils.getPlainNameIfExists(itemStack);

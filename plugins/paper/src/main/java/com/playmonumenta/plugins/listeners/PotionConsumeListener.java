@@ -18,9 +18,9 @@ import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTListCompound;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +40,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -127,7 +126,7 @@ public class PotionConsumeListener implements Listener {
 	}
 
 	private void rightClickPotion(InventoryClickEvent event, Player player, ItemStack item, Inventory clickedInventory) {
-		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
+		ReadableNBTList<ReadWriteNBT> customEffects = NBT.get(item, ItemStatUtils::getEffects);
 		if (customEffects == null || customEffects.isEmpty()) {
 			return;
 		}
@@ -362,21 +361,23 @@ public class PotionConsumeListener implements Listener {
 	}
 
 	private boolean cooldownApplies(ItemStack item) {
-		NBTCompoundList customEffects = ItemStatUtils.getEffects(new NBTItem(item));
-		return cooldownApplies(customEffects);
+		return NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> customEffects = ItemStatUtils.getEffects(nbt);
+			return cooldownApplies(customEffects);
+		});
 	}
 
-	private boolean cooldownApplies(@Nullable NBTCompoundList customEffects) {
+	private boolean cooldownApplies(@Nullable ReadableNBTList<ReadWriteNBT> customEffects) {
 		if (customEffects == null) {
 			return false;
 		}
 
-		for (NBTListCompound effect : customEffects) {
-			if (effect.hasKey(ItemStatUtils.EFFECT_TYPE_KEY)) {
+		for (ReadWriteNBT effect : customEffects) {
+			if (effect.hasTag(ItemStatUtils.EFFECT_TYPE_KEY)) {
 				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
 				if (COOLDOWN_EFFECTS.containsKey(type)) {
 					double amount = COOLDOWN_EFFECTS.get(type);
-					if (amount == 0 || (effect.hasKey(ItemStatUtils.EFFECT_STRENGTH_KEY) && effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY) >= amount)) {
+					if (amount == 0 || (effect.hasTag(ItemStatUtils.EFFECT_STRENGTH_KEY) && effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY) >= amount)) {
 						return true;
 					}
 				}
@@ -386,9 +387,9 @@ public class PotionConsumeListener implements Listener {
 		return false;
 	}
 
-	private boolean isOnlyGlowing(NBTCompoundList customEffects) {
-		for (NBTListCompound effect : customEffects) {
-			if (effect.hasKey(ItemStatUtils.EFFECT_TYPE_KEY)) {
+	private boolean isOnlyGlowing(ReadableNBTList<ReadWriteNBT> customEffects) {
+		for (ReadWriteNBT effect : customEffects) {
+			if (effect.hasTag(ItemStatUtils.EFFECT_TYPE_KEY)) {
 				EffectType type = EffectType.fromType(effect.getString(ItemStatUtils.EFFECT_TYPE_KEY));
 				if (type != EffectType.VANILLA_GLOW) {
 					return false;

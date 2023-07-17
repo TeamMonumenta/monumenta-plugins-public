@@ -16,8 +16,9 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
-import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -589,11 +590,13 @@ public class LoadoutManagerGui extends Gui {
 			return false;
 		}
 		// Must not have any player modifications except for name, skin, or stored vanity
-		NBTCompound playerModified = ItemStatUtils.getPlayerModified(new NBTItem(item));
-		if (playerModified == null) {
-			return true;
-		}
-		return ALLOWED_PLAYER_MODIFIED_KEYS.containsAll(playerModified.getKeys());
+		return NBT.get(item, nbt -> {
+			ReadableNBT playerModified = ItemStatUtils.getPlayerModified(nbt);
+			if (playerModified == null) {
+				return true;
+			}
+			return ALLOWED_PLAYER_MODIFIED_KEYS.containsAll(playerModified.getKeys());
+		});
 	}
 
 }

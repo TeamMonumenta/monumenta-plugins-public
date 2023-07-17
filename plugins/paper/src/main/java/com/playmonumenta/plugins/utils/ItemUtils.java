@@ -9,10 +9,11 @@ import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
-import de.tr7zw.nbtapi.NBTList;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -779,18 +781,43 @@ public class ItemUtils {
 		setPlainLore(itemStack);
 	}
 
+	public static Component getRawDisplayName(@Nullable ItemStack itemStack) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
+			return Component.text("");
+		}
+		return NBT.get(itemStack, ItemUtils::getRawDisplayName);
+	}
+
+	// faster than using .getItemMeta.get
+	public static Component getRawDisplayName(ReadableNBT nbt) {
+		if (!nbt.hasTag(DISPLAY_KEY)) {
+			return Component.text("");
+		}
+		ReadableNBT display = nbt.getCompound(DISPLAY_KEY);
+		if (!display.hasTag(NAME_KEY)) {
+			return Component.text("");
+		}
+		String json = display.getString(NAME_KEY);
+		@Nullable Component displayNameComponent = GsonComponentSerializer.gson().deserializeOr(json, Component.text(""));
+		return displayNameComponent;
+	}
+
+	public static String getRawDisplayNameAsString(ReadableNBT nbt) {
+		Component displayName = getRawDisplayName(nbt);
+		return toPlainTagText(displayName);
+	}
+
+	public static String getRawDisplayNameAsString(ItemStack itemStack) {
+		Component displayName = getRawDisplayName(itemStack);
+		return toPlainTagText(displayName);
+	}
+
 	public static String getPlainName(@Nullable ItemStack itemStack) {
-		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta() || !itemStack.getItemMeta().hasDisplayName()) {
+		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return "";
 		}
 		if (!hasPlainName(itemStack)) {
-			if (itemStack.hasItemMeta()) {
-				ItemMeta itemMeta = itemStack.getItemMeta();
-				if (itemMeta.hasDisplayName()) {
-					return toPlainTagText(itemMeta.displayName());
-				}
-			}
-			return "";
+			return getRawDisplayNameAsString(itemStack);
 		}
 		return getPlainNameIfExists(itemStack);
 	}
@@ -799,16 +826,17 @@ public class ItemUtils {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return "";
 		}
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return "";
-		}
-		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
-		if (!plain.hasKey(DISPLAY_KEY)) {
-			return "";
-		}
-		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		return display.hasKey(NAME_KEY) ? display.getString(NAME_KEY) : "";
+		return NBT.get(itemStack, nbt -> {
+			if (!nbt.hasTag(PLAIN_KEY)) {
+				return "";
+			}
+			ReadableNBT plain = nbt.getCompound(PLAIN_KEY);
+			if (!plain.hasTag(DISPLAY_KEY)) {
+				return "";
+			}
+			ReadableNBT display = plain.getCompound(DISPLAY_KEY);
+			return display.hasTag(NAME_KEY) ? display.getString(NAME_KEY) : "";
+		});
 	}
 
 	public static String getPlainNameOrDefault(@Nullable ItemStack itemStack) {
@@ -826,16 +854,17 @@ public class ItemUtils {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return false;
 		}
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return false;
-		}
-		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
-		if (!plain.hasKey(DISPLAY_KEY)) {
-			return false;
-		}
-		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		return display.hasKey(NAME_KEY);
+		return NBT.get(itemStack, nbt -> {
+			if (!nbt.hasTag(PLAIN_KEY)) {
+				return false;
+			}
+			ReadableNBT plain = nbt.getCompound(PLAIN_KEY);
+			if (!plain.hasTag(DISPLAY_KEY)) {
+				return false;
+			}
+			ReadableNBT display = plain.getCompound(DISPLAY_KEY);
+			return display.hasTag(NAME_KEY);
+		});
 	}
 
 	public static void setPlainName(ItemStack itemStack) {
@@ -854,33 +883,33 @@ public class ItemUtils {
 			return;
 		}
 
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (plainName != null) {
-			// addComponent effectively runs:
-			// if (key exists) { return tag(key) } else { return new tag(key) }
-			nbtItem.addCompound(PLAIN_KEY).addCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
-		} else {
-			if (nbtItem.hasKey(PLAIN_KEY)) {
-				NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
+		NBT.modify(itemStack, nbt -> {
+			if (plainName != null) {
+				// addComponent effectively runs:
+				// if (key exists) { return tag(key) } else { return new tag(key) }
+				nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
+			} else {
+				if (nbt.hasTag(PLAIN_KEY)) {
+					ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
 
-				if (plain.hasKey(DISPLAY_KEY)) {
-					NBTCompound display = plain.getCompound(DISPLAY_KEY);
+					if (plain.hasTag(DISPLAY_KEY)) {
+						ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
 
-					if (display.hasKey(NAME_KEY)) {
-						display.removeKey(NAME_KEY);
+						if (display.hasTag(NAME_KEY)) {
+							display.removeKey(NAME_KEY);
 
-						if (display.getKeys().size() == 0) {
-							plain.removeKey(DISPLAY_KEY);
+							if (display.getKeys().size() == 0) {
+								plain.removeKey(DISPLAY_KEY);
 
-							if (plain.getKeys().size() == 0) {
-								nbtItem.removeKey(PLAIN_KEY);
+								if (plain.getKeys().size() == 0) {
+									nbt.removeKey(PLAIN_KEY);
+								}
 							}
 						}
 					}
 				}
 			}
-		}
-		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
+		});
 	}
 
 	public static List<String> getPlainLore(@Nullable ItemStack itemStack) {
@@ -909,32 +938,34 @@ public class ItemUtils {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return new ArrayList<>();
 		}
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return new ArrayList<>();
-		}
-		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
-		if (!plain.hasKey(DISPLAY_KEY)) {
-			return new ArrayList<>();
-		}
-		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		return display.hasKey(LORE_KEY) ? display.getStringList(LORE_KEY) : new ArrayList<>();
+		return NBT.get(itemStack, nbt -> {
+			if (!nbt.hasTag(PLAIN_KEY)) {
+				return new ArrayList<>();
+			}
+			ReadableNBT plain = nbt.getCompound(PLAIN_KEY);
+			if (!plain.hasTag(DISPLAY_KEY)) {
+				return new ArrayList<>();
+			}
+			ReadableNBT display = plain.getCompound(DISPLAY_KEY);
+			return display.hasTag(LORE_KEY) ? display.getStringList(LORE_KEY).toListCopy() : new ArrayList<>();
+		});
 	}
 
 	public static boolean hasPlainLore(@Nullable ItemStack itemStack) {
 		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
 			return false;
 		}
-		NBTItem nbtItem = new NBTItem(itemStack);
-		if (!nbtItem.hasKey(PLAIN_KEY)) {
-			return false;
-		}
-		NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
-		if (!plain.hasKey(DISPLAY_KEY)) {
-			return false;
-		}
-		NBTCompound display = plain.getCompound(DISPLAY_KEY);
-		return display.hasKey(LORE_KEY);
+		return NBT.get(itemStack, nbt -> {
+			if (!nbt.hasTag(PLAIN_KEY)) {
+				return false;
+			}
+			ReadableNBT plain = nbt.getCompound(PLAIN_KEY);
+			if (!plain.hasTag(DISPLAY_KEY)) {
+				return false;
+			}
+			ReadableNBT display = plain.getCompound(DISPLAY_KEY);
+			return display.hasTag(LORE_KEY);
+		});
 	}
 
 	public static void setPlainLore(ItemStack itemStack) {
@@ -955,37 +986,41 @@ public class ItemUtils {
 	}
 
 	public static void setPlainLore(ItemStack itemStack, @Nullable List<String> plainLore) {
-		NBTItem nbtItem = new NBTItem(itemStack);
+		NBT.modify(itemStack, nbt -> {
+			setPlainLore(nbt, plainLore);
+		});
+	}
+
+	public static void setPlainLore(ReadWriteNBT nbt, @Nullable List<String> plainLore) {
 		if (plainLore != null && plainLore.size() > 0) {
 			// addComponent effectively runs:
 			// if (key exists) { return tag(key) } else { return new tag(key) }
-			NBTList<String> loreList = nbtItem.addCompound(PLAIN_KEY).addCompound(DISPLAY_KEY).getStringList(LORE_KEY);
+			ReadWriteNBTList<String> loreList = nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).getStringList(LORE_KEY);
 			loreList.clear();
 			for (String loreLine : plainLore) {
 				loreList.add(loreLine);
 			}
 		} else {
-			if (nbtItem.hasKey(PLAIN_KEY)) {
-				NBTCompound plain = nbtItem.getCompound(PLAIN_KEY);
+			if (nbt.hasTag(PLAIN_KEY)) {
+				ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
 
-				if (plain.hasKey(DISPLAY_KEY)) {
-					NBTCompound display = plain.getCompound(DISPLAY_KEY);
+				if (plain.hasTag(DISPLAY_KEY)) {
+					ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
 
-					if (display.hasKey(LORE_KEY)) {
+					if (display.hasTag(LORE_KEY)) {
 						display.removeKey(LORE_KEY);
 
 						if (display.getKeys().size() == 0) {
 							plain.removeKey(DISPLAY_KEY);
 
 							if (plain.getKeys().size() == 0) {
-								nbtItem.removeKey(PLAIN_KEY);
+								nbt.removeKey(PLAIN_KEY);
 							}
 						}
 					}
 				}
 			}
 		}
-		itemStack.setItemMeta(nbtItem.getItem().getItemMeta());
 	}
 
 	public static String toPlainTagText(String formattedText) {
@@ -1156,7 +1191,7 @@ public class ItemUtils {
 		if (amount < 0 || amount > 64) {
 			try {
 				itemStack.setAmount(1);
-				ItemStack clone = NBTItem.convertNBTtoItem(NBTItem.convertItemtoNBT(itemStack));
+				ItemStack clone = NBT.itemStackFromNBT(NBT.itemStackToNBT(itemStack));
 				clone.setAmount(amount);
 				return clone;
 			} finally {
@@ -1164,18 +1199,18 @@ public class ItemUtils {
 			}
 		}
 
-		return NBTItem.convertNBTtoItem(NBTItem.convertItemtoNBT(itemStack));
+		return NBT.itemStackFromNBT(NBT.itemStackToNBT(itemStack));
 	}
 
 	/**
 	 * Parses an item stack from an NBT Mojangson string (format {"id": "...", "count": x, "tag": {...}})
 	 */
 	public static ItemStack parseItemStack(String nbtMojangson) {
-		return NBTItem.convertNBTtoItem(new NBTContainer(nbtMojangson));
+		return NBT.itemStackFromNBT(NBT.parseNBT(nbtMojangson));
 	}
 
 	public static String serializeItemStack(ItemStack itemStack) {
-		return NBTItem.convertItemtoNBT(itemStack).toString();
+		return NBT.itemStackToNBT(itemStack).toString();
 	}
 
 	/**
@@ -1263,8 +1298,7 @@ public class ItemUtils {
 		if (item == null || item.getType() == Material.AIR) {
 			return EntityType.UNKNOWN;
 		}
-		NBTItem nbt = new NBTItem(item);
-		NBTCompound entityTag = nbt.getCompound("EntityTag");
+		ReadableNBT entityTag = NBT.get(item, nbt -> nbt.getCompound("EntityTag"));
 		if (entityTag == null) {
 			return getSpawnEggType(item.getType());
 		}
@@ -1302,8 +1336,7 @@ public class ItemUtils {
 			return "/give @s " + itemId + " " + item.getAmount();
 		}
 
-		NBTItem nbtItem = new NBTItem(item);
-		String itemTag = nbtItem.toString();
+		String itemTag = NBT.get(item, nbt -> nbt.toString());
 		return "/give @s " + itemId + itemTag + " " + item.getAmount();
 	}
 
@@ -1455,6 +1488,34 @@ public class ItemUtils {
 
 	public static boolean hasPortableEnderOrIsNearEnderChest(Player player) {
 		return hasPortableEnder(player) || LocationUtils.hasNearbyBlock(player.getLocation(), 5, Material.ENDER_CHEST);
+	}
+
+	public static @Nullable String getContainerLock(ReadableNBT nbt) {
+		ReadableNBT blockEntityTag = nbt.getCompound("BlockEntityTag");
+		if (blockEntityTag == null) {
+			return null;
+		}
+
+		String lock = blockEntityTag.getString("Lock");
+		if (lock == null) {
+			return null;
+		}
+
+		return lock;
+	}
+
+	public static @Nullable ReadableNBTList<ReadWriteNBT> getContainerItems(ReadableNBT nbt) {
+		ReadableNBT blockEntityTag = nbt.getCompound("BlockEntityTag");
+		if (blockEntityTag == null) {
+			return null;
+		}
+
+		ReadableNBTList<ReadWriteNBT> itemStacks = blockEntityTag.getCompoundList("Items");
+		if (itemStacks == null) {
+			return null;
+		}
+
+		return itemStacks;
 	}
 
 }

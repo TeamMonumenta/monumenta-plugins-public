@@ -12,9 +12,10 @@ import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
@@ -255,9 +256,7 @@ public class DamageListener implements Listener {
 		if (proj instanceof AbstractArrow && !(proj instanceof Trident)) {
 			ItemStack item = EntityListener.getArrowItem(uuid);
 			if (item != null && item.getType() != Material.AIR) {
-				NBTItem nbtItem = new NBTItem(item);
-
-				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbtItem);
+				ReadableNBT enchantments = NBT.get(item, ItemStatUtils::getEnchantments);
 
 				for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.PROJECTILE_ENCHANTMENTS) {
 					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
@@ -266,7 +265,7 @@ public class DamageListener implements Listener {
 					}
 				}
 
-				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbtItem);
+				ReadableNBTList<ReadWriteNBT> attributes = NBT.get(item, ItemStatUtils::getAttributes);
 
 				for (ItemStatUtils.AttributeType attr : ItemStatUtils.AttributeType.PROJECTILE_ATTRIBUTE_TYPES) {
 					double value = ItemStatUtils.getAttributeAmount(attributes, attr, ItemStatUtils.Operation.MULTIPLY, ItemStatUtils.Slot.PROJECTILE);

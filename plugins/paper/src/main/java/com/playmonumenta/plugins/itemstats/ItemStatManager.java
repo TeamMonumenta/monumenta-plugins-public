@@ -29,9 +29,10 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -250,10 +251,9 @@ public class ItemStatManager implements Listener {
 						continue;
 					}
 
-					NBTItem nbt = new NBTItem(item);
-					NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
-					NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
-					NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
+					ReadableNBT enchantments = NBT.get(item, nbt -> ItemStatUtils.getEnchantments(nbt));
+					ReadableNBT infusions = NBT.get(item, nbt -> ItemStatUtils.getInfusions(nbt));
+					ReadableNBTList<ReadWriteNBT> attributes = NBT.get(item, nbt -> ItemStatUtils.getAttributes(nbt));
 
 					double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.33, 0.165);
 					boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
@@ -287,10 +287,9 @@ public class ItemStatManager implements Listener {
 			}
 
 			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
-				NBTItem nbt = new NBTItem(mainhand);
-				NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
-				NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
-				NBTCompoundList attributes = ItemStatUtils.getAttributes(nbt);
+				ReadableNBT enchantments = NBT.get(mainhand, nbt -> ItemStatUtils.getEnchantments(nbt));
+				ReadableNBT infusions = NBT.get(mainhand, nbt -> ItemStatUtils.getInfusions(nbt));
+				ReadableNBTList<ReadWriteNBT> attributes = NBT.get(mainhand, nbt -> ItemStatUtils.getAttributes(nbt));
 
 				double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.33, 0.165);
 
@@ -815,8 +814,8 @@ public class ItemStatManager implements Listener {
 				return;
 			}
 
-			NBTItem nbt = new NBTItem(stack);
-			NBTCompound enchantments = ItemStatUtils.getEnchantments(nbt);
+			ReadableNBT enchantments = NBT.get(stack, nbt -> ItemStatUtils.getEnchantments(nbt));
+			ReadableNBT infusions = NBT.get(stack, nbt -> ItemStatUtils.getInfusions(nbt));
 
 			for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
 				int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
@@ -824,8 +823,6 @@ public class ItemStatManager implements Listener {
 					Objects.requireNonNull(ench.getItemStat()).onSpawn(mPlugin, item, level);
 				}
 			}
-
-			NBTCompound infusions = ItemStatUtils.getInfusions(nbt);
 
 			for (ItemStatUtils.InfusionType infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
 				int level = ItemStatUtils.getInfusionLevel(infusions, infusion);

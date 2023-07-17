@@ -570,7 +570,7 @@ public class MasterworkUtils {
 
 		NBTItem playerItemNbt = new NBTItem(base);
 		NBTItem newUpgradeNbt = new NBTItem(newUpgrade);
-		NBTCompound playerModified = ItemStatUtils.getPlayerModified(playerItemNbt);
+		NBTCompound playerModified = playerItemNbt.getCompound(ItemStatUtils.MONUMENTA_KEY).getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
 
 		if (playerModified != null) {
 			ItemStatUtils.addPlayerModified(newUpgradeNbt).mergeCompound(playerModified);
