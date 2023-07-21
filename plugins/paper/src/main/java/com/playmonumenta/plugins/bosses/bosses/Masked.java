@@ -72,6 +72,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 
 		mBoss.setRemoveWhenFarAway(false);
 
+		mBoss.setAI(false);
 		mBoss.setGravity(false);
 		mBoss.setInvulnerable(true);
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0);
@@ -97,6 +98,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 				} else if (mT == TIME_BEGIN) {
 					mBoss.setGravity(true);
 					mBoss.setInvulnerable(false);
+					mBoss.setAI(true);
 					// Swap weapon to bow for phase 1
 					ItemStack item = new ItemStack(Material.BOW, 1);
 					item.addEnchantment(Enchantment.ARROW_DAMAGE, 3);
@@ -157,7 +159,7 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 
 		List<Spell> passiveSpells1 = Arrays.asList(
 			new SpellBlockBreak(mBoss),
-			new SpellPushPlayersAway(mBoss, 7, 15),
+			new SpellPushPlayersAway(mBoss, 7, 15, -3), // Boss spawns on a 3-block tall pillar, and never moves from that spot
 			// Teleport the boss to spawn, preserving look direction
 			new SpellRunAction(() -> {
 				Location teleLoc = mSpawnLoc.clone();
@@ -187,7 +189,6 @@ public class Masked extends SerializedLocationBossAbilityGroup {
 		events.put(50, mBoss -> {
 			changePhase(activeSpells2, passiveSpells2, null);
 			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, MOVEMENT_SPEED);
-			EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
 			// Put sword back in mainhand
 			mBoss.getEquipment().setItemInMainHand(mMeleeWeapon);
 			PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, DETECTION_RANGE, PHASE_CHANGE_DIALOG_COMMAND);
