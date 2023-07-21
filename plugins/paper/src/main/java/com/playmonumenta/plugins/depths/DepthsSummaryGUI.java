@@ -124,17 +124,19 @@ public class DepthsSummaryGUI extends CustomInventory {
 		if (mRequestingPlayer.mEarnedRewards.size() > 0) {
 			rewardItem = new ItemStack(Material.GOLD_INGOT, mRequestingPlayer.mEarnedRewards.size());
 			ItemMeta rewardMeta = rewardItem.getItemMeta();
-			rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
-				.decoration(TextDecoration.ITALIC, false));
-			rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			ItemUtils.setPlainName(rewardItem, "Claim your Room Reward!");
 			if (mRequestingPlayer.mEarnedRewards.size() > 1) {
 				rewardMeta.displayName(Component.text("Claim your Room Rewards!", NamedTextColor.YELLOW)
 					.decoration(TextDecoration.ITALIC, false));
 				rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+				rewardItem.setItemMeta(rewardMeta);
 				ItemUtils.setPlainName(rewardItem, "Claim your Room Rewards!");
+			} else {
+				rewardMeta.displayName(Component.text("Claim your Room Reward!", NamedTextColor.YELLOW)
+				.decoration(TextDecoration.ITALIC, false));
+				rewardMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+				rewardItem.setItemMeta(rewardMeta);
+				ItemUtils.setPlainName(rewardItem, "Claim your Room Reward!");
 			}
-			rewardItem.setItemMeta(rewardMeta);
 		} else {
 			rewardItem = new ItemStack(Material.GOLD_NUGGET, 1);
 			ItemMeta rewardMeta = rewardItem.getItemMeta();

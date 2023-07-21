@@ -708,7 +708,7 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.BARRIER, false).serverCommand("scoreboard players set @S MusicDungeonDelay 1").playerMessage("There will now be no delay between dungeon music tracks."),
 
 			new PebItem(23, "Plots Music Delay",
-				"Enable or disable strike music.", NamedTextColor.LIGHT_PURPLE,
+				"", NamedTextColor.LIGHT_PURPLE,
 				Material.CRAFTING_TABLE, false),
 			new PebItem(32, "Delay",
 				"There will be 10 minutes between the start of each play of plots music.", NamedTextColor.LIGHT_PURPLE,
