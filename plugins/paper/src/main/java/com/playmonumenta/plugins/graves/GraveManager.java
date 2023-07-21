@@ -208,7 +208,7 @@ public class GraveManager {
 			// Check Lich infusion
 			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY) == 0
 				    || ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
-				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were items shattered further. ", NamedTextColor.GRAY)
+				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were equipped items shattered further. ", NamedTextColor.GRAY)
 					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
 			} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 				manager.mGraves.add(new Grave(manager, player, equipment));
@@ -217,7 +217,7 @@ public class GraveManager {
 			}
 		} else if (manager.mGraves.stream().noneMatch(grave -> grave.mGhostGrave && shard.equals(grave.mShardName))) {
 			manager.mGraves.add(new Grave(manager, player, equipment));
-			player.sendMessage(Component.text("You died and left a grave! Return to it to repair your items! ", NamedTextColor.RED)
+			player.sendMessage(Component.text("You died and left a grave! Return to it to repair your equipped items! ", NamedTextColor.RED)
 				.append(Component.text("(/help death for more info)", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/help death"))));
 		} else {
 			player.sendMessage(Component.text("You died but already had a grave, so no new grave was created. Your items have shattered further! ", NamedTextColor.RED)

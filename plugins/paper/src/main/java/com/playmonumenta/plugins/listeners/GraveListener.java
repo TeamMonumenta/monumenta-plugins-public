@@ -327,9 +327,7 @@ public class GraveListener implements Listener {
 			for (int i = 36; i <= 40; i++) {
 				ItemStack item = items[i];
 				if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
-					if (item == null) {
-						extraEquipmentShatter++;
-					}
+					extraEquipmentShatter++;
 					continue;
 				}
 
@@ -340,8 +338,9 @@ public class GraveListener implements Listener {
 			}
 
 			// Handle extra shattering if a player deserves it. (Either empty armor slots or recently (15s) changed their gear into Shattered III.)
-			if (extraEquipmentShatter > 0) {
-				player.sendMessage(Component.text("Some items in your inventory have been shattered!", NamedTextColor.RED));
+			// Only occur if more than 1 item is missing though for a little extra leniency.
+			if (extraEquipmentShatter > 1) {
+				player.sendMessage(Component.text("Some additional items in your inventory have been shattered!", NamedTextColor.RED));
 				ArrayList<ItemStack> hotbarItems = new ArrayList<>();
 				ArrayList<ItemStack> inventoryItems = new ArrayList<>();
 				for (int i = 0; i <= 35; i++) {
