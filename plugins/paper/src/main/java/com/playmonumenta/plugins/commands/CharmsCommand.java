@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -199,6 +200,10 @@ public class CharmsCommand extends GenericCommand {
 			.withArguments(arguments)
 			.executesPlayer((sender, args) -> {
 				Player player = (Player) args[0];
+				if (!PremiumVanishIntegration.canSee(sender, player)) {
+					sender.sendMessage(ChatColor.RED + "No player was found");
+					return;
+				}
 				new CharmsGUI(sender, player).open();
 			}).register();
 

@@ -26,7 +26,6 @@ dependencies {
 
     implementation("org.openjdk.jmh:jmh-core:1.19")
     implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
-    implementation("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
     implementation("com.opencsv:opencsv:5.5") // generateitems
     implementation("dev.jaqobb:namemcapi:2.0.7")
 
@@ -51,6 +50,7 @@ dependencies {
     compileOnly("de.tr7zw:item-nbt-api-plugin:2.11.3")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     compileOnly("io.prometheus:simpleclient:0.11.0")
+    compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.6.3")
     errorprone("com.google.errorprone:error_prone_core:2.10.0")
     errorprone("com.uber.nullaway:nullaway:0.9.5")
 
