@@ -525,7 +525,7 @@ public class PotionBarrelListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void plockPlaceEvent(BlockPlaceEvent event) {
-		if (isPotionBarrel(event.getItemInHand())
+		if (isPotionBarrel(event.getBlock())
 				&& !isValidLocation(event.getBlock().getLocation())) {
 			event.setCancelled(true);
 		}
