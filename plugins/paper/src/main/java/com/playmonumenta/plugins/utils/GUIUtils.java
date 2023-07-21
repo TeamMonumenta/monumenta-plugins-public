@@ -52,10 +52,10 @@ public class GUIUtils {
 		if (content.isEmpty()) {
 			return new ArrayList<>();
 		}
-		if (lore.content().length() <= maxLength && !content.contains("\n")) {
+		String mini = MessagingUtils.toMiniMessage(lore);
+		if (mini.length() <= maxLength && !content.contains("\n")) {
 			return List.of(fixLoreFormatting(lore));
 		}
-		String mini = MessagingUtils.toMiniMessage(lore);
 		String[] splitLine = mini.split(" |(?=\n)"); // split on spaces, and on the empty string just before a line break
 		StringBuilder currentLine = new StringBuilder();
 		List<String> finalMinis = new ArrayList<>();
