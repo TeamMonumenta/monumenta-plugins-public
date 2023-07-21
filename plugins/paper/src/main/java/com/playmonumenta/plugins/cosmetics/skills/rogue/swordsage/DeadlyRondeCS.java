@@ -38,12 +38,12 @@ public class DeadlyRondeCS implements CosmeticSkill {
 		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.0f, 0.1f);
 		world.playSound(particleLoc, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.4f);
 		world.playSound(particleLoc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2.0f, 0.7f);
-		world.playSound(particleLoc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.5f, 1.6f);
+		world.playSound(particleLoc, Sound.ENTITY_GLOW_SQUID_SQUIRT, SoundCategory.PLAYERS, 0.5f, 2.0f);
 		world.playSound(particleLoc, Sound.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.PLAYERS, 1.0f, 1.0f);
 		world.playSound(particleLoc, Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 0.4f, 2.0f);
 		world.playSound(particleLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 2.0f);
-		world.playSound(particleLoc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.5f, 1.2f);
-		world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.1f);
+		world.playSound(particleLoc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.5f, 1.6f);
+		world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.7f);
 	}
 
 	public void rondeGainStackEffect(Player player, Location loc) {

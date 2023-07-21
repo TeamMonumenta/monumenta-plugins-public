@@ -87,7 +87,7 @@ public class HolyJavelin extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE
+		if (event.getType() == DamageType.MELEE && isLevelTwo()
 			    && mCustomTriggers.get(0).check(mPlayer, AbilityTrigger.Key.LEFT_CLICK)) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {

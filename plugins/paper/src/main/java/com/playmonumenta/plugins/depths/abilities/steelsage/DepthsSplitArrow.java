@@ -50,7 +50,7 @@ public class DepthsSplitArrow extends DepthsAbility {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && !proj.hasMetadata(RapidFire.META_DATA_TAG) && EntityUtils.isHostileMob(enemy)) {
+		if (event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile proj && EntityUtils.isAbilityTriggeringProjectile(proj, false) && EntityUtils.isHostileMob(enemy)) {
 			LivingEntity nearestMob = EntityUtils.getNearestMob(enemy.getLocation(), SPLIT_ARROW_CHAIN_RANGE, enemy);
 
 			if (nearestMob != null && !nearestMob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {

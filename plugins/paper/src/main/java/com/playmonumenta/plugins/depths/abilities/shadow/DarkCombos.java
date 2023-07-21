@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
@@ -60,7 +61,7 @@ public class DarkCombos extends DepthsAbility {
 
 	private static TextComponent getDescription(int rarity, TextColor color) {
 		return Component.text("Every third melee attack applies ")
-			       .append(Component.text(VULN_AMPLIFIER[rarity - 1], color))
+			       .append(Component.text(StringUtils.multiplierToPercentage(VULN_AMPLIFIER[rarity - 1]) + "%", color))
 			       .append(Component.text(" vulnerability for " + DURATION / 20 + " seconds."));
 	}
 

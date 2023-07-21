@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
+import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
@@ -220,7 +221,7 @@ public class DamageListener implements Listener {
 
 		// Projectile Iframes rework. Need to be placed at the end in order to get final damage.
 		if (source instanceof Player player
-			    && (damager instanceof Projectile || ElementalArrows.isElementalArrowDamage(event))
+			    && ((damager instanceof Projectile proj && !proj.hasMetadata(RapidFire.META_DATA_TAG)) || ElementalArrows.isElementalArrowDamage(event))
 			    && event.getType() != DamageEvent.DamageType.TRUE) {
 			double damage = event.getDamage();
 			// Now, set damage to 0.001 (to allow for knockback effects), and customly damage enemy using damage function.

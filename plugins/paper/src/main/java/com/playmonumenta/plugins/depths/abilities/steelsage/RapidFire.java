@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.depths.DepthsTree;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
-import com.playmonumenta.plugins.depths.abilities.windwalker.Skyhook;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -33,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -51,7 +51,8 @@ public class RapidFire extends DepthsAbility {
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", RapidFire::cast, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK),
 				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
 			.displayItem(Material.REPEATER)
-			.descriptions(RapidFire::getDescription);
+			.descriptions(RapidFire::getDescription)
+			.priorityAmount(950); // Needs to trigger before a few things like Focused Combos since it cancels damage
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
@@ -89,6 +90,7 @@ public class RapidFire extends DepthsAbility {
 					arrow.setShooter(mPlayer);
 
 					mPlayerItemStatsMap.put(arrow, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+					arrow.setMetadata(META_DATA_TAG, new FixedMetadataValue(mPlugin, 0));
 
 					mPlugin.mProjectileEffectTimers.addEntity(arrow, Particle.ASH);
 					Location loc = mPlayer.getLocation().add(0, 1, 0);
@@ -96,9 +98,6 @@ public class RapidFire extends DepthsAbility {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1, 0.45f);
 					ProjectileLaunchEvent eventLaunch = new ProjectileLaunchEvent(arrow);
 					Bukkit.getPluginManager().callEvent(eventLaunch);
-					if (arrow.hasMetadata(Skyhook.SKYHOOK_ARROW_METADATA)) {
-						arrow.removeMetadata(Skyhook.SKYHOOK_ARROW_METADATA, mPlugin);
-					}
 					mCount++;
 				} else {
 					this.cancel();

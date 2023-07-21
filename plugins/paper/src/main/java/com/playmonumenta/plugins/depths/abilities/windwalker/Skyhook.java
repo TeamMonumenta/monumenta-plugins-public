@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.depths.abilities.DepthsAbility;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.aspects.BowAspect;
-import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -115,7 +114,6 @@ public class Skyhook extends DepthsAbility {
 	@Override
 	public boolean playerShotProjectileEvent(Projectile projectile) {
 		if (isOnCooldown()
-			    || projectile.hasMetadata(RapidFire.META_DATA_TAG)
 			    || !mPlayer.isSneaking()
 			    || !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
 			return true;
