@@ -169,13 +169,15 @@ public class SpellEarthshake extends Spell {
 		for (Player p : PlayerUtils.playersInRange(loc, mParameters.RADIUS, true)) {
 			mParameters.SOUND_EXPLOSION_PLAYER.play(p.getLocation());
 			DamageUtils.damage(mLauncher, p, DamageType.BLAST, mParameters.DAMAGE);
-			double knockupSpeed = mParameters.KNOCK_UP_SPEED + (p.getLocation().distance(loc) <= mParameters.RADIUS / 2.0 ? 0.5 : 0);
-			p.setVelocity(p.getVelocity().add(new Vector(0.0, knockupSpeed, 0.0)));
+			if (mParameters.DO_KNOCK_UP) {
+				double knockupSpeed = mParameters.KNOCK_UP_SPEED + (p.getLocation().distance(loc) <= mParameters.RADIUS / 2.0 ? 0.5 : 0);
+				p.setVelocity(p.getVelocity().add(new Vector(0.0, knockupSpeed, 0.0)));
+			}
 		}
 		//Knock up other mobs because it's fun
 		List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, mParameters.RADIUS);
 		for (LivingEntity mob : mobs) {
-			if (mob.getLocation().distance(loc) <= mParameters.RADIUS) {
+			if (mob.getLocation().distance(loc) <= mParameters.RADIUS && mParameters.DO_KNOCK_UP) {
 				mob.setVelocity(mob.getVelocity().add(new Vector(0.0, mParameters.KNOCK_UP_SPEED + 1.0, 0.0)));
 			}
 		}

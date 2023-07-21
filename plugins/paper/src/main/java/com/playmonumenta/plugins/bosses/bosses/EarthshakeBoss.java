@@ -48,6 +48,7 @@ public class EarthshakeBoss extends BossAbilityGroup {
 
 		@BossParam(help = "Players hit will be pushed up by this amount, plus 0.5 if standing close to the center")
 		public double KNOCK_UP_SPEED = 1.0;
+		public boolean DO_KNOCK_UP = true;
 
 		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean LINE_OF_SIGHT = true;

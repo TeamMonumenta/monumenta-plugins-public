@@ -31,7 +31,7 @@ public class SpellBaseParticleAura extends Spell {
 		mEffectIter++;
 		if (mEffectIter >= mTicksPerIteration) {
 			mEffectIter = 0;
-			if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
+			if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || !mBoss.isValid()) {
 				return;
 			}
 			for (ParticleEffect effect : mEffects) {
