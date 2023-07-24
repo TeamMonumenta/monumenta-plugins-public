@@ -1898,11 +1898,10 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 			ReadWriteNBT infusion = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(PLAYER_MODIFIED_KEY).getOrCreateCompound(InfusionType.KEY).getOrCreateCompound(type.getName());
 			infusion.setInteger(LEVEL_KEY, level);
 			infusion.setString(INFUSER_KEY, infuser.toString());
-
-			if (updateItem) {
-				generateItemStats(item, nbt);
-			}
 		});
+		if (updateItem) {
+			generateItemStats(item);
+		}
 	}
 
 	public static void removeInfusion(final ItemStack item, final InfusionType type) {
@@ -1913,16 +1912,17 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		if (item.getType() == Material.AIR || type == null) {
 			return;
 		}
-		NBT.modify(item, nbt -> {
+		boolean success = NBT.modify(item, nbt -> {
 			ReadWriteNBT infusions = getInfusions(nbt);
 			if (infusions == null) {
-				return;
+				return false;
 			}
 			infusions.removeKey(type.getName());
-			if (updateItem) {
-				generateItemStats(item, nbt);
-			}
+			return true;
 		});
+		if (success && updateItem) {
+			generateItemStats(item);
+		}
 	}
 
 	public static boolean hasInfusion(@Nullable ItemStack item, InfusionType type) {
@@ -2271,7 +2271,7 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		 }
 	}
 
-	public static List<Component> generateItemStats(final ItemStack item, final ReadWriteItemNBT nbt) {
+	private static List<Component> generateItemStats(final ItemStack item, final ReadWriteItemNBT nbt) {
 		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null || monumenta.getKeys().isEmpty()) {
 			return new ArrayList<>();
@@ -2605,7 +2605,7 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		return lore;
 	}
 
-	public static void postGenerateItemStats(ItemStack item, List<Component> lore) {
+	private static void postGenerateItemStats(ItemStack item, List<Component> lore) {
 		lore.removeAll(Collections.singletonList(DUMMY_LORE_TO_REMOVE));
 		item.lore(lore);
 
