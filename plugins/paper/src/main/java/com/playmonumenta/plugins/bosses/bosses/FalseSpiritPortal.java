@@ -29,6 +29,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.EndGateway;
 import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Bee;
@@ -277,27 +278,24 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 					mMobsKilled = 0;
 
 					Location beaconLoc = tridentLoc.clone().add(0, 3, 0);
-					beaconLoc.getBlock().setType(Material.END_GATEWAY);
 
-					//Spawns an end gateway to have a beacon laser to indicate location
+					// Spawns an end gateway to have a beacon laser to indicate location
+					Block b = beaconLoc.getBlock();
+					b.setType(Material.END_GATEWAY);
+					if (b.getState() instanceof EndGateway eg) {
+						eg.setAge(2400);
+						eg.update();
+					}
+
+					// End gateways have their age "frozen" on this server, so this runnable doesn't need to change the block.
 					new BukkitRunnable() {
-						int mT = 2;
 
 						@Override
 						public void run() {
 							if (item.isDead() || !item.isValid() || mBoss.isDead() || !mBoss.isValid()) {
-								beaconLoc.getBlock().setType(Material.AIR);
+								b.setType(Material.AIR);
 								this.cancel();
-								return;
 							}
-
-							if (mT % 160 == 0) {
-								beaconLoc.getBlock().setType(Material.AIR);
-							} else if (mT % 162 == 0) {
-								beaconLoc.getBlock().setType(Material.END_GATEWAY);
-							}
-
-							mT += 2;
 						}
 					}.runTaskTimer(mPlugin, 0, 2);
 				}
