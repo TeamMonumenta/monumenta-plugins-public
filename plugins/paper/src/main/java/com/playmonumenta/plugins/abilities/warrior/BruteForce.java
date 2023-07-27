@@ -41,6 +41,7 @@ public class BruteForce extends Ability {
 	public static final String CHARM_KNOCKBACK = "Brute Force Knockback";
 	public static final String CHARM_WAVE_DAMAGE_RATIO = "Brute Force Wave Damage Ratio";
 	public static final String CHARM_WAVES = "Brute Force Waves";
+	public static final String CHARM_WAVE_DELAY = "Brute Force Wave Delay";
 
 	public static final AbilityInfo<BruteForce> INFO =
 		new AbilityInfo<>(BruteForce.class, "Brute Force", BruteForce::new)
@@ -93,11 +94,12 @@ public class BruteForce extends Ability {
 			if (isEnhanced()) {
 				double damageRatio = ENHANCEMENT_DAMAGE_RATIO + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_WAVE_DAMAGE_RATIO);
 				int waves = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_WAVES);
+				long delay = CharmManager.getDuration(mPlayer, CHARM_WAVE_DELAY, ENHANCEMENT_DELAY);
 				for (int i = 1; i <= waves; i++) {
 					double damage = damageBonus * Math.pow(damageRatio, i);
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						wave(enemy, playerLoc, damage, true);
-					}, (long) ENHANCEMENT_DELAY * i);
+					}, delay * i);
 				}
 			}
 
