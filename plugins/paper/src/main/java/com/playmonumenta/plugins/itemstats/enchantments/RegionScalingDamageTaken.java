@@ -4,8 +4,10 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Entity;
@@ -48,8 +50,8 @@ public class RegionScalingDamageTaken implements Enchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		plugin.mEffectManager.addEffect(player, SPEED_EFFECT_NAME, new PercentSpeed(21, SPEED_EFFECT[Math.max(0, Math.min((int) value, SPEED_EFFECT.length - 1))], SPEED_EFFECT_NAME).displaysTime(false));
-		if (oneHz && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5)) {
-			MessagingUtils.sendActionBarMessage(player, "Your armor or offhand are from a wrong region!", NamedTextColor.RED);
+		if (oneHz && !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.RESIST_5) && !ScoreboardUtils.checkTag(player, Shattered.MESSAGE_DISABLE_TAG)) {
+			MessagingUtils.sendActionBarMessage(player, "Your armor or offhand are incompatible with this region!", NamedTextColor.RED);
 		}
 	}
 }

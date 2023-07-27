@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -10,7 +11,12 @@ import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import net.kyori.adventure.text.Component;
@@ -25,7 +31,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.jetbrains.annotations.Nullable;
 
 public class PEBCustomInventory extends CustomInventory {
 	private static final Material FILLER = Material.GRAY_STAINED_GLASS_PANE;
@@ -279,7 +284,17 @@ public class PEBCustomInventory extends CustomInventory {
 				Material.PRISMARINE, false).playerCommand("virtualfirmament"),
 			new PebItem(30, "Spoof World Names",
 				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
-				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames")
+				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
+			new PebItem(31, "Shattered and Region Scaling Messages",
+				"Click to toggle whether you receive actionbar messages when you have equipment that is shattered or debuffed based on region scaling.", NamedTextColor.LIGHT_PURPLE,
+				Material.DAMAGED_ANVIL, false)
+				.action((peb, event) -> {
+					if (ScoreboardUtils.toggleTag(peb.mPlayer, Shattered.MESSAGE_DISABLE_TAG)) {
+						peb.mPlayer.sendMessage(Component.text("Shattered and Region Scaling actionbar messages have been disabled!", NamedTextColor.GOLD));
+					} else {
+						peb.mPlayer.sendMessage(Component.text("Shattered and Region Scaling actionbar messages have been enabled!", NamedTextColor.GOLD));
+					}
+				})
 		);
 
 		// Toggle-able Options

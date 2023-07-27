@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
+import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.UUID;
@@ -36,6 +38,8 @@ public class Shattered implements Infusion {
 
 	public static final String DAMAGE_DEALT_EFFECT = "Shatter-DD";
 	public static final String DAMAGE_TAKEN_EFFECT = "Shatter-DT";
+
+	public static final String MESSAGE_DISABLE_TAG = "DisableShatteredAndScalingMessage";
 
 	private static final HashSet<UUID> mShatteredDebuff = new HashSet<>();
 
@@ -93,7 +97,7 @@ public class Shattered implements Infusion {
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		if (oneHz) {
 			int shatterLevel = getShatteredLevelsEquipped(player);
-			if (shatterLevel > 0) {
+			if (shatterLevel > 0 && !plugin.mEffectManager.hasEffect(player, RespawnStasis.class) && !ScoreboardUtils.checkTag(player, MESSAGE_DISABLE_TAG)) {
 				MessagingUtils.sendActionBarMessage(player, "Your armor, offhand, or held item are Shattered!", NamedTextColor.RED);
 			}
 			updateEffects(plugin, player, shatterLevel);
