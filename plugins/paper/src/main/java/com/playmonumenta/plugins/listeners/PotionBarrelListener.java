@@ -442,7 +442,7 @@ public class PotionBarrelListener implements Listener {
 			int injectorRefilled = 0;
 			String injectorName = null;
 			for (ItemStack playerItem : playerInventory) {
-				if (playerItem == null || !ItemUtils.isSomePotion(playerItem)) {
+				if (playerItem == null) {
 					continue;
 				}
 				if (playerItem.isSimilar(barrelPotion)) {
