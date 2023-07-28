@@ -51,9 +51,9 @@ public class HolyJavelin extends Ability {
 			.actionBarColor(TextColor.color(255, 255, 50))
 			.descriptions(
 				"While sprinting, left-clicking with a non-pickaxe throws a piercing spear of light, instantly travelling up to 12 blocks or until it hits a solid block. " +
-					"It deals 22 magic damage to all undead enemies in a 0.75-block cube around it along its path, and 11 magic damage to non-undead, and sets them all on fire for 5s. Cooldown: 10s.",
-				"Attacking an undead enemy with that left-click now transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. " +
-					"Damage is increased to 36 against undead, and to 22 against non-undead.")
+					"It deals 22 magic damage to all undead enemies in a 0.75-block cube around it along its path, and 11 magic damage to non-undead, and sets them all on fire for 5s. " +
+					"Attacking an undead enemy with that left-click transmits any passive Divine Justice and Luminous Infusion damage to other enemies pierced by the spear. Cooldown: 10s.",
+				"Damage is increased to 36 against undead, and to 22 against non-undead.")
 			.simpleDescription("Throw a piercing spear of light that ignites and damages mobs.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HolyJavelin::cast,
@@ -87,7 +87,7 @@ public class HolyJavelin extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && isLevelTwo()
+		if (event.getType() == DamageType.MELEE
 			    && mCustomTriggers.get(0).check(mPlayer, AbilityTrigger.Key.LEFT_CLICK)) {
 			double sharedPassiveDamage = 0;
 			if (mLuminousInfusion != null) {
