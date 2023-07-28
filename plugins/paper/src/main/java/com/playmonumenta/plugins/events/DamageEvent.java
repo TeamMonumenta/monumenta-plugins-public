@@ -27,20 +27,20 @@ import org.jetbrains.annotations.Nullable;
 public class DamageEvent extends Event implements Cancellable {
 
 	public enum DamageType {
-		MELEE(false, true),
-		MELEE_SKILL(false, true),
-		MELEE_ENCH(false, true),
-		PROJECTILE(false, true),
-		PROJECTILE_SKILL(false, true),
-		MAGIC(false, true),
-		THORNS(false, true),
-		BLAST(false, true),
-		FIRE(true, true),
-		FALL(true, true),
-		AILMENT(false, false),
-		POISON(false, false),
-		TRUE(false, false),
-		OTHER(false, false);
+		MELEE(false, true, "Melee"),
+		MELEE_SKILL(false, true, "Melee Skill"),
+		MELEE_ENCH(false, true, "Melee Enchantment"),
+		PROJECTILE(false, true, "Projectile"),
+		PROJECTILE_SKILL(false, true, "Projectile Skill"),
+		MAGIC(false, true, "Magic"),
+		THORNS(false, true, "Thorns"),
+		BLAST(false, true, "Blast"),
+		FIRE(true, true, "Fire"),
+		FALL(true, true, "Fall"),
+		AILMENT(false, false, "Ailment"),
+		POISON(false, false, "Poison"),
+		TRUE(false, false, "True"),
+		OTHER(false, false, "Other");
 
 		public static DamageType getType(DamageCause cause) {
 			// List every cause for completeness
@@ -92,10 +92,12 @@ public class DamageEvent extends Event implements Cancellable {
 
 		private final boolean mIsEnvironmental;
 		private final boolean mIsDefendable;
+		private final String mDisplay;
 
-		DamageType(boolean isEnvironmental, boolean isDefendable) {
+		DamageType(boolean isEnvironmental, boolean isDefendable, String display) {
 			mIsEnvironmental = isEnvironmental;
 			mIsDefendable = isDefendable;
+			mDisplay = display;
 		}
 
 		public boolean isEnvironmental() {
@@ -104,6 +106,10 @@ public class DamageEvent extends Event implements Cancellable {
 
 		public boolean isDefendable() {
 			return mIsDefendable;
+		}
+
+		public String getDisplay() {
+			return mDisplay;
 		}
 
 		public static EnumSet<DamageType> getEnumSet() {

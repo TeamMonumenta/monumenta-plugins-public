@@ -3,11 +3,13 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellRunAction;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.text.DecimalFormat;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -25,6 +27,8 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	public static final int detectionRange = 25;
 	private static final DecimalFormat cutoffDigits = new DecimalFormat("0.0####"); // number of 0s/#s determines maximum digits shown
 	private static final DecimalFormat holoDigits = new DecimalFormat("0.0"); // number of 0s/#s determines maximum digits shown
+
+	public static @Nullable DamageEvent.DamageType mNextTrueDamageReplacement = null;
 
 	private final Component HOLOGRAM_DEFAULT_NAME = Component.text("DPS (10s / Max): ", NamedTextColor.YELLOW)
 		                                                .append(Component.text("???", NamedTextColor.DARK_AQUA))
@@ -72,7 +76,24 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 
 		if (source instanceof Player player) {
 			String damageString = damageToString(damage);
-			player.sendMessage(Component.text("Damage: ", NamedTextColor.GOLD).append(Component.text(damageString, NamedTextColor.RED)));
+
+			DamageEvent.DamageType type = event.getType();
+			if (mNextTrueDamageReplacement != null && type == DamageEvent.DamageType.TRUE) {
+				type = mNextTrueDamageReplacement;
+			}
+			mNextTrueDamageReplacement = null;
+			ClassAbility ability = event.getAbility();
+
+			Component hoverDamage = Component.text("Damage: " + damageString + "\n");
+			Component hoverType = Component.text("Type: " + type.getDisplay() + "\n");
+			Component hoverAbility = ability == null ? Component.empty() : Component.text("Source: " + ability.getName() + "\n");
+			Component hoverMob = mBoss.name().append(Component.newline());
+			Component hoverTimestamp = Component.text("Timestamp: " + Bukkit.getCurrentTick());
+			Component hover = hoverDamage.append(hoverType).append(hoverAbility).append(hoverMob).append(hoverTimestamp);
+
+			player.sendMessage(Component.text("Damage: ", NamedTextColor.GOLD)
+				.append(Component.text(damageString + " " + getTypeSymbol(type), NamedTextColor.RED))
+				.hoverEvent(HoverEvent.showText(hover)));
 
 			if (mHologram == null) {
 				mHologram = (ArmorStand) mBoss.getWorld().spawnEntity(mBoss.getEyeLocation().add(0, 0.5, 0), EntityType.ARMOR_STAND);
@@ -165,6 +186,16 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			damageString = cutoffDigits.format(damage);
 		}
 		return damageString;
+	}
+
+	private static String getTypeSymbol(DamageEvent.DamageType type) {
+		return switch (type) {
+			case MELEE, MELEE_SKILL, MELEE_ENCH -> "🗡";
+			case PROJECTILE, PROJECTILE_SKILL -> "🏹";
+			case MAGIC -> "⭐";
+			case AILMENT -> "☠";
+			default -> "";
+		};
 	}
 
 	@Override
