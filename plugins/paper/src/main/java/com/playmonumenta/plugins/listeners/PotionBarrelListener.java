@@ -7,10 +7,14 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import de.tr7zw.nbtapi.NBTItem;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -335,76 +339,170 @@ public class PotionBarrelListener implements Listener {
 					CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
 					takeAll(barrelInventory, player.getInventory());
 				}
-			} else {
-				// Deposit all matching potions
-				// Also refills potion injectors
-				ItemStack barrelPotion = getBarrelPotion(barrelInventory);
-				if (barrelPotion != null) {
-					CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
-					int added = 0;
-					int injectorRefilled = 0;
-					String injectorName = null;
-					for (ItemStack playerItem : playerInventory) {
-						if (playerItem == null) {
-							continue;
-						}
-						if (playerItem.isSimilar(barrelPotion)) {
-							if (addToBarrel(barrelInventory, playerItem)) {
-								added++;
-							}
-						} else if (ShulkerEquipmentListener.isPotionInjectorItem(playerItem)
-							           && playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-							           && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
-							if (InventoryUtils.numEmptySlots(shulkerBox.getInventory()) > 0
-								    && Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
-								injectorRefilled += takeAll(barrelInventory, shulkerBox.getInventory());
-								blockStateMeta.setBlockState(shulkerBox);
-								playerItem.setItemMeta(blockStateMeta);
-								if (injectorName == null) {
-									injectorName = ItemUtils.getPlainName(playerItem);
-								} else {
-									injectorName = "Potion Injectors";
-								}
-							}
-						} else if ((ShulkerShortcutListener.isPurpleTesseractContainer(playerItem)
-							            || (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
-							           && playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
-							           && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
-							boolean changed = false;
-							for (ItemStack shulkerItem : shulkerBox.getInventory()) {
-								if (shulkerItem != null
-									    && shulkerItem.isSimilar(barrelPotion)
-									    && addToBarrel(barrelInventory, shulkerItem)) {
-									added++;
-									changed = true;
-								}
-							}
-							if (changed) {
-								if (ShulkerShortcutListener.isPurpleTesseractContainer(playerItem) && shulkerBox.getInventory().isEmpty()) {
-									playerItem.setAmount(0);
-									ItemStack chest = new ItemStack(Material.CHEST);
-									String name = shulkerBox.getLock();
-									if (!name.isEmpty()) {
-										new NBTItem(chest, true).addCompound("display").setString("Name", name);
-										ItemUtils.setPlainName(chest);
-									}
-									InventoryUtils.giveItem(player, chest);
-								} else {
-									blockStateMeta.setBlockState(shulkerBox);
-									playerItem.setItemMeta(blockStateMeta);
-								}
-							}
+			} else if (MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, "potionbarreldeposit", 50)) {
+				depositPotionsAndRefillInjectorsAllBarrels(barrel.getLocation(), player, playerInventory);
+			}
+		}
+	}
+
+	private static class BarrelInstance {
+		private Block mBlock;
+		private Inventory mInventory;
+		private ItemStack mPotion;
+
+		private BarrelInstance(Block block, Inventory inventory, ItemStack potion) {
+			mBlock = block;
+			mInventory = inventory;
+			mPotion = potion;
+		}
+
+		private Block getBlock() {
+			return mBlock;
+		}
+
+		private Inventory getInventory() {
+			return mInventory;
+		}
+
+		private ItemStack getPotion() {
+			return mPotion;
+		}
+	}
+
+	/* Recursive depth-first search over all adjacent barrels */
+	private void explore(Location loc, HashSet<Location> exploredLocations, List<BarrelInstance> barrels) {
+		/*
+		 * Couple notes:
+		 * - The same Location object is reused to avoid a bunch of unnecessary clones
+		 * - We check here whether exploredLocations contains the item already by adding it.
+		 * If adding fails (it already exists), add returns false
+		 */
+		if (loc.isChunkLoaded() && exploredLocations.add(loc)) {
+			Block testBlock = loc.getBlock();
+			if (isPotionBarrel(testBlock)) {
+				Barrel barrel = (Barrel) testBlock.getState(false);
+				Inventory inventory = barrel.getInventory();
+				ItemStack potion = getBarrelPotion(inventory);
+
+				if (potion != null) {
+					barrels.add(new BarrelInstance(testBlock, inventory, potion));
+				}
+
+				loc.add(-1, 0, 0);
+				explore(loc, exploredLocations, barrels);
+				loc.add(2, 0, 0);
+				explore(loc, exploredLocations, barrels);
+				loc.add(-1, -1, 0);
+				explore(loc, exploredLocations, barrels);
+				loc.add(0, 2, 0);
+				explore(loc, exploredLocations, barrels);
+				loc.add(0, -1, -1);
+				explore(loc, exploredLocations, barrels);
+				loc.add(0, 0, 2);
+				explore(loc, exploredLocations, barrels);
+				// Important to have location set back to the origin before returning.
+				loc.add(0, 0, -1);
+			}
+		}
+	}
+
+	private List<BarrelInstance> getAdjacentPotionBarrels(Location loc) {
+		List<BarrelInstance> barrels = new ArrayList<>();
+		// Used to avoid exploring the same location more than once
+		HashSet<Location> exploredLocations = new HashSet<>();
+
+		explore(loc, exploredLocations, barrels);
+
+		return barrels;
+	}
+
+
+
+	private void depositPotionsAndRefillInjectorsAllBarrels(Location loc, Player player, PlayerInventory playerInventory) {
+		boolean changedSomething = false;
+		for (BarrelInstance b : getAdjacentPotionBarrels(loc)) {
+			changedSomething |= depositPotionsAndRefillInjectorsOneBarrel(b, player, playerInventory);
+		}
+		if (changedSomething) {
+			player.updateInventory();
+		} else {
+			player.sendMessage(Component.text("Nothing to deposit or refill", NamedTextColor.GRAY));
+		}
+	}
+
+	/* Returns true if changed something, false otherwise */
+	private boolean depositPotionsAndRefillInjectorsOneBarrel(BarrelInstance b, Player player, PlayerInventory playerInventory) {
+		// Deposit all matching potions
+		// Also refills potion injectors
+		Inventory barrelInventory = b.getInventory();
+		ItemStack barrelPotion = b.getPotion();
+		if (barrelPotion != null) {
+			CoreProtectIntegration.logContainerTransaction(player, b.getBlock());
+			int added = 0;
+			int injectorRefilled = 0;
+			String injectorName = null;
+			for (ItemStack playerItem : playerInventory) {
+				if (playerItem == null || !ItemUtils.isSomePotion(playerItem)) {
+					continue;
+				}
+				if (playerItem.isSimilar(barrelPotion)) {
+					if (addToBarrel(barrelInventory, playerItem)) {
+						added++;
+					}
+				} else if (ShulkerEquipmentListener.isPotionInjectorItem(playerItem)
+							   && playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+							   && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					if (InventoryUtils.numEmptySlots(shulkerBox.getInventory()) > 0
+							&& Arrays.stream(shulkerBox.getInventory().getContents()).anyMatch(barrelPotion::isSimilar)) {
+						injectorRefilled += takeAll(barrelInventory, shulkerBox.getInventory());
+						blockStateMeta.setBlockState(shulkerBox);
+						playerItem.setItemMeta(blockStateMeta);
+						if (injectorName == null) {
+							injectorName = ItemUtils.getPlainName(playerItem);
+						} else {
+							injectorName = "Potion Injectors";
 						}
 					}
-					if (added > 0) {
-						player.sendMessage(Component.text("Deposited " + added + " " + ItemUtils.getPlainName(barrelPotion) + ".", NamedTextColor.GRAY));
+				} else if ((ShulkerShortcutListener.isPurpleTesseractContainer(playerItem)
+								|| (ItemUtils.isShulkerBox(playerItem.getType()) && !ShulkerShortcutListener.isRestrictedShulker(playerItem)))
+							   && playerItem.getItemMeta() instanceof BlockStateMeta blockStateMeta
+							   && blockStateMeta.getBlockState() instanceof ShulkerBox shulkerBox) {
+					boolean changed = false;
+					for (ItemStack shulkerItem : shulkerBox.getInventory()) {
+						if (shulkerItem != null
+								&& shulkerItem.isSimilar(barrelPotion)
+								&& addToBarrel(barrelInventory, shulkerItem)) {
+							added++;
+							changed = true;
+						}
 					}
-					if (injectorRefilled > 0) {
-						player.sendMessage(Component.text("Removed " + injectorRefilled + " " + ItemUtils.getPlainName(barrelPotion) + " to refill your " + injectorName + ".", NamedTextColor.WHITE));
+					if (changed) {
+						if (ShulkerShortcutListener.isPurpleTesseractContainer(playerItem) && shulkerBox.getInventory().isEmpty()) {
+							playerItem.setAmount(0);
+							ItemStack chest = new ItemStack(Material.CHEST);
+							String name = shulkerBox.getLock();
+							if (!name.isEmpty()) {
+								new NBTItem(chest, true).addCompound("display").setString("Name", name);
+								ItemUtils.setPlainName(chest);
+							}
+							InventoryUtils.giveItem(player, chest);
+						} else {
+							blockStateMeta.setBlockState(shulkerBox);
+							playerItem.setItemMeta(blockStateMeta);
+						}
 					}
 				}
 			}
+			if (added > 0) {
+				player.sendMessage(Component.text("Deposited " + added + " " + ItemUtils.getPlainName(barrelPotion) + ".", NamedTextColor.GRAY));
+			}
+			if (injectorRefilled > 0) {
+				player.sendMessage(Component.text("Removed " + injectorRefilled + " " + ItemUtils.getPlainName(barrelPotion) + " to refill your " + injectorName + ".", NamedTextColor.WHITE));
+			}
+
+			return added > 0 || injectorRefilled > 0;
 		}
+		return false;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -419,7 +517,7 @@ public class PotionBarrelListener implements Listener {
 		event.setCancelled(true);
 	}
 
-	private @Nullable ItemStack getBarrelPotion(Inventory barrelInventory) {
+	private static @Nullable ItemStack getBarrelPotion(Inventory barrelInventory) {
 		for (ItemStack item : barrelInventory) {
 			if (!ItemUtils.isNullOrAir(item)) {
 				return item;
