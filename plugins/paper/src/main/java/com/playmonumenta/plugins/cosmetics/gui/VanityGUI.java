@@ -142,7 +142,7 @@ public class VanityGUI extends Gui {
 					}
 					lore.add(Component.text("Requires the Resource Pack to be hidden", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 					lore.add(Component.text("for yourself when 'Self Vanity' is enabled.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
-					lore.add(Component.text("Exclusive to T4+ patrons.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
+					lore.add(Component.text("Exclusive to T3+ patrons.", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
 				} else {
 					lore.add(Component.text("Active vanity skin. Click to remove.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
 				}
