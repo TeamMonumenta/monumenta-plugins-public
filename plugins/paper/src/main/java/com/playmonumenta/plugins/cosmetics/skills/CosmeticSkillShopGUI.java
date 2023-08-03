@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -26,6 +27,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -102,6 +104,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 	private final Plugin mPlugin;
 	private CSGUIPage mCurrentPage = CSGUIPage.Home;
 	private int mPageNumber = 1;
+	private boolean mCosmeticSkillChanged = false;
 
 	private enum CSGUIPage {
 		Home(0),
@@ -421,6 +424,7 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 1, 1.5f);
 			player.sendMessage(Component.text("You successfully bought " + skin + "! It has been automatically equipped.", NamedTextColor.GREEN));
 			reloadPage(player);
+			mCosmeticSkillChanged = true;
 			return true;
 		} else {
 			// Shouldn't be here! But leave it as a handler to avoid typo in code.
@@ -732,5 +736,16 @@ public class CosmeticSkillShopGUI extends CustomInventory {
 			return temp - ENTRY_START + ENTRY_PER_LINE * (line - 2) + ENTRY_PER_PAGE * (mPageNumber - 1);
 		}
 		return -1;
+	}
+
+	@Override
+	protected void inventoryClose(InventoryCloseEvent event) {
+		if (event.getPlayer() instanceof Player player) {
+			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+				if (mCosmeticSkillChanged) {
+					mPlugin.mAbilityManager.updatePlayerAbilities(player, false);
+				}
+			}, 2);
+		}
 	}
 }
