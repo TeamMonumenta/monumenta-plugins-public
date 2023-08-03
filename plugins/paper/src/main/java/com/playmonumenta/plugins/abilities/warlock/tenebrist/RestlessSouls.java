@@ -48,12 +48,14 @@ public class RestlessSouls extends Ability {
 	private static final int TICK_INTERVAL = 1;
 	private static final int DETECTION_RANGE = 24;
 	private static final int RANGE = 8;
+	private static final double DEBUFF_RANGE = 0.25;
 	private static final double MOVESPEED = 5; // block(s) per second
 
 	public static final String CHARM_DAMAGE = "Restless Souls Damage";
 	public static final String CHARM_RADIUS = "Restless Souls Radius";
 	public static final String CHARM_DURATION = "Restless Souls Duration";
 	public static final String CHARM_CAP = "Restless Souls Vex Cap";
+	public static final String CHARM_DEBUFF_RANGE = "Restless Souls Debuff Radius";
 
 	public static final AbilityInfo<RestlessSouls> INFO =
 		new AbilityInfo<>(RestlessSouls.class, "Restless Souls", RestlessSouls::new)
@@ -62,7 +64,7 @@ public class RestlessSouls extends Ability {
 			.shorthandName("RS")
 			.descriptions(
 				"Whenever an enemy dies within " + RANGE + " blocks of you, a glowing invisible invulnerable vex spawns. " +
-					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage and silences the target for " + SILENCE_DURATION_1 / 20 + " seconds. " +
+					"The vex targets your enemies and possesses them, dealing " + DAMAGE_1 + " damage to the target and silences all mobs within " + DEBUFF_RANGE + " blocks for " + SILENCE_DURATION_1 / 20 + " seconds. " +
 					"Vex count is capped at " + VEX_CAP_1 + " and each lasts for " + VEX_DURATION / 20 + " seconds. " +
 					"Each vex can only possess 1 enemy. Enemies killed by the vex will not spawn additional vexes.",
 				"Damage is increased to " + DAMAGE_2 + " and silence duration increased to " + SILENCE_DURATION_2 / 20 + " seconds. " +
@@ -78,6 +80,7 @@ public class RestlessSouls extends Ability {
 	private final double mDamage;
 	private final int mSilenceTime;
 	private final int mVexCap;
+	private final double mDebuffRange;
 	private final List<Vex> mVexList = new ArrayList<Vex>();
 
 	public RestlessSouls(Plugin plugin, Player player) {
@@ -87,6 +90,7 @@ public class RestlessSouls extends Ability {
 		mDamage = CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, isLevelOne ? DAMAGE_1 : DAMAGE_2);
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
 		mVexCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne ? VEX_CAP_1 : VEX_CAP_2);
+		mDebuffRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_DEBUFF_RANGE, DEBUFF_RANGE);
 	}
 
 	@Override
@@ -126,7 +130,7 @@ public class RestlessSouls extends Ability {
 				return;
 			}
 			ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
-			restlessSoulsBoss.spawn(mPlayer, mDamage, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
+			restlessSoulsBoss.spawn(mPlayer, mDamage, mDebuffRange, mSilenceTime, DEBUFF_DURATION, mLevel, playerItemStats);
 
 			PartialParticle particle1 = new PartialParticle(Particle.SOUL, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);
 			PartialParticle particle2 = new PartialParticle(Particle.SOUL_FIRE_FLAME, vex.getLocation().add(0, 0.25, 0), 1, 0.2, 0.2, 0.2, 0.01).spawnAsPlayerActive(mPlayer);

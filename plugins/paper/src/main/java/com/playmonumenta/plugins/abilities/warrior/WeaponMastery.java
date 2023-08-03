@@ -27,7 +27,7 @@ public class WeaponMastery extends Ability {
 	private static final double SWORD_2_DAMAGE = 0.1;
 	private static final double WEAPON_MASTERY_SWORD_DAMAGE_RESISTANCE = 0.1;
 	private static final double SWORD_WEAKEN = 0.1;
-	private static final double ENHANCED_DAMAGE = 0.1;
+	private static final double ENHANCED_DAMAGE = 0.075;
 	private static final int SWORD_WEAKEN_DURATION = 4 * 20;
 	private static final double AXE_SPEED = 0.15;
 	private static final String SPEED_EFFECT = "WeaponMasterySpeedEffect";
@@ -44,7 +44,7 @@ public class WeaponMastery extends Ability {
 			.descriptions(
 				"You gain 10% damage resistance while holding a sword. Additionally, your axe damage is increased by +2 plus 5% of final damage done.",
 				"Increase axe damage by +4 plus 10% of final damage done and increase sword damage by +1 plus 10% of final damage done.",
-				"Deal +10% final damage when using either an axe or a sword. Gain +15% speed when using an axe. Apply 10% weaken for 4s when using a sword.")
+				"Deal +7.5% final damage when using either an axe or a sword. Gain +15% speed when using an axe. Apply 10% weaken for 4s when using a sword.")
 			.simpleDescription("Increase total damage dealt with axes and swords and gain resistance while holding a sword.")
 			.displayItem(Material.STONE_SWORD);
 

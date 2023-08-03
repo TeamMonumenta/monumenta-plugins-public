@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
 import org.bukkit.Location;
@@ -36,10 +37,11 @@ public final class MeteorSlam extends Ability {
 	public static final ClassAbility ABILITY = ClassAbility.METEOR_SLAM;
 	private static final String SLAM_ONCE_THIS_TICK_METAKEY = "MeteorSlamTickSlammed";
 
-	public static final double DAMAGE_1 = 2.5;
-	public static final double DAMAGE_2 = 3.5;
-	public static final double REDUCED_DAMAGE_1 = 2;
-	public static final double REDUCED_DAMAGE_2 = 2.5;
+	public static final double SCALING_DAMAGE_1 = 1;
+	public static final double SCALING_DAMAGE_2 = 1.25;
+	public static final double REDUCTION_MULTIPLIER = 0.1;
+	public static final int DAMAGE_CAP_1 = 4;
+	public static final int DAMAGE_CAP_2 = 5;
 	public static final int SIZE_1 = 2;
 	public static final int SIZE_2 = 3;
 	public static final int JUMP_AMPLIFIER_1 = 3;
@@ -49,8 +51,9 @@ public final class MeteorSlam extends Ability {
 	public static final int DURATION_SECONDS = 2;
 	public static final int DURATION_TICKS = DURATION_SECONDS * 20;
 	public static final int AUTOMATIC_THRESHOLD = 3; // Minimum fall distance for landing to automatically trigger slam attack
-	public static final double MANUAL_THRESHOLD = 1.5; // Minimum fall distance for attacks to trigger slam attack
-	public static final int REDUCED_THRESHOLD = 8; // Fall distance past which damage transitions from starting to ending damage
+	public static final int SCALING_THRESHOLD = 4; // Blocks fallen after which damage per block fallen increment does not increase
+	public static final double REDUCED_THRESHOLD_1 = 5; // Fall distance past which damage transitions from starting to ending damage
+	public static final double REDUCED_THRESHOLD_2 = 5.5;
 	public static final int COOLDOWN_SECONDS_1 = 8;
 	public static final int COOLDOWN_TICKS_1 = COOLDOWN_SECONDS_1 * 20;
 	public static final int COOLDOWN_SECONDS_2 = 6;
@@ -72,34 +75,40 @@ public final class MeteorSlam extends Ability {
 				String.format(
 					"Pressing the swap key grants you Jump Boost %s for %ss. Cooldown: %ss. " +
 						"Falling more than %s blocks passively generates a slam when you land, " +
-						"dealing %s melee damage to all enemies in a %s block radius around you per block fallen for the first %s blocks, " +
-						"and %s damage per block thereafter. Falling more than %s blocks and attacking an enemy also passively generates a slam at that enemy, " +
-						"and resets your blocks fallen. If any enemies are damaged by a slam, you take no fall damage from that fall.",
+						"dealing melee damage to all enemies in a %s block radius around you. " +
+						"Falling increases the damage scaling per block fallen by +%s melee damage linearly, " +
+						"starting at +%s damage for the first block fallen and capping at +%s melee damage per block fallen. " +
+						"The damage scaling per block fallen is reduced by %s%% after the initial %s blocks. " +
+						"If any enemies are damaged by a slam, you take no fall damage from that fall.",
 					JUMP_LEVEL_1,
 					DURATION_SECONDS,
 					COOLDOWN_SECONDS_1,
 					AUTOMATIC_THRESHOLD,
-					DAMAGE_1,
 					SIZE_1,
-					REDUCED_THRESHOLD,
-					REDUCED_DAMAGE_1,
-					MANUAL_THRESHOLD
+					SCALING_DAMAGE_1,
+					SCALING_DAMAGE_1,
+					DAMAGE_CAP_1,
+					StringUtils.multiplierToPercentage(1 - REDUCTION_MULTIPLIER),
+					REDUCED_THRESHOLD_1
 				),
 				String.format(
 					"Jump Boost level is increased from %s to %s. Cooldown is reduced from %ss to %ss. " +
-						"Damage is increased from %s to %s per block fallen for the first %s blocks, and from %s to %s per block thereafter. " +
-						"Damage size is increased from %s to %s blocks.",
+						"Damage size is increased from %s to %s blocks. " +
+						"Reduction threshold is increased from %s to %s blocks. " +
+						"Damage scaling per block fallen is increased from +%s to +%s, " +
+						"starting at +%s for the first block fallen and capping at +%s melee damage per block fallen instead. ",
 					JUMP_LEVEL_1,
 					JUMP_LEVEL_2,
 					COOLDOWN_SECONDS_1,
 					COOLDOWN_SECONDS_2,
-					DAMAGE_1,
-					DAMAGE_2,
-					REDUCED_THRESHOLD,
-					REDUCED_DAMAGE_1,
-					REDUCED_DAMAGE_2,
 					SIZE_1,
-					SIZE_2
+					SIZE_2,
+					REDUCED_THRESHOLD_1,
+					REDUCED_THRESHOLD_2,
+					SCALING_DAMAGE_1,
+					SCALING_DAMAGE_2,
+					SCALING_DAMAGE_2,
+					DAMAGE_CAP_2
 				)
 			)
 			.simpleDescription("Gain jump boost, and deal area damage when you fall from heights.")
@@ -108,19 +117,21 @@ public final class MeteorSlam extends Ability {
 			.displayItem(Material.FIRE_CHARGE);
 
 	private final double mLevelDamage;
-	private final double mLevelReducedDamage;
+	private final double mLevelDamageCap;
 	private final double mLevelSize;
 	private final int mLevelJumpAmplifier;
+	private final double mReducedThreshold;
 	private final BukkitRunnable mSlamAttackRunner;
 	private double mFallFromY = -7050;
 	private final MeteorSlamCS mCosmetic;
 
 	public MeteorSlam(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mLevelDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
-		mLevelReducedDamage = isLevelOne() ? REDUCED_DAMAGE_1 : REDUCED_DAMAGE_2;
+		mLevelDamage = isLevelOne() ? SCALING_DAMAGE_1 : SCALING_DAMAGE_2;
+		mLevelDamageCap = isLevelOne() ? DAMAGE_CAP_1 : DAMAGE_CAP_2;
 		mLevelSize = CharmManager.getRadius(mPlayer, CHARM_RADIUS, (isLevelOne() ? SIZE_1 : SIZE_2));
 		mLevelJumpAmplifier = (isLevelOne() ? JUMP_AMPLIFIER_1 : JUMP_AMPLIFIER_2) + (int) CharmManager.getLevel(mPlayer, CHARM_JUMP_BOOST);
+		mReducedThreshold = isLevelOne() ? REDUCED_THRESHOLD_1 : REDUCED_THRESHOLD_2;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new MeteorSlamCS());
 
@@ -166,16 +177,6 @@ public final class MeteorSlam extends Ability {
 		cancelOnDeath(mSlamAttackRunner.runTaskTimer(plugin, 0, 1));
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && calculateFallDistance() > MANUAL_THRESHOLD && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, SLAM_ONCE_THIS_TICK_METAKEY)) {
-			doSlamAttack(enemy.getLocation().add(0, 0.15, 0));
-			mFallFromY = -7050;
-			return true;
-		}
-		return false;
-	}
-
 	public void cast() {
 		if (isOnCooldown()
 			    || ZoneUtils.hasZoneProperty(mPlayer, ZoneProperty.NO_MOBILITY_ABILITIES)) {
@@ -216,7 +217,24 @@ public final class MeteorSlam extends Ability {
 
 	private void doSlamAttack(Location location) {
 		double fallDistance = calculateFallDistance();
-		double slamDamage = Math.min(REDUCED_THRESHOLD, fallDistance) * mLevelDamage + Math.max(0, (fallDistance - REDUCED_THRESHOLD)) * mLevelReducedDamage;
+		double linearFallDist = 0;
+		double extraFallDist = 0;
+		if (fallDistance > mReducedThreshold) {
+			extraFallDist = fallDistance - mReducedThreshold;
+			linearFallDist = mReducedThreshold - SCALING_THRESHOLD;
+			fallDistance = SCALING_THRESHOLD;
+		} else if (fallDistance > SCALING_THRESHOLD) {
+			linearFallDist = fallDistance - SCALING_THRESHOLD;
+			fallDistance = SCALING_THRESHOLD;
+		}
+		/* simplified total damage = ax^2 + bx + 0 until cap where both a and b = scaling / 2 for each respective level.
+		 * afterwards linear increment for cap damage between reduced threshold and scaling threshold
+		 * and reduced cap damage for remainder fall distance
+		 */
+		double slamDamage = (mLevelDamage / 2) * Math.pow(fallDistance, 2) + (mLevelDamage / 2) * fallDistance // quadratic scaling
+			                    + linearFallDist * mLevelDamageCap // linear scaling
+			                    + extraFallDist * mLevelDamageCap * REDUCTION_MULTIPLIER; // reduced scaling
+
 		slamDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, slamDamage);
 
 		for (LivingEntity enemy : new Hitbox.SphereHitbox(location, mLevelSize).getHitMobs()) {

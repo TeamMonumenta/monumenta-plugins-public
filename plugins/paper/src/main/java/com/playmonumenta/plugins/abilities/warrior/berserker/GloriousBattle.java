@@ -23,7 +23,6 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.EnumSet;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,12 +40,12 @@ import org.jetbrains.annotations.Nullable;
 public class GloriousBattle extends Ability implements AbilityWithChargesOrStacks {
 	private static final int DAMAGE_1 = 20;
 	private static final int DAMAGE_2 = 25;
+	private static final double VELOCITY_1 = 1.3;
+	private static final double VELOCITY_2 = 1.6;
+	private static final double VERTICAL_SPEED_CAP = 0.3;
 	private static final double RADIUS = 3;
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
-	private static final double DAMAGE_PER = 0.05;
-	private static final int MAX_TARGETING = 6;
-	private static final double TARGET_RANGE = 10;
 
 	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
 		ClassAbility.BRUTE_FORCE_AOE,
@@ -70,12 +68,22 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.shorthandName("GB")
 			.descriptions(
 				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
-					 "Shift and swap hands to consume a stack and charge forwards, gaining full knockback resistance until landing. " +
+					 "Shift and swap hands to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
+					 "Vertical movement speed is capped at %s blocks per second. " +
 					 "When you land, deal %s damage to the nearest mob within %s blocks. " +
 					 "Additionally, knock back all mobs within %s blocks.")
-					.formatted(DAMAGE_1, RADIUS, RADIUS),
-				"Damage increased to %s. Additionally, you now passively gain %s%% melee damage for each mob targeting you within %s blocks, up to %s mobs."
-					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(DAMAGE_PER), TARGET_RANGE, MAX_TARGETING))
+					.formatted(
+						VELOCITY_1,
+						VERTICAL_SPEED_CAP,
+						DAMAGE_1,
+						RADIUS,
+						RADIUS
+					),
+				"Damage is increased to %s. Velocity is increased to %s. Vertical speed cap is removed."
+					.formatted(
+						DAMAGE_2,
+						VELOCITY_2
+					))
 			.simpleDescription("Lunge forward, dealing damage upon landing.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
 				new AbilityTriggerInfo.TriggerRestriction("holding a sword or axe", p -> {
@@ -88,12 +96,14 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 	private final int mStackLimit;
 	private final int mSpellDelay = 10;
 	private final double mDamage;
+	private final double mVelocity;
 	private @Nullable BukkitRunnable mRunnable;
 	private final GloriousBattleCS mCosmetic;
 
 	public GloriousBattle(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDamage = isLevelOne() ? DAMAGE_1 : DAMAGE_2;
+		mVelocity = isLevelOne() ? VELOCITY_1 : VELOCITY_2;
 		mStacks = 0;
 		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS());
@@ -106,8 +116,20 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 
 		mStacks--;
 		Vector dir = mPlayer.getLocation().getDirection();
-		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, 1.05));
-		dir.setY(dir.getY() * 0.4 + 0.3);
+		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, mVelocity));
+		// vertical speed cap for level 1
+		if (isLevelOne() && (dir.getY() > VERTICAL_SPEED_CAP || dir.getY() < -VERTICAL_SPEED_CAP)) {
+			double sign = Math.signum(dir.getY());
+			dir.setY((VERTICAL_SPEED_CAP + 0.2) * sign);
+		} else {
+			if (Math.signum(dir.getY()) > 0) {
+				// +0.22 to allow for horizontal movement
+				dir.setY(dir.getY() * 0.4 + 0.22);
+			} else {
+				// do not -0.3, otherwise will affect planned change for meteor slam (blocks fallen -> velocity)
+				dir.setY(dir.getY() * 0.4);
+			}
+		}
 		mPlayer.setVelocity(dir);
 		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(200, 1, KBR_EFFECT).displaysTime(false));
 		ClientModHandler.updateAbility(mPlayer, this);
@@ -174,22 +196,6 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			}
 			if (mStacks != previousStacks) {
 				ClientModHandler.updateAbility(mPlayer, this);
-			}
-		}
-
-		DamageEvent.DamageType type = event.getType();
-		if (isLevelTwo() && (type == DamageType.MELEE || type == DamageType.MELEE_SKILL || type == DamageType.MELEE_ENCH)) {
-			int count = 0;
-			for (LivingEntity le : new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), TARGET_RANGE).getHitMobs()) {
-				if (le instanceof Mob mob && mob.getTarget() == mPlayer) {
-					count++;
-				}
-			}
-			if (count > 0) {
-				if (count > MAX_TARGETING) {
-					count = MAX_TARGETING;
-				}
-				event.setDamage(event.getDamage() * (1 + count * (DAMAGE_PER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_MODIFIER))));
 			}
 		}
 

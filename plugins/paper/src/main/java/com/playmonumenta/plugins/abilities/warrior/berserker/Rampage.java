@@ -32,7 +32,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 	private static final int RAMPAGE_STACK_DECAY_TIME = 20 * 5;
 	private static final int RAMPAGE_1_DAMAGE_PER_STACK = 50;
 	private static final int RAMPAGE_2_DAMAGE_PER_STACK = 35;
-	private static final double R3_DAMAGE_PER_STACK_MULTIPLIER = 1.5;
+	private static final double R3_DAMAGE_PER_STACK_MULTIPLIER = 2;
 	private static final int ACTIVE_MIN_STACKS = 10;
 	private static final int RAMPAGE_1_STACK_LIMIT = 15;
 	private static final int RAMPAGE_2_STACK_LIMIT = 20;
@@ -56,16 +56,27 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 			.scoreboardId("Rampage")
 			.shorthandName("Rmp")
 			.descriptions(
-				("Gain a stack of rage for each %s melee damage dealt (50%% more in Region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
+				("Gain a stack of rage for each %s melee damage dealt (%s%% more in Region 3). Stacks decay by 1 every %s seconds of not dealing melee damage and cap at %s. " +
 					 "Passively gain %s%% damage resistance for each stack. " +
 					 "When at %s or more stacks, right click while looking down to consume all stacks and damage mobs " +
 					 "in a %s block radius by %s times the number of stacks consumed. For the next (stacks consumed / 2) seconds, " +
 					 "heal %s%% of max health per second and keep your passive damage reduction.")
-					.formatted(RAMPAGE_1_DAMAGE_PER_STACK, StringUtils.ticksToSeconds(RAMPAGE_STACK_DECAY_TIME), RAMPAGE_1_STACK_LIMIT,
-						StringUtils.multiplierToPercentage(RAMPAGE_DAMAGE_RESISTANCE_PER_STACK), ACTIVE_MIN_STACKS, RAMPAGE_RADIUS, RAMPAGE_STACK_PERCENTAGE,
-						StringUtils.multiplierToPercentage(HEAL_PERCENT)),
+					.formatted(
+						RAMPAGE_1_DAMAGE_PER_STACK,
+						StringUtils.multiplierToPercentage(R3_DAMAGE_PER_STACK_MULTIPLIER - 1),
+						StringUtils.ticksToSeconds(RAMPAGE_STACK_DECAY_TIME),
+						RAMPAGE_1_STACK_LIMIT,
+						StringUtils.multiplierToPercentage(RAMPAGE_DAMAGE_RESISTANCE_PER_STACK),
+						ACTIVE_MIN_STACKS,
+						RAMPAGE_RADIUS,
+						RAMPAGE_STACK_PERCENTAGE,
+						StringUtils.multiplierToPercentage(HEAL_PERCENT)
+					),
 				"Gain a stack of rage for each %s melee damage dealt, with stacks capping at %s."
-					.formatted(RAMPAGE_2_DAMAGE_PER_STACK, RAMPAGE_2_STACK_LIMIT))
+					.formatted(
+						RAMPAGE_2_DAMAGE_PER_STACK,
+						RAMPAGE_2_STACK_LIMIT
+					))
 			.simpleDescription("Dealing damage grants rage stacks that give resistance, which can be consume to deal area damage and heal yourself.")
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", Rampage::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).lookDirections(AbilityTrigger.LookDirection.DOWN)
 				                                                                    .keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
@@ -141,7 +152,7 @@ public class Rampage extends Ability implements AbilityWithChargesOrStacks {
 		mTimeToStackDecay = 0;
 
 		mRemainderDamage += damage;
-		int newStacks = (int) (mRemainderDamage / mDamagePerStack);
+		int newStacks = (int) Math.floor(mRemainderDamage / mDamagePerStack);
 		mRemainderDamage -= (newStacks * mDamagePerStack);
 
 		if (newStacks > 0) {

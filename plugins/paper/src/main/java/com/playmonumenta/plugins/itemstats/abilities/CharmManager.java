@@ -692,6 +692,7 @@ public class CharmManager {
 			RestlessSouls.CHARM_DAMAGE,
 			RestlessSouls.CHARM_DURATION,
 			RestlessSouls.CHARM_RADIUS,
+			RestlessSouls.CHARM_DEBUFF_RANGE,
 			WitheringGaze.CHARM_COOLDOWN,
 			WitheringGaze.CHARM_DAMAGE,
 			WitheringGaze.CHARM_STUN,

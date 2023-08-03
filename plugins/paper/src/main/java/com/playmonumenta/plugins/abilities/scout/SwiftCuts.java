@@ -20,12 +20,16 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
-	private static final int EFFECT_DURATION = 10 * 20;
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = DamageType.getAllMeleeTypes();
+	private static final int EFFECT_DURATION = 5 * 20;
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH
+	);
 
 	public static final double DAMAGE_AMPLIFIER = 0.05;
-	public static final int STACKS_CAP_1 = 4;
-	public static final int STACKS_CAP_2 = 7;
+	public static final int STACKS_CAP_1 = 3;
+	public static final int STACKS_CAP_2 = 6;
 	public static final double TACTICAL_MANEUVER_CDR = 0.3;
 	public static final double WHIRLING_BLADE_BUFF = 0.3;
 	public static final double PREDATOR_STRIKE_CDR = 0.2;
@@ -42,7 +46,7 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 			.scoreboardId("SwiftCuts")
 			.shorthandName("SC")
 			.descriptions(
-				String.format("Attacking an enemy with a fully charged melee attack grants you a Swift Cuts stack with a maximum of %d stacks. Every stack grants you +%d%% melee damage. After %d seconds of not gaining any stacks, lose all stacks.",
+				String.format("Attacking an enemy with a fully charged melee attack grants you a Swift Cuts stack with a maximum of %d stacks. Every stack grants you +%d%% melee damage. Stacks decay by 1 after %d seconds.",
 					STACKS_CAP_1,
 					(int) (DAMAGE_AMPLIFIER * 100),
 					EFFECT_DURATION / 20
@@ -83,6 +87,8 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			mCosmetic.onHit(mPlayer, loc, world);
+
+			// add stacks and apply effect
 			if (mStacks < mMaxStacks) {
 				mStacks += 1;
 				//send stack update to client
@@ -99,7 +105,11 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 		if (mStacks > 0 && oneSecond) {
 			//clear and send stack update if needed.
 			if (!hasEffect()) {
-				mStacks = 0;
+				mStacks--;
+				if (mStacks > 0) {
+					double damageBoost = mStacks * mDamageAmplifier;
+					mPlugin.mEffectManager.addEffect(mPlayer, EFFECT_NAME, new PercentDamageDealt(mDuration, damageBoost, AFFECTED_DAMAGE_TYPES));
+				}
 				ClientModHandler.updateAbility(mPlayer, this);
 			}
 		}

@@ -40,6 +40,7 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	private final com.playmonumenta.plugins.Plugin mMonPlugin = com.playmonumenta.plugins.Plugin.getInstance();
 	private @Nullable Player mPlayer;
 	private double mDamage = 0;
+	private double mRange = 0;
 	private int mSilenceTime = 0;
 	private int mDuration = 0;
 	private boolean mLevelOne;
@@ -54,9 +55,10 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 		super.constructBoss(SpellManager.EMPTY, Collections.emptyList(), detectionRange, null);
 	}
 
-	public void spawn(Player player, double damage, int silenceTime, int duration, boolean levelone, ItemStatManager.PlayerItemStats playerItemStats) {
+	public void spawn(Player player, double damage, double range, int silenceTime, int duration, boolean levelone, ItemStatManager.PlayerItemStats playerItemStats) {
 		mPlayer = player;
 		mDamage = damage;
+		mRange = range;
 		mSilenceTime = silenceTime;
 		mDuration = duration;
 		mLevelOne = levelone;
@@ -74,12 +76,12 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
 		event.setCancelled(true);
-		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration);
+		attack(mMonPlugin, mPlayer, mPlayerItemStats, mBoss, damagee, mLevelOne, mDamage, mSilenceTime, mAbilities, mDuration, mRange);
 	}
 
 	public static void attack(com.playmonumenta.plugins.Plugin plugin, @Nullable Player p, @Nullable ItemStatManager.PlayerItemStats playerItemStats,
 	                          LivingEntity boss, LivingEntity damagee, boolean levelOne, double damage, int silenceTime,
-	                          Ability[] abilities, int duration) {
+	                          Ability[] abilities, int duration, double mRange) {
 		if (p != null || playerItemStats != null) {
 			boss.getWorld().playSound(boss.getLocation(), Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 1.0f);
 
@@ -93,29 +95,32 @@ public class RestlessSoulsBoss extends BossAbilityGroup {
 				damagee.removeScoreboardTag("TeneGhost");
 			}
 			// debuff
-			if (!EntityUtils.isBoss(damagee)) {
-				EntityUtils.applySilence(plugin, silenceTime, damagee);
-			}
-			if (!levelOne && p != null) {
-				for (Ability ability : abilities) {
-					if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().getLinkedSpell())) {
-						if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
-							EntityUtils.applyFire(plugin, duration, damagee, p, playerItemStats);
-							if (ability.isLevelTwo()) {
-								PotionUtils.applyPotion(p, damagee, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
+			for (LivingEntity e : EntityUtils.getNearbyMobs(damagee.getLocation(), mRange)) {
+				if (!EntityUtils.isBoss(e)) {
+					EntityUtils.applySilence(plugin, silenceTime, e);
+				}
+				if (!levelOne && p != null) {
+					for (Ability ability : abilities) {
+						if (ability != null && plugin.mTimers.isAbilityOnCooldown(p.getUniqueId(), ability.getInfo().getLinkedSpell())) {
+							if (ability.getInfo().getLinkedSpell() == ClassAbility.CHOLERIC_FLAMES) {
+								EntityUtils.applyFire(plugin, duration, e, p, playerItemStats);
+								if (ability.isLevelTwo()) {
+									PotionUtils.applyPotion(p, e, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true));
+								}
+							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
+								EntityUtils.applySlow(plugin, duration, 0.1, e);
+							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.MELANCHOLIC_LAMENT) {
+								EntityUtils.applyWeaken(plugin, duration, 0.1, e);
+							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
+								EntityUtils.applyVulnerability(plugin, duration, 0.1, e);
+							} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
+								plugin.mEffectManager.addEffect(e, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, playerItemStats, null, DamageType.AILMENT));
 							}
-						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.GRASPING_CLAWS) {
-							EntityUtils.applySlow(plugin, duration, 0.1, damagee);
-						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.MELANCHOLIC_LAMENT) {
-							EntityUtils.applyWeaken(plugin, duration, 0.1, damagee);
-						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.HAUNTING_SHADES) {
-							EntityUtils.applyVulnerability(plugin, duration, 0.1, damagee);
-						} else if (ability.getInfo().getLinkedSpell() == ClassAbility.WITHERING_GAZE) {
-							plugin.mEffectManager.addEffect(damagee, DOT_EFFECT_NAME, new CustomDamageOverTime(duration, 1, 40, p, playerItemStats, null, DamageType.AILMENT));
 						}
 					}
 				}
 			}
+
 			// kill vex
 			boss.remove();
 		}

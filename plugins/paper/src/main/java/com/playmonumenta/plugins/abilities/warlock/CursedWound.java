@@ -64,7 +64,8 @@ public class CursedWound extends Ability {
 				"Your melee attacks passively deal 10% more damage per ability on cooldown instead.",
 				"When you kill a mob with a melee scythe attack, all debuffs on the mob get stored in your scythe. " +
 					"Then, on your next melee scythe attack, all mobs within 3 blocks of the target are inflicted with the effects stored in your scythe, " +
-					"as well as 3% of your melee attack's damage as magic damage per effect.")
+					"as well as 3% of your melee attack's damage as magic damage per effect."
+				)
 			.simpleDescription("Your attacks deal more damage for each ability on cooldown and apply damage over time.")
 			.displayItem(Material.GOLDEN_SWORD);
 
