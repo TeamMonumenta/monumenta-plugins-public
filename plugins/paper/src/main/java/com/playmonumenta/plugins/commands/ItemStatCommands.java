@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.goncalomb.bukkit.nbteditor.nbt.attributes.ItemModifier;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -35,7 +36,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -693,6 +696,18 @@ public class ItemStatCommands {
 			nbt.removeKey(ItemStatUtils.MONUMENTA_KEY);
 			item.setItemMeta(nbt.getItem().getItemMeta());
 			item.lore(Collections.emptyList());
+
+			ItemMeta meta = item.getItemMeta();
+			for (Enchantment ench : Enchantment.values()) {
+				meta.removeEnchant(ench);
+			}
+			meta.removeItemFlags(ItemFlag.values());
+			item.setItemMeta(meta);
+
+			// Copied from nbti command to set the attributes to an empty list instead of removing them entirely
+			ItemModifier.setItemStackModifiers(item, new ArrayList<>());
+
+			ItemUtils.setPlainLore(item);
 
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
