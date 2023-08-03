@@ -130,6 +130,14 @@ public class DelveLootTableGroup {
 		new DelveLootTableGroup("r3/world/poi/waterfall_village/delves/base_chest", "r3/world/poi/waterfall_village/delves/dmat_chest", "r3/world/poi/waterfall_village/delves/cmat_chest", "r3/world/poi/waterfall_village/normalchest").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 		new DelveLootTableGroup("r3/world/poi/waterfall_village/delves/base_final", "r3/world/poi/waterfall_village/delves/dmat_final", "r3/world/poi/waterfall_village/delves/cmat_final", "r3/world/poi/waterfall_village/endchest", "r3/world/poi/waterfall_village/endchest2").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
 
+		// R3 STRIKES (patches astral not spawning)
+
+		// portal
+		new DelveLootTableGroup("r3/dungeons/portalstrike/dummydelve", "r3/dungeons/portalstrike/dummydelve", "r3/dungeons/portalstrike/dummydelve", "r3/dungeons/portalstrike/dummy").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+		// ruin
+		new DelveLootTableGroup("r3/dungeons/bluestrike/dummydelve", "r3/dungeons/bluestrike/dummydelve", "r3/dungeons/bluestrike/dummydelve", "r3/dungeons/bluestrike/dummy").mapDelveLootTables(DELVE_LOOT_TABLE_REPLACEMENT_MAPPINGS);
+
+
 		// EXALTEDS
 
 		// white
