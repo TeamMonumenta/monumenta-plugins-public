@@ -19,10 +19,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.List;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,6 +30,7 @@ public class LuminousInfusion extends Ability {
 	public static final int DAMAGE_1 = 12;
 	public static final int DAMAGE_UNDEAD_1 = 25;
 	public static final double DAMAGE_MULTIPLIER_2 = 0.15;
+	public static final int INFUSED_HITS = 1;
 
 	private final boolean mDoMultiplierAndFire;
 
@@ -48,6 +46,7 @@ public class LuminousInfusion extends Ability {
 	public static final String CHARM_DAMAGE = "Luminous Infusion Damage";
 	public static final String CHARM_COOLDOWN = "Luminous Infusion Cooldown";
 	public static final String CHARM_RADIUS = "Luminous Infusion Radius";
+	public static final String CHARM_HITS = "Luminous Infusion Infused Hits";
 
 	public static final AbilityInfo<LuminousInfusion> INFO =
 		new AbilityInfo<>(LuminousInfusion.class, "Luminous Infusion", LuminousInfusion::new)
@@ -68,6 +67,7 @@ public class LuminousInfusion extends Ability {
 			.displayItem(Material.BLAZE_POWDER);
 
 	private boolean mActive = false;
+	private int mHits = INFUSED_HITS;
 	private final LuminousInfusionCS mCosmetic;
 
 	private @Nullable Crusade mCrusade;
@@ -75,6 +75,7 @@ public class LuminousInfusion extends Ability {
 	public LuminousInfusion(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mDoMultiplierAndFire = isLevelTwo();
+
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new LuminousInfusionCS());
 
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -86,7 +87,9 @@ public class LuminousInfusion extends Ability {
 		if (isOnCooldown()) {
 			return;
 		}
+
 		mActive = true;
+		mHits = INFUSED_HITS + (int) CharmManager.getLevel(mPlayer, CHARM_HITS);
 		putOnCooldown();
 
 		World world = mPlayer.getWorld();
@@ -94,14 +97,15 @@ public class LuminousInfusion extends Ability {
 
 		cancelOnDeath(new BukkitRunnable() {
 			int mT = 0;
+			final int EXPIRE_TICKS = getModifiedCooldown();
 
 			@Override
 			public void run() {
 				mT++;
 				mCosmetic.infusionTickEffect(mPlayer, mT);
-				if (mT >= COOLDOWN || !mActive) {
+				if (mT >= EXPIRE_TICKS || (!mActive && mHits <= 0)) {
 					mActive = false;
-					if (mT >= COOLDOWN) {
+					if (mT >= EXPIRE_TICKS) {
 						mCosmetic.infusionExpireMsg(mPlayer);
 						ClientModHandler.updateAbility(mPlayer, LuminousInfusion.this);
 					}
@@ -144,7 +148,19 @@ public class LuminousInfusion extends Ability {
 	}
 
 	public void execute(LivingEntity damagee) {
+		mHits--;
 		mActive = false;
+
+		// if there are hits remaining, turn back on after a tick to prevent looping
+		if (mHits > 0) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					mActive = true;
+				}
+			}.runTaskLater(Plugin.getInstance(), 1);
+		}
+
 		ClientModHandler.updateAbility(mPlayer, this);
 
 		DamageUtils.damage(mPlayer, damagee, DamageType.MAGIC, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, DAMAGE_UNDEAD_1), mInfo.getLinkedSpell(), true);

@@ -374,6 +374,7 @@ public class CharmManager {
 			LuminousInfusion.CHARM_COOLDOWN,
 			LuminousInfusion.CHARM_RADIUS,
 			LuminousInfusion.CHARM_DAMAGE,
+			LuminousInfusion.CHARM_HITS,
 			EnchantedPrayer.CHARM_COOLDOWN,
 			EnchantedPrayer.CHARM_DAMAGE,
 			EnchantedPrayer.CHARM_RANGE,
