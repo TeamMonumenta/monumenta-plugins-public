@@ -189,7 +189,7 @@ public class ThrownItem {
 
 	public void onAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
 		// Any player is allowed to pick up a thrown item
-		if (event.getRemaining() == 0) {
+		if (event.getRemaining() <= 0) {
 			// Stack was fully picked up
 			mValid = false;
 		} else {

@@ -64,7 +64,7 @@ public class GraveListener implements Listener {
 		mPlugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void playerAttemptPickupItem(PlayerAttemptPickupItemEvent event) {
 		GraveManager.onAttemptPickupItem(event);
 	}

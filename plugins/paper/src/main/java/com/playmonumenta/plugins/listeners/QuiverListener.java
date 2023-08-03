@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.inventories.CustomContainerItemGui;
@@ -9,6 +10,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import de.tr7zw.nbtapi.NBT;
@@ -349,7 +351,14 @@ public class QuiverListener implements Listener {
 		}
 
 		ItemStack itemStack = item.getItemStack();
-		attemptPickup(player, itemStack);
+		// PlayerAttemptPickupItemEvent runs 20 times a tick for one item entity if PickupDelay is set to 0/-1
+		if (!ItemUtils.isArrow(itemStack) || !MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), item, "QuiverPickupDelay" + player.getUniqueId(), 20)) {
+			return;
+		}
+
+		if (!attemptPickup(player, itemStack)) {
+			return;
+		}
 
 		if (itemStack.getAmount() == 0) {
 			event.setCancelled(true);
@@ -360,11 +369,11 @@ public class QuiverListener implements Listener {
 		}
 	}
 
-	public static void attemptPickup(Player player, ItemStack itemStack) {
+	public static boolean attemptPickup(Player player, ItemStack itemStack) {
 		if (player.getGameMode() == GameMode.CREATIVE
 			    || !ItemUtils.isArrow(itemStack)
 			    || ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.THROWING_KNIFE) > 0) {
-			return;
+			return false;
 		}
 		for (ItemStack quiver : player.getInventory()) {
 			if (quiver == null || !ItemStatUtils.isQuiver(quiver) || quiver.getAmount() != 1
@@ -386,9 +395,10 @@ public class QuiverListener implements Listener {
 			}
 
 			if (transformedItemStack.getAmount() == 0) {
-				return;
+				break;
 			}
 		}
+		return true;
 	}
 
 	public static boolean canUseArrowTransformingQuiver(Player player) {
