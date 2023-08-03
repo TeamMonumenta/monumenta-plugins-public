@@ -55,7 +55,8 @@ public class ZoneUtils {
 		BLITZ("Blitz"),
 		NO_PLACING_BOATS("No Placing Boats"),
 		ABYSSAL_FORCED("Abyssal Forced"),
-		ANTI_SPEED("Anti Speed");
+		ANTI_SPEED("Anti Speed"),
+		LOOTING_LIMITER_DISABLED("Looting Limiter Disabled");
 
 		private final String mPropertyName;
 
@@ -124,15 +125,27 @@ public class ZoneUtils {
 		return hasZoneProperty(entity.getLocation(), property);
 	}
 
+	public static boolean hasZoneProperty(Entity entity, ZoneProperty property, String layerName) {
+		return hasZoneProperty(entity.getLocation(), property, layerName);
+	}
+
 	public static boolean hasZoneProperty(Location loc, ZoneProperty property) {
-		return hasZoneProperty(loc.toVector(), property);
+		return hasZoneProperty(loc.toVector(), property, "default");
+	}
+
+	public static boolean hasZoneProperty(Location loc, ZoneProperty property, String layerName) {
+		return hasZoneProperty(loc.toVector(), property, layerName);
 	}
 
 	public static boolean hasZoneProperty(Vector loc, ZoneProperty property) {
+		return hasZoneProperty(loc, property, "default");
+	}
+
+	public static boolean hasZoneProperty(Vector loc, ZoneProperty property, String layerName) {
 		com.playmonumenta.scriptedquests.Plugin scriptedQuestsPlugin;
 		scriptedQuestsPlugin = (com.playmonumenta.scriptedquests.Plugin)Bukkit.getPluginManager().getPlugin("ScriptedQuests");
 
-		return scriptedQuestsPlugin.mZoneManager.hasProperty(loc, "default", property.getPropertyName());
+		return scriptedQuestsPlugin.mZoneManager.hasProperty(loc, layerName, property.getPropertyName());
 	}
 
 	public static Optional<Zone> getZone(Location loc) {

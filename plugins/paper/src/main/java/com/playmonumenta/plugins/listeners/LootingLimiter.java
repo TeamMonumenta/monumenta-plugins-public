@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.Comparator;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -121,6 +122,9 @@ public class LootingLimiter implements Listener {
 
 	public static boolean checkChest(Block block, @Nullable Player player) {
 		if (player != null && player.getGameMode() == GameMode.CREATIVE) {
+			return true;
+		}
+		if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneUtils.ZoneProperty.LOOTING_LIMITER_DISABLED, "looting_limiter_disabled")) {
 			return true;
 		}
 		if (ChestUtils.isChestWithLootTable(block)) {
