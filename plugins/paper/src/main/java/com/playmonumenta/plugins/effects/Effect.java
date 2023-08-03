@@ -109,6 +109,10 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	}
 
+	public double getFishQualityIncrease(Player player) {
+		return 1;
+	}
+
 	public void onDeath(EntityDeathEvent event) {
 
 	}

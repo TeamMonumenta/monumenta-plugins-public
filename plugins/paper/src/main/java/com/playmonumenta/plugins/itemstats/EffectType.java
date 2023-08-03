@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.effects.CrystalineBlessing;
 import com.playmonumenta.plugins.effects.DeepGodsEndowment;
 import com.playmonumenta.plugins.effects.DurabilitySaving;
 import com.playmonumenta.plugins.effects.Effect;
+import com.playmonumenta.plugins.effects.FishQualityIncrease;
 import com.playmonumenta.plugins.effects.HealingSickness;
 import com.playmonumenta.plugins.effects.NegateDamage;
 import com.playmonumenta.plugins.effects.PercentAttackSpeed;
@@ -153,6 +154,9 @@ public enum EffectType {
 
 	COOLDOWN_DECREASE("AbilityCooldownDecrease", "Ability Cooldowns", true, false, false),
 	COOLDOWN_INCREASE("AbilityCooldownIncrease", "Ability Cooldowns", false, false, false),
+
+	FISH_QUALITY_INCREASE("FishQualityIncrease", "Fish Quality", true, false, false),
+	FISH_QUALITY_DECREASE("FishQualityDecrease", "FishQuality", false, false, false),
 
 	BLEED("Bleed", "Bleed", false, false, false),
 
@@ -413,6 +417,9 @@ public enum EffectType {
 
 			case EXP_BONUS -> new PercentExperience(duration, strength);
 			case EXP_LOSS -> new PercentExperience(duration, -strength);
+
+			case FISH_QUALITY_INCREASE -> new FishQualityIncrease(duration, strength);
+			case FISH_QUALITY_DECREASE -> new FishQualityIncrease(duration, -strength);
 
 			case BLEED -> new Bleed(duration, strength, plugin);
 

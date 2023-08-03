@@ -352,6 +352,7 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(VoodooBondsReaper.effectID, VoodooBondsReaper::deserialize);
 		mEffectDeserializer.put(WarmthEffect.effectID, WarmthEffect::deserialize);
 		mEffectDeserializer.put(ColoredGlowingEffect.effectID, ColoredGlowingEffect::deserialize);
+		mEffectDeserializer.put(FishQualityIncrease.effectID, FishQualityIncrease::deserialize);
 	}
 
 	private static final int PERIOD = 5;
@@ -932,6 +933,19 @@ public final class EffectManager implements Listener {
 				}
 			}
 		}
+	}
+
+	public double getFishQualityIncrease(Player player) {
+		double chance = 1;
+		Effects effects = mEntities.get(player);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					chance *= effectGroup.last().getFishQualityIncrease(player);
+				}
+			}
+		}
+		return chance;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -393,14 +393,20 @@ public class FishingManager implements Listener {
 	private void modifyAndAssessFishQuality(Player player, ItemStack fishItem, @Nullable BaitInfo baitInfo) {
 		StatTrackFishCaught.fishCaught(player);
 		int quality = ItemStatUtils.getFishQuality(fishItem);
-		if (baitInfo != null && quality < 5 && FastUtils.randomDoubleInRange(0, 1) <= baitInfo.mBait.mQualityIncreaseOdds) {
-			quality++;
-			new PartialParticle(Particle.ELECTRIC_SPARK, player.getEyeLocation(), 20).delta(1, 0.5, 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
-			ItemStack nextFish = getNextFish(player, ItemUtils.getPlainName(fishItem), quality);
-			if (nextFish == null) {
-				return;
+		if (quality < 5) {
+			double increaseChance = Plugin.getInstance().mEffectManager.getFishQualityIncrease(player);
+			if (baitInfo != null) {
+				increaseChance *= 1 + baitInfo.mBait.mQualityIncreaseOdds;
 			}
-			fishItem.setItemMeta(nextFish.getItemMeta());
+			if (increaseChance > 1 && FastUtils.randomDoubleInRange(0, 1) <= increaseChance - 1) {
+				quality++;
+				new PartialParticle(Particle.ELECTRIC_SPARK, player.getEyeLocation(), 20).delta(1, 0.5, 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+				ItemStack nextFish = getNextFish(player, ItemUtils.getPlainName(fishItem), quality);
+				if (nextFish == null) {
+					return;
+				}
+				fishItem.setItemMeta(nextFish.getItemMeta());
+			}
 		}
 
 		if (quality == 5) {
