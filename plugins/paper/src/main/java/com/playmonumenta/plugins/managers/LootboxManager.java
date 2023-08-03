@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.managers;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -84,8 +85,6 @@ public class LootboxManager implements Listener {
 	);
 
 	private static final Map<UUID, BukkitRunnable> mLoreUpdateRunnables = new HashMap<>();
-
-	private static final Set<UUID> mLock = new HashSet<>();
 
 	public LootboxManager(Plugin plugin) {
 		mPlugin = plugin;
@@ -782,28 +781,18 @@ public class LootboxManager implements Listener {
 	}
 
 	public static boolean isLocked(Player player, boolean silent) {
-		UUID uuid = player.getUniqueId();
-		if (mLock.contains(uuid)) {
+		if (ClickLimiter.isLocked(player, LOOTBOX_RATELIMIT_TICKS, "LootboxCooldown")) {
 			if (!silent) {
 				MessagingUtils.sendError(player, "LOOTBOX is on cooldown!");
 				errorSound(player);
 			}
 			return true;
 		}
-		mLock.add(uuid);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			mLock.remove(uuid);
-		}, LOOTBOX_RATELIMIT_TICKS);
 		return false;
 	}
 
-	public static boolean removeLock(Player player) {
-		UUID uuid = player.getUniqueId();
-		if (mLock.contains(uuid)) {
-			mLock.remove(uuid);
-			return true;
-		}
-		return false;
+	public static void removeLock(Player player) {
+		ClickLimiter.removeLock(player, "LootboxCooldown");
 	}
 
 	/**

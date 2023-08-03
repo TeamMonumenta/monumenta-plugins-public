@@ -128,7 +128,7 @@ public class ExperiencinatorCommand {
 
 	private static void useExperiencinator(Player player, BiConsumer<ExperiencinatorConfig.Experiencinator, ItemStack> func) throws WrapperCommandSyntaxException {
 		if (ClickLimiter.isLocked(player)) {
-			return;
+			throw CommandAPI.failWithString("Player is being interaction limited. Bug a dev about this.");
 		}
 
 		ExperiencinatorConfig experiencinatorConfig = ExperiencinatorUtils.getConfig(player.getLocation());

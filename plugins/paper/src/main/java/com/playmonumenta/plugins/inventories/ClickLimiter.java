@@ -1,49 +1,31 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.Plugin;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
- * This is just for limiting clicks to 20s
+ * This is just for limiting clicks to 4 times a second
  */
 public class ClickLimiter {
-	private static final Map<UUID, BukkitRunnable> mCooldowns = new HashMap<>();
-
+	private static final String DEFAULT_METADATA_KEY = "InventoryClickLimiter";
 	public static boolean isLocked(Player player) {
 		return isLocked(player, 5);
 	}
 
-	public static boolean isLocked(Player player, long delay) {
-		UUID uuid = player.getUniqueId();
-		if (mCooldowns.containsKey(uuid)) {
-			return true;
-		}
-		BukkitRunnable runnable = mCooldowns.remove(uuid);
-		if (runnable != null) {
-			runnable.cancel();
-		}
-		runnable = new BukkitRunnable() {
-			@Override
-			public void run() {
-				mCooldowns.remove(uuid);
-			}
-		};
-		runnable.runTaskLaterAsynchronously(Plugin.getInstance(), delay);
-		mCooldowns.put(uuid, runnable);
-		return false;
+	public static boolean isLocked(Player player, int delay) {
+		return isLocked(player, 5, DEFAULT_METADATA_KEY);
 	}
 
-	public static boolean removeLock(Player player) {
-		UUID uuid = player.getUniqueId();
-		if (mCooldowns.containsKey(uuid)) {
-			mCooldowns.get(uuid).cancel();
-			mCooldowns.remove(uuid);
-			return true;
-		}
-		return false;
+	public static boolean isLocked(Player player, int delay, String key) {
+		return !MetadataUtils.checkOnceInRecentTicks(Plugin.getInstance(), player, key, delay);
+	}
+
+	public static void removeLock(Player player) {
+		removeLock(player, DEFAULT_METADATA_KEY);
+	}
+
+	public static void removeLock(Player player, String key) {
+			MetadataUtils.removeMetadata(player, key);
 	}
 }
