@@ -88,8 +88,8 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 							p.SOUND_SHOOT.play(mBoss.getLocation());
 							Location eyeLoc = mBoss.getEyeLocation();
 							List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-							if (!targets.isEmpty()) {
-								Location targetEyeLoc = targets.get(0).getEyeLocation();
+							for (LivingEntity target : targets) {
+								Location targetEyeLoc = target.getEyeLocation();
 								Vector dir = targetEyeLoc.toVector().subtract(eyeLoc.toVector()).normalize();
 								for (int i = 0; i < p.PROJECTILE_NUMBER; i++) {
 									double yaw = spacing * (i - (p.PROJECTILE_NUMBER - 1) / 2f);
@@ -113,7 +113,6 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 									}
 								}
 							}
-
 							cancel();
 						}
 
