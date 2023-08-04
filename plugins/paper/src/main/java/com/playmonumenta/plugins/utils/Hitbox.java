@@ -299,6 +299,31 @@ public abstract class Hitbox {
 	}
 
 	/**
+	 * Creates an approximate hitbox representing a segment of a hollow upright cylinder (aligned along the y-axis).
+	 *
+	 * @param baseCenter   Center of the cylinder's base, including direction of the segment
+	 * @param height       Height of the cylinder
+	 * @param radiusOuter  Maximum radius for inclusion
+	 * @param radiusInner  Minimum radius for inclusion
+	 * @param halfAngleRad Segment half-angle in radians (half of the full angle)
+	 */
+	public static ApproximateFreeformHitbox approximateHollowCylinderSegment(Location baseCenter, double height, double radiusInner, double radiusOuter, double halfAngleRad) {
+		double radiusOuterSquared = radiusOuter * radiusOuter;
+		double radiusInnerSquared = radiusInner * radiusInner;
+		double baseYaw = Math.toRadians(baseCenter.getYaw() + 90); // +90 as Bukkit yaw starts at the Z axis, not X
+		Vector baseCenterVector = baseCenter.toVector();
+		return new ApproximateFreeformHitbox(baseCenter.getWorld(),
+			new BoundingBox(baseCenter.getX() - radiusOuter, baseCenter.getY(), baseCenter.getZ() - radiusOuter,
+				baseCenter.getX() + radiusOuter, baseCenter.getY() + height, baseCenter.getZ() + radiusOuter),
+			test -> test.getY() >= baseCenterVector.getY()
+				        && test.getY() <= baseCenterVector.getY() + height
+				        && test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) <= radiusOuterSquared
+				        && test.clone().setY(baseCenterVector.getY()).distanceSquared(baseCenterVector) >= radiusInnerSquared
+				        && Math.abs(MathUtils.normalizeAngle(Math.atan2(test.getZ() - baseCenterVector.getZ(), test.getX() - baseCenterVector.getX()) - baseYaw, 0)) <= halfAngleRad
+		);
+	}
+
+	/**
 	 * Creates an approximate cylinder hitbox, where the cylinder may be rotated in any direction.
 	 * Optionally includes rounded end caps, i.e. adds a half-sphere to both ends of the cylinder.
 	 *
@@ -433,6 +458,18 @@ public abstract class Hitbox {
 			       .collect(Collectors.toCollection(ArrayList::new));
 	}
 
+	/**
+	 * Gets a modifiable list of entities of the provided class that are hit by this hitbox.
+	 */
+	public <U extends Entity> List<U> getHitEntitiesByClass(Class<U> entityClass) {
+		return getWorld().getEntitiesByClass(entityClass).stream()
+			       .filter(e -> intersects(e.getBoundingBox()))
+			       .collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	/**
+	 * Gets a modifiable list of entities hit by this hitbox with an optional filter.
+	 */
 	public List<Entity> getHitEntities(@Nullable Predicate<Entity> filter) {
 		return getWorld().getEntities().stream()
 			       .filter(filter == null ? e -> true : filter)

@@ -17,8 +17,8 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.StringUtils;
-import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -33,7 +33,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 
 public class RingOfFlames extends DepthsAbility {
 
@@ -73,17 +72,10 @@ public class RingOfFlames extends DepthsAbility {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0), 5);
 
-		Location tempLoc = loc.clone();
-		List<BoundingBox> boxes = new ArrayList<>();
-
-		for (int deg = 0; deg < 360; deg += 5) {
-			tempLoc.set(loc.getX() + 4 * FastUtils.cos(deg), loc.getY() + 2, loc.getZ() + 4 * FastUtils.sin(deg));
-			boxes.add(BoundingBox.of(tempLoc, 0.5, 3.5, 0.5));
-		}
-
 		new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mDeg = 0;
+			private final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(loc, 4, 4 - 0.5, 4 + 0.5, Math.PI);
 			@Override
 			public void run() {
 				if (mTicks >= DURATION[mRarity - 1]) {
@@ -92,6 +84,7 @@ public class RingOfFlames extends DepthsAbility {
 					return;
 				}
 
+				Location tempLoc = loc.clone();
 				for (int y = -1; y < 4; y++) {
 					tempLoc.set(loc.getX() + 4 * FastUtils.cos(mDeg), loc.getY() + y, loc.getZ() + 4 * FastUtils.sin(mDeg));
 					new PartialParticle(Particle.SOUL_FIRE_FLAME, tempLoc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
@@ -106,25 +99,19 @@ public class RingOfFlames extends DepthsAbility {
 
 
 				if (mTicks % 20 == 0) {
-					List<LivingEntity> mobs = EntityUtils.getNearbyMobs(loc, 6);
-					mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && !mob.getName().equals(DummyDecoy.DUMMY_NAME));
-
+					List<LivingEntity> mobs = mHitbox.getHitMobs().stream().filter(mob -> !mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) || mob.getName().equals(DummyDecoy.DUMMY_NAME)).toList();
 					int mobsHitThisTick = 0;
-					for (BoundingBox box : boxes) {
-						for (LivingEntity e : mobs) {
-							if (box.overlaps(e.getBoundingBox())) {
-								if (mobsHitThisTick <= 10) {
-									world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 0.8f, 1f);
-								}
-								new PartialParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
-								EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer, playerItemStats);
-								EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
-
-								DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
-
-								mobsHitThisTick++;
-							}
+					for (LivingEntity e : mobs) {
+						if (mobsHitThisTick <= 10) {
+							world.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.PLAYERS, 0.8f, 1f);
 						}
+						new PartialParticle(Particle.SOUL_FIRE_FLAME, e.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
+						EntityUtils.applyFire(mPlugin, EFFECT_DURATION, e, mPlayer, playerItemStats);
+						EntityUtils.applyBleed(mPlugin, EFFECT_DURATION, BLEED_AMOUNT, e);
+
+						DamageUtils.damage(mPlayer, e, new DamageEvent.Metadata(DamageType.MAGIC, mInfo.getLinkedSpell(), playerItemStats), DAMAGE[mRarity - 1], false, true, false);
+
+						mobsHitThisTick++;
 					}
 				}
 

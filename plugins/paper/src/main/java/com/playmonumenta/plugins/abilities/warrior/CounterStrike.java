@@ -6,37 +6,44 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.CounterStrikeCS;
+import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class CounterStrike extends Ability {
+	private static final int DURATION = 4 * 20;
+	private static final double DAMAGE_1 = 0.1;
+	private static final double DAMAGE_2 = 0.2;
+	private static final double RESISTANCE = 0.1;
+	private static final double ABSORPTION_RESISTANCE = 0.125;
+	private static final double KBR = 0.5;
+	private static final String KBR_EFFECT = "CounterStrikeKBREffect";
+	private static final double BLEED_AMPLIFIER = 0.1;
+	private static final int BLEED_DURATION = 8 * 20;
+	private static final int RADIUS = 2;
 
-	private static final double COUNTER_STRIKE_1_REFLECT = 0.2;
-	private static final double COUNTER_STRIKE_2_REFLECT = 0.4;
-	private static final float COUNTER_STRIKE_RADIUS = 3.0f;
-	private static final int REDUCTION_DURATION = 10 * 20;
-	private static final double DAMAGE_REDUCTION_PER_STACK = 0.05;
-	private static final int MAX_STACKS = 3;
-
-	public static final String CHARM_DAMAGE = "Counter Strike Damage";
-	public static final String CHARM_RADIUS = "Counter Strike Radius";
 	public static final String CHARM_DURATION = "Counter Strike Duration";
+	public static final String CHARM_DAMAGE = "Counter Strike Damage";
 	public static final String CHARM_DAMAGE_REDUCTION = "Counter Strike Damage Reduction";
-	public static final String CHARM_STACKS = "Counter Strike Stacks";
+	public static final String CHARM_KBR = "Counter Strike Knockback Resistance";
+	public static final String CHARM_BLEED = "Counter Strike Bleed Amplifier";
+	public static final String CHARM_BLEED_DURATION = "Counter Strike Bleed Duration";
+	public static final String CHARM_RADIUS = "Counter Strike Radius";
 
 	public static final AbilityInfo<CounterStrike> INFO =
 		new AbilityInfo<>(CounterStrike.class, "Counter Strike", CounterStrike::new)
@@ -44,73 +51,127 @@ public class CounterStrike extends Ability {
 			.scoreboardId("CounterStrike")
 			.shorthandName("CS")
 			.descriptions(
-				"When you take melee damage, deal damage equal to 20% of pre-mitigation damage taken to all mobs in a 3 block radius.",
-				"The damage is increased to 40% of pre-mitigation damage.",
-				"When this ability activates, gain 5% damage reduction against future melee damage from the mob that activated it for 10 seconds. " +
-					"This effect stacks up to 3 times (15% damage reduction).")
-			.simpleDescription("Getting hit by melee attacks damages mobs in a radius around you.")
+				String.format(
+					"When a mob attacks you (even if the attack is blocked or negated), a Counter Strike is primed against that mob, which lasts up to %ss. Hitting a mob with a Counter Strike deals %s%% more damage and removes the Counter Strike.",
+					StringUtils.ticksToSeconds(DURATION),
+					StringUtils.multiplierToPercentage(DAMAGE_1)
+				),
+				String.format(
+					"Damage bonus is increased to %s%%. Additionally, the first time you taunt a given mob using an ability, a Counter Strike is primed against that mob.",
+					StringUtils.multiplierToPercentage(DAMAGE_1)
+				),
+				String.format(
+					"Take %s%% less damage from a mob that has a Counter Strike primed against them. If the Counter Strike was primed while you had absorption active, take %s%% less damage instead, and gain %s%% Knockback Resistance while the Counter Strike is active. Also, when dealing a Counter Strike, apply %s%% Bleed for %ss to mobs in a %s block radius.",
+					StringUtils.multiplierToPercentage(RESISTANCE),
+					StringUtils.multiplierToPercentage(ABSORPTION_RESISTANCE),
+					StringUtils.multiplierToPercentage(KBR),
+					StringUtils.multiplierToPercentage(BLEED_AMPLIFIER),
+					StringUtils.ticksToSeconds(BLEED_DURATION),
+					RADIUS
+				)
+			)
+			.simpleDescription("Deal extra damage to a mob after taking damage from them.")
 			.displayItem(Material.CACTUS);
 
-	private final double mReflect;
-	private final HashMap<LivingEntity, Integer> mLastDamageTime = new HashMap<>();
-	private final HashMap<LivingEntity, Integer> mStacks = new HashMap<>();
+	private final Map<LivingEntity, Integer> mLastHurtTicks;
+	private final List<LivingEntity> mTauntedMobs;
+	private final List<LivingEntity> mAbsorptionMobs;
+	private final int mDuration;
+	private final double mDamage;
+	private final double mKBR;
 
 	private final CounterStrikeCS mCosmetic;
 
 	public CounterStrike(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mReflect = isLevelOne() ? COUNTER_STRIKE_1_REFLECT : COUNTER_STRIKE_2_REFLECT;
+
+		mLastHurtTicks = new HashMap<>();
+		mTauntedMobs = new ArrayList<>();
+		mAbsorptionMobs = new ArrayList<>();
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
+		mDamage = (isLevelOne() ? DAMAGE_1 : DAMAGE_2) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE);
+		mKBR = KBR + CharmManager.getLevel(mPlayer, CHARM_KBR) / 10;
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new CounterStrikeCS());
 	}
 
 	@Override
 	public void onHurt(DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (event.getType() == DamageType.MELEE
-			    && source != null
-			    && !event.isBlocked()
-			    && mPlayer.getNoDamageTicks() <= mPlayer.getMaximumNoDamageTicks() / 2f) {
-
-			Location loc = mPlayer.getLocation().add(0, 1, 0);
-			mCosmetic.counterOnHurt(mPlayer, loc, source);
-
-			double eventDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, event.getOriginalDamage() * mReflect);
-			Hitbox hitbox = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), CharmManager.getRadius(mPlayer, CHARM_RADIUS, COUNTER_STRIKE_RADIUS));
-			for (LivingEntity mob : hitbox.getHitMobs()) {
-				// Use different ClassAbility for non-target for Glorious Battle
-				ClassAbility ca = ClassAbility.COUNTER_STRIKE_AOE;
-				if (mob == source) {
-					ca = mInfo.getLinkedSpell();
-				}
-				DamageUtils.damage(mPlayer, mob, DamageType.OTHER, eventDamage, ca, true, true);
+		if (source != null) {
+			if (isEnhanced() && mLastHurtTicks.containsKey(source)) {
+				double resistance = (mAbsorptionMobs.contains(source) ? ABSORPTION_RESISTANCE : RESISTANCE) + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION);
+				event.setDamage(event.getDamage() * (1 - resistance));
 			}
 
-			if (isEnhanced()) {
-				// Remove any old mobs from the list so they don't pile up. There should never be too many at once so this shouldn't be intensive
-				mLastDamageTime.entrySet().removeIf(e -> clearIfExpired(e.getKey(), e.getValue()));
-				Integer stacks = mStacks.get(source);
-				Integer lastDamageTime = mLastDamageTime.get(source);
-				if (stacks != null) {
-					if (lastDamageTime != null) {
-						event.setDamage(event.getDamage() * (1 - stacks * (DAMAGE_REDUCTION_PER_STACK + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_DAMAGE_REDUCTION))));
-						mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.5f + 0.1f * stacks, 2.5f - 0.5f * stacks);
-						if (stacks < MAX_STACKS + CharmManager.getLevel(mPlayer, CHARM_STACKS)) {
-							mStacks.put(source, stacks + 1);
-						}
-					}
-				} else {
-					mStacks.put(source, 1);
-				}
-				mLastDamageTime.put(source, Bukkit.getServer().getCurrentTick());
-			}
+			prime(source);
+			mCosmetic.onPrime(mPlayer, mPlayer.getLocation());
 		}
 	}
 
-	private boolean clearIfExpired(LivingEntity mob, Integer time) {
-		if (time < Bukkit.getServer().getCurrentTick() - CharmManager.getDuration(mPlayer, CHARM_DURATION, REDUCTION_DURATION)) {
-			mStacks.remove(mob);
-			return true;
+	@Override
+	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
+		if (event.getType() == DamageEvent.DamageType.MELEE && mLastHurtTicks.remove(enemy) != null) {
+			if (isEnhanced()) {
+				double bleed = BLEED_AMPLIFIER + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_BLEED);
+				int duration = CharmManager.getDuration(mPlayer, CHARM_BLEED_DURATION, BLEED_DURATION);
+				double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
+				Hitbox hitbox = new Hitbox.SphereHitbox(enemy.getLocation().add(0, 0.75, 0), radius);
+				for (LivingEntity entity : hitbox.getHitMobs()) {
+					EntityUtils.applyBleed(mPlugin, duration, bleed, entity);
+				}
+			}
+
+			event.setDamage(event.getDamage() * (1 + mDamage));
+
+			mLastHurtTicks.remove(enemy);
+			boolean recalculationNeeded = mAbsorptionMobs.remove(enemy);
+			if (recalculationNeeded) {
+				recalculateKBR();
+			}
+
+			Location enemyLoc = enemy.getLocation();
+			mCosmetic.onCounterStrike(mPlayer, enemy, enemyLoc);
 		}
+
 		return false;
+	}
+
+	private void prime(LivingEntity enemy) {
+		mLastHurtTicks.put(enemy, Bukkit.getCurrentTick());
+		if (isEnhanced() && mPlayer.getAbsorptionAmount() > 0) {
+			mAbsorptionMobs.add(enemy);
+			recalculateKBR();
+		}
+	}
+
+	public void onTaunt(LivingEntity enemy) {
+		mTauntedMobs.removeIf(e -> e.isDead() || !e.isValid());
+		if (isLevelTwo() && !mTauntedMobs.contains(enemy)) {
+			mTauntedMobs.add(enemy);
+			prime(enemy);
+		}
+	}
+
+	private void recalculateKBR() {
+		mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
+		int currentTick = Bukkit.getCurrentTick();
+		int duration = mAbsorptionMobs.stream().map(mLastHurtTicks::get).filter(Objects::nonNull).mapToInt(t -> t + mDuration - currentTick).max().orElse(0);
+		if (duration > 0) {
+			mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT, new PercentKnockbackResist(duration, mKBR, KBR_EFFECT));
+		}
+	}
+
+	@Override
+	public void periodicTrigger(boolean twoHertz, boolean oneSecond, int ticks) {
+		mLastHurtTicks.keySet().removeIf(e -> e.isDead() || !e.isValid());
+		int currentTick = Bukkit.getCurrentTick();
+		mLastHurtTicks.values().removeIf(t -> currentTick - t > mDuration);
+		boolean recalculationNeeded = mAbsorptionMobs.removeIf(e -> !mLastHurtTicks.containsKey(e));
+		if (recalculationNeeded) {
+			recalculateKBR();
+		}
+
+		mLastHurtTicks.keySet().forEach(e -> mCosmetic.onPrimedMobTick(mPlayer, e.getLocation()));
+		mAbsorptionMobs.forEach(e -> mCosmetic.onAbsorptionMobTick(mPlayer, e.getLocation()));
 	}
 }

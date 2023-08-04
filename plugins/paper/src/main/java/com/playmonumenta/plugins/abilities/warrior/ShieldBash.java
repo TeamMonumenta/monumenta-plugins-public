@@ -13,6 +13,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -57,12 +58,16 @@ public class ShieldBash extends Ability {
 			.displayItem(Material.IRON_DOOR);
 
 	private boolean mIsEnhancementUsed = true;
+	private @Nullable CounterStrike mCounterStrike;
 
 	private final ShieldBashCS mCosmetic;
 
 	public ShieldBash(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ShieldBashCS());
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCounterStrike = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CounterStrike.class);
+		});
 	}
 
 	@Override
@@ -122,6 +127,10 @@ public class ShieldBash extends Ability {
 			EntityUtils.applyStun(mPlugin, duration, le);
 		}
 		if (le instanceof Mob mob) {
+			if (mCounterStrike != null) {
+				mCounterStrike.onTaunt(mob);
+			}
+
 			new BukkitRunnable() {
 				int mT = 0;
 

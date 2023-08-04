@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -29,14 +30,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class GraspingClaws extends Ability {
@@ -136,14 +135,12 @@ public class GraspingClaws extends Ability {
 	private void createCage(Location loc) {
 		World world = loc.getWorld();
 		mCosmetic.onCageCreation(world, loc);
+		double radius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 
 		new BukkitRunnable() {
 			int mT = 0;
-			final List<BoundingBox> mBoxes = new ArrayList<>();
+			final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(loc, 5, radius - 0.6, radius + 0.6, Math.PI);
 			List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
-			final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
-			boolean mHitboxes = false;
-			final double mRadius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 
 			List<Integer> mDegrees1 = new ArrayList<>();
 			List<Integer> mDegrees2 = new ArrayList<>();
@@ -155,47 +152,35 @@ public class GraspingClaws extends Ability {
 
 				// Wall Portion (Particles + Hitbox Definition)
 				if (mT % 4 == 0) {
-					for (int y = 0; y < 5; y++) {
-						for (double degree = 0; degree < 360; degree += 20) {
-							double radian1 = Math.toRadians(degree);
-							Vector vec = new Vector(FastUtils.cos(radian1) * mRadius, y, FastUtils.sin(radian1) * mRadius);
-							vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
-
-							Location l = loc.clone().add(vec);
+					for (double degree = 0; degree < 360; degree += 20) {
+						double radian1 = Math.toRadians(degree);
+						Vector vec = new Vector(FastUtils.cos(radian1) * radius, 0, FastUtils.sin(radian1) * radius);
+						vec = VectorUtils.rotateYAxis(vec, loc.getYaw());
+						Location l = loc.clone().add(vec);
+						for (int y = 0; y < 5; y++) {
+							l.add(0, 1, 0);
 							mCosmetic.cageParticle(mPlayer, l);
-
-							if (!mHitboxes) {
-								mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
-									l.clone().add(0.6, 5, 0.6)));
-							}
-						}
-						mHitboxes = true;
-					}
-				}
-
-				// Hitbox Detection + Knocback
-				for (BoundingBox box : mBoxes) {
-					for (Entity e : world.getNearbyEntities(box)) {
-						if (e instanceof LivingEntity le && EntityUtils.isHostileMob(e)) {
-							// Stores mobs hit this tick
-							mMobsHitThisTick.add(le);
-							// This list does not update to the mobs hit this tick until after everything runs
-							if (!mMobsAlreadyHit.contains(le)) {
-								mMobsAlreadyHit.add(le);
-
-								if (!EntityUtils.isCCImmuneMob(e)) {
-									Location eLoc = e.getLocation();
-									if (loc.distance(eLoc) > mRadius) {
-										MovementUtils.knockAway(loc, le, 0.3f, true);
-									} else {
-										MovementUtils.pullTowards(loc, le, 0.15f);
-									}
-									mCosmetic.onCagedMob(mPlayer, world, eLoc, le);
-								}
-							}
 						}
 					}
 				}
+
+				List<LivingEntity> entities = mHitbox.getHitMobs();
+				for (LivingEntity le : entities) {
+					// This list does not update to the mobs hit this tick until after everything runs
+					if (!mMobsAlreadyHit.contains(le)) {
+						mMobsAlreadyHit.add(le);
+						if (!EntityUtils.isCCImmuneMob(le)) {
+							Location eLoc = le.getLocation();
+							if (loc.distance(eLoc) > radius) {
+								MovementUtils.knockAway(loc, le, 0.3f, true);
+							} else {
+								MovementUtils.pullTowards(loc, le, 0.15f);
+							}
+							mCosmetic.onCagedMob(mPlayer, world, eLoc, le);
+						}
+					}
+				}
+
 				/*
 				 * Compare the two lists of mobs and only remove from the
 				 * actual hit tracker if the mob isn't detected as hit this
@@ -204,27 +189,25 @@ public class GraspingClaws extends Ability {
 				 */
 				List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
 				for (LivingEntity mob : mMobsAlreadyHit) {
-					if (mMobsHitThisTick.contains(mob)) {
+					if (entities.contains(mob)) {
 						mobsAlreadyHitAdjusted.add(mob);
 					}
 				}
 				mMobsAlreadyHit = mobsAlreadyHitAdjusted;
-				mMobsHitThisTick.clear();
 				if (mT >= CAGE_DURATION) {
 					this.cancel();
-					mBoxes.clear();
 				}
 
 				// Player Effect + Outline Particles
 				if (mT % 5 == 0) {
 					if (mT % 20 == 0) {
-						List<Player> affectedPlayers = PlayerUtils.playersInRange(loc, mRadius, true);
+						List<Player> affectedPlayers = new Hitbox.UprightCylinderHitbox(loc, 5, radius).getHitPlayers(true);
 						for (Player p : affectedPlayers) {
 							PlayerUtils.healPlayer(mPlugin, p, EntityUtils.getMaxHealth(p) * HEAL_AMOUNT, mPlayer);
 						}
 					}
 
-					List<Integer> degreesToKeep = mCosmetic.cageTick(mPlayer, loc, mRadius, mDegrees1, mDegrees2, mDegrees3);
+					List<Integer> degreesToKeep = mCosmetic.cageTick(mPlayer, loc, radius, mDegrees1, mDegrees2, mDegrees3);
 
 					mDegrees3 = new ArrayList<>(mDegrees2);
 					mDegrees2 = new ArrayList<>(mDegrees1);

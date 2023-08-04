@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.bosses;
 
+import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
@@ -9,18 +10,18 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class WarriorShieldWallBoss extends BossAbilityGroup {
@@ -31,6 +32,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 		public int DELAY = 4 * 20;
 		public int DURATION = 8 * 20;
 
+		@BossParam(help = "This parameter actually controls the ANGLE in degrees")
 		public int RADIUS = 180;
 		public float DISTANCE = 4f;
 		public int HEIGHT = 5;
@@ -71,7 +73,7 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				if (EntityUtils.isSilenced(mBoss) || EntityUtils.isStunned(mBoss)) {
+				if (EntityUtils.shouldCancelSpells(mBoss)) {
 					return;
 				}
 
@@ -80,72 +82,74 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 				new BukkitRunnable() {
 					int mT = 0;
 					final Location mLoc = mBoss.getLocation();
-					final World mWorld = mBoss.getWorld();
-					final List<BoundingBox> mBoxes = new ArrayList<>();
+					final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(mLoc, p.HEIGHT, p.DISTANCE - 0.6, p.DISTANCE + 0.6, Math.toRadians(p.RADIUS) / 2);
 					List<LivingEntity> mMobsAlreadyHit = new ArrayList<>();
-					final List<LivingEntity> mMobsHitThisTick = new ArrayList<>();
-					boolean mHitboxes = false;
 
 					@Override
 					public void run() {
 						mT++;
 						Vector vec;
-						for (int y = 0; y < p.HEIGHT; y++) {
+
+						if (mT % 4 == 0) {
 							for (double degree = 0; degree < p.RADIUS; degree += 10) {
 								double radian1 = Math.toRadians(degree);
-								vec = new Vector(FastUtils.cos(radian1) * p.DISTANCE, y, FastUtils.sin(radian1) * p.DISTANCE);
+								vec = new Vector(FastUtils.cos(radian1) * p.DISTANCE, 0, FastUtils.sin(radian1) * p.DISTANCE);
 								vec = VectorUtils.rotateYAxis(vec, mLoc.getYaw());
 
 								Location l = mLoc.clone().add(vec);
-								if (mT % 4 == 0) {
+								for (int y = 0; y < p.HEIGHT; y++) {
+									l.add(0, 1, 0);
 									p.PARTICLE_WALL.spawn(boss, l);
 								}
-								if (!mHitboxes) {
-									mBoxes.add(BoundingBox.of(l.clone().subtract(0.6, 0, 0.6),
-										l.clone().add(0.6, p.HEIGHT, 0.6)));
-								}
 							}
-							mHitboxes = true;
 						}
 
-						List<LivingEntity> targets = (List<LivingEntity>) p.TARGETS.getTargetsList(mBoss);
-						for (BoundingBox box : mBoxes) {
-							for (Entity e : mLoc.getWorld().getNearbyEntities(box)) {
-								Location eLoc = e.getLocation();
-								if (e instanceof Projectile proj && p.CAN_BLOCK_PROJECTILE && proj.getShooter() instanceof LivingEntity livingEntity) {
-									if (targets.contains(livingEntity)) {
-										proj.remove();
-										p.PARTICLE_DEFLECT_PROJECTILE.spawn(boss, eLoc);
-										p.SOUND_DEFLECT_PROJECTILE.play(eLoc);
-									}
-								} else if (e instanceof LivingEntity le && targets.contains(le)) {
-									// Stores mobs hit this tick
-									mMobsHitThisTick.add(le);
-									// This list does not update to the mobs hit this tick until after everything runs
-									if (!mMobsAlreadyHit.contains(le)) {
-										mMobsAlreadyHit.add(le);
+						List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
 
-										Location shieldLocation = box.getCenter().toLocation(mWorld);
-										if (p.DAMAGE > 0) {
-											BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation);
-										}
-
-										if (p.DAMAGE_PERCENTAGE > 0) {
-											BossUtils.bossDamagePercent(mBoss, le, p.DAMAGE_PERCENTAGE, shieldLocation, p.SPELL_NAME);
-										}
-
-										p.EFFECTS.apply(le, boss);
-
-										if (p.KNOCK_BACK != 0) {
-											MovementUtils.knockAway(mLoc, le, p.KNOCK_BACK, true);
-										}
-										p.PARTICLE_DEFLECT_ENTITY.spawn(boss, eLoc);
-										p.SOUND_DEFLECT_ENTITY.play(eLoc);
-									}
-
+						if (p.CAN_BLOCK_PROJECTILE) {
+							List<Projectile> projectiles = mHitbox.getHitEntitiesByClass(Projectile.class);
+							for (Projectile proj : projectiles) {
+								if (proj.getShooter() instanceof LivingEntity shooter && targets.contains(shooter)) {
+									proj.remove();
+									Location projLoc = proj.getLocation();
+									p.PARTICLE_DEFLECT_PROJECTILE.spawn(boss, projLoc);
+									p.SOUND_DEFLECT_PROJECTILE.play(projLoc);
 								}
 							}
 						}
+
+						List<LivingEntity> entities = targets.stream().filter(e -> mHitbox.intersects(e.getBoundingBox())).collect(Collectors.toList());
+						for (LivingEntity le : entities) {
+							// This list does not update to the mobs hit this tick until after everything runs
+							if (!mMobsAlreadyHit.contains(le)) {
+								mMobsAlreadyHit.add(le);
+
+								Location shieldLocation = mLoc.clone();
+								shieldLocation.setY(le.getEyeLocation().getY());
+								if (le.getEyeLocation().distanceSquared(shieldLocation) < p.DISTANCE * p.DISTANCE) {
+									shieldLocation.add(LocationUtils.getDirectionTo(le.getEyeLocation(), shieldLocation).multiply(p.DISTANCE));
+								}
+
+								if (p.DAMAGE > 0) {
+									BossUtils.blockableDamage(boss, le, p.DAMAGE_TYPE, p.DAMAGE, p.SPELL_NAME, shieldLocation);
+								}
+
+								if (p.DAMAGE_PERCENTAGE > 0) {
+									BossUtils.bossDamagePercent(mBoss, le, p.DAMAGE_PERCENTAGE, shieldLocation, p.SPELL_NAME);
+								}
+
+								p.EFFECTS.apply(le, boss);
+
+								if (p.KNOCK_BACK != 0) {
+									MovementUtils.knockAway(mLoc, le, p.KNOCK_BACK, true);
+								}
+
+								Location entityLoc = le.getLocation();
+								p.PARTICLE_DEFLECT_ENTITY.spawn(boss, entityLoc);
+								p.SOUND_DEFLECT_ENTITY.play(entityLoc);
+							}
+						}
+
 						/*
 						 * Compare the two lists of mobs and only remove from the
 						 * actual hit tracker if the mob isn't detected as hit this
@@ -154,20 +158,13 @@ public class WarriorShieldWallBoss extends BossAbilityGroup {
 						 */
 						List<LivingEntity> mobsAlreadyHitAdjusted = new ArrayList<>();
 						for (LivingEntity mob : mMobsAlreadyHit) {
-							if (mMobsHitThisTick.contains(mob)) {
+							if (entities.contains(mob)) {
 								mobsAlreadyHitAdjusted.add(mob);
 							}
 						}
 						mMobsAlreadyHit = mobsAlreadyHitAdjusted;
-						mMobsHitThisTick.clear();
-						if (mT >= p.DURATION) {
+						if (mT >= p.DURATION || EntityUtils.shouldCancelSpells(mBoss)) {
 							this.cancel();
-							mBoxes.clear();
-						}
-
-						if (!mBoss.isValid() || mBoss.isDead()) {
-							cancel();
-							mBoxes.clear();
 						}
 					}
 

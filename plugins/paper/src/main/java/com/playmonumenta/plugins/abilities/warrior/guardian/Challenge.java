@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.warrior.CounterStrike;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.ChallengeCS;
@@ -22,6 +23,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -29,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Challenge extends Ability {
 
@@ -81,6 +84,7 @@ public class Challenge extends Ability {
 	private final double mAbsorptionPerMob;
 	private final double mMaxAbsorption;
 	private final int mDuration;
+	private @Nullable CounterStrike mCounterStrike;
 
 	private List<LivingEntity> mAffectedEntities = new ArrayList<>();
 	private int mKillCount = 0;
@@ -94,6 +98,9 @@ public class Challenge extends Ability {
 		mMaxAbsorption = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ABSORPTION_MAX, isLevelOne() ? MAX_ABSORPTION_1 : MAX_ABSORPTION_2);
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new ChallengeCS());
+		Bukkit.getScheduler().runTask(plugin, () -> {
+			mCounterStrike = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, CounterStrike.class);
+		});
 	}
 
 	public void cast() {
@@ -107,7 +114,12 @@ public class Challenge extends Ability {
 			AbsorptionUtils.addAbsorption(mPlayer, mAbsorptionPerMob * mobs.size(), mMaxAbsorption, mDuration);
 			mPlugin.mEffectManager.addEffect(mPlayer, PERCENT_DAMAGE_DEALT_EFFECT_NAME, new PercentDamageDealt(mDuration, mPercentDamageDealtEffect, AFFECTED_DAMAGE_TYPES));
 
-			mobs.stream().filter(mob -> mob instanceof Mob).forEach(mob -> EntityUtils.applyTaunt(mob, mPlayer));
+			mobs.stream().filter(mob -> mob instanceof Mob).forEach(mob -> {
+				EntityUtils.applyTaunt(mob, mPlayer);
+				if (mCounterStrike != null) {
+					mCounterStrike.onTaunt(mob);
+				}
+			});
 			if (isLevelTwo()) {
 				clearAffectedEntities();
 				mAffectedEntities = mobs;
