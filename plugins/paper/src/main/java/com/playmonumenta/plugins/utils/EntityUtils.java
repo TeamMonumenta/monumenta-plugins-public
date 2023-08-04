@@ -868,6 +868,12 @@ public class EntityUtils {
 		}
 	}
 
+	public static void applySlow(Plugin plugin, int ticks, double amount, LivingEntity mob, String effectString) {
+		if (!isCCImmuneMob(mob)) {
+			plugin.mEffectManager.addEffect(mob, SLOW_EFFECT_NAME, new PercentSpeed(ticks, -amount, effectString));
+		}
+	}
+
 	public static boolean isSlowed(Plugin plugin, LivingEntity mob) {
 		return plugin.mEffectManager.hasEffect(mob, SLOW_EFFECT_NAME);
 	}
@@ -893,7 +899,12 @@ public class EntityUtils {
 	}
 
 	public static void setSlowTicks(Plugin plugin, LivingEntity mob, int ticks) {
-		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, SLOW_EFFECT_NAME);
+		setSlowTicks(plugin, mob, ticks, SLOW_EFFECT_NAME);
+	}
+
+
+		public static void setSlowTicks(Plugin plugin, LivingEntity mob, int ticks, String effectName) {
+		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, effectName);
 		if (slows != null) {
 			Effect slow = slows.last();
 			slow.setDuration(ticks);
@@ -932,11 +943,15 @@ public class EntityUtils {
 	);
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob) {
-		applyWeaken(plugin, ticks, amount, mob, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES);
+		applyWeaken(plugin, ticks, amount, mob, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES, WEAKEN_EFFECT_NAME);
 	}
 
 	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet affectedDamageTypes) {
-		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_NAME, new PercentDamageDealt(ticks, -amount, affectedDamageTypes));
+		applyWeaken(plugin, ticks, amount, mob, affectedDamageTypes, WEAKEN_EFFECT_NAME);
+	}
+
+	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet affectedDamageTypes, String effectString) {
+		plugin.mEffectManager.addEffect(mob, effectString, new PercentDamageDealt(ticks, -amount, affectedDamageTypes));
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {
 				if (fourHertz) {
@@ -980,7 +995,11 @@ public class EntityUtils {
 	}
 
 	public static void setWeakenTicks(Plugin plugin, LivingEntity mob, int ticks) {
-		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_NAME);
+		setWeakenTicks(plugin, mob, ticks, WEAKEN_EFFECT_NAME);
+	}
+
+	public static void setWeakenTicks(Plugin plugin, LivingEntity mob, int ticks, String effectName) {
+		NavigableSet<Effect> weaks = plugin.mEffectManager.getEffects(mob, effectName);
 		NavigableSet<Effect> weaksAesthetics = plugin.mEffectManager.getEffects(mob, WEAKEN_EFFECT_AESTHETICS_NAME);
 		if (weaks != null) {
 			Effect weak = weaks.last();

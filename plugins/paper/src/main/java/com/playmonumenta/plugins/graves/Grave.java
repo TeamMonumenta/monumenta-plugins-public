@@ -7,12 +7,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemUtils;
-import com.playmonumenta.plugins.utils.MMLog;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.*;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import java.time.Instant;
@@ -37,6 +34,7 @@ import org.bukkit.World;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -468,6 +466,12 @@ public final class Grave {
 					Phylactery.giveStoredXP(mPlayer);
 				} else {
 					player.sendMessage(Component.text("Goodbye!", NamedTextColor.AQUA));
+				}
+				if (mEntity != null) {
+					for (LivingEntity entity : EntityUtils.getNearbyMobs(mEntity.getLocation(), 20)) {
+						EntityUtils.setWeakenTicks(Plugin.getInstance(), entity, 0, PlayerListener.SOLO_DEATH_MOB_WEAKEN_EFFECT_NAME);
+						EntityUtils.setSlowTicks(Plugin.getInstance(), entity, 0, PlayerListener.SOLO_DEATH_MOB_SLOW_EFFECT_NAME);
+					}
 				}
 				delete();
 			}
