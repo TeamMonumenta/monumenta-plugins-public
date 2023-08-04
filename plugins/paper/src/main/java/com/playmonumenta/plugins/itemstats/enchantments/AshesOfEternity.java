@@ -4,8 +4,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import java.util.EnumSet;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -24,8 +25,8 @@ public class AshesOfEternity implements Enchantment {
 		return EnchantmentType.ASHES_OF_ETERNITY;
 	}
 
-	@Override public EnumSet<ItemStatUtils.Slot> getSlots() {
-		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND);
+	@Override public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND);
 	}
 
 	@Override

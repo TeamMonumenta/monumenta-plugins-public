@@ -2,9 +2,11 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+
 import java.util.EnumSet;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,8 +28,8 @@ public class Starvation implements Enchantment {
 		return EnchantmentType.STARVATION;
 	}
 
-	@Override public EnumSet<ItemStatUtils.Slot> getSlots() {
-		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND);
+	@Override public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.playmonumenta.plugins.guis;
 
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -794,10 +796,10 @@ public class CustomTradeGui extends Gui {
 		if (ItemUtils.isWand(output) || ItemUtils.isAxe(output) || ItemUtils.isAlchemistItem(output) || ItemUtils.isBowOrTrident(output) || ItemUtils.isHoe(output)) {
 			return TradeType.WEAPON;
 		}
-		if (ItemStatUtils.hasAttributeInSlot(output, ItemStatUtils.Slot.OFFHAND) || ItemStatUtils.hasEnchantment(output, ItemStatUtils.EnchantmentType.OFFHAND_MAINHAND_DISABLE)) {
+		if (ItemStatUtils.hasAttributeInSlot(output, Slot.OFFHAND) || ItemStatUtils.hasEnchantment(output, EnchantmentType.OFFHAND_MAINHAND_DISABLE)) {
 			return TradeType.OFFHAND;
 		}
-		if (ItemStatUtils.hasAttributeInSlot(output, ItemStatUtils.Slot.MAINHAND)) {
+		if (ItemStatUtils.hasAttributeInSlot(output, Slot.MAINHAND)) {
 			return TradeType.WEAPON;
 		}
 		return TradeType.MISC;

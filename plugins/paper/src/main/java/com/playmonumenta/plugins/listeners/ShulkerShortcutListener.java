@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.inventories.ShulkerInventory;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -315,7 +316,7 @@ public class ShulkerShortcutListener implements Listener {
 			&& (ShulkerInventoryManager.isShulkerInUse(item)
 			|| isPurpleTesseractContainer(item)
 			|| isEnderExpansion(item)
-			|| ItemStatUtils.getTier(item) != ItemStatUtils.Tier.SHULKER_BOX)) {
+			|| ItemStatUtils.getTier(item) != Tier.SHULKER_BOX)) {
 			event.getBlock().getWorld().playSound(event.getBlock().getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			event.setCancelled(true);
 		}

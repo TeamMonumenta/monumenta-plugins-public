@@ -9,6 +9,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.MonumentaRedisSyncIntegration;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -70,10 +73,10 @@ public class WalletManager implements Listener {
 
 	private static final String KEY_PLUGIN_DATA = "Wallet";
 
-	public static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
-		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
-		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
-		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Architect\\\\u0027s Ring\"}'}}}")
+	public static final ImmutableMap<Region, ItemStack> REGION_ICONS = ImmutableMap.of(
+		Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
+		Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
+		Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Architect\\\\u0027s Ring\"}'}}}")
 	);
 
 	private static @MonotonicNonNull ImmutableList<ItemStack> MANUAL_SORT_ORDER;
@@ -166,16 +169,16 @@ public class WalletManager implements Listener {
 		).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
 	}
 
-	private record WalletSettings(ItemStatUtils.Region mMaxRegion, boolean allCurrencies) {
+	private record WalletSettings(Region mMaxRegion, boolean allCurrencies) {
 	}
 
-	private static final WalletSettings MAX_SETTINGS = new WalletSettings(ItemStatUtils.Region.RING, true);
+	private static final WalletSettings MAX_SETTINGS = new WalletSettings(Region.RING, true);
 	private static final ImmutableMap<ItemUtils.ItemIdentifier, WalletSettings> WALLET_SETTINGS = ImmutableMap.of(
-		new ItemUtils.ItemIdentifier(Material.GLASS_BOTTLE, "Experience Flask"), new WalletSettings(ItemStatUtils.Region.VALLEY, false),
-		new ItemUtils.ItemIdentifier(Material.CAULDRON, "Experience Bucket"), new WalletSettings(ItemStatUtils.Region.VALLEY, true),
-		new ItemUtils.ItemIdentifier(Material.AMETHYST_CLUSTER, "Crystal Cluster"), new WalletSettings(ItemStatUtils.Region.ISLES, false),
-		new ItemUtils.ItemIdentifier(Material.AMETHYST_BLOCK, "Crystal Collector"), new WalletSettings(ItemStatUtils.Region.ISLES, true),
-		new ItemUtils.ItemIdentifier(Material.PORKCHOP, "Piggy Bank"), new WalletSettings(ItemStatUtils.Region.RING, false),
+		new ItemUtils.ItemIdentifier(Material.GLASS_BOTTLE, "Experience Flask"), new WalletSettings(Region.VALLEY, false),
+		new ItemUtils.ItemIdentifier(Material.CAULDRON, "Experience Bucket"), new WalletSettings(Region.VALLEY, true),
+		new ItemUtils.ItemIdentifier(Material.AMETHYST_CLUSTER, "Crystal Cluster"), new WalletSettings(Region.ISLES, false),
+		new ItemUtils.ItemIdentifier(Material.AMETHYST_BLOCK, "Crystal Collector"), new WalletSettings(Region.ISLES, true),
+		new ItemUtils.ItemIdentifier(Material.PORKCHOP, "Piggy Bank"), new WalletSettings(Region.RING, false),
 		new ItemUtils.ItemIdentifier(Material.FLOWER_POT, "Bag of Hoarding"), MAX_SETTINGS
 	);
 
@@ -429,7 +432,7 @@ public class WalletManager implements Listener {
 			}
 
 			// Items grouped by region, and sorted within each region
-			Map<ItemStatUtils.Region, List<WalletItem>> items =
+			Map<Region, List<WalletItem>> items =
 				walletItemsCopy.stream()
 					.sorted(
 						// sort main currencies to the very front
@@ -455,14 +458,14 @@ public class WalletManager implements Listener {
 							// finally, sort by name
 							.thenComparing((WalletItem item) -> ItemUtils.getPlainNameIfExists(item.mItem)))
 					// group everything by region
-					.collect(Collectors.groupingBy((WalletItem item) -> MAIN_CURRENCIES.contains(item.mItem) ? ItemStatUtils.Region.NONE : ItemStatUtils.getRegion(item.mItem)));
+					.collect(Collectors.groupingBy((WalletItem item) -> MAIN_CURRENCIES.contains(item.mItem) ? Region.NONE : ItemStatUtils.getRegion(item.mItem)));
 
 			// Fill GUI with items
 			boolean showAmounts = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_TAG);
 			boolean showAmountsAsStacks = mPlayer.getScoreboardTags().contains(CustomContainerItemManager.SHOW_AMOUNTS_AS_STACKS_TAG);
 			int pos = 0;
 			int itemsPerPage = 5 * 8; // top row and left column reserved
-			for (ItemStatUtils.Region region : ItemStatUtils.Region.values()) {
+			for (Region region : Region.values()) {
 				List<WalletItem> regionItems = items.get(region);
 				if (regionItems == null) {
 					continue;
@@ -820,8 +823,8 @@ public class WalletManager implements Listener {
 	}
 
 	private static boolean checkNotSoulbound(Player player, ItemStack item) {
-		if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
-			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
+			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			player.sendMessage(Component.text("This " + ItemUtils.getPlainName(item) + " does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return true;
@@ -832,8 +835,8 @@ public class WalletManager implements Listener {
 	public static boolean canPutIntoWallet(ItemStack item, WalletSettings settings) {
 		return item != null
 			       && item.getAmount() > 0
-			       && (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.CURRENCY
-				           || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.EVENT_CURRENCY
+			       && (ItemStatUtils.getTier(item) == Tier.CURRENCY
+				           || ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
 				           || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."))
 			       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
 			       && ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) <= 0

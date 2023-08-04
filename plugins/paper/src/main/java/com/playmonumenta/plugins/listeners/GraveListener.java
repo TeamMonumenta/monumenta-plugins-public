@@ -7,6 +7,9 @@ import com.playmonumenta.plugins.commands.GraveCommand;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -179,7 +182,7 @@ public class GraveListener implements Listener {
 			GraveManager.onDestroyItem(entity);
 			if (entity.isValid()
 				    && event.getCause() != EntityDamageEvent.DamageCause.VOID
-				    && ItemStatUtils.getInfusionLevel(entity.getItemStack(), ItemStatUtils.InfusionType.HOPE) > 0) {
+				    && ItemStatUtils.getInfusionLevel(entity.getItemStack(), InfusionType.HOPE) > 0) {
 				// If a hoped item isn't put into a grave (because graves are disabled), cancel all non-void damage.
 				event.setCancelled(true);
 				entity.setInvulnerable(true); // also make the item invulnerable to prevent this event from being spammed
@@ -230,7 +233,7 @@ public class GraveListener implements Listener {
 		ItemStack item = event.getItem();
 		if (item.getItemMeta() instanceof Damageable meta
 			    && event.getDamage() + meta.getDamage() >= item.getType().getMaxDurability()
-			    && ItemStatUtils.getTier(item) != ItemStatUtils.Tier.NONE) {
+			    && ItemStatUtils.getTier(item) != Tier.NONE) {
 			event.setCancelled(true);
 			meta.setDamage(item.getType().getMaxDurability());
 			item.setItemMeta(meta);
@@ -247,7 +250,7 @@ public class GraveListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void playerItemBreakEvent(PlayerItemBreakEvent event) {
 		ItemStack item = event.getBrokenItem();
-		if (ItemStatUtils.getTier(item) != ItemStatUtils.Tier.NONE) {
+		if (ItemStatUtils.getTier(item) != Tier.NONE) {
 			MMLog.warning("Reached PlayerItemBreakEvent for tiered item " + ItemUtils.getPlainName(item) + "!");
 			item.setAmount(item.getAmount() + 1);
 		}
@@ -275,7 +278,7 @@ public class GraveListener implements Listener {
 			// Remove Curse of Vanishing 2 Items even if Keep Inventory is on
 			for (int slot = 0; slot <= 40; slot++) {
 				ItemStack item = inv.getItem(slot);
-				if (ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) >= 2) {
+				if (ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING) >= 2) {
 					inv.setItem(slot, null);
 				}
 			}
@@ -298,7 +301,7 @@ public class GraveListener implements Listener {
 				if (item == null) {
 					continue;
 				}
-				int vanishing = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING);
+				int vanishing = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING);
 				if (vanishing >= 2) {
 					inv.setItem(i, null);
 				} else if (vanishing == 1 || item.containsEnchantment(Enchantment.VANISHING_CURSE)) {
@@ -326,12 +329,12 @@ public class GraveListener implements Listener {
 			int extraEquipmentShatter = 0;
 			for (int i = 36; i <= 40; i++) {
 				ItemStack item = items[i];
-				if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
+				if (item == null || ItemStatUtils.getTier(item) == Tier.NONE) {
 					extraEquipmentShatter++;
 					continue;
 				}
 
-				int shatteredLevel = Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
+				int shatteredLevel = Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
 				if (shatteredLevel > Shattered.MAX_LEVEL && EffectManager.getInstance().hasEffect(player, GearChanged.effectID)) {
 					extraEquipmentShatter++;
 				}
@@ -345,7 +348,7 @@ public class GraveListener implements Listener {
 				ArrayList<ItemStack> inventoryItems = new ArrayList<>();
 				for (int i = 0; i <= 35; i++) {
 					ItemStack item = items[i];
-					if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE || Shattered.isMaxShatter(item)) {
+					if (item == null || ItemStatUtils.getTier(item) == Tier.NONE || Shattered.isMaxShatter(item)) {
 						continue;
 					} else if (i <= 8) {
 						hotbarItems.add(item);
@@ -366,7 +369,7 @@ public class GraveListener implements Listener {
 					} else {
 						break;
 					}
-					Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
+					Shattered.shatter(item, ItemStatUtils.getInfusionLevel(item, InfusionType.HOPE) > 0 ? Math.max(1, shatterLevels - 1) : shatterLevels);
 				}
 			}
 
@@ -375,11 +378,11 @@ public class GraveListener implements Listener {
 
 		} else { // Not safe death, and graves are disabled: use vanilla behaviour of dropping items on death
 			// Handle curse of vanishing
-			event.getDrops().removeIf(item -> ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) >= 2);
+			event.getDrops().removeIf(item -> ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING) >= 2);
 			for (ItemStack item : inv.getContents()) {
 				if (item != null
 					    && item.containsEnchantment(Enchantment.VANISHING_CURSE)
-					    && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.CURSE_OF_VANISHING) == 1) {
+					    && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_VANISHING) == 1) {
 					Shattered.shatter(item, Shattered.CURSE_OF_VANISHING_SHATTER);
 					event.getDrops().add(item);
 				}

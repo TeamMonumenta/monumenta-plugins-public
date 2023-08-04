@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -29,7 +30,7 @@ public class InflationOverride extends BaseOverride {
 		if (inflationTier == 0) {
 			return true;
 		}
-		if (!player.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
+		if (!player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			return true;
 		}
 
@@ -104,7 +105,7 @@ public class InflationOverride extends BaseOverride {
 	private boolean isMoneyStack(ItemStack item) {
 		if (item == null || item.getType() != Material.NETHER_STAR) {
 			return false;
-		} else if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) > 0) {
+		} else if (ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) > 0) {
 			return false;
 		}
 		return ItemUtils.getPlainNameIfExists(item).equals("Hyper Crystalline Shard") && item.getAmount() == 64;

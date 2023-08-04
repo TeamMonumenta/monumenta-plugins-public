@@ -3,8 +3,9 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Material;

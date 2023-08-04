@@ -3,8 +3,8 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.BroomstickSlowFalling;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import java.util.EnumSet;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRiptideEvent;
@@ -25,8 +25,8 @@ public class Broomstick implements Enchantment {
 	}
 
 	@Override
-	public EnumSet<ItemStatUtils.Slot> getSlots() {
-		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.OFFHAND);
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.OFFHAND);
 	}
 
 	@Override

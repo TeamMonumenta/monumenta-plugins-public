@@ -20,9 +20,9 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import java.util.ArrayList;
@@ -302,7 +302,7 @@ public class PlayerTitleManager {
 		// Track if player cannot heal
 		boolean hasAntiHeal = false;
 		ItemStatManager.PlayerItemStats.ItemStatsMap playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStatsCopy(player).getItemStats();
-		double antiHealFromEnchants = Sustenance.getHealingMultiplier(playerItemStats.get(ItemStatUtils.EnchantmentType.SUSTENANCE), playerItemStats.get(ItemStatUtils.EnchantmentType.CURSE_OF_ANEMIA));
+		double antiHealFromEnchants = Sustenance.getHealingMultiplier(playerItemStats.get(EnchantmentType.SUSTENANCE), playerItemStats.get(EnchantmentType.CURSE_OF_ANEMIA));
 
 		PercentHeal antiHeal = Plugin.getInstance().mEffectManager.getActiveEffect(player, PercentHeal.class);
 		if ((antiHeal != null && antiHeal.getValue() <= -1) || antiHealFromEnchants <= 0) {

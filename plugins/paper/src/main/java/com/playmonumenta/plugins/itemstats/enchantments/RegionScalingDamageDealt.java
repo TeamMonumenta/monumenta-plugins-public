@@ -3,9 +3,12 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
@@ -48,7 +51,7 @@ public class RegionScalingDamageDealt implements Enchantment {
 	@Override
 	public void tick(Plugin plugin, Player player, double value, boolean twoHz, boolean oneHz) {
 		ItemStack item = player.getInventory().getItemInMainHand();
-		if (ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) > 0 || ItemUtils.isPickaxe(item) || ItemUtils.isAxe(item) || ItemUtils.isShovel(item)) {
+		if (ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0 || ItemUtils.isPickaxe(item) || ItemUtils.isAxe(item) || ItemUtils.isShovel(item)) {
 			plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, MINING_FATIGUE_AMPLIFIER, false, false));
 		}
 	}

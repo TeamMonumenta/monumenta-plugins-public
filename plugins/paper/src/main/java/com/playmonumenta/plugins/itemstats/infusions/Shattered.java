@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -49,8 +51,8 @@ public class Shattered implements Infusion {
 	}
 
 	@Override
-	public ItemStatUtils.InfusionType getInfusionType() {
-		return ItemStatUtils.InfusionType.SHATTERED;
+	public InfusionType getInfusionType() {
+		return InfusionType.SHATTERED;
 	}
 
 	@Override
@@ -74,7 +76,7 @@ public class Shattered implements Infusion {
 
 	@Override
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
-		int shatterLevel = (int) plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED);
+		int shatterLevel = (int) plugin.mItemStatManager.getInfusionLevel(player, InfusionType.SHATTERED);
 		if (shatterLevel == 0) {
 			updateEffects(plugin, player, 0);
 		}
@@ -105,15 +107,15 @@ public class Shattered implements Infusion {
 	}
 
 	public static int getShatteredLevelsEquipped(Player player) {
-		return (int) Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED);
+		return (int) Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.SHATTERED);
 	}
 
 	public static boolean hasMaxShatteredItemEquipped(Player player) {
-		if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.SHATTERED) < MAX_LEVEL) {
+		if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.SHATTERED) < MAX_LEVEL) {
 			return false;
 		}
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			if (ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), ItemStatUtils.InfusionType.SHATTERED) >= MAX_LEVEL) {
+			if (ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), InfusionType.SHATTERED) >= MAX_LEVEL) {
 				return true;
 			}
 		}
@@ -122,20 +124,20 @@ public class Shattered implements Infusion {
 
 	public static int getHighestShatterLevelEquipped(Player player) {
 		return Arrays.stream(EquipmentSlot.values())
-			       .mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), ItemStatUtils.InfusionType.SHATTERED))
+			       .mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), InfusionType.SHATTERED))
 			       .max().orElse(0);
 	}
 
 	public static int getShatterLevel(ItemStack item) {
-		return ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED);
+		return ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
 	}
 
 	public static boolean isMaxShatter(ItemStack item) {
-		return ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= MAX_LEVEL;
+		return ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) >= MAX_LEVEL;
 	}
 
 	public static boolean isShattered(ItemStack item) {
-		return ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) > 0;
+		return ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) > 0;
 	}
 
 	/**
@@ -144,16 +146,16 @@ public class Shattered implements Infusion {
 	 * @return The new level of shatter of the item. Returns MAX_LEVEL + 1 if it attempts to shatter an item with MAX_LEVEL shatter.
 	 */
 	public static int shatter(ItemStack item, int numLevels) {
-		if (ItemStatUtils.hasEnchantment(item, ItemStatUtils.EnchantmentType.DELETE_ON_SHATTER)) {
+		if (ItemStatUtils.hasEnchantment(item, EnchantmentType.DELETE_ON_SHATTER)) {
 			item.setAmount(0);
 			return 0;
 		}
-		int oldLevel = ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED);
+		int oldLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
 		if (oldLevel >= MAX_LEVEL) {
 			return MAX_LEVEL + 1;
 		}
 		int newLevel = Math.min(oldLevel + numLevels, MAX_LEVEL);
-		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SHATTERED, newLevel, NULL_UUID);
+		ItemStatUtils.addInfusion(item, InfusionType.SHATTERED, newLevel, NULL_UUID);
 		ItemStatUtils.generateItemStats(item);
 		return newLevel;
 	}
@@ -164,14 +166,14 @@ public class Shattered implements Infusion {
 	 * @return Whether the item now has less Shattered levels than before
 	 */
 	public static boolean unshatterOneLevel(ItemStack item) {
-		int oldLevel = ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED);
+		int oldLevel = ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED);
 		if (oldLevel <= 0) {
 			return false;
 		}
 		if (oldLevel == 1) {
-			ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SHATTERED);
+			ItemStatUtils.removeInfusion(item, InfusionType.SHATTERED);
 		} else {
-			ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SHATTERED, oldLevel - 1, NULL_UUID);
+			ItemStatUtils.addInfusion(item, InfusionType.SHATTERED, oldLevel - 1, NULL_UUID);
 		}
 		ItemStatUtils.generateItemStats(item);
 		return true;

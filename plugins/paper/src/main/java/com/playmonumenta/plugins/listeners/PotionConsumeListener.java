@@ -7,12 +7,14 @@ import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -108,7 +110,7 @@ public class PotionConsumeListener implements Listener {
 			return;
 		}
 
-		if (ItemStatUtils.getTier(item) == ItemStatUtils.Tier.LEGACY) {
+		if (ItemStatUtils.getTier(item) == Tier.LEGACY) {
 			return;
 		}
 
@@ -176,7 +178,7 @@ public class PotionConsumeListener implements Listener {
 		if (instantDrink) {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			ItemStatUtils.applyCustomEffects(mPlugin, player, item);
-			StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
+			StatTrackManager.getInstance().incrementStatImmediately(item, player, InfusionType.STAT_TRACK_CONSUMED, 1);
 
 			//Apply Starvation if applicable
 			Starvation.apply(player, starvation);
@@ -200,7 +202,7 @@ public class PotionConsumeListener implements Listener {
 					if (mTicks >= DRINK_DURATION) {
 						ItemStack potion = mPotionsConsumed.remove(player.getUniqueId());
 						ItemStatUtils.applyCustomEffects(mPlugin, player, potion);
-						StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_CONSUMED, 1);
+						StatTrackManager.getInstance().incrementStatImmediately(item, player, InfusionType.STAT_TRACK_CONSUMED, 1);
 
 						Starvation.apply(player, starvation);
 

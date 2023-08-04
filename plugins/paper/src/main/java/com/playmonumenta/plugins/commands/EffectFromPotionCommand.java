@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.commands;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.NonClericProvisionsPassive;
 import com.playmonumenta.plugins.itemstats.enchantments.Starvation;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -137,7 +138,7 @@ public class EffectFromPotionCommand {
 		ItemStack updatedPotion;
 
 		// Test for Starvation.
-		int starvation = ItemStatUtils.getEnchantmentLevel(potion, ItemStatUtils.EnchantmentType.STARVATION);
+		int starvation = ItemStatUtils.getEnchantmentLevel(potion, EnchantmentType.STARVATION);
 		if (starvation > 0) {
 			Starvation.apply(player, starvation);
 		}

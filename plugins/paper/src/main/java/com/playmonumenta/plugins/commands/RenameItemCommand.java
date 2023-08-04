@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -104,7 +105,7 @@ public class RenameItemCommand {
 			player.sendMessage(Component.text("You must be holding a shulker box!", NamedTextColor.RED));
 			throw CommandAPI.failWithString("You must be holding a Shulker box!");
 		}
-		if (ItemStatUtils.getRegion(itemStack) != ItemStatUtils.Region.SHULKER_BOX
+		if (ItemStatUtils.getRegion(itemStack) != Region.SHULKER_BOX
 			    && !ShulkerEquipmentListener.isEquipmentBox(itemStack)
 			    && !ShulkerEquipmentListener.isCharmBox(itemStack)) {
 			player.sendMessage(Component.text("This item cannot be renamed!", NamedTextColor.RED));

@@ -1,6 +1,10 @@
 package com.playmonumenta.plugins.integrations;
 
 import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -182,10 +186,10 @@ public class ChestSortIntegration implements Listener {
 			String strFishQuality = String.valueOf(ItemStatUtils.getFishQuality(item));
 
 			String strIsMaterial = String.valueOf(
-				ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.MATERIAL));
+				ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MATERIAL));
 
 			String strLocation = "~location~"; // Missing values start with ~ and wind up at the end
-			ItemStatUtils.Location location = ItemStatUtils.getLocation(item);
+			Location location = ItemStatUtils.getLocation(item);
 			if (location != null) {
 				int ordinal = location.ordinal();
 				String name = location.toString();
@@ -207,7 +211,7 @@ public class ChestSortIntegration implements Listener {
 			}
 
 			String strRegion = "~region~"; // Missing values start with ~ and wind up at the end
-			ItemStatUtils.Region region = ItemStatUtils.getRegion(item);
+			Region region = ItemStatUtils.getRegion(item);
 			if (region != null) {
 				int ordinal = region.ordinal();
 				String name = region.toString();
@@ -215,7 +219,7 @@ public class ChestSortIntegration implements Listener {
 			}
 
 			String strTier = "~tier~";
-			ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
+			Tier tier = ItemStatUtils.getTier(item);
 			if (tier != null) {
 				int ordinal = tier.ordinal();
 				String name = tier.toString();

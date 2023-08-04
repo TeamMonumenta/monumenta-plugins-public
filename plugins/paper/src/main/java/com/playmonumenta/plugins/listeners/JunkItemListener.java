@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.graves.GraveManager;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -219,8 +220,8 @@ public final class JunkItemListener implements Listener {
 		}
 
 		if (mTieredPlayers.contains(uuid)) {
-			ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
-			if ((tier == ItemStatUtils.Tier.NONE || tier == ItemStatUtils.Tier.ZERO) && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
+			Tier tier = ItemStatUtils.getTier(item);
+			if ((tier == Tier.NONE || tier == Tier.ZERO) && !ItemUtils.isQuestItem(item) && !InventoryUtils.containsSpecialLore(item)) {
 				return true;
 			}
 		} else if (mLorePlayers.contains(uuid)) {

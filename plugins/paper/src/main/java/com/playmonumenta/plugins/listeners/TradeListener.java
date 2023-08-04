@@ -3,10 +3,12 @@ package com.playmonumenta.plugins.listeners;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.playmonumenta.plugins.guis.CustomTradeGui;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
@@ -65,16 +67,16 @@ public class TradeListener implements Listener {
 		ImmutableSet.of("True North", "Truer North", "Truest North"));
 
 	// Infusions whose cost depends on item tier and/or region. These can only be moved in re-skin trades.
-	private static final ItemStatUtils.InfusionType[] VARYING_COST_INFUSIONS = {
-		ItemStatUtils.InfusionType.ACUMEN,
-		ItemStatUtils.InfusionType.FOCUS,
-		ItemStatUtils.InfusionType.PERSPICACITY,
-		ItemStatUtils.InfusionType.TENACITY,
-		ItemStatUtils.InfusionType.VIGOR,
-		ItemStatUtils.InfusionType.VITALITY,
+	private static final InfusionType[] VARYING_COST_INFUSIONS = {
+		InfusionType.ACUMEN,
+		InfusionType.FOCUS,
+		InfusionType.PERSPICACITY,
+		InfusionType.TENACITY,
+		InfusionType.VIGOR,
+		InfusionType.VITALITY,
 
 		// not quite a "varying cost infusion", but still prevent this from being moved to other items unless it's a re-skin trade
-		ItemStatUtils.InfusionType.SOULBOUND
+		InfusionType.SOULBOUND
 	};
 
 	// Items for which to completely disable reskin/dye trades
@@ -135,8 +137,8 @@ public class TradeListener implements Listener {
 				continue;
 			}
 			// only consider trades with "Monumenta items" - these should all have a region
-			if (ItemStatUtils.getRegion(source) == ItemStatUtils.Region.NONE
-				    || ItemStatUtils.getRegion(result) == ItemStatUtils.Region.NONE) {
+			if (ItemStatUtils.getRegion(source) == Region.NONE
+				    || ItemStatUtils.getRegion(result) == Region.NONE) {
 				return;
 			}
 			boolean carryOverVaryingCostInfusions = ItemStatUtils.getRegion(source) == ItemStatUtils.getRegion(result)
@@ -169,7 +171,7 @@ public class TradeListener implements Listener {
 				}
 				// if not a re-skin trade, do not allow moving varying cost infusions
 				if (!carryOverVaryingCostInfusions) {
-					for (ItemStatUtils.InfusionType varyingCostInfusion : VARYING_COST_INFUSIONS) {
+					for (InfusionType varyingCostInfusion : VARYING_COST_INFUSIONS) {
 						if (ItemStatUtils.getInfusionLevel(playerItem, varyingCostInfusion) > 0) {
 							continue playerItemLoop;
 						}
@@ -327,9 +329,9 @@ public class TradeListener implements Listener {
 
 	private static void handleSoulboundTradess(Player player, TradeWindowOpenEvent.Trade trade, MerchantRecipe recipe) {
 		ItemStack result = trade.getRecipe().getResult();
-		if (NULL_UUID.equals(ItemStatUtils.getInfuser(result, ItemStatUtils.InfusionType.SOULBOUND))) {
+		if (NULL_UUID.equals(ItemStatUtils.getInfuser(result, InfusionType.SOULBOUND))) {
 			result = ItemUtils.clone(result);
-			ItemStatUtils.addInfusion(result, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId(), true);
+			ItemStatUtils.addInfusion(result, InfusionType.SOULBOUND, 1, player.getUniqueId(), true);
 			MerchantRecipe newRecipe = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(),
 				recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.shouldIgnoreDiscounts());
 			newRecipe.setIngredients(recipe.getIngredients());

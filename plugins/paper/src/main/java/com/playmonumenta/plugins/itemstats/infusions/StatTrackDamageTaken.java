@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 public class StatTrackDamageTaken implements Infusion {
 
 	@Override
-	public ItemStatUtils.InfusionType getInfusionType() {
-		return ItemStatUtils.InfusionType.STAT_TRACK_DAMAGE_TAKEN;
+	public InfusionType getInfusionType() {
+		return InfusionType.STAT_TRACK_DAMAGE_TAKEN;
 	}
 
 	@Override
@@ -36,9 +36,9 @@ public class StatTrackDamageTaken implements Infusion {
 		int dmgTaken = (int) Math.round(Math.min(event.getFinalDamage(false), player.getHealth() + player.getAbsorptionAmount()));
 
 		for (ItemStack is : inv.getArmorContents()) {
-			StatTrackManager.getInstance().incrementStatImmediately(is, player, ItemStatUtils.InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
+			StatTrackManager.getInstance().incrementStatImmediately(is, player, InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
 		}
-		StatTrackManager.getInstance().incrementStatImmediately(inv.getItemInOffHand(), player, ItemStatUtils.InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
-		StatTrackManager.incrementStat(inv.getItemInMainHand(), player, ItemStatUtils.InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
+		StatTrackManager.getInstance().incrementStatImmediately(inv.getItemInOffHand(), player, InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
+		StatTrackManager.incrementStat(inv.getItemInMainHand(), player, InfusionType.STAT_TRACK_DAMAGE_TAKEN, dmgTaken);
 	}
 }

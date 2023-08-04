@@ -11,6 +11,10 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -123,18 +127,18 @@ public class ElementalArrows extends Ability {
 	}
 
 	private void applyArrowEffects(DamageEvent event, Projectile proj, LivingEntity enemy, boolean thunder, ClassAbility ability, ItemStatManager.PlayerItemStats playerItemStats, Class<? extends Entity> bonusEntity, Consumer<LivingEntity> effectAction) {
-		double baseDamage = playerItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+		double baseDamage = playerItemStats.getMainhandAddStats().get(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 		ItemStack arrowItem = EntityListener.getArrowItem(proj.getUniqueId());
 		if (arrowItem != null) {
-			baseDamage *= 1 + ItemStatUtils.getAttributeAmount(arrowItem, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY, ItemStatUtils.Operation.MULTIPLY, ItemStatUtils.Slot.PROJECTILE);
+			baseDamage *= 1 + ItemStatUtils.getAttributeAmount(arrowItem, AttributeType.PROJECTILE_DAMAGE_MULTIPLY, Operation.MULTIPLY, Slot.PROJECTILE);
 		}
 
 		double targetDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, baseDamage);
 		if (bonusEntity.isInstance(enemy)) {
 			targetDamage += ELEMENTAL_ARROWS_BONUS_DAMAGE;
 		}
-		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getItemStats().get(ItemStatUtils.EnchantmentType.POINT_BLANK));
-		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getItemStats().get(ItemStatUtils.EnchantmentType.SNIPER));
+		targetDamage += PointBlank.apply(mPlayer, enemy, playerItemStats.getItemStats().get(EnchantmentType.POINT_BLANK));
+		targetDamage += Sniper.apply(mPlayer, enemy, playerItemStats.getItemStats().get(EnchantmentType.SNIPER));
 		if (thunder) {
 			targetDamage *= 1 + ENHANCED_DAMAGE_MULTIPLIER;
 		}

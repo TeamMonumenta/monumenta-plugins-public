@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.itemstats.attributes;
 
 import com.playmonumenta.plugins.itemstats.Attribute;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 
 public class PotionDamage implements Attribute {
 	@Override
@@ -10,8 +10,8 @@ public class PotionDamage implements Attribute {
 	}
 
 	@Override
-	public ItemStatUtils.AttributeType getAttributeType() {
-		return ItemStatUtils.AttributeType.POTION_DAMAGE;
+	public AttributeType getAttributeType() {
+		return AttributeType.POTION_DAMAGE;
 	}
 
 	@Override

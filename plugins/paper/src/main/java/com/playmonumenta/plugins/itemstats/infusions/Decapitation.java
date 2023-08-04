@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -17,8 +17,8 @@ public class Decapitation implements Infusion {
 		return "Decapitation";
 	}
 
-	@Override public ItemStatUtils.InfusionType getInfusionType() {
-		return ItemStatUtils.InfusionType.DECAPITATION;
+	@Override public InfusionType getInfusionType() {
+		return InfusionType.DECAPITATION;
 	}
 
 	@Override

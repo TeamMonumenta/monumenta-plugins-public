@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
@@ -88,14 +89,14 @@ public class ClaimRaffle {
 							}
 							// Put the amount redeemed back to redis
 							RemoteDataAPI.increment(player.getUniqueId(), RAFFLE_WINS_UNCLAIMED, 1);
-						} else if (ItemStatUtils.getInfusionLevel(player.getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.GILDED) > 0) {
+						} else if (ItemStatUtils.getInfusionLevel(player.getInventory().getItemInMainHand(), InfusionType.GILDED) > 0) {
 							if (player.isOnline()) {
 								MessagingUtils.sendError(player, "Items can only be gilded once.");
 							}
 							// Put the amount redeemed back to redis
 							RemoteDataAPI.increment(player.getUniqueId(), RAFFLE_WINS_UNCLAIMED, 1);
 						} else {
-							ItemStatUtils.addInfusion(player.getInventory().getItemInMainHand(), ItemStatUtils.InfusionType.GILDED, 1, player.getUniqueId());
+							ItemStatUtils.addInfusion(player.getInventory().getItemInMainHand(), InfusionType.GILDED, 1, player.getUniqueId());
 							player.sendMessage(ChatColor.GREEN + "Your item has been Gilded. Thanks for supporting the server by voting!");
 						}
 					}

@@ -14,6 +14,10 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -199,9 +203,9 @@ public class PredatorStrike extends Ability {
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
 		List<LivingEntity> mobs = hitbox.getHitMobs();
 		if (!mobs.isEmpty()) {
-			double damage = ItemStatUtils.getAttributeAmount(item, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
-			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.POINT_BLANK));
-			damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.SNIPER));
+			double damage = ItemStatUtils.getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+			damage += PointBlank.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
+			damage += Sniper.apply(mPlayer, loc, ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
 
@@ -212,14 +216,14 @@ public class PredatorStrike extends Ability {
 		}
 
 		//Get enchant levels on weapon
-		ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
-		int fire = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.FIRE_ASPECT);
-		int ice = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.ICE_ASPECT);
-		int thunder = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.THUNDER_ASPECT);
-		int decay = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.DECAY);
-		int bleed = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.BLEEDING);
-		int earth = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.EARTH_ASPECT);
-		int wind = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.WIND_ASPECT);
+		ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRE_ASPECT);
+		int fire = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.FIRE_ASPECT);
+		int ice = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.ICE_ASPECT);
+		int thunder = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.THUNDER_ASPECT);
+		int decay = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.DECAY);
+		int bleed = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.BLEEDING);
+		int earth = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.EARTH_ASPECT);
+		int wind = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.WIND_ASPECT);
 
 		if (ice > 0) {
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.6f, 1.3f);

@@ -9,6 +9,10 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -87,10 +91,10 @@ public class DamageListener implements Listener {
 			if (entityDamageByEntityEvent.getDamager() instanceof Player player
 				    && event.getCause() == DamageCause.ENTITY_SWEEP_ATTACK) {
 				PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStats(player);
-				double sweepingEdgeLevel = ItemStatUtils.getEnchantmentLevel(player.getInventory().getItemInMainHand(), ItemStatUtils.EnchantmentType.SWEEPING_EDGE);
+				double sweepingEdgeLevel = ItemStatUtils.getEnchantmentLevel(player.getInventory().getItemInMainHand(), EnchantmentType.SWEEPING_EDGE);
 				if (playerItemStats != null && sweepingEdgeLevel > 0) {
-					double damage = (1 + playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD.getItemStat()))
-						                * playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY.getItemStat());
+					double damage = (1 + playerItemStats.getItemStats().get(AttributeType.ATTACK_DAMAGE_ADD.getItemStat()))
+						                * playerItemStats.getItemStats().get(AttributeType.ATTACK_DAMAGE_MULTIPLY.getItemStat());
 					event.setDamage(1 + damage * (sweepingEdgeLevel / (sweepingEdgeLevel + 1)));
 				} else {
 					event.setDamage(1);
@@ -262,7 +266,7 @@ public class DamageListener implements Listener {
 			if (item != null && item.getType() != Material.AIR) {
 				ReadableNBT enchantments = NBT.get(item, ItemStatUtils::getEnchantments);
 
-				for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.PROJECTILE_ENCHANTMENTS) {
+				for (EnchantmentType ench : EnchantmentType.PROJECTILE_ENCHANTMENTS) {
 					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
 					if (level > 0) {
 						map.add(Objects.requireNonNull(ench.getItemStat()), level);
@@ -271,8 +275,8 @@ public class DamageListener implements Listener {
 
 				ReadableNBTList<ReadWriteNBT> attributes = NBT.get(item, ItemStatUtils::getAttributes);
 
-				for (ItemStatUtils.AttributeType attr : ItemStatUtils.AttributeType.PROJECTILE_ATTRIBUTE_TYPES) {
-					double value = ItemStatUtils.getAttributeAmount(attributes, attr, ItemStatUtils.Operation.MULTIPLY, ItemStatUtils.Slot.PROJECTILE);
+				for (AttributeType attr : AttributeType.PROJECTILE_ATTRIBUTE_TYPES) {
+					double value = ItemStatUtils.getAttributeAmount(attributes, attr, Operation.MULTIPLY, Slot.PROJECTILE);
 					if (value != 0) {
 						ItemStat stat = Objects.requireNonNull(attr.getItemStat());
 						if (map.get(stat) == stat.getDefaultValue()) {

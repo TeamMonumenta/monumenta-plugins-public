@@ -18,6 +18,10 @@ import com.playmonumenta.plugins.itemstats.enchantments.ProjectileProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Regeneration;
 import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.Sustenance;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.infusions.Ardor;
 import com.playmonumenta.plugins.itemstats.infusions.Epoch;
 import com.playmonumenta.plugins.itemstats.infusions.Expedite;
@@ -30,7 +34,6 @@ import com.playmonumenta.plugins.itemstats.infusions.Soothing;
 import com.playmonumenta.plugins.itemstats.infusions.Unyielding;
 import com.playmonumenta.plugins.itemstats.infusions.Vigor;
 import com.playmonumenta.plugins.itemstats.infusions.Vitality;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.text.DecimalFormat;
 import java.util.function.DoubleFunction;
@@ -46,14 +49,14 @@ import org.jetbrains.annotations.Nullable;
 enum PSGUIStat {
 
 	// health and healing
-	HEALTH("Max Health", Formatting.NUMBER, stats -> Math.max(1, stats.getAttributeAmount(ItemStatUtils.AttributeType.MAX_HEALTH, 20)) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.VITALITY))),
-	HEALING_RATE("Healing Rate", Formatting.PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(ItemStatUtils.EnchantmentType.SUSTENANCE), stats.get(ItemStatUtils.EnchantmentType.CURSE_OF_ANEMIA))
-		                                                          * Nutriment.getHealingMultiplier(stats.getInfusion(ItemStatUtils.InfusionType.NUTRIMENT))),
+	HEALTH("Max Health", Formatting.NUMBER, stats -> Math.max(1, stats.getAttributeAmount(AttributeType.MAX_HEALTH, 20)) * (1 + Vitality.HEALTH_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VITALITY))),
+	HEALING_RATE("Healing Rate", Formatting.PERCENT, stats -> Sustenance.getHealingMultiplier(stats.get(EnchantmentType.SUSTENANCE), stats.get(EnchantmentType.CURSE_OF_ANEMIA))
+		                                                          * Nutriment.getHealingMultiplier(stats.getInfusion(InfusionType.NUTRIMENT))),
 	EFFECTIVE_HEALING_RATE("Effective Healing Rate", Formatting.PERCENT, stats -> HEALING_RATE.get(stats) * 20.0 / HEALTH.get(stats)),
-	REGENERATION("Regeneration per second", Formatting.NUMBER, stats -> ((4 * Regeneration.healPer5Ticks(stats.get(ItemStatUtils.EnchantmentType.REGENERATION)))
-		                                                                     + (stats.getInfusion(ItemStatUtils.InfusionType.SOOTHING) * Soothing.HEAL_PER_LEVEL)) * HEALING_RATE.get(stats)),
+	REGENERATION("Regeneration per second", Formatting.NUMBER, stats -> ((4 * Regeneration.healPer5Ticks(stats.get(EnchantmentType.REGENERATION)))
+		                                                                     + (stats.getInfusion(InfusionType.SOOTHING) * Soothing.HEAL_PER_LEVEL)) * HEALING_RATE.get(stats)),
 	EFFECTIVE_REGENERATION("Regeneration in %HP/s", Formatting.PERCENT, stats -> REGENERATION.get(stats) / HEALTH.get(stats)),
-	LIFE_DRAIN("Life Drain on crit", Formatting.NUMBER, stats -> LifeDrain.LIFE_DRAIN_CRIT_HEAL * Math.sqrt(stats.get(ItemStatUtils.EnchantmentType.LIFE_DRAIN)) * HEALING_RATE.get(stats)),
+	LIFE_DRAIN("Life Drain on crit", Formatting.NUMBER, stats -> LifeDrain.LIFE_DRAIN_CRIT_HEAL * Math.sqrt(stats.get(EnchantmentType.LIFE_DRAIN)) * HEALING_RATE.get(stats)),
 	EFFECTIVE_LIFE_DRAIN("Life Drain on crit in %HP", Formatting.PERCENT, stats -> LIFE_DRAIN.get(stats) / HEALTH.get(stats)),
 
 	// These stats are damage taken, but get displayed as damage reduction
@@ -63,7 +66,7 @@ enum PSGUIStat {
 	BLAST_DAMAGE_TAKEN("Blast", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new BlastProtection(), new BlastFragility()), false, Formatting.DR_CHANGE_FORMAT),
 	FIRE_DAMAGE_TAKEN("Fire", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new FireProtection(), new FireFragility()), false, Formatting.DR_CHANGE_FORMAT),
 	FALL_DAMAGE_TAKEN("Fall", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(new FeatherFalling(), new FallFragility())
-		                                                                 * Pennate.getFallDamageResistance(stats.getInfusion(ItemStatUtils.InfusionType.PENNATE)), false, Formatting.DR_CHANGE_FORMAT),
+		                                                                 * Pennate.getFallDamageResistance(stats.getInfusion(InfusionType.PENNATE)), false, Formatting.DR_CHANGE_FORMAT),
 	AILMENT_DAMAGE_TAKEN("Ailment", Formatting.ONE_MINUS_PERCENT, stats -> stats.getDamageTakenMultiplier(null, null), false, Formatting.DR_CHANGE_FORMAT),
 
 	// These stats are effective damage taken, but get displayed as effective damage reduction
@@ -96,23 +99,23 @@ enum PSGUIStat {
 	AILMENT_EHM("Ailment", Formatting.NUMBER, stats -> 1.0 / AILMENT_DAMAGE_TAKEN.get(stats)),
 
 	// melee
-	ATTACK_DAMAGE_ADD("+flat Attack Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD, ItemStatUtils.Operation.ADD)),
-	ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_MULTIPLY)
+	ATTACK_DAMAGE_ADD("+flat Attack Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD)),
+	ATTACK_DAMAGE_MULTIPLY("+% Attack Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(AttributeType.ATTACK_DAMAGE_MULTIPLY)
 		                                                                                 * stats.getDamageDealtMultiplier()
-		                                                                                 * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.VIGOR))),
-	TOTAL_ATTACK_DAMAGE("Total Attack Damage", Formatting.NUMBER, stats -> (1 + stats.get(ItemStatUtils.AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
-	ATTACK_SPEED("Attack Speed", Formatting.NUMBER, stats -> stats.getAttributeAmount(ItemStatUtils.AttributeType.ATTACK_SPEED, 4)
-		                                                         * (1 + (Grace.ATKS_BONUS * stats.getInfusion(ItemStatUtils.InfusionType.GRACE)))),
+		                                                                                 * (1 + Vigor.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.VIGOR))),
+	TOTAL_ATTACK_DAMAGE("Total Attack Damage", Formatting.NUMBER, stats -> (1 + stats.get(AttributeType.ATTACK_DAMAGE_ADD)) * ATTACK_DAMAGE_MULTIPLY.get(stats)),
+	ATTACK_SPEED("Attack Speed", Formatting.NUMBER, stats -> stats.getAttributeAmount(AttributeType.ATTACK_SPEED, 4)
+		                                                         * (1 + (Grace.ATKS_BONUS * stats.getInfusion(InfusionType.GRACE)))),
 
 	// projectile
-	PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD)),
-	PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY)
+	PROJECTILE_DAMAGE_ADD("+flat Projectile Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) - stats.getMainhandAttributeAmount(AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD)),
+	PROJECTILE_DAMAGE_MULTIPLY("+% Projectile Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_MULTIPLY)
 		                                                                                         * stats.getDamageDealtMultiplier()
-		                                                                                         * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.FOCUS))),
-	TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
-	PROJECTILE_SPEED("Projectile Speed", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.PROJECTILE_SPEED)),
+		                                                                                         * (1 + Focus.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.FOCUS))),
+	TOTAL_PROJECTILE_DAMAGE("Total Projectile Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_DAMAGE_ADD) * PROJECTILE_DAMAGE_MULTIPLY.get(stats)),
+	PROJECTILE_SPEED("Projectile Speed", Formatting.NUMBER, stats -> stats.get(AttributeType.PROJECTILE_SPEED)),
 	PROJECTILE_RATE("Shoot/Throw Rate", Formatting.NUMBER, stats -> {
-		double throwRate = stats.get(ItemStatUtils.AttributeType.THROW_RATE);
+		double throwRate = stats.get(AttributeType.THROW_RATE);
 		if (throwRate != 0) {
 			return throwRate;
 		}
@@ -129,26 +132,26 @@ enum PSGUIStat {
 	}),
 
 	// magic
-	SPELL_POWER("Spell Power", Formatting.PERCENT, stats -> stats.get(ItemStatUtils.AttributeType.SPELL_DAMAGE)),
-	MAGIC_DAMAGE_ADD("+flat Magic Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.MAGIC_DAMAGE_ADD)),
-	MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(ItemStatUtils.AttributeType.MAGIC_DAMAGE_MULTIPLY)
+	SPELL_POWER("Spell Power", Formatting.PERCENT, stats -> stats.get(AttributeType.SPELL_DAMAGE)),
+	MAGIC_DAMAGE_ADD("+flat Magic Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_ADD)),
+	MAGIC_DAMAGE_MULTIPLY("+% Magic Damage", Formatting.PERCENT_MODIFIER, stats -> stats.get(AttributeType.MAGIC_DAMAGE_MULTIPLY)
 		                                                                               * stats.getDamageDealtMultiplier()
-		                                                                               * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(ItemStatUtils.InfusionType.PERSPICACITY))),
+		                                                                               * (1 + Perspicacity.DAMAGE_MOD_PER_LEVEL * stats.getInfusion(InfusionType.PERSPICACITY))),
 	TOTAL_SPELL_DAMAGE("Total Spell Damage %", Formatting.PERCENT, stats -> SPELL_POWER.get(stats) * MAGIC_DAMAGE_MULTIPLY.get(stats)),
-	COOLDOWN_MULTIPLIER("Cooldown Multiplier", Formatting.PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(ItemStatUtils.EnchantmentType.APTITUDE)))
-		                                                                        * (1 + Ineptitude.getCooldownPercentage(stats.get(ItemStatUtils.EnchantmentType.INEPTITUDE)))
-		                                                                        * (1 + Epoch.getCooldownPercentage(stats.getInfusion(ItemStatUtils.InfusionType.EPOCH))), false),
+	COOLDOWN_MULTIPLIER("Cooldown Multiplier", Formatting.PERCENT, stats -> (1 + Aptitude.getCooldownPercentage(stats.get(EnchantmentType.APTITUDE)))
+		                                                                        * (1 + Ineptitude.getCooldownPercentage(stats.get(EnchantmentType.INEPTITUDE)))
+		                                                                        * (1 + Epoch.getCooldownPercentage(stats.getInfusion(InfusionType.EPOCH))), false),
 	// misc
-	ARMOR("Total Armor", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.ARMOR)),
-	AGILITY("Total Agility", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.AGILITY)),
+	ARMOR("Total Armor", Formatting.NUMBER, stats -> stats.get(AttributeType.ARMOR)),
+	AGILITY("Total Agility", Formatting.NUMBER, stats -> stats.get(AttributeType.AGILITY)),
 	MOVEMENT_SPEED("Movement Speed", Formatting.PERCENT,
-		stats -> stats.getAttributeAmount(ItemStatUtils.AttributeType.SPEED, 0.1,
+		stats -> stats.getAttributeAmount(AttributeType.SPEED, 0.1,
 			RegionScalingDamageTaken.SPEED_EFFECT[stats.getRegionScaling(stats.mPlayer, false)]
-				+ Ardor.getMovementSpeedBonus(stats.getInfusion(ItemStatUtils.InfusionType.ARDOR))
-				+ Expedite.getMovementSpeedBonus(stats.getInfusion(ItemStatUtils.InfusionType.EXPEDITE), Expedite.MAX_STACKS)) / 0.1),
-	KNOCKBACK_RESISTANCE("Knockback Resistance", Formatting.PERCENT, stats -> Math.min(1, stats.getAttributeAmount(ItemStatUtils.AttributeType.KNOCKBACK_RESISTANCE, 0)
-		                                                                                      + Unyielding.getKnockbackResistance(stats.getInfusion(ItemStatUtils.InfusionType.UNYIELDING)))),
-	THORNS_DAMAGE("Thorns Damage", Formatting.NUMBER, stats -> stats.get(ItemStatUtils.AttributeType.THORNS) * stats.getDamageDealtMultiplier()),
+				+ Ardor.getMovementSpeedBonus(stats.getInfusion(InfusionType.ARDOR))
+				+ Expedite.getMovementSpeedBonus(stats.getInfusion(InfusionType.EXPEDITE), Expedite.MAX_STACKS)) / 0.1),
+	KNOCKBACK_RESISTANCE("Knockback Resistance", Formatting.PERCENT, stats -> Math.min(1, stats.getAttributeAmount(AttributeType.KNOCKBACK_RESISTANCE, 0)
+		                                                                                      + Unyielding.getKnockbackResistance(stats.getInfusion(InfusionType.UNYIELDING)))),
+	THORNS_DAMAGE("Thorns Damage", Formatting.NUMBER, stats -> stats.get(AttributeType.THORNS) * stats.getDamageDealtMultiplier()),
 	MINING_SPEED("Mining Speed", Formatting.NUMBER, stats -> ItemUtils.getMiningSpeed(stats.getItem(PSGUIEquipment.MAINHAND)) * (stats.getRegionScaling(stats.mPlayer, true) > 0 ? 0.3 : 1)),
 
 	;

@@ -1,10 +1,10 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -134,7 +134,7 @@ public class StatTrackItem extends GenericCommand {
 		//Check to see if the item in hand is already infused
 		ItemStack is = player.getInventory().getItemInMainHand();
 
-		if (ItemStatUtils.getInfusionLevel(is, ItemStatUtils.InfusionType.STAT_TRACK) <= 0) {
+		if (ItemStatUtils.getInfusionLevel(is, InfusionType.STAT_TRACK) <= 0) {
 			player.sendMessage("This item is not infused with stat tracking!");
 			return;
 		}
@@ -161,10 +161,10 @@ public class StatTrackItem extends GenericCommand {
 		InfusionType type = StatTrackManager.getTrackingType(is);
 		if (type == null) {
 			player.sendMessage("Could not find stat track infusion type!");
-		} else if (ItemStatUtils.getInfusionLevel(is, ItemStatUtils.InfusionType.STAT_TRACK) <= 0) {
+		} else if (ItemStatUtils.getInfusionLevel(is, InfusionType.STAT_TRACK) <= 0) {
 			player.sendMessage("This item is not infused with stat tracking!");
 		} else if (StatTrackManager.isPlayersItem(is, player)) {
-			ItemStatUtils.removeInfusion(is, ItemStatUtils.InfusionType.STAT_TRACK, false);
+			ItemStatUtils.removeInfusion(is, InfusionType.STAT_TRACK, false);
 			for (InfusionType stat : InfusionType.STAT_TRACK_OPTIONS) {
 				ItemStatUtils.removeInfusion(is, stat, false);
 			}

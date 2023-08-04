@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.itemstats;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 
 public interface Attribute extends ItemStat {
 

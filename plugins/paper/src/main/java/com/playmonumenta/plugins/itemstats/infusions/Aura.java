@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 

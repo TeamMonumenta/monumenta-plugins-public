@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -70,8 +72,8 @@ public class Quickdraw extends Ability {
 		}
 		ItemStack inMainHand = mPlayer.getInventory().getItemInMainHand();
 		ItemStack inOffHand = mPlayer.getInventory().getItemInOffHand();
-		if ((ItemStatUtils.hasEnchantment(inMainHand, ItemStatUtils.EnchantmentType.TWO_HANDED)
-			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, ItemStatUtils.EnchantmentType.WEIGHTLESS)))
+		if ((ItemStatUtils.hasEnchantment(inMainHand, EnchantmentType.TWO_HANDED)
+			&& !(ItemUtils.isNullOrAir(inOffHand) || ItemStatUtils.hasEnchantment(inOffHand, EnchantmentType.WEIGHTLESS)))
 			|| ItemUtils.isShootableItem(inOffHand)) {
 			return;
 		}
@@ -86,7 +88,7 @@ public class Quickdraw extends Ability {
 		if (launched) {
 			putOnCooldown();
 
-			if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.MULTISHOT) > 0) {
+			if (ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.MULTISHOT) > 0) {
 				for (int i = 0; i < 2; i++) {
 					shootProjectile(inMainHand, 2 * i - 1);
 				}
@@ -119,7 +121,7 @@ public class Quickdraw extends Ability {
 		}
 		mProjectile = proj;
 
-		if (!mPlayer.isSneaking() && ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.RECOIL) > 0) {
+		if (!mPlayer.isSneaking() && ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.RECOIL) > 0) {
 			if (EntityUtils.isRecoilDisable(mPlugin, mPlayer, 1)) {
 				proj.addScoreboardTag("NoRecoil");
 			}
@@ -144,7 +146,7 @@ public class Quickdraw extends Ability {
 		if (stats != null) {
 			ItemStatManager.PlayerItemStats.ItemStatsMap map = stats.getItemStats();
 			if (map != null) {
-				ItemStat projDamageAdd = Objects.requireNonNull(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+				ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
 				double damage = map.get(projDamageAdd);
 				map.set(projDamageAdd, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage));
 			}

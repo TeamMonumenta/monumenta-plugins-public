@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTItem;
@@ -260,8 +261,8 @@ public class VanityGUI extends Gui {
 			return;
 		}
 		// equip vanity equipment from inventory
-		if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
-			    && !mPlayer.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
+			    && !mPlayer.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			mPlayer.sendMessage(Component.text("This item is soulbound to another player!", NamedTextColor.RED));
 			mPlayer.playSound(mPlayer.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 1, 1);
 			return;

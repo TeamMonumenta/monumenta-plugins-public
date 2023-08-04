@@ -3,11 +3,9 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Constants.Materials;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
+import com.playmonumenta.plugins.itemstats.enums.*;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
@@ -610,8 +608,8 @@ public class ItemUtils {
 	 * Items drop if they have lore that does not contain $$ and they are a Quest Item or Material
 	 */
 	public static float getItemDropChance(@Nullable ItemStack item) {
-		ItemStatUtils.Tier tier = ItemStatUtils.getTier(item);
-		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$") && (isQuestItem(item) || ItemStatUtils.isMaterial(item) || (tier != null && tier != ItemStatUtils.Tier.CURRENCY))) {
+		Tier tier = ItemStatUtils.getTier(item);
+		if (item != null && (item.hasItemMeta() && item.getItemMeta().hasLore()) && !InventoryUtils.testForItemWithLore(item, "$$") && (isQuestItem(item) || ItemStatUtils.isMaterial(item) || (tier != null && tier != Tier.CURRENCY))) {
 			return 100.0f;
 		} else {
 			return -200.0f;
@@ -1102,7 +1100,7 @@ public class ItemUtils {
 		if (itemStack != null) {
 			return isBowOrTrident(itemStack)
 				       || (itemStack.getType() == Material.SNOWBALL
-					           && ItemStatUtils.getAttributeAmount(itemStack, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND) > 0);
+					           && ItemStatUtils.getAttributeAmount(itemStack, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0);
 		} else {
 			return false;
 		}
@@ -1192,7 +1190,7 @@ public class ItemUtils {
 
 	public static boolean isInteresting(ItemStack item) {
 		return ServerProperties.getAlwaysPickupMats().contains(item.getType())
-			       || (hasLore(item) && ItemStatUtils.getTier(item) != ItemStatUtils.Tier.ZERO)
+			       || (hasLore(item) && ItemStatUtils.getTier(item) != Tier.ZERO)
 			       || (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && ServerProperties.getNamedPickupMats().contains(item.getType()));
 	}
 

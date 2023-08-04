@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
@@ -15,7 +16,7 @@ import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -303,7 +304,7 @@ public class ShulkerEquipmentListener implements Listener {
 			if (item != null && (
 					(slot.getKey() >= 36 && slot.getKey() <= 39 && ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_BINDING)) ||
 					ItemStatUtils.hasEnchantment(item, EnchantmentType.CURSE_OF_EPHEMERALITY) ||
-					ItemStatUtils.hasInfusion(item, ItemStatUtils.InfusionType.LOCKED))) {
+					ItemStatUtils.hasInfusion(item, InfusionType.LOCKED))) {
 				continue;
 			}
 			swapItem(pInv, sInv, slot.getKey(), slot.getValue());

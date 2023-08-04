@@ -16,6 +16,10 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.PointBlank;
 import com.playmonumenta.plugins.itemstats.enchantments.Recoil;
 import com.playmonumenta.plugins.itemstats.enchantments.Sniper;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -193,14 +197,14 @@ public class HallowedBeam extends MultipleChargeAbility {
 				Location eLoc = LocationUtils.getHalfHeightLocation(targetedEntity);
 				int stunDuration;
 				if (Crusade.enemyTriggersAbilities(targetedEntity, mCrusade)) {
-					double damage = ItemStatUtils.getAttributeAmount(inMainHand, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD, ItemStatUtils.Operation.ADD, ItemStatUtils.Slot.MAINHAND);
-					damage += Sniper.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.SNIPER));
-					damage += PointBlank.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.POINT_BLANK));
-					damage *= mPlugin.mItemStatManager.getAttributeAmount(mPlayer, ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
+					double damage = ItemStatUtils.getAttributeAmount(inMainHand, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+					damage += Sniper.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.SNIPER));
+					damage += PointBlank.apply(mPlayer, targetedEntity, ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.POINT_BLANK));
+					damage *= mPlugin.mItemStatManager.getAttributeAmount(mPlayer, AttributeType.PROJECTILE_DAMAGE_MULTIPLY);
 					damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 					DamageUtils.damage(mPlayer, targetedEntity, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true, true);
 
-					if (ItemStatUtils.getEnchantmentLevel(inMainHand, ItemStatUtils.EnchantmentType.FIRE_ASPECT) > 0) {
+					if (ItemStatUtils.getEnchantmentLevel(inMainHand, EnchantmentType.FIRE_ASPECT) > 0) {
 						EntityUtils.applyFire(mPlugin, 20 * 15, targetedEntity, mPlayer);
 					}
 
@@ -223,7 +227,7 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 	public void applyRecoil() {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
-		double recoil = ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RECOIL);
+		double recoil = ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RECOIL);
 		if (recoil > 0
 			&& !EntityUtils.isRecoilDisable(mPlugin, mPlayer, mMaxCharges)
 			&& !mPlayer.isSneaking()

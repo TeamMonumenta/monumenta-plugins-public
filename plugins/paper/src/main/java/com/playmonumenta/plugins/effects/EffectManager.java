@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.events.ArrowConsumeEvent;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.EntityGainAbsorptionEvent;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -811,7 +811,7 @@ public final class EffectManager implements Listener {
 
 		if (killed instanceof Player player) {
 			// Default phylactery level is 10 (should already be accounted for).
-			double phylactery = Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY);
+			double phylactery = Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY);
 
 			// Set durations of Custom Effects for all player effects (including hidden ones)
 			List<EffectManager.EffectPair> effectPairs = getAllEffectPairs(player);

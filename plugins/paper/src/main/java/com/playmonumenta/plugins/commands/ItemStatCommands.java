@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.*;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -48,19 +49,19 @@ public class ItemStatCommands {
 	public static void registerInfoCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editinfo");
 
-		ItemStatUtils.Region[] regionsRaw = ItemStatUtils.Region.values();
+		Region[] regionsRaw = Region.values();
 		String[] regions = new String[regionsRaw.length];
 		for (int i = 0; i < regions.length; i++) {
 			regions[i] = regionsRaw[i].getName();
 		}
 
-		ItemStatUtils.Tier[] tiersRaw = ItemStatUtils.Tier.values();
+		Tier[] tiersRaw = Tier.values();
 		String[] tiers = new String[tiersRaw.length];
 		for (int i = 0; i < tiers.length; i++) {
 			tiers[i] = tiersRaw[i].getName();
 		}
 
-		ItemStatUtils.Masterwork[] masterworkRaw = ItemStatUtils.Masterwork.values();
+		Masterwork[] masterworkRaw = Masterwork.values();
 		String[] ms = new String[masterworkRaw.length];
 		for (int i = 0; i < ms.length; i++) {
 			ms[i] = masterworkRaw[i].getName();
@@ -77,32 +78,32 @@ public class ItemStatCommands {
 			if (item == null) {
 				return;
 			}
-			ItemStatUtils.Region region = ItemStatUtils.Region.getRegion((String) args[0]);
-			ItemStatUtils.Tier tier = ItemStatUtils.Tier.getTier((String) args[1]);
-			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[2]);
-			ItemStatUtils.Masterwork m = ItemStatUtils.Masterwork.getMasterwork((String) args[3]);
+			Region region = Region.getRegion((String) args[0]);
+			Tier tier = Tier.getTier((String) args[1]);
+			Location location = Location.getLocation((String) args[2]);
+			Masterwork m = Masterwork.getMasterwork((String) args[3]);
 
 			// For R3 items, set tier to match masterwork level
-			if (region == ItemStatUtils.Region.RING) {
-				if (m != ItemStatUtils.Masterwork.ERROR && m != ItemStatUtils.Masterwork.NONE) {
+			if (region == Region.RING) {
+				if (m != Masterwork.ERROR && m != Masterwork.NONE) {
 					switch (Objects.requireNonNull(m)) {
 						case ZERO:
 						case I:
 						case II:
 						case III:
-							tier = ItemStatUtils.Tier.RARE;
+							tier = Tier.RARE;
 							break;
 						case IV:
 						case V:
-							tier = ItemStatUtils.Tier.ARTIFACT;
+							tier = Tier.ARTIFACT;
 							break;
 						case VI:
-							tier = ItemStatUtils.Tier.EPIC;
+							tier = Tier.EPIC;
 							break;
 						case VIIA:
 						case VIIB:
 						case VIIC:
-							tier = ItemStatUtils.Tier.LEGENDARY;
+							tier = Tier.LEGENDARY;
 							break;
 						default:
 							break;
@@ -396,7 +397,7 @@ public class ItemStatCommands {
 			if (item == null) {
 				return;
 			}
-			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+			Location location = Location.getLocation((String) args[0]);
 
 			ItemMeta itemMeta = item.getItemMeta();
 			Component displayName = itemMeta.displayName();
@@ -415,7 +416,7 @@ public class ItemStatCommands {
 			if (item == null) {
 				return;
 			}
-			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+			Location location = Location.getLocation((String) args[0]);
 			Boolean bold = (Boolean) args[1];
 			Boolean underline = (Boolean) args[2];
 
@@ -435,7 +436,7 @@ public class ItemStatCommands {
 			if (item == null) {
 				return;
 			}
-			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+			Location location = Location.getLocation((String) args[0]);
 			Boolean bold = (Boolean) args[1];
 			Boolean underline = (Boolean) args[2];
 			String name = (String) args[3];
@@ -521,17 +522,17 @@ public class ItemStatCommands {
 	public static void registerEnchCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editench");
 
-		String[] enchantments = new String[ItemStatUtils.EnchantmentType.values().length + ItemStatUtils.InfusionType.values().length];
+		String[] enchantments = new String[EnchantmentType.values().length + InfusionType.values().length];
 		int i = 0;
 
-		for (ItemStatUtils.EnchantmentType enchantment : ItemStatUtils.EnchantmentType.values()) {
+		for (EnchantmentType enchantment : EnchantmentType.values()) {
 			if (enchantment != null && enchantment.getName() != null) {
 				enchantments[i] = enchantment.getName().replace(" ", "");
 				i++;
 			}
 		}
 
-		for (ItemStatUtils.InfusionType enchantment : ItemStatUtils.InfusionType.values()) {
+		for (InfusionType enchantment : InfusionType.values()) {
 			if (enchantment != null && enchantment.getName() != null) {
 				enchantments[i] = enchantment.getName().replace(" ", "");
 				i++;
@@ -586,7 +587,7 @@ public class ItemStatCommands {
 	}
 
 	private static void addEnchantmentOrInfusion(ItemStack item, Player player, String enchantment, int level) {
-		ItemStatUtils.EnchantmentType type1 = ItemStatUtils.EnchantmentType.getEnchantmentType(enchantment);
+		EnchantmentType type1 = EnchantmentType.getEnchantmentType(enchantment);
 		if (type1 != null) {
 			if (level > 0) {
 				ItemStatUtils.addEnchantment(item, type1, level);
@@ -595,7 +596,7 @@ public class ItemStatCommands {
 			}
 		}
 
-		ItemStatUtils.InfusionType type2 = ItemStatUtils.InfusionType.getInfusionType(enchantment);
+		InfusionType type2 = InfusionType.getInfusionType(enchantment);
 		if (type2 != null) {
 			if (level > 0) {
 				ItemStatUtils.addInfusion(item, type2, level, player.getUniqueId(), false);
@@ -614,10 +615,10 @@ public class ItemStatCommands {
 	public static void registerAttrCommand() {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.editattr");
 
-		String[] attributes = new String[ItemStatUtils.AttributeType.values().length];
+		String[] attributes = new String[AttributeType.values().length];
 		int i = 0;
 
-		for (ItemStatUtils.AttributeType attribute : ItemStatUtils.AttributeType.values()) {
+		for (AttributeType attribute : AttributeType.values()) {
 			attributes[i] = attribute.getCodeName().replace(" ", "");
 			i++;
 		}
@@ -625,8 +626,8 @@ public class ItemStatCommands {
 		List<Argument<?>> arguments = new ArrayList<>();
 		arguments.add(new StringArgument("attribute").replaceSuggestions(ArgumentSuggestions.strings(info -> attributes)));
 		arguments.add(new DoubleArgument("amount"));
-		arguments.add(new MultiLiteralArgument(ItemStatUtils.Operation.ADD.getName(), ItemStatUtils.Operation.MULTIPLY.getName()));
-		arguments.add(new MultiLiteralArgument(ItemStatUtils.Slot.MAINHAND.getName(), ItemStatUtils.Slot.OFFHAND.getName(), ItemStatUtils.Slot.HEAD.getName(), ItemStatUtils.Slot.CHEST.getName(), ItemStatUtils.Slot.LEGS.getName(), ItemStatUtils.Slot.FEET.getName(), ItemStatUtils.Slot.PROJECTILE.getName()));
+		arguments.add(new MultiLiteralArgument(Operation.ADD.getName(), Operation.MULTIPLY.getName()));
+		arguments.add(new MultiLiteralArgument(Slot.MAINHAND.getName(), Slot.OFFHAND.getName(), Slot.HEAD.getName(), Slot.CHEST.getName(), Slot.LEGS.getName(), Slot.FEET.getName(), Slot.PROJECTILE.getName()));
 
 		new CommandAPICommand("editattr").withPermission(perms).withArguments(arguments).executesPlayer((player, args) -> {
 			ItemStack item = getHeldItemAndSendErrors(player);
@@ -635,11 +636,11 @@ public class ItemStatCommands {
 			}
 			String attribute = (String) args[0];
 			Double amount = (Double) args[1];
-			ItemStatUtils.Operation operation = ItemStatUtils.Operation.getOperation((String) args[2]);
+			Operation operation = Operation.getOperation((String) args[2]);
 			if (operation == null) {
 				throw CommandAPI.failWithString("Invalid operation " + args[2]);
 			}
-			ItemStatUtils.Slot slot = ItemStatUtils.Slot.getSlot((String) args[3]);
+			Slot slot = Slot.getSlot((String) args[3]);
 			if (slot == null) {
 				throw CommandAPI.failWithString("Invalid slot " + args[3]);
 			}
@@ -653,7 +654,7 @@ public class ItemStatCommands {
 				return;
 			}
 
-			ItemStatUtils.AttributeType type1 = ItemStatUtils.AttributeType.getAttributeType(attribute);
+			AttributeType type1 = AttributeType.getAttributeType(attribute);
 			if (type1 != null) {
 				if (amount != 0) {
 					ItemStatUtils.addAttribute(item, type1, amount, operation, slot);
@@ -680,13 +681,13 @@ public class ItemStatCommands {
 			}
 
 			// remove all enchantments and attributes even though we clear everything later because some use vanilla mechanics that persist
-			for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.values()) {
+			for (EnchantmentType ench : EnchantmentType.values()) {
 				ItemStatUtils.removeEnchantment(item, ench);
 			}
 
-			for (ItemStatUtils.AttributeType attr : ItemStatUtils.AttributeType.values()) {
-				for (ItemStatUtils.Operation op : ItemStatUtils.Operation.values()) {
-					for (ItemStatUtils.Slot slot : ItemStatUtils.Slot.values()) {
+			for (AttributeType attr : AttributeType.values()) {
+				for (Operation op : Operation.values()) {
+					for (Slot slot : Slot.values()) {
 						ItemStatUtils.removeAttribute(item, attr, op, slot);
 					}
 				}
@@ -720,14 +721,14 @@ public class ItemStatCommands {
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.color");
 
 		new CommandAPICommand("color").withPermission(perms).withArguments(getLocationArgument()).executes((sender, args) -> {
-			ItemStatUtils.Location location = ItemStatUtils.Location.getLocation((String) args[0]);
+			Location location = Location.getLocation((String) args[0]);
 			Component message = Component.empty().append(location.getDisplay()).append(Component.text(" (" + location.getColor().asHexString() + ")")).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString()));
 			sender.sendMessage(message);
 		}).register();
 
 		new CommandAPICommand("color").withPermission(perms).withArguments(new LiteralArgument("list")).executes((sender, args) -> {
 			Component message = Component.empty();
-			for (ItemStatUtils.Location location : ItemStatUtils.Location.values()) {
+			for (Location location : Location.values()) {
 				message = message.append(Component.text(location.getName(), location.getColor()).hoverEvent(HoverEvent.showText(Component.text("Click to copy hex code to clipboard"))).clickEvent(ClickEvent.copyToClipboard(location.getColor().asHexString())));
 				message = message.append(Component.text(" "));
 			}
@@ -749,7 +750,7 @@ public class ItemStatCommands {
 	}
 
 	private static Argument<String> getLocationArgument() {
-		ItemStatUtils.Location[] locationsRaw = ItemStatUtils.Location.values();
+		Location[] locationsRaw = Location.values();
 		String[] locations = new String[locationsRaw.length];
 		for (int i = 0; i < locations.length; i++) {
 			locations[i] = locationsRaw[i].getName();

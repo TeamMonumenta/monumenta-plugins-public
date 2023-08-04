@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Attribute;
-import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 

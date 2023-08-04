@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 
 import com.playmonumenta.plugins.bosses.parameters.BossParam;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -21,7 +21,7 @@ public class ResistanceBoss extends BossAbilityGroup {
 		public boolean UNIVERSAL_INCREASE = true;
 
 		@BossParam(help = "Additive or Multiply")
-		public ItemStatUtils.Operation DAMAGE_INCREASE_TYPE = ItemStatUtils.Operation.MULTIPLY;
+		public Operation DAMAGE_INCREASE_TYPE = Operation.MULTIPLY;
 	}
 
 	public ResistanceBoss(Plugin plugin, LivingEntity boss) {
@@ -32,7 +32,7 @@ public class ResistanceBoss extends BossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		if (!event.getType().equals(DamageEvent.DamageType.TRUE)) {
-			if (mParams.DAMAGE_INCREASE_TYPE.equals(ItemStatUtils.Operation.MULTIPLY)) {
+			if (mParams.DAMAGE_INCREASE_TYPE.equals(Operation.MULTIPLY)) {
 				if (mParams.UNIVERSAL_INCREASE || mParams.DAMAGE_TYPE.equals(event.getType())) {
 					event.setDamage(event.getDamage() * (1 + mParams.DAMAGE_INCREASE));
 				}

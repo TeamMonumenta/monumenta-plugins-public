@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageDealt;
 import com.playmonumenta.plugins.itemstats.enchantments.SKTQuestDamageTaken;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthApply;
 import com.playmonumenta.plugins.itemstats.enchantments.StrengthCancel;
+import com.playmonumenta.plugins.itemstats.enums.*;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Understanding;
 import com.playmonumenta.plugins.listeners.DamageListener;
@@ -19,11 +20,8 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Operation;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -156,14 +154,14 @@ public class ItemStatManager implements Listener {
 		private ItemStatsMap mMainhandAddStats = new ItemStatsMap();
 		private ItemStatsMap mStats = new ItemStatsMap();
 
-		private ItemStatUtils.Region mRegion;
+		private Region mRegion;
 
 		/**
 		 * The mainhand item held when these stats were last updated. Used to check for mainhand modifications by commands or similar.
 		 */
 		private @Nullable ItemStack mMainhand;
 
-		public PlayerItemStats(ItemStatUtils.Region region) {
+		public PlayerItemStats(Region region) {
 			mRegion = region;
 		}
 
@@ -185,11 +183,11 @@ public class ItemStatManager implements Listener {
 			return mMainhandAddStats;
 		}
 
-		public ItemStatUtils.Region getRegion() {
+		public Region getRegion() {
 			return mRegion;
 		}
 
-		public void setRegion(ItemStatUtils.Region region) {
+		public void setRegion(Region region) {
 			mRegion = region;
 		}
 
@@ -217,7 +215,7 @@ public class ItemStatManager implements Listener {
 			Bukkit.getScheduler().runTaskLater(plugin, () -> recalculateAntiSpeed(player), 1);
 		}
 
-		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll, @Nullable ItemStatUtils.Region region) {
+		public void updateStats(@Nullable ItemStack mainhand, @Nullable ItemStack offhand, @Nullable ItemStack head, @Nullable ItemStack chest, @Nullable ItemStack legs, @Nullable ItemStack feet, Player player, boolean updateAll, @Nullable Region region) {
 			mMainhand = mainhand;
 			mRegion = region != null ? region : ServerProperties.getRegion(player);
 
@@ -817,14 +815,14 @@ public class ItemStatManager implements Listener {
 			ReadableNBT enchantments = NBT.get(stack, nbt -> ItemStatUtils.getEnchantments(nbt));
 			ReadableNBT infusions = NBT.get(stack, nbt -> ItemStatUtils.getInfusions(nbt));
 
-			for (ItemStatUtils.EnchantmentType ench : ItemStatUtils.EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
+			for (EnchantmentType ench : EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
 				int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
 				if (level > 0) {
 					Objects.requireNonNull(ench.getItemStat()).onSpawn(mPlugin, item, level);
 				}
 			}
 
-			for (ItemStatUtils.InfusionType infusion : ItemStatUtils.InfusionType.SPAWNABLE_INFUSIONS) {
+			for (InfusionType infusion : InfusionType.SPAWNABLE_INFUSIONS) {
 				int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
 				if (level > 0) {
 					Objects.requireNonNull(infusion.getItemStat()).onSpawn(mPlugin, item, level);
@@ -844,27 +842,27 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
-	public static double getRegionScaling(Player player, ItemStatUtils.Region itemRegion, ItemStatUtils.Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
-		if (itemRegion == ItemStatUtils.Region.RING) {
-			return serverRegion == ItemStatUtils.Region.VALLEY ? twoRegionScaling
-				       : serverRegion == ItemStatUtils.Region.ISLES ? oneRegionScaling
+	public static double getRegionScaling(Player player, Region itemRegion, Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+		if (itemRegion == Region.RING) {
+			return serverRegion == Region.VALLEY ? twoRegionScaling
+				       : serverRegion == Region.ISLES ? oneRegionScaling
 					         : baseScaling;
-		} else if (itemRegion == ItemStatUtils.Region.ISLES) {
+		} else if (itemRegion == Region.ISLES) {
 			// TODO Remove this if-statement after we get rid of R2 in R3 penalty
-			if (serverRegion == ItemStatUtils.Region.RING
+			if (serverRegion == Region.RING
 				    && !(player.getScoreboardTags().contains("SKTQuest") && ServerProperties.getShardName().startsWith("skt"))
 				    && !(ServerProperties.getShardName().startsWith("dev") || ServerProperties.getShardName().contains("plots") || ServerProperties.getShardName().equals("mobs") || player.getGameMode() == GameMode.CREATIVE)) {
 				return oneRegionScaling;
 			}
-			return serverRegion == ItemStatUtils.Region.VALLEY ? oneRegionScaling : baseScaling;
+			return serverRegion == Region.VALLEY ? oneRegionScaling : baseScaling;
 		}
 		return baseScaling;
 	}
 
-	public static double getEffectiveRegionScaling(Player player, ItemStack item, ItemStatUtils.Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
-		ItemStatUtils.Region region;
+	public static double getEffectiveRegionScaling(Player player, ItemStack item, Region serverRegion, double baseScaling, double oneRegionScaling, double twoRegionScaling) {
+		Region region;
 		if (item == null || ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)) {
-			region = ItemStatUtils.Region.VALLEY;
+			region = Region.VALLEY;
 		} else {
 			region = ItemStatUtils.getRegion(item);
 		}

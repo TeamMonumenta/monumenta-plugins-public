@@ -4,13 +4,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.ArrayList;
@@ -143,10 +144,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	};
 
 	private static final int REGION_SETTING_SLOT = 4;
-	public static final ImmutableMap<ItemStatUtils.Region, ItemStack> REGION_ICONS = ImmutableMap.of(
-		ItemStatUtils.Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
-		ItemStatUtils.Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
-		ItemStatUtils.Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Calculation Region: Architect\\\\u0027s Ring\"}'}}}")
+	public static final ImmutableMap<Region, ItemStack> REGION_ICONS = ImmutableMap.of(
+		Region.VALLEY, ItemUtils.parseItemStack("{id:\"minecraft:cyan_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"sc\",Color:3},{Pattern:\"mc\",Color:11},{Pattern:\"flo\",Color:15},{Pattern:\"bts\",Color:11},{Pattern:\"tts\",Color:11}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: King\\'s Valley\",\"italic\":false,\"bold\":true,\"color\":\"aqua\"}'}}}"),
+		Region.ISLES, ItemUtils.parseItemStack("{id:\"minecraft:green_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"gru\",Color:5},{Pattern:\"bo\",Color:13},{Pattern:\"mr\",Color:13},{Pattern:\"mc\",Color:5}]},HideFlags:63,display:{Name:'{\"text\":\"Calculation Region: Celsian Isles\",\"italic\":false,\"bold\":true,\"color\":\"green\"}'}}}"),
+		Region.RING, ItemUtils.parseItemStack("{id:\"minecraft:white_banner\",Count:1b,tag:{BlockEntityTag:{Patterns:[{Pattern:\"ss\",Color:12},{Pattern:\"bts\",Color:13},{Pattern:\"tts\",Color:13},{Pattern:\"gra\",Color:8},{Pattern:\"ms\",Color:13},{Pattern:\"gru\",Color:7},{Pattern:\"flo\",Color:15},{Pattern:\"mc\",Color:0}]},HideFlags:63,display:{Name:'{\"bold\":true,\"italic\":false,\"underlined\":false,\"color\":\"white\",\"text\":\"Calculation Region: Architect\\\\u0027s Ring\"}'}}}")
 	);
 
 	private static final int SWAP_EQUIPMENT_SET_SLOT = 49;
@@ -176,7 +177,7 @@ public class PlayerItemStatsGUI extends CustomInventory {
 		if (otherPlayer != null) {
 			setEquipmentFromPlayer(true, otherPlayer);
 		}
-		ItemStatUtils.Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion(player)), mRightStats.getMaximumRegion(false, ServerProperties.getRegion(player)))
+		Region region = Stream.of(mLeftStats.getMaximumRegion(false, ServerProperties.getRegion(player)), mRightStats.getMaximumRegion(false, ServerProperties.getRegion(player)))
 			                              .max(Comparator.naturalOrder())
 			                              .orElse(ServerProperties.getRegion(player));
 		mLeftStats.mPlayerItemStats.setRegion(region);
@@ -275,9 +276,9 @@ public class PlayerItemStatsGUI extends CustomInventory {
 			}
 
 			if (slot == REGION_SETTING_SLOT) {
-				ItemStatUtils.Region region = mLeftStats.mPlayerItemStats.getRegion() == ItemStatUtils.Region.VALLEY ? ItemStatUtils.Region.ISLES
-					                              : mLeftStats.mPlayerItemStats.getRegion() == ItemStatUtils.Region.ISLES ? ItemStatUtils.Region.RING
-						                                : ItemStatUtils.Region.VALLEY;
+				Region region = mLeftStats.mPlayerItemStats.getRegion() == Region.VALLEY ? Region.ISLES
+					                              : mLeftStats.mPlayerItemStats.getRegion() == Region.ISLES ? Region.RING
+						                                : Region.VALLEY;
 				mLeftStats.mPlayerItemStats.setRegion(region);
 				mRightStats.mPlayerItemStats.setRegion(region);
 				generateInventory();

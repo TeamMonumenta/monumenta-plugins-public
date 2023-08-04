@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.guis.Gui;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.listeners.QuiverListener;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -178,8 +179,8 @@ public class CustomContainerItemManager implements Listener {
 	}
 
 	private static boolean checkSoulbound(Player player, ItemStack item) {
-		if (ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SOULBOUND) > 0
-			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, ItemStatUtils.InfusionType.SOULBOUND))) {
+		if (ItemStatUtils.getInfusionLevel(item, InfusionType.SOULBOUND) > 0
+			    && !player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
 			player.sendMessage(Component.text("This " + ItemUtils.getPlainName(item) + " does not belong to you!", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 			return false;
@@ -446,7 +447,7 @@ public class CustomContainerItemManager implements Listener {
 			CustomContainerItemConfiguration configuration = getConfiguration(result);
 			if (configuration != null && configuration.soulBoundOnTrade() && trade.getOriginalResult() == null) {
 				result = ItemUtils.clone(result);
-				ItemStatUtils.addInfusion(result, ItemStatUtils.InfusionType.SOULBOUND, 1, event.getPlayer().getUniqueId());
+				ItemStatUtils.addInfusion(result, InfusionType.SOULBOUND, 1, event.getPlayer().getUniqueId());
 				MerchantRecipe newRecipe = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(),
 					recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice(), recipe.shouldIgnoreDiscounts());
 				newRecipe.setIngredients(recipe.getIngredients().stream().map(ItemUtils::clone).toList());

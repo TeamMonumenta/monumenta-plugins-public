@@ -5,9 +5,10 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.EnumSet;
@@ -39,8 +40,8 @@ public class EarthAspect implements Enchantment {
 	}
 
 	@Override
-	public EnumSet<ItemStatUtils.Slot> getSlots() {
-		return EnumSet.of(ItemStatUtils.Slot.MAINHAND, ItemStatUtils.Slot.PROJECTILE);
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND, Slot.PROJECTILE);
 	}
 
 	@Override

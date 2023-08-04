@@ -16,6 +16,8 @@ import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmsGUI;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
@@ -34,7 +36,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -672,7 +673,7 @@ public class PlayerListener implements Listener {
 		if (event.getClick() == ClickType.SWAP_OFFHAND
 			    && event.getClickedInventory() == player.getInventory()
 			    && ItemUtils.isNullOrAir(event.getCursor())
-			    && ItemStatUtils.hasEnchantment(item, ItemStatUtils.EnchantmentType.MULTITOOL)) {
+			    && ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)) {
 			Multitool.swap(mPlugin, (Player) event.getWhoClicked(), item);
 			GUIUtils.refreshOffhand(event);
 		}
@@ -1533,7 +1534,7 @@ public class PlayerListener implements Listener {
 				String matStr = mat.getKey().toString();
 
 				ItemMeta meta = item.getItemMeta();
-				if (meta != null && meta.hasLore() && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.MATERIAL) == 0) {
+				if (meta != null && meta.hasLore() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.MATERIAL) == 0) {
 					cancel = true;
 				} else {
 					if (matStr.endsWith("_dye")) {

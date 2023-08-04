@@ -18,6 +18,8 @@ import com.playmonumenta.plugins.itemstats.enchantments.JunglesNourishment;
 import com.playmonumenta.plugins.itemstats.enchantments.LiquidCourage;
 import com.playmonumenta.plugins.itemstats.enchantments.RageOfTheKeter;
 import com.playmonumenta.plugins.itemstats.enchantments.TemporalBender;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -47,12 +49,12 @@ public class VirtualItemsReplacer extends PacketAdapter {
 	public static final String IS_VIRTUAL_ITEM_NBT_KEY = "IsVirtualItem";
 
 	// Map of Infinity Food Enchantments to their virtual cooldown items
-	private static final ImmutableMap<ItemStatUtils.EnchantmentType, Material> FOOD_COOLDOWN_ITEMS = ImmutableMap.<ItemStatUtils.EnchantmentType, Material>builder()
-		.put(ItemStatUtils.EnchantmentType.JUNGLES_NOURISHMENT, JunglesNourishment.COOLDOWN_ITEM)
-		.put(ItemStatUtils.EnchantmentType.RAGE_OF_THE_KETER, RageOfTheKeter.COOLDOWN_ITEM)
-		.put(ItemStatUtils.EnchantmentType.TEMPORAL_BENDER, TemporalBender.COOLDOWN_ITEM)
-		.put(ItemStatUtils.EnchantmentType.INTOXICATING_WARMTH, IntoxicatingWarmth.COOLDOWN_ITEM)
-		.put(ItemStatUtils.EnchantmentType.LIQUID_COURAGE, LiquidCourage.COOLDOWN_ITEM)
+	private static final ImmutableMap<EnchantmentType, Material> FOOD_COOLDOWN_ITEMS = ImmutableMap.<EnchantmentType, Material>builder()
+		.put(EnchantmentType.JUNGLES_NOURISHMENT, JunglesNourishment.COOLDOWN_ITEM)
+		.put(EnchantmentType.RAGE_OF_THE_KETER, RageOfTheKeter.COOLDOWN_ITEM)
+		.put(EnchantmentType.TEMPORAL_BENDER, TemporalBender.COOLDOWN_ITEM)
+		.put(EnchantmentType.INTOXICATING_WARMTH, IntoxicatingWarmth.COOLDOWN_ITEM)
+		.put(EnchantmentType.LIQUID_COURAGE, LiquidCourage.COOLDOWN_ITEM)
 		.build();
 
 	private final Plugin mPlugin;
@@ -166,7 +168,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				}
 
 				// Virtual cooldown items for Infinity food
-				for (Map.Entry<ItemStatUtils.EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
+				for (Map.Entry<EnchantmentType, Material> entry : FOOD_COOLDOWN_ITEMS.entrySet()) {
 					if (mPlugin.mEffectManager.hasEffect(player, ItemCooldown.toSource(entry.getKey())) && ItemStatUtils.getEnchantmentLevel(itemStack, entry.getKey()) > 0) {
 						itemStack.setType(entry.getValue());
 						markVirtual(itemStack);
@@ -259,7 +261,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			if (customName != null) {
 				String prefix;
 				String suffix;
-				if (ItemStatUtils.getRegion(itemStack) == ItemStatUtils.Region.SHULKER_BOX) {
+				if (ItemStatUtils.getRegion(itemStack) == Region.SHULKER_BOX) {
 					prefix = "`";
 					suffix = "´";
 				} else {

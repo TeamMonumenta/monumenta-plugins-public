@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.playmonumenta.plugins.Constants;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.NmsUtils;

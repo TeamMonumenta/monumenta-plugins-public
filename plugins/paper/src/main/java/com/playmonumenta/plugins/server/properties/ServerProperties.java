@@ -5,8 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.utils.DungeonUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -425,7 +425,7 @@ public class ServerProperties {
 		}
 	}
 
-	public static ItemStatUtils.Region getRegion(Player player) {
-		return ServerProperties.getAbilityEnhancementsEnabled(player) ? ItemStatUtils.Region.RING : ServerProperties.getClassSpecializationsEnabled(player) ? ItemStatUtils.Region.ISLES : ItemStatUtils.Region.VALLEY;
+	public static Region getRegion(Player player) {
+		return ServerProperties.getAbilityEnhancementsEnabled(player) ? Region.RING : ServerProperties.getClassSpecializationsEnabled(player) ? Region.ISLES : Region.VALLEY;
 	}
 }

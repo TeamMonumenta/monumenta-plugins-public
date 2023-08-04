@@ -5,11 +5,11 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -35,8 +35,8 @@ public class Reverb implements Enchantment {
 	private @Nullable LivingEntity mEntity;
 
 	@Override
-	public ItemStatUtils.EnchantmentType getEnchantmentType() {
-		return ItemStatUtils.EnchantmentType.REVERB;
+	public EnchantmentType getEnchantmentType() {
+		return EnchantmentType.REVERB;
 	}
 
 	@Override

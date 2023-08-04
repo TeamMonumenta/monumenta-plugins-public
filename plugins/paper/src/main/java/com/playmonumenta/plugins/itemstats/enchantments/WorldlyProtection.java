@@ -3,10 +3,11 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Slot;
+
 import java.util.EnumSet;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -42,7 +43,7 @@ public class WorldlyProtection implements Enchantment {
 		event.setDamage(event.getDamage() * getDamageMultiplier(value, ServerProperties.getRegion(player)));
 	}
 
-	public static double getDamageMultiplier(double level, ItemStatUtils.Region region) {
+	public static double getDamageMultiplier(double level, Region region) {
 		return switch (region) {
 			case RING -> 1 - level * DAMAGE_MULTIPLIER_R3;
 			case ISLES -> 1 - level * DAMAGE_MULTIPLIER_R2;

@@ -1,8 +1,8 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
 import com.playmonumenta.plugins.utils.MasterworkUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import dev.jorel.commandapi.CommandAPI;

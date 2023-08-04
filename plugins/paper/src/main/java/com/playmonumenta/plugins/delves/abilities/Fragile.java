@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.delves.abilities;
 
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.entity.Player;
@@ -21,7 +22,7 @@ public class Fragile {
 		}
 		for (int i = 36; i <= 40; i++) {
 			ItemStack item = player.getInventory().getContents()[i];
-			if (item == null || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE) {
+			if (item == null || ItemStatUtils.getTier(item) == Tier.NONE) {
 				continue;
 			}
 			Shattered.shatter(item, 1);

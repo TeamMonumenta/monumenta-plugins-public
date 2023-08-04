@@ -16,13 +16,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
@@ -429,7 +429,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getDamage(ItemStatManager.PlayerItemStats playerItemStats) {
-		return playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.POTION_DAMAGE.getItemStat());
+		return playerItemStats.getItemStats().get(AttributeType.POTION_DAMAGE.getItemStat());
 	}
 
 	public double getRadius() {
@@ -437,7 +437,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getRadius(ItemStatManager.PlayerItemStats playerItemStats) {
-		return CharmManager.getRadius(mPlayer, CHARM_RADIUS, playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.POTION_RADIUS.getItemStat()));
+		return CharmManager.getRadius(mPlayer, CHARM_RADIUS, playerItemStats.getItemStats().get(AttributeType.POTION_RADIUS.getItemStat()));
 	}
 
 	public double getSpeed() {
@@ -445,7 +445,7 @@ public class AlchemistPotions extends Ability implements AbilityWithChargesOrSta
 	}
 
 	public double getSpeed(ItemStatManager.PlayerItemStats playerItemStats) {
-		return playerItemStats.getItemStats().get(ItemStatUtils.AttributeType.PROJECTILE_SPEED.getItemStat());
+		return playerItemStats.getItemStats().get(AttributeType.PROJECTILE_SPEED.getItemStat());
 	}
 
 	@Override

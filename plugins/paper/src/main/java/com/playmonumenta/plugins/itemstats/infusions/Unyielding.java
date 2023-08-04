@@ -2,8 +2,7 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import java.util.Collection;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -21,7 +20,7 @@ public class Unyielding implements Infusion {
 	}
 
 	@Override
-	public ItemStatUtils.InfusionType getInfusionType() {
+	public InfusionType getInfusionType() {
 		return InfusionType.UNYIELDING;
 	}
 
@@ -36,7 +35,7 @@ public class Unyielding implements Infusion {
 				}
 			}
 		}
-		double level = plugin.mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.UNYIELDING);
+		double level = plugin.mItemStatManager.getInfusionLevel(player, InfusionType.UNYIELDING);
 		if (level > 0) {
 			AttributeInstance knockBack = player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
 			if (knockBack != null) {

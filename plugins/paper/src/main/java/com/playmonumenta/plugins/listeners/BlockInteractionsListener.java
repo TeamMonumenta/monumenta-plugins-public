@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.listeners;
 
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -112,7 +113,7 @@ public final class BlockInteractionsListener implements Listener {
 			       && !ServerProperties.getIsTownWorld() // allow using item frames/armor stands in plots without having to disable this feature
 			       && playerItem != null // null/empty hand: takes an item from an armor stand and is allowed
 			       && !playerItem.getType().isAir()
-			       && ItemStatUtils.getTier(playerItem) != ItemStatUtils.Tier.KEYTIER // allow placing key items in item frames and on armor stands
+			       && ItemStatUtils.getTier(playerItem) != Tier.KEYTIER // allow placing key items in item frames and on armor stands
 			       && player.getScoreboardTags().contains(DISABLE_TAG);
 	}
 

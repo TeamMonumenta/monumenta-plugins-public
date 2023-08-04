@@ -2,8 +2,8 @@ package com.playmonumenta.plugins.abilities;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,7 +29,7 @@ public class AbilityTriggerInfo<T extends Ability> {
 		new TriggerRestriction("not holding a projectile weapon", player -> !ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()));
 
 	public static final TriggerRestriction HOLDING_MAGIC_WAND_RESTRICTION =
-		new TriggerRestriction("holding a wand", player -> Plugin.getInstance().mItemStatManager.getPlayerItemStats(player).getItemStats().get(ItemStatUtils.EnchantmentType.MAGIC_WAND) > 0);
+		new TriggerRestriction("holding a wand", player -> Plugin.getInstance().mItemStatManager.getPlayerItemStats(player).getItemStats().get(EnchantmentType.MAGIC_WAND) > 0);
 	public static final TriggerRestriction HOLDING_SCYTHE_RESTRICTION =
 		new TriggerRestriction("holding a scythe", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()));
 	public static final TriggerRestriction HOLDING_TWO_SWORDS_RESTRICTION =

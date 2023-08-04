@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import de.tr7zw.nbtapi.NBTItem;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
@@ -27,13 +28,13 @@ public class Multiload implements Enchantment {
 	}
 
 	@Override
-	public ItemStatUtils.EnchantmentType getEnchantmentType() {
-		return ItemStatUtils.EnchantmentType.MULTILOAD;
+	public EnchantmentType getEnchantmentType() {
+		return EnchantmentType.MULTILOAD;
 	}
 
 	@Override
-	public EnumSet<ItemStatUtils.Slot> getSlots() {
-		return EnumSet.of(ItemStatUtils.Slot.MAINHAND);
+	public EnumSet<Slot> getSlots() {
+		return EnumSet.of(Slot.MAINHAND);
 	}
 
 	@Override

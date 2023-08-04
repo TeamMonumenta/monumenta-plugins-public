@@ -2,12 +2,13 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.protocollib.FirmamentLagFix;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -132,7 +133,7 @@ public class FirmamentOverride {
 					}
 
 					//Stat tracking for firmament
-					StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_BLOCKS, 1);
+					StatTrackManager.getInstance().incrementStatImmediately(item, player, InfusionType.STAT_TRACK_BLOCKS, 1);
 
 					// Prevent sending block update packets for neighbors of the placed block
 					FirmamentLagFix.firmamentUsed(event.getBlock());

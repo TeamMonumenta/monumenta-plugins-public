@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.commands.experiencinator;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.EnumMap;
 import java.util.Map;

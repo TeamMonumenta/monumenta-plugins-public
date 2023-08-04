@@ -16,6 +16,9 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
 import com.playmonumenta.plugins.inventories.ShulkerInventoryManager;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
@@ -84,25 +87,25 @@ public class LoadoutManager implements Listener {
 	/**
 	 * Set of locations that are to be considered "exalted" in r3, i.e. such items will only be selected by the armory if the {@link LoadoutItem#mIsExalted exalted} flag is set.
 	 */
-	private static final ImmutableSet<ItemStatUtils.Location> EXALTED_LOCATIONS = ImmutableSet.of(
+	private static final ImmutableSet<Location> EXALTED_LOCATIONS = ImmutableSet.of(
 		// Region 1
-		ItemStatUtils.Location.LABS, ItemStatUtils.Location.WHITE, ItemStatUtils.Location.ORANGE, ItemStatUtils.Location.MAGENTA,
-		ItemStatUtils.Location.LIGHTBLUE, ItemStatUtils.Location.YELLOW, ItemStatUtils.Location.REVERIE,
-		ItemStatUtils.Location.WILLOWS, ItemStatUtils.Location.WILLOWSKIN, ItemStatUtils.Location.EPHEMERAL, ItemStatUtils.Location.EPHEMERAL_ENHANCEMENTS,
-		ItemStatUtils.Location.SANCTUM, ItemStatUtils.Location.VERDANT, ItemStatUtils.Location.VERDANTSKIN,
-		ItemStatUtils.Location.AZACOR, ItemStatUtils.Location.KAUL, ItemStatUtils.Location.DIVINE, ItemStatUtils.Location.ROYAL,
+		Location.LABS, Location.WHITE, Location.ORANGE, Location.MAGENTA,
+		Location.LIGHTBLUE, Location.YELLOW, Location.REVERIE,
+		Location.WILLOWS, Location.WILLOWSKIN, Location.EPHEMERAL, Location.EPHEMERAL_ENHANCEMENTS,
+		Location.SANCTUM, Location.VERDANT, Location.VERDANTSKIN,
+		Location.AZACOR, Location.KAUL, Location.DIVINE, Location.ROYAL,
 
 		// Region 2
-		ItemStatUtils.Location.LIME, ItemStatUtils.Location.PINK, ItemStatUtils.Location.GRAY, ItemStatUtils.Location.LIGHTGRAY,
-		ItemStatUtils.Location.CYAN, ItemStatUtils.Location.PURPLE, ItemStatUtils.Location.TEAL, ItemStatUtils.Location.SHIFTING,
-		ItemStatUtils.Location.FORUM,
-		ItemStatUtils.Location.MIST, ItemStatUtils.Location.HOARD, ItemStatUtils.Location.GREEDSKIN,
-		ItemStatUtils.Location.REMORSE, ItemStatUtils.Location.REMORSEFULSKIN, ItemStatUtils.Location.VIGIL,
-		ItemStatUtils.Location.DEPTHS,
-		ItemStatUtils.Location.HORSEMAN, ItemStatUtils.Location.HALLOWEENSKIN,
-		ItemStatUtils.Location.FROSTGIANT, ItemStatUtils.Location.TITANICSKIN,
-		ItemStatUtils.Location.LICH, ItemStatUtils.Location.ETERNITYSKIN,
-		ItemStatUtils.Location.RUSH, ItemStatUtils.Location.TREASURE, ItemStatUtils.Location.INTELLECT
+		Location.LIME, Location.PINK, Location.GRAY, Location.LIGHTGRAY,
+		Location.CYAN, Location.PURPLE, Location.TEAL, Location.SHIFTING,
+		Location.FORUM,
+		Location.MIST, Location.HOARD, Location.GREEDSKIN,
+		Location.REMORSE, Location.REMORSEFULSKIN, Location.VIGIL,
+		Location.DEPTHS,
+		Location.HORSEMAN, Location.HALLOWEENSKIN,
+		Location.FROSTGIANT, Location.TITANICSKIN,
+		Location.LICH, Location.ETERNITYSKIN,
+		Location.RUSH, Location.TREASURE, Location.INTELLECT
 	);
 
 	private final Map<UUID, LoadoutData> mData = new HashMap<>();
@@ -452,7 +455,7 @@ public class LoadoutManager implements Listener {
 			return false;
 		}
 		return loadoutItem.mIdentifier.isIdentifierFor(item, !matchInfusion)
-			       && (!EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) || loadoutItem.mIsExalted == (ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING))
+			       && (!EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) || loadoutItem.mIsExalted == (ItemStatUtils.getRegion(item) == Region.RING))
 			       && (!matchInfusion || loadoutItem.mInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mInfusionType))
 			       && (!matchInfusion || loadoutItem.mDelveInfusionType == null || ItemStatUtils.hasInfusion(item, loadoutItem.mDelveInfusionType));
 	}
@@ -655,7 +658,7 @@ public class LoadoutManager implements Listener {
 				ItemStack item = contents[i];
 				if (item != null && !item.getType().isAir() && !isEquipmentStorageBox(item)) {
 					mEquipment.add(new LoadoutItem(i, ItemUtils.getIdentifier(item, false),
-						EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) && ItemStatUtils.getRegion(item) == ItemStatUtils.Region.RING,
+						EXALTED_LOCATIONS.contains(ItemStatUtils.getLocation(item)) && ItemStatUtils.getRegion(item) == Region.RING,
 						InfusionUtils.getCurrentInfusion(item).getInfusionType(),
 						Objects.requireNonNullElse(DelveInfusionUtils.getCurrentInfusion(item), DelveInfusionUtils.DelveInfusionSelection.REFUND).getInfusionType()));
 				}
@@ -823,10 +826,10 @@ public class LoadoutManager implements Listener {
 		public int mSlot;
 		public ItemUtils.ItemIdentifier mIdentifier; // TODO r3 exalted items
 		public boolean mIsExalted;
-		public @Nullable ItemStatUtils.InfusionType mInfusionType;
-		public @Nullable ItemStatUtils.InfusionType mDelveInfusionType;
+		public @Nullable InfusionType mInfusionType;
+		public @Nullable InfusionType mDelveInfusionType;
 
-		public LoadoutItem(int slot, ItemUtils.ItemIdentifier identifier, boolean isExalted, @Nullable ItemStatUtils.InfusionType infusionType, @Nullable ItemStatUtils.InfusionType delveInfusionType) {
+		public LoadoutItem(int slot, ItemUtils.ItemIdentifier identifier, boolean isExalted, @Nullable InfusionType infusionType, @Nullable InfusionType delveInfusionType) {
 			mSlot = slot;
 			mIdentifier = identifier;
 			mIsExalted = isExalted;
@@ -849,17 +852,17 @@ public class LoadoutManager implements Listener {
 			int slot = json.getAsJsonPrimitive("slot").getAsInt();
 			ItemUtils.ItemIdentifier identifier = parseItemIdentifier(json, "type", "name");
 			boolean exalted = json.has("exalted") && json.getAsJsonPrimitive("exalted").getAsBoolean();
-			ItemStatUtils.InfusionType infusion;
+			InfusionType infusion;
 			try {
 				JsonPrimitive infusionElement = json.getAsJsonPrimitive("infusion");
-				infusion = infusionElement == null ? null : ItemStatUtils.InfusionType.valueOf(infusionElement.getAsString());
+				infusion = infusionElement == null ? null : InfusionType.valueOf(infusionElement.getAsString());
 			} catch (IllegalArgumentException e) {
 				infusion = null;
 			}
-			ItemStatUtils.InfusionType delveInfusion;
+			InfusionType delveInfusion;
 			try {
 				JsonPrimitive infusionElement = json.getAsJsonPrimitive("delveInfusion");
-				delveInfusion = infusionElement == null ? null : ItemStatUtils.InfusionType.valueOf(infusionElement.getAsString());
+				delveInfusion = infusionElement == null ? null : InfusionType.valueOf(infusionElement.getAsString());
 			} catch (IllegalArgumentException e) {
 				delveInfusion = null;
 			}

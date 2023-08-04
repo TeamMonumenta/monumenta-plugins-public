@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.PlayerListener;
@@ -420,7 +421,7 @@ public final class Grave {
 					boolean hasEnderChest = ItemUtils.hasPortableEnder(player);
 					equipmentLoop:
 					for (ItemStack graveEquipment : mEquipment.values()) {
-						if (ItemStatUtils.getInfusionLevel(graveEquipment, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {
+						if (ItemStatUtils.getInfusionLevel(graveEquipment, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL) {
 							continue;
 						}
 						ItemUtils.ItemIdentifier identifier = ItemUtils.getIdentifier(graveEquipment, true);

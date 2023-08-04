@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -57,7 +58,7 @@ public class GiveSoulbound extends GenericCommand {
 	}
 
 	private static void give(Player player, ItemStack stack) {
-		ItemStatUtils.addInfusion(stack, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId());
+		ItemStatUtils.addInfusion(stack, InfusionType.SOULBOUND, 1, player.getUniqueId());
 		InventoryUtils.giveItem(player, stack);
 	}
 }

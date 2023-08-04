@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 
 public class NoGlint implements Enchantment {
 
@@ -11,7 +11,7 @@ public class NoGlint implements Enchantment {
 	}
 
 	@Override
-	public ItemStatUtils.EnchantmentType getEnchantmentType() {
-		return ItemStatUtils.EnchantmentType.NO_GLINT;
+	public EnchantmentType getEnchantmentType() {
+		return EnchantmentType.NO_GLINT;
 	}
 }

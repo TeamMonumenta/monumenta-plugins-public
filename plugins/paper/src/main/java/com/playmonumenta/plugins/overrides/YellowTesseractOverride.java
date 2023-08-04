@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory;
 import com.playmonumenta.plugins.effects.AbilitySilence;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -118,7 +120,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		}
 
 		// This tesseract is not updated or otherwise broken, replace it with a fresh one
-		if (ItemStatUtils.getTier(item) != ItemStatUtils.Tier.UNIQUE) {
+		if (ItemStatUtils.getTier(item) != Tier.UNIQUE) {
 			setToBlankTesseract(player, item);
 			player.sendMessage(ChatColor.RED + "Your Tesseract had incorrect data, so it has been replaced. Only report this if it happens multiple times on the same Tesseract or if the replacement does not function.");
 			return false;
@@ -202,7 +204,7 @@ public class YellowTesseractOverride extends BaseOverride {
 	private static void storeSkills(Player player, ItemStack item) {
 		item.setItemMeta(generateAbilityLore(player, item));
 
-		ItemStatUtils.addInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, 1, player.getUniqueId(), false);
+		ItemStatUtils.addInfusion(item, InfusionType.SOULBOUND, 1, player.getUniqueId(), false);
 
 		ItemMeta meta = item.getItemMeta();
 		meta.displayName(CONFIGURED);
@@ -222,7 +224,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		NBTItem nbt = new NBTItem(item);
 		List<String> lore = ItemStatUtils.getPlainLore(nbt);
 
-		ItemStatUtils.removeInfusion(item, ItemStatUtils.InfusionType.SOULBOUND, false);
+		ItemStatUtils.removeInfusion(item, InfusionType.SOULBOUND, false);
 		for (int i = lore.size() - 1; i >= 0; --i) {
 			String line = lore.get(i);
 			if (line.startsWith(CLASS_STR)

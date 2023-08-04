@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.custominventories;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.infusions.Acumen;
 import com.playmonumenta.plugins.itemstats.infusions.Focus;
 import com.playmonumenta.plugins.itemstats.infusions.Perspicacity;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils.InfusionSelection;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;

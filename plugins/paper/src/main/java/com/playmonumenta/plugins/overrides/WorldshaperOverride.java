@@ -3,12 +3,13 @@ package com.playmonumenta.plugins.overrides;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.ItemCooldown;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -290,7 +291,7 @@ public class WorldshaperOverride {
 			plugin.mEffectManager.addEffect(player, COOLDOWN_SOURCE, new ItemCooldown(cooldown, item, COOLDOWN_ITEM, plugin));
 
 			// update stat track
-			StatTrackManager.getInstance().incrementStatImmediately(item, player, ItemStatUtils.InfusionType.STAT_TRACK_BLOCKS, blocksPlaced);
+			StatTrackManager.getInstance().incrementStatImmediately(item, player, InfusionType.STAT_TRACK_BLOCKS, blocksPlaced);
 		}
 		return false;
 	}

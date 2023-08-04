@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Experiencinator;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Tier;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.io.File;
@@ -171,7 +171,7 @@ public abstract class ExperiencinatorUtils {
 		if (!soldSomething) {
 			player.sendRawMessage(ChatColor.AQUA + "No items were converted.");
 		} else {
-			StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, ItemStatUtils.InfusionType.STAT_TRACK_CONVERT, soldItems);
+			StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, InfusionType.STAT_TRACK_CONVERT, soldItems);
 			player.updateInventory();
 		}
 

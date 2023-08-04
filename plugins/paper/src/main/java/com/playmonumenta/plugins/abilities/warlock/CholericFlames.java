@@ -13,11 +13,11 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
@@ -102,7 +102,7 @@ public class CholericFlames extends Ability {
 			if (isEnhanced()) {
 				int debuffs = Math.min(AbilityUtils.getDebuffCount(mPlugin, mob) / 2, maxDebuffs);
 				if (debuffs > 0) {
-					playerItemStats.getItemStats().add(Objects.requireNonNull(ItemStatUtils.EnchantmentType.INFERNO.getItemStat()), debuffs);
+					playerItemStats.getItemStats().add(Objects.requireNonNull(EnchantmentType.INFERNO.getItemStat()), debuffs);
 				}
 				mPlugin.mEffectManager.addEffect(mob, SPREAD_EFFECT_ON_DEATH_EFFECT, new SpreadEffectOnDeath(SPREAD_EFFECT_DURATION, Inferno.INFERNO_EFFECT_NAME, spreadRadius, SPREAD_EFFECT_DURATION_APPLIED, false));
 			}

@@ -5,6 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -203,10 +205,10 @@ public class GraveManager {
 		if (equipment.entrySet().stream().filter(e -> e.getKey() != EquipmentSlot.HAND)
 			    .map(Map.Entry::getValue)
 			    .allMatch(item -> ItemUtils.isNullOrAir(item)
-				                      || ItemStatUtils.getTier(item) == ItemStatUtils.Tier.NONE
-				                      || ItemStatUtils.getInfusionLevel(item, ItemStatUtils.InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
+				                      || ItemStatUtils.getTier(item) == Tier.NONE
+				                      || ItemStatUtils.getInfusionLevel(item, InfusionType.SHATTERED) >= Shattered.MAX_LEVEL)) {
 			// Check Lich infusion
-			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, ItemStatUtils.InfusionType.PHYLACTERY) == 0
+			if (Plugin.getInstance().mItemStatManager.getInfusionLevel(player, InfusionType.PHYLACTERY) == 0
 				    || ScoreboardUtils.getScoreboardValue(player, Phylactery.GRAVE_XP_SCOREBOARD).orElse(0) == 0) {
 				player.sendMessage(Component.text("You died but had nothing equipped that could shatter, so no grave was created nor were equipped items shattered further. ", NamedTextColor.GRAY)
 					                   .append(Component.text("(/help death for more info)", NamedTextColor.GRAY).clickEvent(ClickEvent.runCommand("/help death"))));
@@ -258,7 +260,7 @@ public class GraveManager {
 			ThrownItem item = THROWN_ITEMS.remove(entity.getUniqueId());
 			if (item.isValid()) {
 				item.onDestroyItem();
-				if (ItemStatUtils.getInfusionLevel(item.mItem, ItemStatUtils.InfusionType.HOPE) <= 0) {
+				if (ItemStatUtils.getInfusionLevel(item.mItem, InfusionType.HOPE) <= 0) {
 					Shattered.shatter(item.mItem, Shattered.DROPPED_ITEM_DESTROYED);
 				}
 				if (item.mItem.getAmount() > 0) {

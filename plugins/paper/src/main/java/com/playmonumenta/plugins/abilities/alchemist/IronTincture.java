@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.IronTinctureCS;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -117,7 +118,7 @@ public class IronTincture extends Ability {
 				.decoration(TextDecoration.ITALIC, false));
 		itemTincture.setItemMeta(tinctMeta);
 		// Add infinity enchantment so that potion injector cannot use it
-		ItemStatUtils.addEnchantment(itemTincture, ItemStatUtils.EnchantmentType.INFINITY, 1);
+		ItemStatUtils.addEnchantment(itemTincture, EnchantmentType.INFINITY, 1);
 		ItemUtils.setPlainName(itemTincture, mCosmetic.tinctureName());
 		World world = mPlayer.getWorld();
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);

@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.depths.abilities.aspects.WandAspect;
 import com.playmonumenta.plugins.depths.abilities.frostborn.Permafrost;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
@@ -156,7 +157,7 @@ public class DepthsUtils {
 	 */
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
 		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) ||
-			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || (item.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(item, ItemStatUtils.EnchantmentType.RIPTIDE) == 0));
+			ItemUtils.isWand(item) || ItemUtils.isHoe(item) || (item.getType() == Material.TRIDENT && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.RIPTIDE) == 0));
 	}
 
 	public static boolean isWeaponAspectAbility(String s) {

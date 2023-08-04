@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.listeners.AuditListener;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Masterwork;
-import com.playmonumenta.plugins.utils.ItemStatUtils.Region;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import java.util.ArrayList;

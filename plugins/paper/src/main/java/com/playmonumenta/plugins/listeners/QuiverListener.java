@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.inventories.CustomContainerItemGui;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -210,7 +211,7 @@ public class QuiverListener implements Listener {
 		if (event.getEntity() instanceof Player player
 			    && ItemStatUtils.isQuiver(event.getConsumable())) {
 			ItemStack quiver = event.getConsumable();
-			boolean hasInfinity = ItemStatUtils.hasEnchantment(event.getBow(), ItemStatUtils.EnchantmentType.INFINITY);
+			boolean hasInfinity = ItemStatUtils.hasEnchantment(event.getBow(), EnchantmentType.INFINITY);
 			Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, 1, item -> {
 				// infinity with normal arrows: don't consume
 				if (hasInfinity && item.getType() == Material.ARROW) {
@@ -282,7 +283,7 @@ public class QuiverListener implements Listener {
 				// Cancel the event as there's no way to change which projectile will be loaded
 				event.setCancelled(true);
 				if (crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta) {
-					int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(crossbow, ItemStatUtils.EnchantmentType.MULTILOAD);
+					int numProjectiles = 1 + ItemStatUtils.getEnchantmentLevel(crossbow, EnchantmentType.MULTILOAD);
 
 					// Crossbows refund arrows when being shot instead of not consuming arrows when being loaded
 					Pair<ItemStack, Boolean> projectile = takeFromQuiver(player, quiver, numProjectiles, is -> true);
@@ -295,7 +296,7 @@ public class QuiverListener implements Listener {
 						projectileItem.setAmount(1);
 					}
 					crossbowMeta.addChargedProjectile(projectileItem);
-					if (ItemStatUtils.hasEnchantment(crossbow, ItemStatUtils.EnchantmentType.MULTISHOT)) {
+					if (ItemStatUtils.hasEnchantment(crossbow, EnchantmentType.MULTISHOT)) {
 						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
 						crossbowMeta.addChargedProjectile(ItemUtils.clone(projectileItem));
 					}
@@ -372,7 +373,7 @@ public class QuiverListener implements Listener {
 	public static boolean attemptPickup(Player player, ItemStack itemStack) {
 		if (player.getGameMode() == GameMode.CREATIVE
 			    || !ItemUtils.isArrow(itemStack)
-			    || ItemStatUtils.getEnchantmentLevel(itemStack, ItemStatUtils.EnchantmentType.THROWING_KNIFE) > 0) {
+			    || ItemStatUtils.getEnchantmentLevel(itemStack, EnchantmentType.THROWING_KNIFE) > 0) {
 			return false;
 		}
 		for (ItemStack quiver : player.getInventory()) {

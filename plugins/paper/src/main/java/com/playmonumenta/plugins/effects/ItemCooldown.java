@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.effects;
 
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -93,7 +93,7 @@ public class ItemCooldown extends Effect {
 	 * @param enchantmentType input
 	 * @return "CD" + enchantmentName
 	 */
-	public static String toSource(ItemStatUtils.EnchantmentType enchantmentType) {
+	public static String toSource(EnchantmentType enchantmentType) {
 		return "CD" + enchantmentType.getName();
 	}
 

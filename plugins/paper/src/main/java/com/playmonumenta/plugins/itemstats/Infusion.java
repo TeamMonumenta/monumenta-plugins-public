@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.itemstats;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 
 public interface Infusion extends ItemStat {
 

@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.enchantments.RegionScalingDamageTaken
 import com.playmonumenta.plugins.itemstats.enchantments.SecondWind;
 import com.playmonumenta.plugins.itemstats.enchantments.Shielding;
 import com.playmonumenta.plugins.itemstats.enchantments.WorldlyProtection;
+import com.playmonumenta.plugins.itemstats.enums.*;
 import com.playmonumenta.plugins.itemstats.infusions.Carapace;
 import com.playmonumenta.plugins.itemstats.infusions.Choler;
 import com.playmonumenta.plugins.itemstats.infusions.Decapitation;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 class PSGUIStats {
 	final Player mPlayer;
-	final ItemStatManager.PlayerItemStats mPlayerItemStats = new ItemStatManager.PlayerItemStats(ItemStatUtils.Region.VALLEY);
+	final ItemStatManager.PlayerItemStats mPlayerItemStats = new ItemStatManager.PlayerItemStats(Region.VALLEY);
 	final EnumMap<PSGUIEquipment, ItemStack> mEquipment = new EnumMap<>(PSGUIEquipment.class);
 	final EnumMap<PSGUIEquipment, ItemStack> mDisplayedEquipment = new EnumMap<>(PSGUIEquipment.class);
 	final EnumMap<PSGUIEquipment, ItemStack> mOriginalEquipment = new EnumMap<>(PSGUIEquipment.class);
@@ -46,11 +47,11 @@ class PSGUIStats {
 		mSettings = settings;
 	}
 
-	double get(ItemStatUtils.AttributeType attr) {
+	double get(AttributeType attr) {
 		return mPlayerItemStats.getItemStats().get(attr.getItemStat());
 	}
 
-	double get(ItemStatUtils.EnchantmentType ench) {
+	double get(EnchantmentType ench) {
 		return mPlayerItemStats.getItemStats().get(ench.getItemStat());
 	}
 
@@ -69,8 +70,8 @@ class PSGUIStats {
 		return mInfusionSetting;
 	}
 
-	double getInfusion(ItemStatUtils.InfusionType infusion) {
-		if (infusion == ItemStatUtils.InfusionType.SHATTERED) {
+	double getInfusion(InfusionType infusion) {
+		if (infusion == InfusionType.SHATTERED) {
 			return mPlayerItemStats.getItemStats().get(infusion.getItemStat());
 		}
 		PlayerItemStatsGUI.InfusionSetting setting = getInfusionSetting();
@@ -81,7 +82,7 @@ class PSGUIStats {
 			}
 			double value = mPlayerItemStats.getItemStats().get(infusion.getItemStat());
 			if (infusion.isDelveInfusion() && value > 0) {
-				return Math.min(value, DelveInfusionUtils.MAX_LEVEL) + Math.min(DelveInfusionUtils.MAX_LEVEL, mPlayerItemStats.getItemStats().get(ItemStatUtils.InfusionType.UNDERSTANDING.getItemStat())) * Understanding.POINTS_PER_LEVEL;
+				return Math.min(value, DelveInfusionUtils.MAX_LEVEL) + Math.min(DelveInfusionUtils.MAX_LEVEL, mPlayerItemStats.getItemStats().get(InfusionType.UNDERSTANDING.getItemStat())) * Understanding.POINTS_PER_LEVEL;
 			}
 			return value;
 		} else if (setting.mInfusionType == infusion) {
@@ -90,19 +91,19 @@ class PSGUIStats {
 			}
 			return 24;
 		} else {
-			if (setting == PlayerItemStatsGUI.InfusionSetting.VITALITY && infusion == ItemStatUtils.InfusionType.TENACITY) {
+			if (setting == PlayerItemStatsGUI.InfusionSetting.VITALITY && infusion == InfusionType.TENACITY) {
 				return 4;
 			}
 			return 0;
 		}
 	}
 
-	double getMainhandAttributeAmount(ItemStatUtils.AttributeType type, ItemStatUtils.Operation operation) {
+	double getMainhandAttributeAmount(AttributeType type, Operation operation) {
 		ItemStack mainhand = getItem(PSGUIEquipment.MAINHAND);
-		return mainhand == null ? 0 : ItemStatUtils.getAttributeAmount(mainhand, type, operation, ItemStatUtils.Slot.MAINHAND);
+		return mainhand == null ? 0 : ItemStatUtils.getAttributeAmount(mainhand, type, operation, Slot.MAINHAND);
 	}
 
-	double getAttributeAmount(ItemStatUtils.AttributeType type, ItemStatUtils.Operation operation) {
+	double getAttributeAmount(AttributeType type, Operation operation) {
 		double result = 0;
 		for (PSGUIEquipment slot : PSGUIEquipment.values()) {
 			ItemStack item = getItem(slot);
@@ -111,18 +112,18 @@ class PSGUIStats {
 		return result;
 	}
 
-	double getAttributeAmount(ItemStatUtils.AttributeType type, double base) {
+	double getAttributeAmount(AttributeType type, double base) {
 		return getAttributeAmount(type, base, 0);
 	}
 
-	double getAttributeAmount(ItemStatUtils.AttributeType type, double base, double additionalModifier) {
-		return (base + getAttributeAmount(type, ItemStatUtils.Operation.ADD)) * (1 + getAttributeAmount(type, ItemStatUtils.Operation.MULTIPLY) + additionalModifier);
+	double getAttributeAmount(AttributeType type, double base, double additionalModifier) {
+		return (base + getAttributeAmount(type, Operation.ADD)) * (1 + getAttributeAmount(type, Operation.MULTIPLY) + additionalModifier);
 	}
 
-	ItemStatUtils.Region getMaximumRegion(boolean mainhand, ItemStatUtils.Region defaultRegion) {
+	Region getMaximumRegion(boolean mainhand, Region defaultRegion) {
 		return (mainhand ? Stream.of(PSGUIEquipment.MAINHAND) : Arrays.stream(PSGUIEquipment.values()).filter(slot -> slot != PSGUIEquipment.MAINHAND))
 			       .map(slot -> ItemStatUtils.getRegion(getItem(slot)))
-			       .filter(region -> region == ItemStatUtils.Region.VALLEY || region == ItemStatUtils.Region.ISLES || region == ItemStatUtils.Region.RING)
+			       .filter(region -> region == Region.VALLEY || region == Region.ISLES || region == Region.RING)
 			       .max(Comparator.naturalOrder())
 			       .orElse(defaultRegion);
 	}
@@ -149,27 +150,27 @@ class PSGUIStats {
 
 		double result = 1.0;
 
-		if (getInfusion(ItemStatUtils.InfusionType.SHATTERED) > 0) {
+		if (getInfusion(InfusionType.SHATTERED) > 0) {
 			result *= (1 - Shattered.getMultiplier(getShatteredItemEquipped()));
 		}
 
 		result *= RegionScalingDamageDealt.DAMAGE_DEALT_MULTIPLIER[getRegionScaling(mPlayer, true)];
 
-		result *= Choler.getDamageDealtMultiplier(getInfusion(ItemStatUtils.InfusionType.CHOLER));
-		result *= Execution.getDamageDealtMultiplier(getInfusion(ItemStatUtils.InfusionType.EXECUTION));
-		result *= Vengeful.getDamageDealtMultiplier(getInfusion(ItemStatUtils.InfusionType.VENGEFUL));
-		result *= Decapitation.getDamageDealtMultiplier(getInfusion(ItemStatUtils.InfusionType.DECAPITATION));
+		result *= Choler.getDamageDealtMultiplier(getInfusion(InfusionType.CHOLER));
+		result *= Execution.getDamageDealtMultiplier(getInfusion(InfusionType.EXECUTION));
+		result *= Vengeful.getDamageDealtMultiplier(getInfusion(InfusionType.VENGEFUL));
+		result *= Decapitation.getDamageDealtMultiplier(getInfusion(InfusionType.DECAPITATION));
 
 		return result;
 	}
 
 	double getDamageTakenMultiplier(@Nullable Protection protection, @Nullable Protection inverseProtection) {
-		boolean region2 = mPlayerItemStats.getRegion().compareTo(ItemStatUtils.Region.ISLES) >= 0;
+		boolean region2 = mPlayerItemStats.getRegion().compareTo(Region.ISLES) >= 0;
 
 		double damageMultiplier = 1;
 		if (protection != null && inverseProtection != null) {
-			double armor = get(ItemStatUtils.AttributeType.ARMOR);
-			double agility = get(ItemStatUtils.AttributeType.AGILITY);
+			double armor = get(AttributeType.ARMOR);
+			double agility = get(AttributeType.AGILITY);
 
 			double armorBonus = 0;
 			double agilityBonus = 0;
@@ -181,7 +182,7 @@ class PSGUIStats {
 				}
 			}
 
-			boolean adaptability = get(ItemStatUtils.EnchantmentType.ADAPTABILITY) > 0;
+			boolean adaptability = get(EnchantmentType.ADAPTABILITY) > 0;
 			double epf = (protection.getEPF() * get(protection.getEnchantmentType()))
 				             + (inverseProtection.getEPF() * get(inverseProtection.getEnchantmentType()));
 
@@ -191,22 +192,22 @@ class PSGUIStats {
 
 		// when Steadfast is enabled, also include Second Wind in calculation
 		if (mSettings.mSecondaryStatEnabled.contains(PSGUISecondaryStat.STEADFAST)) {
-			damageMultiplier *= SecondWind.getDamageMultiplier(get(ItemStatUtils.EnchantmentType.SECOND_WIND));
+			damageMultiplier *= SecondWind.getDamageMultiplier(get(EnchantmentType.SECOND_WIND));
 		}
 
-		damageMultiplier *= WorldlyProtection.getDamageMultiplier(get(ItemStatUtils.EnchantmentType.WORLDLY_PROTECTION), mPlayerItemStats.getRegion());
+		damageMultiplier *= WorldlyProtection.getDamageMultiplier(get(EnchantmentType.WORLDLY_PROTECTION), mPlayerItemStats.getRegion());
 
-		if (protection == null || protection.getEnchantmentType() != ItemStatUtils.EnchantmentType.FEATHER_FALLING) {
+		if (protection == null || protection.getEnchantmentType() != EnchantmentType.FEATHER_FALLING) {
 			damageMultiplier *= RegionScalingDamageTaken.DAMAGE_TAKEN_MULTIPLIER[getRegionScaling(mPlayer, false)];
 		}
 
-		if (getInfusion(ItemStatUtils.InfusionType.SHATTERED) > 0) {
+		if (getInfusion(InfusionType.SHATTERED) > 0) {
 			damageMultiplier *= (1 + Shattered.getMultiplier(getShatteredItemEquipped()));
 		}
 
-		damageMultiplier *= Tenacity.getDamageTakenMultiplier(getInfusion(ItemStatUtils.InfusionType.TENACITY));
-		damageMultiplier *= Carapace.getDamageTakenMultiplier(getInfusion(ItemStatUtils.InfusionType.CARAPACE));
-		damageMultiplier *= Fueled.getDamageTakenMultiplier(getInfusion(ItemStatUtils.InfusionType.FUELED));
+		damageMultiplier *= Tenacity.getDamageTakenMultiplier(getInfusion(InfusionType.TENACITY));
+		damageMultiplier *= Carapace.getDamageTakenMultiplier(getInfusion(InfusionType.CARAPACE));
+		damageMultiplier *= Fueled.getDamageTakenMultiplier(getInfusion(InfusionType.FUELED));
 
 		return damageMultiplier;
 	}

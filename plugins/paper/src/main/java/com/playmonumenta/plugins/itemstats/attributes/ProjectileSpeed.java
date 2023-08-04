@@ -2,7 +2,7 @@ package com.playmonumenta.plugins.itemstats.attributes;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Attribute;
-import com.playmonumenta.plugins.utils.ItemStatUtils.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;

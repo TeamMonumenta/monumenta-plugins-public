@@ -2,9 +2,10 @@ package com.playmonumenta.plugins.utils;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.listeners.QuiverListener;
-import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
