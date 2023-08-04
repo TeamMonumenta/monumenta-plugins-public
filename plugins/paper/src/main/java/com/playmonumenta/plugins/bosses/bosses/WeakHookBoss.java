@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -14,8 +15,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -44,6 +43,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 30;
+	private static final String COLOR = "red";
 
 	public static class Parameters extends BossParameters {
 		public float MULTIPLIER = 3;
@@ -57,7 +57,7 @@ public class WeakHookBoss extends BossAbilityGroup {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(COLOR, NamedTextColor.RED), DELAY);
 					world.playSound(loc, Sound.ITEM_CROSSBOW_LOADING_MIDDLE, SoundCategory.HOSTILE, 2f, 0.5f);
 				},
 				// Launch Aesthetic

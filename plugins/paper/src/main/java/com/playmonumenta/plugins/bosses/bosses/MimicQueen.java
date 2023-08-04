@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,6 +52,7 @@ public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 	private static final boolean COLLIDES_WITH_BLOCKS = true;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 35;
+	private static final String COLOR = "red";
 
 	public MimicQueen(Plugin plugin, LivingEntity boss, Location spawnLoc, Location endLoc) {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
@@ -63,7 +65,7 @@ public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
-					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(COLOR, NamedTextColor.RED), DELAY);
 					world.playSound(loc, Sound.ENTITY_BLAZE_AMBIENT, SoundCategory.HOSTILE, 1f, 0.5f);
 				},
 				// Launch Aesthetic

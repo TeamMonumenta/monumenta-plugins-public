@@ -2,8 +2,10 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -52,8 +54,8 @@ public class SpellFireball extends Spell {
 	 * @param launchEffect Function to run on boss and targeted player(s)
 	 */
 	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count, int duration,
-	                     float yield, boolean isIncendiary, boolean singleTarget,
-	                     LaunchFireballEffect launchEffect) {
+						 float yield, boolean isIncendiary, boolean singleTarget,
+						 LaunchFireballEffect launchEffect) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -77,7 +79,7 @@ public class SpellFireball extends Spell {
 			public void run() {
 				mBoss.setAI(false);
 				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 40, 2, false, false));
-				mBoss.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, false, false));
+				PotionUtils.applyColoredGlowing(mBoss.getName(), mBoss, NamedTextColor.RED, 40);
 				for (Player player : mPlayers) {
 					player.playSound(player.getLocation(), Sound.UI_TOAST_IN, SoundCategory.HOSTILE, 2, 2f);
 				}

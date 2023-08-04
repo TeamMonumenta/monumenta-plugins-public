@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -11,9 +12,26 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class ColoredGlowingEffect extends Effect {
+	public static final long UPDATE_DELAY = 3600000 / 50;
+
+	@MonotonicNonNull
+	private static BukkitRunnable task;
+
+	public static void registerCleanerTask(Plugin plugin) {
+		task = new BukkitRunnable() {
+			@Override
+			public void run() {
+				ColoredTeam.cleanTeams();
+			}
+		};
+		task.runTaskTimer(plugin, 0, UPDATE_DELAY);
+	}
+
 	public static final String effectID = "ColoredGlowingEffect";
 
 	@Nullable
@@ -163,6 +181,35 @@ public class ColoredGlowingEffect extends Effect {
 			Team team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(mTeamName);
 			if (team != null) {
 				team.unregister();
+			}
+		}
+
+		public void cleanTeamMembers() {
+			Team team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(mTeamName);
+			if (team == null) {
+				return;
+			}
+
+			for (String entry : team.getEntries()) {
+				try {
+					Entity entity = Bukkit.getEntity(UUID.fromString(entry));
+					if (entity == null || !entity.isValid()) {
+						team.removeEntry(entry);
+						continue;
+					}
+
+					if (!EffectManager.getInstance().hasEffect(entity, ColoredGlowingEffect.class)) {
+						team.removeEntry(entry);
+					}
+				} catch (Exception e) {
+					Plugin.getInstance().getLogger().info("Caught error trying to get an entity: " + e);
+				}
+			}
+		}
+
+		public static void cleanTeams() {
+			for (ColoredTeam team : values()) {
+				team.cleanTeamMembers();
 			}
 		}
 

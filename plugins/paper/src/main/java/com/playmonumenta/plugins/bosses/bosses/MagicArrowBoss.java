@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,8 +14,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -44,6 +43,7 @@ public class MagicArrowBoss extends BossAbilityGroup {
 		public boolean SINGLE_TARGET = true;
 		public boolean LAUNCH_TRACKING = true;
 		public boolean COLLIDES_WITH_BLOCKS = true;
+		public String COLOR = "red";
 	}
 
 	public MagicArrowBoss(Plugin plugin, LivingEntity boss) {
@@ -54,28 +54,28 @@ public class MagicArrowBoss extends BossAbilityGroup {
 		int lifeTimeTicks = (int) (p.DISTANCE / p.SPEED);
 
 		Spell spell = new SpellBaseSeekingProjectile(plugin, boss, p.DETECTION, p.SINGLE_TARGET, p.LAUNCH_TRACKING, p.COOLDOWN, p.DELAY,
-			p.SPEED, p.TURN_RADIUS, lifeTimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
-			// Initiate Aesthetic
-			(World world, Location loc, int ticks) -> {
-				PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
-			},
-			// Launch Aesthetic
-			(World world, Location loc, int ticks) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 1.5f);
-			},
-			// Projectile Aesthetic
-			(World world, Location loc, int ticks) -> {
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(boss);
-				new PartialParticle(Particle.CRIT_MAGIC, loc, 20, 0.2, 0.2, 0.2, 0.1).spawnAsEntityActive(boss);
-			},
-			// Hit Action
-			(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
-				if (target != null) {
-					BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);
-				}
-			});
+				p.SPEED, p.TURN_RADIUS, lifeTimeTicks, p.HITBOX_LENGTH, p.COLLIDES_WITH_BLOCKS, p.LINGERS,
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.DELAY);
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 1.5f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(boss);
+					new PartialParticle(Particle.CRIT_MAGIC, loc, 20, 0.2, 0.2, 0.2, 0.1).spawnAsEntityActive(boss);
+				},
+				// Hit Action
+				(World world, @Nullable LivingEntity target, Location loc, @Nullable Location prevLoc) -> {
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
+					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 30, 0, 0, 0, 0.25).spawnAsEntityActive(boss);
+					if (target != null) {
+						BossUtils.blockableDamage(boss, target, DamageType.MAGIC, p.DAMAGE, prevLoc);
+					}
+				});
 
 		super.constructBoss(spell, p.DETECTION);
 	}

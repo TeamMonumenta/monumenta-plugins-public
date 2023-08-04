@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -50,40 +51,41 @@ public class SpellShuraDagger extends Spell {
 		mPlugin = plugin;
 
 		mMissile = new SpellBaseSeekingProjectile(plugin, boss, CShura.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-			// Initiate Aesthetic
-			(World world, Location loc, int ticks) -> {
-				PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-				world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
-				world.playSound(loc, Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
+				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyColoredGlowing(CShura.identityTag, mBoss, NamedTextColor.RED, DELAY);
+					world.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.HOSTILE, 3.0f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_EVOKER_CELEBRATE, SoundCategory.HOSTILE, 2.0f, 0.7f);
 
-				if (ticks % 4 == 0) {
-					new PartialParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
-				}
-			},
-			// Launch Aesthetic
-			(World world, Location loc, int ticks) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1.2f);
-			},
-			// Projectile Aesthetic
-			(World world, Location loc, int ticks) -> {
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 4, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(mBoss);
-			},
-			// Hit Action
-			(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {
-				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 1, 1);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.5, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
-				if (le instanceof Player player) {
-					BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Arcane Dagger", prevLoc);
-					PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.POISON, 6 * 20, 0));
-					AbilityUtils.increaseHealingPlayer(player, 6 * 20, -0.5, "Shura");
-				}
-			});
+					if (ticks % 4 == 0) {
+						new PartialParticle(Particle.SMOKE_NORMAL, loc, 8, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);
+					}
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.HOSTILE, 3, 1.2f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 4, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SMOKE_NORMAL, loc, 4, 0.25, 0.25, 0.25, 0.05).spawnAsEntityActive(mBoss);
+				},
+				// Hit Action
+				(World world, @Nullable LivingEntity le, Location loc, @Nullable Location prevLoc) -> {
+					loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 1, 1);
+					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 20, 0.5, 0.5, 0.5, 0.5).spawnAsEntityActive(mBoss);
+					if (le instanceof Player player) {
+						BossUtils.blockableDamage(boss, player, DamageEvent.DamageType.MAGIC, DAMAGE, "Arcane Dagger", prevLoc);
+						PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.POISON, 6 * 20, 0));
+						AbilityUtils.increaseHealingPlayer(player, 6 * 20, -0.5, "Shura");
+					}
+				});
 	}
 
 	@Override
 	public void run() {
+		mMissile.runInitiateAesthetic(mBoss.getWorld(), mBoss.getEyeLocation(), 0);
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), CShura.detectionRange, true);
 		Collections.shuffle(players);
 		if (players.size() == 0 || mBoss.getTargetBlock(CShura.detectionRange) == null) {
@@ -117,7 +119,7 @@ public class SpellShuraDagger extends Spell {
 					this.cancel();
 				}
 
-				PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
+				PotionUtils.applyColoredGlowing(CShura.identityTag, mBoss, NamedTextColor.RED, DELAY);
 
 				if (mTicks % 4 == 0) {
 					new PartialParticle(Particle.SMOKE_NORMAL, mBoss.getLocation(), 4, 0.5, 0.5, 0.5, 0.2).spawnAsEntityActive(mBoss);

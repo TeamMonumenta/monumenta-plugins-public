@@ -1,7 +1,11 @@
 package com.playmonumenta.plugins.bosses.spells;
 
-import com.playmonumenta.plugins.utils.*;
-
+import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -533,6 +537,11 @@ public class SpellBaseSeekingProjectile extends Spell {
 		} else {
 			mChargeRemain = mCharge - 1;
 		}
+	}
+
+	// If the mob using this spell only calls launch(), then the initiateAesthetic will never be run. Use this when needed
+	public void runInitiateAesthetic(World world, Location loc, int ticks) {
+		mInitiateAesthetic.run(world, loc, ticks);
 	}
 
 }

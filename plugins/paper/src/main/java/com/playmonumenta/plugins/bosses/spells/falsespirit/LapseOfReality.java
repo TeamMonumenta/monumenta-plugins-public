@@ -10,6 +10,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -18,8 +19,6 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,41 +44,43 @@ public class LapseOfReality extends Spell {
 	private static final boolean COLLIDES_WITH_BLOCKS = false;
 	private static final boolean LINGERS = true;
 	private static final int DAMAGE = 30;
+	private static final NamedTextColor COLOR = NamedTextColor.RED;
 
 	public LapseOfReality(LivingEntity boss, Plugin plugin) {
 		mBoss = boss;
 		mPlugin = plugin;
 
 		mMissile = new SpellBaseSeekingProjectile(plugin, boss, FalseSpirit.detectionRange, SINGLE_TARGET, LAUNCH_TRACKING, COOLDOWN, DELAY,
-			SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
-			// Initiate Aesthetic
-			(World world, Location loc, int ticks) -> {
-				PotionUtils.applyPotion(null, mBoss, new PotionEffect(PotionEffectType.GLOWING, DELAY, 0));
-			},
-			// Launch Aesthetic
-			(World world, Location loc, int ticks) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 0.5f);
-				world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
-			},
-			// Projectile Aesthetic
-			(World world, Location loc, int ticks) -> {
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.025).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
-				new PartialParticle(Particle.SPELL_WITCH, loc, 2, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
-			},
-			// Hit Action
-			(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
-				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
-				world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
-				new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
-				if (player != null) {
-					BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Lapse of Reality", prevLoc);
-				}
-			});
+				SPEED, TURN_RADIUS, LIFETIME_TICKS, HITBOX_LENGTH, COLLIDES_WITH_BLOCKS, LINGERS,
+				// Initiate Aesthetic
+				(World world, Location loc, int ticks) -> {
+					PotionUtils.applyColoredGlowing(mBoss.getName(), mBoss, COLOR, DELAY);
+				},
+				// Launch Aesthetic
+				(World world, Location loc, int ticks) -> {
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.HOSTILE, 1f, 0.5f);
+					world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1f, 0f);
+				},
+				// Projectile Aesthetic
+				(World world, Location loc, int ticks) -> {
+					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.05, 0.05, 0.05, 0.025).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.CRIT_MAGIC, loc, 5, 0.1, 0.1, 0.1, 0.05).spawnAsEntityActive(mBoss);
+					new PartialParticle(Particle.SPELL_WITCH, loc, 2, 0, 0, 0, 0.3).spawnAsEntityActive(mBoss);
+				},
+				// Hit Action
+				(World world, @Nullable LivingEntity player, Location loc, @Nullable Location prevLoc) -> {
+					world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.HOSTILE, 0.5f, 1.5f);
+					world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.HOSTILE, 0.5f, 0.5f);
+					new PartialParticle(Particle.FIREWORKS_SPARK, loc, 10, 0, 0, 0, 0.25).spawnAsEntityActive(mBoss);
+					if (player != null) {
+						BossUtils.blockableDamage(boss, player, DamageType.MAGIC, DAMAGE, "Lapse of Reality", prevLoc);
+					}
+				});
 	}
 
 	@Override
 	public void run() {
+		mMissile.runInitiateAesthetic(mBoss.getWorld(), mBoss.getEyeLocation(), 0);
 		mBoss.teleport(mBoss.getLocation().add(0, 10, 0));
 		World world = mBoss.getWorld();
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 5, 0.5f);

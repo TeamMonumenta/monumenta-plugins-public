@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -13,8 +14,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -44,6 +43,7 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 		public boolean LAUNCH_TRACKING = true;
 		public double TURN_RADIUS = Math.PI / 75;
 		public boolean COLLIDES_WITH_BLOCKS = true;
+		public String COLOR = "red";
 	}
 
 	public ArcaneProjectileBoss(Plugin plugin, LivingEntity boss) {
@@ -58,7 +58,7 @@ public final class ArcaneProjectileBoss extends BossAbilityGroup {
 				// Initiate Aesthetic
 				(World world, Location loc, int ticks) -> {
 					world.playSound(mBoss.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.HOSTILE, 2, 1);
-					PotionUtils.applyPotion(null, boss, new PotionEffect(PotionEffectType.GLOWING, p.DELAY, 0));
+					PotionUtils.applyColoredGlowing(identityTag, boss, NamedTextColor.NAMES.valueOr(p.COLOR, NamedTextColor.RED), p.DELAY);
 				},
 				// Launch Aesthetic
 				(World world, Location loc, int ticks) -> {

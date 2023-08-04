@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsGUICommands;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.effects.ColoredGlowingEffect;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.fishing.FishingCombatManager;
 import com.playmonumenta.plugins.fishing.FishingManager;
@@ -373,6 +374,9 @@ public class Plugin extends JavaPlugin {
 
 		DailyReset.startTimer(this);
 
+		//TODO move that to somewhere else.
+		ColoredGlowingEffect.registerCleanerTask(this);
+
 		SpawnerCommand.register();
 
 		//  Load info.
@@ -384,14 +388,14 @@ public class Plugin extends JavaPlugin {
 
 		/* If this is the plots shard, register /plotaccess functions and enable functionality */
 		if (ServerProperties.getShardName().equals("plots")
-			|| ServerProperties.getShardName().equals("mobs")
-			|| ServerProperties.getShardName().equals("dev1")
-			|| ServerProperties.getShardName().equals("dev2")) {
+				|| ServerProperties.getShardName().equals("mobs")
+				|| ServerProperties.getShardName().equals("dev1")
+				|| ServerProperties.getShardName().equals("dev2")) {
 			manager.registerEvents(new ShopManager(), this);
 		}
 
 		if (ServerProperties.getShardName().contains("valley")
-			|| ServerProperties.getShardName().contains("dev")) {
+				|| ServerProperties.getShardName().contains("dev")) {
 
 			//minigames can only be on devshard or valley
 			TowerCommands.register(this);
@@ -468,13 +472,13 @@ public class Plugin extends JavaPlugin {
 		}
 
 		if (ServerProperties.getShardName().contains("gallery")
-			    || ServerProperties.getShardName().startsWith("dev")) {
+				|| ServerProperties.getShardName().startsWith("dev")) {
 			GalleryCommands.register();
 			manager.registerEvents(new GalleryManager(this), this);
 		}
 
 		if (ServerProperties.getShardName().contains("ring")
-			|| ServerProperties.getShardName().startsWith("dev")) {
+				|| ServerProperties.getShardName().startsWith("dev")) {
 			FishingCombatManager fishingCombatManager = new FishingCombatManager();
 			manager.registerEvents(fishingCombatManager, this);
 			manager.registerEvents(new FishingManager(fishingCombatManager), this);
