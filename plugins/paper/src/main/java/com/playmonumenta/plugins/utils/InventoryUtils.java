@@ -590,4 +590,10 @@ public class InventoryUtils {
 			}
 		}
 	}
+
+	public static boolean inventoryContainsItemOrMore(Inventory inventory, ItemStack item) {
+		int numItems = item.getAmount();
+		ItemStack oneItem = item.asOne();
+		return (InventoryUtils.numInInventory(inventory, oneItem) >= numItems);
+	}
 }

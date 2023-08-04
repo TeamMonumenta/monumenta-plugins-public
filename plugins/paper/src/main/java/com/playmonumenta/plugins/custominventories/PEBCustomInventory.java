@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.custominventories;
 
+import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.itemstats.enchantments.Multitool;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.ParticleCategory;
@@ -41,6 +42,7 @@ public class PEBCustomInventory extends CustomInventory {
 		PLAYER_INFO,
 		GAMEPLAY_OPTIONS,
 		TECHNICAL_OPTIONS,
+		TRADE_GUI,
 		INTERACTABLE_OPTIONS,
 		SERVER_INFO,
 		BOOK_SKINS,
@@ -172,7 +174,7 @@ public class PEBCustomInventory extends CustomInventory {
 				"Particle options, skill-related toggles, and other toggle related to combat.", NamedTextColor.LIGHT_PURPLE,
 				Material.DIAMOND_SWORD, false).switchToPage(PebPage.GAMEPLAY_OPTIONS),
 			new PebItem(38, "Technical Options",
-				"Dungeon auto-abandon, world name spoofing, and other technical enhancements.", NamedTextColor.LIGHT_PURPLE,
+				"Dungeon auto-abandon, world name spoofing, GUI options, and other technical enhancements.", NamedTextColor.LIGHT_PURPLE,
 				Material.COMPARATOR, false).switchToPage(PebPage.TECHNICAL_OPTIONS),
 			new PebItem(39, "Trigger/Interactable Options",
 				"Offhand Swap, Filtered Pickup, and more options to change or disable triggers.", NamedTextColor.LIGHT_PURPLE,
@@ -285,8 +287,7 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(30, "Spoof World Names",
 				"Click to enable or disable spoofing of shard-specific world names. This is helpful for world map mods to be able to detect worlds better.", NamedTextColor.LIGHT_PURPLE,
 				Material.CARTOGRAPHY_TABLE, false).playerCommand("toggleworldnames"),
-			new PebItem(31, "Shattered and Region Scaling Messages",
-				"Click to toggle whether you receive actionbar messages when you have equipment that is shattered or debuffed based on region scaling.", NamedTextColor.LIGHT_PURPLE,
+			new PebItem(31, "Shattered and Region Scaling Messages", "Click to toggle whether you receive actionbar messages when you have equipment that is shattered or debuffed based on region scaling.", NamedTextColor.LIGHT_PURPLE,
 				Material.DAMAGED_ANVIL, false)
 				.action((peb, event) -> {
 					if (ScoreboardUtils.toggleTag(peb.mPlayer, Shattered.MESSAGE_DISABLE_TAG)) {
@@ -294,7 +295,97 @@ public class PEBCustomInventory extends CustomInventory {
 					} else {
 						peb.mPlayer.sendMessage(Component.text("Shattered and Region Scaling actionbar messages have been enabled!", NamedTextColor.GOLD));
 					}
-				})
+				}),
+			new PebItem(32, "Trading GUI Options",
+				"Click to choose your NPC trading preferences.", NamedTextColor.LIGHT_PURPLE,
+				Material.DEEPSLATE_EMERALD_ORE, false).switchToPage(PebPage.TRADE_GUI)
+		);
+
+		// Trade GUI Options
+		definePage(PebPage.TRADE_GUI,
+			new PebItem(4, "Trading GUI Options",
+				"", NamedTextColor.LIGHT_PURPLE,
+				Material.DEEPSLATE_EMERALD_ORE, false),
+			new PebItem(10, gui -> "General: ",
+				gui -> Component.text("", NamedTextColor.LIGHT_PURPLE),
+				Material.BIRCH_SIGN, false),
+			new PebItem(19, gui -> "Custom Trade GUI: ",
+				gui -> Component.text("Toggles between vanilla UI and custom GUI. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.MAIN).orElse(0) == 1 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				Material.LOOM, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.MAIN).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.MAIN, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+			new PebItem(20, gui -> "Theme: ",
+				gui -> Component.text("Toggles between classic and sleek theme. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.THEME).orElse(0) == 1 ? "Sleek." : "Classic."), NamedTextColor.LIGHT_PURPLE),
+				Material.CARTOGRAPHY_TABLE, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.THEME).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.THEME, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+
+			new PebItem(14, gui -> "Trade Preview Page: ",
+				gui -> Component.text("", NamedTextColor.LIGHT_PURPLE),
+				Material.BIRCH_SIGN, false),
+			new PebItem(23, gui -> "Trade Spacing: ",
+				gui -> Component.text("Toggles between auto, 16, and 28 items per page. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SPACING).orElse(0) == 0 ? "Auto." :
+					                                                                                          ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SPACING).orElse(0) == 1 ? "16 per page." : "28 per page."), NamedTextColor.LIGHT_PURPLE),
+				Material.TRIPWIRE_HOOK, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.SPACING).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.SPACING, oldValue == 2 ? 0 : oldValue + 1); // cycles from 0, 1, 2 -> 0
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+
+			new PebItem(24, gui -> "Display Price on Preview Items: ",
+				gui -> Component.text("Toggles displaying the price of each item on the preview page. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.PREVIEWDISPLAY).orElse(0) == 0 ? "True." : "False."), NamedTextColor.LIGHT_PURPLE),
+				Material.EMERALD, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.PREVIEWDISPLAY).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.PREVIEWDISPLAY, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+			new PebItem(25, gui -> "Trade organization: ",
+				gui -> Component.text("Toggles sorting trades by category or displaying them together. Trade sorting will only occur for rare traders/traders with a large number of items. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.TRADEORG).orElse(0) == 0 ? "Split trades by type." : "Display trades together."), NamedTextColor.LIGHT_PURPLE),
+				Material.BOOKSHELF, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.TRADEORG).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.TRADEORG, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+
+			new PebItem(28, gui -> "Trade Logistics: ",
+				gui -> Component.text("", NamedTextColor.LIGHT_PURPLE),
+				Material.BIRCH_SIGN, false),
+			new PebItem(37, gui -> "Confirm page on left-click: ",
+					gui -> Component.text("Toggles whether to show a confirm page when left-clicking on a trade preview. Right-clicking will always bring up a confirm page. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.CONFIRM).orElse(0) == 0 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				Material.ANVIL, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.CONFIRM).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.CONFIRM, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+			new PebItem(38, gui -> "Upon successful trade: ",
+				gui -> Component.text("Toggles between returning to preview page or closing the GUI upon successful trade. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(0) == 0 ? "Return to trade preview." : "Close GUI."), NamedTextColor.LIGHT_PURPLE),
+				Material.GLOW_ITEM_FRAME, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+
+			new PebItem(32, gui -> "Misc: ",
+				gui -> Component.text("", NamedTextColor.LIGHT_PURPLE),
+				Material.BIRCH_SIGN, false),
+			new PebItem(41, gui -> "Trade particle effects: ",
+				gui -> Component.text("Toggles particle effects upon successful trade. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.PARTICLES).orElse(0) == 0 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				Material.FIREWORK_ROCKET, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.PARTICLES).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.PARTICLES, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			}),
+			new PebItem(42, gui -> "Trade sound effects: ",
+				gui -> Component.text("Toggles sound effects upon successful trade. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SOUNDS).orElse(0) == 0 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				Material.BELL, false).action((inventory, action) -> {
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.SOUNDS).orElse(0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.SOUNDS, oldValue == 0 ? 1 : 0);
+				inventory.setLayout(inventory.mCurrentPage);
+			})
 		);
 
 		// Toggle-able Options

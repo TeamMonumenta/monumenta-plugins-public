@@ -29,8 +29,6 @@ import org.jetbrains.annotations.Nullable;
 public class AbilityTriggersGui extends Gui {
 
 	private static final Component MAIN_PAGE_TITLE = Component.text("Ability Triggers");
-
-
 	private @Nullable AbilityInfo<?> mSelectedAbility;
 	private @Nullable AbilityTriggerInfo<?> mSelectedTrigger;
 	private @Nullable AbilityTrigger mNewTrigger;

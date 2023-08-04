@@ -2,11 +2,13 @@ package com.playmonumenta.plugins.listeners;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTCompound;
@@ -97,6 +99,12 @@ public class TradeListener implements Listener {
 			handleReskinTrades(player, trades, trade, recipe);
 			handleDyedTrades(player, trades, trade, recipe);
 			handleSoulboundTradess(player, trade, recipe);
+		}
+		// Custom GUI:
+		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(0) == 1 && player.hasPermission(CustomTradeGui.PERMISSION)) {
+			// Custom Trade GUI Enabled:
+			event.setCancelled(true);
+			new CustomTradeGui(player, event.getVillager(), trades).open();
 		}
 	}
 
