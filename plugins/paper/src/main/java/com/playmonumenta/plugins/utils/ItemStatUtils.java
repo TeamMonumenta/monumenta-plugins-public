@@ -2354,18 +2354,21 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 					}
 					ReadableNBT enchantment = enchantments.getCompound(type.getName());
 					if (enchantment != null) {
+						Component display = type.getDisplay(enchantment.getInteger(LEVEL_KEY));
 						if (type.isItemTypeEnchantment()) {
-							tagsLater.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
+							tagsLater.add(display);
 						} else if (type.getName().equals("Mending") || type.getName().equals("Unbreaking") || type.getName().equals("Unbreakable")) {
-							unbreakingTags.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
+							unbreakingTags.add(display);
 						} else {
-							lore.add(type.getDisplay(enchantment.getInteger(LEVEL_KEY)));
+							lore.add(display);
 						}
 					}
 				}
 			}
 		}
 
+		// Add unbreaking tags
+		lore.addAll(unbreakingTags);
 
 		List<Component> statTrackLater = new ArrayList<>();
 		List<Component> infusionTagsLater = new ArrayList<>();
@@ -2395,9 +2398,6 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 				}
 			}
 		}
-
-		// Add unbreaking tags
-		lore.addAll(unbreakingTags);
 
 		// Add infusions with message
 		lore.addAll(infusionTagsLater);
