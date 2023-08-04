@@ -48,7 +48,8 @@ public class Pyroblast extends DepthsAbility {
 			.linkedSpell(ClassAbility.PYROBLAST)
 			.cooldown(COOLDOWN)
 			.displayItem(Material.TNT_MINECART)
-			.descriptions(Pyroblast::getDescription);
+			.descriptions(Pyroblast::getDescription)
+			.priorityAmount(949); // Needs to trigger before Rapid Fire
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 

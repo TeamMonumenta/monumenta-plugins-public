@@ -47,7 +47,8 @@ public class Skyhook extends DepthsAbility {
 			.linkedSpell(ClassAbility.SKYHOOK)
 			.cooldown(COOLDOWN)
 			.displayItem(Material.FISHING_ROD)
-			.descriptions(Skyhook::getDescription);
+			.descriptions(Skyhook::getDescription)
+			.priorityAmount(949); // Needs to trigger before Rapid Fire
 
 	public Skyhook(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

@@ -57,7 +57,8 @@ public class DummyDecoy extends DepthsAbility {
 			.linkedSpell(ClassAbility.DUMMY_DECOY)
 			.cooldown(COOLDOWN)
 			.displayItem(Material.ARMOR_STAND)
-			.descriptions(DummyDecoy::getDescription);
+			.descriptions(DummyDecoy::getDescription)
+			.priorityAmount(949); // Needs to trigger before Rapid Fire
 
 	public DummyDecoy(Plugin plugin, Player player) {
 		super(plugin, player, INFO);

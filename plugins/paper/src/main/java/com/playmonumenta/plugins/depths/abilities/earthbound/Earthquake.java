@@ -50,7 +50,8 @@ public class Earthquake extends DepthsAbility {
 			.linkedSpell(ClassAbility.EARTHQUAKE)
 			.cooldown(COOLDOWN)
 			.displayItem(Material.COARSE_DIRT)
-			.descriptions(Earthquake::getDescription);
+			.descriptions(Earthquake::getDescription)
+			.priorityAmount(949); // Needs to trigger before Rapid Fire
 
 	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
 
