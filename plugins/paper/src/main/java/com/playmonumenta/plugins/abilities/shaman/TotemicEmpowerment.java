@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentSpeed;
@@ -37,14 +37,14 @@ public class TotemicEmpowerment extends Ability {
 		new AbilityInfo<>(TotemicEmpowerment.class, null, TotemicEmpowerment::new)
 			.canUse(player -> ScoreboardUtils.getScoreboardValue(player, AbilityUtils.SCOREBOARD_CLASS_NAME).orElse(0) == Shaman.CLASS_ID);
 
-	private @Nullable SharedEmpowerment mSharedEmpowerment;
+	private @Nullable SupportExpertise mSupportExpertise;
 
 	public TotemicEmpowerment(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
-		Bukkit.getScheduler().runTask(plugin, () -> mSharedEmpowerment = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SharedEmpowerment.class));
+		Bukkit.getScheduler().runTask(plugin, () -> mSupportExpertise = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, SupportExpertise.class));
 	}
 
 	public boolean canUse(Player player) {
@@ -67,14 +67,13 @@ public class TotemicEmpowerment extends Ability {
 				if (mPlayer.getLocation().distance(totem.getLocation()) <= radius) {
 					double selfSpeed = SPEED + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SPEED);
 					double selfResist = RESISTANCE + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
-					if (mSharedEmpowerment != null) {
-						selfSpeed += mSharedEmpowerment.getSelfBoost();
-						selfResist += mSharedEmpowerment.getSelfBoost();
+					if (mSupportExpertise != null) {
+						double soothRadius = CharmManager.getRadius(mPlayer, SupportExpertise.CHARM_RADIUS, SupportExpertise.RADIUS);
+						selfSpeed += SupportExpertise.SELF_BOOST;
+						selfResist += SupportExpertise.SELF_BOOST;
 
-						double otherSpeed = SPEED + mSharedEmpowerment.getOtherSpeed();
-						double otherResist = RESISTANCE + mSharedEmpowerment.getOtherResist();
-						List<Player> affectedPlayers = PlayerUtils.otherPlayersInRange(mPlayer, radius, true);
-						affectedPlayers.forEach(p -> applyEffects(p, otherSpeed, otherResist));
+						List<Player> affectedPlayers = PlayerUtils.otherPlayersInRange(mPlayer, soothRadius, true);
+						affectedPlayers.forEach(p -> applyEffects(p, SPEED, RESISTANCE));
 					}
 					applyEffects(mPlayer, selfSpeed, selfResist);
 					break;

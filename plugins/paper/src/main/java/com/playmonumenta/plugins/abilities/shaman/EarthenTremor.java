@@ -3,60 +3,53 @@ package com.playmonumenta.plugins.abilities.shaman;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.AbilityTrigger;
+import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
-import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.MovementUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
-import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.List;
-import java.util.WeakHashMap;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
+
 
 public class EarthenTremor extends Ability {
-	public static final String ABILITY_NAME = "Earthen Tremor";
-	public static final int COOLDOWN_1 = 20 * 20;
-	public static final int COOLDOWN_2 = 14 * 20;
-	public static final int DELAY = 20;
-	public static final int RADIUS = 6;
-	public static final double KNOCKBACK = 0.8;
-	public static final int DAMAGE_1 = 10;
-	public static final int DAMAGE_2 = 14;
 
-	public static String CHARM_COOLDOWN = "Earthen Tremor Cooldown";
-	public static String CHARM_DAMAGE = "Earthen Tremor Damage";
-	public static String CHARM_RADIUS = "Earthen Tremor Radius";
-	public static String CHARM_DELAY = "Earthen Tremor Delay";
-	public static String CHARM_KNOCKBACK = "Earthen Tremor Knockback";
+	private static final int COOLDOWN = 10 * 20;
+	private static final int SILENCE_DURATION = 30;
+	private static final int RANGE = 8;
+	private static final int DAMAGE_1 = 10;
+	private static final int DAMAGE_2 = 13;
+	private static final double KNOCKBACK = 0.8;
 
-	public int mCooldown;
-	public double mDamage;
-	public int mDelay;
-	public double mRadius;
-	public double mKnockback;
-	private final WeakHashMap<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap;
+	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
+
+	public static final String CHARM_COOLDOWN = "Earthen Tremor Cooldown";
+	public static final String CHARM_DAMAGE = "Earthen Tremor Damage";
+	public static final String CHARM_RADIUS = "Earthen Tremor Radius";
+	public static final String CHARM_SILENCE_DURATION = "Earthen Tremor Silence Duration";
+	public static final String CHARM_KNOCKBACK = "Earthen Tremor Knockback";
+
+	private double mDamage;
+	private final double mRadius;
+	private final int mSilenceDuration;
+	private final float mKnockback;
 
 	public static final AbilityInfo<EarthenTremor> INFO =
 		new AbilityInfo<>(EarthenTremor.class, "Earthen Tremor", EarthenTremor::new)
@@ -64,19 +57,20 @@ public class EarthenTremor extends Ability {
 			.scoreboardId("EarthenTremor")
 			.shorthandName("ET")
 			.descriptions(
-				String.format("Shoot a bow while sneaking to trigger a tremor where the arrow lands, dealing %s magic damage to mobs within %s blocks of the landing location " +
-						"after %s second and throwing them and yourself (if within range) into the air. Cooldown: %ss.",
+				String.format("Press swap with a weapon while sneaking to summon a earthen tremor on your position. Deals %s magic damage to mobs within %s blocks and pushes them away. Cooldown: %ss.",
 					DAMAGE_1,
-					RADIUS,
-					StringUtils.ticksToSeconds(DELAY),
-					StringUtils.ticksToSeconds(COOLDOWN_1)
+					RANGE,
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
-				String.format("Magic damage dealt is boosted to %s and cooldown is reduced to %ss.",
+				String.format("Damage increased to %s and silences targets for %ss.",
 					DAMAGE_2,
-					StringUtils.ticksToSeconds(COOLDOWN_2))
+					StringUtils.ticksToSeconds(SILENCE_DURATION))
 			)
-			.simpleDescription("Fires an arrow that will cause a tremor where it lands, dealing damage and knocking up yourself and mobs.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+			.simpleDescription("Summons a earthen tremor on your location, dealing damage and knocking mobs away.")
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", EarthenTremor::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
+				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.DIRT);
 
 	public EarthenTremor(Plugin plugin, Player player) {
@@ -84,137 +78,42 @@ public class EarthenTremor extends Ability {
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
-		mPlayerItemStatsMap = new WeakHashMap<>();
 		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
 		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
 		mDamage *= SupportExpertise.damageBuff(mPlayer);
-		mCooldown = isLevelOne() ? COOLDOWN_1 : COOLDOWN_2;
-
-		mDelay = CharmManager.getDuration(mPlayer, CHARM_DELAY, DELAY);
-		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-		mKnockback = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
+		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RANGE);
+		mSilenceDuration = CharmManager.getDuration(mPlayer, CHARM_SILENCE_DURATION, SILENCE_DURATION);
+		mKnockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
 	}
 
-	@Override
-	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		Entity damager = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && damager instanceof AbstractArrow arrow && mPlayerItemStatsMap.containsKey(damager)) {
-			quake(arrow, enemy.getLocation());
-		}
-		return false; // prevents multiple calls by removing the arrow (from the world and the player stats map)
-	}
-
-	// Since Snowballs disappear after landing, we need an extra detection for when it hits the ground.
-	@Override
-	public void projectileHitEvent(ProjectileHitEvent event, Projectile proj) {
-		if (proj instanceof Snowball && mPlayerItemStatsMap.containsKey(proj)) {
-			quake(proj, proj.getLocation());
-		}
-	}
-
-	private void quake(Projectile projectile, Location loc) {
-		World world = mPlayer.getWorld();
-
-		double particleScale = (mRadius * mRadius) / (RADIUS * RADIUS);
-
-		ItemStatManager.PlayerItemStats playerItemStats = mPlayerItemStatsMap.remove(projectile);
-		if (playerItemStats != null) {
-			new BukkitRunnable() {
-				int mTicks = 0;
-
-				@Override
-				public void run() {
-					if (mTicks >= mDelay) {
-						for (LivingEntity mob : EntityUtils.getNearbyMobsInSphere(loc, RADIUS, null)) {
-							if (!EntityUtils.isCCImmuneMob(mob) && !EntityUtils.isBoss(mob)) {
-								knockup(mob);
-							}
-							DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, mDamage, mInfo.getLinkedSpell());
-						}
-
-						if (!ZoneUtils.hasZoneProperty(mPlayer, ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES) && !mPlayer.getScoreboardTags().contains("NoTremorKnockup") && mPlayer.getLocation().distance(loc) <= RADIUS) {
-							knockup(mPlayer);
-						}
-
-						new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, (int) (6 * particleScale), mRadius / 2, 0.1, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer);
-						new PartialParticle(Particle.LAVA, loc, (int) (20 * particleScale), mRadius / 2, 0.3, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer);
-						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 3, 1.0f);
-						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 1, 1.0f);
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 0.75f, 1.0f);
-						this.cancel();
-					} else {
-						for (Material mat : List.of(Material.PODZOL, Material.GRANITE, Material.IRON_ORE)) {
-							new PartialParticle(Particle.BLOCK_CRACK, loc, (int) (30 * particleScale), mRadius / 2, 0.25, mRadius / 2, 0.1, mat.createBlockData()).spawnAsPlayerActive(mPlayer);
-						}
-						world.playSound(loc, Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
-						world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, 0.75f, 0.5f);
-					}
-
-					mTicks += 5;
-				}
-			}.runTaskTimer(mPlugin, 0, 5);
-		}
-
-		projectile.remove();
-	}
-
-	private void knockup(LivingEntity le) {
-		le.setVelocity(le.getVelocity().add(new Vector(0.0, mKnockback, 0.0)));
-	}
-
-	@Override
-	public boolean playerShotProjectileEvent(Projectile projectile) {
-		if (isOnCooldown()
-			|| !mPlayer.isSneaking()
-			|| !EntityUtils.isAbilityTriggeringProjectile(projectile, false)) {
-			return true;
+	public void cast() {
+		if (isOnCooldown()) {
+			return;
 		}
 		putOnCooldown();
-		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.BLOCK_CAMPFIRE_CRACKLE, 2, 1.0f);
 
-		if (projectile instanceof AbstractArrow arrow) {
-			arrow.setPierceLevel(0);
-			arrow.setCritical(true);
-			arrow.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		for (LivingEntity mob : EntityUtils.getNearbyMobsInSphere(mPlayer.getLocation(), mRadius, null)) {
+			DamageUtils.damage(mPlayer, mob, DamageEvent.DamageType.MAGIC, mDamage, mInfo.getLinkedSpell(), true, false);
+			if (!EntityUtils.isCCImmuneMob(mob)) {
+				MovementUtils.knockAway(mPlayer, mob, mKnockback);
+				if (isLevelTwo()) {
+					EntityUtils.applySilence(mPlugin, mSilenceDuration, mob);
+				}
+			}
 		}
 
-		mPlayerItemStatsMap.put(projectile, mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer));
+		World world = mPlayer.getWorld();
+		Location loc = mPlayer.getLocation().add(0, 0.1, 0);
 
-		mPlugin.mProjectileEffectTimers.addEntity(projectile, Particle.LAVA);
+		for (Material mat : List.of(Material.PODZOL, Material.GRANITE, Material.IRON_ORE)) {
+			ParticleUtils.explodingRingEffect(mPlugin, loc, mRadius, 0.3, 5, 0.075, l -> new PartialParticle(Particle.BLOCK_CRACK, loc, 30, mRadius / 2, 0.25, mRadius / 2, 0.1, mat.createBlockData()).spawnAsPlayerActive(mPlayer));
+		}
+		ParticleUtils.explodingRingEffect(mPlugin, loc, mRadius, 0.3, 5, 0.05, l -> new PartialParticle(Particle.CAMPFIRE_COSY_SMOKE, loc, 6, mRadius / 2, 0.1, mRadius / 2, 0.1).spawnAsPlayerActive(mPlayer));
 
-		new BukkitRunnable() {
-			int mT = 0;
-			Location mLastLoc = mPlayer.getLocation();
+		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 2, 0.6f);
+		world.playSound(loc, Sound.ITEM_AXE_WAX_OFF, 0.4f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, 0.25f, 0.5f);
+		world.playSound(loc, Sound.ITEM_TOTEM_USE, 0.4f, 2.0f);
 
-			@Override
-			public void run() {
-				if (mT > mCooldown || !mPlayerItemStatsMap.containsKey(projectile)) {
-					projectile.remove();
-
-					this.cancel();
-					return;
-				}
-
-				if (!projectile.isDead()) {
-					mLastLoc = projectile.getLocation();
-				} else {
-					quake(projectile, mLastLoc);
-					this.cancel();
-					return;
-				}
-
-				if (projectile.getVelocity().length() < .05 || projectile.isOnGround()) {
-					quake(projectile, projectile.getLocation());
-
-					this.cancel();
-					return;
-				}
-				mT++;
-			}
-
-		}.runTaskTimer(mPlugin, 0, 1);
-
-		return true;
 	}
 }

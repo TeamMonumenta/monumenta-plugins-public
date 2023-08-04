@@ -22,10 +22,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class InterconnectedHavoc extends Ability {
-	private static final int DAMAGE_1 = 4;
-	private static final int DAMAGE_2 = 6;
-	private static final int RANGE_1 = 8;
-	private static final int RANGE_2 = 14;
+	private static final int DAMAGE_1 = 5;
+	private static final int DAMAGE_2 = 7;
+	private static final int RANGE_1 = 10;
+	private static final int RANGE_2 = 16;
 
 	public static final String CHARM_DAMAGE = "Interconnected Havoc Damage";
 	public static final String CHARM_RANGE = "Interconnected Havoc Range";

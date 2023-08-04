@@ -26,12 +26,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class DesecratingShot extends Ability {
 	private static final int COOLDOWN = 4 * 20;
-	private static final double DAMAGE_1 = 0.3;
-	private static final double DAMAGE_2 = 0.5;
+	private static final double DAMAGE_1 = 0.4;
+	private static final double DAMAGE_2 = 0.6;
 	private static final double WEAKNESS_1 = 0.15;
 	private static final double WEAKNESS_2 = 0.3;
 	private static final int WEAKNESS_DURATION = 6 * 20;
-	private static final int RADIUS = 3;
+	private static final int RADIUS = 4;
 
 	public static final String CHARM_COOLDOWN = "Desecrating Shot Cooldown";
 	public static final String CHARM_DAMAGE = "Desecrating Shot Damage";

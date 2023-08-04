@@ -38,10 +38,9 @@ public class LightningTotem extends TotemAbility {
 	private static final int TOTEM_DURATION = 10 * 20;
 	private static final int INTERVAL = 2 * 20;
 	private static final int AOE_RANGE = 7;
-	private static final int DAMAGE_1 = 14;
-	private static final int DAMAGE_2 = 23;
+	private static final int DAMAGE_1 = 16;
+	private static final int DAMAGE_2 = 24;
 	public static final double STUCK_DAMAGE_PERCENT = 0.5;
-	public static String TOTEM_NAME = "Lightning Totem";
 	public static final Particle.DustOptions YELLOW = new Particle.DustOptions(Color.fromRGB(255, 255, 0), 1.25f);
 
 	public static final String CHARM_DURATION = "Lightning Totem Duration";
@@ -55,7 +54,7 @@ public class LightningTotem extends TotemAbility {
 			.scoreboardId("LightningTotem")
 			.shorthandName("LT")
 			.descriptions(
-				String.format("Press right click with a melee weapon while sneaking to summon a lightning totem. The totem will target a " +
+				String.format("Press drop while not sneaking with a melee weapon while sneaking to summon a lightning totem. The totem will target a " +
 					"mob within %s blocks with priority towards boss and elite mobs and deal %s magic damage every %s seconds. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE,
 					DAMAGE_1,
@@ -68,7 +67,7 @@ public class LightningTotem extends TotemAbility {
 			)
 			.simpleDescription("Summon a totem which will strike a mob within range for high damage throughout its duration.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LightningTotem::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(true)
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", LightningTotem::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)
 				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)))
 			.displayItem(Material.YELLOW_WOOL);
@@ -77,9 +76,10 @@ public class LightningTotem extends TotemAbility {
 	private final int mDuration;
 	private final double mRadius;
 	private @Nullable LivingEntity mTarget = null;
+	public double mDecayedTotemBuff = 0;
 
 	public LightningTotem(Plugin plugin, Player player) {
-		super(plugin, player, INFO, "Lightning Totem Projectile", "LightningTotem");
+		super(plugin, player, INFO, "Lightning Totem Projectile", "LightningTotem", "Lightning Totem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
@@ -121,7 +121,8 @@ public class LightningTotem extends TotemAbility {
 				}
 			}
 			if (mTarget != null) {
-				DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
+				double damageApplied = mDamage + mDecayedTotemBuff;
+				DamageUtils.damage(mPlayer, mTarget, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), damageApplied, true, false, false);
 				PPLightning lightning = new PPLightning(Particle.END_ROD, mTarget.getLocation())
 					.count(8).duration(3);
 				if (mMobStuckWithEffect != null && mMobStuckWithEffect.isValid() && !mTarget.equals(mMobStuckWithEffect)) {
@@ -131,6 +132,7 @@ public class LightningTotem extends TotemAbility {
 				lightning.init(4, 2.5, 0.3, 0.3);
 				lightning.spawnAsPlayerActive(mPlayer);
 			}
+			dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), INTERVAL + 20);
 		}
 	}
 
@@ -139,6 +141,7 @@ public class LightningTotem extends TotemAbility {
 		new PartialParticle(Particle.FLASH, standLocation, 3, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(mPlayer);
 		world.playSound(standLocation, Sound.ENTITY_BLAZE_DEATH, 0.7f, 0.5f);
 		mTarget = null;
+		mDecayedTotemBuff = 0;
 	}
 
 }

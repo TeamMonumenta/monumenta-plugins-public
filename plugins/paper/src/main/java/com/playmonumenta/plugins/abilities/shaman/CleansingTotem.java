@@ -55,7 +55,6 @@ public class CleansingTotem extends TotemAbility {
 	public static String CHARM_WEAKNESS_DURATION = "Cleansing Totem Adhesion Weakness Duration";
 
 	private final int mDuration;
-	private final double mHealPercent;
 	private final double mRadius;
 
 	public static final AbilityInfo<CleansingTotem> INFO =
@@ -83,12 +82,11 @@ public class CleansingTotem extends TotemAbility {
 			.displayItem(Material.BLUE_STAINED_GLASS);
 
 	public CleansingTotem(Plugin plugin, Player player) {
-		super(plugin, player, INFO, "Cleansing Totem Projectile", "CleansingTotem");
+		super(plugin, player, INFO, "Cleansing Totem Projectile", "CleansingTotem", "Cleansing Totem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
 		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, isLevelOne() ? DURATION_1 : DURATION_2);
-		mHealPercent = HEAL_PERCENT + (SupportExpertise.healingBuff(mPlayer) - 1);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 	}
 
@@ -109,17 +107,17 @@ public class CleansingTotem extends TotemAbility {
 			for (LivingEntity p : affectedPlayers) {
 				double maxHealth = EntityUtils.getMaxHealth(p);
 				mPlugin.mEffectManager.clearEffects(p, HEAL_EFFECT_NAME);
-				mPlugin.mEffectManager.addEffect(p, HEAL_EFFECT_NAME, new CustomRegeneration(EFFECT_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * mHealPercent), mPlayer, mPlugin));
+				mPlugin.mEffectManager.addEffect(p, HEAL_EFFECT_NAME, new CustomRegeneration(EFFECT_DURATION, CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, maxHealth * HEAL_PERCENT), mPlayer, mPlugin));
 			}
 
 			PPCircle cleansingRing = new PPCircle(Particle.REDSTONE, standLocation, mRadius).countPerMeter(1.05).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
 			PPSpiral cleansingSpiral = new PPSpiral(Particle.REDSTONE, standLocation, mRadius).distancePerParticle(0.075).ticks(5).count(1).delta(0).extra(0.05).data(DUST_CLEANSING_RING);
 			cleansingRing.spawnAsPlayerActive(mPlayer);
 			cleansingSpiral.spawnAsPlayerActive(mPlayer);
-
+			dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), 40);
 		}
 		if (isLevelTwo() && ticks == mDuration / (CLEANSES + (int) CharmManager.getLevel(mPlayer, CHARM_CLEANSES)) - 1) {
-			List<Player> cleansePlayers = PlayerUtils.playersInRange(mPlayer.getLocation(), mRadius, true);
+			List<Player> cleansePlayers = PlayerUtils.playersInRange(standLocation, mRadius, true);
 			for (Player player : cleansePlayers) {
 				PotionUtils.clearNegatives(mPlugin, player);
 				EntityUtils.setWeakenTicks(mPlugin, player, 0);

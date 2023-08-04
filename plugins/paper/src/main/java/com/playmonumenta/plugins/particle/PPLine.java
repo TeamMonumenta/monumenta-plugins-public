@@ -29,6 +29,16 @@ public class PPLine extends AbstractPartialParticle<PPLine> {
 		mLength = startLocation.distance(endLocation);
 	}
 
+	public PPLine(Particle particle, Location startLocation, Location endLocation, double delta) {
+		super(particle, startLocation);
+		mDirection = LocationUtils.getDirectionTo(endLocation, startLocation);
+		mLength = startLocation.distance(endLocation);
+		mDeltaX = delta;
+		mDeltaY = delta;
+		mDeltaZ = delta;
+	}
+
+
 	public PPLine(Particle particle, Location startLocation, Vector direction, double length) {
 		super(particle, startLocation);
 		mDirection = direction;

@@ -2,21 +2,13 @@ package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
-import com.playmonumenta.plugins.abilities.shaman.AdhesiveTotems;
-import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
-import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
-import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
-import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
-import com.playmonumenta.plugins.abilities.shaman.LightningCrash;
-import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
-import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
-import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
+import com.playmonumenta.plugins.abilities.shaman.*;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.EyeOfTheStorm;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.ChainHealingWave;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.utils.StringUtils;
@@ -31,20 +23,14 @@ public class Shaman extends PlayerClass {
 	public static final int HEXBREAKER_ID = 16;
 	public static final String PERMISSION_STRING = "monumenta.class.shaman";
 
-	public static final double PASSIVE_SPEED = 0.05;
-	public static final double PASSIVE_DR = 0.05;
-	public static final double SOOTH_PASSIVE_DAMAGE_BOOST = 0.08;
-	public static final double SOOTH_PASSIVE_HEAL_PERCENT = 0.02;
-	public static final double HEX_PASSIVE_DAMAGE_BOOST = 0.15;
-
 	public Shaman() {
 		mAbilities.add(CleansingTotem.INFO);
 		mAbilities.add(TotemicProjection.INFO);
 		mAbilities.add(FlameTotem.INFO);
 		mAbilities.add(InterconnectedHavoc.INFO);
 		mAbilities.add(LightningTotem.INFO);
+		mAbilities.add(ChainLightning.INFO);
 		mAbilities.add(EarthenTremor.INFO);
-		mAbilities.add(LightningCrash.INFO);
 		mAbilities.add(AdhesiveTotems.INFO);
 		mClass = CLASS_ID;
 		mClassName = "Shaman";
@@ -55,9 +41,9 @@ public class Shaman extends PlayerClass {
 			StringUtils.multiplierToPercentage(TotemicEmpowerment.SPEED), StringUtils.multiplierToPercentage(TotemicEmpowerment.RESISTANCE), TotemicEmpowerment.RADIUS);
 		mClassPassiveName = "Totemic Empowerment";
 
-		mSpecOne.mAbilities.add(SharedEmpowerment.INFO);
+		mSpecOne.mAbilities.add(Sanctuary.INFO);
 		mSpecOne.mAbilities.add(WhirlwindTotem.INFO);
-		mSpecOne.mAbilities.add(EyeOfTheStorm.INFO);
+		mSpecOne.mAbilities.add(ChainHealingWave.INFO);
 		mSpecOne.mSpecQuestScoreboard = "Quest103o";
 		mSpecOne.mSpecialization = SOOTHSAYER_ID;
 		mClassColor = TextColor.fromHexString("#009900");
@@ -65,8 +51,8 @@ public class Shaman extends PlayerClass {
 		mSpecOne.mDisplayItem = Material.OAK_SAPLING;
 		mSpecOne.mDescription = "Focuses on using your tools to support your team and turn the tide of battle.";
 		mSpecOne.mPassiveName = "Support Expertise";
-		mSpecOne.mPassiveDescription = String.format("Boosts the max health healed done by your Cleansing Totem by %s%% and magic damage done by your class skills by %s%%",
-			StringUtils.multiplierToPercentage(SupportExpertise.HEAL_BOOST), StringUtils.multiplierToPercentage(SupportExpertise.DAMAGE_BOOST));
+		mSpecOne.mPassiveDescription = String.format("Boosts the magic damage done by your class skills by %s%% per specialization point and the power of Totemic Empowerment's buffs by %s%%, as well as providing the base values to players within %s blocks.",
+			StringUtils.multiplierToPercentage(SupportExpertise.DAMAGE_BOOST), StringUtils.multiplierToPercentage(SupportExpertise.SELF_BOOST), SupportExpertise.RADIUS);
 
 		mSpecTwo.mAbilities.add(DesecratingShot.INFO);
 		mSpecTwo.mAbilities.add(DecayedTotem.INFO);
@@ -77,7 +63,7 @@ public class Shaman extends PlayerClass {
 		mSpecTwo.mDisplayItem = Material.MAGMA_BLOCK;
 		mSpecTwo.mDescription = "Deals in dark magics, focusing on harming enemies at the cost of totems.";
 		mSpecTwo.mPassiveName = "Destructive Expertise";
-		mSpecTwo.mPassiveDescription = String.format("Increases the magic damage done by your class skills by %s%%", StringUtils.multiplierToPercentage(DestructiveExpertise.DAMAGE_BOOST));
+		mSpecTwo.mPassiveDescription = String.format("Increases the magic damage done by your class skills by %s%% per specialization point.", StringUtils.multiplierToPercentage(DestructiveExpertise.DAMAGE_BOOST));
 
 		mTriggerOrder = ImmutableList.of(
 			InterconnectedHavoc.INFO,
@@ -87,7 +73,8 @@ public class Shaman extends PlayerClass {
 
 			LightningTotem.INFO,
 			WhirlwindTotem.INFO,
-			EyeOfTheStorm.INFO,
+			ChainHealingWave.INFO,
+			ChainLightning.INFO,
 
 			DecayedTotem.INFO,
 			Devastation.INFO,
@@ -95,7 +82,7 @@ public class Shaman extends PlayerClass {
 
 			FlameTotem.INFO,
 			TacticalManeuver.INFO,
-			LightningCrash.INFO
+			EarthenTremor.INFO
 		);
 
 	}

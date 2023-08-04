@@ -10,8 +10,12 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.Player;
 
 public class SupportExpertise extends Ability {
-	public static final double DAMAGE_BOOST = 0.08;
-	public static final double HEAL_BOOST = 0.02;
+	public static final double DAMAGE_BOOST = 0.04;
+
+	public static final String CHARM_RADIUS = "Support Expertise Radius";
+
+	public static final int RADIUS = 12;
+	public static final double SELF_BOOST = 0.02;
 
 	public static final AbilityInfo<SupportExpertise> INFO =
 		new AbilityInfo<>(SupportExpertise.class, null, SupportExpertise::new)
@@ -22,12 +26,8 @@ public class SupportExpertise extends Ability {
 	}
 
 	public static double damageBuff(Player player) {
+		double damageBoost = AbilityUtils.getEffectiveTotalSpecPoints(player) * DAMAGE_BOOST;
 		return (ServerProperties.getClassSpecializationsEnabled(player) &&
-			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.SOOTHSAYER_ID) ? 1 + DAMAGE_BOOST : 1;
-	}
-
-	public static double healingBuff(Player player) {
-		return (ServerProperties.getClassSpecializationsEnabled(player) &&
-			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.SOOTHSAYER_ID) ? 1 + HEAL_BOOST : 1;
+			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.SOOTHSAYER_ID) ? 1 + damageBoost : 1;
 	}
 }

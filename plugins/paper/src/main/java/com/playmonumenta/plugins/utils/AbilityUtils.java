@@ -587,18 +587,42 @@ public class AbilityUtils {
 		return (type == DamageEvent.DamageType.MELEE && ItemStatUtils.isNotExclusivelyRanged(player.getInventory().getItemInMainHand())) || type == DamageEvent.DamageType.PROJECTILE || TRIGGERS_ASPECTS.contains(event.getAbility());
 	}
 
-	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration) {
-		Component indicatorName = Component.empty().append(Component.text("[", NamedTextColor.WHITE));
-
-		int greenIndicator = (int) (20 * ((double) currentDuration / (double) totalDuration));
-		for (int i = 0; i < greenIndicator; i++) {
-			indicatorName = indicatorName.append(Component.text("|", NamedTextColor.GREEN));
+	public static void produceDurationString(LivingEntity totem, ArmorStand target, int totalDuration, int currentDuration, double whirlwindBuffed, boolean decayBuffed) {
+		Component indicatorName = Component.empty();
+		if (decayBuffed) {
+			indicatorName = indicatorName.append(Component.text("☠", NamedTextColor.BLACK)
+				.append(Component.text("☠", NamedTextColor.DARK_GREEN)));
 		}
-		int redIndicator = 20 - greenIndicator;
-		for (int i = 0; i < redIndicator; i++) {
-			indicatorName = indicatorName.append(Component.text("|", NamedTextColor.RED));
+		indicatorName = indicatorName.append(Component.text("[", NamedTextColor.WHITE));
+		int fullDuration;
+		int verticalBars;
+		if (whirlwindBuffed != 0) {
+			fullDuration = (int) (totalDuration * whirlwindBuffed);
+			verticalBars = (int) (20 * whirlwindBuffed);
+		} else {
+			fullDuration = totalDuration;
+			verticalBars = 20;
+		}
+
+		int greenIndicator = (int) (verticalBars * ((double) currentDuration / (double) fullDuration));
+		int redIndicator = verticalBars - greenIndicator;
+		for (int i = 0; i < verticalBars; i++) {
+			if (greenIndicator > 0) {
+				greenIndicator--;
+				indicatorName = indicatorName.append(Component.text("|", NamedTextColor.GREEN));
+			} else if (redIndicator > 0 && i <= 20) {
+				redIndicator--;
+				indicatorName = indicatorName.append(Component.text("|", NamedTextColor.RED));
+			} else if (redIndicator > 0) {
+				redIndicator--;
+				indicatorName = indicatorName.append(Component.text("|", NamedTextColor.YELLOW));
+			}
 		}
 		indicatorName = indicatorName.append(Component.text("]", NamedTextColor.WHITE));
+		if (decayBuffed) {
+			indicatorName = indicatorName.append(Component.text("☠", NamedTextColor.DARK_GREEN)
+				.append(Component.text("☠", NamedTextColor.BLACK)));
+		}
 
 		target.customName(indicatorName);
 		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));

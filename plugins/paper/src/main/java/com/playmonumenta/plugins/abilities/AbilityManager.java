@@ -90,21 +90,13 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.AdhesiveTotems;
-import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
-import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
-import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
-import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
-import com.playmonumenta.plugins.abilities.shaman.LightningCrash;
-import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
-import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
-import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
+import com.playmonumenta.plugins.abilities.shaman.*;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.EyeOfTheStorm;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.ChainHealingWave;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
@@ -336,10 +328,10 @@ public class AbilityManager {
 
 			//********** SHAMAN **************//
 			CleansingTotem.INFO,
-			EarthenTremor.INFO,
+			ChainLightning.INFO,
 			FlameTotem.INFO,
 			InterconnectedHavoc.INFO,
-			LightningCrash.INFO,
+			EarthenTremor.INFO,
 			LightningTotem.INFO,
 			AdhesiveTotems.INFO,
 			TotemicEmpowerment.INFO,
@@ -431,8 +423,8 @@ public class AbilityManager {
 
 			//*********** SHAMAN ***********//
 			//Soothsayer
-			EyeOfTheStorm.INFO,
-			SharedEmpowerment.INFO,
+			ChainHealingWave.INFO,
+			Sanctuary.INFO,
 			SupportExpertise.INFO,
 			WhirlwindTotem.INFO,
 

@@ -163,14 +163,14 @@ public enum ClassAbility {
 	EARTHEN_TREMOR("Earthen Tremor"),
 	FLAME_TOTEM("Flame Totem"),
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
-	LIGHTNING_CRASH("Lightning Crash"),
+	CHAIN_LIGHTNING("Chain Lightning"),
 	LIGHTNING_TOTEM("Lightning Totem"),
 	ADHESIVE_TOTEMS("Adhesive Totems"),
 	TOTEMIC_PROJECTION("Totemic Projection"),
 
 	// Soothsayer
-	EYE_OF_THE_STORM("Eye of the Storm"),
-	SHARED_EMPOWERMENT("Shared Empowerment"),
+	CHAIN_HEALING_WAVE("Chain Healing Wave"),
+	SANCTUARY("Sanctuary"),
 	WHIRLWIND_TOTEM("Whirlwind Totem"),
 
 	// Hexbreaker

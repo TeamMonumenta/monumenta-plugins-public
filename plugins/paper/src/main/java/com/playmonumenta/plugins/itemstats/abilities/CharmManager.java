@@ -76,19 +76,12 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
-import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
-import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
-import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
-import com.playmonumenta.plugins.abilities.shaman.LightningCrash;
-import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
-import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
-import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
+import com.playmonumenta.plugins.abilities.shaman.*;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.EyeOfTheStorm;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SharedEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.ChainHealingWave;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
@@ -804,11 +797,11 @@ public class CharmManager {
 			CleansingTotem.CHARM_CLEANSES,
 			CleansingTotem.CHARM_WEAKNESS,
 			CleansingTotem.CHARM_WEAKNESS_DURATION,
-			EarthenTremor.CHARM_COOLDOWN,
-			EarthenTremor.CHARM_DAMAGE,
-			EarthenTremor.CHARM_RADIUS,
-			EarthenTremor.CHARM_DELAY,
-			EarthenTremor.CHARM_KNOCKBACK,
+			ChainLightning.CHARM_COOLDOWN,
+			ChainLightning.CHARM_DAMAGE,
+			ChainLightning.CHARM_RADIUS,
+			ChainLightning.CHARM_TARGETS,
+			ChainLightning.CHARM_CHARGES,
 			FlameTotem.CHARM_DURATION,
 			FlameTotem.CHARM_RADIUS,
 			FlameTotem.CHARM_COOLDOWN,
@@ -816,18 +809,19 @@ public class CharmManager {
 			FlameTotem.CHARM_FIRE_DURATION,
 			InterconnectedHavoc.CHARM_DAMAGE,
 			InterconnectedHavoc.CHARM_RANGE,
-			LightningCrash.CHARM_DAMAGE,
-			LightningCrash.CHARM_COOLDOWN,
-			LightningCrash.CHARM_RADIUS,
-			LightningCrash.CHARM_KNOCKBACK,
-			LightningCrash.CHARM_STUN_DURATION,
+			EarthenTremor.CHARM_DAMAGE,
+			EarthenTremor.CHARM_COOLDOWN,
+			EarthenTremor.CHARM_RADIUS,
+			EarthenTremor.CHARM_KNOCKBACK,
+			EarthenTremor.CHARM_SILENCE_DURATION,
 			LightningTotem.CHARM_DURATION,
 			LightningTotem.CHARM_RADIUS,
 			LightningTotem.CHARM_COOLDOWN,
 			LightningTotem.CHARM_DAMAGE,
 			TotemicProjection.CHARM_COOLDOWN,
 			TotemicProjection.CHARM_DISTANCE,
-			TotemicProjection.CHARM_DAMAGE,
+			TotemicProjection.CHARM_SLOWNESS_PERCENT,
+			TotemicProjection.CHARM_SLOWNESS_DURATION,
 			TotemicProjection.CHARM_DAMAGE_RADIUS,
 			DecayedTotem.CHARM_DURATION,
 			DecayedTotem.CHARM_RADIUS,
@@ -845,14 +839,13 @@ public class CharmManager {
 			Devastation.CHARM_DAMAGE,
 			Devastation.CHARM_RADIUS,
 			Devastation.CHARM_COOLDOWN,
-			EyeOfTheStorm.CHARM_COOLDOWN,
-			EyeOfTheStorm.CHARM_DAMAGE,
-			EyeOfTheStorm.CHARM_DURATION,
-			EyeOfTheStorm.CHARM_RADIUS,
-			EyeOfTheStorm.CHARM_PULL,
-			SharedEmpowerment.CHARM_RADIUS,
-			SharedEmpowerment.CHARM_OTHER_SPEED,
-			SharedEmpowerment.CHARM_OTHER_RESISTANCE,
+			ChainHealingWave.CHARM_COOLDOWN,
+			ChainHealingWave.CHARM_HEALING,
+			ChainHealingWave.CHARM_TARGETS,
+			ChainHealingWave.CHARM_RADIUS,
+			Sanctuary.CHARM_WEAKNESS_PERCENT,
+			Sanctuary.CHARM_SLOWNESS_PERCENT,
+			Sanctuary.CHARM_VULNERABILITY_PERCENT,
 			WhirlwindTotem.CHARM_DURATION,
 			WhirlwindTotem.CHARM_RADIUS,
 			WhirlwindTotem.CHARM_COOLDOWN,
@@ -947,16 +940,15 @@ public class CharmManager {
 			TacticalManeuver.CHARM_COOLDOWN,
 			WhirlingBlade.CHARM_COOLDOWN,
 			CleansingTotem.CHARM_COOLDOWN,
-			EarthenTremor.CHARM_COOLDOWN,
-			EarthenTremor.CHARM_DELAY,
+			ChainLightning.CHARM_COOLDOWN,
 			FlameTotem.CHARM_COOLDOWN,
-			LightningCrash.CHARM_COOLDOWN,
+			EarthenTremor.CHARM_COOLDOWN,
 			LightningTotem.CHARM_COOLDOWN,
 			TotemicProjection.CHARM_COOLDOWN,
 			DecayedTotem.CHARM_COOLDOWN,
 			DesecratingShot.CHARM_COOLDOWN,
 			Devastation.CHARM_COOLDOWN,
-			EyeOfTheStorm.CHARM_COOLDOWN,
+			ChainHealingWave.CHARM_COOLDOWN,
 			WhirlwindTotem.CHARM_COOLDOWN
 		);
 	}

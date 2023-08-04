@@ -1,9 +1,12 @@
 package com.playmonumenta.plugins.abilities.shaman.hexbreaker;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
 import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
@@ -40,8 +43,9 @@ public class DecayedTotem extends TotemAbility {
 	private static final double SLOWNESS_PERCENT = 0.4;
 	public static final int DECAY_LEVEL = 5;
 	public static final int DECAY_DURATION = 5 * 20;
-	public static final String TOTEM_NAME = "Decayed Totem";
 	private static final int TARGETS = 3;
+	private static final int FLAME_TOTEM_DAMAGE_BUFF = 2;
+	private static final int LIGHTNING_TOTEM_DAMAGE_BUFF = 8;
 
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 	private static final Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(5, 120, 5), 1.0f);
@@ -54,6 +58,8 @@ public class DecayedTotem extends TotemAbility {
 	public static final String CHARM_SLOWNESS = "Decayed Totem Slowness";
 	public static final String CHARM_DECAY = "Decayed Totem Adhesion Decay Level";
 	public static final String CHARM_DECAY_DURATION = "Decayed Totem Adhesion Decay Duration";
+	public static final String CHARM_FLAME_TOTEM_DAMAGE_BUFF = "Decayed Totem Flame Totem Damage";
+	public static final String CHARM_LIGHTNING_TOTEM_DAMAGE_BUFF = "Decayed Totem Lightning Totem Damage";
 
 	public static final AbilityInfo<DecayedTotem> INFO =
 		new AbilityInfo<>(DecayedTotem.class, "Decayed Totem", DecayedTotem::new)
@@ -62,13 +68,16 @@ public class DecayedTotem extends TotemAbility {
 			.shorthandName("DT")
 			.descriptions(
 				String.format("Press swap while holding a melee weapon to fire a projectile that summons a Decayed Totem. The totem anchors up to %s targets within %s blocks of the totem, " +
-						"inflicting %s magic damage per second and %s%% Slowness (%ss duration, %ss cooldown)",
+						"inflicting %s magic damage per second and %s%% Slowness (%ss duration, %ss cooldown). Additionally grants %s damage to your flame totems and %s damage to your lightning " +
+						" totems that exist during this totem's duration.",
 					TARGETS,
 					AOE_RANGE,
 					DAMAGE,
 					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
 					StringUtils.ticksToSeconds(DURATION_1),
-					StringUtils.ticksToSeconds(COOLDOWN)
+					StringUtils.ticksToSeconds(COOLDOWN),
+					FLAME_TOTEM_DAMAGE_BUFF,
+					LIGHTNING_TOTEM_DAMAGE_BUFF
 				),
 				String.format("Damage now ticks every half second, and duration is increased to %ss.",
 					StringUtils.ticksToSeconds(DURATION_2))
@@ -87,9 +96,11 @@ public class DecayedTotem extends TotemAbility {
 	private final double mSlowness;
 	private final int mTargetCount;
 	private final List<LivingEntity> mTargets = new ArrayList<>();
+	private final double mFlameTotemBuff;
+	private final double mLightningTotemBuff;
 
 	public DecayedTotem(Plugin plugin, Player player) {
-		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem");
+		super(plugin, player, INFO, "Decayed Totem Projectile", "DecayedTotem", "Decayed Totem");
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
@@ -99,6 +110,8 @@ public class DecayedTotem extends TotemAbility {
 		mTickSpeed = isLevelOne() ? 20 : 10;
 		mSlowness = SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS);
 		mTargetCount = TARGETS + (int) CharmManager.getLevel(mPlayer, CHARM_TARGETS);
+		mFlameTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_FLAME_TOTEM_DAMAGE_BUFF, FLAME_TOTEM_DAMAGE_BUFF);
+		mLightningTotemBuff = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_LIGHTNING_TOTEM_DAMAGE_BUFF, LIGHTNING_TOTEM_DAMAGE_BUFF);
 	}
 
 	@Override
@@ -109,6 +122,7 @@ public class DecayedTotem extends TotemAbility {
 	@Override
 	public void onTotemTick(int ticks, ArmorStand stand, World world, Location standLocation, ItemStatManager.PlayerItemStats stats) {
 		if (ticks == 0) {
+			applyDecayedDamageBoost();
 			stand.getWorld().playSound(stand, Sound.BLOCK_CONDUIT_AMBIENT, 20.0f, 1.2f);
 			stand.getWorld().playSound(stand, Sound.ENTITY_SKELETON_HURT, 0.6f, 0.3f);
 			stand.getWorld().playSound(stand, Sound.ENTITY_PHANTOM_DEATH, 0.5f, 0.2f);
@@ -137,9 +151,11 @@ public class DecayedTotem extends TotemAbility {
 			}
 		}
 		if (ticks % mTickSpeed == 0) {
+			applyDecayedDamageBoost();
 			for (LivingEntity target : mTargets) {
 				impactMob(target, mTickSpeed + 20, true);
 			}
+			dealSanctuaryImpacts(EntityUtils.getNearbyMobsInSphere(standLocation, mRadius, null), mTickSpeed + 20);
 		}
 	}
 
@@ -155,10 +171,25 @@ public class DecayedTotem extends TotemAbility {
 		new PartialParticle(Particle.SQUID_INK, standLocation, 5, 0.2, 1.1, 0.2, 0.1).spawnAsPlayerActive(mPlayer);
 		world.playSound(standLocation, Sound.BLOCK_WOOD_BREAK, 0.7f, 0.5f);
 		mTargets.clear();
+		applyDecayedDamageBoost();
 	}
 
 	@Override
 	public void onAdhereToMob(LivingEntity hitMob) {
 		Decay.apply(mPlugin, hitMob, CharmManager.getDuration(mPlayer, CHARM_DECAY_DURATION, DECAY_DURATION), DECAY_LEVEL + (int) CharmManager.getLevel(mPlayer, CHARM_DECAY), mPlayer);
+	}
+
+	public void applyDecayedDamageBoost() {
+		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+			if (abil instanceof TotemAbility totemAbility && totemAbility.getRemainingAbilityDuration() > 0 && !(abil instanceof DecayedTotem)) {
+				if (totemAbility instanceof FlameTotem totem) {
+					totem.mDecayedTotemBuff = mFlameTotemBuff;
+					totemAbility.mDecayedBuffed = true;
+				} else if (totemAbility instanceof LightningTotem totem) {
+					totem.mDecayedTotemBuff = mLightningTotemBuff;
+					totemAbility.mDecayedBuffed = true;
+				}
+			}
+		}
 	}
 }

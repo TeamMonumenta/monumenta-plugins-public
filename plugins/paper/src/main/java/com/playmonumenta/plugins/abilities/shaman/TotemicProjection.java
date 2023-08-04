@@ -38,12 +38,15 @@ public class TotemicProjection extends Ability {
 
 	private static final int COOLDOWN_1 = 6 * 20;
 	private static final int COOLDOWN_2 = 4 * 20;
-	private static final int DAMAGE_2 = 5;
-	private static final int RADIUS = 4;
+	private static final double SLOWNESS_PERCENT = 0.2;
+	private static final int SLOWNESS_DURATION = 3 * 20;
+	private static final int RADIUS = 6;
 	private static final double VELOCITY = 2;
-	private static final int DISTRIBUTION_RADIUS = 2;
+	private static final int DISTRIBUTION_RADIUS = 3;
 
-	public static final String CHARM_DAMAGE = "Totemic Projection Damage";
+	public static final String CHARM_SLOWNESS_PERCENT = "Totemic Projection Slowness";
+	public static final String CHARM_SLOWNESS_DURATION = "Totemic Projection Slowness Duration";
+
 	public static final String CHARM_COOLDOWN = "Totemic Projection Cooldown";
 	public static final String CHARM_DAMAGE_RADIUS = "Totemic Projection Damage Radius";
 	public static final String CHARM_DISTANCE = "Totemic Projection Distance";
@@ -54,33 +57,33 @@ public class TotemicProjection extends Ability {
 			.scoreboardId("TotemicProjection")
 			.shorthandName("TP")
 			.descriptions(
-				String.format("Press drop with a weapon to fire a projectile that, on landing, moves all active totems to within %s blocks of it. %ss cooldown.",
+				String.format("Press swap with a projectile weapon to fire a projectile that, on landing, moves all active totems to within %s blocks of it. %ss cooldown.",
 					DISTRIBUTION_RADIUS,
 					StringUtils.ticksToSeconds(COOLDOWN_1)
 				),
-				String.format("Deals %s magic damage within a %s block radius on hit. %ss cooldown.",
-					DAMAGE_2,
+				String.format("Slow mobs near the projectile landing spot by %s%% for %ss within a %s block radius on hit. %ss cooldown.",
+					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
+					StringUtils.ticksToSeconds(SLOWNESS_DURATION),
 					RADIUS,
 					StringUtils.ticksToSeconds(COOLDOWN_2))
 			)
 			.simpleDescription("Fires a projectile that summons all of your active totems around the landing location.")
 			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemicProjection::cast, new AbilityTrigger(AbilityTrigger.Key.DROP)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_PICKAXE)
-				.keyOptions(AbilityTrigger.KeyOptions.NO_USABLE_ITEMS)))
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", TotemicProjection::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)
+				.keyOptions(AbilityTrigger.KeyOptions.REQUIRE_PROJECTILE_WEAPON)))
 			.displayItem(Material.ENDER_PEARL);
 
 	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
-	private double mDamage;
+	private final double mSlownessPercent;
+	private final int mSlownessDuration;
 
 	public TotemicProjection(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? 0 : DAMAGE_2);
-		mDamage *= DestructiveExpertise.damageBuff(mPlayer);
-		mDamage *= SupportExpertise.damageBuff(mPlayer);
+		mSlownessPercent = isLevelTwo() ? SLOWNESS_PERCENT + CharmManager.getLevelPercentDecimal(mPlayer, CHARM_SLOWNESS_PERCENT) : 0;
+		mSlownessDuration = CharmManager.getDuration(mPlayer, CHARM_SLOWNESS_DURATION, SLOWNESS_DURATION);
 	}
 
 	public void cast() {
@@ -163,7 +166,7 @@ public class TotemicProjection extends Ability {
 				new PPCircle(Particle.REVERSE_PORTAL, dropCenter, radius).ringMode(false).countPerMeter(4).spawnAsPlayerActive(mPlayer);
 
 				for (LivingEntity mob : affectedMobs) {
-					DamageUtils.damage(mPlayer, mob, new DamageEvent.Metadata(DamageEvent.DamageType.MAGIC, mInfo.getLinkedSpell(), stats), mDamage, true, false, false);
+					EntityUtils.applySlow(mPlugin, mSlownessDuration, mSlownessPercent, mob);
 				}
 			}
 		}

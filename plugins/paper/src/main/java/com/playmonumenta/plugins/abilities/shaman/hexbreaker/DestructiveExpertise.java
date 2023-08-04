@@ -11,7 +11,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import org.bukkit.entity.Player;
 
 public class DestructiveExpertise extends Ability {
-	public static final double DAMAGE_BOOST = 0.18;
+	public static final double DAMAGE_BOOST = 0.06;
 
 	public static final AbilityInfo<DestructiveExpertise> INFO =
 		new AbilityInfo<>(DestructiveExpertise.class, null, DestructiveExpertise::new)
@@ -25,7 +25,8 @@ public class DestructiveExpertise extends Ability {
 	}
 
 	public static double damageBuff(Player player) {
-		return (ServerProperties.getAbilityEnhancementsEnabled(player) &&
-			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.HEXBREAKER_ID) ? 1 + DAMAGE_BOOST : 1;
+		double damageBoost = AbilityUtils.getEffectiveTotalSpecPoints(player) * DAMAGE_BOOST;
+		return (ServerProperties.getClassSpecializationsEnabled(player) &&
+			ScoreboardUtils.getScoreboardValue(player, "Specialization").orElse(0) == Shaman.HEXBREAKER_ID) ? 1 + damageBoost : 1;
 	}
 }

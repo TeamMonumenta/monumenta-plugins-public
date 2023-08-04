@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.shaman.TotemAbility;
 import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
@@ -30,6 +31,7 @@ public class Devastation extends Ability {
 	public static final int RADIUS_2 = 8;
 	public static final int DAMAGE_1 = 23;
 	public static final int DAMAGE_2 = 28;
+	public static final int CDR_ON_KILL = 3 * 20;
 
 	public static final String CHARM_DAMAGE = "Devastation Damage";
 	public static final String CHARM_RADIUS = "Devastation Radius";
@@ -87,6 +89,16 @@ public class Devastation extends Ability {
 		putOnCooldown();
 
 		Location targetLoc = totemToNuke.getLocation();
+		for (Ability abil : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+			if (abil instanceof TotemAbility totemAbility
+				&& totemAbility.getRemainingAbilityDuration() > 0
+				&& totemAbility.mDisplayName.equalsIgnoreCase(totemToNuke.getName())) {
+				ClassAbility linkedSpell = abil.getInfo().getLinkedSpell();
+				if (linkedSpell != null) {
+					mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, CDR_ON_KILL);
+				}
+			}
+		}
 		TotemicEmpowerment.removeTotem(mPlayer, totemToNuke);
 
 		for (Particle particle : List.of(Particle.FLAME, Particle.LAVA)) {

@@ -6,11 +6,13 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.kyori.adventure.text.Component;
@@ -37,15 +39,19 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final String mProjectileName;
 	private final String mTotemName;
+	public final String mDisplayName;
 	public @Nullable LivingEntity mAttachedMob = null;
 	public @Nullable LivingEntity mMobStuckWithEffect = null;
+	public double mWhirlwindBuffPercent = 0;
+	public boolean mDecayedBuffed = false;
 
 	private @Nullable BukkitRunnable mTotemTickingRunnable;
 
-	public TotemAbility(Plugin plugin, Player player, AbilityInfo<?> info, String projectileName, String totemName) {
+	public TotemAbility(Plugin plugin, Player player, AbilityInfo<?> info, String projectileName, String totemName, String displayName) {
 		super(plugin, player, info);
 		mProjectileName = projectileName;
 		mTotemName = totemName;
+		mDisplayName = displayName;
 	}
 
 	public void cast() {
@@ -173,10 +179,15 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				} else {
 					stand.setGravity(true);
 				}
+				if (durationStand != null) {
+					AbilityUtils.produceDurationString(stand, durationStand, duration, mT, mWhirlwindBuffPercent, mDecayedBuffed);
+				}
 
-				AbilityUtils.produceDurationString(stand, durationStand, duration, mT);
-
-				if (mT >= duration || mPlayer.isDead() || !mPlayer.isValid() || !mPlayer.getWorld().equals(standLocation.getWorld())) {
+				if (((mWhirlwindBuffPercent != 0 && mT >= duration * mWhirlwindBuffPercent) || (mWhirlwindBuffPercent == 0 && mT >= duration))
+					|| mPlayer.isDead() || !mPlayer.isValid()
+					|| !mPlayer.getWorld().equals(standLocation.getWorld())) {
+					mWhirlwindBuffPercent = 0;
+					mDecayedBuffed = false;
 					onTotemExpire(world, standLocation);
 					this.cancel();
 				}
@@ -185,14 +196,15 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 				if (mCurrDuration >= 0) {
 					mCurrDuration++;
 				}
-
 			}
 
 			@Override
 			public synchronized void cancel() {
 				mAttachedMob = null;
 				mMobStuckWithEffect = null;
-				durationStand.remove();
+				if (durationStand != null) {
+					durationStand.remove();
+				}
 				TotemicEmpowerment.removeTotem(mPlayer, stand);
 				mCurrDuration = -1;
 				ClientModHandler.updateAbility(mPlayer, TotemAbility.this);
@@ -216,6 +228,13 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 
 	public void onAdhereToMob(LivingEntity hitMob) {
 
+	}
+
+	public void dealSanctuaryImpacts(List<LivingEntity> targets, int ticks) {
+		Sanctuary sanctuary = AbilityManager.getManager().getPlayerAbility(mPlayer, Sanctuary.class);
+		if (sanctuary != null) {
+			sanctuary.dealSanctuaryDebuffs(targets, ticks);
+		}
 	}
 
 	@Override
