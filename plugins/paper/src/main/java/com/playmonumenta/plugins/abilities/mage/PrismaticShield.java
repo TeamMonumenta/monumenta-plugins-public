@@ -40,6 +40,7 @@ public class PrismaticShield extends Ability {
 	private static final int HEAL_DURATION = 5 * 20;
 	private static final int HEAL_PERCENT = 5;
 	private static final float DAMAGE_BUFF_PERCENT = 30;
+	private static final int ENHANCEMENT_COOLDOWN_REDUCTION_TICKS = 5 * 20;
 	private static final String DAMAGE_BUFF_NAME = "PrismaticShieldDamageBuff";
 	private static final String HEALED_THIS_TICK_METAKEY = "PrismaticShieldHealedThisTick";
 
@@ -71,10 +72,13 @@ public class PrismaticShield extends Ability {
 					ABSORPTION_HEALTH_2,
 					(int) RADIUS,
 					STUN_DURATION / 20),
-				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health.",
+				String.format("After Prismatic Shield is activated, in the next %ss, you deal %s%% more damage and every spell that deals damage to at least one enemy will heal you for %s%% of your max health." +
+									" Additionally, %ss will be reduced from your abilities' cooldowns.",
 					HEAL_DURATION / 20,
 					DAMAGE_BUFF_PERCENT,
-					HEAL_PERCENT)
+					HEAL_PERCENT,
+					ENHANCEMENT_COOLDOWN_REDUCTION_TICKS / 20
+				)
 			)
 			.simpleDescription("When health drops below a threshold, gain absorption.")
 			.cooldown(COOLDOWN, CHARM_COOLDOWN)
@@ -139,6 +143,16 @@ public class PrismaticShield extends Ability {
 				World world = mPlayer.getWorld();
 				mCosmetic.prismaEffect(world, mPlayer, mPlayer.getLocation(), mRadius);
 				sendActionBarMessage("Prismatic Shield has been activated");
+
+				if (isEnhanced()) {
+					for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilities()) {
+						ClassAbility linkedSpell = ability.getInfo().getLinkedSpell();
+						if (linkedSpell == null || linkedSpell == ClassAbility.PRISMATIC_SHIELD) {
+							continue;
+						}
+						mPlugin.mTimers.updateCooldown(mPlayer, linkedSpell, ENHANCEMENT_COOLDOWN_REDUCTION_TICKS);
+					}
+				}
 
 				if (dealDamageLater) {
 					mPlayer.setHealth(1);
