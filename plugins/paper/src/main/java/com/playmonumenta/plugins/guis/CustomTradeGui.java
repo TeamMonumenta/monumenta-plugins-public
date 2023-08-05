@@ -143,7 +143,7 @@ public class CustomTradeGui extends Gui {
 				mHasRequirements = mHasRequirements && meetsRequirement;
 				// Finally, construct lore:
 				int numItems = requirement.getAmount();
-				String plainName = ItemUtils.getPlainName(requirement);
+				String plainName = ItemUtils.getPlainNameOrDefault(requirement);
 				mLore.add(
 					Component.text(numItems + " " + plainName + " ", NamedTextColor.WHITE).append(
 						Component.text(meetsRequirement ? "\u2713" : "\u2717", (meetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
@@ -312,7 +312,7 @@ public class CustomTradeGui extends Gui {
 		}
 		// Vars:
 		MerchantRecipe recipe = mSelectedTrade.getRecipe();
-		String itemName = ItemUtils.getPlainName(recipe.getResult());
+		String itemName = ItemUtils.getPlainNameOrDefault(recipe.getResult());
 		TradeReq tradeReq = new TradeReq(mPlayer, mSelectedTrade, mSelectedTradeMultiplier, true);
 		// Header:
 		setItem(0, 4, GUIUtils.createBasicItem(Material.OAK_SIGN, "Viewing: ", NamedTextColor.BLUE, false,
@@ -359,11 +359,11 @@ public class CustomTradeGui extends Gui {
 			.onLeftClick(this::navReturnToPreview);
 		// Confirm/Deny Button:
 		if (tradeReq.status()) {
-			setItem(4, 5, createConfirmButton(recipe, tradeReq)).onLeftClick(() -> {
+			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq)).onLeftClick(() -> {
 				buyNow(mSelectedTrade, mSelectedTradeMultiplier);
 			});
 		} else {
-			setItem(4, 5, createConfirmButton(recipe, tradeReq));
+			setItem(4, 5, createConfirmButton(mSelectedTrade, recipe, tradeReq));
 		}
 	}
 
@@ -467,7 +467,28 @@ public class CustomTradeGui extends Gui {
 		}
 		// Success, give item * multiplier:
 		for (int i = 0; i < multiplier; i++) {
-			InventoryUtils.giveItem(mPlayer, trade.getRecipe().getResult());
+			ItemStack result = trade.getOriginalResult();
+			int count = trade.getCount();
+			if (result == null || count <= 1) {
+				InventoryUtils.giveItem(mPlayer, trade.getRecipe().getResult());
+			} else {
+				// Copied from SQ NpcTradeManager
+				int maxStackSize = result.getMaxStackSize();
+				List<ItemStack> items = new ArrayList<>();
+				while (count > 0) {
+					int amount = count;
+					if (amount > maxStackSize) {
+						amount = maxStackSize;
+					}
+					ItemStack resultCopy = new ItemStack(result);
+					resultCopy.setAmount(amount);
+					items.add(resultCopy);
+
+					count -= amount;
+				}
+
+				com.playmonumenta.scriptedquests.utils.InventoryUtils.giveItems(mPlayer, items, false);
+			}
 		}
 		mPlayer.updateInventory();
 		// Run Quest Actions:
@@ -649,7 +670,7 @@ public class CustomTradeGui extends Gui {
 		return banner;
 	}
 
-	private ItemStack createConfirmButton(MerchantRecipe recipe, TradeReq tradeReq) {
+	private ItemStack createConfirmButton(TradeWindowOpenEvent.Trade trade, MerchantRecipe recipe, TradeReq tradeReq) {
 		// Decide to confirm or deny:
 		ItemStack itemStack = new ItemStack(Material.LIME_DYE);
 		if (!tradeReq.status()) {
@@ -662,10 +683,20 @@ public class CustomTradeGui extends Gui {
 			itemMeta.displayName(Component.text("Missing material(s)", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		// Set lore:
-		int numItem = recipe.getResult().getAmount() * mSelectedTradeMultiplier;
-		String itemName = ItemUtils.getPlainName(recipe.getResult());
+		ItemStack result = recipe.getResult();
+		ItemStack originalResult = trade.getOriginalResult();
+		if (originalResult != null) {
+			result = originalResult;
+		}
+		int numItem = result.getAmount() * mSelectedTradeMultiplier;
+		int count = trade.getCount();
+		if (count > 1) {
+			numItem *= count;
+		}
+		String itemName = ItemUtils.getPlainNameOrDefault(result);
+		Component comp = Component.text("Buy " + numItem + " " + itemName + " for: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
 		List<Component> confirmLore = new ArrayList<>();
-		confirmLore.add(Component.text("Buy " + numItem + " " + itemName + " for: ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false));
+		confirmLore.add(comp);
 		confirmLore.addAll(tradeReq.lore());
 		itemMeta.lore(confirmLore);
 		// Finalize:
