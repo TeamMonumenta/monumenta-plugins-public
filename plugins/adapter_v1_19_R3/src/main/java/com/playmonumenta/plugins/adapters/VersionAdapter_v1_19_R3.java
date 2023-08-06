@@ -16,16 +16,17 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
@@ -49,23 +50,24 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.core.Holder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlockState;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftCreature;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftMob;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftParrot;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_18_R2.scoreboard.CraftScoreboard;
-import org.bukkit.craftbukkit.v1_18_R2.util.CraftVector;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftCreature;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftMob;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftParrot;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.scoreboard.CraftScoreboard;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
 import org.bukkit.entity.AbstractSkeleton;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.CaveSpider;
@@ -90,11 +92,11 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class VersionAdapter_v1_18_R2 implements VersionAdapter {
+public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 
 	final Logger mLogger;
 
-	public VersionAdapter_v1_18_R2(Logger logger) {
+	public VersionAdapter_v1_19_R3(Logger logger) {
 		mLogger = logger;
 	}
 
@@ -114,19 +116,16 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		playerHandle.resetLastActionTime();
 	}
 
-	private static class CustomDamageSource extends EntityDamageSource {
+	private static class CustomDamageSource extends DamageSource  {
 		private final boolean mBlockable;
 		private final String mKilledUsingMsg;
+		private final net.minecraft.world.entity.Entity mAttacker;
 
-		public CustomDamageSource(net.minecraft.world.entity.Entity damager, boolean blockable, @Nullable String killedUsingMsg) {
-			super("custom", damager);
+		public CustomDamageSource(Holder<DamageType> type, @Nullable net.minecraft.world.entity.Entity source, @Nullable net.minecraft.world.entity.Entity attacker, boolean blockable, @Nullable String killedUsingMsg) {
+			super(type, source, attacker);
+			mAttacker = attacker;
 			mBlockable = blockable;
-			if (killedUsingMsg == null || killedUsingMsg.isEmpty()) {
-				// We don't want to see "Player was killed by Mob using ", so just get rid of the message if it's nothing
-				mKilledUsingMsg = null;
-			} else {
-				mKilledUsingMsg = killedUsingMsg;
-			}
+			mKilledUsingMsg = killedUsingMsg;
 		}
 
 		@Override
@@ -135,20 +134,23 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		}
 
 		@Override
-		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity entityliving) {
+		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity killed) {
 			if (mKilledUsingMsg == null) {
+				// death.attack.mob=%1$s was killed by %2$s
 				String s = "death.attack.mob";
-				return new TranslatableComponent(s, entityliving.getDisplayName(), this.entity.getDisplayName());
+				return Component.translatable(s, killed.getDisplayName(), this.mAttacker.getDisplayName());
 			} else {
 				// death.attack.indirectMagic.item=%1$s was killed by %2$s using %3$s
 				String s = "death.attack.indirectMagic.item";
-				return new TranslatableComponent(s, entityliving.getDisplayName(), this.entity.getDisplayName(), mKilledUsingMsg);
+				return Component.translatable(s, killed.getDisplayName(), this.mAttacker.getDisplayName(), mKilledUsingMsg);
 			}
 		}
 	}
 
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
-		DamageSource reason = damager == null ? DamageSource.GENERIC : new CustomDamageSource(((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
+		String id = damager == null ? "monumenta:mob" : "monumenta:magic"; // datapack damage types
+		Holder<DamageType> type = ((CraftLivingEntity) damagee).getHandle().getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(id))).get(); // this will throw if not present in the datapack
+		DamageSource reason = new CustomDamageSource(type, ((CraftLivingEntity) damagee).getHandle(), ((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
 		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
 	}
@@ -250,7 +252,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	}
 
 	// unobfuscated field name: attackStrengthTicker
-	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "aQ");
+	private static final Field attackCooldownField = getField(net.minecraft.world.entity.LivingEntity.class, "aO");
 
 	@SuppressWarnings("unboxing.of.nullable")
 	public int getAttackCooldown(LivingEntity entity) {
@@ -262,7 +264,8 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 	}
 
 	// Update the code in releaseActiveItem() below before updating this, as this may not even be used anymore.
-	private static final Method tickActiveItemStack = getMethod(net.minecraft.world.entity.LivingEntity.class, "A");
+	// unobfuscated field name: updatingUsingItem
+	private static final Method tickActiveItemStack = getMethod(net.minecraft.world.entity.LivingEntity.class, "D");
 
 	public void releaseActiveItem(LivingEntity entity, boolean clearActiveItem) {
 		net.minecraft.world.entity.LivingEntity nmsEntity = ((CraftLivingEntity) entity).getHandle();
@@ -410,7 +413,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
 	@Override
 	public Object createDimensionTypeResourceKey(String namespace, String key) {
-		return ResourceKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(namespace, key));
+		return ResourceKey.create(Registries.DIMENSION_TYPE, new ResourceLocation(namespace, key));
 	}
 
 	@Override
@@ -433,7 +436,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
 	@Override
 	public void runConsoleCommandSilently(String command) {
-		MinecraftServer.getServer().getCommands().performCommand(MinecraftServer.getServer().createCommandSourceStack().withSuppressedOutput(), command);
+		MinecraftServer.getServer().getCommands().performCommand(MinecraftServer.getServer().getCommands().getDispatcher().parse(command, MinecraftServer.getServer().createCommandSourceStack().withSuppressedOutput()), command);
 	}
 
 	public boolean hasCollision(World world, BoundingBox aabb) {
@@ -473,7 +476,7 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 		return (Class<?>) getFieldValue(targetTypeField, goal);
 	}
 
-	private static final Field WITHER_TARGETING_CONDITIONS = getField(WitherBoss.class, "cg"); // unobfuscated field name: TARGETING_CONDITIONS
+	private static final Field WITHER_TARGETING_CONDITIONS = getField(WitherBoss.class, "cd"); // unobfuscated field name: TARGETING_CONDITIONS
 
 	static {
 		// make withers only attack players and not other mobs
@@ -482,8 +485,8 @@ public class VersionAdapter_v1_18_R2 implements VersionAdapter {
 
 	@Override
 	public void mobAIChanges(Mob mob) {
-		Set<WrappedGoal> availableGoals = ((CraftMob) mob).getHandle().goalSelector.availableGoals;
-		Set<WrappedGoal> availableTargetGoals = ((CraftMob) mob).getHandle().targetSelector.availableGoals;
+		Set<WrappedGoal> availableGoals = ((CraftMob) mob).getHandle().goalSelector.getAvailableGoals();
+		Set<WrappedGoal> availableTargetGoals = ((CraftMob) mob).getHandle().targetSelector.getAvailableGoals();
 		if (mob instanceof Fox || mob instanceof AbstractSkeleton) {
 			// prevent foxes running from players, wolves, and polar bears, and skeletons running away from wolves
 			availableGoals.removeIf(goal -> goal.getGoal() instanceof AvoidEntityGoal);

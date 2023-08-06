@@ -5,6 +5,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.playmonumenta.plugins.Plugin;
@@ -42,7 +43,7 @@ public class GlowingReplacer extends PacketAdapter {
 		// Find the watchable objects containing the entity flags.
 		// It is a byte and is at index 0, see https://wiki.vg/Entity_metadata#Entity
 		// Different packet types have the value at different locations, so just use and modify whichever are present.
-		List<WrappedWatchableObject> wrappedWatchableObjects = packet.getWatchableCollectionModifier().getValues().stream()
+		List<WrappedDataValue> wrappedWatchableObjects = packet.getDataValueCollectionModifier().getValues().stream()
 				.flatMap(Collection::stream)
 				.filter(wwo -> wwo.getIndex() == 0 && wwo.getRawValue() instanceof Byte b && (b & GLOWING_BIT) != 0)
 				.toList();
@@ -78,7 +79,7 @@ public class GlowingReplacer extends PacketAdapter {
 			}
 			throw e;
 		}
-		wrappedWatchableObjects = packet.getWatchableCollectionModifier().getValues().stream()
+		wrappedWatchableObjects = packet.getDataValueCollectionModifier().getValues().stream()
 			.flatMap(Collection::stream)
 			.filter(wwo -> wwo.getIndex() == 0 && wwo.getRawValue() instanceof Byte b && (b & GLOWING_BIT) != 0)
 			.toList();
@@ -86,7 +87,7 @@ public class GlowingReplacer extends PacketAdapter {
 			.filter(dw -> dw.hasIndex(0) && dw.getObject(0) instanceof Byte b && (b & GLOWING_BIT) != 0)
 			.toList();
 		event.setPacket(packet);
-		for (WrappedWatchableObject wrappedWatchableObject : wrappedWatchableObjects) {
+		for (WrappedDataValue wrappedWatchableObject : wrappedWatchableObjects) {
 			wrappedWatchableObject.setValue((byte) (((Byte) wrappedWatchableObject.getValue()) & ~GLOWING_BIT));
 		}
 		for (WrappedDataWatcher dataWatcherModifier : dataWatcherModifiers) {

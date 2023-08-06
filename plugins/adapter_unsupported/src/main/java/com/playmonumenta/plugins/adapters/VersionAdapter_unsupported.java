@@ -78,11 +78,6 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	public int getEntityTypeRegistryId(Entity entity) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void disablePerching(Parrot parrot) {
 
 	}

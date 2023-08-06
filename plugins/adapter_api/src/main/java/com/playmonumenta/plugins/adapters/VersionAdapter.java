@@ -69,8 +69,6 @@ public interface VersionAdapter {
 	 */
 	Entity spawnWorldlessEntity(EntityType type, World world);
 
-	int getEntityTypeRegistryId(Entity entity);
-
 	/**
 	 * Prevents the given parrot from moving onto a player's shoulders.
 	 * This is not persistent and needs to be re-applied whenever the parrot is loaded again.

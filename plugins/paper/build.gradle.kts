@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":adapter_api"))
     implementation(project(":adapter_unsupported"))
     implementation(project(":adapter_v1_18_R2", "reobf"))
+    implementation(project(":adapter_v1_19_R3", "reobf"))
 
     implementation("org.openjdk.jmh:jmh-core:1.19")
     implementation("org.openjdk.jmh:jmh-generator-annprocess:1.19")
@@ -143,6 +144,7 @@ tasks {
             exclude(project(":adapter_api"))
             exclude(project(":adapter_unsupported"))
             exclude(project(":adapter_v1_18_R2"))
+            exclude(project(":adapter_v1_19_R3"))
         }
     }
 }
