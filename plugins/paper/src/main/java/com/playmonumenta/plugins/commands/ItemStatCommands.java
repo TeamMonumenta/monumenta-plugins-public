@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.EffectType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.*;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -113,7 +114,7 @@ public class ItemStatCommands {
 
 			ItemStatUtils.editItemInfo(item, region, tier, m, location);
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
 				playerItemStats.updateStats(player, true, true);
@@ -137,7 +138,7 @@ public class ItemStatCommands {
 
 			ItemStatUtils.addLore(item, index, Component.empty());
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 
 		arguments.add(new GreedyStringArgument("lore"));
@@ -152,7 +153,7 @@ public class ItemStatCommands {
 
 			ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 
 		arguments.clear();
@@ -168,7 +169,7 @@ public class ItemStatCommands {
 
 			ItemStatUtils.removeLore(item, index);
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 
 		arguments.clear();
@@ -186,7 +187,7 @@ public class ItemStatCommands {
 			ItemStatUtils.removeLore(item, index);
 			ItemStatUtils.addLore(item, index, MessagingUtils.fromMiniMessage(lore));
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 
 		arguments.clear();
@@ -226,7 +227,7 @@ public class ItemStatCommands {
 				loreIdx++;
 			}
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 	}
 
@@ -261,7 +262,7 @@ public class ItemStatCommands {
 
 						ItemStatUtils.addCharmEffect(item, index, Component.empty());
 
-						ItemStatUtils.generateItemStats(item);
+						ItemUpdateHelper.generateItemStats(item);
 					}))
 			.withSubcommand(
 				new CommandAPICommand("add")
@@ -290,7 +291,7 @@ public class ItemStatCommands {
 						Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
 						ItemStatUtils.addCharmEffect(item, index, text);
 
-						ItemStatUtils.generateItemStats(item);
+						ItemUpdateHelper.generateItemStats(item);
 					}))
 
 			.withSubcommand(
@@ -305,7 +306,7 @@ public class ItemStatCommands {
 
 						ItemStatUtils.removeCharmEffect(item, index);
 
-						ItemStatUtils.generateItemStats(item);
+						ItemUpdateHelper.generateItemStats(item);
 					}))
 
 			.withSubcommand(
@@ -324,7 +325,7 @@ public class ItemStatCommands {
 							ItemStatUtils.removeCharmPower(item);
 						}
 
-						ItemStatUtils.generateItemStats(item);
+						ItemUpdateHelper.generateItemStats(item);
 					}))
 
 			.withSubcommand(
@@ -354,7 +355,7 @@ public class ItemStatCommands {
 						Component text = Component.text(lore, TextColor.fromHexString(hexColor)).decoration(TextDecoration.ITALIC, false);
 						ItemStatUtils.addCharmEffect(item, index, text);
 
-						ItemStatUtils.generateItemStats(item);
+						ItemUpdateHelper.generateItemStats(item);
 					}))
 			.register();
 	}
@@ -380,7 +381,7 @@ public class ItemStatCommands {
 							ItemStatUtils.removeFishQuality(item);
 						}
 
-						ItemStatUtils.generateItemStats(item);
+						ItemUpdateHelper.generateItemStats(item);
 					})
 			)
 		.register();
@@ -515,7 +516,7 @@ public class ItemStatCommands {
 
 			ItemStatUtils.removeConsumeEffect(item, index);
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		}).register();
 	}
 
@@ -605,7 +606,7 @@ public class ItemStatCommands {
 			}
 		}
 
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 		if (playerItemStats != null) {
 			playerItemStats.updateStats(player, true, true);
@@ -663,7 +664,7 @@ public class ItemStatCommands {
 				}
 			}
 
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = Plugin.getInstance().mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
 				playerItemStats.updateStats(player, true, true);

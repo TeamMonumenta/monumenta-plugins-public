@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.player.PlayerData;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -168,7 +169,7 @@ public class StatTrackItem extends GenericCommand {
 			for (InfusionType stat : InfusionType.STAT_TRACK_OPTIONS) {
 				ItemStatUtils.removeInfusion(is, stat, false);
 			}
-			ItemStatUtils.generateItemStats(is);
+			ItemUpdateHelper.generateItemStats(is);
 			player.sendMessage("Removed Stat Tracking from your item!");
 			EntityUtils.fireworkAnimation(player);
 

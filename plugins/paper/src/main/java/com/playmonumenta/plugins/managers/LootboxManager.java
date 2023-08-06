@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.managers;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.inventories.ClickLimiter;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -599,7 +600,7 @@ public class LootboxManager implements Listener {
 		ItemStatUtils.removeLore(lootbox, loreIndex);
 		ItemStatUtils.addLore(lootbox, loreIndex, Component.text(amount + "/" + max + " shares")
 				.decoration(TextDecoration.ITALIC, false).color(NamedTextColor.WHITE));
-		ItemStatUtils.generateItemStats(lootbox); // this is major performance killer
+		ItemUpdateHelper.generateItemStats(lootbox); // this is major performance killer
 	}
 
 	/**

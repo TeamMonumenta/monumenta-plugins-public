@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.QuiverListener;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -152,7 +153,7 @@ public class CustomContainerItemManager implements Listener {
 							                   .hoverEvent(HoverEvent.showText(Component.text(
 								                   depositedItems.entrySet().stream().map(e -> e.getValue() + " " + e.getKey())
 									                   .collect(Collectors.joining("\n")), NamedTextColor.GRAY))));
-						ItemStatUtils.generateItemStats(container);
+						ItemUpdateHelper.generateItemStats(container);
 					}
 				}
 			} else {
@@ -292,7 +293,7 @@ public class CustomContainerItemManager implements Listener {
 		});
 
 		if (updateItem && generateItemStats) {
-			ItemStatUtils.generateItemStats(container);
+			ItemUpdateHelper.generateItemStats(container);
 		}
 
 	}
@@ -353,7 +354,7 @@ public class CustomContainerItemManager implements Listener {
 		});
 
 		if (found) {
-			ItemStatUtils.generateItemStats(container);
+			ItemUpdateHelper.generateItemStats(container);
 			return;
 		}
 
@@ -402,7 +403,7 @@ public class CustomContainerItemManager implements Listener {
 
 		// only generate if consumed is true
 		if (result != null && result.getValue()) {
-			ItemStatUtils.generateItemStats(container);
+			ItemUpdateHelper.generateItemStats(container);
 		}
 
 		return result;

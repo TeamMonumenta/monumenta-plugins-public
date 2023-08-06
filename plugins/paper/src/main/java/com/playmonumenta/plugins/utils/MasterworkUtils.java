@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -575,7 +576,7 @@ public class MasterworkUtils {
 		if (playerModified != null) {
 			ItemStatUtils.addPlayerModified(newUpgradeNbt).mergeCompound(playerModified);
 			newUpgrade = newUpgradeNbt.getItem();
-			ItemStatUtils.generateItemStats(newUpgrade);
+			ItemUpdateHelper.generateItemStats(newUpgrade);
 		}
 
 		// Carry over the durability to not make the trade repair items (a possible shattered state is copied via lore)

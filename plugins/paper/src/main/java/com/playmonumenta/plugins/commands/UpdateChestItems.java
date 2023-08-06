@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,7 +22,7 @@ public class UpdateChestItems extends GenericCommand {
 		if (b.getType() == Material.CHEST) {
 			Chest chest = (Chest) b.getState();
 			for (ItemStack item : chest.getInventory().getContents()) {
-				ItemStatUtils.generateItemStats(item);
+				ItemUpdateHelper.generateItemStats(item);
 			}
 		}
 	}

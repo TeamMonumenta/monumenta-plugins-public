@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.guis.CustomTradeGui;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InfusionUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -199,7 +200,7 @@ public class TradeListener implements Listener {
 				ItemStatUtils.addPlayerModified(newResultNbt).mergeCompound(playerModified);
 				newResult = newResultNbt.getItem();
 
-				ItemStatUtils.generateItemStats(newResult);
+				ItemUpdateHelper.generateItemStats(newResult);
 
 				// Carry over the durability to not make the trade repair items (a possible shattered state is copied via playerModified tag)
 				if (newResult.getItemMeta() instanceof Damageable newResultMeta && playerItem.getItemMeta() instanceof Damageable playerItemMeta) {

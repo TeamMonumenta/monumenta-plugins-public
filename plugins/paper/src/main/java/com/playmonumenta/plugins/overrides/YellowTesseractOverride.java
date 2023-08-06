@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory
 import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -216,7 +217,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1, 2.5f);
 		player.sendMessage(Component.text("The Tesseract of the Elements has stored your skills!", NamedTextColor.YELLOW));
 
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		ItemUtils.setPlainTag(item);
 	}
 
@@ -237,7 +238,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 	}
 
 	// Returns an ItemMeta containing the lore based of Player's currently equipped skills.
@@ -284,7 +285,7 @@ public class YellowTesseractOverride extends BaseOverride {
 			}
 		}
 
-		ItemStatUtils.generateItemStats(copyItem);
+		ItemUpdateHelper.generateItemStats(copyItem);
 		ItemUtils.setPlainTag(copyItem);
 
 		return copyItem.getItemMeta();

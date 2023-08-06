@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.inventories.CustomContainerItemGui;
 import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Multiload;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -160,7 +161,7 @@ public class QuiverListener implements Listener {
 								ArrowTransformMode[] allModes = ArrowTransformMode.values();
 								ArrowTransformMode newMode = allModes[(mode.ordinal() + (event.getClick() == ClickType.LEFT ? 1 : -1) + allModes.length) % allModes.length];
 								ItemStatUtils.setArrowTransformMode(quiver, newMode);
-								ItemStatUtils.generateItemStats(quiver);
+								ItemUpdateHelper.generateItemStats(quiver);
 								gui.mPlayer.playSound(gui.mPlayer.getLocation(), Sound.ENTITY_ARROW_SHOOT, SoundCategory.BLOCKS, 1, 1);
 								gui.update();
 							} else if (event.getClick() == ClickType.SWAP_OFFHAND && mode.mItemStack != null) {

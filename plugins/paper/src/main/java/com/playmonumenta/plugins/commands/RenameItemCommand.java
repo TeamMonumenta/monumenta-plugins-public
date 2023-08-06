@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.utils.CommandUtils;
@@ -123,7 +124,7 @@ public class RenameItemCommand {
 				playerModified.removeKey(ItemStatUtils.PLAYER_CUSTOM_NAME_KEY);
 			}
 		});
-		ItemStatUtils.generateItemStats(itemStack);
+		ItemUpdateHelper.generateItemStats(itemStack);
 		player.updateInventory();
 		String baseName = ItemUtils.getPlainNameIfExists(itemStack);
 		if (!name.isEmpty()) {

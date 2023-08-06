@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.potion.PotionManager;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -156,7 +157,7 @@ public class Shattered implements Infusion {
 		}
 		int newLevel = Math.min(oldLevel + numLevels, MAX_LEVEL);
 		ItemStatUtils.addInfusion(item, InfusionType.SHATTERED, newLevel, NULL_UUID);
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		return newLevel;
 	}
 
@@ -175,7 +176,7 @@ public class Shattered implements Infusion {
 		} else {
 			ItemStatUtils.addInfusion(item, InfusionType.SHATTERED, oldLevel - 1, NULL_UUID);
 		}
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		return true;
 	}
 }

@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
@@ -82,7 +83,7 @@ public class AnvilFixInInventory implements Listener {
 		// Put anvils into lime tess
 		if (!isUpgradedLimeTesseract && ItemStatUtils.isUpgradedLimeTesseract(item)) {
 			ItemStatUtils.setCharges(item, ItemStatUtils.getCharges(item) + anvilOrTess.getAmount());
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 			anvilOrTess.setAmount(0);
 			event.setCancelled(true);
 			player.updateInventory();
@@ -97,7 +98,7 @@ public class AnvilFixInInventory implements Listener {
 			}
 			if (isUpgradedLimeTesseract) {
 				ItemStatUtils.setCharges(anvilOrTess, limeTesseractCharges - 1);
-				ItemStatUtils.generateItemStats(anvilOrTess);
+				ItemUpdateHelper.generateItemStats(anvilOrTess);
 			} else {
 				anvilOrTess.subtract();
 			}

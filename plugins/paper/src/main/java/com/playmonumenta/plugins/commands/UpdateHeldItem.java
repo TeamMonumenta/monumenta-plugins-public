@@ -1,6 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import org.bukkit.command.CommandSender;
@@ -17,7 +17,7 @@ public class UpdateHeldItem extends GenericCommand {
 		if (item.getAmount() <= 0) {
 			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		}
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		player.getEquipment().setItemInMainHand(item, true);
 	}
 }

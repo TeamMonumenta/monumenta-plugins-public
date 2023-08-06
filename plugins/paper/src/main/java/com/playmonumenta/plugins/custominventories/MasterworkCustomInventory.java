@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.custominventories;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.Masterwork;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.GUIUtils;
@@ -431,7 +432,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 			MasterworkUtils.payCost(cost, p, item, true);
 			item.setType(nextItem.getType());
 			item.setItemMeta(nextItem.getItemMeta());
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 			p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.f, 1.f);
 			return;
 		}
@@ -441,7 +442,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 				MasterworkUtils.payCost(cost, p, item, false);
 				item.setType(nextItem.getType());
 				item.setItemMeta(nextItem.getItemMeta());
-				ItemStatUtils.generateItemStats(item);
+				ItemUpdateHelper.generateItemStats(item);
 				MasterworkUtils.animate(p, ItemStatUtils.getMasterwork(nextItem));
 			} else {
 				p.sendMessage(ChatColor.RED + "You don't have enough currency for this upgrade.");

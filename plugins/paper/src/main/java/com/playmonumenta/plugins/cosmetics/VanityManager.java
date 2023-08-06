@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.protocollib.VirtualItemsReplacer;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -130,7 +131,7 @@ public class VanityManager implements Listener {
 			if (isValidVanityItem(player, item, slot)) {
 				if (!ItemStatUtils.isClean(item)) {
 					ItemUtils.setPlainTag(item);
-					ItemStatUtils.generateItemStats(item);
+					ItemUpdateHelper.generateItemStats(item);
 					ItemStatUtils.markClean(item);
 				}
 				vanityData.equip(slot, item, null);

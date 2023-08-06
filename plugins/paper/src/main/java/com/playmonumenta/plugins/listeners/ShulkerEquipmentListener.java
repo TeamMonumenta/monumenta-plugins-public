@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.overrides.FirmamentOverride;
 import com.playmonumenta.plugins.overrides.WorldshaperOverride;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
@@ -339,7 +340,7 @@ public class ShulkerEquipmentListener implements Listener {
 				newVanity = null;
 			} else if (newVanity != null && !ItemStatUtils.isClean(newVanity)) {
 				ItemUtils.setPlainTag(newVanity);
-				ItemStatUtils.generateItemStats(newVanity);
+				ItemUpdateHelper.generateItemStats(newVanity);
 				ItemStatUtils.markClean(newVanity);
 			}
 			ItemStack oldVanity = vanityData.getEquipped(slot);
@@ -413,7 +414,7 @@ public class ShulkerEquipmentListener implements Listener {
 		// Set new lore
 		item.setItemMeta(itemMeta);
 
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		ItemUtils.setPlainTag(item);
 	}
 

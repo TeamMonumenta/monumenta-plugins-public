@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
@@ -202,7 +203,7 @@ public class InfusionUtils {
 				ItemStatUtils.removeInfusion(item, infusionType, false);
 			}
 		}
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		if (refundMaterials > 0 && region != null) {
 			giveMaterials(player, region, refundMaterials);
 		}

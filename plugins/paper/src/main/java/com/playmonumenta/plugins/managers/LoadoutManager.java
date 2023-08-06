@@ -20,6 +20,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.itemstats.enums.Region;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.listeners.AuditListener;
 import com.playmonumenta.plugins.listeners.ShulkerEquipmentListener;
 import com.playmonumenta.plugins.overrides.YellowTesseractOverride;
@@ -779,7 +780,7 @@ public class LoadoutManager implements Listener {
 				ItemStack item = ItemUtils.parseItemStack(json.getAsJsonPrimitive("displayItem").getAsString());
 				if (!ItemStatUtils.isClean(item)) {
 					ItemUtils.setPlainTag(item);
-					ItemStatUtils.generateItemStats(item);
+					ItemUpdateHelper.generateItemStats(item);
 					ItemStatUtils.markClean(item);
 					item = VanityManager.cleanCopyForDisplay(item);
 				}
@@ -808,7 +809,7 @@ public class LoadoutManager implements Listener {
 				ItemStack item = ItemUtils.parseItemStack(entry.getValue().getAsString());
 				if (!ItemStatUtils.isClean(item)) {
 					ItemUtils.setPlainTag(item);
-					ItemStatUtils.generateItemStats(item);
+					ItemUpdateHelper.generateItemStats(item);
 					ItemStatUtils.markClean(item);
 					item = VanityManager.cleanCopyForDisplay(item);
 				}

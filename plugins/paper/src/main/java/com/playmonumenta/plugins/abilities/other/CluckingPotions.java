@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -59,7 +60,7 @@ public class CluckingPotions extends Ability {
 						if (!cluckingCandidates.isEmpty()) {
 							ItemStack item = cluckingCandidates.get(FastUtils.RANDOM.nextInt(cluckingCandidates.size()));
 							ItemStatUtils.addEnchantment(item, EnchantmentType.CLUCKING, 1);
-							ItemStatUtils.generateItemStats(item);
+							ItemUpdateHelper.generateItemStats(item);
 							mPlugin.mItemStatManager.updateStats(player);
 							new PartialParticle(Particle.EXPLOSION_LARGE, entity.getLocation(), 1, 0, 0, 0, 0).minimumCount(1).spawnAsPlayerActive(mPlayer);
 						}

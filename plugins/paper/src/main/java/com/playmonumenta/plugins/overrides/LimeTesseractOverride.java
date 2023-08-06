@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.overrides;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.MonumentaTrigger;
 import com.playmonumenta.plugins.commands.PickLevelAfterAnvils;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -45,7 +46,7 @@ public class LimeTesseractOverride extends BaseOverride {
 		int given = Math.min(charges, 64);
 		InventoryUtils.giveItemFromLootTable(player, PickLevelAfterAnvils.ANVIL_TABLE, given);
 		ItemStatUtils.setCharges(item, charges - given);
-		ItemStatUtils.generateItemStats(item);
+		ItemUpdateHelper.generateItemStats(item);
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1, 2);
 		player.sendMessage(Component.text("The tesseract pulses and " + (given == 1 ? "an anvil appears" : given + " anvils appear") + " in your inventory.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 		return false;
@@ -108,7 +109,7 @@ public class LimeTesseractOverride extends BaseOverride {
 			if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
 				player.sendMessage(Component.text("The tesseract pulls from your intellect and gains an anvil charge.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 				ItemStatUtils.setCharges(item, ItemStatUtils.getCharges(item) + 1);
-				ItemStatUtils.generateItemStats(item);
+				ItemUpdateHelper.generateItemStats(item);
 			} else {
 				player.sendMessage(Component.text("The tesseract pulls from your intellect, and you feel your inventory get slightly heavier.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 				InventoryUtils.giveItemFromLootTable(player, PickLevelAfterAnvils.ANVIL_TABLE, 1);
@@ -133,7 +134,7 @@ public class LimeTesseractOverride extends BaseOverride {
 		if (ItemStatUtils.isUpgradedLimeTesseract(item)) {
 			player.sendMessage(Component.text("The tesseract pulls from your intellect and gains " + anvilsCreated + " anvil charges.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 			ItemStatUtils.setCharges(item, ItemStatUtils.getCharges(item) + anvilsCreated);
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 		} else {
 			player.sendMessage(Component.text("The tesseract pulls from your intellect, and gives you " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 			InventoryUtils.giveItemFromLootTable(player, PickLevelAfterAnvils.ANVIL_TABLE, anvilsCreated);

@@ -247,7 +247,7 @@ public class ItemUpdateManager implements Listener {
 			// Only generate item stats on items with Monumenta tag
 			NBTItem nbt = new NBTItem(item);
 			if (nbt.hasTag(ItemStatUtils.MONUMENTA_KEY)) {
-				ItemStatUtils.generateItemStats(item);
+				ItemUpdateHelper.generateItemStats(item);
 
 				// Update arrows in quivers immediately - otherwise, they would need updating every time an arrow is shot or picked up
 				if (ItemStatUtils.isQuiver(item)) {

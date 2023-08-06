@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import java.util.EnumSet;
@@ -47,7 +48,7 @@ public class AshesOfEternity implements Enchantment {
 				item = player.getInventory().getItemInOffHand();
 			}
 			ItemStatUtils.removeEnchantment(item, EnchantmentType.ASHES_OF_ETERNITY);
-			ItemStatUtils.generateItemStats(item);
+			ItemUpdateHelper.generateItemStats(item);
 			ItemStatManager.PlayerItemStats playerItemStats = plugin.mItemStatManager.getPlayerItemStats(player);
 			if (playerItemStats != null) {
 				playerItemStats.updateStats(player, true, true);

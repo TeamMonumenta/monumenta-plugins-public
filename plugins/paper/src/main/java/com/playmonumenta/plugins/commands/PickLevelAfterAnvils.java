@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.overrides.LimeTesseractOverride;
 import com.playmonumenta.plugins.utils.ExperienceUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
@@ -68,7 +69,7 @@ public class PickLevelAfterAnvils extends GenericCommand {
 					if (ItemStatUtils.isUpgradedLimeTesseract(mainHand)) {
 						player.sendMessage(Component.text("The tesseract pulls from your intellect and gains " + anvilsCreated + " anvil charges.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));
 						ItemStatUtils.setCharges(mainHand, ItemStatUtils.getCharges(mainHand) + anvilsCreated);
-						ItemStatUtils.generateItemStats(mainHand);
+						ItemUpdateHelper.generateItemStats(mainHand);
 					} else {
 						if (LimeTesseractOverride.isAnyLimeTesseract(mainHand)) {
 							player.sendMessage(Component.text("The tesseract pulls from your intellect, and gives you " + anvilsCreated + " anvils.", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false));

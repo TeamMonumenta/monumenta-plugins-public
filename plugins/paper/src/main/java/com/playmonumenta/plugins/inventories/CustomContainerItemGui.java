@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.inventories;
 
 import com.playmonumenta.plugins.guis.Gui;
 import com.playmonumenta.plugins.guis.GuiItem;
+import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -260,7 +261,7 @@ public class CustomContainerItemGui extends Gui {
 		ItemStack clone = ItemUtils.clone(cursor);
 		CustomContainerItemManager.addToContainer(mPlayer, mContainer, mConfig, cursor, false, false);
 		CustomContainerItemManager.reorderInContainer(mPlayer, mContainer, clone, position);
-		ItemStatUtils.generateItemStats(mContainer);
+		ItemUpdateHelper.generateItemStats(mContainer);
 		update();
 	}
 
@@ -310,7 +311,7 @@ public class CustomContainerItemGui extends Gui {
 						}
 					}
 					if (clickedItem.getAmount() != currentItem.getAmount()) {
-						ItemStatUtils.generateItemStats(mContainer);
+						ItemUpdateHelper.generateItemStats(mContainer);
 					}
 					update();
 				} else if (!ItemUtils.isNullOrAir(currentItem)) {
