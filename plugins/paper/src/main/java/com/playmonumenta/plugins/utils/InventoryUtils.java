@@ -540,13 +540,16 @@ public class InventoryUtils {
 	}
 
 	public static int numInInventory(Inventory inventory, ItemStack item) {
-		return Arrays.stream(inventory.getStorageContents())
+		return numInInventory(inventory.getContents(), item);
+	}
+
+	public static int numInInventory(ItemStack[] inventory, ItemStack item) {
+		return Arrays.stream(inventory)
 			       .filter(Objects::nonNull)
 			       .filter(item::isSimilar)
 			       .mapToInt(ItemStack::getAmount)
 			       .sum();
 	}
-
 	/**
 	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
 	 */
@@ -595,5 +598,35 @@ public class InventoryUtils {
 		int numItems = item.getAmount();
 		ItemStack oneItem = item.asOne();
 		return (InventoryUtils.numInInventory(inventory, oneItem) >= numItems);
+	}
+
+	public static boolean inventoryContainsItemOrMore(ItemStack[] inventory, ItemStack item) {
+		int numItems = item.getAmount();
+		ItemStack oneItem = item.asOne();
+		return (InventoryUtils.numInInventory(inventory, oneItem) >= numItems);
+	}
+
+	public static void removeItemFromArray(ItemStack[] inventory, ItemStack item) {
+		// Note: works on shallow inventory copies, with a workaround to avoid modifying original itemstacks.
+		int numItems = item.getAmount();
+		ItemStack oneItem = item.asOne();
+		for (int i = 0; i < inventory.length; i++) {
+			ItemStack currentItem = inventory[i];
+			if (currentItem != null && currentItem.isSimilar(oneItem)) {
+				int currentAmount = currentItem.getAmount();
+				if (currentAmount > numItems) {
+					ItemStack newItem = currentItem.clone();
+					newItem.setAmount(currentAmount - numItems);
+					inventory[i] = newItem;
+					break;
+				} else if (currentAmount == numItems) {
+					inventory[i] = null;
+					break;
+				} else {
+					inventory[i] = null;
+					numItems -= currentAmount;
+				}
+			}
+		}
 	}
 }

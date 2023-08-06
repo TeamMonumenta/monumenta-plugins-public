@@ -68,7 +68,7 @@ public class CustomTradeGui extends Gui {
 	private final List<TradeWindowOpenEvent.Trade> mTradeOffhand = new ArrayList<>();
 	private final List<TradeWindowOpenEvent.Trade> mTradeArmor = new ArrayList<>();
 	private final List<TradeWindowOpenEvent.Trade> mTradeCharm = new ArrayList<>();
-	private final Map<ItemStack, Boolean> mSavedBaseRequirements = new HashMap<>(); // Save the result of base requirement checks as they can be intensive.
+	private final Map<List<ItemStack>, TradeStatusWrapper> mSavedBaseRequirements = new HashMap<>(); // Save the result of base requirement checks as they can be intensive.
 
 	// GUI Vars:
 	private @Nullable TradeWindowOpenEvent.Trade mSelectedTrade = null;
@@ -105,7 +105,7 @@ public class CustomTradeGui extends Gui {
 
 	private class TradeReq {
 		// This class holds the status of the player's requirements for a specific trade.
-		private final List<Component> mLore = new ArrayList<>();
+		private List<Component> mLore = new ArrayList<>();
 		private final List<ItemStack> mRequirements = new ArrayList<>();
 		private final int mNumRequirements;
 		private boolean mHasRequirements = true;
@@ -121,32 +121,38 @@ public class CustomTradeGui extends Gui {
 				requirement.setAmount(requirement.getAmount() * multiplier);
 				mRequirements.add(requirement);
 			}
-
 			// Update mNumRequirements:
 			mNumRequirements = mRequirements.size();
-
+			// See if we should check our saved map:
+			if (useCache && multiplier == 1 && mSavedBaseRequirements.containsKey(mRequirements)) {
+				// useCache is true: usually true, but if we are in buyNow(), we should recheck the player's inventory.
+				// multiplier == 1: our map only saves the base requirement, without any trade multipliers.
+				TradeStatusWrapper wrapper = mSavedBaseRequirements.get(mRequirements);
+				mHasRequirements = wrapper.status();
+				mLore = wrapper.lore();
+				return;
+			}
+			// Shallow copy of player's inventory:
+			ItemStack[] itemStacks = player.getInventory().getContents().clone();
 			// Check each requirement, constructing lore and updating mHasRequirements:
 			for (ItemStack requirement : mRequirements) {
 				boolean meetsRequirement;
 				// Obtain the status of this requirement:
-				if (useCache && multiplier == 1 && mSavedBaseRequirements.containsKey(requirement)) {
-					// We should check our saved map if:
-						// useCache is true: usually true, but if we are in buyNow(), we should recheck the player's inventory,
-						// multiplier == 1: our map only saves the base requirement.
-					meetsRequirement = mSavedBaseRequirements.get(requirement);
-				} else {
-					meetsRequirement = InventoryUtils.inventoryContainsItemOrMore(player.getInventory(), requirement);
-				}
-				if (multiplier == 1) {
-					mSavedBaseRequirements.put(requirement, meetsRequirement);
-				}
+				meetsRequirement = InventoryUtils.inventoryContainsItemOrMore(itemStacks, requirement);
 				mHasRequirements = mHasRequirements && meetsRequirement;
-				// Finally, construct lore:
+				if (meetsRequirement) {
+					InventoryUtils.removeItemFromArray(itemStacks, requirement);
+				}
+				// Construct lore:
 				int numItems = requirement.getAmount();
 				String plainName = ItemUtils.getPlainNameOrDefault(requirement);
 				mLore.add(
 					Component.text(numItems + " " + plainName + " ", NamedTextColor.WHITE).append(
 						Component.text(meetsRequirement ? "\u2713" : "\u2717", (meetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
+			}
+			// Finally, save the base requirement to our map:
+			if (multiplier == 1) {
+				mSavedBaseRequirements.put(mRequirements, new TradeStatusWrapper(mHasRequirements, mLore));
 			}
 		}
 
@@ -166,6 +172,28 @@ public class CustomTradeGui extends Gui {
 			return mHasRequirements;
 		}
 	}
+
+	private static class TradeStatusWrapper {
+		private boolean mHasRequirements;
+		private List<Component> mLore;
+
+
+		public TradeStatusWrapper(boolean hasRequirements, List<Component> lore) {
+			this.mHasRequirements = hasRequirements;
+			this.mLore = lore;
+		}
+
+
+		public boolean status() {
+			return this.mHasRequirements;
+		}
+
+
+		public List<Component> lore() {
+			return this.mLore;
+		}
+	}
+
 
 	// Options:
 		// Note: mPeb_tradeGUI_main & mPeb_tradeGUI_locked are also scoreboards, but not tested in here.
