@@ -101,7 +101,11 @@ public class TradeListener implements Listener {
 			handleSoulboundTradess(player, trade, recipe);
 		}
 		// Custom GUI:
-		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(0) == 1 && player.hasPermission(CustomTradeGui.PERMISSION)) {
+		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(0) == 1) {
+			if (!player.hasPermission(CustomTradeGui.PERMISSION)) {
+				player.sendMessage("The custom trade GUI has been temporarily disabled, opening the default GUI. ");
+				return;
+			}
 			// Custom Trade GUI Enabled:
 			event.setCancelled(true);
 			new CustomTradeGui(player, event.getVillager(), trades).open();
