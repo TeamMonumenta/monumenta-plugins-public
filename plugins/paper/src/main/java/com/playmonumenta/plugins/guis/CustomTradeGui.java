@@ -202,7 +202,7 @@ public class CustomTradeGui extends Gui {
 	private final int mPebTradeGUIPreviewDisplay; // 0: display price on preview. 1: dont.
 	private final int mPebTradeGUITradeOrg; // 0: split trades by type. 1: dont.
 	private final int mPebTradeGUIConfirm; // 0: bring up confirm menu. 1: dont.
-	private final int mPebTradeGUISuccess; // 0: return to preview upon successful trade. 1: dont.
+	private final int mPebTradeGUISuccess; // 0: return to preview upon successful trade. 1: close gui. 2: do nothing.
 	private final int mPebTradeGUIParticles; // 0: particles on. 1: off.
 	private final int mPebTradeGUISounds; // 0: sounds on. 1: off.
 
@@ -498,7 +498,7 @@ public class CustomTradeGui extends Gui {
 			ItemStack result = trade.getOriginalResult();
 			int count = trade.getCount();
 			if (result == null || count <= 1) {
-				InventoryUtils.giveItem(mPlayer, trade.getRecipe().getResult());
+				InventoryUtils.giveItem(mPlayer, trade.getRecipe().getResult().clone());
 			} else {
 				// Copied from SQ NpcTradeManager
 				int maxStackSize = result.getMaxStackSize();
@@ -533,13 +533,18 @@ public class CustomTradeGui extends Gui {
 		if (mPebTradeGUIParticles == 0) {
 			EntityUtils.fireworkAnimation(location, List.of(Color.GREEN, Color.LIME, Color.FUCHSIA), FireworkEffect.Type.BALL, 40);
 		}
-		// Either return to preview, or close GUI:
+		// Either return to preview, close GUI, or do nothing:
+		if (mPebTradeGUISuccess == 1) {
+			// close GUI:
+			close();
+			return;
+		}
+		// Clear saved reqs (since item was bought, need to recheck):
+		mSavedBaseRequirements.clear();
 		if (mPebTradeGUISuccess == 0) {
-			// Clear saved reqs (since item was bought, need to recheck):
-			mSavedBaseRequirements.clear();
 			navReturnToPreview();
 		} else {
-			close();
+			update();
 		}
 	}
 

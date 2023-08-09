@@ -362,10 +362,12 @@ public class PEBCustomInventory extends CustomInventory {
 				inventory.setLayout(inventory.mCurrentPage);
 			}),
 			new PebItem(38, gui -> "Upon successful trade: ",
-				gui -> Component.text("Toggles between returning to preview page or closing the GUI upon successful trade. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(0) == 0 ? "Return to trade preview." : "Close GUI."), NamedTextColor.LIGHT_PURPLE),
+				gui -> Component.text("Toggles between: return to preview page, close GUI, or do nothing. \n\nCurrent: " +
+					                      (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(0) == 0 ? "Return to preview." :
+						                       ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(0) == 1 ? "Close GUI." : "Do nothing."), NamedTextColor.LIGHT_PURPLE),
 				Material.GLOW_ITEM_FRAME, false).action((inventory, action) -> {
 				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS).orElse(0);
-				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS, oldValue == 0 ? 1 : 0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS, oldValue == 2 ? 0 : oldValue + 1); // cycles from 0, 1, 2 -> 0
 				inventory.setLayout(inventory.mCurrentPage);
 			}),
 
