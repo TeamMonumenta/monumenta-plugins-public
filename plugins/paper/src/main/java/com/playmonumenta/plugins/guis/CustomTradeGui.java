@@ -133,7 +133,7 @@ public class CustomTradeGui extends Gui {
 				return;
 			}
 			// Shallow copy of player's inventory:
-			ItemStack[] itemStacks = player.getInventory().getContents().clone();
+			ItemStack[] itemStacks = player.getInventory().getStorageContents().clone();
 			// Check each requirement, constructing lore and updating mHasRequirements:
 			for (ItemStack requirement : mRequirements) {
 				boolean meetsRequirement;
@@ -491,7 +491,7 @@ public class CustomTradeGui extends Gui {
 		// Remove reqs:
 		Inventory inventory = mPlayer.getInventory();
 		for (ItemStack requirement : tradeReq.requirements()) {
-			inventory.removeItem(requirement);
+			inventory.removeItem(requirement.clone());
 		}
 		// Success, give item * multiplier:
 		for (int i = 0; i < multiplier; i++) {
