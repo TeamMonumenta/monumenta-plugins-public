@@ -117,6 +117,9 @@ public class GalleryGrave {
 		mRunnable.runTaskTimer(GalleryManager.mPlugin, 0, 10);
 	}
 
+	public GalleryPlayer getPlayer() {
+		return mPlayer;
+	}
 
 	public void respawnPlayer() {
 		//TODO - sound and particle
