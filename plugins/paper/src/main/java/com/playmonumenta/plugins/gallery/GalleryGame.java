@@ -565,6 +565,11 @@ public class GalleryGame {
 
 	public void playerLeave(Player target) {
 		mPlayersMap.remove(target.getUniqueId());
+		for (GalleryGrave grave : mGraves) {
+			if (grave.getPlayer().getPlayer() != null && grave.getPlayer().getPlayer().equals(target)) {
+				grave.removeGrave();
+			}
+		}
 		if (mPlayersMap.isEmpty()) {
 			GalleryManager.removeGame(GAME_INSTANCE);
 		}
