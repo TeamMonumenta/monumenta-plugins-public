@@ -71,7 +71,7 @@ public class RiftBoss extends BossAbilityGroup {
 		public ParticlesList PARTICLE_RIFT_LINGER = ParticlesList.fromString("[(EXPLOSION_NORMAL,1,0.5,0.5,0.5,0.1),(DAMAGE_INDICATOR,1,0.5,0.5,0.5,0.1)]");
 
 		@BossParam(help = "sound played when the mob starts telegraphing")
-		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,3,0.5]");
+		public SoundsList SOUND_WARN = SoundsList.fromString("[(ENTITY_ENDER_DRAGON_GROWL,3,0.5)]");
 		@BossParam(help = "sound played while the lines are telegraphed")
 		public SoundsList SOUND_CHARGE = SoundsList.fromString("[(BLOCK_END_PORTAL_FRAME_FILL,1.25,1),(ENTITY_ENDER_DRAGON_HURT,1.25,1)]");
 		@BossParam(help = "sound played as the rift is created")
