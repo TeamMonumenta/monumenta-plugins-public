@@ -25,9 +25,39 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
 
 public class AnvilOverride extends BaseOverride {
 	private static final String REPAIR_OBJECTIVE = "RepairT";
+
+	private CoreProtectAPI getCoreProtect() {
+        Plugin plugin = getServer().getPluginManager().getPlugin("CoreProtect");
+
+        // Check that CoreProtect is loaded
+        if (plugin == null || !(plugin instanceof CoreProtect)) {
+            return null;
+        }
+
+        // Check that the API is enabled
+        CoreProtectAPI CoreProtect = ((CoreProtect) plugin).getAPI();
+        if (CoreProtect.isEnabled() == false) {
+            return null;
+        }
+
+        // Check that a compatible version of the API is loaded
+        if (CoreProtect.APIVersion() < 9) {
+            return null;
+        }
+
+        return CoreProtect;
+	}
+	
+	private void logAnvilRemoved(Player p, Location loc){
+		CoreProtectAPI api = getCoreProtect();
+		String name = p.getName();
+		api.logRemoval(name, loc, Material.ANVIL, null); // technically anvil has direction block data but i don't think coreprotect cares if you ignore it, the docs aren't super great
+	}
 
 	@Override
 	public boolean rightClickBlockInteraction(Plugin plugin, Player player, Action action, @Nullable ItemStack item, Block block, PlayerInteractEvent event) {
@@ -77,6 +107,7 @@ public class AnvilOverride extends BaseOverride {
 
 				}.runTaskTimer(plugin, 0, 7);
 				block.setType(Material.AIR);
+				logAnvilRemoved(player, block.getLocation());
 				block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 				int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;
 				ScoreboardUtils.setScoreboardValue(player, REPAIR_OBJECTIVE, repCount);
