@@ -22,7 +22,6 @@ dependencies {
     // NOTE - Make sure if you add another version here you make sure to exclude it from minimization below!
     implementation(project(":adapter_api"))
     implementation(project(":adapter_unsupported"))
-    implementation(project(":adapter_v1_18_R2", "reobf"))
     implementation(project(":adapter_v1_19_R3", "reobf"))
 
     implementation("org.openjdk.jmh:jmh-core:1.19")
@@ -34,7 +33,7 @@ dependencies {
     compileOnly("net.kyori:adventure-api:4.11.0")
     compileOnly("net.kyori:adventure-text-minimessage:4.11.0")
 
-    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:8.7.0")
     compileOnly("me.clip:placeholderapi:2.10.4")
     compileOnly("de.jeff_media:ChestSortAPI:12.0.0")
@@ -70,7 +69,7 @@ version = rootProject.version
 bukkit {
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     main = "com.playmonumenta.plugins.Plugin"
-    apiVersion = "1.18"
+    apiVersion = "1.19"
     name = "Monumenta"
     authors = listOf("The Monumenta Team")
     depend = listOf("CommandAPI", "ScriptedQuests", "NBTAPI")
@@ -143,7 +142,6 @@ tasks {
         minimize {
             exclude(project(":adapter_api"))
             exclude(project(":adapter_unsupported"))
-            exclude(project(":adapter_v1_18_R2"))
             exclude(project(":adapter_v1_19_R3"))
         }
     }
