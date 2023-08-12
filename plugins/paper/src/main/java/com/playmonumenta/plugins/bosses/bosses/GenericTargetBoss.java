@@ -60,6 +60,7 @@ public class GenericTargetBoss extends BossAbilityGroup {
 
 				if (mLastTarget == null || param.TARGET_EVERY_TICK) {
 					List<? extends LivingEntity> targets = param.TARGETS.getTargetsList(mob);
+					targets.removeIf(le -> le instanceof Player player && AbilityUtils.isStealthed(player));
 					if (targets.size() > 0) {
 						mob.setTarget(targets.get(0));
 						mLastTarget = targets.get(0);
