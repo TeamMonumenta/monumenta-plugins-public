@@ -60,8 +60,7 @@ public class SagesInsight extends Ability implements AbilityWithChargesOrStacks 
 					MAX_STACKS,
 					DECAY_TIMER / 20,
 					MAX_STACKS,
-					(ABILITIES_COUNT_1 == 1) ? "the cooldown of the previous spell"
-						: String.format("the cooldowns of the previous %s spells", ABILITIES_COUNT_1)
+					String.format("the cooldowns of the previous %s spells", ABILITIES_COUNT_1)
 				),
 				String.format("Sage's Insight now refreshes the cooldowns of your previous %s spells, upon activating.",
 					ABILITIES_COUNT_2

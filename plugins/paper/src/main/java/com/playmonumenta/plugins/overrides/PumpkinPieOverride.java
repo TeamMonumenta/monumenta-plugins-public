@@ -1,12 +1,12 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -23,7 +23,7 @@ public class PumpkinPieOverride extends BaseOverride {
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity, ItemStack item) {
 		if (player == null
 			    || !ServerProperties.getTrickyCreepersEnabled()
-			    || !(clickedEntity instanceof Creeper)
+			    || !(clickedEntity instanceof Creeper creeper)
 			    || !InventoryUtils.testForItemWithName(item, "Creeper's Delight", true)
 			    || "plots".equals(ServerProperties.getShardName())
 			    || "playerplots".equals(ServerProperties.getShardName())
@@ -36,8 +36,11 @@ public class PumpkinPieOverride extends BaseOverride {
 			return true;
 		}
 
-		// TODO: Clean this up once the boss plugin and main plugin are merged
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bossfight " + clickedEntity.getUniqueId().toString() + " boss_halloween_creeper");
+		try {
+			BossManager.createBoss(null, creeper, "boss_halloween_creeper");
+		} catch (Exception e) {
+			plugin.getLogger().warning("Failed to create Tricky Creeper boss: " + e.getMessage());
+		}
 
 		// Consume the item
 		item.subtract(1);

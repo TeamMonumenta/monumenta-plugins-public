@@ -859,6 +859,7 @@ public class AbilityManager {
 		mDropKeyDisabledLeftClicks.add(player.getUniqueId());
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean checkTrigger(Player player, AbilityTrigger.Key key) {
 		// click rate limiter: the client sends multiple click events per physical button press, especially for right clicks that send a right or a left click up to 2 ticks later
 		// thus, limit clicks to once per tick, and additionally make right clicks ignore left or right clicks for 1/2 ticks, depending on the held item's type

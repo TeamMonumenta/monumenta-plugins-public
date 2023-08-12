@@ -336,6 +336,7 @@ public class BossUtils {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public static @Nullable <T extends BossAbilityGroup> T getBossOfClass(Entity entity, Class<T> cls) {
 		BossManager bossManager = BossManager.getInstance();
 		if (bossManager != null) {

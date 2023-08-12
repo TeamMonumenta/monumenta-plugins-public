@@ -123,6 +123,7 @@ public class PersistentDataCommand {
 		sender.sendMessage(Component.text("No such data on this world!"));
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void set(CommandSender sender, World world, NamespacedKey key, String dataType, String valueString) throws WrapperCommandSyntaxException {
 		Constants.SupportedPersistentDataType type;
 		try {

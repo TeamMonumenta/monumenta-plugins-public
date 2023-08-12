@@ -26,6 +26,7 @@ public class CustomEffect {
 	private static final String COMMAND = "customeffect";
 	private static final String PERMISSION = "monumenta.commands.customeffect";
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		Argument<?> entitiesArgument = new EntitySelectorArgument.ManyEntities("entities");
 		Argument<?> effectArgument = new MultiLiteralArgument(Arrays.stream(EffectType.values()).map(et -> et.getType().toLowerCase()).toArray(String[]::new));

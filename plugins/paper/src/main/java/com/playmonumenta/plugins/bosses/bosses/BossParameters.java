@@ -90,6 +90,7 @@ public abstract class BossParameters {
 		return res;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T extends BossParameters> ParseResult<T> parseParameters(StringReader reader, T parameters, boolean fullSuggestions) {
 		String bossDescription = "undefined";
 		BossParam annotations = parameters.getClass().getAnnotation(BossParam.class);
@@ -314,12 +315,12 @@ public abstract class BossParameters {
 						}
 						((BossPhasesList) validType.getField().get(parameters)).addBossPhases(Objects.requireNonNull(result.getResult()));
 					} else if (Enum.class.isAssignableFrom(validTypeClass)) {
-						Object val = reader.readEnum(((Class<? extends Enum>) validTypeClass).getEnumConstants());
+						Object val = reader.readEnum(((Class<? extends Enum<?>>) validTypeClass).getEnumConstants());
 						if (val == null) {
 							// Entry not valid, offer all entries as completions
 							List<Tooltip<String>> suggArgs = new ArrayList<>();
 							String soFar = reader.readSoFar();
-							for (Enum<?> valid : ((Class<? extends Enum>) validTypeClass).getEnumConstants()) {
+							for (Enum<?> valid : ((Class<? extends Enum<?>>) validTypeClass).getEnumConstants()) {
 								suggArgs.add(Tooltip.ofString(soFar + valid.name(), validType.getDesc()));
 							}
 							return ParseResult.of(suggArgs.toArray(Tooltip.arrayOf()));

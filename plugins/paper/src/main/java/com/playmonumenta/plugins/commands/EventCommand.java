@@ -9,7 +9,6 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
-import dev.jorel.commandapi.executors.CommandExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;

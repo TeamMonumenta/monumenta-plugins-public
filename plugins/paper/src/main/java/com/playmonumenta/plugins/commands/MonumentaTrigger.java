@@ -18,6 +18,7 @@ public class MonumentaTrigger {
 
 	private static final AtomicInteger nextId = new AtomicInteger(0);
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand("monumentatrigger")
 			.withArguments(new IntegerArgument("id"))
@@ -35,6 +36,7 @@ public class MonumentaTrigger {
 			.register();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static String makeTrigger(Player player, Consumer<Player> callback) {
 		Map<Integer, Consumer<Player>> triggers;
 		List<MetadataValue> metadata = player.getMetadata(METADATA_KEY);

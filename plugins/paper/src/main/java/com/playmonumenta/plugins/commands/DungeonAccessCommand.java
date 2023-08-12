@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 
 public class DungeonAccessCommand extends GenericCommand {
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.dungeonaccess");

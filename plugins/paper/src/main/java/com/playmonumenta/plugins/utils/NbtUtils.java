@@ -38,13 +38,13 @@ public class NbtUtils {
 		NestedCompoundIterator(NBTCompound compound, List<Iterable<String>> pathIterables) {
 			mHere = compound;
 			if (pathIterables.isEmpty()) {
-				mSubPathIterables = new ArrayList();
+				mSubPathIterables = new ArrayList<>();
 				return;
 			}
 			mSubPathIterables = pathIterables.subList(1, pathIterables.size());
 			mIt = pathIterables.get(0).iterator();
 			if (mIt == null) {
-				mIt = new ArrayList(mHere.getKeys()).iterator();
+				mIt = new ArrayList<>(mHere.getKeys()).iterator();
 			}
 		}
 

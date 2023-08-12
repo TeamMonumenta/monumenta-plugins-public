@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.scout.ranger;
 
-import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import org.bukkit.Location;
@@ -13,7 +11,6 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 public class TacticalManeuverCS implements CosmeticSkill {
 

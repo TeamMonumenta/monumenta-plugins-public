@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.warlock;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.GalleryCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;

@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 public class AbsorptionCommand {
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand("absorption")
 			.withPermission("monumenta.command.absorption")

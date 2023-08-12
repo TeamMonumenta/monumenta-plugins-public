@@ -29,6 +29,7 @@ public class DelvesCommands {
 
 	private static final String COMMAND = "delves";
 
+	@SuppressWarnings("unchecked")
 	public static void register(Plugin plugin) {
 		String perms = "monumenta.command.delves";
 

@@ -16,6 +16,7 @@ public class AttributeModifierCommand {
 	private static final String COMMAND = "attributemodifier";
 	private static final String PERMISSION = "monumenta.commands.attributemodifier";
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)

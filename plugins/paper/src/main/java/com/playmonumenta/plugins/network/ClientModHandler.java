@@ -196,6 +196,7 @@ public class ClientModHandler {
 	/**
 	 * Sent whenever a player's class is updated.
 	 */
+	@SuppressWarnings("unused")
 	private static class ClassUpdatePacket implements Packet {
 
 		final String _type = "ClassUpdatePacket";
@@ -225,6 +226,7 @@ public class ClientModHandler {
 	/**
 	 * Sent whenever an ability is used or changed in any way
 	 */
+	@SuppressWarnings("unused")
 	private static class AbilityUpdatePacket implements Packet {
 
 		final String _type = "AbilityUpdatePacket";
@@ -247,6 +249,7 @@ public class ClientModHandler {
 	/**
 	 * Custom player status effects that effect skills
 	 */
+	@SuppressWarnings("unused")
 	private static class PlayerStatusPacket implements Packet {
 
 		final String _type = "PlayerStatusPacket";
@@ -259,6 +262,7 @@ public class ClientModHandler {
 	/**
 	 * Sent whenever the number of chests in a strike changes
 	 */
+	@SuppressWarnings("unused")
 	private static class StrikeChestUpdatePacket implements Packet {
 
 		final String _type = "StrikeChestUpdatePacket";

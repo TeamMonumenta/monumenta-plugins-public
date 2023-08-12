@@ -71,6 +71,7 @@ public class BossTagCommand {
 
 	private static final Map<String, List<Soul>> SEARCH_OUTCOME_MAP = new LinkedHashMap<>();
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 
 		new CommandAPICommand(COMMAND)

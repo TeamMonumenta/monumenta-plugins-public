@@ -946,11 +946,11 @@ public class EntityUtils {
 		applyWeaken(plugin, ticks, amount, mob, WEAKEN_EFFECT_AFFECTED_DAMAGE_TYPES, WEAKEN_EFFECT_NAME);
 	}
 
-	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet affectedDamageTypes) {
+	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet<DamageType> affectedDamageTypes) {
 		applyWeaken(plugin, ticks, amount, mob, affectedDamageTypes, WEAKEN_EFFECT_NAME);
 	}
 
-	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet affectedDamageTypes, String effectString) {
+	public static void applyWeaken(Plugin plugin, int ticks, double amount, LivingEntity mob, @Nullable EnumSet<DamageType> affectedDamageTypes, String effectString) {
 		plugin.mEffectManager.addEffect(mob, effectString, new PercentDamageDealt(ticks, -amount, affectedDamageTypes));
 		plugin.mEffectManager.addEffect(mob, WEAKEN_EFFECT_AESTHETICS_NAME, new Aesthetics(ticks,
 			(entity, fourHertz, twoHertz, oneHertz) -> {

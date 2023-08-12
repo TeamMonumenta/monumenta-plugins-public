@@ -6,8 +6,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class SpellMobHealAoE extends Spell {

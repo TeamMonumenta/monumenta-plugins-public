@@ -1,9 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.classes.ClassAbility;
-import com.playmonumenta.plugins.cosmetics.Cosmetic;
-import com.playmonumenta.plugins.cosmetics.CosmeticType;
 import com.playmonumenta.plugins.cosmetics.skills.PrestigeCS;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.FastUtils;

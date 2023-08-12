@@ -29,6 +29,7 @@ public class GalleryCommands {
 	private static final String COMMAND = "gallery";
 	private static final String PERMISSION = "monumenta.r3.gallery";
 
+	@SuppressWarnings("unchecked")
 	public static void register() {
 		new CommandAPICommand(COMMAND)
 			.withPermission(PERMISSION)
@@ -111,6 +112,7 @@ public class GalleryCommands {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	private static void registerUtils() {
 		Argument<?> util = new MultiLiteralArgument("utils");
 

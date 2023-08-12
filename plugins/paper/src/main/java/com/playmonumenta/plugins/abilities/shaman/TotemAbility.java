@@ -77,7 +77,6 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 		mProjectiles.keySet().removeIf(p -> p.isDead() || !p.isValid() || p.getTicksLived() >= 100);
 		new BukkitRunnable() {
 			int mT = 0;
-			Location mLastLoc = proj.getLocation();
 			@Override
 			public void run() {
 				if (mProjectiles.get(proj) != playerItemStats) {
@@ -89,9 +88,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 					this.cancel();
 				}
 
-				if (!proj.isDead()) {
-					mLastLoc = proj.getLocation();
-				} else {
+				if (proj.isDead()) {
 					if (mProjectiles.remove(proj) != null) {
 						placeTotem(proj.getLocation(), playerItemStats);
 					}

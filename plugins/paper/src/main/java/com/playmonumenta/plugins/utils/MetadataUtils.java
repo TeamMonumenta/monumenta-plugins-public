@@ -85,6 +85,7 @@ public class MetadataUtils {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> T getMetadata(Metadatable metadatable, String key, T defaultValue) {
 		MetadataValue metadata = getMetadataValue(metadatable, key);
 		if (metadata != null) {
@@ -93,6 +94,7 @@ public class MetadataUtils {
 		return defaultValue;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> Optional<T> getMetadata(Metadatable metadatable, String key) {
 		MetadataValue metadata = getMetadataValue(metadatable, key);
 		if (metadata != null) {
