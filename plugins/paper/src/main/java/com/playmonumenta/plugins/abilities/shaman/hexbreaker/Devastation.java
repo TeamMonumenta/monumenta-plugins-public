@@ -43,9 +43,10 @@ public class Devastation extends Ability {
 			.scoreboardId("Devastation")
 			.shorthandName("DV")
 			.descriptions(
-				String.format("Press Swap while sneaking with a projectile weapon to destroy the nearest totem, dealing %s magic damage within a %s block radius of the totem. (%ss cooldown)",
+				String.format("Press Swap while sneaking and holding a projectile weapon to destroy the nearest totem, dealing %s magic damage within a %s block radius of the totem. The totem's cooldown is reduced by %ss. Cooldown: %ss",
 					DAMAGE_1,
 					RADIUS_1,
+					StringUtils.ticksToSeconds(CDR_ON_KILL),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Magic damage is increased to %s and the radius is increased to %s blocks.",

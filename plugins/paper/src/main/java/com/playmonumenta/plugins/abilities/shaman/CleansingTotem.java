@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Shaman;
 import com.playmonumenta.plugins.effects.CustomRegeneration;
@@ -44,7 +43,6 @@ public class CleansingTotem extends TotemAbility {
 	private static final int CLEANSES = 2;
 	public static final double WEAKNESS_PERCENT = 0.4;
 	public static final int WEAKNESS_DURATION = 8 * 20;
-	public static String TOTEM_NAME = "Cleansing Totem";
 
 	public static String CHARM_DURATION = "Cleansing Totem Duration";
 	public static String CHARM_RADIUS = "Cleansing Totem Radius";
@@ -63,8 +61,8 @@ public class CleansingTotem extends TotemAbility {
 			.scoreboardId("CleansingTotem")
 			.shorthandName("CT")
 			.descriptions(
-				String.format("Press left click with a melee weapon while sneaking to summon a cleansing totem. Players within %s blocks of this totem " +
-						"heal for %s%% of their maximum health per second. Duration: %ss. Cooldown: %ss.",
+				String.format("Left click while holding a melee weapon and sneaking to fire a projectile that summons a Cleansing Totem. Players within %s blocks of this totem " +
+					"heal for %s%% of their maximum health per second. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE,
 					StringUtils.multiplierToPercentage(HEAL_PERCENT),
 					StringUtils.ticksToSeconds(DURATION_1),

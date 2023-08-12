@@ -58,7 +58,7 @@ public class CounterStrike extends Ability {
 				),
 				String.format(
 					"Damage bonus is increased to %s%%. Additionally, the first time you taunt a given mob using an ability, a Counter Strike is primed against that mob.",
-					StringUtils.multiplierToPercentage(DAMAGE_1)
+					StringUtils.multiplierToPercentage(DAMAGE_2)
 				),
 				String.format(
 					"Take %s%% less damage from a mob that has a Counter Strike primed against them. If the Counter Strike was primed while you had absorption active, take %s%% less damage instead, and gain %s%% Knockback Resistance while the Counter Strike is active. Also, when dealing a Counter Strike, apply %s%% Bleed for %ss to mobs in a %s block radius.",

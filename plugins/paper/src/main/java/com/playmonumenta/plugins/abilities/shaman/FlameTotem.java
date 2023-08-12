@@ -59,8 +59,8 @@ public class FlameTotem extends TotemAbility {
 			.scoreboardId("FlameTotem")
 			.shorthandName("FT")
 			.descriptions(
-				String.format("Press right click with a melee weapon while sneaking to summon a flame totem. Mobs within %s blocks of this totem are dealt %s magic damage and set on " +
-						"fire, without inferno damage, for %s seconds every second. Duration: %ss. Cooldown: %ss.",
+				String.format("Right click while holding a melee weapon and sneaking to fire a projectile that summons a flame totem. Mobs within %s blocks of this totem are dealt %s magic damage and set on " +
+					"fire, without inferno damage, for %s seconds every second. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE,
 					DAMAGE_1,
 					StringUtils.ticksToSeconds(FIRE_DURATION),

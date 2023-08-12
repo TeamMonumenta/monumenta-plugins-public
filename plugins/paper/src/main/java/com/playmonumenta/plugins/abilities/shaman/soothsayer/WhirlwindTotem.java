@@ -57,17 +57,17 @@ public class WhirlwindTotem extends TotemAbility {
 			.scoreboardId("WhirlwindTotem")
 			.shorthandName("WWT")
 			.descriptions(
-				String.format("Swap with a melee weapon to fire a projectile which will summon a Whirlwind Totem. Every %ss, all players in a %s block radius " +
-						"have their class cooldowns reduced by %s%% (maximum %ss). Cannot decrease the cooldown on any player's whirlwind totem, and does not stack " +
-						"with other whirlwind totems (%ss duration, %ss cooldown). Additionally, apply a %s%% duration boost to other totems existing at any point " +
-						"in this totem's duration.",
+				String.format("Press the swap key while holding a melee weapon and not sneaking to fire a projectile that summons a Whirlwind Totem. Every %ss, all players in a %s block radius " +
+					"have their class cooldowns reduced by %s%% (maximum %ss). Cannot decrease the cooldown on any player's whirlwind totem, and does not stack " +
+					"with other whirlwind totems. Additionally, apply a %s%% duration boost to other totems existing at any point " +
+					"in this totem's duration. Duration: %ss. Cooldown: %ss.",
 					StringUtils.ticksToSeconds(INTERVAL),
 					AOE_RANGE,
 					StringUtils.multiplierToPercentage(CDR_PERCENT),
 					StringUtils.ticksToSeconds(CDR_MAX_PER_SECOND),
+					StringUtils.multiplierToPercentage(DURATION_BOOST),
 					StringUtils.ticksToSeconds(DURATION_1),
-					StringUtils.ticksToSeconds(COOLDOWN),
-					StringUtils.multiplierToPercentage(DURATION_BOOST)
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Totem duration increased to %ss, and now gives %s%% speed to players within range.",
 					StringUtils.ticksToSeconds(DURATION_2),

@@ -67,17 +67,17 @@ public class DecayedTotem extends TotemAbility {
 			.scoreboardId("DecayedTotem")
 			.shorthandName("DT")
 			.descriptions(
-				String.format("Press swap while holding a melee weapon to fire a projectile that summons a Decayed Totem. The totem anchors up to %s targets within %s blocks of the totem, " +
-						"inflicting %s magic damage per second and %s%% Slowness (%ss duration, %ss cooldown). Additionally grants %s damage to your flame totems and %s damage to your lightning " +
-						" totems that exist during this totem's duration.",
+				String.format("Press the swap key while holding a melee weapon and not sneaking to fire a projectile that summons a Decayed Totem. The totem anchors up to %s targets within %s blocks of the totem, " +
+					"inflicting %s magic damage per second and %s%% Slowness. Additionally grants %s damage to your flame totems and %s damage to your lightning " +
+					" totems that exist during this totem's duration. Duration: %ss. Cooldown: %ss.",
 					TARGETS,
 					AOE_RANGE,
 					DAMAGE,
 					StringUtils.multiplierToPercentage(SLOWNESS_PERCENT),
-					StringUtils.ticksToSeconds(DURATION_1),
-					StringUtils.ticksToSeconds(COOLDOWN),
 					FLAME_TOTEM_DAMAGE_BUFF,
-					LIGHTNING_TOTEM_DAMAGE_BUFF
+					LIGHTNING_TOTEM_DAMAGE_BUFF,
+					StringUtils.ticksToSeconds(DURATION_1),
+					StringUtils.ticksToSeconds(COOLDOWN)
 				),
 				String.format("Damage now ticks every half second, and duration is increased to %ss.",
 					StringUtils.ticksToSeconds(DURATION_2))

@@ -54,7 +54,7 @@ public class LightningTotem extends TotemAbility {
 			.scoreboardId("LightningTotem")
 			.shorthandName("LT")
 			.descriptions(
-				String.format("Press drop while not sneaking with a melee weapon while sneaking to summon a lightning totem. The totem will target a " +
+				String.format("Press the drop key while holding a melee weapon and not sneaking to fire a projectile that summons a Lightning Totem. The totem will target a " +
 					"mob within %s blocks with priority towards boss and elite mobs and deal %s magic damage every %s seconds. Duration: %ss. Cooldown: %ss.",
 					AOE_RANGE,
 					DAMAGE_1,
