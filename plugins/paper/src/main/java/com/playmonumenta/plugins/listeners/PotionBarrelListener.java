@@ -563,7 +563,7 @@ public class PotionBarrelListener implements Listener {
 	private static boolean isValidLocation(Location location) {
 		return ServerProperties.getShardName().equals("playerplots")
 				|| ServerProperties.getShardName().startsWith("dev")
-				|| (ServerProperties.getShardName().equals("plots") && !ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE));
+				|| (ServerProperties.getShardName().equals("plots"));
 	}
 
 }
