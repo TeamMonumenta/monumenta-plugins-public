@@ -28,17 +28,17 @@ public class CounterStrikeCS implements CosmeticSkill {
 	}
 
 	public void onPrime(Player player, Location loc) {
-		player.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, SoundCategory.PLAYERS, 0.6f, 0.5f);
-		player.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.6f, 1.0f);
-		player.playSound(loc, Sound.ITEM_ARMOR_EQUIP_DIAMOND, SoundCategory.PLAYERS, 0.4f, 0.3f);
+		player.playSound(loc, Sound.ENTITY_ARMOR_STAND_BREAK, SoundCategory.PLAYERS, 0.8f, 0.5f);
+		player.playSound(loc, Sound.BLOCK_CHAIN_PLACE, SoundCategory.PLAYERS, 0.8f, 1.0f);
+		player.playSound(loc, Sound.ITEM_ARMOR_EQUIP_DIAMOND, SoundCategory.PLAYERS, 0.6f, 0.3f);
 	}
 
 	public void onCounterStrike(Player player, LivingEntity enemy, Location enemyLoc) {
-		player.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.6f, 0.1f);
-		player.playSound(enemyLoc, Sound.ENTITY_PLAYER_BIG_FALL, SoundCategory.PLAYERS, 0.6f, 0.1f);
-		player.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.6f, 0.6f);
-		player.playSound(enemyLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.4f, 0.8f);
-		player.playSound(enemyLoc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.3f, 2.0f);
+		player.playSound(enemyLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.8f, 0.1f);
+		player.playSound(enemyLoc, Sound.ENTITY_PLAYER_BIG_FALL, SoundCategory.PLAYERS, 0.8f, 0.1f);
+		player.playSound(enemyLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 0.8f, 0.6f);
+		player.playSound(enemyLoc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.PLAYERS, 0.6f, 0.8f);
+		player.playSound(enemyLoc, Sound.ENTITY_ELDER_GUARDIAN_HURT, SoundCategory.PLAYERS, 0.4f, 2.0f);
 		new PartialParticle(Particle.SWEEP_ATTACK, enemyLoc, 3, 0.75, 0.5, 0.75, 0.001).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.FIREWORKS_SPARK, enemyLoc, 8, 0.75, 0.5, 0.75, 0.1).spawnAsPlayerActive(player);
 	}
