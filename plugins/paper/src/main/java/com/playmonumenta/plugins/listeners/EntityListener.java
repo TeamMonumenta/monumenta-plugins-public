@@ -1138,9 +1138,9 @@ public class EntityListener implements Listener {
 			// Remove the bonus range Vindicators get when riding Ravagers
 			NmsUtils.getVersionAdapter().setAttackRange(vindicator, 1.43);
 		} else if (event.getEntity() instanceof Zoglin zoglin) {
-			NmsUtils.getVersionAdapter().setAttackRange(zoglin, 2.5);
+			NmsUtils.getVersionAdapter().setAttackRange(zoglin, 1.8);
 		} else if (event.getEntity() instanceof Hoglin hoglin) {
-			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 2.5);
+			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 1.8);
 		} else if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
 			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
 			event.getEntity().remove();
