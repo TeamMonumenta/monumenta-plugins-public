@@ -63,6 +63,8 @@ public class HallowedBeam extends MultipleChargeAbility {
 	public static final String CHARM_HEAL = "Hallowed Beam Healing";
 	public static final String CHARM_DISTANCE = "Hallowed Beam Distance";
 	public static final String CHARM_STUN = "Hallowed Beam Stun Duration";
+	public static final String CHARM_RESISTANCE = "Hallowed Beam Resistance";
+	public static final String CHARM_RESISTANCE_DURATION = "Hallowed Beam Resistance Duration";
 	public static final String CHARM_CHARGE = "Hallowed Beam Charge";
 
 	public static final AbilityInfo<HallowedBeam> INFO =
@@ -178,7 +180,9 @@ public class HallowedBeam extends MultipleChargeAbility {
 
 				Location eLoc = healedPlayer.getLocation().add(0, healedPlayer.getHeight() / 2, 0);
 				if (isLevelTwo()) {
-					mPlugin.mEffectManager.addEffect(healedPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(HALLOWED_DAMAGE_REDUCTION_DURATION, HALLOWED_DAMAGE_REDUCTION_PERCENT));
+					double resistance = HALLOWED_DAMAGE_REDUCTION_PERCENT - CharmManager.getLevelPercentDecimal(mPlayer, CHARM_RESISTANCE);
+					int duration = CharmManager.getDuration(mPlayer, CHARM_RESISTANCE_DURATION, HALLOWED_DAMAGE_REDUCTION_DURATION);
+					mPlugin.mEffectManager.addEffect(healedPlayer, PERCENT_DAMAGE_RESIST_EFFECT_NAME, new PercentDamageReceived(duration, resistance));
 				}
 				for (LivingEntity le : EntityUtils.getNearbyMobs(eLoc, HALLOWED_RADIUS)) {
 					MovementUtils.knockAway(healedPlayer, le, 0.65f, true);

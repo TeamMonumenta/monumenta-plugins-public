@@ -385,6 +385,8 @@ public class CharmManager {
 			HallowedBeam.CHARM_DISTANCE,
 			HallowedBeam.CHARM_STUN,
 			HallowedBeam.CHARM_HEAL,
+			HallowedBeam.CHARM_RESISTANCE,
+			HallowedBeam.CHARM_RESISTANCE_DURATION,
 			Rejuvenation.CHARM_THRESHOLD,
 
 			//Rogue
