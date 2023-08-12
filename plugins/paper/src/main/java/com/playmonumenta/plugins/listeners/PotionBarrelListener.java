@@ -526,7 +526,7 @@ public class PotionBarrelListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void plockPlaceEvent(BlockPlaceEvent event) {
 		if (isPotionBarrel(event.getBlock())
-				&& !isValidLocation(event.getBlock().getLocation())) {
+				&& !isValidShard()) {
 			event.setCancelled(true);
 		}
 	}
@@ -560,7 +560,7 @@ public class PotionBarrelListener implements Listener {
 				&& POTION_BARREL_NAME.equals(MessagingUtils.plainText(barrel.customName()));
 	}
 
-	private static boolean isValidLocation(Location location) {
+	private static boolean isValidShard() {
 		return ServerProperties.getShardName().equals("playerplots")
 				|| ServerProperties.getShardName().startsWith("dev")
 				|| ServerProperties.getShardName().equals("plots");
