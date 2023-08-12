@@ -335,7 +335,7 @@ public class PotionBarrelListener implements Listener {
 					CoreProtectIntegration.logContainerTransaction(player, clickedBlock);
 					takeAll(barrelInventory, player.getInventory());
 				}
-			} else {
+			} else if (!isShopLocation(clickedBlock.getLocation())) {
 				// Deposit all matching potions
 				// Also refills potion injectors
 				ItemStack barrelPotion = getBarrelPotion(barrelInventory);
@@ -564,6 +564,11 @@ public class PotionBarrelListener implements Listener {
 		return ServerProperties.getShardName().equals("playerplots")
 				|| ServerProperties.getShardName().startsWith("dev")
 				|| ServerProperties.getShardName().equals("plots");
+	}
+
+	private static boolean isShopLocation(Location location) {
+		return ServerProperties.getShardName().equals("plots")
+			    && ZoneUtils.hasZoneProperty(location, ZoneUtils.ZoneProperty.SHOPS_POSSIBLE);
 	}
 
 }
