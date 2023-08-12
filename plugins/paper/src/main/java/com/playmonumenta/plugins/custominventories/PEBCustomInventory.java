@@ -235,25 +235,15 @@ public class PEBCustomInventory extends CustomInventory {
 			new PebItem(24, "Inventory Drink",
 				"Click to toggle drinking potions with a right click in any inventory.", NamedTextColor.LIGHT_PURPLE,
 				Material.GLASS_BOTTLE, false).playerCommand("clickable peb_tid"),
-			new PebItem(29, "Toggle Darksight",
+			new PebItem(30, "Toggle Darksight",
 				"Click to toggle whether Darksight provides Night Vision", NamedTextColor.LIGHT_PURPLE,
 				Material.LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/darksight_toggle"),
-			new PebItem(30, "Toggle Radiant",
+			new PebItem(31, "Toggle Radiant",
 				"Click to toggle whether Radiant provides Night Vision.", NamedTextColor.LIGHT_PURPLE,
 				Material.SOUL_LANTERN, false).serverCommand("execute as @S run function monumenta:mechanisms/radiant_toggle"),
-			new PebItem(31, "Rocket Jump",
+			new PebItem(32, "Rocket Jump",
 				"Click to enable or disable Rocket Jump", NamedTextColor.LIGHT_PURPLE,
-				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP),
-			new PebItem(32, "Earthen Tremor",
-				"Click to enable or disable the self-knockup on earthen tremor.", NamedTextColor.LIGHT_PURPLE,
-				Material.HANGING_ROOTS, false)
-				.action((gui, event) -> {
-					if (ScoreboardUtils.toggleTag(gui.mPlayer, "NoTremorKnockup")) {
-						gui.mPlayer.sendMessage("Earthen Tremor self knockup disabled!");
-					} else {
-						gui.mPlayer.sendMessage("Earthen Tremor self knockup enabled!");
-					}
-				})
+				Material.FIREWORK_ROCKET, false).switchToPage(PebPage.ROCKET_JUMP)
 		);
 
 		definePage(PebPage.TECHNICAL_OPTIONS,
