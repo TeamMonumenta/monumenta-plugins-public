@@ -68,20 +68,20 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Setup Golang with cache
-      uses: magnetikonline/action-golang-cache@v3
-      with:
-        go-version: ~1.18
-    - run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@master
+    # - name: Setup Golang with cache
+    #   uses: magnetikonline/action-golang-cache@v3
+    #   with:
+    #     go-version: ~1.18
+    # - run: go install github.com/reviewdog/reviewdog/cmd/reviewdog@master
 
     # Currently installing this manually using the above golang build because the current latest
     # v0.14.1 has a bug where too much data causes the data post to fail
     # Check https://github.com/reviewdog/reviewdog/releases/ and if it's > 0.14.1,
     # remove the above block and uncomment the below stuff
-    # - name: Setup reviewdog
-    #   uses: reviewdog/action-setup@v1
-    #   with:
-    #     reviewdog_version: latest
+    - name: Setup reviewdog
+      uses: reviewdog/action-setup@v1
+      with:
+        reviewdog_version: latest
 
     - name: Build and report style/pmd/warnings
       working-directory: ./plugins
