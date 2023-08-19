@@ -57,7 +57,8 @@ public class OnHitBoss extends BossAbilityGroup {
 			// Attack was blocked
 			return;
 		}
-		if (!mParams.SPELL_NAME.equals("") && event.getBossSpellName() != null && !event.getBossSpellName().equals(mParams.SPELL_NAME)) {
+
+		if (!mParams.SPELL_NAME.equals("") && !mParams.SPELL_NAME.equals(event.getBossSpellName())) {
 			// If it isn't the spell that we want, don't trigger anything
 			return;
 		}

@@ -20,13 +20,15 @@ import org.bukkit.plugin.Plugin;
 public class ImmortalPassengerBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_immortalpassenger";
-	public static final int detectionRange = 40;
 
 	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(InfernoDamage.class, CustomDamageOverTime.class);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
 		public boolean TRANSFER_DAMAGE = true;
+
+		@BossParam(help = "detection range of this ability")
+		public int DETECTION = 40;
 	}
 
 	private final boolean mTransferDamage;
@@ -49,7 +51,7 @@ public class ImmortalPassengerBoss extends BossAbilityGroup {
 			}, 1, true)
 		);
 
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null, 0, 1);
 	}
 
 	@Override

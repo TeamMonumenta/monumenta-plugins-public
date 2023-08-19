@@ -14,21 +14,22 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class ImmortalMountBoss extends BossAbilityGroup {
 
 	public static final String identityTag = "boss_immortalmount";
-	public static final int detectionRange = 40;
 
 	private static final ImmutableList<Class<? extends Effect>> COPIED_EFFECTS = ImmutableList.of(InfernoDamage.class, CustomDamageOverTime.class);
 
 	public static class Parameters extends BossParameters {
 		@BossParam(help = "Whether or not damage taken by this mount is redirected to its passenger")
 		public boolean TRANSFER_DAMAGE = true;
+
+		@BossParam(help = "detection range of this ability")
+		public int DETECTION = 40;
 	}
 
 	private final boolean mTransferDamage;
@@ -46,6 +47,13 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 		List<Spell> passiveSpells = List.of(
 			new SpellRunAction(() -> {
 				List<Entity> passengers = boss.getPassengers();
+
+				// exception for snowball passengers
+				if (!passengers.isEmpty() && passengers.get(0) instanceof Snowball snowball && snowball.getPassengers().isEmpty()) {
+					boss.setHealth(0);
+					boss.remove();
+				}
+
 				if (passengers.size() == 0) {
 					boss.setHealth(0);
 					boss.remove();
@@ -65,7 +73,7 @@ public class ImmortalMountBoss extends BossAbilityGroup {
 			}, 1, true)
 		);
 
-		super.constructBoss(SpellManager.EMPTY, passiveSpells, detectionRange, null);
+		super.constructBoss(SpellManager.EMPTY, passiveSpells, p.DETECTION, null, 0, 1);
 	}
 
 	@Override
