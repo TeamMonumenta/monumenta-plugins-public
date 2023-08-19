@@ -62,8 +62,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 			.scoreboardId("HeavenlyBoon")
 			.shorthandName("HB")
 			.descriptions(
-				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever an undead mob you have hit within 1.5s dies or you deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an Instant Health I potion, with an additional effect of either Regen I, +10% Attack Damage, +10 Damage Resistance, +20% Speed, or +20% Absorption with 20 second duration.",
-				"The chance to be splashed upon killing an Undead increases to 20%, the effect potions now give Instant Health 2 and the durations of each are increased to 50 seconds.",
+				"Whenever you are hit with a positive splash potion, the effects are also given to other players in a 12 block radius. In addition, whenever an undead mob you have hit within 1.5s dies or you deal damage to a boss (R1 100/R2 200/R3 300), you have a 10% chance to be splashed with an 20% Instant Health potion, with an additional effect of either Regen I, +10% Strength, +10% Resistance, +20% Speed, or +20% Absorption with a 20 second duration.",
+				"The chance to be splashed upon killing an undead mob is increased to 20%. The effect potions now give 40% Instant Health and the durations of each are increased to 50 seconds.",
 				String.format(
 					"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
 						" (capped at +%ss, and up to a maximum of %s minutes) on all players in the radius.",
