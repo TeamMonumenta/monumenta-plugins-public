@@ -41,7 +41,13 @@ public class ThuribleProcession extends Ability implements AbilityWithChargesOrS
 	private static final double EFFECT_PERCENT_2 = 0.15;
 	private static final int MAX_BUFFS = 4;
 	private static final double DAMAGE_BREAK_PERCENT = 0.6;
-	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(DamageType.MELEE, DamageType.PROJECTILE);
+	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
+		DamageType.MELEE,
+		DamageType.MELEE_SKILL,
+		DamageType.MELEE_ENCH,
+		DamageType.PROJECTILE,
+		DamageType.PROJECTILE_SKILL
+	);
 	private static final String PERCENT_ATTACK_SPEED_EFFECT_NAME = "ThuribleProcessionPercentAttackSpeedEffect";
 	private static final String PERCENT_SPEED_EFFECT_NAME = "ThuribleProcessionPercentSpeedEffect";
 	public static final String PERCENT_DAMAGE_EFFECT_NAME = "ThuribleProcessionPercentDamageEffect";

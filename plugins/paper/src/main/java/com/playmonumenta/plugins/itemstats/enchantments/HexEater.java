@@ -81,6 +81,10 @@ public class HexEater implements Enchantment {
 			effects++;
 		}
 
+		if (EntityUtils.isVulnerable(plugin, target)) {
+			effects++;
+		}
+
 		if (target.getFireTicks() > 0 || Inferno.hasInferno(plugin, target)) {
 			effects++;
 		}
