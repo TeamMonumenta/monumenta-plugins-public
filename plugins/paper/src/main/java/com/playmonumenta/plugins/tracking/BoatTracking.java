@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import org.bukkit.Material;
-import org.bukkit.TreeSpecies;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+
 
 public class BoatTracking implements EntityTracking {
 	private Set<Boat> mEntities = new HashSet<Boat>();
@@ -18,7 +18,7 @@ public class BoatTracking implements EntityTracking {
 
 	@Override
 	public void addEntity(Entity entity) {
-		mEntities.add((Boat)entity);
+		mEntities.add((Boat) entity);
 	}
 
 	@Override
@@ -33,29 +33,60 @@ public class BoatTracking implements EntityTracking {
 			Boat boat = boatIter.next();
 			if (boat != null && boat.isValid() && boat.getLocation().isChunkLoaded()) {
 				if (!LocationUtils.isValidBoatLocation(boat.getLocation())) {
-					TreeSpecies woodType = boat.getWoodType();
+					Material woodType = boat.getBoatMaterial();
 					World world = boat.getWorld();
 					switch (woodType) {
-					case ACACIA:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.ACACIA_BOAT));
-						break;
-					case BIRCH:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.BIRCH_BOAT));
-						break;
-					case DARK_OAK:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.DARK_OAK_BOAT));
-						break;
-					case GENERIC:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.OAK_BOAT));
-						break;
-					case JUNGLE:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.JUNGLE_BOAT));
-						break;
-					case REDWOOD:
-					default:
-						world.dropItem(boat.getLocation(), new ItemStack(Material.SPRUCE_BOAT));
-						break;
+						case ACACIA_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.ACACIA_BOAT));
+							break;
+						case ACACIA_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.ACACIA_CHEST_BOAT));
+							break;
+						case BIRCH_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.BIRCH_BOAT));
+							break;
+						case BIRCH_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.BIRCH_CHEST_BOAT));
+							break;
+						case DARK_OAK_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.DARK_OAK_BOAT));
+							break;
+						case DARK_OAK_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.DARK_OAK_CHEST_BOAT));
+							break;
+						case OAK_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.OAK_BOAT));
+							break;
+						case OAK_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.OAK_CHEST_BOAT));
+							break;
+						case JUNGLE_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.JUNGLE_BOAT));
+							break;
+						case JUNGLE_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.JUNGLE_CHEST_BOAT));
+							break;
+						case SPRUCE_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.SPRUCE_BOAT));
+							break;
+						case SPRUCE_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.SPRUCE_CHEST_BOAT));
+							break;
+						case CHERRY_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.CHERRY_BOAT));
+							break;
+						case CHERRY_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.CHERRY_CHEST_BOAT));
+							break;
+						case MANGROVE_CHEST_BOAT:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.MANGROVE_CHEST_BOAT));
+							break;
+						case MANGROVE_BOAT:
+						default:
+							world.dropItem(boat.getLocation(), new ItemStack(Material.MANGROVE_BOAT));
+							break;
 					}
+
 					boatIter.remove();
 					boat.remove();
 				} else {

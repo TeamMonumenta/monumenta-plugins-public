@@ -9,7 +9,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Objects;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -90,7 +89,11 @@ public final class ItemOverrides {
 		Material.SPRUCE_SIGN,
 		Material.SPRUCE_WALL_SIGN,
 		Material.WARPED_SIGN,
-		Material.WARPED_WALL_SIGN
+		Material.WARPED_WALL_SIGN,
+		Material.MANGROVE_SIGN,
+		Material.MANGROVE_WALL_SIGN,
+		Material.CHERRY_SIGN,
+		Material.CHERRY_WALL_SIGN
 	);
 
 	public ItemOverrides() {
@@ -101,6 +104,7 @@ public final class ItemOverrides {
 
 	public void registerOverrides() {
 		BaseOverride monsterEggOverride = new MonsterEggOverride();
+		mItems.put(Material.ALLAY_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.AXOLOTL_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.BAT_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.BEE_SPAWN_EGG, monsterEggOverride);
@@ -118,6 +122,7 @@ public final class ItemOverrides {
 		mItems.put(Material.ENDERMAN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ENDERMITE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.EVOKER_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.FROG_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.FOX_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.GHAST_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.GLOW_SQUID_SPAWN_EGG, monsterEggOverride);
@@ -153,6 +158,7 @@ public final class ItemOverrides {
 		mItems.put(Material.SQUID_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.STRAY_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.STRIDER_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.TADPOLE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.TRADER_LLAMA_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.TROPICAL_FISH_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.TURTLE_SPAWN_EGG, monsterEggOverride);
@@ -160,6 +166,7 @@ public final class ItemOverrides {
 		mItems.put(Material.VILLAGER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.VINDICATOR_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WANDERING_TRADER_SPAWN_EGG, monsterEggOverride);
+		mItems.put(Material.WARDEN_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WITCH_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WITHER_SKELETON_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.WOLF_SPAWN_EGG, monsterEggOverride);
@@ -168,6 +175,7 @@ public final class ItemOverrides {
 		mItems.put(Material.ZOMBIE_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIE_VILLAGER_SPAWN_EGG, monsterEggOverride);
 		mItems.put(Material.ZOMBIFIED_PIGLIN_SPAWN_EGG, monsterEggOverride);
+
 
 		BaseOverride bedOverride = new BedOverride();
 		mItems.put(Material.WHITE_BED, bedOverride);
@@ -192,11 +200,22 @@ public final class ItemOverrides {
 
 		BaseOverride boatOverride = new BoatOverride();
 		mItems.put(Material.OAK_BOAT, boatOverride);
+		mItems.put(Material.OAK_CHEST_BOAT, boatOverride);
 		mItems.put(Material.ACACIA_BOAT, boatOverride);
+		mItems.put(Material.ACACIA_CHEST_BOAT, boatOverride);
 		mItems.put(Material.BIRCH_BOAT, boatOverride);
+		mItems.put(Material.BIRCH_CHEST_BOAT, boatOverride);
 		mItems.put(Material.DARK_OAK_BOAT, boatOverride);
+		mItems.put(Material.DARK_OAK_CHEST_BOAT, boatOverride);
 		mItems.put(Material.JUNGLE_BOAT, boatOverride);
+		mItems.put(Material.JUNGLE_CHEST_BOAT, boatOverride);
 		mItems.put(Material.SPRUCE_BOAT, boatOverride);
+		mItems.put(Material.SPRUCE_CHEST_BOAT, boatOverride);
+		mItems.put(Material.CHERRY_BOAT, boatOverride);
+		mItems.put(Material.CHERRY_CHEST_BOAT, boatOverride);
+		mItems.put(Material.MANGROVE_BOAT, boatOverride);
+		mItems.put(Material.MANGROVE_CHEST_BOAT, boatOverride);
+
 
 		BaseOverride minecartOverride = new MinecartOverride();
 		mItems.put(Material.MINECART, minecartOverride);
@@ -227,6 +246,7 @@ public final class ItemOverrides {
 		mItems.put(Material.SALMON_BUCKET, bucketOverride);
 		mItems.put(Material.TROPICAL_FISH_BUCKET, bucketOverride);
 		mItems.put(Material.AXOLOTL_BUCKET, bucketOverride);
+		mItems.put(Material.TADPOLE_BUCKET, bucketOverride);
 
 		BaseOverride chestOverride = new ChestOverride();
 		mItems.put(Material.CHEST, chestOverride);
@@ -281,6 +301,10 @@ public final class ItemOverrides {
 		mItems.put(Material.WARPED_WALL_SIGN, signOverride);
 		mItems.put(Material.CRIMSON_SIGN, signOverride);
 		mItems.put(Material.CRIMSON_WALL_SIGN, signOverride);
+		mItems.put(Material.MANGROVE_SIGN, signOverride);
+		mItems.put(Material.MANGROVE_WALL_SIGN, signOverride);
+		mItems.put(Material.CHERRY_SIGN, signOverride);
+		mItems.put(Material.CHERRY_WALL_SIGN, signOverride);
 
 		BaseOverride trapdoorOverride = new TrapdoorOverride();
 		mItems.put(Material.ACACIA_TRAPDOOR, trapdoorOverride);
@@ -291,6 +315,8 @@ public final class ItemOverrides {
 		mItems.put(Material.OAK_TRAPDOOR, trapdoorOverride);
 		mItems.put(Material.SPRUCE_TRAPDOOR, trapdoorOverride);
 		mItems.put(Material.WARPED_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.MANGROVE_TRAPDOOR, trapdoorOverride);
+		mItems.put(Material.CHERRY_TRAPDOOR, trapdoorOverride);
 
 		BaseOverride berryBushOverride = new BerryBushOverride();
 		mItems.put(Material.SWEET_BERRY_BUSH, berryBushOverride);
@@ -306,6 +332,8 @@ public final class ItemOverrides {
 		mItems.put(Material.OAK_DOOR, doorOverride);
 		mItems.put(Material.SPRUCE_DOOR, doorOverride);
 		mItems.put(Material.WARPED_DOOR, doorOverride);
+		mItems.put(Material.MANGROVE_DOOR, doorOverride);
+		mItems.put(Material.CHERRY_DOOR, doorOverride);
 
 		BaseOverride unbreakableOverride = new UnbreakableOnBedrockOverride();
 		mItems.put(Material.SPAWNER, unbreakableOverride);
@@ -428,7 +456,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean rightClickEntityInteraction(Plugin plugin, Player player, Entity clickedEntity,
-											   ItemStack itemInHand) {
+	                                           ItemStack itemInHand) {
 		Material itemType = (itemInHand != null) ? itemInHand.getType() : Material.AIR;
 		BaseOverride override = mItems.get(itemType);
 
@@ -477,7 +505,7 @@ public final class ItemOverrides {
 		// Prevent players from breaking blocks in safezones from outside of them
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE) {
 			if (ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE) &&
-				!ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
+				    !ZoneUtils.hasZoneProperty(player.getLocation(), ZoneProperty.ADVENTURE_MODE)) {
 				// Allow breaking if the player would be in survival mode at that spot
 				if (!ZoneUtils.isInPlot(block.getLocation())) {
 					eventCancelled = true;
@@ -489,7 +517,7 @@ public final class ItemOverrides {
 	}
 
 	public boolean blockPlaceInteraction(Plugin plugin, Player player, ItemStack item,
-										 BlockPlaceEvent event) {
+	                                     BlockPlaceEvent event) {
 		boolean eventCancelled = false;
 
 		//  If it's not a certain lore item go ahead and run the normal override place interaction.
@@ -500,10 +528,10 @@ public final class ItemOverrides {
 
 		//  Don't allow placing of certain items with Lore.
 		if (item.hasItemMeta()
-			&& item.getItemMeta().hasLore()
-			&& player.getGameMode() != GameMode.CREATIVE
-			&& !EXCEPTION_LORED_MATERIALS.contains(item.getType())
-			&& !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
+			    && item.getItemMeta().hasLore()
+			    && player.getGameMode() != GameMode.CREATIVE
+			    && !EXCEPTION_LORED_MATERIALS.contains(item.getType())
+			    && !Objects.equals(new NBTItem(item).getByte("Placeable"), (byte) 1)) {
 			eventCancelled |= true;
 		}
 
@@ -517,9 +545,9 @@ public final class ItemOverrides {
 			// Don't allow players to place rail on bedrock because of a dumb mojang bug
 			Material blockPlacedMat = event.getBlockPlaced().getType();
 			if (belowMat.equals(Material.BEDROCK) &&
-				(blockPlacedMat.equals(Material.RAIL) ||
-					blockPlacedMat.equals(Material.POWERED_RAIL) ||
-					blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
+				    (blockPlacedMat.equals(Material.RAIL) ||
+					     blockPlacedMat.equals(Material.POWERED_RAIL) ||
+					     blockPlacedMat.equals(Material.DETECTOR_RAIL))) {
 				eventCancelled = true;
 			}
 		}
@@ -540,7 +568,7 @@ public final class ItemOverrides {
 
 		// Don't allow blocks to break if they're on the server's list of unbreakable blocks
 		if (!eventCancelled && player.getGameMode() != GameMode.CREATIVE &&
-			ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
+			    ServerProperties.getUnbreakableBlocks().contains(block.getType())) {
 			eventCancelled = true;
 		}
 

@@ -105,6 +105,10 @@ public class ItemUtils {
 		Material.ANVIL,
 		Material.CHIPPED_ANVIL,
 		Material.DAMAGED_ANVIL,
+		Material.CHERRY_BUTTON,
+		Material.CHERRY_DOOR,
+		Material.CHERRY_FENCE_GATE,
+		Material.CHERRY_TRAPDOOR,
 		Material.BEACON,
 		Material.BIRCH_BUTTON,
 		Material.BIRCH_DOOR,
@@ -155,6 +159,10 @@ public class ItemUtils {
 		Material.LIME_SHULKER_BOX,
 		Material.MAGENTA_BED,
 		Material.MAGENTA_SHULKER_BOX,
+		Material.MANGROVE_BUTTON,
+		Material.MANGROVE_DOOR,
+		Material.MANGROVE_FENCE_GATE,
+		Material.MANGROVE_TRAPDOOR,
 		Material.NOTE_BLOCK,
 		Material.OAK_BUTTON,
 		Material.OAK_DOOR,
@@ -254,7 +262,9 @@ public class ItemUtils {
 		Material.JUNGLE_BUTTON,
 		Material.POLISHED_BLACKSTONE_BUTTON,
 		Material.OAK_BUTTON,
-		Material.SPRUCE_BUTTON
+		Material.SPRUCE_BUTTON,
+		Material.CHERRY_BUTTON,
+		Material.MANGROVE_BUTTON
 	);
 
 	public static final Set<Material> shulkerBoxes = EnumSet.of(
@@ -346,6 +356,8 @@ public class ItemUtils {
 		Material.ACACIA_LEAVES,
 		Material.AZALEA_LEAVES,
 		Material.FLOWERING_AZALEA_LEAVES,
+		Material.MANGROVE_LEAVES,
+		Material.CHERRY_LEAVES,
 		Material.SEA_LANTERN,
 		Material.GLOWSTONE
 	);
@@ -357,6 +369,8 @@ public class ItemUtils {
 		Material.DARK_OAK_LOG,
 		Material.ACACIA_LOG,
 		Material.OAK_LOG,
+		Material.MANGROVE_LOG,
+		Material.CHERRY_LOG,
 		Material.CRIMSON_HYPHAE,
 		Material.CRIMSON_STEM,
 		Material.BIRCH_WOOD,
@@ -365,6 +379,8 @@ public class ItemUtils {
 		Material.DARK_OAK_WOOD,
 		Material.ACACIA_WOOD,
 		Material.OAK_WOOD,
+		Material.MANGROVE_WOOD,
+		Material.CHERRY_WOOD,
 		Material.WARPED_STEM,
 		Material.WARPED_HYPHAE
 	);
@@ -374,12 +390,16 @@ public class ItemUtils {
 		Material.ACACIA_WALL_SIGN,
 		Material.BIRCH_SIGN,
 		Material.BIRCH_WALL_SIGN,
+		Material.CHERRY_SIGN,
+		Material.CHERRY_WALL_SIGN,
 		Material.CRIMSON_SIGN,
 		Material.CRIMSON_WALL_SIGN,
 		Material.DARK_OAK_SIGN,
 		Material.DARK_OAK_WALL_SIGN,
 		Material.JUNGLE_SIGN,
 		Material.JUNGLE_WALL_SIGN,
+		Material.MANGROVE_SIGN,
+		Material.MANGROVE_WALL_SIGN,
 		Material.OAK_SIGN,
 		Material.OAK_WALL_SIGN,
 		Material.SPRUCE_SIGN,
@@ -417,7 +437,8 @@ public class ItemUtils {
 		Material.POTTED_OXEYE_DAISY, Material.POTTED_CORNFLOWER, Material.POTTED_LILY_OF_THE_VALLEY, Material.POTTED_WITHER_ROSE,
 		Material.POTTED_RED_MUSHROOM, Material.POTTED_BROWN_MUSHROOM, Material.POTTED_DEAD_BUSH, Material.POTTED_CACTUS,
 		Material.POTTED_BAMBOO, Material.POTTED_CRIMSON_FUNGUS, Material.POTTED_WARPED_FUNGUS, Material.POTTED_CRIMSON_ROOTS,
-		Material.POTTED_WARPED_ROOTS, Material.POTTED_AZALEA_BUSH, Material.POTTED_FLOWERING_AZALEA_BUSH
+		Material.POTTED_WARPED_ROOTS, Material.POTTED_AZALEA_BUSH, Material.POTTED_FLOWERING_AZALEA_BUSH, Material.POTTED_MANGROVE_PROPAGULE,
+		Material.POTTED_CHERRY_SAPLING
 	);
 
 	// list of blocks that are supposedly used as limits to player movements
@@ -470,25 +491,25 @@ public class ItemUtils {
 	// Returns the cost (in tier 2 currency (CXP/CCS/etc.)) to reforge an item.
 	public static Integer getReforgeCost(ItemStack item) {
 		switch (ItemStatUtils.getTier(item)) {
-		case IV:
-			return item.getAmount() * 1;
-		case V:
-			return item.getAmount() * 4;
-		case UNCOMMON:
-		case UNIQUE:
-			return item.getAmount() * 16;
-		case EVENT:
-			return item.getAmount() * 32;
-		case RARE:
-		case PATRON:
-			return item.getAmount() * 48;
-		case ARTIFACT:
-		case OBFUSCATED:
-			return item.getAmount() * 64;
-		case SHULKER_BOX:
-			return item.getAmount() * 64 * 2;
-		case EPIC:
-			return item.getAmount() * 64 * 3;
+			case IV:
+				return item.getAmount() * 1;
+			case V:
+				return item.getAmount() * 4;
+			case UNCOMMON:
+			case UNIQUE:
+				return item.getAmount() * 16;
+			case EVENT:
+				return item.getAmount() * 32;
+			case RARE:
+			case PATRON:
+				return item.getAmount() * 48;
+			case ARTIFACT:
+			case OBFUSCATED:
+				return item.getAmount() * 64;
+			case SHULKER_BOX:
+				return item.getAmount() * 64 * 2;
+			case EPIC:
+				return item.getAmount() * 64 * 3;
 			default:
 				return 0;
 		}
@@ -551,37 +572,37 @@ public class ItemUtils {
 	//Gets the armor equip sound based off of the armor type
 	public static Sound getArmorEquipSound(Material mat) {
 		switch (mat) {
-		case CHAINMAIL_HELMET:
-		case CHAINMAIL_CHESTPLATE:
-		case CHAINMAIL_LEGGINGS:
-		case CHAINMAIL_BOOTS:
-			return Sound.ITEM_ARMOR_EQUIP_CHAIN;
-		case DIAMOND_HELMET:
-		case DIAMOND_CHESTPLATE:
-		case DIAMOND_LEGGINGS:
-		case DIAMOND_BOOTS:
-			return Sound.ITEM_ARMOR_EQUIP_DIAMOND;
-		case ELYTRA:
-			return Sound.ITEM_ARMOR_EQUIP_ELYTRA;
-		default:
-			return Sound.ITEM_ARMOR_EQUIP_GENERIC;
-		case GOLDEN_HELMET:
-		case GOLDEN_CHESTPLATE:
-		case GOLDEN_LEGGINGS:
-		case GOLDEN_BOOTS:
-			return Sound.ITEM_ARMOR_EQUIP_GOLD;
-		case IRON_HELMET:
-		case IRON_CHESTPLATE:
-		case IRON_LEGGINGS:
-		case IRON_BOOTS:
-			return Sound.ITEM_ARMOR_EQUIP_IRON;
-		case LEATHER_HELMET:
-		case LEATHER_CHESTPLATE:
-		case LEATHER_LEGGINGS:
-		case LEATHER_BOOTS:
-			return Sound.ITEM_ARMOR_EQUIP_LEATHER;
-		case TURTLE_HELMET:
-			return Sound.ITEM_ARMOR_EQUIP_TURTLE;
+			case CHAINMAIL_HELMET:
+			case CHAINMAIL_CHESTPLATE:
+			case CHAINMAIL_LEGGINGS:
+			case CHAINMAIL_BOOTS:
+				return Sound.ITEM_ARMOR_EQUIP_CHAIN;
+			case DIAMOND_HELMET:
+			case DIAMOND_CHESTPLATE:
+			case DIAMOND_LEGGINGS:
+			case DIAMOND_BOOTS:
+				return Sound.ITEM_ARMOR_EQUIP_DIAMOND;
+			case ELYTRA:
+				return Sound.ITEM_ARMOR_EQUIP_ELYTRA;
+			default:
+				return Sound.ITEM_ARMOR_EQUIP_GENERIC;
+			case GOLDEN_HELMET:
+			case GOLDEN_CHESTPLATE:
+			case GOLDEN_LEGGINGS:
+			case GOLDEN_BOOTS:
+				return Sound.ITEM_ARMOR_EQUIP_GOLD;
+			case IRON_HELMET:
+			case IRON_CHESTPLATE:
+			case IRON_LEGGINGS:
+			case IRON_BOOTS:
+				return Sound.ITEM_ARMOR_EQUIP_IRON;
+			case LEATHER_HELMET:
+			case LEATHER_CHESTPLATE:
+			case LEATHER_LEGGINGS:
+			case LEATHER_BOOTS:
+				return Sound.ITEM_ARMOR_EQUIP_LEATHER;
+			case TURTLE_HELMET:
+				return Sound.ITEM_ARMOR_EQUIP_TURTLE;
 		}
 	}
 
@@ -638,7 +659,7 @@ public class ItemUtils {
 	}
 
 	public static void addPotionEffect(ItemStack potion, PotionInfo info) {
-		PotionMeta meta = (PotionMeta)potion.getItemMeta();
+		PotionMeta meta = (PotionMeta) potion.getItemMeta();
 		meta.addCustomEffect(new PotionEffect(info.mType, info.mDuration, info.mAmplifier, false, true), false);
 		potion.setItemMeta(meta);
 	}
@@ -1159,7 +1180,8 @@ public class ItemUtils {
 				     GRAY_BANNER, GRAY_WALL_BANNER, GREEN_BANNER, GREEN_WALL_BANNER, LIGHT_BLUE_BANNER, LIGHT_BLUE_WALL_BANNER,
 				     LIGHT_GRAY_BANNER, LIGHT_GRAY_WALL_BANNER, LIME_BANNER, LIME_WALL_BANNER, MAGENTA_BANNER, MAGENTA_WALL_BANNER,
 				     ORANGE_BANNER, ORANGE_WALL_BANNER, PINK_BANNER, PINK_WALL_BANNER, PURPLE_BANNER, PURPLE_WALL_BANNER,
-				     RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER -> true;
+				     RED_BANNER, RED_WALL_BANNER, WHITE_BANNER, WHITE_WALL_BANNER, YELLOW_BANNER, YELLOW_WALL_BANNER ->
+				true;
 			default -> false;
 		};
 	}
@@ -1219,6 +1241,7 @@ public class ItemUtils {
 	 */
 	public static EntityType getSpawnEggType(Material material) {
 		return switch (material) {
+			case ALLAY_SPAWN_EGG -> EntityType.ALLAY;
 			case AXOLOTL_SPAWN_EGG -> EntityType.AXOLOTL;
 			case BAT_SPAWN_EGG -> EntityType.BAT;
 			case BEE_SPAWN_EGG -> EntityType.BEE;
@@ -1237,6 +1260,7 @@ public class ItemUtils {
 			case ENDERMITE_SPAWN_EGG -> EntityType.ENDERMITE;
 			case EVOKER_SPAWN_EGG -> EntityType.EVOKER;
 			case FOX_SPAWN_EGG -> EntityType.FOX;
+			case FROG_SPAWN_EGG -> EntityType.FROG;
 			case GHAST_SPAWN_EGG -> EntityType.GHAST;
 			case GLOW_SQUID_SPAWN_EGG -> EntityType.GLOW_SQUID;
 			case GOAT_SPAWN_EGG -> EntityType.GOAT;
@@ -1271,6 +1295,7 @@ public class ItemUtils {
 			case SQUID_SPAWN_EGG -> EntityType.SQUID;
 			case STRAY_SPAWN_EGG -> EntityType.STRAY;
 			case STRIDER_SPAWN_EGG -> EntityType.STRIDER;
+			case TADPOLE_SPAWN_EGG -> EntityType.TADPOLE;
 			case TRADER_LLAMA_SPAWN_EGG -> EntityType.TRADER_LLAMA;
 			case TROPICAL_FISH_SPAWN_EGG -> EntityType.TROPICAL_FISH;
 			case TURTLE_SPAWN_EGG -> EntityType.TURTLE;
@@ -1278,6 +1303,7 @@ public class ItemUtils {
 			case VILLAGER_SPAWN_EGG -> EntityType.VILLAGER;
 			case VINDICATOR_SPAWN_EGG -> EntityType.VINDICATOR;
 			case WANDERING_TRADER_SPAWN_EGG -> EntityType.WANDERING_TRADER;
+			case WARDEN_SPAWN_EGG -> EntityType.WARDEN;
 			case WITCH_SPAWN_EGG -> EntityType.WITCH;
 			case WITHER_SKELETON_SPAWN_EGG -> EntityType.WITHER_SKELETON;
 			case WOLF_SPAWN_EGG -> EntityType.WOLF;

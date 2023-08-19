@@ -135,7 +135,9 @@ public class EntityUtils {
 		EntityType.COD,
 		EntityType.SALMON,
 		EntityType.TROPICAL_FISH,
-		EntityType.PUFFERFISH
+		EntityType.PUFFERFISH,
+		EntityType.FROG,
+		EntityType.TADPOLE
 	);
 
 	// This list is hardcoded for Crusade description & Duelist advancement
@@ -154,7 +156,10 @@ public class EntityUtils {
 		EntityType.IRON_GOLEM,
 		EntityType.SNOWMAN,
 
-		EntityType.GIANT
+		EntityType.GIANT,
+
+		EntityType.ALLAY,
+		EntityType.WARDEN
 	);
 
 	private static final EnumSet<EntityType> FLYING_MOBS = EnumSet.of(
@@ -165,7 +170,8 @@ public class EntityUtils {
 		EntityType.GHAST,
 		EntityType.PARROT,
 		EntityType.PHANTOM,
-		EntityType.VEX
+		EntityType.VEX,
+		EntityType.ALLAY
 	);
 
 	private static final EnumSet<EntityType> WATER_MOBS = EnumSet.of(
@@ -180,7 +186,9 @@ public class EntityUtils {
 		EntityType.COD,
 		EntityType.SALMON,
 		EntityType.TROPICAL_FISH,
-		EntityType.PUFFERFISH
+		EntityType.PUFFERFISH,
+		EntityType.TADPOLE,
+		EntityType.FROG
 	);
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
@@ -335,8 +343,8 @@ public class EntityUtils {
 	// Check for if a mob is CCImmune, meaning cannot be stunned, cannot be slowed, etc.
 	public static boolean isCCImmuneMob(Entity entity) {
 		return isBoss(entity)
-				   || ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
-				   || EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
+			       || ScoreboardUtils.checkTag(entity, CrowdControlImmunityBoss.identityTag)
+			       || EffectManager.getInstance().hasEffect(entity, CCImmuneEffect.class);
 	}
 
 	public static boolean isTrainingDummy(Entity entity) {
@@ -351,9 +359,9 @@ public class EntityUtils {
 			return false;
 		}
 		if (entity instanceof Monster || entity instanceof Slime || entity instanceof Ghast || entity instanceof PolarBear
-				|| entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
-				|| entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
-				|| entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
+			    || entity instanceof Phantom || entity instanceof Shulker || entity instanceof PufferFish
+			    || entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Giant
+			    || entity instanceof Hoglin || entity instanceof Piglin || entity instanceof Bee) {
 			return true;
 		} else if (entity instanceof Wolf) {
 			return (((Wolf) entity).isAngry() && ((Wolf) entity).getOwner() != null) || entity.getScoreboardTags().contains("boss_targetplayer");
@@ -369,7 +377,7 @@ public class EntityUtils {
 
 	public static boolean isFireResistant(LivingEntity mob) {
 		return mob instanceof Blaze || mob instanceof Ghast || mob instanceof MagmaCube || mob instanceof PigZombie || mob instanceof Wither
-				   || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
+			       || mob instanceof WitherSkeleton || mob.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE);
 	}
 
 	public static boolean isStillLoaded(Entity entity) {
@@ -695,16 +703,16 @@ public class EntityUtils {
 
 	public static @Nullable LivingEntity getNearestMob(Location loc, List<LivingEntity> nearbyMobs) {
 		return nearbyMobs
-				   .stream()
-				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-				   .orElse(null);
+			       .stream()
+			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			       .orElse(null);
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
 		return PlayerUtils.playersInRange(loc, radius, true)
-				   .stream()
-				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-				   .orElse(null);
+			       .stream()
+			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			       .orElse(null);
 	}
 
 	/**
@@ -740,10 +748,10 @@ public class EntityUtils {
 	public static @Nullable LivingEntity getNearestHostile(Player player, double range) {
 		Location loc = player.getLocation();
 		return loc.getNearbyEntitiesByType(LivingEntity.class, range, range, range)
-				   .stream()
-				   .filter(e -> e.isValid() && isHostileMob(e))
-				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-				   .orElse(null);
+			       .stream()
+			       .filter(e -> e.isValid() && isHostileMob(e))
+			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			       .orElse(null);
 	}
 
 	public static void amplifyPotionLevel(LivingEntity en, PotionEffectType effectType, int ampAmount, int ampCap) {
@@ -903,7 +911,7 @@ public class EntityUtils {
 	}
 
 
-		public static void setSlowTicks(Plugin plugin, LivingEntity mob, int ticks, String effectName) {
+	public static void setSlowTicks(Plugin plugin, LivingEntity mob, int ticks, String effectName) {
 		NavigableSet<Effect> slows = plugin.mEffectManager.getEffects(mob, effectName);
 		if (slows != null) {
 			Effect slow = slows.last();
@@ -1263,10 +1271,10 @@ public class EntityUtils {
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		return loc.getNearbyEntities(1f, 1f, 1f)
-				   .stream()
-				   .filter(e -> e.getType().equals(type))
-				   .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
-				   .orElseThrow(() -> new Exception("Summoned mob but no mob appeared - " + cmd));
+			       .stream()
+			       .filter(e -> e.getType().equals(type))
+			       .min(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(loc)))
+			       .orElseThrow(() -> new Exception("Summoned mob but no mob appeared - " + cmd));
 	}
 
 	/*
@@ -1476,7 +1484,7 @@ public class EntityUtils {
 		} else if (proj instanceof Snowball) {
 			ItemStatManager.PlayerItemStats projectileItemStats = DamageListener.getProjectileItemStats(proj);
 			return projectileItemStats != null
-					   && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
+				       && projectileItemStats.getMainhandAddStats().get(ItemStatUtils.AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat()) > 0;
 		}
 		return false;
 	}
@@ -1509,7 +1517,7 @@ public class EntityUtils {
 			for (int z = -radius; z < radius + 16; z += 16) {
 				Location offsetLocation = location.clone().add(x, 0, z);
 				if (offsetLocation.isChunkLoaded()
-						&& !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
+					    && !offsetLocation.getChunk().getTileEntities(block -> block.getLocation().distanceSquared(location) <= radiusSquared && blockPredicate.test(block), false).isEmpty()) {
 					return true;
 				}
 			}
