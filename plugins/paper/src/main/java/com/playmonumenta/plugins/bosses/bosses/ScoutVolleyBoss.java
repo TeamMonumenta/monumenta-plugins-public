@@ -36,7 +36,9 @@ public class ScoutVolleyBoss extends BossAbilityGroup {
 
 		public int DAMAGE = 0;
 
-		public EntityTargets TARGETS = EntityTargets.GENERIC_ONE_PLAYER_TARGET;
+		public boolean SINGLE_TARGET = true;
+
+		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET;
 
 		public SoundsList SOUND_START = SoundsList.fromString("[(ITEM_CROSSBOW_LOADING_START,5,0.5)]");
 		public SoundsList SOUND_END = SoundsList.fromString("[(ITEM_CROSSBOW_LOADING_MIDDLE,5,0.5)]");

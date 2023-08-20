@@ -124,9 +124,9 @@ public class ParticleUtils {
 	public static void explodingConeEffect(Plugin plugin, LivingEntity entity, Vector dir, float radius, SpawnParticleAction spawnParticleAction1, SpawnParticleAction spawnParticleAction2, double dotAngle) {
 		new BukkitRunnable() {
 			double mCurrentRadius = Math.PI / 4;
-			Location mLoc = entity.getLocation();
-			World mWorld = mLoc.getWorld();
-			Vector mDirection = dir.setY(0).normalize();
+			final Location mLoc = entity.getLocation();
+			final World mWorld = mLoc.getWorld();
+			final Vector mDirection = dir.setY(0).normalize();
 
 			@Override
 			public void run() {
@@ -174,23 +174,11 @@ public class ParticleUtils {
 		NavigableMap<Double, BoundingBoxEdge> edgeWeights = new TreeMap<>();
 		double largestKey = 0.0;
 		for (BoundingBoxEdge edge : BoundingBoxEdge.values()) {
-			double edgeSize;
-			switch (edge) {
-			case X_YMIN_ZMIN:
-			case X_YMIN_ZMAX:
-			case X_YMAX_ZMIN:
-			case X_YMAX_ZMAX:
-				edgeSize = bbSize.getX();
-				break;
-			case Y_XMIN_ZMIN:
-			case Y_XMIN_ZMAX:
-			case Y_XMAX_ZMIN:
-			case Y_XMAX_ZMAX:
-				edgeSize = bbSize.getY();
-				break;
-			default:
-				edgeSize = bbSize.getZ();
-			}
+			double edgeSize = switch (edge) {
+				case X_YMIN_ZMIN, X_YMIN_ZMAX, X_YMAX_ZMIN, X_YMAX_ZMAX -> bbSize.getX();
+				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Y_XMAX_ZMIN, Y_XMAX_ZMAX -> bbSize.getY();
+				default -> bbSize.getZ();
+			};
 			// Ensure bounding boxes with a size of 0 still show up
 			edgeSize += 0.001;
 			largestKey += edgeSize;
@@ -204,59 +192,29 @@ public class ParticleUtils {
 			}
 			BoundingBoxEdge edge = edgeEntry.getValue();
 
-			double x;
-			switch (edge) {
-			case X_YMIN_ZMIN:
-			case X_YMIN_ZMAX:
-			case X_YMAX_ZMIN:
-			case X_YMAX_ZMAX:
-				x = bb.getMinX() + bbSize.getX() * FastUtils.RANDOM.nextDouble();
-				break;
-			case Y_XMIN_ZMIN:
-			case Y_XMIN_ZMAX:
-			case Z_XMIN_YMIN:
-			case Z_XMIN_YMAX:
-				x = bb.getMinX();
-				break;
-			default:
-				x = bb.getMaxX();
-			}
+			double x = switch (edge) {
+				case X_YMIN_ZMIN, X_YMIN_ZMAX, X_YMAX_ZMIN, X_YMAX_ZMAX ->
+					bb.getMinX() + bbSize.getX() * FastUtils.RANDOM.nextDouble();
+				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Z_XMIN_YMIN, Z_XMIN_YMAX ->
+					bb.getMinX();
+				default -> bb.getMaxX();
+			};
 
-			double y;
-			switch (edge) {
-			case Y_XMIN_ZMIN:
-			case Y_XMIN_ZMAX:
-			case Y_XMAX_ZMIN:
-			case Y_XMAX_ZMAX:
-				y = bb.getMinY() + bbSize.getY() * FastUtils.RANDOM.nextDouble();
-				break;
-			case X_YMIN_ZMIN:
-			case X_YMIN_ZMAX:
-			case Z_XMIN_YMIN:
-			case Z_XMAX_YMIN:
-				y = bb.getMinY();
-				break;
-			default:
-				y = bb.getMaxY();
-			}
+			double y = switch (edge) {
+				case Y_XMIN_ZMIN, Y_XMIN_ZMAX, Y_XMAX_ZMIN, Y_XMAX_ZMAX ->
+					bb.getMinY() + bbSize.getY() * FastUtils.RANDOM.nextDouble();
+				case X_YMIN_ZMIN, X_YMIN_ZMAX, Z_XMIN_YMIN, Z_XMAX_YMIN ->
+					bb.getMinY();
+				default -> bb.getMaxY();
+			};
 
-			double z;
-			switch (edge) {
-			case Z_XMIN_YMIN:
-			case Z_XMIN_YMAX:
-			case Z_XMAX_YMIN:
-			case Z_XMAX_YMAX:
-				z = bb.getMinZ() + bbSize.getZ() * FastUtils.RANDOM.nextDouble();
-				break;
-			case X_YMIN_ZMIN:
-			case X_YMAX_ZMIN:
-			case Y_XMIN_ZMIN:
-			case Y_XMAX_ZMIN:
-				z = bb.getMinZ();
-				break;
-			default:
-				z = bb.getMaxZ();
-			}
+			double z = switch (edge) {
+				case Z_XMIN_YMIN, Z_XMIN_YMAX, Z_XMAX_YMIN, Z_XMAX_YMAX ->
+					bb.getMinZ() + bbSize.getZ() * FastUtils.RANDOM.nextDouble();
+				case X_YMIN_ZMIN, X_YMAX_ZMIN, Y_XMIN_ZMIN, Y_XMAX_ZMIN ->
+					bb.getMinZ();
+				default -> bb.getMaxZ();
+			};
 
 			world.spawnParticle(Particle.REDSTONE, x, y, z, 1, 0.0, 0.0, 0.0, dustOptions);
 		}
@@ -309,19 +267,19 @@ public class ParticleUtils {
 		}.runTaskTimer(com.playmonumenta.plugins.Plugin.getInstance(), 0, 1);
 	}
 
-	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
+	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
 												   double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd,
 												   Particle... effects) {
-		drawParticleCircleExplosion(player, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, 0, effects);
+		drawParticleCircleExplosion(entity, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, 0, effects);
 	}
 
-	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
+	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
 	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
 	                                               Particle... effects) {
-		drawParticleCircleExplosion(player, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, y, null, effects);
+		drawParticleCircleExplosion(entity, loc, angle, radius, yaw, pitch, points, speed, atOrigin, radianAdd, y, null, effects);
 	}
 
-	public static void drawParticleCircleExplosion(Player player, Location loc, double angle,
+	public static void drawParticleCircleExplosion(LivingEntity entity, Location loc, double angle,
 	                                               double radius, double yaw, double pitch, int points, float speed, boolean atOrigin, double radianAdd, double y,
 	                                               @Nullable Object data, Particle... effects) {
 
@@ -343,10 +301,16 @@ public class ParticleUtils {
 				nonYVec = VectorUtils.rotateYAxis(nonYVec, loc.getYaw() + yaw);
 				l = l.add(nonYVec);
 			}
-
+		if (entity instanceof Player player) {
 			for (Particle effect : effects) {
 				new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
 					.spawnAsPlayerActive(player);
+			}
+		} else {
+				for (Particle effect : effects) {
+					new PartialParticle(effect, atOrigin ? loc : l, 1, vec.getX(), vec.getY(), vec.getZ(), speed, data, true, 0)
+						.spawnAsEntityActive(entity);
+				}
 			}
 		}
 	}
@@ -408,16 +372,12 @@ public class ParticleUtils {
 	}
 
 	public static void drawCleaveArc(Location loc,
-									 double radius, double angle, double startingDegrees, double endingDegrees, int rings, double extraYaw,
+									 final double radius, final double angle, double startingDegrees, double endingDegrees,
+									 final int rings, final double extraYaw,
 									 double extraPitch, double spacing, double arcInc, CleaveAnimation cleaveAnim) {
 		double radiusInc = (Math.PI / (endingDegrees - startingDegrees));
-		double finalRadius = radius;
 
-		loc = loc.clone();
-
-		double finalAngle = angle;
-		double finalExtraYaw = extraYaw;
-		Location finalLoc = loc;
+		Location finalLoc = loc.clone();
 		new BukkitRunnable() {
 			double mDegrees = startingDegrees;
 			double mPI = 0;
@@ -430,11 +390,11 @@ public class ParticleUtils {
 
 					for (int i = 0; i < rings; i++) {
 						double radiusSpacing = FastUtils.sin(mPI) * (i * spacing);
-						vec = new Vector(FastUtils.cos(radian1) * (finalRadius + radiusSpacing),
-							0, FastUtils.sin(radian1) * (finalRadius + radiusSpacing));
-						vec = VectorUtils.rotateZAxis(vec, finalAngle);
+						vec = new Vector(FastUtils.cos(radian1) * (radius + radiusSpacing),
+							0, FastUtils.sin(radian1) * (radius + radiusSpacing));
+						vec = VectorUtils.rotateZAxis(vec, angle);
 						vec = VectorUtils.rotateXAxis(vec, finalLoc.getPitch() + extraPitch);
-						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw() + finalExtraYaw);
+						vec = VectorUtils.rotateYAxis(vec, finalLoc.getYaw() + extraYaw);
 
 						Location l = finalLoc.clone().add(vec);
 						cleaveAnim.cleaveAnimation(l, i + 1);
