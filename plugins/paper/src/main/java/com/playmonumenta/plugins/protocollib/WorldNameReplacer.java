@@ -37,16 +37,16 @@ public class WorldNameReplacer extends PacketAdapter {
 		}
 
 		// docs:
-		// login: https://wiki.vg/Protocol#Join_Game
+		// login: https://wiki.vg/Protocol#Login_.28play.29
 		// respawn: https://wiki.vg/Protocol#Respawn
 
 		PacketContainer packet = event.getPacket();
 
 		Class resourceKeyClass = NmsUtils.getVersionAdapter().getResourceKeyClass();
 
-		// first identifier (in both packets): world name
+		// second identifier (in both packets): world name
 		StructureModifier worldNameMod = packet.getSpecificModifier(resourceKeyClass);
-		Object currentWorldKey = worldNameMod.read(0);
+		Object currentWorldKey = worldNameMod.read(1);
 
 		World world = NmsUtils.getVersionAdapter().getWorldByResourceKey(currentWorldKey);
 		String worldName = world == null ? null : world.getPersistentDataContainer().get(WORLD_NAME_KEY, PersistentDataType.STRING);
@@ -58,7 +58,7 @@ public class WorldNameReplacer extends PacketAdapter {
 		}
 		Object shardWorldNameKey = NmsUtils.getVersionAdapter().createDimensionTypeResourceKey("monumenta", worldName);
 
-		worldNameMod.write(0, shardWorldNameKey);
+		worldNameMod.write(1, shardWorldNameKey);
 
 		// login packets also have a set of possible world names - replace the changed name in that set
 		if (event.getPacketType().equals(PacketType.Play.Server.LOGIN)) {

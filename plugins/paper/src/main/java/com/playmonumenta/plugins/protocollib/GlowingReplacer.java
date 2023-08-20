@@ -1,19 +1,16 @@
 package com.playmonumenta.plugins.protocollib;
 
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.cleric.DivineJustice;
 import com.playmonumenta.plugins.commands.GlowingCommand;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import java.util.Collection;
-import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -27,11 +24,7 @@ public class GlowingReplacer extends PacketAdapter {
 
 	public GlowingReplacer(Plugin plugin) {
 		super(plugin, ListenerPriority.NORMAL,
-				PacketType.Play.Server.ENTITY_METADATA,
-				PacketType.Play.Server.SPAWN_ENTITY,
-				PacketType.Play.Server.SPAWN_ENTITY_EXPERIENCE_ORB,
-				PacketType.Play.Server.SPAWN_ENTITY_LIVING,
-				PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+			PacketType.Play.Server.ENTITY_METADATA);
 	}
 
 	@Override
@@ -39,24 +32,17 @@ public class GlowingReplacer extends PacketAdapter {
 
 		PacketContainer packet = event.getPacket();
 
-		// Find the watchable objects containing the entity flags.
-		// It is a byte and is at index 0, see https://wiki.vg/Entity_metadata#Entity
-		// Different packet types have the value at different locations, so just use and modify whichever are present.
-		List<WrappedDataValue> wrappedWatchableObjects = packet.getDataValueCollectionModifier().getValues().stream()
-				.flatMap(Collection::stream)
-				.filter(wwo -> wwo.getIndex() == 0 && wwo.getRawValue() instanceof Byte b && (b & GLOWING_BIT) != 0)
-				.toList();
-		List<WrappedDataWatcher> dataWatcherModifiers = packet.getDataWatcherModifier().getValues().stream()
-				.filter(dw -> dw.hasIndex(0) && dw.getObject(0) instanceof Byte b && (b & GLOWING_BIT) != 0)
-				.toList();
-		if (wrappedWatchableObjects.isEmpty() && dataWatcherModifiers.isEmpty()) { // no glowing bit is set, so there's nothing to do
+		// Entity flags is a byte and is at index 0, see https://wiki.vg/Entity_metadata#Entity
+		PacketPlayOutEntityMetadataHandle handle = PacketPlayOutEntityMetadataHandle.createHandle(packet.getHandle());
+		if (handle.getMetadataItems().isEmpty() || !(handle.getMetadataItems().get(0).value() instanceof Byte data) || (data & GLOWING_BIT) == 0) {
+			// No glowing bit is set, so there's nothing to do
 			return;
 		}
 
 		Player player = event.getPlayer();
 		int playerSettings = ScoreboardUtils.getScoreboardValue(player, GlowingCommand.SCOREBOARD_OBJECTIVE).orElse(0);
 
-		// check if glowing is disabled for the entity's type.
+		// Check if glowing is disabled for the entity's type.
 		if (playerSettings != 0xFFFFFFFF) { // If all glowing is disabled, this check can be skipped.
 			Entity entity = packet.getEntityModifier(event).read(0); // NB: this is the first int, not (just) the first entity in the packet.
 			if (entity == null || (GlowingCommand.isGlowingEnabled(player, playerSettings, entity)
@@ -67,7 +53,7 @@ public class GlowingReplacer extends PacketAdapter {
 		}
 
 		// Finally, unset the glowing bits
-		// We need to clone the packet to not affect other players, and get the data watchers again from the new packet
+		// We need to clone the packet to not affect other players (as the packet is shared between players)
 		try {
 			packet = packet.deepClone();
 		} catch (RuntimeException e) {
@@ -78,20 +64,9 @@ public class GlowingReplacer extends PacketAdapter {
 			}
 			throw e;
 		}
-		wrappedWatchableObjects = packet.getDataValueCollectionModifier().getValues().stream()
-			.flatMap(Collection::stream)
-			.filter(wwo -> wwo.getIndex() == 0 && wwo.getRawValue() instanceof Byte b && (b & GLOWING_BIT) != 0)
-			.toList();
-		dataWatcherModifiers = packet.getDataWatcherModifier().getValues().stream()
-			.filter(dw -> dw.hasIndex(0) && dw.getObject(0) instanceof Byte b && (b & GLOWING_BIT) != 0)
-			.toList();
+		handle = PacketPlayOutEntityMetadataHandle.createHandle(packet.getHandle());
+		handle.getMetadataItems().set(0, handle.getMetadataItems().get(0).cloneWithValue((byte) (data & ~GLOWING_BIT)));
 		event.setPacket(packet);
-		for (WrappedDataValue wrappedWatchableObject : wrappedWatchableObjects) {
-			wrappedWatchableObject.setValue((byte) (((Byte) wrappedWatchableObject.getValue()) & ~GLOWING_BIT));
-		}
-		for (WrappedDataWatcher dataWatcherModifier : dataWatcherModifiers) {
-			dataWatcherModifier.setObject(0, (byte) (dataWatcherModifier.getByte(0) & ~GLOWING_BIT));
-		}
 	}
 
 }

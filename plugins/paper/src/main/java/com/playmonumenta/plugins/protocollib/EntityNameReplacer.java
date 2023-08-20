@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import java.util.List;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
@@ -27,9 +28,11 @@ public class EntityNameReplacer extends PacketAdapter {
 		Entity entity = packet.getEntityModifier(event).read(0);
 		if (entity != null && entity.getScoreboardTags().contains("boss_upside_down")) {
 			PacketPlayOutEntityMetadataHandle handle = PacketPlayOutEntityMetadataHandle.createHandle(packet.getHandle());
-			for (DataWatcher.Item<Object> metadataItem : handle.getMetadataItems()) {
-				if (EntityHandle.DATA_CUSTOM_NAME.equals(metadataItem.getKey())) {
-					metadataItem.setValue(Optional.of(NmsUtils.getVersionAdapter().toVanillaChatComponent(Component.text("Grumm"))), true);
+			List<DataWatcher.PackedItem<Object>> metadataItems = handle.getMetadataItems();
+			for (int i = 0; i < metadataItems.size(); i++) {
+				DataWatcher.PackedItem<Object> metadataItem = metadataItems.get(i);
+				if (metadataItem.isForKey(EntityHandle.DATA_CUSTOM_NAME)) {
+					metadataItems.set(i, metadataItem.cloneWithValue(Optional.of(NmsUtils.getVersionAdapter().toVanillaChatComponent(Component.text("Grumm")))));
 					break;
 				}
 			}
