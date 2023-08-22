@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.abilities.cleric;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
@@ -19,6 +20,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
+
 import java.util.Collection;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -41,6 +43,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 	private static final double HEAVENLY_BOON_1_CHANCE = 0.1;
 	private static final double HEAVENLY_BOON_2_CHANCE = 0.2;
+	private static final double HEAVENLY_BOON_HEAL_1 = 0.2;
+	private static final double HEAVENLY_BOON_HEAL_2 = 0.4;
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
@@ -56,6 +60,14 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	public static final String CHARM_CHANCE = "Heavenly Boon Potion Chance";
 	public static final String CHARM_DURATION = "Heavenly Boon Potion Duration";
 	public static final String CHARM_RADIUS = "Heavenly Boon Radius";
+
+	public static final String CHARM_HEAL_AMPLIFIER = "Heavenly Boon Healing";
+	public static final String CHARM_REGEN_AMPLIFIER = "Heavenly Boon Regeneration Amplifier";
+	public static final String CHARM_SPEED_AMPLIFIER = "Heavenly Boon Speed Amplifier";
+	public static final String CHARM_STRENGTH_AMPLIFIER = "Heavenly Boon Strength Amplifier";
+	public static final String CHARM_RESIST_AMPLIFIER = "Heavenly Boon Resistance Amplifier";
+	public static final String CHARM_ABSORPTION_AMPLIFIER = "Heavenly Boon Absorption Amplifier";
+
 
 	public static final AbilityInfo<HeavenlyBoon> INFO =
 		new AbilityInfo<>(HeavenlyBoon.class, "Heavenly Boon", HeavenlyBoon::new)
@@ -95,6 +107,7 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private final KillTriggeredAbilityTracker mTracker;
 	private final double mChance;
 	private final int mDurationChange;
+	private final ImmutableMap<String, Double> mPotStrengthChange;
 	private final double mRadius;
 	private int mLastSuccessfulProcTick = 0;
 
@@ -106,6 +119,14 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 
 		mChance = CharmManager.getLevelPercentDecimal(player, CHARM_CHANCE) + (isLevelOne() ? HEAVENLY_BOON_1_CHANCE : HEAVENLY_BOON_2_CHANCE);
 		mDurationChange = CharmManager.getExtraDuration(player, CHARM_DURATION);
+		mPotStrengthChange = ImmutableMap.of(
+			"InstantHealthPercent", (isLevelOne() ? HEAVENLY_BOON_HEAL_1 : HEAVENLY_BOON_HEAL_2) * CharmManager.getLevelPercentDecimal(player, CHARM_HEAL_AMPLIFIER),
+			"Regeneration", CharmManager.getLevelPercentDecimal(player, CHARM_REGEN_AMPLIFIER),
+			"Speed", CharmManager.getLevelPercentDecimal(player, CHARM_SPEED_AMPLIFIER),
+			"damage", CharmManager.getLevelPercentDecimal(player, CHARM_STRENGTH_AMPLIFIER),
+			"Resistance", CharmManager.getLevelPercentDecimal(player, CHARM_RESIST_AMPLIFIER),
+			"Absorption", CharmManager.getLevelPercentDecimal(player, CHARM_ABSORPTION_AMPLIFIER)
+		);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, HEAVENLY_BOON_RADIUS);
 
 		Bukkit.getScheduler().runTask(plugin, () -> mCrusade = plugin.mAbilityManager.getPlayerAbilityIgnoringSilence(player, Crusade.class));
@@ -142,9 +163,17 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 					continue;
 				}
 
+				boolean isBoonPotion = false;
+				for (String boon : BOON_DROPS) {
+					if (potion.getItem().getItemMeta().displayName().toString().contains(boon)) {
+						isBoonPotion = true;
+						break;
+					}
+				}
+
 				// Apply custom effects from potion
-				if (BOON_DROPS.contains(potion.getItem().getItemMeta().getDisplayName())) {
-					ItemStatUtils.changeEffectsDuration(p, potion.getItem(), mDurationChange);
+				if (isBoonPotion) {
+					ItemStatUtils.changeDurationAndStrengths(p, potion.getItem(), mDurationChange, mPotStrengthChange);
 				} else {
 					ItemStatUtils.applyCustomEffects(mPlugin, p, potion.getItem(), false);
 				}

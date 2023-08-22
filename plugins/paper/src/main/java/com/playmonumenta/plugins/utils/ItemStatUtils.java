@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.utils;
 
+import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.Alchemist;
@@ -18,14 +19,7 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.NavigableSet;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -168,6 +162,31 @@ public class ItemStatUtils {
 			EffectType effectType = EffectType.fromType(type);
 			if (effectType != null) {
 				EffectType.applyEffect(effectType, player, duration + durationChange, strength, null, false);
+			}
+		}
+	}
+
+	public static void changeDurationAndStrengths(Player player, ItemStack item, int durationChange, ImmutableMap<String, Double> strengthChanges) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+
+		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+
+		if (effects == null || effects.isEmpty()) {
+			return;
+		}
+
+
+		for (ReadWriteNBT effect : effects) {
+			String type = effect.getString(EFFECT_TYPE_KEY);
+			int duration = effect.getInteger(EFFECT_DURATION_KEY);
+			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+			double strengthChange = strengthChanges.getOrDefault(type, 0.0);
+
+			EffectType effectType = EffectType.fromType(type);
+			if (effectType != null) {
+				EffectType.applyEffect(effectType, player, duration + durationChange, strength + strengthChange, null, false);
 			}
 		}
 	}
