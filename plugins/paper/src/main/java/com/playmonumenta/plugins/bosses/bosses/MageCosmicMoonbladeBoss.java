@@ -36,6 +36,10 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 		public int SPELL_DELAY = 20;
 		public int SWINGS_DELAY = 10;
 		public int DELAY = 4 * 20;
+		public int START_ANGLE = 45;
+		public int END_ANGLE = 135;
+		public int RANGE = 6;
+		public int DEGREE_INCREMENT = 30;
 		public EntityTargets TARGETS_DIRECTION = EntityTargets.GENERIC_ONE_PLAYER_CLOSER_TARGET;
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET.clone().setRange(6);
 
@@ -74,7 +78,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 
 					mTelegraphInterrupt = false;
 					new BukkitRunnable() {
-						int mDegree = 45;
+						int mDegree = p.START_ANGLE;
 
 						@Override
 						public void run() {
@@ -84,8 +88,8 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 									return;
 								}
 
-							for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
-								for (double degree = mDegree; degree < mDegree + 30; degree += 5) {
+							for (double r = 1; r < p.RANGE; r += 0.5) {
+								for (double degree = mDegree; degree < mDegree + p.DEGREE_INCREMENT; degree += 5) {
 									double radian1 = Math.toRadians(degree);
 									Vector vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 									vec = VectorUtils.rotateZAxis(vec, -8);
@@ -96,11 +100,11 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 									mParams.PARTICLE_TELL.spawn(boss, l);
 								}
 							}
-							if (mDegree >= 135) {
+							if (mDegree >= p.END_ANGLE) {
 								cancel();
 								return;
 							}
-							mDegree += 30;
+							mDegree += p.DEGREE_INCREMENT;
 						}
 					}.runTaskTimer(mPlugin, 0, 1);
 
@@ -137,7 +141,7 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 							new BukkitRunnable() {
 								final int mI = mSwings;
 								double mRoll;
-								double mD = 45;
+								double mD = p.START_ANGLE;
 								boolean mInit = false;
 								final List<LivingEntity> mAlreadyHit = new ArrayList<>();
 
@@ -146,10 +150,10 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 									if (!mInit) {
 										if (mI % 2 == 0) {
 											mRoll = -8;
-											mD = 45;
+											mD = p.START_ANGLE;
 										} else {
 											mRoll = 8;
-											mD = 135;
+											mD = p.END_ANGLE;
 										}
 										mInit = true;
 									}
@@ -159,8 +163,8 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 									}
 									if (mI % 2 == 0) {
 										Vector vec;
-										for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
-											for (double degree = mD; degree < mD + 30; degree += 5) {
+										for (double r = 1; r < p.RANGE; r += 0.5) {
+											for (double degree = mD; degree < mD + p.DEGREE_INCREMENT; degree += 5) {
 												double radian1 = Math.toRadians(degree);
 												vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 												vec = VectorUtils.rotateZAxis(vec, mRoll);
@@ -181,11 +185,11 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 											}
 										}
 
-										mD += 30;
+										mD += p.DEGREE_INCREMENT;
 									} else {
 										Vector vec;
-										for (double r = 1; r < p.TARGETS.getRange(); r += 0.5) {
-											for (double degree = mD; degree > mD - 30; degree -= 5) {
+										for (double r = 1; r < p.RANGE; r += 0.5) {
+											for (double degree = mD; degree > mD - p.DEGREE_INCREMENT; degree -= 5) {
 												double radian1 = Math.toRadians(degree);
 												vec = new Vector(FastUtils.cos(radian1) * r, 0, FastUtils.sin(radian1) * r);
 												vec = VectorUtils.rotateZAxis(vec, mRoll);
@@ -206,10 +210,10 @@ public class MageCosmicMoonbladeBoss extends BossAbilityGroup {
 												}
 											}
 										}
-										mD -= 30;
+										mD -= p.DEGREE_INCREMENT;
 									}
 
-									if ((mD >= 135 && mI % 2 == 0) || (mD <= 45 && mI % 2 > 0)) {
+									if ((mD >= p.END_ANGLE && mI % 2 == 0) || (mD <= p.START_ANGLE && mI % 2 > 0)) {
 										mAlreadyHit.clear();
 										this.cancel();
 									}
