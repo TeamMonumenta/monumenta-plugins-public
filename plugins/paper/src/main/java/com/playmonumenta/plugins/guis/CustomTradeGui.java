@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.guis;
 
+import com.playmonumenta.plugins.inventories.WalletManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -55,6 +56,7 @@ public class CustomTradeGui extends Gui {
 	public static final String SUCCESS = "peb_tradeGUI_success";
 	public static final String PARTICLES = "peb_tradeGUI_particles";
 	public static final String SOUNDS = "peb_tradeGUI_sounds";
+	public static final String WALLET = "peb_tradeGUI_wallet";
 
 	public static final String PERMISSION = "monumenta.customtradegui";
 
@@ -78,6 +80,7 @@ public class CustomTradeGui extends Gui {
 	private int mSelectedTradeMaxMultiplier = 64;
 	private @Nullable TradeType mCurrentTab = null;
 	private int mCurrentPage = 1;
+	private boolean mShowAllTrades = true; // toggle between showing all trades versus the ones you can currently buy.
 
 	// Misc:
 	private ItemStack mBackgroundPane = GUIUtils.createBasicItem(Material.BROWN_STAINED_GLASS_PANE, "", NamedTextColor.GRAY, false,
@@ -134,23 +137,49 @@ public class CustomTradeGui extends Gui {
 				mLore = wrapper.lore();
 				return;
 			}
-			// Shallow copy of player's inventory:
+			// Copy of player's inventory and wallet (if enabled):
 			ItemStack[] itemStacks = player.getInventory().getStorageContents().clone();
+			WalletManager.InventoryWallet inventoryWallet = null;
+			if (mPebTradeGUIWallet == 0) {
+				inventoryWallet = new WalletManager.InventoryWallet(player, true);
+			}
 			// Check each requirement, constructing lore and updating mHasRequirements:
 			for (ItemStack requirement : mRequirements) {
-				boolean meetsRequirement;
 				// Obtain the status of this requirement:
-				meetsRequirement = InventoryUtils.inventoryContainsItemOrMore(itemStacks, requirement);
-				mHasRequirements = mHasRequirements && meetsRequirement;
-				if (meetsRequirement) {
-					InventoryUtils.removeItemFromArray(itemStacks, requirement);
+				boolean meetsRequirement = false;
+				int numFromWallet = 0;
+
+				// Check wallet and inventory if applicable:
+				if (inventoryWallet != null &&
+					    WalletManager.isCurrency(requirement) &&
+					    (long) inventoryWallet.numInWallet(requirement) + (long) InventoryUtils.numInInventory(itemStacks, requirement) >= (long) requirement.getAmount()) {
+					// Meets requirement, simulate removal:
+					meetsRequirement = true;
+					ItemStack leftovers = inventoryWallet.removeFromWallet(requirement);
+					if (leftovers == null) {
+						// Wallet paid for everything:
+						numFromWallet = requirement.getAmount();
+					} else {
+						// Wallet paid for some:
+						numFromWallet = requirement.getAmount() - leftovers.getAmount();
+						InventoryUtils.removeItemFromArray(itemStacks, leftovers);
+					}
+				} else {
+					// Non-currency or wallet integration disabled:
+					meetsRequirement = InventoryUtils.inventoryContainsItemOrMore(itemStacks, requirement);
+					if (meetsRequirement) {
+						InventoryUtils.removeItemFromArray(itemStacks, requirement);
+					}
 				}
+				// Update overall requirement status:
+				mHasRequirements = mHasRequirements && meetsRequirement;
 				// Construct lore:
 				int numItems = requirement.getAmount();
 				String plainName = ItemUtils.getPlainNameOrDefault(requirement);
 				mLore.add(
 					Component.text(numItems + " " + plainName + " ", NamedTextColor.WHITE).append(
-						Component.text(meetsRequirement ? "\u2713" : "\u2717", (meetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).decoration(TextDecoration.ITALIC, false));
+						Component.text(meetsRequirement ? "\u2713" : "\u2717", (meetsRequirement ? NamedTextColor.GREEN : NamedTextColor.RED))).append(
+						Component.text(numFromWallet > 0 ? " (" + numFromWallet + " from wallet)" : "", NamedTextColor.GRAY)).decoration(TextDecoration.ITALIC, false));
 			}
 			// Finally, save the base requirement to our map:
 			if (multiplier == 1) {
@@ -172,6 +201,40 @@ public class CustomTradeGui extends Gui {
 
 		public boolean status() {
 			return mHasRequirements;
+		}
+
+		public void removeRequirements() {
+			Inventory inventory = mPlayer.getInventory();
+			WalletManager.InventoryWallet inventoryWallet = null;
+			if (mPebTradeGUIWallet == 0) {
+				inventoryWallet = new WalletManager.InventoryWallet(mPlayer, false);
+			}
+			for (ItemStack requirement : requirements()) {
+				if (inventoryWallet != null &&
+					    WalletManager.isCurrency(requirement) &&
+					    (long) inventoryWallet.numInWallet(requirement) + (long) InventoryUtils.numInInventory(inventory, requirement) >= (long) requirement.getAmount()) {
+					// Take from wallet, then from inventory:
+					ItemStack leftovers = inventoryWallet.removeFromWallet(requirement);
+					int numFromWallet;
+					if (leftovers == null) {
+						// Wallet paid for everything:
+						numFromWallet = requirement.getAmount();
+					} else {
+						// Wallet paid for some:
+						numFromWallet = requirement.getAmount() - leftovers.getAmount();
+						inventory.removeItem(leftovers);
+					}
+					if (numFromWallet > 0) {
+						mPlayer.sendMessage(Component.text("Removed ", NamedTextColor.GREEN).append(
+							Component.text(numFromWallet + " " + ItemUtils.getPlainNameOrDefault(requirement), NamedTextColor.WHITE).append(
+								Component.text(" from your wallet. ", NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false)
+							)));
+					}
+				} else {
+					// Remove directly from inventory:
+					inventory.removeItem(requirement.clone());
+				}
+			}
 		}
 	}
 
@@ -207,6 +270,7 @@ public class CustomTradeGui extends Gui {
 	private final int mPebTradeGUISuccess; // 0: return to preview upon successful trade. 1: close gui. 2: do nothing.
 	private final int mPebTradeGUIParticles; // 0: particles on. 1: off.
 	private final int mPebTradeGUISounds; // 0: sounds on. 1: off.
+	private final int mPebTradeGUIWallet; // 0: enabled, prioritize wallet. 1: disabled.
 
 	// Interface:
 	public CustomTradeGui(Player player, Villager villager, List<TradeWindowOpenEvent.Trade> trades) {
@@ -222,6 +286,7 @@ public class CustomTradeGui extends Gui {
 		mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SUCCESS).orElse(0);
 		mPebTradeGUIParticles = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PARTICLES).orElse(0);
 		mPebTradeGUISounds = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SOUNDS).orElse(0);
+		mPebTradeGUIWallet = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.WALLET).orElse(0);
 		// Options:
 			// tradeOrg:
 		organizeTradesIfApplicable();
@@ -327,6 +392,14 @@ public class CustomTradeGui extends Gui {
 				update();
 			});
 		}
+		// Button to toggle between showing all trades or trade you can buy:
+		setItem(5, 8, GUIUtils.createBasicItem(mShowAllTrades ? Material.AMETHYST_CLUSTER : Material.MEDIUM_AMETHYST_BUD, mShowAllTrades ? "Showing: All Trades" : "Showing: Trades You Can Buy", NamedTextColor.YELLOW, true,
+			"Click to toggle. ", NamedTextColor.GRAY, 20)).onLeftClick(() -> {
+			// Page Flip:
+			mShowAllTrades = !mShowAllTrades;
+			playSound(mPlayer.getLocation(), SoundType.PAGE_FLIP);
+			update();
+		});
 		// Load trades for the current tab:
 		showTrades(mCurrentTab);
 	}
@@ -443,6 +516,10 @@ public class CustomTradeGui extends Gui {
 			// Trade preview logic:
 			TradeWindowOpenEvent.Trade trade = trades.get(i);
 			TradeReq tradeReq = new TradeReq(mPlayer, trade, 1, true);
+			// New trade toggle:
+			if (!mShowAllTrades && !tradeReq.status()) {
+				continue;
+			}
 			setItem(guiRow, guiCol, createTradePreviewGuiItem(trade.getRecipe(), tradeReq, true, 1)).onLeftClick(() -> {
 				if (mPebTradeGUIConfirm == 0) {
 					// Open confirm menu:
@@ -491,10 +568,7 @@ public class CustomTradeGui extends Gui {
 			return;
 		}
 		// Remove reqs:
-		Inventory inventory = mPlayer.getInventory();
-		for (ItemStack requirement : tradeReq.requirements()) {
-			inventory.removeItem(requirement.clone());
-		}
+		tradeReq.removeRequirements();
 		// Success, give item * multiplier:
 		for (int i = 0; i < multiplier; i++) {
 			ItemStack result = trade.getOriginalResult();
@@ -750,7 +824,7 @@ public class CustomTradeGui extends Gui {
 		if (includePriceInLore && mPebTradeGUIPreviewDisplay == 0) {
 			// Construct price tag lore:
 			List<Component> newLore = new ArrayList<>();
-			newLore.add(Component.empty());
+			newLore.add(Component.newline());
 			newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 			newLore.addAll(tradeReq.lore());
 			if (mPebTradeGUIConfirm == 1) {

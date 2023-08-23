@@ -835,12 +835,16 @@ public class WalletManager implements Listener {
 	public static boolean canPutIntoWallet(ItemStack item, WalletSettings settings) {
 		return item != null
 			       && item.getAmount() > 0
-			       && (ItemStatUtils.getTier(item) == Tier.CURRENCY
-				           || ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
-				           || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."))
+			       && isCurrency(item)
 			       && ItemStatUtils.getPlayerModified(new NBTItem(item)) == null
 			       && ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) <= 0
 			       && (settings.allCurrencies || ItemStatUtils.getRegion(item).compareTo(settings.mMaxRegion) < 0 || MAIN_CURRENCIES.stream().anyMatch(c -> c.isSimilar(item)));
+	}
+
+	public static boolean isCurrency(ItemStack item) {
+		return (ItemStatUtils.getTier(item) == Tier.CURRENCY
+			 || ItemStatUtils.getTier(item) == Tier.EVENT_CURRENCY
+			 || InventoryUtils.testForItemWithLore(item, "Can be put into a wallet."));
 	}
 
 	private static boolean isBase(ItemStack item) {
@@ -906,4 +910,75 @@ public class WalletManager implements Listener {
 		}
 	}
 
+	public static class InventoryWallet {
+		final Wallet mWallet;
+		final Player mPlayer;
+
+		public InventoryWallet(Player player, boolean isClone) {
+			mPlayer = player;
+			// Either grab actual wallet or clone it:
+			Wallet walletRef = mWallets.computeIfAbsent(player.getUniqueId(), Wallet::new);
+			if (isClone) {
+				// Deep clone of wallet.
+				// Note: because the only link between wallets and playerdata is through mWallets Map(),
+				//          a deep copy of the player's wallet cannot modify the player's actual wallet.
+				mWallet = new Wallet(walletRef.mOwner);
+				List<WalletItem> walletItemsCopy = new ArrayList<>(
+					walletRef.mItems.stream()
+						.map(item -> new WalletItem(ItemUtils.clone(item.mItem), item.mAmount))
+						.toList());
+				mWallet.mItems.addAll(walletItemsCopy);
+			} else {
+				// Reference player's actual wallet:
+				mWallet = walletRef;
+			}
+		}
+
+		public int numInWallet(ItemStack currency) {
+			// Returns the nearest integer multiple of the specified currency.asOne(), rounding down.
+			// EX: if your wallet contains 600 xp, and currency={hxp}, it will return 1.
+
+			// Find the amount of the base currency in wallet:
+			long result;
+			long amountBase = mWallet.count(currency);
+			CompressionInfo compressionInfo = getCompressionInfo(currency);
+			if (compressionInfo != null) {
+				// Compressible currency:
+				// Wallet's count() will multiply the amount of base currency by the compressed multiplier (so that it can determine the amount of base to remove).
+				// However, since we want the base amount itself, we reverse this by dividing by the compressed multiplier.
+				// Finally, to get the base amount in terms of the compressed currency, we divide once again.
+				long multiplier = compressionInfo.mAmount;
+				long normalizedAmount = amountBase / multiplier;
+				result = normalizedAmount / multiplier;
+			} else {
+				// Normal, incompressible currency:
+				result = amountBase;
+			}
+			// Return an int, prevent overflow:
+			return (result > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) result;
+		}
+
+		public @Nullable ItemStack removeFromWallet(ItemStack currency) {
+			// Attempts to remove currency from the wallet of a player, returns the leftovers (not removed).
+			// EX: if your wallet contains 600 xp, and currency={2 hxp}, it will remove 512 xp from wallet. It will return {1 hxp}, and 88 xp will remain in wallet.
+
+			// Setup:
+			ItemStack currencyClone = currency.clone();
+			int itemCount = currencyClone.getAmount();
+			int walletCount = numInWallet(currencyClone);
+			if (walletCount == 0) {
+				// No items removed:
+				return currencyClone;
+			} else if (walletCount >= itemCount) {
+				// No leftovers:
+				mWallet.remove(mPlayer, currencyClone);
+				return null;
+			} else {
+				// Some leftovers:
+				mWallet.remove(mPlayer, currencyClone);
+				currencyClone.setAmount(itemCount - walletCount); // itemCount is always positive and walletCount < itemCount.
+				return currencyClone;
+			}
+		}
+	}
 }
