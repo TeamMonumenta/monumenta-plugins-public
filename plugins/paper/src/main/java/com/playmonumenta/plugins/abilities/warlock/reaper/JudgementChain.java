@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.reaper.JudgementChainCS;
@@ -49,7 +50,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class JudgementChain extends Ability {
+public class JudgementChain extends Ability implements AbilityWithDuration {
 	private static final int COOLDOWN = 25 * 20;
 	private static final int DURATION = 20 * 20;
 	private static final int BUFF_DURATION = 10 * 20;
@@ -72,12 +73,12 @@ public class JudgementChain extends Ability {
 	private static final String HEAL_RATE_NAME = "JudgementChainPercentHealEffect";
 	private static final String L2_RESIST_NAME = "JudgementChainL2DefenseEffect";
 	private static final EnumSet<DamageType> AFFECTED_DAMAGE_TYPES = EnumSet.of(
-		DamageType.MELEE,
-		DamageType.MELEE_ENCH,
-		DamageType.MELEE_SKILL,
-		DamageType.PROJECTILE,
-		DamageType.PROJECTILE_SKILL,
-		DamageType.MAGIC
+			DamageType.MELEE,
+			DamageType.MELEE_ENCH,
+			DamageType.MELEE_SKILL,
+			DamageType.PROJECTILE,
+			DamageType.PROJECTILE_SKILL,
+			DamageType.MAGIC
 	);
 
 	public static final String CHARM_COOLDOWN = "Judgement Chain Cooldown";
@@ -86,26 +87,26 @@ public class JudgementChain extends Ability {
 	public static final String CHARM_DURATION = "Judgement Chain Buff Duration";
 
 	public static final AbilityInfo<JudgementChain> INFO =
-		new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
-			.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
-			.scoreboardId("JudgementChain")
-			.shorthandName("JC")
-			.actionBarColor(TextColor.color(115, 115, 115))
-			.descriptions(
-				"Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. " +
-					"For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. " +
-					"All damage taken by the chained mob is passed to the nearest mob in 8 blocks. " +
-					"All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. " +
-					"Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. " +
-					"Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.",
-				"While a mob is chained, the reaper gains 10% damage resistance. " +
-					"When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. " +
-					"Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.")
-			.simpleDescription("Chain a target mob, weakening it and redirecting damage it takes to other nearby mobs. Gain buffs for debuffing the chained mob.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
-				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(Material.CHAIN);
+			new AbilityInfo<>(JudgementChain.class, "Judgement Chain", JudgementChain::new)
+					.linkedSpell(ClassAbility.JUDGEMENT_CHAIN)
+					.scoreboardId("JudgementChain")
+					.shorthandName("JC")
+					.actionBarColor(TextColor.color(115, 115, 115))
+					.descriptions(
+							"Press the swap key while not sneaking targeting a non-boss hostile mob to conjure an unbreakable chain, linking the Reaper and the mob. " +
+									"For the next 20s, long as another mob is within 8 blocks, the mob becomes immortal and can only target or damage the Reaper, is slowed by 25%, and deals 50% less damage. " +
+									"All damage taken by the chained mob is passed to the nearest mob in 8 blocks. " +
+									"All debuffs on the chained mob are inverted to their positive counterpart and transferred to the Reaper for 10s, capped at 10%. " +
+									"Pressing swap while a mob is already chained will pull it towards you, dealing 20 magic damage and breaking the chain. " +
+									"Walking 16+ blocks away will deal damage but not pull the mob. Cooldown: 25s.",
+							"While a mob is chained, the reaper gains 10% damage resistance. " +
+									"When breaking the chain, apply all the positively inverted debuffs to other players and all debuffs (capped at 10%) to other mobs in an 8 block radius of the player for 10s. " +
+									"Additionally, deal 20 magic damage to all mobs in a 4 block radius of the player.")
+					.simpleDescription("Chain a target mob, weakening it and redirecting damage it takes to other nearby mobs. Gain buffs for debuffing the chained mob.")
+					.cooldown(COOLDOWN, CHARM_COOLDOWN)
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", JudgementChain::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+					.displayItem(Material.CHAIN);
 
 	private final double mAmplifier;
 	private final HashMap<Player, HashMap<ClassAbility, List<DamageEvent>>> mDamageInTick = new HashMap<>();
@@ -115,6 +116,8 @@ public class JudgementChain extends Ability {
 	private boolean mChainActive = false;
 
 	private final JudgementChainCS mCosmetic;
+
+	private int mCurrDuration = -1;
 
 	public JudgementChain(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -204,6 +207,7 @@ public class JudgementChain extends Ability {
 			EntityUtils.applyTaunt(mTarget, mPlayer);
 			mCosmetic.onSummonChain(world, loc);
 
+			mCurrDuration = 0;
 			cancelOnDeath(new BukkitRunnable() {
 				final int mRunnableDuration = DURATION;
 				final double mWidth = e.getWidth() / 2;
@@ -213,6 +217,7 @@ public class JudgementChain extends Ability {
 				public void run() {
 					Location l = LocationUtils.getHalfHeightLocation(mPlayer);
 					mT++;
+					mCurrDuration++;
 					if (mTarget != null) {
 						Location targetLoc = mTarget.getLocation().add(0, mTarget.getHeight() / 2, 0);
 						mCosmetic.chain(mPlayer, l, targetLoc, mWidth, mT);
@@ -239,15 +244,20 @@ public class JudgementChain extends Ability {
 							mChainActive = false;
 							breakChain(false, false);
 							mTarget = null;
-							ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 						}
 					} else if (l.distance(mTarget.getLocation()) > range || mT >= mRunnableDuration) {
 						this.cancel();
 						mChainActive = false;
 						breakChain(true, false);
 						mTarget = null;
-						ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 					}
+				}
+
+				@Override
+				public synchronized void cancel() {
+					super.cancel();
+					mCurrDuration = -1;
+					ClientModHandler.updateAbility(mPlayer, JudgementChain.this);
 				}
 
 			}.runTaskTimer(mPlugin, 0, 1));
@@ -309,51 +319,51 @@ public class JudgementChain extends Ability {
 		boolean isBleed = EntityUtils.isBleeding(mPlugin, mTarget);
 
 		effects.add(effect(isSlow || isBleed,
-			mob -> {
-				if (isSlow) {
-					EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
-				}
-				if (isBleed) {
-					EntityUtils.applyBleed(mPlugin, duration, mAmplifier, mob);
-				}
-			},
-			player -> mPlugin.mEffectManager.addEffect(player, SPEED_NAME, new PercentSpeed(duration, mAmplifier, SPEED_NAME))));
+				mob -> {
+					if (isSlow) {
+						EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
+					}
+					if (isBleed) {
+						EntityUtils.applyBleed(mPlugin, duration, mAmplifier, mob);
+					}
+				},
+				player -> mPlugin.mEffectManager.addEffect(player, SPEED_NAME, new PercentSpeed(duration, mAmplifier, SPEED_NAME))));
 
 		effects.add(effect(isWeak || isBleed,
-			mob -> {
-				if (isWeak) {
-					EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
-				}
-				// We've already applied bleed
-			},
-			player -> mPlugin.mEffectManager.addEffect(player, STRENGTH_NAME, new PercentDamageDealt(duration, mAmplifier, AFFECTED_DAMAGE_TYPES))));
+				mob -> {
+					if (isWeak) {
+						EntityUtils.applySlow(mPlugin, duration, mAmplifier, mob);
+					}
+					// We've already applied bleed
+				},
+				player -> mPlugin.mEffectManager.addEffect(player, STRENGTH_NAME, new PercentDamageDealt(duration, mAmplifier, AFFECTED_DAMAGE_TYPES))));
 
 		effects.add(effect(mTarget.getFireTicks() > 0,
-			mob -> EntityUtils.setFireTicksIfLower(duration, mob),
-			player -> PotionUtils.applyPotion(mPlayer, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, 0, false, true))));
+				mob -> EntityUtils.setFireTicksIfLower(duration, mob),
+				player -> PotionUtils.applyPotion(mPlayer, player, new PotionEffect(PotionEffectType.FIRE_RESISTANCE, duration, 0, false, true))));
 
 		effects.add(effect(EntityUtils.isParalyzed(mPlugin, mTarget),
-			mob -> mPlugin.mEffectManager.addEffect(mob, PARA_NAME, new Paralyze(duration, mPlugin)),
-			player -> mPlugin.mEffectManager.addEffect(player, KBR_NAME, new PercentKnockbackResist(duration, mAmplifier, KBR_NAME))));
+				mob -> mPlugin.mEffectManager.addEffect(mob, PARA_NAME, new Paralyze(duration, mPlugin)),
+				player -> mPlugin.mEffectManager.addEffect(player, KBR_NAME, new PercentKnockbackResist(duration, mAmplifier, KBR_NAME))));
 
 		effects.add(effect(EntityUtils.isVulnerable(mPlugin, mTarget),
-			mob -> EntityUtils.applyVulnerability(mPlugin, duration, mAmplifier, mob),
-			player -> mPlugin.mEffectManager.addEffect(player, DEF_NAME, new PercentDamageReceived(duration, -mAmplifier))));
+				mob -> EntityUtils.applyVulnerability(mPlugin, duration, mAmplifier, mob),
+				player -> mPlugin.mEffectManager.addEffect(player, DEF_NAME, new PercentDamageReceived(duration, -mAmplifier))));
 
 		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.POISON) || mTarget.hasPotionEffect(PotionEffectType.WITHER) || EntityUtils.hasDamageOverTime(mPlugin, mTarget),
-			mob -> mPlugin.mEffectManager.addEffect(mob, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null)),
-			player -> {
-				if (player == mPlayer) {
-					// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
-					// We do this because constant re-application doesn't actually do anything
-					PlayerUtils.healPlayer(mPlugin, player, 1.0d / 60.0d, player);
-				}
-				mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
-			}));
+				mob -> mPlugin.mEffectManager.addEffect(mob, DOT_NAME, new CustomDamageOverTime(duration, 1, 20, mPlayer, null)),
+				player -> {
+					if (player == mPlayer) {
+						// 1 / 60 = 1/60th HP every tick, 60 ticks in 3 second interval
+						// We do this because constant re-application doesn't actually do anything
+						PlayerUtils.healPlayer(mPlugin, player, 1.0d / 60.0d, player);
+					}
+					mPlugin.mEffectManager.addEffect(player, HEAL_NAME, new CustomRegeneration(duration, 0.333, mPlayer, mPlugin));
+				}));
 
 		effects.add(effect(mTarget.hasPotionEffect(PotionEffectType.HUNGER),
-			mob -> PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true)),
-			player -> mPlugin.mEffectManager.addEffect(player, HEAL_RATE_NAME, new PercentHeal(duration, mAmplifier))));
+				mob -> PotionUtils.applyPotion(mPlayer, mob, new PotionEffect(PotionEffectType.HUNGER, duration, 0, false, true)),
+				player -> mPlugin.mEffectManager.addEffect(player, HEAL_RATE_NAME, new PercentHeal(duration, mAmplifier))));
 
 		effects.forEach(effect -> effect.accept(hostiles, players));
 	}
@@ -381,5 +391,15 @@ public class JudgementChain extends Ability {
 				mPlugin.mEffectManager.addEffect(p, "JudgementChainPlayerEffectBy" + mPlayer.getName(), new JudgementChainPlayerEffect(20, mPlayer));
 			}
 		}
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return DURATION;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }

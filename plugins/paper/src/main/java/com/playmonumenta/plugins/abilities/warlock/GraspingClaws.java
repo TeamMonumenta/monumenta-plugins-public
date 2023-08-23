@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.GraspingClawsCS;
@@ -12,6 +13,7 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -38,7 +40,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-public class GraspingClaws extends Ability {
+public class GraspingClaws extends Ability implements AbilityWithDuration {
 
 	private static final int RADIUS = 8;
 	private static final float PULL_SPEED = 0.175f;
@@ -63,31 +65,33 @@ public class GraspingClaws extends Ability {
 	public static final String CHARM_CAGE_RADIUS = "Grasping Claws Cage Radius";
 
 	public static final AbilityInfo<GraspingClaws> INFO =
-		new AbilityInfo<>(GraspingClaws.class, "Grasping Claws", GraspingClaws::new)
-			.linkedSpell(ClassAbility.GRASPING_CLAWS)
-			.scoreboardId("GraspingClaws")
-			.shorthandName("GC")
-			.descriptions(
-				("Pressing the drop key while sneaking and holding a scythe or projectile weapon fires a projectile " +
-					 "that pulls nearby enemies towards it once it makes contact with a mob or block. " +
-					 "Mobs caught in the projectile's %s block radius are given %s%% Slowness for %s seconds and take %s magic damage. Cooldown: %ss.")
-					.formatted(RADIUS, StringUtils.multiplierToPercentage(AMPLIFIER_1), StringUtils.ticksToSeconds(DURATION), DAMAGE_1, StringUtils.ticksToSeconds(COOLDOWN)),
-				"The pulled enemies now take %s damage, and their Slowness is increased to %s%%."
-					.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(AMPLIFIER_2)),
-				("At the location that the arrow lands, summon an impenetrable cage. " +
-					 "Non-boss mobs within a %s block radius of the location cannot enter or exit the cage, " +
-					 "and players within the cage are granted %s%% max health healing every second. " +
-					 "The cage disappears after %s seconds. Mobs that are immune to crowd control cannot be trapped.")
-					.formatted(CAGE_RADIUS, StringUtils.multiplierToPercentage(HEAL_AMOUNT), StringUtils.ticksToSeconds(CAGE_DURATION)))
-			.simpleDescription("Fire a projectile that damages, pulls, and slows mobs.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
-				new AbilityTriggerInfo.TriggerRestriction("holding a scythe or projectile weapon", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()) || ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()))))
-			.displayItem(Material.BOW);
+			new AbilityInfo<>(GraspingClaws.class, "Grasping Claws", GraspingClaws::new)
+					.linkedSpell(ClassAbility.GRASPING_CLAWS)
+					.scoreboardId("GraspingClaws")
+					.shorthandName("GC")
+					.descriptions(
+							("Pressing the drop key while sneaking and holding a scythe or projectile weapon fires a projectile " +
+									"that pulls nearby enemies towards it once it makes contact with a mob or block. " +
+									"Mobs caught in the projectile's %s block radius are given %s%% Slowness for %s seconds and take %s magic damage. Cooldown: %ss.")
+									.formatted(RADIUS, StringUtils.multiplierToPercentage(AMPLIFIER_1), StringUtils.ticksToSeconds(DURATION), DAMAGE_1, StringUtils.ticksToSeconds(COOLDOWN)),
+							"The pulled enemies now take %s damage, and their Slowness is increased to %s%%."
+									.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(AMPLIFIER_2)),
+							("At the location that the arrow lands, summon an impenetrable cage. " +
+									"Non-boss mobs within a %s block radius of the location cannot enter or exit the cage, " +
+									"and players within the cage are granted %s%% max health healing every second. " +
+									"The cage disappears after %s seconds. Mobs that are immune to crowd control cannot be trapped.")
+									.formatted(CAGE_RADIUS, StringUtils.multiplierToPercentage(HEAL_AMOUNT), StringUtils.ticksToSeconds(CAGE_DURATION)))
+					.simpleDescription("Fire a projectile that damages, pulls, and slows mobs.")
+					.cooldown(COOLDOWN, CHARM_COOLDOWN)
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GraspingClaws::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(true),
+							new AbilityTriggerInfo.TriggerRestriction("holding a scythe or projectile weapon", player -> ItemUtils.isHoe(player.getInventory().getItemInMainHand()) || ItemUtils.isProjectileWeapon(player.getInventory().getItemInMainHand()))))
+					.displayItem(Material.BOW);
 
 	private final double mAmplifier;
 	private final double mDamage;
 	private final Map<Projectile, ItemStatManager.PlayerItemStats> mPlayerItemStatsMap = new WeakHashMap<>();
+
+	private int mCurrDuration = -1;
 
 	private final GraspingClawsCS mCosmetic;
 
@@ -137,6 +141,9 @@ public class GraspingClaws extends Ability {
 		mCosmetic.onCageCreation(world, loc);
 		double radius = CharmManager.getRadius(mPlayer, CHARM_CAGE_RADIUS, CAGE_RADIUS);
 
+		mCurrDuration = 0;
+		ClientModHandler.updateAbility(mPlayer, this);
+
 		new BukkitRunnable() {
 			int mT = 0;
 			final Hitbox mHitbox = Hitbox.approximateHollowCylinderSegment(loc, 5, radius - 0.6, radius + 0.6, Math.PI);
@@ -149,6 +156,7 @@ public class GraspingClaws extends Ability {
 			@Override
 			public void run() {
 				mT++;
+				mCurrDuration++;
 
 				// Wall Portion (Particles + Hitbox Definition)
 				if (mT % 4 == 0) {
@@ -215,6 +223,23 @@ public class GraspingClaws extends Ability {
 				}
 			}
 
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, GraspingClaws.this);
+			}
+
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return isEnhanced() ? CAGE_DURATION : 0;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 && isEnhanced() ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }

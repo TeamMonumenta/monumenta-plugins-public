@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.HuntingCompanionCS;
@@ -17,6 +18,7 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.Operation;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.parrots.RainbowParrot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -63,7 +65,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-public class HuntingCompanion extends Ability {
+public class HuntingCompanion extends Ability implements AbilityWithDuration {
 	private static final int COOLDOWN = 24 * 20;
 	private static final int DURATION = 12 * 20;
 	private static final int TICK_INTERVAL = 5;
@@ -92,30 +94,30 @@ public class HuntingCompanion extends Ability {
 	public static final String CHARM_EAGLES = "Hunting Companion Eagles";
 
 	public static final AbilityInfo<HuntingCompanion> INFO =
-		new AbilityInfo<>(HuntingCompanion.class, "Hunting Companion", HuntingCompanion::new)
-			.linkedSpell(ClassAbility.HUNTING_COMPANION)
-			.scoreboardId("HuntingCompanion")
-			.shorthandName("HC")
-			.descriptions(
-				"Swap hands while holding a projectile weapon to summon an invulnerable fox companion. " +
-					"The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. " +
-					"The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. " +
-					"The fox deals damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your mainhand's projectile damage, amplified by both melee and projectile damage from gear. " +
-					"Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. " +
-					"When a mob that was damaged by the fox dies, you heal " + (int) (HEALING_PERCENT * 100) + "% of your max health. " +
-					"The fox disappears after " + DURATION / 20 + " seconds. Triggering while on cooldown will clear the specified target. " +
-					"If used while in water, an axolotl is spawned instead, and if used while in lava, a strider is spawned instead. Cooldown: " + COOLDOWN / 20 + "s.",
-				"Damage is increased to " + (int) (100 * DAMAGE_FRACTION_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.",
-				"Also summon an invulnerable eagle (parrot). " +
-					"The eagle deals the same damage as the fox and targets similarly, although the two will always avoid targeting the same mob at once. " +
-					"The eagle can swoop towards its target. " +
-					"The eagle applies " + (int) (BLEED_AMOUNT * 100) + "% Bleed for " + BLEED_DURATION / 20 + "s instead of stunning, which can be reapplied on a mob. " +
-					"If used in water, a dolphin is spawned instead.")
-			.simpleDescription("Summon a fox to help you fight and stun mobs.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(Material.SWEET_BERRIES);
+			new AbilityInfo<>(HuntingCompanion.class, "Hunting Companion", HuntingCompanion::new)
+					.linkedSpell(ClassAbility.HUNTING_COMPANION)
+					.scoreboardId("HuntingCompanion")
+					.shorthandName("HC")
+					.descriptions(
+							"Swap hands while holding a projectile weapon to summon an invulnerable fox companion. " +
+									"The fox attacks the nearest mob within " + DETECTION_RANGE + " blocks. " +
+									"The fox prioritizes the first enemy you hit with a projectile after summoning, which can be reapplied once that target dies. " +
+									"The fox deals damage equal to " + (int) (100 * DAMAGE_FRACTION_1) + "% of your mainhand's projectile damage, amplified by both melee and projectile damage from gear. " +
+									"Once per mob, the fox stuns upon attack for " + STUN_TIME_1 / 20 + " seconds, except for elites and bosses. " +
+									"When a mob that was damaged by the fox dies, you heal " + (int) (HEALING_PERCENT * 100) + "% of your max health. " +
+									"The fox disappears after " + DURATION / 20 + " seconds. Triggering while on cooldown will clear the specified target. " +
+									"If used while in water, an axolotl is spawned instead, and if used while in lava, a strider is spawned instead. Cooldown: " + COOLDOWN / 20 + "s.",
+							"Damage is increased to " + (int) (100 * DAMAGE_FRACTION_2) + "% of your projectile damage and the stun time is increased to " + STUN_TIME_2 / 20 + " seconds.",
+							"Also summon an invulnerable eagle (parrot). " +
+									"The eagle deals the same damage as the fox and targets similarly, although the two will always avoid targeting the same mob at once. " +
+									"The eagle can swoop towards its target. " +
+									"The eagle applies " + (int) (BLEED_AMOUNT * 100) + "% Bleed for " + BLEED_DURATION / 20 + "s instead of stunning, which can be reapplied on a mob. " +
+									"If used in water, a dolphin is spawned instead.")
+					.simpleDescription("Summon a fox to help you fight and stun mobs.")
+					.cooldown(COOLDOWN, CHARM_COOLDOWN)
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HuntingCompanion::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP),
+							AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+					.displayItem(Material.SWEET_BERRIES);
 
 	private final HashMap<Mob, LivingEntity> mSummons;
 	private final double mDamageFraction;
@@ -124,6 +126,9 @@ public class HuntingCompanion extends Ability {
 	private final double mBleedAmount;
 	private final double mHealingPercent;
 	private @Nullable BukkitRunnable mRunnable;
+
+	private final int mMaxDuration;
+	private int mCurrDuration = -1;
 
 	private final HuntingCompanionCS mCosmetic;
 
@@ -136,6 +141,7 @@ public class HuntingCompanion extends Ability {
 		mHealingPercent = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_HEALING, HEALING_PERCENT);
 		mSummons = new HashMap<>();
 		mRunnable = null;
+		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HuntingCompanionCS());
 	}
@@ -189,6 +195,7 @@ public class HuntingCompanion extends Ability {
 			@Override
 			public void run() {
 				mT++;
+				mCurrDuration++;
 				for (Iterator<Map.Entry<Mob, LivingEntity>> iterator = mSummons.entrySet().iterator(); iterator.hasNext(); ) {
 					Map.Entry<Mob, LivingEntity> e = iterator.next();
 					Mob summon = e.getKey();
@@ -202,17 +209,23 @@ public class HuntingCompanion extends Ability {
 					this.cancel();
 				}
 			}
+
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, HuntingCompanion.this);
+			}
 		};
 		cosmeticRunnable.runTaskTimer(mPlugin, 0, 1);
 
-		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
 		World world = mPlayer.getWorld();
 		mRunnable = new BukkitRunnable() {
 			int mTicksElapsed = 0;
 
 			@Override
 			public void run() {
-				if (mTicksElapsed >= duration) {
+				if (mTicksElapsed >= mMaxDuration) {
 					mSummons.keySet().forEach(summon -> mCosmetic.onDespawn(world, summon.getLocation(), summon, mPlayer));
 					clearSummons();
 					return;
@@ -453,5 +466,15 @@ public class HuntingCompanion extends Ability {
 		}
 
 		return EntityUtils.getNearestMob(summon.getLocation(), nearbyMobs);
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return mMaxDuration;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }

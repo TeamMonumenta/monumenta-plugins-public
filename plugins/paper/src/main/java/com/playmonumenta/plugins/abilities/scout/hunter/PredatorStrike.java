@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.scout.SwiftCuts;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -48,7 +49,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 
-public class PredatorStrike extends Ability {
+public class PredatorStrike extends Ability implements AbilityWithDuration {
 
 	private static final int COOLDOWN_1 = 20 * 18;
 	private static final int COOLDOWN_2 = 20 * 14;
@@ -59,42 +60,45 @@ public class PredatorStrike extends Ability {
 	private static final int MAX_DAMAGE_RANGE = 12;
 	private static final double EXPLODE_RADIUS = 1.25;
 
+	private static final int DURATION = 20 * 5;
+
 	public static final String CHARM_COOLDOWN = "Predator Strike Cooldown";
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
 	public static final String CHARM_RADIUS = "Predator Strike Radius";
 	public static final String CHARM_RANGE = "Predator Strike Range";
 
 	public static final AbilityInfo<PredatorStrike> INFO =
-		new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
-			.linkedSpell(ClassAbility.PREDATOR_STRIKE)
-			.scoreboardId("PredatorStrike")
-			.shorthandName("PrS")
-			.descriptions(
-				String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
-					              "When you fire a critical projectile, it will instantaneously travel in a straight line " +
-					              "for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
-					              "This ability deals %s%% of your projectile damage increased by %s%% for every block of distance from you and the target " +
-					              "(up to %d blocks, or %s%% total). Cooldown: %ds.",
-					MAX_RANGE, EXPLODE_RADIUS, StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER), StringUtils.multiplierToPercentage(DISTANCE_SCALE_1), MAX_DAMAGE_RANGE,
-					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), COOLDOWN_1 / 20),
-				String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). Cooldown: %ds.", StringUtils.multiplierToPercentage(DISTANCE_SCALE_2),
-					StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER), COOLDOWN_2 / 20))
-			.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
-			.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
-			// Put this trigger first so that they can be made the same for convenience
-			.addTrigger(new AbilityTriggerInfo<>("unprime", "unprime", PredatorStrike::unprime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false).sneaking(false),
-				new AbilityTriggerInfo.TriggerRestriction("Predator Strike is primed", player -> {
-					PredatorStrike predatorStrike = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PredatorStrike.class);
-					return predatorStrike != null && predatorStrike.mDeactivationRunnable != null;
-				})))
-			.addTrigger(new AbilityTriggerInfo<>("cast", "prime", PredatorStrike::prime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
-				AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
-			.displayItem(Material.SPECTRAL_ARROW);
+			new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
+					.linkedSpell(ClassAbility.PREDATOR_STRIKE)
+					.scoreboardId("PredatorStrike")
+					.shorthandName("PrS")
+					.descriptions(
+							String.format("Left-clicking with a projectile weapon while not sneaking will prime a Predator Strike that unprimes after 5s. " +
+											"When you fire a critical projectile, it will instantaneously travel in a straight line " +
+											"for up to %d blocks or until it hits an enemy or block and damages enemies in a %s block radius. " +
+											"This ability deals %s%% of your projectile damage increased by %s%% for every block of distance from you and the target " +
+											"(up to %d blocks, or %s%% total). Cooldown: %ds.",
+									MAX_RANGE, EXPLODE_RADIUS, StringUtils.multiplierToPercentage(DAMAGE_MULTIPLIER), StringUtils.multiplierToPercentage(DISTANCE_SCALE_1), MAX_DAMAGE_RANGE,
+									StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_1 + DAMAGE_MULTIPLIER), COOLDOWN_1 / 20),
+							String.format("Damage now increases by %s%% for each block of distance (up to %s%% in total). Cooldown: %ds.", StringUtils.multiplierToPercentage(DISTANCE_SCALE_2),
+									StringUtils.multiplierToPercentage(MAX_DAMAGE_RANGE * DISTANCE_SCALE_2 + DAMAGE_MULTIPLIER), COOLDOWN_2 / 20))
+					.simpleDescription("Upon activation, your next shot will travel instantly and deal more damage the further it travels.")
+					.cooldown(COOLDOWN_1, COOLDOWN_2, CHARM_COOLDOWN)
+					// Put this trigger first so that they can be made the same for convenience
+					.addTrigger(new AbilityTriggerInfo<>("unprime", "unprime", PredatorStrike::unprime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).enabled(false).sneaking(false),
+							new AbilityTriggerInfo.TriggerRestriction("Predator Strike is primed", player -> {
+								PredatorStrike predatorStrike = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, PredatorStrike.class);
+								return predatorStrike != null && predatorStrike.mDeactivationRunnable != null;
+							})))
+					.addTrigger(new AbilityTriggerInfo<>("cast", "prime", PredatorStrike::prime, new AbilityTrigger(AbilityTrigger.Key.LEFT_CLICK).sneaking(false),
+							AbilityTriggerInfo.HOLDING_PROJECTILE_WEAPON_RESTRICTION))
+					.displayItem(Material.SPECTRAL_ARROW);
 
 	private @Nullable BukkitRunnable mDeactivationRunnable = null;
 	private final double mDistanceScale;
 	private final double mExplodeRadius;
 	private @Nullable SwiftCuts mSwiftCuts;
+	private int mCurrDuration = 0;
 
 	private final PredatorStrikeCS mCosmetic;
 
@@ -119,8 +123,7 @@ public class PredatorStrike extends Ability {
 		} else {
 			mDeactivationRunnable.cancel();
 		}
-
-		ClientModHandler.updateAbility(mPlayer, this);
+		mCurrDuration = 0;
 
 		mDeactivationRunnable = new BukkitRunnable() {
 			int mTicks = 0;
@@ -128,9 +131,10 @@ public class PredatorStrike extends Ability {
 			@Override
 			public void run() {
 				mTicks++;
+				mCurrDuration++;
 				mCosmetic.strikeTick(mPlayer, mTicks);
 
-				if (mTicks >= 20 * 5) {
+				if (mTicks >= DURATION) {
 					this.cancel();
 				}
 			}
@@ -139,10 +143,12 @@ public class PredatorStrike extends Ability {
 			public synchronized void cancel() {
 				super.cancel();
 				mDeactivationRunnable = null;
+				mCurrDuration = -1;
 				ClientModHandler.updateAbility(mPlayer, PredatorStrike.this);
 			}
 		};
 		cancelOnDeath(mDeactivationRunnable.runTaskTimer(mPlugin, 0, 1));
+		ClientModHandler.updateAbility(mPlayer, this);
 	}
 
 	public void unprime() {
@@ -181,7 +187,7 @@ public class PredatorStrike extends Ability {
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
 		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
-			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
+				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
 		Location endLoc;
 		if (result == null) {
@@ -260,5 +266,15 @@ public class PredatorStrike extends Ability {
 	@Override
 	public @Nullable String getMode() {
 		return mDeactivationRunnable != null ? "active" : null;
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return DURATION;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }

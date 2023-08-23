@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.HauntingShadesCS;
@@ -12,6 +13,7 @@ import com.playmonumenta.plugins.effects.CustomRegeneration;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
@@ -28,7 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-public class HauntingShades extends Ability {
+public class HauntingShades extends Ability implements AbilityWithDuration {
 
 	private static final String HEAL_NAME = "HauntingShadesHealing";
 	private static final String STR_NAME = "HauntingShadesStrength";
@@ -51,26 +53,30 @@ public class HauntingShades extends Ability {
 	public static final String CHARM_DAMAGE = "Haunting Shades Damage Modifier";
 
 	public static final AbilityInfo<HauntingShades> INFO =
-		new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
-			.linkedSpell(ClassAbility.HAUNTING_SHADES)
-			.scoreboardId("HauntingShades")
-			.shorthandName("HS")
-			.descriptions(
-				"Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. " +
-					"Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.",
-				"Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. " +
-					"Effects do not stack with other Tenebrists.")
-			.simpleDescription("Place a Shade that debuffs nearby enemies with Vulnerability.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
-				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(Material.SKELETON_SKULL);
+			new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
+					.linkedSpell(ClassAbility.HAUNTING_SHADES)
+					.scoreboardId("HauntingShades")
+					.shorthandName("HS")
+					.descriptions(
+							"Press the swap key while not sneaking with a scythe to conjure a Shade at the target block or mob location. " +
+									"Mobs within 6 blocks of a Shade are afflicted with 10% Vulnerability. A Shade fades back into darkness after 7 seconds. Cooldown: 10s.",
+							"Players within 6 blocks of the shade are given 10% damage dealt and gain a custom healing effect that regenerates 2.5% of max health every second for 1 second. " +
+									"Effects do not stack with other Tenebrists.")
+					.simpleDescription("Place a Shade that debuffs nearby enemies with Vulnerability.")
+					.cooldown(COOLDOWN, CHARM_COOLDOWN)
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", HauntingShades::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false),
+							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+					.displayItem(Material.SKELETON_SKULL);
 
 	private final HauntingShadesCS mCosmetic;
+
+	private final int mMaxDuration;
+	private int mCurrDuration = -1;
 
 	public HauntingShades(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new HauntingShadesCS());
+		mMaxDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHADES_DURATION);
 	}
 
 	public void cast() {
@@ -134,15 +140,17 @@ public class HauntingShades extends Ability {
 		stand.setVisible(false);
 		stand.setCustomNameVisible(false);
 		stand.setSmall(true);
+		mCurrDuration = 0;
 
-		int duration = CharmManager.getDuration(mPlayer, CHARM_DURATION, SHADES_DURATION);
-
+		ClientModHandler.updateAbility(mPlayer, this);
 		new BukkitRunnable() {
 			final double mAoeRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, AOE_RANGE);
 			int mT = 0;
+
 			@Override
 			public void run() {
 				mT++;
+				mCurrDuration++;
 				if (mT % 5 == 0) {
 					if (isLevelTwo()) {
 						List<Player> affectedPlayers = PlayerUtils.playersInRange(bLoc, mAoeRadius, true);
@@ -165,13 +173,29 @@ public class HauntingShades extends Ability {
 
 				mCosmetic.shadesTickEffect(mPlugin, world, mPlayer, bLoc, mAoeRadius, mT);
 
-				if (mT >= duration || mPlayer.isDead() || !mPlayer.isValid()) {
+				if (mT >= mMaxDuration || mPlayer.isDead() || !mPlayer.isValid()) {
 					stand.remove();
 					mCosmetic.shadesEndEffect(world, mPlayer, bLoc, mAoeRadius);
 					this.cancel();
 				}
 			}
 
+			@Override
+			public synchronized void cancel() {
+				super.cancel();
+				mCurrDuration = -1;
+				ClientModHandler.updateAbility(mPlayer, HauntingShades.this);
+			}
 		}.runTaskTimer(mPlugin, 0, 1);
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return mMaxDuration;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }

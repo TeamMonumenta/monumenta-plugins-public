@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
+import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.SanguineHarvestCS;
@@ -12,6 +13,7 @@ import com.playmonumenta.plugins.effects.SanguineHarvestBlight;
 import com.playmonumenta.plugins.effects.SanguineMark;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -34,7 +36,7 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-public class SanguineHarvest extends Ability {
+public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
 	private static final int RANGE = 8;
 	private static final int RADIUS_1 = 3;
@@ -61,33 +63,35 @@ public class SanguineHarvest extends Ability {
 	public static final String CHARM_BLEED = "Sanguine Harvest Bleed Amplifier";
 
 	public static final AbilityInfo<SanguineHarvest> INFO =
-		new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
-			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
-			.scoreboardId("SanguineHarvest")
-			.shorthandName("SH")
-			.actionBarColor(TextColor.color(179, 0, 0))
-			.descriptions(
-				("Enemies you damage with an ability are afflicted with Bleed I for %s seconds. " +
-					 "Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
-					 "Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
-					 "This projectile travels up to %s blocks and upon contact with a surface or an enemy, it explodes, " +
-					 "knocking back all mobs within %s blocks. " +
-					 "Any player that kills a mob knocked back by this ability is healed for %s%% of max health. Cooldown: %ss.")
-					.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
-				"Increase passive Bleed level to II, and increase the radius to %s blocks. Healing from killing affected mobs is increased to %s%%."
-					.formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)),
-				("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
-					 "Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
-					.formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)))
-			.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
-			.cooldown(COOLDOWN, CHARM_COOLDOWN)
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
-				AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
-			.displayItem(Material.NETHER_STAR);
+			new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
+					.linkedSpell(ClassAbility.SANGUINE_HARVEST)
+					.scoreboardId("SanguineHarvest")
+					.shorthandName("SH")
+					.actionBarColor(TextColor.color(179, 0, 0))
+					.descriptions(
+							("Enemies you damage with an ability are afflicted with Bleed I for %s seconds. " +
+									"Bleed gives mobs 10%% Slowness and 10%% Weaken per level if the mob is below 50%% Max Health. " +
+									"Additionally, right click while holding a scythe and not sneaking to fire a burst of darkness. " +
+									"This projectile travels up to %s blocks and upon contact with a surface or an enemy, it explodes, " +
+									"knocking back all mobs within %s blocks. " +
+									"Any player that kills a mob knocked back by this ability is healed for %s%% of max health. Cooldown: %ss.")
+									.formatted(StringUtils.ticksToSeconds(BLEED_DURATION), RANGE, RADIUS_1, StringUtils.multiplierToPercentage(HEAL_PERCENT_1), StringUtils.ticksToSeconds(COOLDOWN)),
+							"Increase passive Bleed level to II, and increase the radius to %s blocks. Healing from killing affected mobs is increased to %s%%."
+									.formatted(RADIUS_2, StringUtils.multiplierToPercentage(HEAL_PERCENT_2)),
+							("Sanguine now seeps into the ground where it lands, causing blocks in the cone to become Blighted. " +
+									"Mobs standing on these Blighted blocks take %s%% extra damage per debuff. The Blight disappears after %ss and is not counted as a debuff.")
+									.formatted(StringUtils.multiplierToPercentage(ENHANCEMENT_DMG_INCREASE), StringUtils.ticksToSeconds(ENHANCEMENT_BLIGHT_DURATION)))
+					.simpleDescription("Passively apply Bleed with your abilities. Activate to mark mobs, healing whoever kills them.")
+					.cooldown(COOLDOWN, CHARM_COOLDOWN)
+					.addTrigger(new AbilityTriggerInfo<>("cast", "cast", SanguineHarvest::cast, new AbilityTrigger(AbilityTrigger.Key.RIGHT_CLICK).sneaking(false),
+							AbilityTriggerInfo.HOLDING_SCYTHE_RESTRICTION))
+					.displayItem(Material.NETHER_STAR);
 
 	private final double mRadius;
 	private final double mBleedLevel;
 	private final double mHealPercent;
+
+	private int mCurrDuration = -1;
 
 	private final ArrayList<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
@@ -159,7 +163,7 @@ public class SanguineHarvest extends Ability {
 		}
 
 		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
-			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
+				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
 
 		Location endLoc;
 		if (result == null) {
@@ -193,7 +197,7 @@ public class SanguineHarvest extends Ability {
 
 	private void runMarkerRunnable() {
 		if (!mMarkedLocations.isEmpty() &&
-			isEnhanced()) {
+				isEnhanced()) {
 			new BukkitRunnable() {
 				int mTicks = 0;
 
@@ -220,8 +224,28 @@ public class SanguineHarvest extends Ability {
 					}
 
 					mTicks += 10;
+					mCurrDuration += 10;
+				}
+
+				@Override
+				public synchronized void cancel() {
+					super.cancel();
+					mCurrDuration = -1;
+					ClientModHandler.updateAbility(mPlayer, SanguineHarvest.this);
 				}
 			}.runTaskTimer(mPlugin, 0, 10);
+			mCurrDuration = 0;
+			ClientModHandler.updateAbility(mPlayer, this);
 		}
+	}
+
+	@Override
+	public int getInitialAbilityDuration() {
+		return isEnhanced() ? ENHANCEMENT_BLIGHT_DURATION : 0;
+	}
+
+	@Override
+	public int getRemainingAbilityDuration() {
+		return this.mCurrDuration >= 0 && isEnhanced() ? getInitialAbilityDuration() - this.mCurrDuration : 0;
 	}
 }
