@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import org.bukkit.attribute.AttributeModifier;
 import org.jetbrains.annotations.Nullable;
 

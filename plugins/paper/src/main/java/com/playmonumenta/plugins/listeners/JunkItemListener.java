@@ -13,7 +13,9 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -112,7 +114,7 @@ public final class JunkItemListener implements Listener {
 	private void playerSetMin(Player player, int newMin) {
 		newMin = Math.max(1, Math.min(newMin, MAX_POSSIBLE_STACK + 1));
 		ScoreboardUtils.setScoreboardValue(player, PICKUP_MIN_OBJ_NAME, newMin);
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Threshold to pick up uninteresting items set to " + newMin + ".");
+		player.sendMessage(Component.text("Threshold to pick up uninteresting items set to " + newMin + ".", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -131,28 +133,28 @@ public final class JunkItemListener implements Listener {
 
 	private void pickupAll(Player player) {
 		remove(player);
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now pick up all items.");
+		player.sendMessage(Component.text("You will now pick up all items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void pickupTiered(Player player) {
 		remove(player);
 		player.addScoreboardTag(TIERED_TAG);
 		mTieredPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now only pick up items with a tier.");
+		player.sendMessage(Component.text("You will now only pick up items with a tier.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void pickupLore(Player player) {
 		remove(player);
 		player.addScoreboardTag(LORE_TAG);
 		mLorePlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will now only pick up items with lore text.");
+		player.sendMessage(Component.text("You will now only pick up items with lore text.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void pickupInteresting(Player player) {
 		remove(player);
 		player.addScoreboardTag(INTERESTING_TAG);
 		mInterestingPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You will no longer pick up uninteresting items.");
+		player.sendMessage(Component.text("You will no longer pick up uninteresting items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

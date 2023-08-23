@@ -5,13 +5,14 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -58,13 +59,13 @@ public class DivineAura implements Enchantment {
 					new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerActive(player);
 					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1, 0.25f);
-					player.sendMessage(ChatColor.AQUA + "You feel the Divine Aura around you fall dormant...");
+					player.sendMessage(Component.text("You feel the Divine Aura around you fall dormant...", NamedTextColor.AQUA));
 					player.addScoreboardTag(TAG_TO_DISABLE);
 				} else {
 					new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), 20, 0.25, 0.5, 0.25, 1).spawnAsPlayerActive(player);
 					new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 25, 0.5, 0.45, 0.25, 1).spawnAsPlayerActive(player);
 					world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1, 1.25f);
-					player.sendMessage(ChatColor.AQUA + "You feel a Divine Aura envelop you.");
+					player.sendMessage(Component.text("You feel a Divine Aura envelop you.", NamedTextColor.AQUA));
 					player.removeScoreboardTag(TAG_TO_DISABLE);
 				}
 				player.setCooldown(item.getType(), 20);

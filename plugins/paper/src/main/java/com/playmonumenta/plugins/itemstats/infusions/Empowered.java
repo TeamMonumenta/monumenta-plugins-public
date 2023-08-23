@@ -2,13 +2,16 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class Empowered implements Infusion {
 
@@ -53,10 +56,20 @@ public class Empowered implements Infusion {
 		if (repairs > 0) {
 			for (int i : slotList) {
 				ItemStack item = inv.getItem(i);
-				if ((item != null && item.getDurability() > 0 && !item.getType().isBlock()
-					    && item.hasItemMeta() && ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) == 0)) {
-					int maxDura = item.getType().getMaxDurability();
-					int currDura = item.getDurability();
+				if (item == null || !item.hasItemMeta()) {
+					continue;
+				}
+				Material type = item.getType();
+				if (type == Material.AIR || type.isBlock() || ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.CURSE_OF_IRREPARIBILITY) > 0) {
+					continue;
+				}
+				ItemMeta meta = item.getItemMeta();
+				if (meta instanceof Damageable damageMeta) {
+					int currDura = damageMeta.getDamage();
+					if (currDura <= 0) {
+						continue;
+					}
+					int maxDura = type.getMaxDurability();
 					double newDura = Math.max(currDura - (maxDura * repairs * PERCENT_REPAIR), 0);
 					double frac = newDura - Math.floor(newDura);
 					if (Math.random() < frac) {
@@ -64,7 +77,8 @@ public class Empowered implements Infusion {
 					} else {
 						newDura = Math.ceil(newDura);
 					}
-					item.setDurability((short)newDura);
+					damageMeta.setDamage((short)newDura);
+					item.setItemMeta(damageMeta);
 				}
 			}
 		}

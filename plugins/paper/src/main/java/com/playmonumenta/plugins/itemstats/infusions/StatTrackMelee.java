@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

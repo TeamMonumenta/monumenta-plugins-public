@@ -6,6 +6,9 @@ import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.scriptedquests.utils.CustomInventory;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -13,10 +16,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import static org.bukkit.ChatColor.BOLD;
-import static org.bukkit.ChatColor.GOLD;
-import static org.bukkit.ChatColor.GRAY;
 
 /*
  * Main menu for Experiencinators.
@@ -55,25 +54,28 @@ public final class ExperiencinatorMainGui extends CustomInventory {
 		{
 			ItemStack options = new ItemStack(Material.CRAFTING_TABLE);
 			ItemMeta meta = options.getItemMeta();
-			meta.setDisplayName(GOLD + "" + BOLD + "Settings");
-			meta.setLore(List.of(GRAY + "Configure your " + ItemUtils.getPlainName(mExperiencinatorItem)));
+			meta.displayName(Component.text("Settings", NamedTextColor.GOLD, TextDecoration.BOLD));
+			meta.lore(List.of(Component.text("Configure your " + ItemUtils.getPlainName(mExperiencinatorItem), NamedTextColor.GRAY)));
 			options.setItemMeta(meta);
+			GUIUtils.setPlaceholder(options);
 			mInventory.setItem(11, options);
 		}
 		{
 			ItemStack convertAll = new ItemStack(Material.GOLD_INGOT);
 			ItemMeta meta = convertAll.getItemMeta();
-			meta.setDisplayName(GOLD + "" + BOLD + "Convert Now");
-			meta.setLore(List.of(GRAY + "Convert all items in your inventory"));
+			meta.displayName(Component.text("Convert Now", NamedTextColor.GOLD, TextDecoration.BOLD));
+			meta.lore(List.of(Component.text("Convert all items in your inventory", NamedTextColor.GRAY)));
 			convertAll.setItemMeta(meta);
+			GUIUtils.setPlaceholder(convertAll);
 			mInventory.setItem(13, convertAll);
 		}
 		{
 			ItemStack selectiveConvert = new ItemStack(Material.GOLD_NUGGET);
 			ItemMeta meta = selectiveConvert.getItemMeta();
-			meta.setDisplayName(GOLD + "" + BOLD + "Selective Conversion");
-			meta.setLore(List.of(GRAY + "Convert specific items only"));
+			meta.displayName(Component.text("Selective Conversion", NamedTextColor.GOLD, TextDecoration.BOLD));
+			meta.lore(List.of(Component.text("Convert specific items only", NamedTextColor.GRAY)));
 			selectiveConvert.setItemMeta(meta);
+			GUIUtils.setPlaceholder(selectiveConvert);
 			mInventory.setItem(15, selectiveConvert);
 		}
 

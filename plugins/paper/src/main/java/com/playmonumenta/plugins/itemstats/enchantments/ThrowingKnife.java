@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import java.util.EnumSet;
 import org.bukkit.GameMode;
 import org.bukkit.Location;

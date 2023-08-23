@@ -2,11 +2,10 @@ package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-
 import java.util.EnumSet;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

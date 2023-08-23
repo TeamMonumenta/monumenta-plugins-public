@@ -6,10 +6,9 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.AbilityUtils;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-
 import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

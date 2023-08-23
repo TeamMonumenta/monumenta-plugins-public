@@ -97,7 +97,7 @@ public class QuiverListener implements Listener {
 			@Override
 			public boolean canPutIntoContainer(ItemStack item) {
 				return ItemUtils.isArrow(item)
-					       && NBT.get(item, ItemStatUtils::getPlayerModified) == null
+					       && !ItemStatUtils.hasPlayerModified(item)
 					       && !ItemStatUtils.isQuiver(item)
 					       && !InventoryUtils.containsSpecialLore(item);
 			}
@@ -114,11 +114,21 @@ public class QuiverListener implements Listener {
 
 			@Override
 			public void generateDescription(ReadableNBT monumenta, Consumer<Component> addLore) {
-				ReadableNBTList<ReadWriteNBT> items = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY)
-					                        .getCompoundList(ItemStatUtils.ITEMS_KEY);
+				ReadableNBT playerMod = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+				if (playerMod == null) {
+					return;
+				}
+				ReadableNBTList<ReadWriteNBT> items = playerMod.getCompoundList(ItemStatUtils.ITEMS_KEY);
+				if (items == null) {
+					return;
+				}
 				long amount = 0;
 				for (ReadWriteNBT compound : items) {
-					amount += ItemStatUtils.addPlayerModified(compound.getCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
+					ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
+					if (playerModified == null) {
+						continue;
+					}
+					amount += playerModified.getLong(CustomContainerItemManager.AMOUNT_KEY);
 				}
 				addLore.accept(Component.text("Contains ", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
 					               .append(Component.text(amount + (mTotalItemsLimit > 0 ? "/" + mTotalItemsLimit : ""), NamedTextColor.WHITE))
@@ -131,7 +141,7 @@ public class QuiverListener implements Listener {
 					ArrowTransformMode mode = ItemStatUtils.getArrowTransformMode(quiver);
 					ItemStack icon = mode.mItemStack == null ? new ItemStack(Material.ARROW) : ItemUtils.clone(mode.mItemStack);
 					ItemUtils.modifyMeta(icon, meta -> {
-						meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+						meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 						if (mode == ArrowTransformMode.NONE) {
 							meta.displayName(Component.text("Arrow transformation disabled", NamedTextColor.WHITE)
 								                 .decorate(TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
@@ -173,6 +183,9 @@ public class QuiverListener implements Listener {
 									for (int i = 0; i < itemsListCopy.size(); i++) {
 										ReadWriteNBT compound = itemsList.get(i);
 										ItemStack containedItem = NBT.itemStackFromNBT(compound);
+										if (containedItem == null) {
+											continue;
+										}
 										NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
 										if (Arrays.stream(ArrowTransformMode.values()).anyMatch(m -> containedItem.isSimilar(m.mItemStack))) {
 											if (firstArrowPlayerModified == null) {

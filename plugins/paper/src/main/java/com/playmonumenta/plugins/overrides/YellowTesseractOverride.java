@@ -30,7 +30,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -123,7 +122,7 @@ public class YellowTesseractOverride extends BaseOverride {
 		// This tesseract is not updated or otherwise broken, replace it with a fresh one
 		if (ItemStatUtils.getTier(item) != Tier.UNIQUE) {
 			setToBlankTesseract(player, item);
-			player.sendMessage(ChatColor.RED + "Your Tesseract had incorrect data, so it has been replaced. Only report this if it happens multiple times on the same Tesseract or if the replacement does not function.");
+			player.sendMessage(Component.text("Your Tesseract had incorrect data, so it has been replaced. Only report this if it happens multiple times on the same Tesseract or if the replacement does not function.", NamedTextColor.RED));
 			return false;
 		}
 

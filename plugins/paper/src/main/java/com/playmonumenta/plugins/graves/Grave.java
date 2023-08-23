@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.PlayerListener;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.*;
 import de.tr7zw.nbtapi.NBTContainer;
@@ -305,8 +306,8 @@ public final class Grave {
 			double mTheta = 0;
 			@Override
 			public void run() {
-				mPlayer.spawnParticle(Particle.TOTEM, loc.clone().add(FastUtils.cos(mTheta), mY, FastUtils.sin(mTheta)), 1, 0, 0, 0, 0);
-				mPlayer.spawnParticle(Particle.TOTEM, loc.clone().add(-FastUtils.cos(mTheta), mY, -FastUtils.sin(mTheta)), 1, 0, 0, 0, 0);
+				new PartialParticle(Particle.TOTEM, loc.clone().add(FastUtils.cos(mTheta), mY, FastUtils.sin(mTheta)), 1, 0, 0, 0, 0).spawnAsPlayerPassive(mPlayer);
+				new PartialParticle(Particle.TOTEM, loc.clone().add(-FastUtils.cos(mTheta), mY, -FastUtils.sin(mTheta)), 1, 0, 0, 0, 0).spawnAsPlayerPassive(mPlayer);
 
 				mTicks += 2;
 				mY += 0.2;

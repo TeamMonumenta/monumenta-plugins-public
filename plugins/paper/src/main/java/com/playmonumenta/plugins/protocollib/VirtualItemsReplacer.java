@@ -134,32 +134,35 @@ public class VirtualItemsReplacer extends PacketAdapter {
 				    && VirtualFirmament.isEnabled(player)) {
 					String plainName = ItemUtils.getPlainNameIfExists(itemStack);
 					if ("Firmament".equals(plainName) || "Doorway from Eternity".equals(plainName)) {
-						ReadableNBTList<ReadWriteNBT> items = NBT.get(itemStack, ItemUtils::getContainerItems);
-						int count = 0;
-						if (items != null) {
-							for (ReadWriteNBT itemNBT : items) {
-								if (itemNBT.hasTag("tag")) { // probably has lore
-									continue;
-								}
-								String id = itemNBT.getString("id"); // minecraft:tag
-								Byte amount = itemNBT.getByte("Count"); // count
-								Material mat = Material.matchMaterial(id); // use bukkit's material system to check if it is a block
-								// check copied from FirmanentOverride
-								if (mat == null
-									|| mat.isAir()
-									|| ItemUtils.notAllowedTreeReplace.contains(mat)
-									|| (!mat.isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(mat))) {
-									continue;
-								}
-								if (mat.isBlock()) {
-									count += amount;
-								}
-								if (count >= 64) { // if above 64, we know we have enough blocks
-									break;
+						int blockCountInsideFirm = NBT.get(itemStack, nbt -> {
+							int count = 0;
+							ReadableNBTList<ReadWriteNBT> items = ItemUtils.getContainerItems(nbt);
+							if (items != null) {
+								for (ReadWriteNBT itemNBT : items) {
+									if (itemNBT.hasTag("tag")) { // probably has lore
+										continue;
+									}
+									String id = itemNBT.getString("id"); // minecraft:tag
+									Byte amount = itemNBT.getByte("Count"); // count
+									Material mat = Material.matchMaterial(id); // use bukkit's material system to check if it is a block
+									// check copied from FirmanentOverride
+									if (mat == null
+										|| mat.isAir()
+										|| ItemUtils.notAllowedTreeReplace.contains(mat)
+										|| (!mat.isOccluding() && !ItemUtils.GOOD_OCCLUDERS.contains(mat))) {
+										continue;
+									}
+									if (mat.isBlock()) {
+										count += amount;
+									}
+									if (count >= 64) { // if above 64, we know we have enough blocks
+										break;
+									}
 								}
 							}
-						}
-						itemStack.setAmount(Math.max(1, Math.min(count, 64)));
+							return count;
+						});
+						itemStack.setAmount(Math.max(1, Math.min(blockCountInsideFirm, 64)));
 						// ? Add shulker box id here for resourcepack team when they need dyed support
 						itemStack.setType("Firmament".equals(plainName) ? Material.PRISMARINE : Material.BLACKSTONE);
 						markVirtual(itemStack);
@@ -203,15 +206,29 @@ public class VirtualItemsReplacer extends PacketAdapter {
 			// Quivers: fake a larger stack size to not have them disappear from the inventory on the client when a bow is shot (until the next inventory update happens)
 			if (ItemStatUtils.isQuiver(itemStack)) {
 				if (itemStack.getAmount() == 1) {
-					ReadableNBTList<ReadWriteNBT> items = NBT.get(itemStack, ItemStatUtils::getItemList);
-					long amount = 0;
-					for (ReadWriteNBT compound : items) {
-						// this can be null
-						amount += ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY);
-						if (amount >= 64) {
-							break;
+					long amount = NBT.get(itemStack, nbt -> {
+						long count = 0;
+						ReadableNBTList<ReadWriteNBT> items = ItemStatUtils.getItemList(nbt);
+						if (items == null) {
+							return count;
 						}
-					}
+						for (ReadWriteNBT compound : items) {
+							// this can be null
+							ReadWriteNBT tag = compound.getCompound("tag");
+							if (tag == null) {
+								continue;
+							}
+							ReadableNBT playerTag = ItemStatUtils.getPlayerModified(nbt);
+							if (playerTag == null) {
+								continue;
+							}
+							count += playerTag.getLong(CustomContainerItemManager.AMOUNT_KEY);
+							if (count >= 64) {
+								break;
+							}
+						}
+						return count;
+					});
 					itemStack.setAmount(Math.max(1, (int) Math.min(amount, 64)));
 					markVirtual(itemStack);
 				}

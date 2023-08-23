@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import java.util.EnumSet;
 import org.bukkit.Color;
 import org.bukkit.Particle;

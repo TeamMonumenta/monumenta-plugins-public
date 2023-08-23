@@ -8,7 +8,6 @@ import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
-
 import java.util.EnumSet;
 import org.bukkit.Location;
 import org.bukkit.Particle;

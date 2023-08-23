@@ -26,8 +26,9 @@ import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -128,28 +129,35 @@ public class PotionConsumeListener implements Listener {
 	}
 
 	private void rightClickPotion(InventoryClickEvent event, Player player, ItemStack item, Inventory clickedInventory) {
-		ReadableNBTList<ReadWriteNBT> customEffects = NBT.get(item, ItemStatUtils::getEffects);
-		if (customEffects == null || customEffects.isEmpty()) {
-			return;
-		}
-
-		event.setCancelled(true);
-
-		if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !isOnlyGlowing(customEffects)) {
-			player.sendMessage(ChatColor.RED + "Infinite potions can not be quick drinked!");
-			float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
-			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
-			return;
-		}
-
-		if (cooldownApplies(customEffects) && clickedInventory.getType() != InventoryType.CHEST) {
-			if (checkPotionCooldown(player)) {
-				player.sendMessage(ChatColor.RED + "Quick drink is still on cooldown!");
-				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				return;
-			} else {
-				setPotionCooldown(player);
+		boolean cancel = NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> customEffects = ItemStatUtils.getEffects(nbt);
+			if (customEffects == null || customEffects.isEmpty()) {
+				return true;
 			}
+
+			event.setCancelled(true);
+
+			if (ItemStatUtils.hasEnchantment(item, EnchantmentType.INFINITY) && !isOnlyGlowing(customEffects)) {
+				player.sendMessage(Component.text("Infinite potions can not be quick drinked!", NamedTextColor.RED));
+				float pitch = ((float) FastUtils.RANDOM.nextDouble() - 0.5f) * 0.05f;
+				player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f + pitch);
+				return true;
+			}
+
+			if (cooldownApplies(customEffects) && clickedInventory.getType() != InventoryType.CHEST) {
+				if (checkPotionCooldown(player)) {
+					player.sendMessage(Component.text("Quick drink is still on cooldown!", NamedTextColor.RED));
+					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					return true;
+				} else {
+					setPotionCooldown(player);
+				}
+			}
+			return false;
+		});
+
+		if (cancel) {
+			return;
 		}
 
 		Material mat = item.getType();
@@ -413,10 +421,13 @@ public class PotionConsumeListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
 		if (inventory instanceof PlayerInventory) {
+			return;
+		}
+		if (inventory == null) {
 			return;
 		}
 		postPotionDrink((Player) event.getPlayer(), inventory, null, true);

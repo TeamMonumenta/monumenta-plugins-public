@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
-
 import java.util.HashSet;
 import java.util.UUID;
 import org.bukkit.entity.Player;

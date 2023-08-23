@@ -48,7 +48,7 @@ dependencies {
     compileOnly("com.bergerkiller.bukkit:BKCommonLib:1.19.4-v2")
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("com.goncalomb.bukkit:nbteditor:3.2")
-    compileOnly("de.tr7zw:item-nbt-api-plugin:2.11.3")
+    compileOnly("de.tr7zw:item-nbt-api-plugin:2.12.0-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     compileOnly("io.prometheus:simpleclient:0.11.0")
     compileOnly("com.github.LeonMangler:PremiumVanishAPI:2.6.3")

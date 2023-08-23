@@ -478,7 +478,7 @@ public class LootboxManager implements Listener {
 	}
 
 	private static @Nullable NBTCompound getItemKeyFromItem(NBTCompound index, String itemKey) {
-		if (index.hasKey(itemKey)) {
+		if (index.hasTag(itemKey)) {
 			return index.getCompound(itemKey);
 		}
 		return null;

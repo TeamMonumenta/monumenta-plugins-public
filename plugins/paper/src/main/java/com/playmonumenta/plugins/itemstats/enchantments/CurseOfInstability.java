@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
-
 import java.util.Random;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

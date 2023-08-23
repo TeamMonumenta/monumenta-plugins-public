@@ -13,8 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
@@ -50,7 +51,7 @@ public class Phylactery implements Infusion {
 				if (!event.getKeepInventory() && GraveListener.gravesEnabled(player)) {
 					int previousStorage = Math.max(0, ScoreboardUtils.getScoreboardValue(player, GRAVE_XP_SCOREBOARD).orElse(0));
 					ScoreboardUtils.setScoreboardValue(player, GRAVE_XP_SCOREBOARD, previousStorage + savedXp);
-					player.sendMessage(ChatColor.GOLD + "" + (int) (100 * value * XP_KEPT) + "% of your experience has been stored. Collect your grave to retrieve it.");
+					player.sendMessage(Component.text("" + (int) (100 * value * XP_KEPT) + "% of your experience has been stored. Collect your grave to retrieve it.", NamedTextColor.GOLD));
 				} else {
 					newTotalXp += savedXp;
 					int newLevel = ExperienceUtils.getLevel(newTotalXp);
@@ -87,7 +88,7 @@ public class Phylactery implements Infusion {
 		if (phylacteryXP > 0) {
 			ExperienceUtils.addTotalExperience(player, phylacteryXP);
 			ScoreboardUtils.setScoreboardValue(player, GRAVE_XP_SCOREBOARD, 0);
-			player.sendMessage(ChatColor.GOLD + "You received the experience stored in the grave.");
+			player.sendMessage(Component.text("You received the experience stored in the grave.", NamedTextColor.GOLD));
 		}
 	}
 

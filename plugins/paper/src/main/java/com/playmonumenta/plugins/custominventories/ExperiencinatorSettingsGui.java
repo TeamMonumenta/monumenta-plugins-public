@@ -216,7 +216,6 @@ public final class ExperiencinatorSettingsGui extends CustomInventory {
 				ItemStack item = GUIUtils.createBasicItem(conversionResult.getItem().getType(), Math.max(1, amount), Component.text("Convert to ", NamedTextColor.WHITE).append(Component.text(conversion.getName(), NamedTextColor.GOLD)), lore, false);
 
 				ItemUtils.setPlainName(item, ItemUtils.getPlainNameIfExists(conversionResult.getItem()));
-				ItemUtils.setPlainLore(item, List.of("This is a placeholder item."));
 
 				mInventory.setItem(offset + 1 + i, item);
 			}

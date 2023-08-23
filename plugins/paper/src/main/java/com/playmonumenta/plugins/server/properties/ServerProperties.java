@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -417,7 +416,7 @@ public class ServerProperties {
 					e.printStackTrace();
 
 					if (sender != null) {
-						sender.sendMessage(ChatColor.RED + "Invalid " + propertyName + " element: '" + iter + "'");
+						sender.sendMessage(Component.text("Invalid " + propertyName + " element: '" + iter + "'", NamedTextColor.RED));
 						MessagingUtils.sendStackTrace(sender, e);
 					}
 				}

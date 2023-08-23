@@ -851,6 +851,7 @@ public class WalletManager implements Listener {
 		}
 		return false;
 	}
+
 	private static @Nullable CompressionInfo getCompressionInfo(ItemStack item) {
 		for (CompressionInfo compressionInfo : COMPRESSIBLE_CURRENCIES) {
 			if (compressionInfo.mCompressed.isSimilar(item)) {

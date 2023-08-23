@@ -698,7 +698,7 @@ public class CustomTradeGui extends Gui {
 			Component[] lore = {Component.text("Left click to decrease, right click to increase.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false), Component.text("Hold shift to offset by 5.", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)};
 			bannerMeta.lore(Arrays.asList(lore));
 			// Hide patterns:
-			bannerMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // banner patterns are actually the same 'data' as potion effects, lmao
+			bannerMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // banner patterns are actually the same 'data' as potion effects, lmao
 			// Finalize:
 			banner.setItemMeta(bannerMeta);
 		}

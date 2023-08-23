@@ -236,7 +236,7 @@ public class SpawnerUtils {
 		if (wantedAction.size() > 0) {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value));
 			spawnerItem.setItemMeta(item.getItem().getItemMeta());
 		}
@@ -254,7 +254,7 @@ public class SpawnerUtils {
 		if (wantedAction.size() > 0) {
 			// Set the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			parameters.setString(parameterName, MessagingUtils.GSON.toJson(value));
 		}
 	}
@@ -271,7 +271,7 @@ public class SpawnerUtils {
 		if (wantedAction.size() > 0) {
 			// Try to find the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			if (parameters.hasTag(parameterName)) {
 				String json = parameters.getOrDefault(parameterName, null);
 				if (json == null) {
@@ -296,7 +296,7 @@ public class SpawnerUtils {
 		if (wantedAction.size() > 0) {
 			// Try to find the requested parameter
 			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			if (parameters.hasTag(parameterName)) {
 				String json = parameters.getOrDefault(parameterName, null);
 				if (json == null) {
@@ -320,7 +320,7 @@ public class SpawnerUtils {
 		if (wantedAction.size() > 0) {
 			HashMap<String, Object> parameterMap = new HashMap<>(SpawnerActionManager.getActionParameters(actionIdentifier));
 			ReadWriteNBT actionCompound = wantedAction.get(0);
-			ReadWriteNBT parameters = actionCompound.getCompound("parameters");
+			ReadWriteNBT parameters = actionCompound.getOrCreateCompound("parameters");
 			// Start from base parameters map and replace the values with the ones stored on the block.
 			parameterMap.forEach((key, value) -> {
 				Object currParam = parameters.getString(key);

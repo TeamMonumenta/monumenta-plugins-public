@@ -131,6 +131,10 @@ public class MessagingUtils {
 		return GSON_SERIALIZER.deserialize(json);
 	}
 
+	public static String serializeComponent(Component component) {
+		return GSON_SERIALIZER.serialize(component);
+	}
+
 	public static void sendBoldTitle(Player player, @Nullable String title, @Nullable String subtitle) {
 		sendBoldTitle(player, Component.text(title != null ? title : ""), Component.text(subtitle != null ? subtitle : ""));
 	}

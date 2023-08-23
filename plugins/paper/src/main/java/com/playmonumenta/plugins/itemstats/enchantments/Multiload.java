@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
+import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTItem;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.EnumSet;
@@ -129,13 +130,8 @@ public class Multiload implements Enchantment {
 		if (itemStack == null || itemStack.getType().isAir()) {
 			return 0;
 		}
-
-		NBTItem nbtItem = new NBTItem(itemStack);
-
-		if (!nbtItem.hasKey(AMMO_KEY)) {
-			return 0;
-		}
-
-		return nbtItem.getInteger(AMMO_KEY);
+		return NBT.get(itemStack, nbt -> {
+			return nbt.getOrDefault(AMMO_KEY, 0);
+		});
 	}
 }

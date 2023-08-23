@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-
 import java.util.EnumSet;
 import org.bukkit.Particle;
 import org.bukkit.Sound;

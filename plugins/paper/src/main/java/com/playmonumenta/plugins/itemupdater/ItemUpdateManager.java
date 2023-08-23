@@ -2,21 +2,17 @@ package com.playmonumenta.plugins.itemupdater;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.managers.LootboxManager;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTCompoundList;
-import de.tr7zw.nbtapi.NBTContainer;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import net.kyori.adventure.text.Component;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -45,7 +41,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.LlamaInventory;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -222,53 +217,39 @@ public class ItemUpdateManager implements Listener {
 		}
 
 		try {
-			if (ItemStatUtils.isClean(item)) {
+			if (ItemStatUtils.isClean(item) || GUIUtils.isPlaceholder(item)) {
 				return;
 			}
 			ItemStatUtils.markClean(item);
 
-			ItemMeta itemMeta = item.getItemMeta();
-			if (itemMeta.hasLore()) {
-				for (Component loreLine : itemMeta.lore()) {
-					if (ItemUtils.toPlainTagText(loreLine).contains("This is a placeholder item.")) {
-						return;
-					}
-				}
-			}
-			if (ItemUtils.getPlainLoreIfExists(item).contains("This is a placeholder item.")) {
-				return;
-			}
-
-			ItemUtils.setPlainTag(item);
-
-			// Internally checks if the item is a loot box before updating
-			LootboxManager.updateLootboxLore(item);
+			ItemUpdateHelper.generateItemStats(item);
 
 			// Only generate item stats on items with Monumenta tag
-			NBTItem nbt = new NBTItem(item);
-			if (nbt.hasTag(ItemStatUtils.MONUMENTA_KEY)) {
-				ItemUpdateHelper.generateItemStats(item);
-
+			boolean hasMonumenta = NBT.get(item, nbt -> (boolean) nbt.hasTag(ItemStatUtils.MONUMENTA_KEY));
+			if (hasMonumenta) {
 				// Update arrows in quivers immediately - otherwise, they would need updating every time an arrow is shot or picked up
 				if (ItemStatUtils.isQuiver(item)) {
-					NBTCompound playerModified = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY).getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-					if (playerModified != null) {
-						NBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-						if (arrowNBTs != null) {
-							List<String> arrowPath = new ArrayList<>(path);
-							arrowPath.add("in quiver");
-							List<NBTContainer> arrows = new ArrayList<>(arrowNBTs.size());
-							for (ReadWriteNBT arrowNBT : arrowNBTs) {
-								ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
-								updateNested(arrowPath, arrow);
-								arrows.add(NBTItem.convertItemtoNBT(arrow));
-							}
-							arrowNBTs.clear();
-							for (NBTContainer arrow : arrows) {
-								arrowNBTs.addCompound(arrow);
+					NBT.modify(item, nbt -> {
+						ReadWriteNBT playerModified = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+						if (playerModified != null) {
+							ReadWriteNBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
+							if (arrowNBTs != null) {
+								List<String> arrowPath = new ArrayList<>();
+								arrowPath.add("in quiver");
+								List<ItemStack> arrows = new ArrayList<>(arrowNBTs.size());
+								for (ReadWriteNBT arrowNBT : arrowNBTs) {
+									ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
+									updateNested(arrowPath, arrow);
+									arrows.add(arrow);
+								}
+								arrowNBTs.clear();
+								for (ItemStack arrow : arrows) {
+									ReadWriteNBT newCompound = NBT.itemStackToNBT(arrow);
+									arrowNBTs.addCompound().mergeCompound(newCompound);
+								}
 							}
 						}
-					}
+					});
 				}
 
 			}

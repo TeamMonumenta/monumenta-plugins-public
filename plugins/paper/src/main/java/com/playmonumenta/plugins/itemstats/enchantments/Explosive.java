@@ -15,7 +15,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-
 import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Color;

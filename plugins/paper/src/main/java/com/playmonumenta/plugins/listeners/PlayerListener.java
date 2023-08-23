@@ -21,6 +21,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.particle.ParticleCategory;
 import com.playmonumenta.plugins.player.EnderPearlTracker;
 import com.playmonumenta.plugins.poi.POIManager;
@@ -301,7 +302,7 @@ public class PlayerListener implements Listener {
 			return;
 		}
 
-		if (player.getGameMode() != GameMode.CREATIVE && blockData instanceof Powerable && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.DISABLE_REDSTONE_INTERACTIONS)) {
+		if (player.getGameMode() != GameMode.CREATIVE && block != null && blockData instanceof Powerable && ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.DISABLE_REDSTONE_INTERACTIONS)) {
 			event.setCancelled(true);
 			event.setUseInteractedBlock(Event.Result.DENY);
 			return;
@@ -1058,8 +1059,8 @@ public class PlayerListener implements Listener {
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.45f);
 				world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1, 0.25f);
 				BlockData fallingDustData = Material.ANVIL.createBlockData();
-				world.spawnParticle(Particle.FALLING_DUST, loc.add(0, 1, 0), 20,
-					1.1, 0.6, 1.1, fallingDustData);
+				new PartialParticle(Particle.FALLING_DUST, loc.add(0, 1, 0), 20,
+					1.1, 0.6, 1.1, fallingDustData).spawnAsPlayerActive(player);
 				Component itemName = ItemUtils.getDisplayName(item).decoration(TextDecoration.UNDERLINED, false);
 				String translatedMessage = TranslationsManager.translate(player, "Your %s is about to break!");
 				Component message = Component.text(translatedMessage).color(NamedTextColor.RED).decoration(TextDecoration.ITALIC, false)

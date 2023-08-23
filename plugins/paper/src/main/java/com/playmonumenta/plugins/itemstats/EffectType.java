@@ -346,6 +346,10 @@ public enum EffectType {
 			}
 			return;
 		} else if (effectType == INSTANT_DAMAGE) {
+			if (strength >= 1) {
+				entity.setHealth(0);
+				return;
+			}
 			DamageUtils.damage(null, entity, DamageEvent.DamageType.AILMENT, EntityUtils.getMaxHealth(entity) * strength);
 			return;
 		}

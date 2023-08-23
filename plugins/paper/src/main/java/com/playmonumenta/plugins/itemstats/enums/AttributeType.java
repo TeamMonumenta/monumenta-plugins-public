@@ -4,16 +4,15 @@ import com.google.common.collect.ImmutableList;
 import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.attributes.*;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.attribute.Attribute;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public enum AttributeType {
 	ARMOR(new Armor(), false, true),
@@ -62,24 +61,21 @@ public enum AttributeType {
 	final boolean mIsRegionScaled;
 	final boolean mIsMainhandRegionScaled;
 
-	AttributeType(Attribute attribute, String name, boolean isRegionScaled, boolean isMainhandRegionScaled) {
-		mAttribute = attribute;
-		mItemStat = null;
-		mName = name;
-		mCodeName = mName.replace(" ", "");
-		mIsRegionScaled = isRegionScaled;
-		mIsMainhandRegionScaled = isMainhandRegionScaled;
-	}
-
+	// custom attribute
 	AttributeType(ItemStat itemStat, boolean isRegionScaled, boolean isMainhandRegionScaled) {
-		this(itemStat, itemStat.getName().replace(" ", ""), isRegionScaled, isMainhandRegionScaled);
+		this(itemStat, null, itemStat.getName(), isRegionScaled, isMainhandRegionScaled);
 	}
 
-	AttributeType(ItemStat itemStat, String codeName, boolean isRegionScaled, boolean isMainhandRegionScaled) {
-		mAttribute = null;
+	// vanilla attribute
+	AttributeType(Attribute attribute, String name, boolean isRegionScaled, boolean isMainhandRegionScaled) {
+		this(null, attribute, name, isRegionScaled, isMainhandRegionScaled);
+	}
+
+	AttributeType(@Nullable ItemStat itemStat, @Nullable Attribute attribute, String name, boolean isRegionScaled, boolean isMainhandRegionScaled) {
+		mAttribute = attribute;
 		mItemStat = itemStat;
-		mName = itemStat.getName();
-		mCodeName = codeName;
+		mName = name;
+		mCodeName = name.replace(" ", "");
 		mIsRegionScaled = isRegionScaled;
 		mIsMainhandRegionScaled = isMainhandRegionScaled;
 	}

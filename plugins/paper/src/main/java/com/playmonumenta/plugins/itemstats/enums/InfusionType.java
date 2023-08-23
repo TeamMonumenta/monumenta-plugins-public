@@ -4,18 +4,16 @@ import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.enchantments.Festive;
 import com.playmonumenta.plugins.itemstats.enchantments.Gilded;
 import com.playmonumenta.plugins.itemstats.infusions.*;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public enum InfusionType {
 	// Infusions

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.utils;
 
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class GUIUtils {
+	public static final String GUI_KEY = "GUI";
+	public static final String PLACEHOLDER_KEY = "Placeholder";
 
 	public static void splitLoreLine(ItemStack item, String lore, TextColor color, int maxLength, boolean clean) {
 		ItemMeta meta = item.getItemMeta();
@@ -188,6 +191,7 @@ public class GUIUtils {
 		if (setPlainTag) {
 			ItemUtils.setPlainTag(item);
 		}
+		GUIUtils.setPlaceholder(item);
 		return item;
 	}
 
@@ -206,6 +210,7 @@ public class GUIUtils {
 		ItemMeta meta = filler.getItemMeta();
 		meta.displayName(Component.empty());
 		filler.setItemMeta(meta);
+		setPlaceholder(filler);
 		for (int i = 0; i < inventory.getSize(); i++) {
 			if (inventory.getItem(i) == null || clearInv) {
 				inventory.setItem(i, filler.clone());
@@ -221,9 +226,32 @@ public class GUIUtils {
 		if (value == null) {
 			return;
 		}
-		new NBTItem(item, true)
-			.addCompound("GUI")
-			.setString(tagName, value);
+		NBT.modify(item, nbt -> {
+			nbt.getOrCreateCompound(GUI_KEY).setString(tagName, value);
+		});
+	}
+
+	public static boolean isPlaceholder(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return true;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT monumenta = nbt.getCompound("GUI");
+			if (monumenta == null) {
+				return true;
+			}
+
+			return monumenta.hasTag(PLACEHOLDER_KEY);
+		});
+	}
+
+	public static void setPlaceholder(final @Nullable ItemStack item) {
+		if (item == null || item.getType() == Material.AIR) {
+			return;
+		}
+		NBT.modify(item, nbt -> {
+			nbt.getOrCreateCompound("GUI").setBoolean(PLACEHOLDER_KEY, true);
+		});
 	}
 
 	public static void refreshOffhand(InventoryClickEvent event) {

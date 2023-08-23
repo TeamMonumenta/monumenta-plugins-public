@@ -18,6 +18,11 @@ public class UpdateHeldItem extends GenericCommand {
 			throw CommandAPI.failWithString("Player must have a valid item in their main hand!");
 		}
 		ItemUpdateHelper.generateItemStats(item);
+		String errorFound = ItemUpdateHelper.checkForErrors(item);
+		if (errorFound != null) {
+			errorFound = "Errors found with held item: " + errorFound;
+			throw CommandAPI.failWithString(errorFound);
+		}
 		player.getEquipment().setItemInMainHand(item, true);
 	}
 }

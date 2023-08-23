@@ -132,7 +132,7 @@ public class WorldshaperOverride {
 		} else if (mode == Mode.WALL) {
 			cooldown = 5 * 20;
 
-			Location origin = player.getTargetBlock(3).getLocation();
+			Location origin = player.getTargetBlockExact(3).getLocation();
 			origin.setY(player.getLocation().getY() + 1);
 
 			float playerYaw = player.getLocation().getYaw();

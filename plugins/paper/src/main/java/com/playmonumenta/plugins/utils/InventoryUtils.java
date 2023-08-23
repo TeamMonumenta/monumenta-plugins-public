@@ -3,9 +3,9 @@ package com.playmonumenta.plugins.utils;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.enchantments.CurseOfEphemerality;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.listeners.GraveListener;
 import com.playmonumenta.plugins.listeners.QuiverListener;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -119,16 +119,11 @@ public class InventoryUtils {
 	}
 
 	public static boolean isSoulboundToPlayer(final ItemStack item, final Player player) {
-		if (player == null || item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+		if (player == null || ItemUtils.isNullOrAir(item) || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return false;
 		}
-		List<String> lore = item.getLore();
-		if (lore != null) {
-			for (String line : lore) {
-				if (line.contains("Soulbound to") && line.contains(player.getName())) {
-					return true;
-				}
-			}
+		if (player.getUniqueId().equals(ItemStatUtils.getInfuser(item, InfusionType.SOULBOUND))) {
+			return true;
 		}
 		return false;
 	}
@@ -551,6 +546,7 @@ public class InventoryUtils {
 			       .mapToInt(ItemStack::getAmount)
 			       .sum();
 	}
+
 	/**
 	 * Checks whether an inventory is full, i.e. has at least one item in every slot. Does not check if the stacks are at max size.
 	 */

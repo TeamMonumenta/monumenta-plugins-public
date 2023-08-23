@@ -361,18 +361,40 @@ public class TradeListener implements Listener {
 			return false;
 		}
 
-		// custom enchantments
-		// cannot compare NBT directly due to Divine Aura
-		ReadableNBT enchantments1 = NBT.get(i1, ItemStatUtils::getEnchantments);
-		ReadableNBT enchantments2 = NBT.get(i2, ItemStatUtils::getEnchantments);
-		for (EnchantmentType ench : EnchantmentType.values()) {
-			// Divine Aura is a bonus enchantment for Kaul reskins, so ignore it
-			if (ench == EnchantmentType.DIVINE_AURA || ench == EnchantmentType.UNBREAKABLE) {
-				continue;
-			}
-			if (ItemStatUtils.getEnchantmentLevel(enchantments1, ench) != ItemStatUtils.getEnchantmentLevel(enchantments2, ench)) {
-				return false;
-			}
+		// Compare custom enchantments and attributes at the same time
+		boolean nbtSimilar = NBT.get(i1, nbt1 -> {
+			return NBT.get(i2, nbt2 -> {
+				// custom enchantments
+				// cannot compare NBT directly due to Divine Aura
+				ReadableNBT enchantments1 = ItemStatUtils.getEnchantments(nbt1);
+				ReadableNBT enchantments2 = ItemStatUtils.getEnchantments(nbt2);
+
+				for (EnchantmentType ench : EnchantmentType.values()) {
+					// Divine Aura is a bonus enchantment for Kaul reskins, so ignore it
+					if (ench == EnchantmentType.DIVINE_AURA || ench == EnchantmentType.UNBREAKABLE) {
+						continue;
+					}
+					if (ItemStatUtils.getEnchantmentLevel(enchantments1, ench) != ItemStatUtils.getEnchantmentLevel(enchantments2, ench)) {
+						return false;
+					}
+				}
+
+				// custom attributes - compare NBT directly, ignoring order
+				ReadableNBTList<ReadWriteNBT> attrs1 = ItemStatUtils.getAttributes(nbt1);
+				ReadableNBTList<ReadWriteNBT> attrs2 = ItemStatUtils.getAttributes(nbt2);
+				if ((attrs1 == null) != (attrs2 == null)) {
+					// Different nullness - objects are different
+					return false;
+				} else if (attrs1 != null && attrs2 != null) {
+					// Both are non-null, compare contents without order
+					return Set.copyOf(attrs1.toListCopy()).equals(Set.copyOf(attrs2.toListCopy()));
+				}
+				return true;
+			});
+		});
+
+		if (!nbtSimilar) {
+			return false;
 		}
 
 		// vanilla attributes
@@ -396,17 +418,6 @@ public class TradeListener implements Listener {
 			}
 		} else if (vanillaMods1 != null || vanillaMods2 != null) { // one item has mods but the other doesn't, so they differ
 			return false;
-		}
-
-		// custom attributes - compare NBT directly, ignoring order
-		ReadableNBTList<ReadWriteNBT> attrs1 = NBT.get(i1, ItemStatUtils::getAttributes);
-		ReadableNBTList<ReadWriteNBT> attrs2 = NBT.get(i2, ItemStatUtils::getAttributes);
-		if ((attrs1 == null) != (attrs2 == null)) {
-			// Different nullness - objects are different
-			return false;
-		} else if (attrs1 != null && attrs2 != null) {
-			// Both are non-null, compare contents without order
-			return Set.copyOf(attrs1.toListCopy()).equals(Set.copyOf(attrs2.toListCopy()));
 		}
 
 		// if we get here, the items have the same stats

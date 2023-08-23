@@ -55,6 +55,7 @@ public class Excavator implements Enchantment {
 		BlockFace brokenFace = player.getTargetBlockFace(7);
 		if (brokenFace == null) {
 			player.sendMessage("Somehow, the blockface was null");
+			return;
 		}
 
 		ItemStack mainHand = player.getInventory().getItemInMainHand();

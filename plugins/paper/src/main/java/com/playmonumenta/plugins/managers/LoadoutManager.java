@@ -58,7 +58,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -125,7 +124,6 @@ public class LoadoutManager implements Listener {
 		return item != null && ItemUtils.isShulkerBox(item.getType()) && STORAGE_SHULKER_NAME.equals(ItemUtils.getPlainNameIfExists(item));
 	}
 
-	@SuppressWarnings("unused") // no, ErrorProne, these are used ._.
 	private record ItemInventory(Inventory mInventory, Runnable mSaveAction) {
 	}
 
@@ -414,7 +412,7 @@ public class LoadoutManager implements Listener {
 				if (success) {
 					if (yellowCooldown != 0) {
 						player.sendMessage(Component.text("Swapping skills is still on cooldown. You have been silenced for 30s.", NamedTextColor.RED)
-							                   .append(Component.text(ChatColor.AQUA + " (Swap CD: " + ChatColor.YELLOW + "" + yellowCooldown + "" + ChatColor.AQUA + " mins)")));
+							.append(Component.text(" (Swap CD: ", NamedTextColor.AQUA)).append(Component.text(yellowCooldown, NamedTextColor.YELLOW)).append(Component.text(" mins)", NamedTextColor.AQUA)));
 						Plugin.getInstance().mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
 						YellowTesseractOverride.setCooldown(player, 3);

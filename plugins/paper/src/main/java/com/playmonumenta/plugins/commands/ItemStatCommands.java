@@ -35,7 +35,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -217,7 +216,7 @@ public class ItemStatCommands {
 
 			List<Component> oldLore = item.lore();
 			if (oldLore == null || oldLore.isEmpty()) {
-				player.sendMessage(ChatColor.RED + "Item has no lore!");
+				player.sendMessage(Component.text("Item has no lore!", NamedTextColor.RED));
 				return;
 			}
 
@@ -697,7 +696,7 @@ public class ItemStatCommands {
 			NBTItem nbt = new NBTItem(item);
 			nbt.removeKey(ItemStatUtils.MONUMENTA_KEY);
 			item.setItemMeta(nbt.getItem().getItemMeta());
-			item.lore(Collections.emptyList());
+			item.lore(null);
 
 			ItemMeta meta = item.getItemMeta();
 			for (Enchantment ench : Enchantment.values()) {

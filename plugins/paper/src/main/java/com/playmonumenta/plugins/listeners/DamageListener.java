@@ -264,27 +264,29 @@ public class DamageListener implements Listener {
 		if (proj instanceof AbstractArrow && !(proj instanceof Trident)) {
 			ItemStack item = EntityListener.getArrowItem(uuid);
 			if (item != null && item.getType() != Material.AIR) {
-				ReadableNBT enchantments = NBT.get(item, ItemStatUtils::getEnchantments);
+				NBT.get(item, nbt -> {
+					ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
 
-				for (EnchantmentType ench : EnchantmentType.PROJECTILE_ENCHANTMENTS) {
-					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
-					if (level > 0) {
-						map.add(Objects.requireNonNull(ench.getItemStat()), level);
-					}
-				}
-
-				ReadableNBTList<ReadWriteNBT> attributes = NBT.get(item, ItemStatUtils::getAttributes);
-
-				for (AttributeType attr : AttributeType.PROJECTILE_ATTRIBUTE_TYPES) {
-					double value = ItemStatUtils.getAttributeAmount(attributes, attr, Operation.MULTIPLY, Slot.PROJECTILE);
-					if (value != 0) {
-						ItemStat stat = Objects.requireNonNull(attr.getItemStat());
-						if (map.get(stat) == stat.getDefaultValue()) {
-							value += stat.getDefaultValue();
+					for (EnchantmentType ench : EnchantmentType.PROJECTILE_ENCHANTMENTS) {
+						int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
+						if (level > 0) {
+							map.add(Objects.requireNonNull(ench.getItemStat()), level);
 						}
-						map.add(Objects.requireNonNull(attr.getItemStat()), value);
 					}
-				}
+
+					ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
+
+					for (AttributeType attr : AttributeType.PROJECTILE_ATTRIBUTE_TYPES) {
+						double value = ItemStatUtils.getAttributeAmount(attributes, attr, Operation.MULTIPLY, Slot.PROJECTILE);
+						if (value != 0) {
+							ItemStat stat = Objects.requireNonNull(attr.getItemStat());
+							if (map.get(stat) == stat.getDefaultValue()) {
+								value += stat.getDefaultValue();
+							}
+							map.add(Objects.requireNonNull(attr.getItemStat()), value);
+						}
+					}
+				});
 			}
 		}
 

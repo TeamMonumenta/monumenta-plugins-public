@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.scriptedquests.trades.TradeWindowOpenEvent;
 import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
@@ -86,8 +85,14 @@ public class CustomContainerItemManager implements Listener {
 		}
 
 		public void generateDescription(ReadableNBT monumenta, Consumer<Component> addLore) {
-			ReadableNBTList<ReadWriteNBT> items = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY)
-				                        .getCompoundList(ItemStatUtils.ITEMS_KEY);
+			ReadableNBT playerMod = monumenta.getCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+			if (playerMod == null) {
+				return;
+			}
+			ReadableNBTList<ReadWriteNBT> items = playerMod.getCompoundList(ItemStatUtils.ITEMS_KEY);
+			if (items == null) {
+				return;
+			}
 			long amount = 0;
 			for (ReadWriteNBT compound : items) {
 				ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
@@ -232,7 +237,12 @@ public class CustomContainerItemManager implements Listener {
 			ReadWriteNBT foundCompound = null;
 			for (ReadWriteNBT compound : itemsList) {
 				ItemStack containedItem = NBT.itemStackFromNBT(compound);
-				ItemStatUtils.removePlayerModified(new NBTItem(containedItem, true));
+				if (containedItem == null) {
+					continue;
+				}
+				NBT.modify(containedItem, inbt -> {
+					ItemStatUtils.removePlayerModified(inbt);
+				});
 				ReadableNBT playerModified = ItemStatUtils.addPlayerModified(compound.getCompound("tag"));
 				if (playerModified == null) {
 					continue;
@@ -303,22 +313,30 @@ public class CustomContainerItemManager implements Listener {
 			throw new IllegalStateException("Container not valid in countInContainer");
 		}
 
-		ReadableNBTList<ReadWriteNBT> itemsList = NBT.get(container, nbt -> {
-			return ItemStatUtils.getItemList(nbt);
+		return NBT.get(container, nbt -> {
+			ReadableNBTList<ReadWriteNBT> itemsList = ItemStatUtils.getItemList(nbt);
+			if (itemsList == null) {
+				return 0L;
+			}
+			for (ReadWriteNBT compound : itemsList) {
+				ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
+				if (playerModified == null) {
+					continue;
+				}
+				ItemStack containedItem = NBT.itemStackFromNBT(compound);
+				if (containedItem == null) {
+					continue;
+				}
+				NBT.modify(containedItem, inbt -> {
+					ItemStatUtils.removePlayerModified(inbt);
+				});
+				if (containedItem.isSimilar(currency)) {
+					// this can be null
+					return playerModified.getLong(AMOUNT_KEY);
+				}
+			}
+			return 0L;
 		});
-		for (ReadWriteNBT compound : itemsList) {
-			ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
-			if (playerModified == null) {
-				continue;
-			}
-			ItemStack containedItem = NBT.itemStackFromNBT(compound);
-			NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
-			if (containedItem.isSimilar(currency)) {
-				// this can be null
-				return playerModified.getLong(AMOUNT_KEY);
-			}
-		}
-		return 0;
 	}
 
 	/**
@@ -334,6 +352,9 @@ public class CustomContainerItemManager implements Listener {
 			for (int i = 0; i < itemsList.size(); i++) {
 				ReadWriteNBT compound = itemsList.get(i);
 				ItemStack containedItem = NBT.itemStackFromNBT(compound);
+				if (containedItem == null) {
+					continue;
+				}
 				NBT.modify(containedItem, inbt -> {
 					ItemStatUtils.removePlayerModified(inbt);
 				});
@@ -372,6 +393,9 @@ public class CustomContainerItemManager implements Listener {
 			for (int i = 0; i < itemsListCopy.size(); i++) {
 				ReadWriteNBT compound = itemsList.get(i);
 				ItemStack removedItem = NBT.itemStackFromNBT(compound);
+				if (removedItem == null) {
+					continue;
+				}
 				NBT.modify(removedItem, ItemStatUtils::removePlayerModified);
 				if (!testPredicate.test(removedItem)) {
 					continue;
@@ -420,7 +444,12 @@ public class CustomContainerItemManager implements Listener {
 			for (int i = 0; i < itemsList.size(); i++) {
 				ReadWriteNBT compound = itemsList.get(i);
 				ItemStack containedItem = NBT.itemStackFromNBT(compound);
-				NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
+				if (containedItem == null) {
+					continue;
+				}
+				NBT.modify(containedItem, inbt -> {
+					ItemStatUtils.removePlayerModified(inbt);
+				});
 				if (containedItem.isSimilar(item)) {
 					// NBTCompoundList does not support inserting elements in the middle - so make an ArrayList and modify that, then copy the contents back
 					List<ReadWriteNBT> list = itemsList.toListCopy();

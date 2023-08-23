@@ -21,7 +21,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -98,7 +97,7 @@ public class ShulkerShortcutListener implements Listener {
 			if (!mPlugin.mShulkerInventoryManager.updateShulker(player) || !portableStorageAllowed) { // Try to update Shulker if it still exists.
 				// The currently open shulker no longer exists, cancel the click and close the inventory.
 				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "Shulker no longer available");
+				player.sendMessage(Component.text("Shulker no longer available", NamedTextColor.RED));
 				Bukkit.getScheduler().runTask(mPlugin, () -> player.closeInventory(InventoryCloseEvent.Reason.CANT_USE));
 				return;
 			}
@@ -167,7 +166,7 @@ public class ShulkerShortcutListener implements Listener {
 			    && !portableStorageAllowed) {
 			// Cancel all right clicks on Shulkers if portable storage is not allowed
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			player.sendMessage(ChatColor.RED + "You can't use this here");
+			player.sendMessage(Component.text("You can't use this here", NamedTextColor.RED));
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
@@ -175,14 +174,14 @@ public class ShulkerShortcutListener implements Listener {
 			           && !clickedInventory.getType().equals(InventoryType.ENDER_CHEST)) {
 			// Right clicked an Ender Chest Expansion shulker outside an ender chest
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			player.sendMessage(ChatColor.RED + "This item only works in an ender chest");
+			player.sendMessage(Component.text("This item only works in an ender chest", NamedTextColor.RED));
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		} else if ((click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)
 			           && isPurpleTesseractContainer(itemClicked)) {
 			// Right-clicked a purple tesseract shulker that can't be opened
 			player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-			player.sendMessage(ChatColor.RED + "This container must be placed to access its items");
+			player.sendMessage(Component.text("This container must be placed to access its items", NamedTextColor.RED));
 			event.setCancelled(true);
 			GUIUtils.refreshOffhand(event);
 		} else if (itemClicked != null
@@ -194,13 +193,13 @@ public class ShulkerShortcutListener implements Listener {
 			if (clickedInventory == topInventory && shulkerInventory != null && (click == ClickType.RIGHT || click == ClickType.SWAP_OFFHAND)) {
 				// A shulker inside another shulker was right-clicked, cancel.
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "Cannot open nested shulkers");
+				player.sendMessage(Component.text("Cannot open nested shulkers", NamedTextColor.RED));
 				event.setCancelled(true);
 				GUIUtils.refreshOffhand(event);
 			} else if (ShulkerInventoryManager.isShulkerInUse(itemClicked)) {
 				// A currently open shulker box was clicked, cancel.
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "That shulker is open");
+				player.sendMessage(Component.text("That shulker is open", NamedTextColor.RED));
 				event.setCancelled(true);
 				GUIUtils.refreshOffhand(event);
 			} else {
@@ -220,15 +219,15 @@ public class ShulkerShortcutListener implements Listener {
 						} else if (remaining == 0) {
 							// All items were inserted successfully.
 							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.0f);
-							player.sendMessage(ChatColor.GOLD + "Item deposited into shulker.");
+							player.sendMessage(Component.text("Item deposited into shulker.", NamedTextColor.GOLD));
 							event.getView().setCursor(null);
 						} else if (remaining == starting) {
 							// No items were placed, shulker is full.
 							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-							player.sendMessage(ChatColor.RED + "That shulker is full.");
+							player.sendMessage(Component.text("That shulker is full.", NamedTextColor.RED));
 						} else {
 							// Items were inserted, but not all
-							player.sendMessage(ChatColor.RED + "That shulker was too full to accept the full stack.");
+							player.sendMessage(Component.text("That shulker was too full to accept the full stack.", NamedTextColor.RED));
 							player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						}
 					} else if (click == ClickType.RIGHT && action == InventoryAction.PICKUP_HALF) {
@@ -247,7 +246,7 @@ public class ShulkerShortcutListener implements Listener {
 						GUIUtils.refreshOffhand(event);
 						depositAllMatching(player, itemClicked);
 					} else if (ShulkerInventoryManager.playerIsShulkerRateLimited(player)) {
-						player.sendMessage(ChatColor.RED + "Too fast! Please try again");
+						player.sendMessage(Component.text("Too fast! Please try again", NamedTextColor.RED));
 						player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						event.setCancelled(true);
 						GUIUtils.refreshOffhand(event);
@@ -270,7 +269,7 @@ public class ShulkerShortcutListener implements Listener {
 			if (shulkerInventory != null) { // Shulker was opened via shortcut
 				if (!acceptsItem(shulkerInventory, event.getOldCursor())
 					&& event.getRawSlots().stream().anyMatch(slot -> event.getView().getInventory(slot) == shulkerInventory.getInventory())) {
-					player.sendMessage(ChatColor.RED + "Only arrows can be put into a quiver");
+					player.sendMessage(Component.text("Only arrows can be put into a quiver", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 					event.setCancelled(true);
 					return;
@@ -278,7 +277,7 @@ public class ShulkerShortcutListener implements Listener {
 				if (!mPlugin.mShulkerInventoryManager.updateShulker(player)) { // Try to update Shulker if it still exists.
 					// The currently open shulker no longer exists, cancel the click and close the inventory.
 					event.setCancelled(true);
-					player.sendMessage(ChatColor.RED + "Shulker no longer available");
+					player.sendMessage(Component.text("Shulker no longer available", NamedTextColor.RED));
 					new BukkitRunnable() {
 						@Override
 						public void run() {
@@ -337,7 +336,7 @@ public class ShulkerShortcutListener implements Listener {
 				event.setCancelled(true);
 				event.setBuild(false);
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-				player.sendMessage(ChatColor.RED + "That shulker is open");
+				player.sendMessage(Component.text("That shulker is open", NamedTextColor.RED));
 			} else if (isPurpleTesseractContainer(event.getItemInHand())) {
 				event.setCancelled(true);
 				event.setBuild(false);

@@ -3,8 +3,9 @@ package com.playmonumenta.plugins.itemstats.infusions;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
-import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import de.tr7zw.nbtapi.NBTEntity;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -48,7 +49,7 @@ public class Hope implements Infusion {
 					return;
 				}
 
-				item.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 3, 0.2, 0.2, 0.2, 0);
+				new PartialParticle(Particle.SPELL_INSTANT, loc, 3, 0.2, 0.2, 0.2, 0).spawnFull();
 
 				// Very infrequently check if the item is still actually there
 				mNumTicks++;

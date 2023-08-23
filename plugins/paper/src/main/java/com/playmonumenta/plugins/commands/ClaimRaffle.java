@@ -11,7 +11,8 @@ import dev.jorel.commandapi.CommandPermission;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -59,14 +60,14 @@ public class ClaimRaffle {
 				}
 
 				if (amountAvailable <= 0) {
-					player.sendMessage(ChatColor.GREEN + "You have no unclaimed raffle rewards.");
+					player.sendMessage(Component.text("You have no unclaimed raffle rewards.", NamedTextColor.GREEN));
 					return;
 				}
 
 				if (CONFIRMED_PLAYERS.add(player)) {
-					player.sendMessage(ChatColor.GREEN + "You have won the weekly voting raffle! Congratulations!");
-					player.sendMessage(ChatColor.GREEN + "The reward is to add the Gilded enchant to an item of your choice. This will give you a unique particle effect while equipped or held.");
-					player.sendMessage(ChatColor.GREEN + "To claim this reward, run " + ChatColor.GOLD + "/claimraffle " + ChatColor.GREEN + "again with the item you wish to gild in your main hand.");
+					player.sendMessage(Component.text("You have won the weekly voting raffle! Congratulations!", NamedTextColor.GREEN));
+					player.sendMessage(Component.text("The reward is to add the Gilded enchant to an item of your choice. This will give you a unique particle effect while equipped or held.", NamedTextColor.GREEN));
+					player.sendMessage(Component.text("To claim this reward, run ", NamedTextColor.GREEN).append(Component.text("/claimraffle ", NamedTextColor.GOLD)).append(Component.text("again with the item you wish to gild in your main hand.", NamedTextColor.GREEN)));
 					return;
 				}
 
@@ -97,7 +98,7 @@ public class ClaimRaffle {
 							RemoteDataAPI.increment(player.getUniqueId(), RAFFLE_WINS_UNCLAIMED, 1);
 						} else {
 							ItemStatUtils.addInfusion(player.getInventory().getItemInMainHand(), InfusionType.GILDED, 1, player.getUniqueId());
-							player.sendMessage(ChatColor.GREEN + "Your item has been Gilded. Thanks for supporting the server by voting!");
+							player.sendMessage(Component.text("Your item has been Gilded. Thanks for supporting the server by voting!", NamedTextColor.GREEN));
 						}
 					}
 				});
@@ -105,4 +106,3 @@ public class ClaimRaffle {
 		});
 	}
 }
-

@@ -79,6 +79,8 @@ public class PotionUtils {
 			PotionEffectType.UNLUCK
 	);
 
+	public static final ImmutableSet<PotionType> BASE_POTION_ITEM_TYPES = ImmutableSet.of(PotionType.AWKWARD, PotionType.THICK, PotionType.MUNDANE, PotionType.WATER);
+
 	// This map only notes any "useful" effect pairs, i.e. effects that would be non-annoying and balanced to invert
 	private static final Map<PotionEffectType, PotionEffectType> OPPOSITE_EFFECTS = new HashMap<PotionEffectType, PotionEffectType>();
 

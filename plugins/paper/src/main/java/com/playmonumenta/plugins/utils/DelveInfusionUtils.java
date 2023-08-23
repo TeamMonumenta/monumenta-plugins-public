@@ -4,7 +4,6 @@ import com.playmonumenta.plugins.custominventories.ClassSelectionCustomInventory
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Location;
 import com.playmonumenta.plugins.listeners.AuditListener;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

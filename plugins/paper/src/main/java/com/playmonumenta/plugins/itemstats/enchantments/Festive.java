@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -49,7 +48,6 @@ public class Festive implements Infusion {
 	public void onSpawn(Plugin plugin, Item item, double value) {
 		new BukkitRunnable() {
 			int mTicks = 0;
-			final World mWorld = item.getWorld();
 
 			@Override
 			public void run() {

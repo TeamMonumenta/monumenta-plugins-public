@@ -77,11 +77,6 @@ public class StatTrackManager implements Listener {
 		return null;
 	}
 
-	private static void incrementStat(ItemStack item, StatTrackData data, Player player) {
-		int oldStat = ItemStatUtils.getInfusionLevel(item, data.mInfusion);
-		ItemStatUtils.addInfusion(item, data.mInfusion, oldStat + data.mUncommittedAmount, player.getUniqueId());
-	}
-
 	/**
 	 * Updates the given item with currently accumulated, but uncommitted stat track info.
 	 */
@@ -177,6 +172,11 @@ public class StatTrackManager implements Listener {
 			}
 		}
 		ItemStatUtils.addInfusion(item, enchant, oldStat + amount, player.getUniqueId());
+	}
+
+	private static void incrementStat(ItemStack item, StatTrackData data, Player player) {
+		int oldStat = ItemStatUtils.getInfusionLevel(item, data.mInfusion);
+		ItemStatUtils.addInfusion(item, data.mInfusion, oldStat + data.mUncommittedAmount, player.getUniqueId());
 	}
 
 	/**

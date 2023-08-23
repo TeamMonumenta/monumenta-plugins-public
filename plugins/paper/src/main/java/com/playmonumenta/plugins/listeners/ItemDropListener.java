@@ -1,9 +1,9 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
@@ -11,7 +11,9 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.GameMode;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -234,42 +236,42 @@ public final class ItemDropListener implements Listener {
 
 	private void enable(Player player) {
 		remove(player);
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can now drop all items.");
+		player.sendMessage(Component.text("You can now drop all items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void disableLore(Player player) {
 		remove(player);
 		player.addScoreboardTag(LORE_TAG);
 		mLorePlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items with lore text.");
+		player.sendMessage(Component.text("You can no longer drop items with lore text.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void disableInteresting(Player player) {
 		remove(player);
 		player.addScoreboardTag(INTERESTING_TAG);
 		mInterestingPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop interesting items.");
+		player.sendMessage(Component.text("You can no longer drop interesting items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void disableAll(Player player) {
 		remove(player);
 		player.addScoreboardTag(ALL_TAG);
 		mAllPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items.");
+		player.sendMessage(Component.text("You can no longer drop items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void disableEquipped(Player player) {
 		remove(player);
 		player.addScoreboardTag(EQUIPPED_TAG);
 		mEquippedPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop items you have equipped.");
+		player.sendMessage(Component.text("You can no longer drop items you have equipped.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private void disableTiered(Player player) {
 		remove(player);
 		player.addScoreboardTag(TIERED_TAG);
 		mTieredPlayers.add(player.getUniqueId());
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "You can no longer drop tiered items.");
+		player.sendMessage(Component.text("You can no longer drop tiered items.", NamedTextColor.GOLD, TextDecoration.BOLD));
 	}
 
 	private boolean hasTag(Player player) {

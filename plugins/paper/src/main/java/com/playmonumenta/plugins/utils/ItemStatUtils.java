@@ -20,7 +20,6 @@ import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import java.text.DecimalFormat;
 import java.util.*;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -69,11 +68,6 @@ public class ItemStatUtils {
 
 	public static final Component DUMMY_LORE_TO_REMOVE = Component.text("DUMMY LORE TO REMOVE", NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false);
 
-	/*
-	 * TODO: converting these enums (EnchantmentType, InfusionType, AttributeType, AbilityAttributeType)
-	 * into a proper class hierarchy with static final instances would cut down on code and improve logic
-	 */
-
 	public static void applyCustomEffects(Plugin plugin, Player player, ItemStack item) {
 		applyCustomEffects(plugin, player, item, true);
 	}
@@ -104,44 +98,46 @@ public class ItemStatUtils {
 			item.setItemMeta(potionMeta);
 		}
 
-		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+		NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
 
-		if (effects == null || effects.isEmpty()) {
-			return;
-		}
+			if (effects == null || effects.isEmpty()) {
+				return;
+			}
 
-		double quenchScale = Quench.getDurationScaling(plugin, player);
+			double quenchScale = Quench.getDurationScaling(plugin, player);
 
-		for (ReadWriteNBT effect : effects) {
-			String type = effect.getString(EFFECT_TYPE_KEY);
-			int duration = effect.getInteger(EFFECT_DURATION_KEY);
-			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+			for (ReadWriteNBT effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
+				int duration = effect.getInteger(EFFECT_DURATION_KEY);
+				double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
 
-			int modifiedDuration = (int) (duration * quenchScale);
+				int modifiedDuration = (int) (duration * quenchScale);
 
-			EffectType effectType = EffectType.fromType(type);
-			if (effectType != null) {
-				if (effectType == EffectType.ABSORPTION) {
-					double sicknessPenalty = 0;
-					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
-					if (sicks != null) {
-						Effect sick = sicks.last();
-						sicknessPenalty = sick.getMagnitude();
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					if (effectType == EffectType.ABSORPTION) {
+						double sicknessPenalty = 0;
+						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "AbsorptionSickness");
+						if (sicks != null) {
+							Effect sick = sicks.last();
+							sicknessPenalty = sick.getMagnitude();
+						}
+						EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
+					} else if (effectType == EffectType.INSTANT_HEALTH) {
+						double sicknessPenalty = 0;
+						NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
+						if (sicks != null) {
+							Effect sick = sicks.last();
+							sicknessPenalty = sick.getMagnitude();
+						}
+						EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
+					} else {
+						EffectType.applyEffect(effectType, player, modifiedDuration, strength, null, applySickness);
 					}
-					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
-				} else if (effectType == EffectType.INSTANT_HEALTH) {
-					double sicknessPenalty = 0;
-					NavigableSet<Effect> sicks = plugin.mEffectManager.getEffects(player, "HealingSickness");
-					if (sicks != null) {
-						Effect sick = sicks.last();
-						sicknessPenalty = sick.getMagnitude();
-					}
-					EffectType.applyEffect(effectType, player, modifiedDuration, strength * (1 - sicknessPenalty), null, applySickness);
-				} else {
-					EffectType.applyEffect(effectType, player, modifiedDuration, strength, null, applySickness);
 				}
 			}
-		}
+	});
 	}
 
 	public static void changeEffectsDuration(Player player, ItemStack item, int durationChange) {
@@ -149,21 +145,23 @@ public class ItemStatUtils {
 			return;
 		}
 
-		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+		NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
 
-		if (effects == null || effects.isEmpty()) {
-			return;
-		}
-
-		for (ReadWriteNBT effect : effects) {
-			String type = effect.getString(EFFECT_TYPE_KEY);
-			int duration = effect.getInteger(EFFECT_DURATION_KEY);
-			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-			EffectType effectType = EffectType.fromType(type);
-			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, duration + durationChange, strength, null, false);
+			if (effects == null || effects.isEmpty()) {
+				return;
 			}
-		}
+
+			for (ReadWriteNBT effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					int duration = effect.getInteger(EFFECT_DURATION_KEY);
+					double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+					EffectType.applyEffect(effectType, player, duration + durationChange, strength, null, false);
+				}
+			}
+		});
 	}
 
 	public static void changeDurationAndStrengths(Player player, ItemStack item, int durationChange, ImmutableMap<String, Double> strengthChanges) {
@@ -171,24 +169,26 @@ public class ItemStatUtils {
 			return;
 		}
 
-		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+		NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
 
-		if (effects == null || effects.isEmpty()) {
-			return;
-		}
-
-
-		for (ReadWriteNBT effect : effects) {
-			String type = effect.getString(EFFECT_TYPE_KEY);
-			int duration = effect.getInteger(EFFECT_DURATION_KEY);
-			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-			double strengthChange = strengthChanges.getOrDefault(type, 0.0);
-
-			EffectType effectType = EffectType.fromType(type);
-			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, duration + durationChange, strength + strengthChange, null, false);
+			if (effects == null || effects.isEmpty()) {
+				return;
 			}
-		}
+
+
+			for (ReadWriteNBT effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
+				int duration = effect.getInteger(EFFECT_DURATION_KEY);
+				double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+				double strengthChange = strengthChanges.getOrDefault(type, 0.0);
+
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					EffectType.applyEffect(effectType, player, duration + durationChange, strength + strengthChange, null, false);
+				}
+			}
+		});
 	}
 
 	public static void changeEffectsDurationSplash(Player player, ItemStack item, double scale) {
@@ -196,21 +196,23 @@ public class ItemStatUtils {
 			return;
 		}
 
-		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+		NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
 
-		if (effects == null || effects.isEmpty()) {
-			return;
-		}
-
-		for (ReadWriteNBT effect : effects) {
-			String type = effect.getString(EFFECT_TYPE_KEY);
-			int duration = effect.getInteger(EFFECT_DURATION_KEY);
-			double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
-			EffectType effectType = EffectType.fromType(type);
-			if (effectType != null) {
-				EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, null, false);
+			if (effects == null || effects.isEmpty()) {
+				return;
 			}
-		}
+
+			for (ReadWriteNBT effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					int duration = effect.getInteger(EFFECT_DURATION_KEY);
+					double strength = effect.getDouble(EFFECT_STRENGTH_KEY);
+					EffectType.applyEffect(effectType, player, (int) (duration * scale), strength, null, false);
+				}
+			}
+		});
 	}
 
 	public static boolean hasConsumeEffect(ItemStack item) {
@@ -218,21 +220,24 @@ public class ItemStatUtils {
 			return false;
 		}
 
-		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+		return NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
 
-		if (effects == null || effects.isEmpty()) {
-			return false;
-		}
-
-		for (ReadWriteNBT effect : effects) {
-			String type = effect.getString(EFFECT_TYPE_KEY);
-
-			EffectType effectType = EffectType.fromType(type);
-			if (effectType != null) {
-				return true;
+			if (effects == null || effects.isEmpty()) {
+				return false;
 			}
-		}
-		return false;
+
+			for (ReadWriteNBT effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
+
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					return true;
+				}
+			}
+
+			return false;
+		});
 	}
 
 	public static boolean hasNegativeEffect(ItemStack item) {
@@ -240,62 +245,31 @@ public class ItemStatUtils {
 			return false;
 		}
 
-		ReadableNBTList<ReadWriteNBT> effects = NBT.get(item, ItemStatUtils::getEffects);
+		return NBT.get(item, nbt -> {
+			ReadableNBTList<ReadWriteNBT> effects = getEffects(nbt);
 
-		if (effects == null || effects.isEmpty()) {
-			return false;
-		}
+			if (effects == null || effects.isEmpty()) {
+				return false;
+			}
 
-		for (ReadWriteNBT effect : effects) {
-			String type = effect.getString(EFFECT_TYPE_KEY);
+			for (ReadWriteNBT effect : effects) {
+				String type = effect.getString(EFFECT_TYPE_KEY);
 
-			EffectType effectType = EffectType.fromType(type);
-			if (effectType != null) {
-				if (!effectType.isPositive()) {
-					return true;
+				EffectType effectType = EffectType.fromType(type);
+				if (effectType != null) {
+					if (!effectType.isPositive()) {
+						return true;
+					}
 				}
 			}
-		}
-		return false;
+
+			return false;
+		});
 	}
 
 	public static final DecimalFormat NUMBER_FORMATTER = new DecimalFormat("0.###");
 	public static final DecimalFormat NUMBER_CHANGE_FORMATTER = new DecimalFormat("+0.###;-0.###");
 	public static final DecimalFormat PERCENT_CHANGE_FORMATTER = new DecimalFormat("+0.###%;-0.###%");
-
-	public static Optional<ReadableNBT> getCompound(@Nullable ReadableNBT compound, String... path) {
-		if (compound == null) {
-			return Optional.empty();
-		}
-		for (String p : path) {
-			compound = compound.getCompound(p);
-			if (compound == null) {
-				return Optional.empty();
-			}
-		}
-		return Optional.of(compound);
-	}
-
-	public static Optional<ReadableNBT> getCompound(@Nullable ItemStack item, String... path) {
-		if (item == null || item.getType() == Material.AIR) {
-			return Optional.empty();
-		}
-		return NBT.get(item, nbt -> {
-			return getCompound(nbt, path);
-		});
-	}
-
-	public static <T extends Enum<T>> @Nullable T getEnum(ReadableNBT compound, String key, Class<T> enumClass) {
-		String value = compound.getString(key);
-		if (value == null) {
-			return null;
-		}
-		try {
-			return Enum.valueOf(enumClass, value.toUpperCase(Locale.ROOT));
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
 
 	public static void editItemInfo(final ItemStack item, final Region region, final Tier tier, final Masterwork masterwork, final Location location) {
 		if (item.getType() == Material.AIR) {
@@ -363,21 +337,27 @@ public class ItemStatUtils {
 				}
 			}
 			if (lore.isEmpty()) {
-				nbt.getCompound(MONUMENTA_KEY).removeKey(LORE_KEY);
-				item.lore(Collections.emptyList());
+				monumenta.removeKey(LORE_KEY);
+				item.lore(null);
 			}
 		});
 	}
 
 	public static void clearLore(final ItemStack item) {
 		NBT.modify(item, nbt -> {
-			nbt.getCompound(MONUMENTA_KEY).removeKey(LORE_KEY);
+			ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
+				return;
+			}
+			monumenta.removeKey(LORE_KEY);
 		});
-		item.lore(Collections.emptyList());
+		item.lore(null);
 	}
 
 	public static List<Component> getLore(final ItemStack item) {
-		return NBT.get(item, ItemStatUtils::getLore);
+		return NBT.get(item, nbt -> {
+			return getLore(nbt);
+		});
 	}
 
 	public static List<Component> getLore(final ReadableNBT nbt) {
@@ -430,7 +410,9 @@ public class ItemStatUtils {
 	}
 
 	public static List<Component> getCharmEffects(final ItemStack item) {
-		return NBT.get(item, ItemStatUtils::getCharmEffects);
+		return NBT.get(item, nbt -> {
+			return getCharmEffects(nbt);
+		});
 	}
 
 	public static List<Component> getCharmEffects(final ReadableNBT nbt) {
@@ -503,7 +485,9 @@ public class ItemStatUtils {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;
 		}
-		return NBT.get(item, ItemStatUtils::getCharmPower);
+		return NBT.get(item, nbt -> {
+			return getCharmPower(nbt);
+		});
 	}
 
 	public static int getCharmPower(final ReadableNBT nbt) {
@@ -518,7 +502,9 @@ public class ItemStatUtils {
 		if (item == null || item.getType() == Material.AIR) {
 			return 0;
 		}
-		return NBT.get(item, ItemStatUtils::getFishQuality);
+		return NBT.get(item, nbt -> {
+			return getFishQuality(nbt);
+		});
 	}
 
 	public static int getFishQuality(final ReadableNBT nbt) {
@@ -534,10 +520,10 @@ public class ItemStatUtils {
 			return null;
 		}
 		return NBT.get(itemStack, nbt -> {
-			if (!nbt.hasTag(MONUMENTA_KEY)) {
+			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
 				return null;
 			}
-			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 			if (!monumenta.hasTag(CHARM_KEY)) {
 				return null;
 			}
@@ -788,6 +774,19 @@ public class ItemStatUtils {
 		return getEnchantmentLevel(item, type) > 0;
 	}
 
+	public static boolean hasPlayerModified(final @Nullable ItemStack item) {
+		if (ItemUtils.isNullOrAir(item)) {
+			return false;
+		}
+		return NBT.get(item, nbt -> {
+			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
+				return false;
+			}
+			return monumenta.hasTag(PLAYER_MODIFIED_KEY);
+		});
+	}
+
 	public static @Nullable ReadWriteNBT getPlayerModified(final ReadWriteNBT nbt) {
 		ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 		if (monumenta == null) {
@@ -824,7 +823,8 @@ public class ItemStatUtils {
 			return null;
 		}
 
-		ReadableNBT playerModified = NBT.get(item, ItemStatUtils::getPlayerModified);
+		ReadableNBT itemNBT = NBT.readNbt(item);
+		ReadableNBT playerModified = getPlayerModified(itemNBT);
 		if (playerModified == null) {
 			return newItem;
 		}
@@ -892,7 +892,7 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 	}
 
 	public static @Nullable UUID getInfuser(final @Nullable ItemStack item, final @Nullable InfusionType type) {
-		if (item == null || item.getType() == Material.AIR || type == null || type.getName() == null) {
+		if (ItemUtils.isNullOrAir(item) || type == null || type.getName() == null) {
 			return null;
 		}
 		return NBT.get(item, nbt -> {
@@ -904,9 +904,12 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 			if (infusion == null) {
 				return null;
 			}
-
+			String uuid = infusion.getString(INFUSER_KEY);
+			if (uuid == null || uuid.isEmpty()) {
+				return null;
+			}
 			try {
-				return UUID.fromString(infusion.getString(INFUSER_KEY));
+				return UUID.fromString(uuid);
 			} catch (IllegalArgumentException e) { // bad item format
 				return null;
 			}
@@ -1147,7 +1150,7 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 			}
 
 			String tierString = monumenta.getString(Masterwork.KEY);
-			if (tierString != null) {
+			if (tierString != null && !tierString.isEmpty()) {
 				return Masterwork.getMasterwork(tierString);
 			}
 
@@ -1179,10 +1182,10 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 			return true;
 		}
 		return NBT.get(item, nbt -> {
-			if (!nbt.hasTag(MONUMENTA_KEY)) {
+			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
 				return true;
 			}
-			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 
 			return !monumenta.hasTag(DIRTY_KEY);
 		});
@@ -1193,10 +1196,10 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			if (!nbt.hasTag(MONUMENTA_KEY)) {
+			ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
+			if (monumenta == null) {
 				return;
 			}
-			ReadWriteNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 
 			if (!monumenta.hasTag(DIRTY_KEY)) {
 				return;
@@ -1216,19 +1219,27 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 	}
 
 	public static int getShulkerSlots(@Nullable ItemStack item) {
-		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(SHULKER_SLOTS_KEY)).orElse(27);
+		return NBT.get(item, nbt -> {
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + SHULKER_SLOTS_KEY, 27);
+		});
 	}
 
 	public static int getCustomInventoryItemTypesLimit(@Nullable ItemStack item) {
-		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(CUSTOM_INVENTORY_TYPES_LIMIT_KEY)).orElse(0);
+		return NBT.get(item, nbt -> {
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + CUSTOM_INVENTORY_TYPES_LIMIT_KEY, 0);
+		});
 	}
 
 	public static int getCustomInventoryItemsPerTypeLimit(@Nullable ItemStack item) {
-		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(CUSTOM_INVENTORY_ITEMS_PER_TYPE_LIMIT_KEY)).orElse(0);
+		return NBT.get(item, nbt -> {
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + CUSTOM_INVENTORY_ITEMS_PER_TYPE_LIMIT_KEY, 0);
+		});
 	}
 
 	public static int getCustomInventoryTotalItemsLimit(@Nullable ItemStack item) {
-		return getCompound(item, MONUMENTA_KEY, STOCK_KEY).map(stock -> stock.getInteger(CUSTOM_INVENTORY_TOTAL_ITEMS_LIMIT_KEY)).orElse(0);
+		return NBT.get(item, nbt -> {
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + STOCK_KEY + "." + CUSTOM_INVENTORY_TOTAL_ITEMS_LIMIT_KEY, 0);
+		});
 	}
 
 	/**
@@ -1260,14 +1271,14 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			addPlayerModified(nbt).setString(QUIVER_ARROW_TRANSFORM_MODE_KEY, arrowTransformMode.name().toLowerCase(Locale.ROOT));
+			addPlayerModified(nbt).setString(QUIVER_ARROW_TRANSFORM_MODE_KEY, arrowTransformMode.name().toUpperCase(Locale.ROOT));
 		});
 	}
 
 	public static QuiverListener.ArrowTransformMode getArrowTransformMode(@Nullable ItemStack item) {
-		return getCompound(item, MONUMENTA_KEY, PLAYER_MODIFIED_KEY)
-			.map(playerModified -> getEnum(playerModified, QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.class))
-			.orElse(QuiverListener.ArrowTransformMode.NONE);
+		return NBT.get(item, nbt -> {
+			return (QuiverListener.ArrowTransformMode) nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + QUIVER_ARROW_TRANSFORM_MODE_KEY, QuiverListener.ArrowTransformMode.NONE);
+		});
 	}
 
 	public static boolean isUpgradedLimeTesseract(@Nullable ItemStack item) {
@@ -1277,7 +1288,9 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 	}
 
 	public static int getCharges(@Nullable ItemStack item) {
-		return getCompound(item, MONUMENTA_KEY, PLAYER_MODIFIED_KEY).map(playerModified -> playerModified.getInteger(CHARGES_KEY)).orElse(0);
+		return NBT.get(item, nbt -> {
+			return nbt.resolveOrDefault(MONUMENTA_KEY + "." + PLAYER_MODIFIED_KEY + "." + CHARGES_KEY, 0);
+		});
 	}
 
 	public static void setCharges(@Nullable ItemStack item, int charges) {

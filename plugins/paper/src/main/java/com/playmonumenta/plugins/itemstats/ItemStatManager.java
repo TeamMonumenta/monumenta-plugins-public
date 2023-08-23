@@ -20,8 +20,6 @@ import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DelveInfusionUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.itemstats.enums.Operation;
-import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
@@ -249,35 +247,37 @@ public class ItemStatManager implements Listener {
 						continue;
 					}
 
-					ReadableNBT enchantments = NBT.get(item, nbt -> ItemStatUtils.getEnchantments(nbt));
-					ReadableNBT infusions = NBT.get(item, nbt -> ItemStatUtils.getInfusions(nbt));
-					ReadableNBTList<ReadWriteNBT> attributes = NBT.get(item, nbt -> ItemStatUtils.getAttributes(nbt));
+					NBT.get(item, nbt -> {
+						ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
+						ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
+						ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
 
-					double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.33, 0.165);
-					boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
+						double regionScaling = getEffectiveRegionScaling(player, item, mRegion, 1, 0.33, 0.165);
+						boolean shattered = ItemStatUtils.getInfusionLevel(infusions, InfusionType.SHATTERED) > 0;
 
-					for (ItemStat stat : ITEM_STATS) {
-						if (stat instanceof Attribute attribute) {
-							double multiplier = attribute.getAttributeType().isRegionScaled() ? regionScaling : 1.0;
-							newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot) * multiplier);
-							newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot) * multiplier);
-						} else if (stat instanceof Enchantment enchantment) {
-							double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
-							if (enchantment.getEnchantmentType() == EnchantmentType.MAINHAND_OFFHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
-								break;
-							}
-							if (enchantment.getSlots().contains(slot)) {
-								newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
-							}
-							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
-								newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getEffectiveRegionScaling(player, item, mRegion, 0, 1, 2)));
-							}
-						} else if (stat instanceof Infusion infusion) {
-							if (!(infusion.getInfusionType().isDisabledByShatter() && shattered)) {
-								newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+						for (ItemStat stat : ITEM_STATS) {
+							if (stat instanceof Attribute attribute) {
+								double multiplier = attribute.getAttributeType().isRegionScaled() ? regionScaling : 1.0;
+								newArmorAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, slot) * multiplier);
+								newArmorMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, slot) * multiplier);
+							} else if (stat instanceof Enchantment enchantment) {
+								double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
+								if (enchantment.getEnchantmentType() == EnchantmentType.MAINHAND_OFFHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
+									break;
+								}
+								if (enchantment.getSlots().contains(slot)) {
+									newArmorAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
+								}
+								if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_TAKEN) {
+									newArmorAddStats.set(stat, Math.max(newArmorAddStats.get(enchantment), getEffectiveRegionScaling(player, item, mRegion, 0, 1, 2)));
+								}
+							} else if (stat instanceof Infusion infusion) {
+								if (!(infusion.getInfusionType().isDisabledByShatter() && shattered)) {
+									newArmorAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
+								}
 							}
 						}
-					}
+					});
 				}
 			} else {
 				newArmorAddStats = mArmorAddStats;
@@ -285,41 +285,43 @@ public class ItemStatManager implements Listener {
 			}
 
 			if (mainhand != null && mainhand.getType() != Material.AIR && !ItemUtils.isArmorOrWearable(mainhand)) {
-				ReadableNBT enchantments = NBT.get(mainhand, nbt -> ItemStatUtils.getEnchantments(nbt));
-				ReadableNBT infusions = NBT.get(mainhand, nbt -> ItemStatUtils.getInfusions(nbt));
-				ReadableNBTList<ReadWriteNBT> attributes = NBT.get(mainhand, nbt -> ItemStatUtils.getAttributes(nbt));
+				NBT.get(mainhand, nbt -> {
+					ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
+					ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
+					ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
 
-				double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.33, 0.165);
+					double regionScaling = getEffectiveRegionScaling(player, mainhand, mRegion, 1, 0.33, 0.165);
 
-				if (!ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) ||
-						(ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) && PlayerUtils.isAlchemist(player))) {
-					for (ItemStat stat : ITEM_STATS) {
-						if (stat instanceof Attribute attribute) {
-							double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
-							if (attribute instanceof ProjectileSpeed) {
-								// Hack for mainhands using projectile speed multiply instead of add
-								newMainhandAddStats.add(stat, (ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND)
-																   + ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
-							} else {
-								newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
-								newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
+					if (!ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) ||
+							(ItemStatUtils.hasEnchantment(mainhand, EnchantmentType.ALCHEMICAL_ALEMBIC) && PlayerUtils.isAlchemist(player))) {
+						for (ItemStat stat : ITEM_STATS) {
+							if (stat instanceof Attribute attribute) {
+								double multiplier = attribute.getAttributeType().isMainhandRegionScaled() ? regionScaling : 1.0;
+								if (attribute instanceof ProjectileSpeed) {
+									// Hack for mainhands using projectile speed multiply instead of add
+									newMainhandAddStats.add(stat, (ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND)
+																		+ ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND)) * multiplier);
+								} else {
+									newMainhandAddStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.ADD, Slot.MAINHAND) * multiplier);
+									newMainhandMultiplyStats.add(stat, ItemStatUtils.getAttributeAmount(attributes, attribute.getAttributeType(), Operation.MULTIPLY, Slot.MAINHAND) * multiplier);
+								}
+							} else if (stat instanceof Enchantment enchantment) {
+								double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
+								if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
+									break;
+								}
+								if (enchantment.getSlots().contains(Slot.MAINHAND)) {
+									newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
+								}
+								if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
+									newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
+								}
+							} else if (stat instanceof Infusion infusion) {
+								newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
 							}
-						} else if (stat instanceof Enchantment enchantment) {
-							double multiplier = enchantment.getEnchantmentType().isRegionScaled() ? regionScaling : 1.0;
-							if (enchantment.getEnchantmentType() == EnchantmentType.OFFHAND_MAINHAND_DISABLE && ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) > 0) {
-								break;
-							}
-							if (enchantment.getSlots().contains(Slot.MAINHAND)) {
-								newMainhandAddStats.add(stat, ItemStatUtils.getEnchantmentLevel(enchantments, enchantment.getEnchantmentType()) * multiplier);
-							}
-							if (enchantment.getEnchantmentType() == EnchantmentType.REGION_SCALING_DAMAGE_DEALT) {
-								newMainhandAddStats.add(stat, getEffectiveRegionScaling(player, mainhand, mRegion, 0, 1, 2));
-							}
-						} else if (stat instanceof Infusion infusion) {
-							newMainhandAddStats.add(stat, ItemStatUtils.getInfusionLevel(infusions, infusion.getInfusionType()));
 						}
 					}
-				}
+				});
 			}
 
 			int understanding = Math.min(DelveInfusionUtils.MAX_LEVEL, (int) (newArmorAddStats.get(InfusionType.UNDERSTANDING.getItemStat()) + newMainhandAddStats.get(InfusionType.UNDERSTANDING.getItemStat())));
@@ -812,22 +814,24 @@ public class ItemStatManager implements Listener {
 				return;
 			}
 
-			ReadableNBT enchantments = NBT.get(stack, nbt -> ItemStatUtils.getEnchantments(nbt));
-			ReadableNBT infusions = NBT.get(stack, nbt -> ItemStatUtils.getInfusions(nbt));
+			NBT.get(stack, nbt -> {
+				ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
+				ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
 
-			for (EnchantmentType ench : EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
-				int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
-				if (level > 0) {
-					Objects.requireNonNull(ench.getItemStat()).onSpawn(mPlugin, item, level);
+				for (EnchantmentType ench : EnchantmentType.SPAWNABLE_ENCHANTMENTS) {
+					int level = ItemStatUtils.getEnchantmentLevel(enchantments, ench);
+					if (level > 0) {
+						Objects.requireNonNull(ench.getItemStat()).onSpawn(mPlugin, item, level);
+					}
 				}
-			}
 
-			for (InfusionType infusion : InfusionType.SPAWNABLE_INFUSIONS) {
-				int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
-				if (level > 0) {
-					Objects.requireNonNull(infusion.getItemStat()).onSpawn(mPlugin, item, level);
+				for (InfusionType infusion : InfusionType.SPAWNABLE_INFUSIONS) {
+					int level = ItemStatUtils.getInfusionLevel(infusions, infusion);
+					if (level > 0) {
+						Objects.requireNonNull(infusion.getItemStat()).onSpawn(mPlugin, item, level);
+					}
 				}
-			}
+			});
 		}
 	}
 

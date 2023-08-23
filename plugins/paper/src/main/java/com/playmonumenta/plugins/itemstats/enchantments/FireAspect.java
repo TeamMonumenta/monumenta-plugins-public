@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import java.util.EnumSet;
 import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;

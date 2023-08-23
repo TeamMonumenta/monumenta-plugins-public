@@ -19,7 +19,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -60,7 +59,7 @@ public class FirmamentOverride {
 			return player.hasPermission(CAN_PLACE_SHULKER_PERM);
 		}
 		if (!player.hasPermission("monumenta.firmament")) {
-			player.sendMessage(ChatColor.RED + "You don't have permission to use this item. Please ask a moderator to fix this.");
+			player.sendMessage(Component.text("You don't have permission to use this item. Please ask a moderator to fix this.", NamedTextColor.RED));
 			return false;
 		}
 		if (!ZoneUtils.playerCanMineBlock(player, event.getBlock())) {
@@ -115,7 +114,7 @@ public class FirmamentOverride {
 				}
 
 				// Log for overworld replacements
-				BlockPlaceEvent placeEvent = new BlockPlaceEvent(event.getBlock(), event.getBlockReplacedState(), event.getBlockAgainst(), currentItem, event.getPlayer(), event.canBuild());
+				BlockPlaceEvent placeEvent = new BlockPlaceEvent(event.getBlock(), event.getBlockReplacedState(), event.getBlockAgainst(), currentItem, event.getPlayer(), event.canBuild(), event.getHand());
 				Bukkit.getPluginManager().callEvent(placeEvent);
 				placeEvent.getBlockReplacedState().setBlockData(blockData);
 				if (!event.isCancelled()) {
@@ -153,7 +152,7 @@ public class FirmamentOverride {
 				}
 			}
 		}
-		player.sendMessage(ChatColor.RED + "There are no valid blocks to place in the shulker!");
+		player.sendMessage(Component.text("There are no valid blocks to place in the shulker!", NamedTextColor.RED));
 		return false;
 	}
 

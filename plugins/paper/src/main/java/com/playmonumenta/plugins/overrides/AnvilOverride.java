@@ -2,12 +2,14 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.itemstats.infusions.Shattered;
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.infusions.Shattered;
+import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,11 +69,11 @@ public class AnvilOverride extends BaseOverride {
 						mTicks++;
 						if (mTicks >= 3) {
 							this.cancel();
-							world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData());
+							new PartialParticle(Particle.BLOCK_DUST, mParticleLoc.subtract(0, 0.6, 0), 60, 0.3, 0.3, 0.3, 1.2F, Material.ANVIL.createBlockData()).spawnAsPlayerActive(player);
 							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
 							world.playSound(mParticleLoc, Sound.BLOCK_STONE_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
 						} else {
-							world.spawnParticle(Particle.BLOCK_DUST, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData());
+							new PartialParticle(Particle.BLOCK_DUST, mParticleLoc, 10, 0.15, 0.15, 0.15, 0.35F, Material.ANVIL.createBlockData()).spawnAsPlayerActive(player);
 						}
 					}
 
@@ -84,15 +86,14 @@ public class AnvilOverride extends BaseOverride {
 				NmsUtils.getVersionAdapter().runConsoleCommandSilently("execute as " + player.getName() + " run function monumenta:mechanisms/item_repair/grant_repair_advancement");
 			}
 		} else {
-			player.sendMessage(ChatColor.GOLD + "Right click the anvil with the item you want to repair");
+			player.sendMessage(Component.text("Right click the anvil with the item you want to repair", NamedTextColor.GOLD));
 			if (!block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 				Location loc = block.getLocation().add(0.5, 1.2, 0.5);
-				World world = loc.getWorld();
 				new BukkitRunnable() {
 					int mTicks = 0;
 					@Override
 					public void run() {
-						world.spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.2, 0, 0.2, 0);
+						new PartialParticle(Particle.FIREWORKS_SPARK, loc, 1, 0.2, 0, 0.2, 0).spawnAsPlayerActive(player);
 						mTicks++;
 						if (block.getType() == Material.AIR || !block.hasMetadata(Constants.ANVIL_CONFIRMATION_METAKEY)) {
 							this.cancel();

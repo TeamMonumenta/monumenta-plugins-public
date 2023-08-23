@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.integrations.PremiumVanishIntegration;
 import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.FastUtils;
-
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Material;

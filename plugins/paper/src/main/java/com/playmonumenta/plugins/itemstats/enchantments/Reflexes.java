@@ -6,7 +6,6 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

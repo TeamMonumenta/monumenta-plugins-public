@@ -2,9 +2,9 @@ package com.playmonumenta.plugins.itemstats.infusions;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.itemstats.Infusion;
+import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 

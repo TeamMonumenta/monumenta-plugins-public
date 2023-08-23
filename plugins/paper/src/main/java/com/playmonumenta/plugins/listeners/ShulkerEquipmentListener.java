@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.AbilitySilence;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.itemupdater.ItemUpdateHelper;
@@ -17,7 +18,6 @@ import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -102,19 +102,19 @@ public class ShulkerEquipmentListener implements Listener {
 	public static boolean checkAllowedToSwapEquipment(Player player) {
 
 		if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
-			player.sendMessage(ChatColor.RED + "You can't use this here");
+			player.sendMessage(Component.text("You can't use this here", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 			return false;
 		}
 
 		if (player.getLocation().getY() < player.getWorld().getMinHeight()) {
-			player.sendMessage(ChatColor.RED + "You can't use this in the void");
+			player.sendMessage(Component.text("You can't use this in the void", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 			return false;
 		}
 
 		if (EntityUtils.touchesLava(player)) {
-			player.sendMessage(ChatColor.RED + "You can't use this in lava");
+			player.sendMessage(Component.text("You can't use this in lava", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 			return false;
 		}
@@ -216,7 +216,9 @@ public class ShulkerEquipmentListener implements Listener {
 					// If the CD hasn't hit 0, tell the player and silence them.
 					if (yellowCooldown != 0) {
 						player.sendMessage(Component.text("Swapping skills is still on cooldown. You have been silenced for 30s.", NamedTextColor.RED)
-							                   .append(Component.text(ChatColor.AQUA + " (Skill CD: " + ChatColor.YELLOW + "" + yellowCooldown + "" + ChatColor.AQUA + " mins)")));
+							.append(Component.text(" (Skill CD: ", NamedTextColor.AQUA))
+							.append(Component.text(yellowCooldown, NamedTextColor.YELLOW))
+							.append(Component.text(" mins)", NamedTextColor.AQUA)));
 						mPlugin.mEffectManager.addEffect(player, "YellowTessSilence", new AbilitySilence(30 * 20));
 					} else if (!safeZone) {
 						YellowTesseractOverride.setCooldown(player, 3);
@@ -287,7 +289,7 @@ public class ShulkerEquipmentListener implements Listener {
 		for (Map.Entry<Integer, Integer> slot : SWAP_SLOTS.entrySet()) {
 			ItemStack item = pInv.getItem(slot.getKey());
 			if (!canSwapItem(item)) {
-				player.sendMessage(ChatColor.RED + "You can not store shulker boxes");
+				player.sendMessage(Component.text("You can not store shulker boxes", NamedTextColor.RED));
 				player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.1f);
 				return;
 			}
@@ -295,7 +297,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 		StatTrackManager.getInstance().updateInventory(player);
 
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Equipment Swapped");
+		player.sendMessage(Component.text("Equipment Swapped", NamedTextColor.GOLD, TextDecoration.BOLD));
 		player.playSound(player.getLocation(), Sound.ENTITY_SHULKER_OPEN, SoundCategory.PLAYERS, 1.0f, 1.1f);
 		EffectManager.getInstance().addEffect(player, GearChanged.effectID, new GearChanged(GearChanged.DURATION));
 		Inventory sInv = sbox.getInventory();
@@ -335,7 +337,7 @@ public class ShulkerEquipmentListener implements Listener {
 				continue;
 			}
 			String slotKey = slot.name().toLowerCase(Locale.ROOT);
-			ItemStack newVanity = vanityItems.hasKey(slotKey) ? vanityItems.getItemStack(slotKey) : null;
+			ItemStack newVanity = vanityItems.hasTag(slotKey) ? vanityItems.getItemStack(slotKey) : null;
 			if (newVanity != null && (newVanity.getType() == Material.AIR || !VanityManager.isValidVanityItem(player, newVanity, slot))) {
 				newVanity = null;
 			} else if (newVanity != null && !ItemStatUtils.isClean(newVanity)) {
@@ -381,7 +383,7 @@ public class ShulkerEquipmentListener implements Listener {
 
 			charmInventory.clear();
 		}
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Charms Swapped");
+		player.sendMessage(Component.text("Charms Swapped", NamedTextColor.GOLD, TextDecoration.BOLD));
 		player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.0f, 2.0f);
 
 		for (Map.Entry<Integer, Integer> slot : CHARM_SLOTS.entrySet()) {
@@ -394,7 +396,7 @@ public class ShulkerEquipmentListener implements Listener {
 					// If can equip charm, equip.
 					CharmManager.getInstance().addCharm(player, shulkerBoxCharm);
 				} else {
-					player.sendMessage(ChatColor.RED + "Failed to equip charm " + ItemUtils.getPlainName(shulkerBoxCharm) + ", it has been re-added to your inventory.");
+					player.sendMessage(Component.text("Failed to equip charm " + ItemUtils.getPlainName(shulkerBoxCharm) + ", it has been re-added to your inventory.", NamedTextColor.RED));
 					InventoryUtils.giveItem(player, shulkerBoxCharm);
 				}
 			}

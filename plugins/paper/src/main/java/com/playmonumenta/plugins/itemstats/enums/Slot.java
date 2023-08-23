@@ -1,6 +1,5 @@
 package com.playmonumenta.plugins.itemstats.enums;
 
-import com.playmonumenta.plugins.utils.ItemStatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

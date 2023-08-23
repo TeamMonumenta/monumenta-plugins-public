@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.itemstats.Enchantment;
 import com.playmonumenta.plugins.itemstats.ItemStatManager.PlayerItemStats;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
-
 import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.entity.LivingEntity;

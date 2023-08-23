@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -218,7 +219,7 @@ public final class ExperiencinatorConfig {
 
 		public boolean checkPrerequisites(Player player, ItemStack experiencinatorItem) {
 			if (mPrerequisites != null && !new QuestContext(Plugin.getInstance(), player, null, false, mPrerequisites, experiencinatorItem).prerequisitesMet()) {
-				player.sendRawMessage(ChatColor.DARK_RED + mPrerequisitesFailureMessage);
+				player.sendMessage(Component.text(mPrerequisitesFailureMessage, NamedTextColor.RED));
 				return false;
 			}
 			return true;

@@ -2,9 +2,8 @@ package com.playmonumenta.plugins.utils;
 
 import com.google.common.collect.ImmutableMap;
 import com.playmonumenta.plugins.delves.DelvePreset;
-import java.util.Arrays;
-
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import java.util.Arrays;
 import org.jetbrains.annotations.Nullable;
 
 public class DungeonUtils {
@@ -117,4 +116,3 @@ public class DungeonUtils {
 
 	}
 }
-

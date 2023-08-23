@@ -25,11 +25,11 @@ import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enchantments.FireProtection;
 import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.listeners.EntityListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -967,11 +967,10 @@ public class EntityUtils {
 					if (!(mob instanceof Player p)) {
 						return;
 					}
-					World world = p.getWorld();
 					Location rightHand = PlayerUtils.getRightSide(p.getEyeLocation(), 0.45).subtract(0, .8, 0);
 					Location leftHand = PlayerUtils.getRightSide(p.getEyeLocation(), -0.45).subtract(0, .8, 0);
-					world.spawnParticle(Particle.SMOKE_NORMAL, leftHand, 2, 0.05f, 0.05f, 0.05f, 0);
-					world.spawnParticle(Particle.SMOKE_NORMAL, rightHand, 2, 0.05f, 0.05f, 0.05f, 0);
+					new PartialParticle(Particle.SMOKE_NORMAL, leftHand, 2, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(p);
+					new PartialParticle(Particle.SMOKE_NORMAL, rightHand, 2, 0.05f, 0.05f, 0.05f, 0).spawnAsPlayerActive(p);
 				}
 			},
 			(entity) -> {
@@ -1268,7 +1267,7 @@ public class EntityUtils {
 	 */
 	public static Entity getSummonEntityAt(Location loc, EntityType type, String nbt) throws Exception {
 		String worldName = Bukkit.getWorlds().get(0).equals(loc.getWorld()) ? "overworld" : loc.getWorld().getName();
-		String cmd = "execute in " + worldName + " run summon " + type.getName() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
+		String cmd = "execute in " + worldName + " run summon " + type.getKey().asString() + " " + loc.getX() + " " + loc.getY() + " " + loc.getZ() + " " + nbt;
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently(cmd);
 
 		return loc.getNearbyEntities(1f, 1f, 1f)
@@ -1449,11 +1448,6 @@ public class EntityUtils {
 		//1 damage is constant and doesn't scale
 		double ratio = (originalDamage - 1) / (maxOriginalDamage - 1);
 		return ratio * (baseDamage - 1) + 1;
-	}
-
-	public static boolean isTrainingDummy(LivingEntity e) {
-		Set<String> tags = e.getScoreboardTags();
-		return tags.contains("boss_training_dummy");
 	}
 
 	// Adds a Tag which Removes the entity on unload.

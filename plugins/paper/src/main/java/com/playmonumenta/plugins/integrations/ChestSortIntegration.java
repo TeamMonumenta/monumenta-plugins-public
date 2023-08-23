@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -145,7 +144,7 @@ public class ChestSortIntegration implements Listener {
 			// Fix name sorting to ignore formatting
 			String customName = sortMap.get("{customName}");
 			if (customName != null) {
-				customName = ChatColor.stripColor(customName);
+				customName = ItemUtils.toPlainTagText(customName);
 				sortMap.put("{customName}", customName);
 			}
 
@@ -153,14 +152,14 @@ public class ChestSortIntegration implements Listener {
 			if (strBookAuthor == null) {
 				strBookAuthor = "~bookAuthor~";
 			} else {
-				strBookAuthor = ChatColor.stripColor(strBookAuthor) + " ";
+				strBookAuthor = ItemUtils.toPlainTagText(strBookAuthor) + " ";
 			}
 
 			String strBookTitle = ItemUtils.getBookTitle(item);
 			if (strBookTitle == null) {
 				strBookTitle = "~bookTitle~";
 			} else {
-				strBookTitle = ChatColor.stripColor(strBookTitle) + " ";
+				strBookTitle = ItemUtils.toPlainTagText(strBookTitle) + " ";
 			}
 
 			String strCharmClass;

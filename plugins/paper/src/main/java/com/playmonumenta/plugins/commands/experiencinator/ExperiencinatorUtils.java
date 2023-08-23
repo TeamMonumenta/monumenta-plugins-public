@@ -5,11 +5,11 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorConfig.Experiencinator;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
+import com.playmonumenta.plugins.itemstats.enums.Region;
+import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.StatTrackManager;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
-import com.playmonumenta.plugins.itemstats.enums.Region;
-import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import java.io.File;
@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -169,7 +171,7 @@ public abstract class ExperiencinatorUtils {
 		}
 
 		if (!soldSomething) {
-			player.sendRawMessage(ChatColor.AQUA + "No items were converted.");
+			player.sendMessage(Component.text("No items were converted.", NamedTextColor.AQUA));
 		} else {
 			StatTrackManager.getInstance().incrementStatImmediately(experiencinatorItem, player, InfusionType.STAT_TRACK_CONVERT, soldItems);
 			player.updateInventory();
@@ -241,7 +243,7 @@ public abstract class ExperiencinatorUtils {
 			}
 			if (remainingValue != 0) {
 				// this should never happen, as a result with value 1 must exist (and this is checked when the config is loaded)
-				player.sendRawMessage(ChatColor.RED + "Unable to give you " + remainingValue + " remaining items! Please contact a moderator.");
+				player.sendMessage(Component.text("Unable to give you " + remainingValue + " remaining items! Please contact a moderator.", NamedTextColor.RED));
 				Plugin.getInstance().getLogger().severe("Unable to give " + remainingValue + " remaining Experiencinator result items to " + player.getName() + ".");
 			}
 
@@ -269,7 +271,7 @@ public abstract class ExperiencinatorUtils {
 				player.sendRawMessage(ChatColor.AQUA + "Given " + message + "!");
 			}
 		} catch (Throwable t) {
-			player.sendRawMessage(ChatColor.RED + "Error while giving you " + remainingValue + " remaining items from a total of " + totalValue + "! Please contact a moderator.");
+			player.sendMessage(Component.text("Error while giving you " + remainingValue + " remaining items from a total of " + totalValue + "! Please contact a moderator.", NamedTextColor.RED));
 			Plugin.getInstance().getLogger().severe("Error while giving Experiencinator result items to " + player.getName() + ". Initial sell value: " + sellValue + ", totalValue: " + totalValue + ", remainingValue: " + remainingValue);
 			throw t;
 		}
