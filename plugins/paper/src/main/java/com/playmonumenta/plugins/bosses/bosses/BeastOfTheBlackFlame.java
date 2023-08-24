@@ -23,7 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -168,7 +169,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 					constructBoss(normalSpells, passiveNormalSpells, detectionRange, bossBar, 20 * 10);
 
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "???", ChatColor.RED + "Beast of the Blackflame");
+						MessagingUtils.sendBoldTitle(player, Component.text("???", NamedTextColor.DARK_RED), Component.text("Beast of the Blackflame", NamedTextColor.RED));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 					}
 				} else if (mTicks >= 20 * 2 && mBoss.getLocation().getY() < mSpawnLoc.getY()) {
@@ -260,7 +261,7 @@ public final class BeastOfTheBlackFlame extends SerializedLocationBossAbilityGro
 						@Override
 						public void run() {
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-								MessagingUtils.sendBoldTitle(player, ChatColor.GRAY + "VICTORY", ChatColor.DARK_GRAY + "Ghalkor, Svalgot, and The Beast");
+								MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GRAY), Component.text("Ghalkor, Svalgot, and The Beast", NamedTextColor.DARK_GRAY));
 								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							}
 						}

@@ -24,8 +24,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -310,7 +311,7 @@ public final class SwordsageRichter extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Richter", ChatColor.DARK_AQUA + "Expert Swordsage");
+			MessagingUtils.sendBoldTitle(player, Component.text("Richter", NamedTextColor.AQUA), Component.text("Expert Swordsage", NamedTextColor.DARK_AQUA));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}
 	}

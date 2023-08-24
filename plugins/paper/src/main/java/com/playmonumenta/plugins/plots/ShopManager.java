@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -647,16 +649,16 @@ public class ShopManager implements Listener {
 
 		if (!shop.isLockingEnabled()) {
 			if (player != null) {
-				player.sendMessage(ChatColor.WHITE + "Locking and unlocking this shop is disabled, change that setting first before trying to lock.");
+				player.sendMessage(Component.text("Locking and unlocking this shop is disabled, change that setting first before trying to lock.", NamedTextColor.WHITE));
 			}
 			return;
 		}
 
 		if (player != null) {
 			if (fullLock) {
-				player.sendMessage(ChatColor.WHITE + "Your shop has been locked.");
+				player.sendMessage(Component.text("Your shop has been locked.", NamedTextColor.WHITE));
 			} else {
-				player.sendMessage(ChatColor.WHITE + "Your shop has been locked, except for barrels.");
+				player.sendMessage(Component.text("Your shop has been locked, except for barrels.", NamedTextColor.WHITE));
 			}
 		}
 
@@ -702,13 +704,13 @@ public class ShopManager implements Listener {
 
 		if (!shop.isLockingEnabled()) {
 			if (player != null) {
-				player.sendMessage(ChatColor.WHITE + "Locking and unlocking this shop is disabled, change that setting first before trying to unlock.");
+				player.sendMessage(Component.text("Locking and unlocking this shop is disabled, change that setting first before trying to unlock.", NamedTextColor.WHITE));
 			}
 			return;
 		}
 
 		if (player != null) {
-			player.sendMessage(ChatColor.WHITE + "Your shop has been unlocked.");
+			player.sendMessage(Component.text("Your shop has been unlocked.", NamedTextColor.WHITE));
 		}
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 0.5f);
@@ -752,7 +754,7 @@ public class ShopManager implements Listener {
 		checkAllowedToChangeLock(shop, player);
 
 		if (player != null) {
-			player.sendMessage(ChatColor.WHITE + "Your shop has been reset.");
+			player.sendMessage(Component.text("Your shop has been reset.", NamedTextColor.WHITE));
 		}
 
 		shop.particles();

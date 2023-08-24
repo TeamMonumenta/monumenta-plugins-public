@@ -11,7 +11,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -48,7 +49,7 @@ public class DoomsdayClock extends Spell {
 	@Override
 	public void run() {
 		World world = mBoss.getWorld();
-		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(ChatColor.DARK_AQUA + "let your doom be made manifest!"));
+		PlayerUtils.playersInRange(mCenter, TealSpirit.detectionRange, true).forEach(player -> player.sendMessage(Component.text("let your doom be made manifest!", NamedTextColor.DARK_AQUA)));
 		Plugin plugin = Plugin.getInstance();
 		mIsActive = true;
 

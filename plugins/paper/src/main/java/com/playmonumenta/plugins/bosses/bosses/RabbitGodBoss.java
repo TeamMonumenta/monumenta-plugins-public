@@ -29,7 +29,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -461,7 +460,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-							MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_GREEN + "April Clucking Fools");
+							MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("April Clucking Fools", NamedTextColor.DARK_GREEN));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 1.15f);
 						}
 					}, 20 * 3);
@@ -488,7 +487,7 @@ public final class RabbitGodBoss extends SerializedLocationBossAbilityGroup {
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 			player.sendMessage(Component.text("OINK OINK!!! OINK OINK, OINK OINK OINK!?!?", NamedTextColor.DARK_RED));
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "The Pig God", ChatColor.RED + "A Broken Clucking Boss");
+			MessagingUtils.sendBoldTitle(player, Component.text("The Pig God", NamedTextColor.DARK_RED), Component.text("A Broken Clucking Boss", NamedTextColor.RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
 	}

@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -146,7 +147,7 @@ public class SpellHailstorm extends Spell {
 				mDamage.put(player, runnable);
 
 				if (!mWarned.contains(player)) {
-					player.sendMessage(ChatColor.DARK_RED + "The Hailstorm is freezing! Move closer to the Giant!");
+					player.sendMessage(Component.text("The Hailstorm is freezing! Move closer to the Giant!", NamedTextColor.DARK_RED));
 					mWarned.add(player);
 				}
 			}

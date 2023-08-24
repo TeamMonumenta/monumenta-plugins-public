@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -145,7 +146,7 @@ public final class VarcosasLastBreathBoss extends SerializedLocationBossAbilityG
 		summonArmorStandIfNoneAreThere(mCenter.clone().add(-11.5, 0, 0));
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.RED + "Varcosa's", ChatColor.DARK_RED + "Last Breath");
+			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa's", NamedTextColor.RED), Component.text("Last Breath", NamedTextColor.DARK_RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}

@@ -63,12 +63,12 @@ public class JoinGuild {
 			throw CommandAPI.failWithString(err);
 		}
 		if (currentGuildName == null) {
-			founder.sendMessage(ChatColor.RED + "You are not currently in a guild.");
+			founder.sendMessage(Component.text("You are not currently in a guild.", NamedTextColor.RED));
 			return;
 		}
 		players.removeIf(player -> founder.getName().equalsIgnoreCase(player.getName()));
 		if (players.size() == 0) {
-			founder.sendMessage(ChatColor.RED + "No other players found on the pedestal to add to your guild.");
+			founder.sendMessage(Component.text("No other players found on the pedestal to add to your guild.", NamedTextColor.RED));
 		}
 
 		// Check nearby players, add if not in guild and not founder of something
@@ -76,7 +76,7 @@ public class JoinGuild {
 			if (ScoreboardUtils.getScoreboardValue(p, "Founder").orElse(0) == 0) {
 				Group group = LuckPermsIntegration.getGuild(p);
 				if (group != null) {
-					p.sendMessage(ChatColor.RED + "You are already a part of another guild, please leave your current guild before trying again.");
+					p.sendMessage(Component.text("You are already a part of another guild, please leave your current guild before trying again.", NamedTextColor.RED));
 					continue;
 				}
 				// Add user to guild
@@ -114,10 +114,10 @@ public class JoinGuild {
 			} else {
 				Group group = LuckPermsIntegration.getGuild(p);
 				if (group != null) {
-					p.sendMessage(ChatColor.RED + "You are marked as a founder but have no current guild, please contact a moderator.");
+					p.sendMessage(Component.text("You are marked as a founder but have no current guild, please contact a moderator.", NamedTextColor.RED));
 					continue;
 				}
-				p.sendMessage(ChatColor.RED + "You are the founder of another guild, please leave your current guild before trying again.");
+				p.sendMessage(Component.text("You are the founder of another guild, please leave your current guild before trying again.", NamedTextColor.RED));
 			}
 		}
 	}

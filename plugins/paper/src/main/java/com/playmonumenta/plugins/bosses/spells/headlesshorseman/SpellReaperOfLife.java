@@ -11,7 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -90,7 +91,7 @@ public class SpellReaperOfLife extends Spell {
 				for (Player player : players) {
 					if (!mWarnedPlayers.contains(player)) {
 						mWarnedPlayers.add(player);
-						player.sendMessage(ChatColor.AQUA + "Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?");
+						player.sendMessage(Component.text("Seems like the Horseman threw a bomb to the center of the arena. Maybe you can disarm it?", NamedTextColor.AQUA));
 					}
 				}
 			}

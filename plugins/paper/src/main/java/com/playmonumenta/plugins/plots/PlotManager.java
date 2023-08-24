@@ -206,8 +206,8 @@ public class PlotManager {
 						int plot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 						int currentplot = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.CURRENT_PLOT).orElse(0);
 						if (plot != currentplot) {
-							sender.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
-							player.sendMessage(ChatColor.RED + "Only the owner of this plot can change its border");
+							sender.sendMessage(Component.text("Only the owner of this plot can change its border", NamedTextColor.RED));
+							player.sendMessage(Component.text("Only the owner of this plot can change its border", NamedTextColor.RED));
 						} else {
 							if (player.hasPermission("monumenta.plotborderoverride")) {
 								new PlotBorderCustomInventory(player, true).openInventory(player, Plugin.getInstance());
@@ -226,8 +226,8 @@ public class PlotManager {
 						try {
 							int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 							if (score > 0) {
-								sender.sendMessage(ChatColor.RED + "Can't create new plot for player that has nonzero Plot score");
-								player.sendMessage(ChatColor.RED + "Can't create new plot for you because you have a nonzero Plot score. This is a bug, please report it.");
+								sender.sendMessage(Component.text("Can't create new plot for player that has nonzero Plot score", NamedTextColor.RED));
+								player.sendMessage(Component.text("Can't create new plot for you because you have a nonzero Plot score. This is a bug, please report it.", NamedTextColor.RED));
 							} else {
 								RBoardAPI.add("$Plot", "Plot", 1).whenComplete((newInstance, ex) -> {
 									Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
@@ -258,8 +258,8 @@ public class PlotManager {
 					for (Player player : (List<Player>)args[0]) {
 						int score = ScoreboardUtils.getScoreboardValue(player, Constants.Objectives.OWN_PLOT).orElse(0);
 						if (score == 0) {
-							sender.sendMessage(ChatColor.RED + "Can't reset plot for player that has a Plot score of zero");
-							player.sendMessage(ChatColor.RED + "Can't reset your plot because your Plot score is zero. This is a bug, please report it.");
+							sender.sendMessage(Component.text("Can't reset plot for player that has a Plot score of zero", NamedTextColor.RED));
+							player.sendMessage(Component.text("Can't reset your plot because your Plot score is zero. This is a bug, please report it.", NamedTextColor.RED));
 						} else {
 							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, 0);
 							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, 0);
@@ -305,9 +305,9 @@ public class PlotManager {
 		sender.sendMessage(ChatColor.GREEN + "Your plot number is: " + ChatColor.GOLD + "#" + info.mOwnedPlotId);
 		sender.sendMessage(ChatColor.GREEN + "Your currently selected plot is: " + ChatColor.GOLD + "#" + info.mCurrentPlotId);
 		if (info.mOtherAccessToOwnerPlot.size() == 0) {
-			sender.sendMessage(ChatColor.GREEN + "There are no players with access to your plot");
+			sender.sendMessage(Component.text("There are no players with access to your plot", NamedTextColor.GREEN));
 		} else {
-			sender.sendMessage(ChatColor.GREEN + "These players have access to your plot:");
+			sender.sendMessage(Component.text("These players have access to your plot:", NamedTextColor.GREEN));
 
 			info.mOtherAccessToOwnerPlot.forEach((key, expiration) -> {
 				if (expiration <= 0) {
@@ -319,9 +319,9 @@ public class PlotManager {
 		}
 
 		if (info.mOwnerAccessToOtherPlots.size() == 0) {
-			sender.sendMessage(ChatColor.GREEN + "You don't have access to any other player's plot");
+			sender.sendMessage(Component.text("You don't have access to any other player's plot", NamedTextColor.GREEN));
 		} else {
-			sender.sendMessage(ChatColor.GREEN + "You have access to these other plots:");
+			sender.sendMessage(Component.text("You have access to these other plots:", NamedTextColor.GREEN));
 
 			info.mOwnerAccessToOtherPlots.forEach((key, other) -> {
 				if (other.mExpiration <= 0) {

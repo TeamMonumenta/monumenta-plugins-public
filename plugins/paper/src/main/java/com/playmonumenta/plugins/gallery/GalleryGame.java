@@ -28,7 +28,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -665,7 +664,7 @@ public class GalleryGame {
 			mIsGameEnded = true;
 			for (GalleryPlayer player : new ArrayList<>(mPlayersMap.values())) {
 				if (player.isOnline()) {
-					player.sendMessage(ChatColor.DARK_RED + "The Nightmare has taken you, a fresh canvas begging to be painted.");
+					player.sendMessage(Component.text("The Nightmare has taken you, a fresh canvas begging to be painted.", NamedTextColor.DARK_RED));
 					GalleryUtils.runCommandAsEntity(player.getPlayer(), "function monumenta:dungeons/gallery/enter_lootroom");
 				}
 			}
@@ -877,7 +876,7 @@ public class GalleryGame {
 		GalleryPlayer gPlayer = mPlayersMap.get(player.getUniqueId());
 		if (gPlayer != null) {
 			if (mIsGameEnded) {
-				gPlayer.sendMessage(ChatColor.DARK_RED + "The Nightmare has taken you, a fresh canvas begging to be painted.");
+				gPlayer.sendMessage(Component.text("The Nightmare has taken you, a fresh canvas begging to be painted.", NamedTextColor.DARK_RED));
 				GalleryUtils.runCommandAsEntity(player, "function monumenta:dungeons/gallery/enter_lootroom");
 			}
 			gPlayer.onPlayerJoinEvent();

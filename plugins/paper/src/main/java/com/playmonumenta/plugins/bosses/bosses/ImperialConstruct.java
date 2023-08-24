@@ -35,7 +35,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -625,7 +624,7 @@ public class ImperialConstruct extends SerializedLocationBossAbilityGroup {
 		EntityUtils.setMaxHealthAndHealth(mBoss, mHealth);
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Silver Construct", ChatColor.RED + "Forgotten Defender");
+			MessagingUtils.sendBoldTitle(player, Component.text("Silver Construct", NamedTextColor.GOLD), Component.text("Forgotten Defender", NamedTextColor.RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}

@@ -270,7 +270,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					}
 					for (Player p : players) {
 						p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, SoundCategory.HOSTILE, 3.0f, 0.5f);
-						p.sendMessage(ChatColor.LIGHT_PURPLE + "WHAT IS THIS... PAIN? I HAVE NOT FELT PAIN IN ETERNITY...");
+						p.sendMessage(Component.text("WHAT IS THIS... PAIN? I HAVE NOT FELT PAIN IN ETERNITY...", NamedTextColor.LIGHT_PURPLE));
 					}
 				}
 
@@ -387,7 +387,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			mCutscene = false;
 			List<Player> players = playersInRange(mStart.getLocation(), detectionRange, true);
 			for (Player p : players) {
-				p.sendMessage(ChatColor.LIGHT_PURPLE + "YOUR RUDENESS SHALL NOT GO UNPUNISHED.");
+				p.sendMessage(Component.text("YOUR RUDENESS SHALL NOT GO UNPUNISHED.", NamedTextColor.LIGHT_PURPLE));
 			}
 		});
 
@@ -700,7 +700,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			southSpawn.setZ(southSpawn.getZ() + 23);
 			northSpawn.setZ(northSpawn.getZ() - 23);
 			for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-				p.sendMessage(ChatColor.LIGHT_PURPLE + "AKRHH ALMAWT DEFIES THEE. BREAK FREE, RIDERS OF THE VEIL! TO WAR!");
+				p.sendMessage(Component.text("AKRHH ALMAWT DEFIES THEE. BREAK FREE, RIDERS OF THE VEIL! TO WAR!", NamedTextColor.LIGHT_PURPLE));
 			}
 			// south conquest - SkeletalHorse
 			// north strife - AshenRemains
@@ -716,7 +716,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			eastSpawn.setX(eastSpawn.getX() + 23);
 			westSpawn.setX(westSpawn.getX() - 23);
 			for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-				p.sendMessage(ChatColor.LIGHT_PURPLE + "AGAIN I SPEAK THE CALL! AKRHH ALMAWT! RIDE FORTH, TORMENTED BEASTS - YOUR MASTER BIDS YOU RIDE!");
+				p.sendMessage(Component.text("AGAIN I SPEAK THE CALL! AKRHH ALMAWT! RIDE FORTH, TORMENTED BEASTS - YOUR MASTER BIDS YOU RIDE!", NamedTextColor.LIGHT_PURPLE));
 			}
 			// east demise - RottenHorse
 			// west judgement - ExpeditiusEvaluation
@@ -727,7 +727,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		events.put(10, mBoss -> {
 			if (!mKey.isDead() || mKey.isValid()) {
 				for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-					p.sendMessage(ChatColor.LIGHT_PURPLE + "THE SHADOWS STILL CLOAK MY SOUL. YOU WILL NEVER DESTROY MY BEING.");
+					p.sendMessage(Component.text("THE SHADOWS STILL CLOAK MY SOUL. YOU WILL NEVER DESTROY MY BEING.", NamedTextColor.LIGHT_PURPLE));
 				}
 			}
 		});
@@ -833,7 +833,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 										mBoss.setInvulnerable(false);
 										mPhase = 1;
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											MessagingUtils.sendBoldTitle(p, ChatColor.DARK_GRAY + "Hekawt, The Eternal", ChatColor.GRAY + "Inheritor of Eternity");
+											MessagingUtils.sendBoldTitle(p, Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY), Component.text("Inheritor of Eternity", NamedTextColor.GRAY));
 											p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10f, 0.75f);
 											p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2 * 20, 2));
 										}
@@ -979,7 +979,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					forceCastSpell(SpellRaiseDead.class);
 					spawnCrystal(mCrystalLoc, 4, mShieldCrystal);
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(ChatColor.LIGHT_PURPLE + "YOUR HASTE WILL BE YOUR DOWNFALL.");
+						p.sendMessage(Component.text("YOUR HASTE WILL BE YOUR DOWNFALL.", NamedTextColor.LIGHT_PURPLE));
 					}
 
 					new BukkitRunnable() {
@@ -987,7 +987,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						@Override
 						public void run() {
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.LIGHT_PURPLE + "YOU WILL NEVER DESTROY MY SOUL, YOU SEE. DIES IRAE! DIES ILLA!");
+								p.sendMessage(Component.text("YOU WILL NEVER DESTROY MY SOUL, YOU SEE. DIES IRAE! DIES ILLA!", NamedTextColor.LIGHT_PURPLE));
 							}
 							forceCastSpell(SpellDiesIrae.class);
 							new BukkitRunnable() {
@@ -1045,7 +1045,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			event.setCancelled(true);
 			player.playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1, 5);
 			new PartialParticle(Particle.FIREWORKS_SPARK, mBoss.getLocation(), 10, 0, 0, 0, 0.1).spawnAsBoss();
-			player.sendMessage(ChatColor.AQUA + "Hekawt has formed a miasma shield around himself! Get closer to pierce through the shield!");
+			player.sendMessage(Component.text("Hekawt has formed a miasma shield around himself! Get closer to pierce through the shield!", NamedTextColor.AQUA));
 			//stop teleport
 			return;
 		}
@@ -1233,7 +1233,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 
 		p.playSound(p.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 0.5f);
 		com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, curseSource, new LichCurseEffect(time * 20));
-		p.sendMessage(ChatColor.LIGHT_PURPLE + "I CAST DOWN DOOM UPON THEE, AND CURSE YOUR VERY BONES. YOU SHALL JOIN MY REVENANTS.");
+		p.sendMessage(Component.text("I CAST DOWN DOOM UPON THEE, AND CURSE YOUR VERY BONES. YOU SHALL JOIN MY REVENANTS.", NamedTextColor.LIGHT_PURPLE));
 		p.sendActionBar(Component.text("You are cursed! You take double damage for " + time + " Seconds.", NamedTextColor.DARK_RED));
 	}
 
@@ -1517,7 +1517,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		block.setGravity(false);
 		block.setTicksLived(1);
 		for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-			p.sendMessage(ChatColor.LIGHT_PURPLE + "AND I HAVE NO TIME FOR YOU AND YOUR MEDDLING!");
+			p.sendMessage(Component.text("AND I HAVE NO TIME FOR YOU AND YOUR MEDDLING!", NamedTextColor.LIGHT_PURPLE));
 		}
 
 		List<Spell> death0Passives = Arrays.asList(
@@ -1600,7 +1600,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						if (mChat == 0) {
 							mChat++;
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.AQUA + "The crystals! I can use them against Hekawt!");
+								p.sendMessage(Component.text("The crystals! I can use them against Hekawt!", NamedTextColor.AQUA));
 							}
 						}
 					} else if (mCounter == 1) {
@@ -1614,7 +1614,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						if (mChat == 1) {
 							mChat++;
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.LIGHT_PURPLE + "HOW MUCH TIME HAS PASSED? I SWORE IT WAS MONTHS... ONLY MONTHS...");
+								p.sendMessage(Component.text("HOW MUCH TIME HAS PASSED? I SWORE IT WAS MONTHS... ONLY MONTHS...", NamedTextColor.LIGHT_PURPLE));
 							}
 						}
 					} else if (mCounter == 2) {
@@ -1629,7 +1629,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						if (mChat == 2) {
 							mChat++;
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.LIGHT_PURPLE + "THINGS HAVE CHANGED... POWERS HAVE SHIFTED? HAS ETERNITY ABANDONED ME?");
+								p.sendMessage(Component.text("THINGS HAVE CHANGED... POWERS HAVE SHIFTED? HAS ETERNITY ABANDONED ME?", NamedTextColor.LIGHT_PURPLE));
 							}
 						}
 					} else if (mCounter == 3) {
@@ -1644,7 +1644,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						if (mChat == 3) {
 							mChat++;
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.LIGHT_PURPLE + "WHERE HAVE THE YEARS GONE? WHAT HAVE I LOST IN THE DEPTHS OF THE VEIL?");
+								p.sendMessage(Component.text("WHERE HAVE THE YEARS GONE? WHAT HAVE I LOST IN THE DEPTHS OF THE VEIL?", NamedTextColor.LIGHT_PURPLE));
 							}
 						}
 					} else if (mCounter == 4) {
@@ -1743,7 +1743,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 					}
 
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(ChatColor.AQUA + "The crystals moved into the big tower. Destroy them before it's too late!");
+						p.sendMessage(Component.text("The crystals moved into the big tower. Destroy them before it's too late!", NamedTextColor.AQUA));
 					}
 				} else if (mCrystal.size() == 0) {
 					this.cancel();

@@ -11,8 +11,9 @@ import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
 import java.util.UUID;
 import java.util.logging.Logger;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,9 +51,9 @@ public class MonumentaRedisSyncIntegration implements Listener {
 		if (ServerProperties.getPreventDungeonItemTransfer()) {
 			int dropped = InventoryUtils.removeSpecialItems(player, false, true);
 			if (dropped == 1) {
-				player.sendMessage(ChatColor.RED + "The dungeon key you were carrying was dropped!");
+				player.sendMessage(Component.text("The dungeon key you were carrying was dropped!", NamedTextColor.RED));
 			} else if (dropped > 1) {
-				player.sendMessage(ChatColor.RED + "The dungeon keys you were carrying were dropped!");
+				player.sendMessage(Component.text("The dungeon keys you were carrying were dropped!", NamedTextColor.RED));
 			}
 		} else {
 			InventoryUtils.removeSpecialItems(player, true, true);

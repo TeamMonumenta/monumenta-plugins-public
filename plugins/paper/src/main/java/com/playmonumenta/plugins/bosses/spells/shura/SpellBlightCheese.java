@@ -6,7 +6,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -47,7 +48,7 @@ public class SpellBlightCheese extends Spell {
 					mPRed.location(p.getEyeLocation()).spawnAsBoss();
 					mPWitch.location(p.getLocation()).spawnAsBoss();
 					if (!mWarned.contains(p)) {
-						p.sendMessage(ChatColor.AQUA + "Blight around the Sanctum gathers above. Stay close to the ground!");
+						p.sendMessage(Component.text("Blight around the Sanctum gathers above. Stay close to the ground!", NamedTextColor.AQUA));
 						mWarned.add(p);
 					}
 				}

@@ -18,8 +18,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Arrays;
 import java.util.List;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -115,7 +115,7 @@ public final class MimicQueen extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_PURPLE + "Mimic Queen", ChatColor.LIGHT_PURPLE + "Varcosa's Plunder Protector");
+			MessagingUtils.sendBoldTitle(player, Component.text("Mimic Queen", NamedTextColor.DARK_PURPLE), Component.text("Varcosa's Plunder Protector", NamedTextColor.LIGHT_PURPLE));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}

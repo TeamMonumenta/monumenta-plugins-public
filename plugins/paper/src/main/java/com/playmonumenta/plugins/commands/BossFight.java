@@ -11,7 +11,8 @@ import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -57,7 +58,7 @@ public class BossFight {
 				MessagingUtils.sendStackTrace(sender, ex);
 			}
 		} else {
-			sender.sendMessage(ChatColor.RED + "This command must be on a LivingEntity!");
+			sender.sendMessage(Component.text("This command must be on a LivingEntity!", NamedTextColor.RED));
 		}
 	}
 
@@ -69,7 +70,7 @@ public class BossFight {
 					MessagingUtils.sendStackTrace(sender, ex);
 				}
 		} else {
-			sender.sendMessage(ChatColor.RED + "This command must be on a LivingEntity!");
+			sender.sendMessage(Component.text("This command must be on a LivingEntity!", NamedTextColor.RED));
 		}
 	}
 }

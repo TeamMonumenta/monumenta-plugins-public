@@ -19,7 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -205,7 +206,7 @@ public final class Ghalkor extends SerializedLocationBossAbilityGroup {
 					}
 
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-						MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Ghalkor & Svalgot", ChatColor.GRAY + "Speakers of Remorse");
+						MessagingUtils.sendBoldTitle(player, Component.text("Ghalkor & Svalgot", NamedTextColor.DARK_GRAY), Component.text("Speakers of Remorse", NamedTextColor.GRAY));
 						player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 					}
 				}

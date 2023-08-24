@@ -8,11 +8,11 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
-import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.HashMap;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -165,7 +165,7 @@ public class SilverBolts extends SpellBaseSeekingProjectile {
 		com.playmonumenta.plugins.Plugin plugin = com.playmonumenta.plugins.Plugin.getInstance();
 		PotionUtils.applyPotion(plugin, player, new PotionEffect(PotionEffectType.SLOW_DIGGING, CAGE_DURATION, 99, false, false, true));
 		plugin.mEffectManager.addEffect(player, "SilverBoltsAntiHealEffect", new PercentHeal(CAGE_DURATION, -0.5));
-		MessagingUtils.sendActionBarMessage(player, ChatColor.RED + "You have 50% reduced healing for 10s");
+		player.sendActionBar(Component.text("You have 50% reduced healing for 10s", NamedTextColor.RED));
 
 		Location loc = player.getLocation();
 		CAGE_LOCATIONS.forEach((offset, data) -> {

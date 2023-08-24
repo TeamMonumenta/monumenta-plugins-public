@@ -87,6 +87,7 @@ public class SpellBaseLeapAttack extends Spell {
 		this(plugin, boss, range, minRange, runDistance, cooldown, velocityMultiplier, initiateAesthetic, leapAesthetic,
 			leapingAesthetic, hitAction, velocityModifier, midLeapTick, true, false);
 	}
+
 	/**
 	 * @param plugin             Plugin
 	 * @param boss               Boss

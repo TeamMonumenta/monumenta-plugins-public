@@ -90,7 +90,15 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.Quickdraw;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.*;
+import com.playmonumenta.plugins.abilities.shaman.AdhesiveTotems;
+import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
+import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
+import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
+import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
+import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
+import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
@@ -877,7 +885,7 @@ public class AbilityManager {
 			} else {
 				// If right-clicking with a "useable" item, the client will send a left click soon after, so need to ignore that click when it happens
 				// Need to also check vanity, as the item type on the client is what matters
-				List<@org.jetbrains.annotations.Nullable ItemStack> potentiallyUseableItems = Arrays.asList(player.getInventory().getItemInMainHand(),
+				List<@Nullable ItemStack> potentiallyUseableItems = Arrays.asList(player.getInventory().getItemInMainHand(),
 					player.getInventory().getItemInOffHand(),
 					mPlugin.mVanityManager.getData(player).getEquipped(EquipmentSlot.OFF_HAND));
 				if (potentiallyUseableItems.stream()

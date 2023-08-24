@@ -20,7 +20,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -74,7 +73,7 @@ public class SpellVolcanicDemise extends Spell {
 		List<Player> players = PlayerUtils.playersInRange(mCenter, 50, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61);
 		for (Player player : players) {
-			player.sendMessage(ChatColor.GREEN + "SCATTER, INSECTS.");
+			player.sendMessage(Component.text("SCATTER, INSECTS.", NamedTextColor.GREEN));
 		}
 		// For the advancement "Such Devastation"
 		NmsUtils.getVersionAdapter().runConsoleCommandSilently(

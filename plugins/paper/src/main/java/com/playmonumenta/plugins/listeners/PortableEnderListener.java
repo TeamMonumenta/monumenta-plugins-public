@@ -3,7 +3,8 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.ShulkerBox;
@@ -34,11 +35,11 @@ public class PortableEnderListener implements Listener {
 				// The clicked item is a portable ender chest, and is not shattered
 				event.setCancelled(true);
 				if (ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.NO_PORTABLE_STORAGE)) {
-					player.sendMessage(ChatColor.RED + "The void here is too thick to part");
+					player.sendMessage(Component.text("The void here is too thick to part", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 				} else if (ScoreboardUtils.getScoreboardValue(player, "RushDown").orElse(0) < 40 &&
 					           ScoreboardUtils.getScoreboardValue(player, "RushDuo").orElse(0) < 80) {
-					player.sendMessage(ChatColor.RED + "You must conquer Wave 40 of Rush of Dissonance solo or Wave 80 as a duo before you can part the void.");
+					player.sendMessage(Component.text("You must conquer Wave 40 of Rush of Dissonance solo or Wave 80 as a duo before you can part the void.", NamedTextColor.RED));
 					player.playSound(player.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, SoundCategory.PLAYERS, 1.0f, 0.6f);
 				} else {
 					player.closeInventory(InventoryCloseEvent.Reason.OPEN_NEW);

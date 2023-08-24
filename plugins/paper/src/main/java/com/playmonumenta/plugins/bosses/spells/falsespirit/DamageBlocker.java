@@ -10,6 +10,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -89,7 +91,7 @@ public class DamageBlocker extends Spell {
 				DamageEvent.DamageType type = event.getType();
 				if (type != DamageEvent.DamageType.FIRE && type != DamageEvent.DamageType.AILMENT) {
 					if (!mWarned.contains(player) && (mHell.checkPortals() || mCeilingHell.checkPortals())) {
-						player.sendMessage(ChatColor.DARK_RED + "Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.");
+						player.sendMessage(Component.text("Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.", NamedTextColor.DARK_RED));
 						mWarned.add(player);
 					} else if (!mWarned.contains(player)) {
 						player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");

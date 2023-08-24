@@ -6,7 +6,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.utils.MetadataUtils;
 import java.util.Collection;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -26,7 +27,7 @@ public class SpellActions {
 				// Only show the message every 30s
 				if (!MetadataUtils.happenedInRecentTicks(player, "PlayerIntoDepthsVarcosaMetakey", 600)) {
 					MetadataUtils.checkOnceThisTick(Plugin.getInstance(), player, "PlayerIntoDepthsVarcosaMetakey"); // Mark this tick
-					player.sendMessage(ChatColor.RED + "Into the depths with ye! The deep gods take yer soul!");
+					player.sendMessage(Component.text("Into the depths with ye! The deep gods take yer soul!", NamedTextColor.RED));
 				}
 			}
 		});

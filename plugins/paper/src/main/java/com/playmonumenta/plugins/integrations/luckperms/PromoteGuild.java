@@ -52,8 +52,8 @@ public class PromoteGuild {
 		Group currentGuild = LuckPermsIntegration.getGuild(founder);
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuild == null || currentGuildName == null) {
-			String err = ChatColor.RED + "Founder is not in a guild";
-			throw CommandAPI.failWithString(err);
+			Component err = Component.text("Founder is not in a guild", NamedTextColor.RED);
+			throw CommandAPI.failWithAdventureComponent(err);
 		}
 
 		if (ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
@@ -62,7 +62,7 @@ public class PromoteGuild {
 		}
 		players.removeIf(player -> founder.getName().equalsIgnoreCase(player.getName()));
 		if (players.size() == 0) {
-			founder.sendMessage(ChatColor.RED + "No other players found on the pedestal to promote to founder.");
+			founder.sendMessage(Component.text("No other players found on the pedestal to promote to founder.", NamedTextColor.RED));
 		}
 
 		// Check the nearby players for proper setup

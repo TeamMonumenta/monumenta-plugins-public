@@ -11,6 +11,8 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -60,7 +62,7 @@ public class Eggify {
 			return;
 		}
 
-		player.sendMessage(ChatColor.RED + "This entity cannot be turned into an egg.");
+		player.sendMessage(Component.text("This entity cannot be turned into an egg.", NamedTextColor.RED));
 	}
 
 }

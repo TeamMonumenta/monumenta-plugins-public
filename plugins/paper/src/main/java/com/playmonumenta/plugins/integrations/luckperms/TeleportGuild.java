@@ -9,8 +9,9 @@ import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -57,9 +58,9 @@ public class TeleportGuild {
 			// Look up the player's guild
 			group = LuckPermsIntegration.getGuild(player);
 			if (group == null) {
-				String err = ChatColor.RED + "You are not in a guild!";
+				Component err = Component.text("You are not in a guild!", NamedTextColor.RED);
 				player.sendMessage(err);
-				throw CommandAPI.failWithString(err);
+				throw CommandAPI.failWithAdventureComponent(err);
 			}
 		} else {
 			// need to look up from name
@@ -77,8 +78,8 @@ public class TeleportGuild {
 		Location loc = LuckPermsIntegration.getGuildTp(player.getWorld(), group);
 
 		if (loc == null) {
-			player.sendMessage(ChatColor.RED + "The teleport for your guild is not set up");
-			player.sendMessage(ChatColor.RED + "Please ask a moderator to fix this");
+			player.sendMessage(Component.text("The teleport for your guild is not set up", NamedTextColor.RED));
+			player.sendMessage(Component.text("Please ask a moderator to fix this", NamedTextColor.RED));
 		} else {
 			player.teleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND);
 		}

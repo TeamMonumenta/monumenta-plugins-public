@@ -14,7 +14,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -58,7 +57,7 @@ public class CharmsGUI extends Gui {
 		int totalBudget = ScoreboardUtils.getScoreboardValue(mTargetPlayer, AbilityUtils.CHARM_POWER).orElse(0);
 		if (totalBudget <= 0) {
 			if (mTargetPlayer.equals(mPlayer)) {
-				mTargetPlayer.sendMessage(ChatColor.RED + "You have no Charm Power!");
+				mTargetPlayer.sendMessage(Component.text("You have no Charm Power!", NamedTextColor.RED));
 			} else {
 				mPlayer.sendMessage(Component.text(mTargetPlayer.getName() + " has no Charm Power!", NamedTextColor.RED));
 			}
@@ -176,7 +175,7 @@ public class CharmsGUI extends Gui {
 					InventoryUtils.giveItem(mTargetPlayer, charm);
 				}
 			}
-			mTargetPlayer.sendMessage(ChatColor.RED + "Your equipped charms cost more than your budget (likely because their cost was adjusted). Your charms have all be unequipped");
+			mTargetPlayer.sendMessage(Component.text("Your equipped charms cost more than your budget (likely because their cost was adjusted). Your charms have all be unequipped", NamedTextColor.RED));
 			mTargetPlayer.playSound(mTargetPlayer.getLocation(), Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 1f, 1f);
 			update();
 		}

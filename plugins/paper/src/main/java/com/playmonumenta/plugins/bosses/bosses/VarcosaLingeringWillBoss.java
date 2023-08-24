@@ -27,7 +27,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -151,7 +152,7 @@ public final class VarcosaLingeringWillBoss extends SerializedLocationBossAbilit
 		mBoss.setHealth(finalHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_RED + "Lingering Will", null);
+			MessagingUtils.sendBoldTitle(player, Component.text("Lingering Will", NamedTextColor.DARK_RED), null);
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
 		}

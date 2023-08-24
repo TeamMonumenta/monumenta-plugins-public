@@ -10,8 +10,9 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.FunctionArgument;
 import dev.jorel.commandapi.arguments.ObjectiveArgument;
 import dev.jorel.commandapi.wrappers.FunctionWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class NameMCVerify extends GenericCommand {
@@ -28,7 +29,7 @@ public class NameMCVerify extends GenericCommand {
 						Bukkit.getScheduler().runTask(plugin, () -> {
 							Player player = (Player)args[0];
 							if (ex != null || server == null) {
-								player.sendMessage(ChatColor.RED + "Failed to get NameMC status, please try again. If this continues please report this bug");
+								player.sendMessage(Component.text("Failed to get NameMC status, please try again. If this continues please report this bug", NamedTextColor.RED));
 								if (ex != null) {
 									MessagingUtils.sendStackTrace(player, ex);
 								}

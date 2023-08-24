@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -184,7 +183,7 @@ public final class CrownbearerBoss extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Onyx Crownbearer", ChatColor.DARK_RED + "The King's Assassinator");
+			MessagingUtils.sendBoldTitle(player, Component.text("Onyx Crownbearer", NamedTextColor.GOLD), Component.text("The King's Assassinator", NamedTextColor.DARK_RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
 	}

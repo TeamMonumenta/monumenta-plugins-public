@@ -24,7 +24,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -125,7 +124,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		List<Player> players = PlayerUtils.playersInRange(mBossLoc, KAULS_JUDGEMENT_RANGE, true);
 		players.removeIf(p -> p.getLocation().getY() >= 61); //Get rid of spectators
 		for (Player player : players) {
-			player.sendMessage(ChatColor.DARK_GREEN + "IT IS TIME FOR JUDGEMENT TO COME.");
+			player.sendMessage(Component.text("IT IS TIME FOR JUDGEMENT TO COME.", NamedTextColor.DARK_GREEN));
 		}
 		world.playSound(mBossLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 10, 2);
 		new PartialParticle(Particle.SMOKE_LARGE, mBossLoc, 50, 0.5, 0.25, 0.5, 0).spawnAsBoss();
@@ -198,7 +197,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 						new PartialParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 60, 0, 0.4, 0, 1).spawnAsBoss();
 						new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().add(0, 1, 0), 20, 0, 0.4, 0, 0.15).spawnAsBoss();
 
-						player.sendMessage(ChatColor.AQUA + "What happened!? You need to find your way out of here quickly!");
+						player.sendMessage(Component.text("What happened!? You need to find your way out of here quickly!", NamedTextColor.AQUA));
 						MessagingUtils.sendTitle(player, Component.text("ESCAPE", NamedTextColor.RED, TextDecoration.BOLD), Component.empty(), 1, 20 * 3, 1);
 					});
 				} else if (mTicks < KAULS_JUDGEMENT_TOTAL_TIME) {

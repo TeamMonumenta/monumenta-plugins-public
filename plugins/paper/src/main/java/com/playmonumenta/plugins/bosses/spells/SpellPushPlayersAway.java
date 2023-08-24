@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -62,7 +64,7 @@ public class SpellPushPlayersAway extends Spell {
 				}
 				// Give player a hint if they haven't had one already
 				if (mPlayerHintsGiven.get(player.getUniqueId()) == null || !mPlayerHintsGiven.get(player.getUniqueId())) {
-					player.sendMessage(ChatColor.DARK_AQUA + "I shouldn't stay in this ring for too long.");
+					player.sendMessage(Component.text("I shouldn't stay in this ring for too long.", NamedTextColor.DARK_AQUA));
 					mPlayerHintsGiven.put(player.getUniqueId(), true);
 				}
 

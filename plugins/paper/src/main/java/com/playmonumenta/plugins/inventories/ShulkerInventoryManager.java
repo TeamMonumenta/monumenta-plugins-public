@@ -6,7 +6,8 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.HumanEntity;
@@ -25,11 +26,11 @@ import org.jetbrains.annotations.Nullable;
  * @see com.playmonumenta.plugins.inventories.ShulkerInventory
  */
 public class ShulkerInventoryManager {
-	private static final String ERROR_SHULKER_LOCKED = ChatColor.RED + "This shulker is locked";
-	private static final String ERROR_SHULKER_ALREADY_OPEN = ChatColor.RED + "This shulker is already open";
-	private static final String ERROR_SHULKER_ZONE_BLOCKED = ChatColor.RED + "Shulkers can not be opened here";
-	private static final String ERROR_SHULKER_RATE_LIMITED = ChatColor.RED + "Too fast! Please try again";
-	private static final String ERROR_NOT_A_SHULKER = ChatColor.RED + "How did you...? That isn't a shulker. Please report this";
+	private static final Component ERROR_SHULKER_LOCKED = Component.text("This shulker is locked", NamedTextColor.RED);
+	private static final Component ERROR_SHULKER_ALREADY_OPEN = Component.text("This shulker is already open", NamedTextColor.RED);
+	private static final Component ERROR_SHULKER_ZONE_BLOCKED = Component.text("Shulkers can not be opened here", NamedTextColor.RED);
+	private static final Component ERROR_SHULKER_RATE_LIMITED = Component.text("Too fast! Please try again", NamedTextColor.RED);
+	private static final Component ERROR_NOT_A_SHULKER = Component.text("How did you...? That isn't a shulker. Please report this", NamedTextColor.RED);
 	private static @Nullable ShulkerInventoryManager INSTANCE = null;
 	private final Plugin mPlugin;
 	private final HashMap<UUID, ShulkerInventory> mInventories = new HashMap<>();

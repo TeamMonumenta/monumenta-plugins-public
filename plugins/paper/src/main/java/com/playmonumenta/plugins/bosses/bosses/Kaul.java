@@ -46,7 +46,6 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -190,7 +189,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 					if (player.isSleeping()) {
 						DamageUtils.damage(mBoss, player, DamageType.OTHER, 22);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 15, 1));
-						player.sendMessage(ChatColor.DARK_GREEN + "THE JUNGLE FORBIDS YOU TO DREAM.");
+						player.sendMessage(Component.text("THE JUNGLE FORBIDS YOU TO DREAM.", NamedTextColor.DARK_GREEN));
 						player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.HOSTILE, 1, 0.85f);
 					}
 				}
@@ -251,10 +250,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				if (player.getLocation().getBlock().isLiquid()) {
 					if (!hit.contains(player.getUniqueId())) {
 						hit.add(player.getUniqueId());
-						player.sendMessage(ChatColor.AQUA + "That hurt! It seems like the water is extremely corrosive. Best to stay out of it.");
+						player.sendMessage(Component.text("That hurt! It seems like the water is extremely corrosive. Best to stay out of it.", NamedTextColor.AQUA));
 					}
 				} else if (!loc.isInSphere(mShrineMarker.getLocation().toVector(), 42)) {
-					player.sendMessage(ChatColor.AQUA + "You feel a powerful force pull you back in fiercely. It seems there's no escape from this fight.");
+					player.sendMessage(Component.text("You feel a powerful force pull you back in fiercely. It seems there's no escape from this fight.", NamedTextColor.AQUA));
 				}
 			}
 		});
@@ -1015,7 +1014,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								if (mT >= 100) {
 									this.cancel();
 									for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-										MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_GREEN + "Kaul, Soul of the Jungle");
+										MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("Kaul, Soul of the Jungle", NamedTextColor.DARK_GREEN));
 										player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 									}
 									mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
@@ -1108,7 +1107,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 							mBoss.getEquipment().setItemInOffHand(o);
 
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-								MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GREEN + "Kaul", ChatColor.GREEN + "Soul of the Jungle");
+								MessagingUtils.sendBoldTitle(player, Component.text("Kaul", NamedTextColor.DARK_GREEN), Component.text("Soul of the Jungle", NamedTextColor.GREEN));
 								player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 							}
 							world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);

@@ -13,6 +13,7 @@ import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -201,7 +202,7 @@ public class CharmsCommand extends GenericCommand {
 			.executesPlayer((sender, args) -> {
 				Player player = (Player) args[0];
 				if (!PremiumVanishIntegration.canSee(sender, player)) {
-					sender.sendMessage(ChatColor.RED + "No player was found");
+					sender.sendMessage(Component.text("No player was found", NamedTextColor.RED));
 					return;
 				}
 				new CharmsGUI(sender, player).open();

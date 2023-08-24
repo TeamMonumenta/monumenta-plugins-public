@@ -12,6 +12,8 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
@@ -46,9 +48,9 @@ public class LeaveGuild {
 
 		Group group = LuckPermsIntegration.getGuild(player);
 		if (group == null) {
-			String err = ChatColor.RED + "You are not in a guild";
+			Component err = Component.text("You are not in a guild", NamedTextColor.RED);
 			player.sendMessage(err);
-			throw CommandAPI.failWithString(err);
+			throw CommandAPI.failWithAdventureComponent(err);
 		}
 
 		String guildName = LuckPermsIntegration.getGuildName(group);

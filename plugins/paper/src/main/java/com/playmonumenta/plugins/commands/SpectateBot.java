@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -97,7 +99,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 
 	private void run(Plugin plugin, Player player) throws WrapperCommandSyntaxException {
 		if (mSpectators.containsKey(player.getUniqueId())) {
-			player.sendMessage(ChatColor.RED + "You are no longer spectate botting");
+			player.sendMessage(Component.text("You are no longer spectate botting", NamedTextColor.RED));
 			mSpectators.remove(player.getUniqueId());
 		} else {
 			mSpectators.put(player.getUniqueId(), new SpectateContext(player));
@@ -116,7 +118,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 							if (ctx.mTarget == null || !ctx.mTarget.isOnline() || ctx.mTimeSinceLastSwitch > AUTO_PLAYER_SWITCH_TICKS) {
 								ctx.mTarget = getPlayerToSpectate(ctx.mSpectator);
 								if (ctx.mTarget == null) {
-									ctx.mSpectator.sendMessage(ChatColor.RED + "No player to spectate");
+									ctx.mSpectator.sendMessage(Component.text("No player to spectate", NamedTextColor.RED));
 									it.remove();
 									continue;
 								} else {

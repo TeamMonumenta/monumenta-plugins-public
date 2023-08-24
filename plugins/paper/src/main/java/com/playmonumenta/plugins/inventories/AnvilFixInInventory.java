@@ -10,7 +10,8 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -57,7 +58,7 @@ public class AnvilFixInInventory implements Listener {
 		Player player = (Player) event.getWhoClicked();
 
 		if (item.getAmount() > 1) {
-			player.sendMessage(ChatColor.RED + "Cannot repair stacks of items!");
+			player.sendMessage(Component.text("Cannot repair stacks of items!", NamedTextColor.RED));
 			event.setCancelled(true);
 			return;
 		}
@@ -67,7 +68,7 @@ public class AnvilFixInInventory implements Listener {
 		if (isUpgradedLimeTesseract) {
 			limeTesseractCharges = ItemStatUtils.getCharges(anvilOrTess);
 			if (limeTesseractCharges <= 0) {
-				player.sendMessage(ChatColor.RED + "There are no anvils in the tesseract!");
+				player.sendMessage(Component.text("There are no anvils in the tesseract!", NamedTextColor.RED));
 				event.setCancelled(true);
 				return;
 			}
@@ -119,7 +120,7 @@ public class AnvilFixInInventory implements Listener {
 			player.updateInventory();
 			event.setCancelled(true);
 		} else {
-			player.sendMessage(ChatColor.RED + "This is not a valid item to repair!");
+			player.sendMessage(Component.text("This is not a valid item to repair!", NamedTextColor.RED));
 			event.setCancelled(true);
 		}
 	}

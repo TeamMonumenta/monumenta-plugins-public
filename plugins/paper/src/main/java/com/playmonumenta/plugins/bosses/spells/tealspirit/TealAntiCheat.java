@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -37,7 +38,7 @@ public class TealAntiCheat extends Spell {
 				double height = loc.getY() - mSpawnLoc.getY();
 				if (LocationUtils.xzDistance(mSpawnLoc, loc) > RADIUS || (height > HEIGHT_UP && PlayerUtils.isOnGround(player)) || height < -HEIGHT_DOWN) {
 					BossUtils.bossDamagePercent(mBoss, player, 0.85);
-					player.sendMessage(ChatColor.RED + "You are too far from the fight!");
+					player.sendMessage(Component.text("You are too far from the fight!", NamedTextColor.RED));
 				}
 			}
 

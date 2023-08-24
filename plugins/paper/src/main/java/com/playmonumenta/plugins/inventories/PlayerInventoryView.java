@@ -8,8 +8,8 @@ import com.playmonumenta.plugins.utils.InventoryUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -93,7 +93,7 @@ public class PlayerInventoryView implements Listener {
 	public void inventoryView(Player player, Player clickedPlayer) {
 		//Make sure whoever is getting hit with a PEB doesn't have the tag that opts them out of this feature
 		if (clickedPlayer.getScoreboardTags().contains("inventoryPrivacy")) {
-			player.sendMessage(ChatColor.RED + "This player has opted out of inventory viewing.");
+			player.sendMessage(Component.text("This player has opted out of inventory viewing.", NamedTextColor.RED));
 			return;
 		}
 		//Added for tracking to prevent them from clicking on stuff

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
@@ -201,16 +203,16 @@ public class GlowingCommand {
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_OBJECTIVE, value);
 
-		player.sendMessage(ChatColor.GOLD + "Glowing " + operation + "d"
+		player.sendMessage(Component.text("Glowing ", NamedTextColor.GOLD) + operation + "d"
 			                   + " for " + StringUtils.join(options, ", ") + ". Your new options are:");
 		showConfig(player, false);
-		player.sendMessage(ChatColor.GRAY + " You may need to leave and re-enter the current area for all entities to be updated.");
+		player.sendMessage(Component.text(" You may need to leave and re-enter the current area for all entities to be updated.", NamedTextColor.GRAY));
 
 	}
 
 	private static void showConfig(Player player, boolean withHeader) {
 		if (withHeader) {
-			player.sendRawMessage(ChatColor.GOLD + "Your active glowing options:");
+			player.sendMessage(Component.text("Your active glowing options:", NamedTextColor.GOLD));
 		}
 		int value = ScoreboardUtils.getScoreboardValue(player, SCOREBOARD_OBJECTIVE).orElse(0);
 		List<String> enabled = new ArrayList<>();

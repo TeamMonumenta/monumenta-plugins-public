@@ -15,7 +15,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -125,7 +126,7 @@ public final class VarcosaSummonerBoss extends SerializedLocationBossAbilityGrou
 		mBoss.setHealth(bossTargetHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.RED + "Varcosa", ChatColor.DARK_RED + "Mighty Pirate Captain");
+			MessagingUtils.sendBoldTitle(player, Component.text("Varcosa", NamedTextColor.RED), Component.text("Mighty Pirate Captain", NamedTextColor.DARK_RED));
 		}
 
 		mActive = true;

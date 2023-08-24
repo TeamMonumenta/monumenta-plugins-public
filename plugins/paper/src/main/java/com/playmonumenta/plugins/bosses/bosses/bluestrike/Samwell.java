@@ -298,7 +298,7 @@ public class Samwell extends BossAbilityGroup {
 					mBoss.setAI(true);
 					changePhaseNormal();
 					mSpawnLoc.getNearbyPlayers(100).forEach(p -> {
-						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, ChatColor.DARK_RED + "Samwell", ChatColor.RED + "Usurper Of Life");
+						com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(p, Component.text("Samwell", NamedTextColor.DARK_RED), Component.text("Usurper Of Life", NamedTextColor.RED));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, true, false, false));
 					});
 					mSpawnLoc.getWorld().playSound(mSpawnLoc, Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 5, 0.7f);
@@ -607,7 +607,7 @@ public class Samwell extends BossAbilityGroup {
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "VICTORY", ChatColor.DARK_RED + "Samwell, Usurper Of Life");
+							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("Samwell, Usurper Of Life", NamedTextColor.DARK_RED));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 						}
 						mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -62,7 +63,7 @@ public class SpellShuraAS extends Spell {
 			new PartialParticle(Particle.CRIT_MAGIC, loc.clone().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.5f).spawnAsEntityActive(mBoss);
 			world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1, 1);
 			mBoss.teleport(mCenter.clone().add(0, -10, 0));
-			mTarget.sendMessage(ChatColor.AQUA + "A chill runs down your spine.");
+			mTarget.sendMessage(Component.text("A chill runs down your spine.", NamedTextColor.AQUA));
 			mTarget.playSound(mTarget.getLocation(), Sound.ENTITY_GUARDIAN_HURT, SoundCategory.HOSTILE, 1f, 0.5f);
 
 			BukkitRunnable tp = new BukkitRunnable() {

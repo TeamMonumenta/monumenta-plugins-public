@@ -204,6 +204,14 @@ public class CosmeticsManager implements Listener {
 		}
 	}
 
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability) {
+		return getCosmeticsOfTypeAlphabetical(player, type, ability == null ? null : ability.getLinkedSpell());
+	}
+
+	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type) {
+		return getCosmeticsOfTypeAlphabetical(player, type, (ClassAbility) null);
+	}
+
 	public @Nullable Cosmetic getCosmetic(Player player, CosmeticType type, String name) {
 		for (Cosmetic cosmetic : getCosmetics(player)) {
 			if (cosmetic.getType() == type
@@ -223,14 +231,6 @@ public class CosmeticsManager implements Listener {
 			}
 		}
 		return null;
-	}
-
-	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type, @Nullable AbilityInfo<?> ability) {
-		return getCosmeticsOfTypeAlphabetical(player, type, ability == null ? null : ability.getLinkedSpell());
-	}
-
-	public List<Cosmetic> getCosmeticsOfTypeAlphabetical(Player player, CosmeticType type) {
-		return getCosmeticsOfTypeAlphabetical(player, type, (ClassAbility) null);
 	}
 
 	/**

@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -76,7 +78,7 @@ public class FestiveTesseractOverride extends BaseOverride implements Listener {
 			return true;
 		}
 		if (ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.FESTIVE_TESSERACT_DISABLED)) {
-			player.sendMessage(ChatColor.RED + "You can't use this here!");
+			player.sendMessage(Component.text("You can't use this here!", NamedTextColor.RED));
 			return false;
 		}
 		List<String> currentSummons = STANDARD_SUMMONS;

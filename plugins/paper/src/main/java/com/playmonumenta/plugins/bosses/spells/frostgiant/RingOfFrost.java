@@ -8,7 +8,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -62,7 +63,7 @@ public class RingOfFrost extends Spell {
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_POLAR_BEAR_WARNING, SoundCategory.HOSTILE, 5, 0);
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 3, 0);
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), FrostGiant.detectionRange, true)) {
-			player.sendMessage(ChatColor.DARK_PURPLE + "The air away from the giant starts to freeze!");
+			player.sendMessage(Component.text("The air away from the giant starts to freeze!", NamedTextColor.DARK_PURPLE));
 		}
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;

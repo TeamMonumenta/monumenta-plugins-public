@@ -21,8 +21,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -300,7 +301,7 @@ public final class TCalin extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.GREEN + "T'Calin", ChatColor.DARK_GREEN + "Forest Battlemage");
+			MessagingUtils.sendBoldTitle(player, Component.text("T'Calin", NamedTextColor.GREEN), Component.text("Forest Battlemage", NamedTextColor.DARK_GREEN));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 1.25f);
 		}
 	}

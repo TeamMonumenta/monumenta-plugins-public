@@ -17,8 +17,9 @@ import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -133,7 +134,7 @@ public class ExperiencinatorCommand {
 
 		ExperiencinatorConfig experiencinatorConfig = ExperiencinatorUtils.getConfig(player.getLocation());
 		if (experiencinatorConfig == null) {
-			player.sendRawMessage(ChatColor.RED + "There's a problem with the server's Experiencinator configuration. Please contact a moderator.");
+			player.sendMessage(Component.text("There's a problem with the server's Experiencinator configuration. Please contact a moderator.", NamedTextColor.RED));
 			return;
 		}
 

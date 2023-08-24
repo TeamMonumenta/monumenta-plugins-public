@@ -10,9 +10,8 @@ import com.comphenix.protocol.wrappers.Pair;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.VanityManager;
 import com.playmonumenta.plugins.utils.ItemUtils;
-import java.util.List;
-
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
@@ -135,7 +136,7 @@ public class CreateGuild {
 					// Add tags, display messages and effects
 					for (Player founder : founders) {
 						ScoreboardUtils.setScoreboardValue(founder, "Founder", 1);
-						founder.sendMessage(ChatColor.GOLD + "Congratulations! You have founded a new guild!");
+						founder.sendMessage(Component.text("Congratulations! You have founded a new guild!", NamedTextColor.GOLD));
 						founder.playSound(founder.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1f, 1.5f);
 
 						// Refresh chat name
@@ -150,7 +151,7 @@ public class CreateGuild {
 					try {
 						MonumentaNetworkRelayIntegration.broadcastCommand("tellraw @a[all_worlds=true] [\"\",{\"text\":\"A new guild has just been founded. Say hello to " + guildName + "!!\",\"bold\":true}]");
 					} catch (Exception e) {
-						sender.sendMessage(ChatColor.RED + "Broadcasting command failed");
+						sender.sendMessage(Component.text("Broadcasting command failed", NamedTextColor.RED));
 					}
 				});
 			}

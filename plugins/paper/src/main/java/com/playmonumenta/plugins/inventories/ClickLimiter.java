@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
  */
 public class ClickLimiter {
 	private static final String DEFAULT_METADATA_KEY = "InventoryClickLimiter";
+
 	public static boolean isLocked(Player player) {
 		return isLocked(player, 5);
 	}

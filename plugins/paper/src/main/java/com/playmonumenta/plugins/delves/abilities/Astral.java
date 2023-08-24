@@ -106,6 +106,7 @@ public class Astral {
 		}
 		return false;
 	}
+
 	public static void applyModifiers(Chest chest, int level) {
 		if (level == 0 || ZoneUtils.hasZoneProperty(chest.getLocation(), ZoneUtils.ZoneProperty.LOOTROOM)) {
 			return;

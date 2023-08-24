@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -67,13 +68,13 @@ public class SpellFrostbite extends Spell {
 			if (playerLoc.getY() - mStartLoc.getY() >= 4 && (effect == null || effect.getAmplifier() < 3) && (player.getGameMode() == GameMode.SURVIVAL || player.getLocation().distance(mStartLoc) < FrostGiant.fighterRange) && player.getLocation().getY() - mStartLoc.getY() <= 45) {
 				damage = true;
 				if (!mWarned.contains(player)) {
-					player.sendMessage(ChatColor.RED + "The upper air is freezing!");
+					player.sendMessage(Component.text("The upper air is freezing!", NamedTextColor.RED));
 					mWarned.add(player);
 				}
 			} else if (playerLoc.getY() - mStartLoc.getY() <= -4) {
 				damage = true;
 				if (!mWarned.contains(player)) {
-					player.sendMessage(ChatColor.RED + "The lower air is freezing!");
+					player.sendMessage(Component.text("The lower air is freezing!", NamedTextColor.RED));
 					mWarned.add(player);
 				}
 			}

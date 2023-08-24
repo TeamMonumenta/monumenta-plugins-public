@@ -9,7 +9,8 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -86,7 +87,7 @@ public class SpellFinalParticle extends Spell {
 			if (pGroundLoc.distance(mCenter) < 8) {
 				if (!mWarned.contains(p)) {
 					mWarned.add(p);
-					p.sendMessage(ChatColor.AQUA + "Looks like a dense cloud of miasma formed at the center of the arena.");
+					p.sendMessage(Component.text("Looks like a dense cloud of miasma formed at the center of the arena.", NamedTextColor.AQUA));
 				}
 				BossUtils.bossDamagePercent(mBoss, p, 0.05, "Miasma");
 				//death bloom nod >:3

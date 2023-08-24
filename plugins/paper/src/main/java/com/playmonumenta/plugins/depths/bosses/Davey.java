@@ -36,7 +36,6 @@ import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -225,7 +224,7 @@ public class Davey extends BossAbilityGroup {
 		SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
 
 		for (Player player : players) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Lieutenant Davey", ChatColor.GRAY + "Void Herald");
+			MessagingUtils.sendBoldTitle(player, Component.text("Lieutenant Davey", NamedTextColor.DARK_GRAY), Component.text("Void Herald", NamedTextColor.GRAY));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 			player.sendMessage(Component.text("", NamedTextColor.BLUE)

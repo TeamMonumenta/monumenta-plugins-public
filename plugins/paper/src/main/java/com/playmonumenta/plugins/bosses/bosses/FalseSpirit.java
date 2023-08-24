@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -279,7 +278,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
 			player.sendMessage(Component.text("I am deeper than the power of Malkus... I shall take you into the nothingness from which you came.", NamedTextColor.DARK_RED));
-			MessagingUtils.sendBoldTitle(player, ChatColor.RED + "False Spirit", ChatColor.DARK_RED + "Remnant of Olive");
+			MessagingUtils.sendBoldTitle(player, Component.text("False Spirit", NamedTextColor.RED), Component.text("Remnant of Olive", NamedTextColor.DARK_RED));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 		}
 	}
@@ -382,7 +381,7 @@ public final class FalseSpirit extends SerializedLocationBossAbilityGroup {
 						@Override
 						public void run() {
 							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-								MessagingUtils.sendBoldTitle(player, ChatColor.RED + "VICTORY", ChatColor.DARK_RED + "False Spirit, Remnant of Olive");
+								MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.RED), Component.text("False Spirit, Remnant of Olive", NamedTextColor.DARK_RED));
 								player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 							}
 

@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -63,7 +64,7 @@ public class SpellEdgeKill extends Spell {
 
 					//warn player
 					if (!mWarned.contains(p)) {
-						p.sendMessage(ChatColor.LIGHT_PURPLE + "YES, YOU SHALL FLEE! BEGONE.");
+						p.sendMessage(Component.text("YES, YOU SHALL FLEE! BEGONE.", NamedTextColor.LIGHT_PURPLE));
 						mWarned.add(p);
 					}
 				}

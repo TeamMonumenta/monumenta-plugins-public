@@ -51,6 +51,18 @@ public class ChestUtils {
 			4.5
 	};
 
+	private static boolean lootTableInventoryHasBonusRolls(Inventory inventory) {
+		if (!(inventory.getHolder() instanceof Lootable lootable)) {
+			return false;
+		}
+		LootTable lootTable = lootable.getLootTable();
+		if (lootTable == null) {
+			return false;
+		}
+		LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
+		return lootEntry != null && lootEntry.hasBonusRolls();
+	}
+
 	public static void generateContainerLootWithScaling(Player player, Block block) {
 		BlockState blockState = block.getState();
 		if (blockState instanceof Container) {
@@ -63,18 +75,6 @@ public class ChestUtils {
 				generateContainerLootWithScaling(player, inventory);
 			}
 		}
-	}
-
-	private static boolean lootTableInventoryHasBonusRolls(Inventory inventory) {
-		if (!(inventory.getHolder() instanceof Lootable lootable)) {
-			return false;
-		}
-		LootTable lootTable = lootable.getLootTable();
-		if (lootTable == null) {
-			return false;
-		}
-		LootTableManager.LootTableEntry lootEntry = LootTableManager.getLootTableEntry(lootTable.getKey());
-		return lootEntry != null && lootEntry.hasBonusRolls();
 	}
 
 	private static void generateContainerLootWithScaling(Player player, Inventory inventory) {

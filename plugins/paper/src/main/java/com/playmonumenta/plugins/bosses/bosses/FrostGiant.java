@@ -46,7 +46,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -688,7 +687,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 										world.playSound(mStartLoc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 6, 0.5f);
 
 										for (Player player : PlayerUtils.playersInRange(mStartLoc, detectionRange, true)) {
-											MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "Eldrask", ChatColor.BLUE + "The Waking Giant");
+											MessagingUtils.sendBoldTitle(player, Component.text("Eldrask", NamedTextColor.AQUA), Component.text("The Waking Giant", NamedTextColor.BLUE));
 											player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.75f);
 										}
 
@@ -884,7 +883,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 					this.cancel();
 
 					for (Player player : PlayerUtils.playersInRange(mSpawnLoc, fighterRange, true)) {
-						MessagingUtils.sendBoldTitle(player, ChatColor.AQUA + "VICTORY", ChatColor.DARK_AQUA + "Eldrask, The Waking Giant");
+						MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.AQUA), Component.text("Eldrask, The Waking Giant", NamedTextColor.DARK_AQUA));
 						player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 					}
 					mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);

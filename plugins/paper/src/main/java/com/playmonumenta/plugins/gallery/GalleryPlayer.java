@@ -137,6 +137,13 @@ public class GalleryPlayer {
 		}
 	}
 
+	public void sendMessage(Component s) {
+		Player player = getPlayer();
+		if (player != null) {
+			player.sendMessage(s);
+		}
+	}
+
 	public void playSound(Sound sound, float pitch, float volume) {
 		Player player = getPlayer();
 		if (player != null) {

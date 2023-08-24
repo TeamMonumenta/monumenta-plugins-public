@@ -134,7 +134,7 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(bossTargetHp);
 
 		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_PURPLE + "Captain Varcosa", ChatColor.RED + "The Legendary Pirate King");
+			MessagingUtils.sendBoldTitle(player, Component.text("Captain Varcosa", NamedTextColor.DARK_PURPLE), Component.text("The Legendary Pirate King", NamedTextColor.RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}

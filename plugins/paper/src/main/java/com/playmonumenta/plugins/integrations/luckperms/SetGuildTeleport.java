@@ -10,8 +10,9 @@ import dev.jorel.commandapi.arguments.TextArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.luckperms.api.model.group.Group;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -55,6 +56,6 @@ public class SetGuildTeleport {
 
 		LuckPermsIntegration.setGuildTp(group, plugin, loc);
 
-		player.sendMessage(ChatColor.GOLD + "Guild teleport set to your location");
+		player.sendMessage(Component.text("Guild teleport set to your location", NamedTextColor.GOLD));
 	}
 }

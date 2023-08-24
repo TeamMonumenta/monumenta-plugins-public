@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -102,7 +101,7 @@ public class OldLabsBoss extends SerializedLocationBossAbilityGroup {
 						new PartialParticle(Particle.SMOKE_NORMAL, loc, 75, 0.2, 0.45, 0.2, 0.2).spawnAsEntityActive(boss);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 35, 0.2, 0.45, 0.2, 0.15).spawnAsEntityActive(boss);
 						for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-							MessagingUtils.sendBoldTitle(player, ChatColor.GOLD + "Elcard", ChatColor.RED + "The Ignoble");
+							MessagingUtils.sendBoldTitle(player, Component.text("Elcard", NamedTextColor.GOLD), Component.text("The Ignoble", NamedTextColor.RED));
 							player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 10, 1.65f);
 							player.playSound(player.getLocation(), Sound.ENTITY_WITCH_AMBIENT, SoundCategory.HOSTILE, 10, 0.6f);
 						}

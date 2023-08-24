@@ -4,6 +4,8 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
@@ -103,7 +105,7 @@ public class TemporalFlux extends Effect {
 	public void entityLoseEffect(Entity entity) {
 		mBossBar.setVisible(false);
 		mBossBar.removeAll();
-		entity.sendMessage(ChatColor.GRAY + "You are no longer inflicted with Paradox, you are safe for now.");
+		entity.sendMessage(Component.text("You are no longer inflicted with Paradox, you are safe for now.", NamedTextColor.GRAY));
 	}
 
 	@Override

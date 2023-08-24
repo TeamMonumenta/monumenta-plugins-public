@@ -423,7 +423,7 @@ public final class MasterworkCustomInventory extends CustomInventory {
 
 	private void attemptUpgrade(Player p, ItemStack item, ItemStack nextItem, MasterworkCost cost) {
 		if (item.getAmount() > 1) {
-			p.sendMessage(ChatColor.RED + "You cannot upgrade stacked items.");
+			p.sendMessage(Component.text("You cannot upgrade stacked items.", NamedTextColor.RED));
 			return;
 		}
 
@@ -445,11 +445,11 @@ public final class MasterworkCustomInventory extends CustomInventory {
 				ItemUpdateHelper.generateItemStats(item);
 				MasterworkUtils.animate(p, ItemStatUtils.getMasterwork(nextItem));
 			} else {
-				p.sendMessage(ChatColor.RED + "You don't have enough currency for this upgrade.");
+				p.sendMessage(Component.text("You don't have enough currency for this upgrade.", NamedTextColor.RED));
 			}
 			mRowSelected = 99;
 		} catch (Exception e) {
-			p.sendMessage(ChatColor.RED + "If you see this message please contact a mod! (Error in upgrade)");
+			p.sendMessage(Component.text("If you see this message please contact a mod! (Error in upgrade)", NamedTextColor.RED));
 			e.printStackTrace();
 		}
 	}

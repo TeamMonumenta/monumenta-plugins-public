@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -178,7 +177,7 @@ public final class Azacor extends SerializedLocationBossAbilityGroup {
 		mBoss.setHealth(finalHp);
 
 		for (Player player : PlayerUtils.playersInRange(mSpawnLoc, detectionRange, true)) {
-			MessagingUtils.sendBoldTitle(player, ChatColor.DARK_GRAY + "Azacor", ChatColor.GRAY + "The Dark Summoner");
+			MessagingUtils.sendBoldTitle(player, Component.text("Azacor", NamedTextColor.DARK_GRAY), Component.text("The Dark Summoner", NamedTextColor.GRAY));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
 		}

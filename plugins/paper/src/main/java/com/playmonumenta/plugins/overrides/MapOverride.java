@@ -4,7 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.EnumSet;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -55,14 +56,14 @@ public class MapOverride extends BaseOverride {
 		GameMode playerMode = player.getGameMode();
 		if ((playerMode.equals(GameMode.ADVENTURE) || playerMode.equals(GameMode.SPECTATOR))
 			    && !(ItemUtils.isQuestItem(mapItem) && itemFrame != null && itemFrame.getScoreboardTags().contains("Removable"))) {
-			player.sendMessage(ChatColor.RED + "You can not place maps in town item frames");
+			player.sendMessage(Component.text("You can not place maps in town item frames", NamedTextColor.RED));
 			return false;
 		} else if (playerMode.equals(GameMode.CREATIVE)) {
 			return true;
 		}
 
 		if (InventoryUtils.testForItemWithLore(mapItem, "* Official Map *")) {
-			player.sendMessage(ChatColor.RED + "You can not modify official maps");
+			player.sendMessage(Component.text("You can not modify official maps", NamedTextColor.RED));
 			return false;
 		}
 

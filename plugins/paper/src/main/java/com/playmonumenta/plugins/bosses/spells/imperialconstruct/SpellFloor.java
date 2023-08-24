@@ -11,7 +11,6 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -70,7 +69,7 @@ public class SpellFloor extends Spell {
 				}
 
 				if (p.getLocation().distance(mCurrentLoc) > 31) {
-					p.sendMessage(ChatColor.GRAY + "The mechanical void pushes you back in.");
+					p.sendMessage(Component.text("The mechanical void pushes you back in.", NamedTextColor.GRAY));
 					p.playSound(p.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, SoundCategory.HOSTILE, 1, 0);
 					new PartialParticle(Particle.FIREWORKS_SPARK, p.getLocation().add(0, 1, 0), 15, 0.4, 0.4, 0.4, 0.15);
 					new PartialParticle(Particle.DRAGON_BREATH, p.getLocation().add(0, 1, 0), 6, 0.4, 0.4, 0.4, 0.2);
