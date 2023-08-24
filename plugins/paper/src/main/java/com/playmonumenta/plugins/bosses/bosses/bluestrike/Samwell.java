@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -498,7 +499,7 @@ public class Samwell extends BossAbilityGroup {
 
 				if (mTimer > DAGGER_DURATION) {
 					List<Player> players = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
-					players.forEach(p -> p.sendMessage(ChatColor.AQUA + "" + ChatColor.ITALIC + "As the dagger loses its magic, it vaporizes into thin air..."));
+					players.forEach(p -> p.sendMessage(Component.text("As the dagger loses its magic, it vaporizes into thin air...", NamedTextColor.AQUA, TextDecoration.ITALIC)));
 					clearDagger();
 					changePhaseNormal();
 					this.cancel();

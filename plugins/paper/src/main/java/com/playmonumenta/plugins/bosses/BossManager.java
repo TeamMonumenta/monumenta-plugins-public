@@ -926,7 +926,7 @@ public class BossManager implements Listener {
 				}
 			} else {
 				if (sender != null) {
-					sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+					sender.sendMessage(Component.text("No boss found with the tag '" + requestedTag + "'", NamedTextColor.RED));
 				}
 			}
 		}
@@ -960,7 +960,7 @@ public class BossManager implements Listener {
 				}
 			} else {
 				if (sender != null) {
-					sender.sendMessage(ChatColor.RED + "No boss found with the tag '" + requestedTag + "'");
+					sender.sendMessage(Component.text("No boss found with the tag '" + requestedTag + "'", NamedTextColor.RED));
 				}
 			}
 		}

@@ -9,7 +9,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -65,7 +66,7 @@ public class SpellParadoxSwap extends Spell {
 	}
 
 	private void deployEffect(Player damager) {
-		PlayerUtils.playersInRange(damager.getLocation(), 50, true).forEach(player -> player.sendMessage(ChatColor.GOLD + "[Temporal Exchanger]" + ChatColor.WHITE + " TEMPORAL ANOMALY TRANSFERRED - ENTERING TEMPORARY ENERGY REGENERATION STATE"));
+		PlayerUtils.playersInRange(damager.getLocation(), 50, true).forEach(player -> player.sendMessage(Component.text("[Temporal Exchanger]", NamedTextColor.GOLD).append(Component.text(" TEMPORAL ANOMALY TRANSFERRED - ENTERING TEMPORARY ENERGY REGENERATION STATE", NamedTextColor.WHITE))));
 		List<Player> nearbyPlayers = EntityUtils.getNearestPlayers(mBoss.getLocation(), mRange);
 		Collections.reverse(nearbyPlayers);
 		nearbyPlayers.remove(damager);

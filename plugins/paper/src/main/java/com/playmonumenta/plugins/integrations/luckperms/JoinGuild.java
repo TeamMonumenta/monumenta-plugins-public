@@ -59,8 +59,8 @@ public class JoinGuild {
 		String currentGuildName = LuckPermsIntegration.getGuildName(currentGuild);
 		if (currentGuildName != null &&
 			ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
-			String err = ChatColor.RED + "You are not a founder of '" + currentGuildName + "' !";
-			throw CommandAPI.failWithString(err);
+			Component err = Component.text("You are not a founder of '" + currentGuildName + "' !", NamedTextColor.RED);
+			throw CommandAPI.failWithAdventureComponent(err);
 		}
 		if (currentGuildName == null) {
 			founder.sendMessage(Component.text("You are not currently in a guild.", NamedTextColor.RED));

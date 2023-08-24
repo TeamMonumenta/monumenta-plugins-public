@@ -18,7 +18,6 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -122,7 +121,7 @@ public final class SpectateBot extends GenericCommand implements Listener {
 									it.remove();
 									continue;
 								} else {
-									ctx.mSpectator.sendMessage(ChatColor.RED + "Now spectating: " + ctx.mTarget.getName());
+									ctx.mSpectator.sendMessage(Component.text("Now spectating: " + ctx.mTarget.getName(), NamedTextColor.RED));
 									ctx.mTimeSinceLastSwitch = 0;
 									ctx.mLastTargetLoc = ctx.mTarget.getLocation();
 									ctx.mSpectator.teleport(ctx.mLastTargetLoc);

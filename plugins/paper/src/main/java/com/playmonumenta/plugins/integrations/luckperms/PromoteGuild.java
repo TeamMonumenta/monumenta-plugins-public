@@ -57,8 +57,8 @@ public class PromoteGuild {
 		}
 
 		if (ScoreboardUtils.getScoreboardValue(founder, "Founder").orElse(0) != 1) {
-			String err = ChatColor.RED + "You are not a founder of guild '" + currentGuildName + "'";
-			throw CommandAPI.failWithString(err);
+			Component err = Component.text("You are not a founder of guild '" + currentGuildName + "'", NamedTextColor.RED);
+			throw CommandAPI.failWithAdventureComponent(err);
 		}
 		players.removeIf(player -> founder.getName().equalsIgnoreCase(player.getName()));
 		if (players.size() == 0) {

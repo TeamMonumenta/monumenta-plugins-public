@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -86,7 +85,7 @@ public class SpellPushPlayersAway extends Spell {
 					vect.normalize().setY(0.7f).multiply(2);
 					player.setVelocity(vect);
 					nearTime = 0;
-					player.sendMessage(ChatColor.GOLD + "[Masked Man] " + ChatColor.WHITE + "Get back, cur!");
+					player.sendMessage(Component.text("[Masked Man] ", NamedTextColor.GOLD).append(Component.text("Get back, cur!", NamedTextColor.WHITE)));
 
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, SoundCategory.HOSTILE, 1, 1.65f);
 					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_BREAK_BLOCK, SoundCategory.HOSTILE, 0.25f, 1.0f);

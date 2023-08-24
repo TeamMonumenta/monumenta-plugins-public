@@ -63,7 +63,7 @@ public class PlotManager {
 						getPlotInfo(player.getUniqueId()).whenComplete((info, ex) -> {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
-								player.sendMessage(ChatColor.RED + "Got error trying to list plot access, please report this: " + ex.getMessage());
+								player.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
 								ex.printStackTrace();
 							} else {
 								plotAccessInfo(player, info);
@@ -80,7 +80,7 @@ public class PlotManager {
 						getPlotInfo(uuid).whenComplete((info, ex) -> {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + name + " : " + ex.getMessage());
-								sender.sendMessage(ChatColor.RED + "Got error trying to list plot access, please report this: " + ex.getMessage());
+								sender.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
 								ex.printStackTrace();
 							} else {
 								sender.sendMessage(ChatColor.GOLD + "Displaying info for player " + ChatColor.AQUA + name);
@@ -155,8 +155,8 @@ public class PlotManager {
 						try {
 							sendPlayerToPlot(player);
 						} catch (Exception ex) {
-							sender.sendMessage(ChatColor.RED + "Failed to send player to plot '" + player.getName() + "': " + ex.getMessage());
-							sender.sendMessage(ChatColor.RED + "Failed to send you to plot, please report this: " + ex.getMessage());
+							sender.sendMessage(Component.text("Failed to send player to plot '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
+							sender.sendMessage(Component.text("Failed to send you to plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
 							ex.printStackTrace();
 						}
 					}
@@ -171,8 +171,8 @@ public class PlotManager {
 							ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.CURRENT_PLOT, (Integer) args[1]);
 							sendPlayerToPlot(player);
 						} catch (Exception ex) {
-							sender.sendMessage(ChatColor.RED + "Failed to send player to plot '" + player.getName() + "': " + ex.getMessage());
-							sender.sendMessage(ChatColor.RED + "Failed to send you to plot, please report this: " + ex.getMessage());
+							sender.sendMessage(Component.text("Failed to send player to plot '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
+							sender.sendMessage(Component.text("Failed to send you to plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
 							ex.printStackTrace();
 						}
 					}
@@ -186,7 +186,7 @@ public class PlotManager {
 						getPlotInfo(player.getUniqueId()).thenCompose((info) -> info.populateNamesAndHeads()).whenComplete((info, ex) -> {
 							if (ex != null) {
 								Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
-								sender.sendMessage(ChatColor.RED + "Got error trying to list plot access, please report this: " + ex.getMessage());
+								sender.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
 								ex.printStackTrace();
 							} else {
 								new PlotAccessCustomInventory(player, info).openInventory(player, Plugin.getInstance());
@@ -232,8 +232,8 @@ public class PlotManager {
 								RBoardAPI.add("$Plot", "Plot", 1).whenComplete((newInstance, ex) -> {
 									Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 										if (ex != null) {
-											sender.sendMessage(ChatColor.RED + "Failed to get new plot score: " + ex.getMessage());
-											player.sendMessage(ChatColor.RED + "Failed to get new plot score, please report this: " + ex.getMessage());
+											sender.sendMessage(Component.text("Failed to get new plot score: " + ex.getMessage(), NamedTextColor.RED));
+											player.sendMessage(Component.text("Failed to get new plot score, please report this: " + ex.getMessage(), NamedTextColor.RED));
 											ex.printStackTrace();
 										} else {
 											ScoreboardUtils.setScoreboardValue(player, Constants.Objectives.OWN_PLOT, newInstance.intValue());
@@ -244,8 +244,8 @@ public class PlotManager {
 								});
 							}
 						} catch (Exception ex) {
-							sender.sendMessage(ChatColor.RED + "Failed to create new plot for player '" + player.getName() + "': " + ex.getMessage());
-							sender.sendMessage(ChatColor.RED + "Failed to create new plot, please report this: " + ex.getMessage());
+							sender.sendMessage(Component.text("Failed to create new plot for player '" + player.getName() + "': " + ex.getMessage(), NamedTextColor.RED));
+							sender.sendMessage(Component.text("Failed to create new plot, please report this: " + ex.getMessage(), NamedTextColor.RED));
 							ex.printStackTrace();
 						}
 					}
@@ -266,7 +266,7 @@ public class PlotManager {
 							getPlotInfo(player.getUniqueId()).whenComplete((info, ex) -> {
 								if (ex != null) {
 									Plugin.getInstance().getLogger().severe("Caught exception trying to list plot access for owner " + player.getName() + " : " + ex.getMessage());
-									player.sendMessage(ChatColor.RED + "Got error trying to list plot access, please report this: " + ex.getMessage());
+									player.sendMessage(Component.text("Got error trying to list plot access, please report this: " + ex.getMessage(), NamedTextColor.RED));
 									ex.printStackTrace();
 								} else {
 									for (UUID otherUUID : info.mOtherAccessToOwnerPlot.keySet()) {
@@ -459,7 +459,7 @@ public class PlotManager {
 				MonumentaRedisSyncAPI.sendPlayer(player, "playerplots");
 			}
 		} catch (Exception ex) {
-			player.sendMessage(ChatColor.RED + "Failed to send you to playerplots, please report this: " + ex.getMessage());
+			player.sendMessage(Component.text("Failed to send you to playerplots, please report this: " + ex.getMessage(), NamedTextColor.RED));
 			ex.printStackTrace();
 		}
 	}

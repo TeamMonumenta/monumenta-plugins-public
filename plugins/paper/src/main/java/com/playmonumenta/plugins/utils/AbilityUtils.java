@@ -4,7 +4,17 @@ import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityManager;
-import com.playmonumenta.plugins.classes.*;
+import com.playmonumenta.plugins.classes.Alchemist;
+import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
+import com.playmonumenta.plugins.classes.Mage;
+import com.playmonumenta.plugins.classes.MonumentaClasses;
+import com.playmonumenta.plugins.classes.PlayerClass;
+import com.playmonumenta.plugins.classes.Rogue;
+import com.playmonumenta.plugins.classes.Scout;
+import com.playmonumenta.plugins.classes.Shaman;
+import com.playmonumenta.plugins.classes.Warlock;
+import com.playmonumenta.plugins.classes.Warrior;
 import com.playmonumenta.plugins.cosmetics.skills.StealthCosmeticSkill;
 import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.effects.AbilitySilence;
@@ -28,14 +38,18 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -464,7 +478,7 @@ public class AbilityUtils {
 	public static void refreshClass(Player player) {
 		AbilityManager.getManager().updatePlayerAbilities(player, true);
 		InventoryUtils.scheduleDelayedEquipmentCheck(Plugin.getInstance(), player, null);
-		Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");
+		Bukkit.getConsoleSender().sendMessage(Component.text("Refreshed class for player '" + player.getName() + "'", NamedTextColor.GOLD));
 	}
 
 	public static void updateAbilityScores(Player player) {

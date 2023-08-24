@@ -19,7 +19,6 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class LeaveGuild {
@@ -77,6 +76,6 @@ public class LeaveGuild {
 			LuckPermsIntegration.pushUserUpdate(user);
 		});
 
-		player.sendMessage(ChatColor.GOLD + "You have left the guild '" + guildName + "'");
+		player.sendMessage(Component.text("You have left the guild '" + guildName + "'", NamedTextColor.GOLD));
 	}
 }

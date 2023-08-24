@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -94,7 +93,7 @@ public class DamageBlocker extends Spell {
 						player.sendMessage(Component.text("Foolish. I am made of nothing. Your attacks shall do nothing to me while my gates are powered.", NamedTextColor.DARK_RED));
 						mWarned.add(player);
 					} else if (!mWarned.contains(player)) {
-						player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " You must get closer! It's turning your attacks to nothing!");
+						player.sendMessage(Component.text("[Bhairavi]", NamedTextColor.GOLD).append(Component.text(" You must get closer! It's turning your attacks to nothing!", NamedTextColor.WHITE)));
 						mWarned.add(player);
 					}
 					mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_ANVIL_PLACE, SoundCategory.HOSTILE, 1, 2);

@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.commands;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -14,9 +15,9 @@ public class RemoveTags extends GenericCommand {
 		entity.getScoreboardTags().clear();
 
 		if (entity instanceof Player) {
-			sender.sendMessage(ChatColor.GOLD + "Cleared all tags from player '" + ((Player)entity).getName() + "'");
+			sender.sendMessage(Component.text("Cleared all tags from player '" + ((Player)entity).getName() + "'", NamedTextColor.GOLD));
 		} else {
-			sender.sendMessage(ChatColor.GOLD + "Cleared all tags from entity '" + entity.getUniqueId() + "'");
+			sender.sendMessage(Component.text("Cleared all tags from entity '" + entity.getUniqueId() + "'", NamedTextColor.GOLD));
 		}
 	}
 }

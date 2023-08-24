@@ -268,7 +268,7 @@ public abstract class ExperiencinatorUtils {
 				} else { // 3 or more: join with ", ", and the last one with ", and "
 					message = StringUtils.join(givenTexts.subList(0, givenTexts.size() - 1), ", ") + ", and " + givenTexts.get(givenTexts.size() - 1);
 				}
-				player.sendRawMessage(ChatColor.AQUA + "Given " + message + "!");
+				player.sendMessage(Component.text("Given " + message + "!", NamedTextColor.AQUA));
 			}
 		} catch (Throwable t) {
 			player.sendMessage(Component.text("Error while giving you " + remainingValue + " remaining items from a total of " + totalValue + "! Please contact a moderator.", NamedTextColor.RED));

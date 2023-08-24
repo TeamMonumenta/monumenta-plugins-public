@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PrefixNode;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.command.CommandSender;
@@ -73,16 +73,13 @@ public class CreateGuild {
 		boolean inGuildAlready = false;
 		for (Player founder : founders) {
 			if (LuckPermsIntegration.getGuild(founder) != null) {
-				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "Player "
-					                   + founder.getName() + " is already in a guild!");
+				sender.sendMessage(Component.text("Player " + founder.getName() + " is already in a guild!", NamedTextColor.DARK_RED, TextDecoration.ITALIC));
 				inGuildAlready = true;
 			}
 
 			int level = ScoreboardUtils.getScoreboardValue(founder, AbilityUtils.TOTAL_LEVEL).orElse(0);
 			if (level < 5) {
-				sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.ITALIC + "The minimal level for "
-					                   + founder.getName() + " is not reached ("
-					                   + level + "/5)");
+				sender.sendMessage(Component.text("The minimal level for " + founder.getName() + " is not reached (" + level + "/5)", NamedTextColor.DARK_RED, TextDecoration.ITALIC));
 				hasEnoughLevels = false;
 			}
 		}

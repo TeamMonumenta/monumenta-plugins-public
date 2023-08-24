@@ -10,7 +10,9 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -99,10 +101,12 @@ public class DeathMsg {
 			newState = DeathMessageState.getDeathMessageState(ScoreboardUtils.getScoreboardValue(player, Constants.SCOREBOARD_DEATH_MESSAGE).orElse(0));
 		}
 
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Death Message Settings");
-		player.sendMessage(ChatColor.AQUA + "When you die, your death message will be shown to:");
-		player.sendMessage(ChatColor.GREEN + "  " + newState.getDescription());
-		player.sendMessage(ChatColor.AQUA + "Change this with " + ChatColor.GOLD + "/deathmsg visible" +
-		                   ChatColor.AQUA + " or " + ChatColor.GOLD + "/deathmsg hidden");
+		player.sendMessage(Component.text("Death Message Settings", NamedTextColor.GOLD, TextDecoration.BOLD));
+		player.sendMessage(Component.text("When you die, your death message will be shown to:", NamedTextColor.AQUA));
+		player.sendMessage(Component.text("  " + newState.getDescription(), NamedTextColor.GREEN));
+		player.sendMessage(Component.text("Change this with ", NamedTextColor.AQUA)
+						   .append(Component.text("/deathmsg visible", NamedTextColor.GOLD))
+						   .append(Component.text(" or ", NamedTextColor.AQUA))
+						   .append(Component.text("/deathmsg hidden", NamedTextColor.GOLD)));
 	}
 }

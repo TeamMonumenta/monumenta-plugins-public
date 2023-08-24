@@ -630,7 +630,7 @@ public class ShopManager implements Listener {
 		shop.setLockingEnabled(lockable);
 
 		if (player != null) {
-			player.sendMessage(ChatColor.WHITE + "Locking/unlocking your shop is now " + (lockable ? "enabled" : "disabled"));
+			player.sendMessage(Component.text("Locking/unlocking your shop is now " + (lockable ? "enabled" : "disabled"), NamedTextColor.WHITE));
 		}
 
 		shopEntity.getWorld().playSound(shopEntity.getLocation(), Sound.BLOCK_CHEST_LOCKED, SoundCategory.PLAYERS, 1.0f, 1.1f);

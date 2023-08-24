@@ -2,7 +2,8 @@ package com.playmonumenta.plugins.commands;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -19,6 +20,6 @@ public class RefreshClass extends GenericCommand {
 			plugin.mAbilityManager.updatePlayerAbilities(player, true);
 		}
 		InventoryUtils.scheduleDelayedEquipmentCheck(plugin, player, null);
-		sender.sendMessage(ChatColor.GOLD + "Refreshed class for player '" + player.getName() + "'");
+		sender.sendMessage(Component.text("Refreshed class for player '" + player.getName() + "'", NamedTextColor.GOLD));
 	}
 }

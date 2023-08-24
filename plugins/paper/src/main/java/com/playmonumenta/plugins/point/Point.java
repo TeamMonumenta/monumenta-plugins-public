@@ -1,7 +1,8 @@
 package com.playmonumenta.plugins.point;
 
 import com.playmonumenta.plugins.utils.CommandUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +33,7 @@ public class Point {
 		String[] strArray = str.replaceAll("[()]", "").split("[, ]+");
 		if (strArray.length != 3) {
 			if (sender != null) {
-				sender.sendMessage(ChatColor.RED + "Failed to parse string '" + str +
-					                   "' as point - found " + strArray.length + " elements");
+				sender.sendMessage(Component.text("Failed to parse string '" + str + "' as point - found " + strArray.length + " elements", NamedTextColor.RED));
 			}
 			throw new Exception("Failed to parse string '" + str +
 				                    "' as point - found " + strArray.length + " elements");

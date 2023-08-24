@@ -226,7 +226,7 @@ public class CharmsCommand extends GenericCommand {
 					}
 				}
 				if (results.isEmpty()) {
-					player.sendMessage(ChatColor.RED + "No effects found containing " + ChatColor.DARK_RED + key);
+					player.sendMessage(Component.text("No effects found containing ", NamedTextColor.RED).append(Component.text(key, NamedTextColor.DARK_RED)));
 				} else {
 					player.sendMessage("Found " + results.size() + " effects containing " + ChatColor.GREEN + key);
 					results.forEach(effect -> player.sendMessage(Component.text(effect, TextColor.fromHexString("#4AC2E5"))));
