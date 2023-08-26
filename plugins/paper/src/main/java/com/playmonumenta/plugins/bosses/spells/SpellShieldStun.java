@@ -9,10 +9,16 @@ import org.bukkit.entity.Player;
 
 public class SpellShieldStun extends Spell {
 
-	private int mStunTicks;
+	private final int mStunTicks;
+	private final DamageType mDamageType;
 
 	public SpellShieldStun(int stunTicks) {
+		this(stunTicks, DamageType.MELEE);
+	}
+
+	public SpellShieldStun(int stunTicks, DamageType damageType) {
 		mStunTicks = stunTicks;
+		mDamageType = damageType;
 	}
 
 	@Override
@@ -22,7 +28,7 @@ public class SpellShieldStun extends Spell {
 
 	@Override
 	public void onDamage(DamageEvent event, LivingEntity damagee) {
-		if (damagee instanceof Player player && event.getType() == DamageType.MELEE) {
+		if (damagee instanceof Player player && event.getType() == mDamageType) {
 			if (event.isBlockedByShield()) {
 				NmsUtils.getVersionAdapter().stunShield(player, mStunTicks);
 				event.setDamage(0);

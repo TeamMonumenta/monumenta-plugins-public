@@ -234,7 +234,7 @@ public class SpellBaseGrenadeLauncher extends Spell {
 			double velocity = distance * timeOfFlight;
 
 			// lessen velocity if the y-velocity is very low as to avoid overshooting, and vice versa
-			velocity *= 1 + 0.6 * (mGrenadeVelocity - 0.7);
+			velocity *= 1 + (mGrenadeVelocity - 0.7);
 
 			// Divide the actual velocity by 32 (speed at which things fall in minecraft; don't ask me why, but it works)
 			Vector vel = new Vector(pLoc.getX() - tLoc.getX(), 0, pLoc.getZ() - tLoc.getZ()).normalize().multiply(velocity / 32);
