@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.bosses.parameters.ParticlesList;
 import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -62,6 +64,8 @@ public class StarfallBoss extends BossAbilityGroup {
 		public SoundsList SOUND_LOCKING = SoundsList.fromString("[(ITEM_FIRECHARGE_USE,1,0)]");
 		public SoundsList SOUND_METEOR = SoundsList.fromString("[(ENTITY_BLAZE_SHOOT,3,1)]");
 		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(ENTITY_DRAGON_FIREBALL_EXPLODE,3,1)]");
+		@BossParam(help = "LibraryOfSouls name of the mob spawned when the grenade explodes")
+		public String SPAWNEDMOB = "";
 
 	}
 
@@ -127,6 +131,10 @@ public class StarfallBoss extends BossAbilityGroup {
 							if (mCurrentHeight <= 0) {
 								p.PARTICLE_EXPLOSION.spawn(boss, meteorCenter, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, p.TARGETS_EXPLOSION.getRange() / 2, 0.1);
 								p.SOUND_EXPLOSION.play(meteorCenter);
+								Entity spawn = LibraryOfSoulsIntegration.summon(meteorCenter, p.SPAWNEDMOB);
+								if (spawn != null) {
+									summonPlugins(spawn);
+								}
 								for (LivingEntity target : p.TARGETS_EXPLOSION.getTargetsListByLocation(mBoss, meteorCenter)) {
 
 									if (p.DAMAGE > 0) {
@@ -169,5 +177,9 @@ public class StarfallBoss extends BossAbilityGroup {
 				mTicks += 2;
 			}
 		}.runTaskTimer(mPlugin, 0, 2);
+	}
+
+	public void summonPlugins(Entity summon) {
+
 	}
 }
