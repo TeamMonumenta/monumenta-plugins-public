@@ -104,9 +104,9 @@ public class TradeListener implements Listener {
 			handleSoulboundTradess(player, trade, recipe);
 		}
 		// Custom GUI:
-		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(0) == 1) {
+		if (ScoreboardUtils.getScoreboardValue(player, CustomTradeGui.MAIN).orElse(1) == 1) {
 			if (!player.hasPermission(CustomTradeGui.PERMISSION)) {
-				player.sendMessage("The custom trade GUI has been temporarily disabled, opening the default GUI. ");
+				player.sendMessage("The custom trade GUI has been temporarily disabled, opening the vanilla GUI. ");
 				return;
 			}
 			// Custom Trade GUI Enabled:

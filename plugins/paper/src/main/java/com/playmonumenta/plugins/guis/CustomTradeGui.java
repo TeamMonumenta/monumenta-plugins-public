@@ -283,7 +283,7 @@ public class CustomTradeGui extends Gui {
 		mPebTradeGUIPreviewDisplay = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PREVIEWDISPLAY).orElse(0);
 		mPebTradeGUITradeOrg = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.TRADEORG).orElse(0);
 		mPebTradeGUIConfirm = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.CONFIRM).orElse(0);
-		mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SUCCESS).orElse(0);
+		mPebTradeGUISuccess = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SUCCESS).orElse(2);
 		mPebTradeGUIParticles = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.PARTICLES).orElse(0);
 		mPebTradeGUISounds = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.SOUNDS).orElse(0);
 		mPebTradeGUIWallet = ScoreboardUtils.getScoreboardValue(mPlayer, CustomTradeGui.WALLET).orElse(0);

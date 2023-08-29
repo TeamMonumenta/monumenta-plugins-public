@@ -300,9 +300,9 @@ public class PEBCustomInventory extends CustomInventory {
 				gui -> Component.text("", NamedTextColor.LIGHT_PURPLE),
 				Material.BIRCH_SIGN, false),
 			new PebItem(19, gui -> "Custom Trade GUI: ",
-				gui -> Component.text("Toggles between vanilla UI and custom GUI. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.MAIN).orElse(0) == 1 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				gui -> Component.text("Toggles between vanilla UI and custom GUI. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.MAIN).orElse(1) == 1 ? "Custom." : "Vanilla."), NamedTextColor.LIGHT_PURPLE),
 				Material.LOOM, false).action((inventory, action) -> {
-				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.MAIN).orElse(0);
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.MAIN).orElse(1);
 				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.MAIN, oldValue == 0 ? 1 : 0);
 				inventory.setLayout(inventory.mCurrentPage);
 			}),
@@ -353,10 +353,10 @@ public class PEBCustomInventory extends CustomInventory {
 			}),
 			new PebItem(38, gui -> "Upon successful trade: ",
 				gui -> Component.text("Toggles between: return to preview page, close GUI, or do nothing. \n\nCurrent: " +
-					                      (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(0) == 0 ? "Return to preview." :
-						                       ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(0) == 1 ? "Close GUI." : "Do nothing."), NamedTextColor.LIGHT_PURPLE),
+					                      (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(2) == 0 ? "Return to preview." :
+						                       ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.SUCCESS).orElse(2) == 1 ? "Close GUI." : "Do nothing."), NamedTextColor.LIGHT_PURPLE),
 				Material.GLOW_ITEM_FRAME, false).action((inventory, action) -> {
-				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS).orElse(0);
+				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS).orElse(2);
 				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.SUCCESS, oldValue == 2 ? 0 : oldValue + 1); // cycles from 0, 1, 2 -> 0
 				inventory.setLayout(inventory.mCurrentPage);
 			}),
