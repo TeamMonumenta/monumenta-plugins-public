@@ -33,7 +33,7 @@ public class KillTriggeredAbilityTracker {
 	public void updateDamageDealtToBosses(double damage, LivingEntity mob) {
 		if (EntityUtils.isBoss(mob)) {
 			mDamageDealtToBosses += damage;
-			if (mDamageDealtToBosses >= mDamageDealtToBossesPerKill) {
+			while (mDamageDealtToBosses >= mDamageDealtToBossesPerKill) {
 				mDamageDealtToBosses -= mDamageDealtToBossesPerKill;
 				mLinkedAbility.triggerOnKill(mob);
 			}
