@@ -267,6 +267,12 @@ public class SandsOfTime extends Spell {
 		return mCooldownTicks;
 	}
 
+	@Override
+	public void cancel() {
+		super.cancel();
+		mNormalTeam.addEntity(mBoss);
+	}
+
 	private enum SandsColor {
 		RED(Color.RED, NamedTextColor.RED, BossBar.Color.RED, ScoreboardUtils.getExistingTeamOrCreate(RED_TEAM, NamedTextColor.DARK_RED), 0.5f, 0, null),
 		BLUE(Color.BLUE, NamedTextColor.BLUE, BossBar.Color.BLUE, ScoreboardUtils.getExistingTeamOrCreate(BLUE_TEAM, NamedTextColor.BLUE), 0.354f, BLUE_DELAY, p -> Plugin.getInstance().mEffectManager.addEffect(p, ROOT_EFFECT, new PercentSpeed(BLUE_ROOT, -1, ROOT_EFFECT)));
