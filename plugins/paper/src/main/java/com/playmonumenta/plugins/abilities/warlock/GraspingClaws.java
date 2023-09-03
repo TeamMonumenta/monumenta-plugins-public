@@ -76,7 +76,7 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 									.formatted(RADIUS, StringUtils.multiplierToPercentage(AMPLIFIER_1), StringUtils.ticksToSeconds(DURATION), DAMAGE_1, StringUtils.ticksToSeconds(COOLDOWN)),
 							"The pulled enemies now take %s damage, and their Slowness is increased to %s%%."
 									.formatted(DAMAGE_2, StringUtils.multiplierToPercentage(AMPLIFIER_2)),
-							("At the location that the arrow lands, summon an impenetrable cage. " +
+							("When the projectile lands, an impenetrable cage is summoned at its location. " +
 									"Non-boss mobs within a %s block radius of the location cannot enter or exit the cage, " +
 									"and players within the cage are granted %s%% max health healing every second. " +
 									"The cage disappears after %s seconds. Mobs that are immune to crowd control cannot be trapped.")

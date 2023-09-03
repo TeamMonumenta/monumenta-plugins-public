@@ -86,7 +86,7 @@ public class AbilityTrigger {
 			player -> !ItemUtils.isShovel(player.getInventory().getItemInMainHand())),
 		NO_AXE("not holding an axe", "may be holding an axe", Material.IRON_AXE,
 			player -> !ItemUtils.isAxe(player.getInventory().getItemInMainHand())),
-		REQUIRE_PROJECTILE_WEAPON("holding a projective weapon", "may be not holding a projectile weapon", Material.CROSSBOW,
+		REQUIRE_PROJECTILE_WEAPON("holding a projectile weapon", "may be not holding a projectile weapon", Material.CROSSBOW,
 			player -> ItemUtils.isShootableItem(player.getInventory().getItemInMainHand())),
 		SNEAK_WITH_SHIELD("sneaking if holding a shield", "no sneak requirement if holding a shield", Material.SHIELD,
 			player -> player.isSneaking() || !(player.getInventory().getItemInMainHand().getType() == Material.SHIELD || player.getInventory().getItemInOffHand().getType() == Material.SHIELD)),
