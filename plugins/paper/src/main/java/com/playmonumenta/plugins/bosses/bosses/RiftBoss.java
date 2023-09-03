@@ -43,8 +43,12 @@ public class RiftBoss extends BossAbilityGroup {
 		public double SPLIT_ANGLE = 30;
 		@BossParam(help = "tick period at which the rift will grow (higher = rift grows slower)")
 		public int RIFT_PERIOD = 1;
-		@BossParam(help = "how far in blocks the rift will step (higher = sparser rift)")
+		@BossParam(help = "how far in blocks the rift will step each tick (higher = sparser rift)")
 		public double RIFT_STEP = 1.25;
+		@BossParam(help = "y-offset from where the rift should start")
+		public double HEIGHT_OFFSET = 0.5;
+		@BossParam(help = "if true, the rift will stay horizontal and not attempt to climb up/down slopes, and will ignore walls")
+		public boolean HORIZONTAL_LOCK = false;
 		@BossParam(help = "damage the rift will deal on direct contact")
 		public double DIRECT_DAMAGE = 0;
 		@BossParam(help = "% damage the rift will deal on direct contact")
@@ -94,7 +98,7 @@ public class RiftBoss extends BossAbilityGroup {
 				World world = mBoss.getWorld();
 				p.SOUND_WARN.play(mStartLoc);
 
-
+				List<? extends LivingEntity> players = PlayerUtils.playersInRange(mStartLoc, p.MAX_RANGE * 2, true);
 				List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
 				List<Location> locs = new ArrayList<>();
 				for (LivingEntity target : targets) {
@@ -122,7 +126,7 @@ public class RiftBoss extends BossAbilityGroup {
 				new BukkitRunnable() {
 					double mT = 0;
 					float mPitch = 1;
-					final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+					final Location mLoc = mBoss.getLocation().add(0, p.HEIGHT_OFFSET, 0);
 					final double mBossX = mLoc.getX();
 					final double mBossY = mLoc.getY();
 					final double mBossZ = mLoc.getZ();
@@ -160,7 +164,7 @@ public class RiftBoss extends BossAbilityGroup {
 							this.cancel();
 
 							for (Location l : finalLocs) {
-								createRift(l, targets);
+								createRift(l, players);
 							}
 							EntityUtils.cancelSelfRoot(mBoss);
 						}
@@ -168,11 +172,11 @@ public class RiftBoss extends BossAbilityGroup {
 				}.runTaskTimer(mPlugin, 0, 2);
 			}
 
-			private void createRift(Location loc, List<? extends LivingEntity> targets) {
+			private void createRift(Location loc, List<? extends LivingEntity> players) {
 				List<Location> locs = new ArrayList<>();
 
 				BukkitRunnable runnable = new BukkitRunnable() {
-					final Location mLoc = mBoss.getLocation().add(0, 0.5, 0);
+					final Location mLoc = mBoss.getLocation().add(0, p.HEIGHT_OFFSET, 0);
 					final Vector mDir = LocationUtils.getDirectionTo(loc, mLoc).setY(0).normalize();
 					final BoundingBox mBox = BoundingBox.of(mLoc, 0.85, 1.2, 0.85);
 					final Location mOgLoc = mLoc.clone();
@@ -183,20 +187,22 @@ public class RiftBoss extends BossAbilityGroup {
 						Location bLoc = mBox.getCenter().toLocation(mLoc.getWorld());
 
 						//Allows the rift to climb up and down blocks
-						if (bLoc.getBlock().getType().isSolid()) {
-							bLoc.add(0, 1, 0);
+						if (!p.HORIZONTAL_LOCK) {
 							if (bLoc.getBlock().getType().isSolid()) {
-								this.cancel();
-								bLoc.subtract(0, 1, 0);
+								bLoc.add(0, 1, 0);
+								if (bLoc.getBlock().getType().isSolid()) {
+									this.cancel();
+									bLoc.subtract(0, 1, 0);
+								}
 							}
-						}
 
-						if (!bLoc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
-							bLoc.subtract(0, 1, 0);
-							if (!bLoc.getBlock().getType().isSolid()) {
+							if (!bLoc.subtract(0, 1, 0).getBlock().getType().isSolid()) {
 								bLoc.subtract(0, 1, 0);
 								if (!bLoc.getBlock().getType().isSolid()) {
-									this.cancel();
+									bLoc.subtract(0, 1, 0);
+									if (!bLoc.getBlock().getType().isSolid()) {
+										this.cancel();
+									}
 								}
 							}
 						}
@@ -215,7 +221,7 @@ public class RiftBoss extends BossAbilityGroup {
 						}
 						p.SOUND_RIFT.play(bLoc);
 
-						for (LivingEntity target : targets) {
+						for (LivingEntity target : players) {
 							if (target.getBoundingBox().overlaps(mBox)) {
 								directHit(target, bLoc);
 							}
@@ -244,7 +250,7 @@ public class RiftBoss extends BossAbilityGroup {
 								p.PARTICLE_RIFT_LINGER.spawn(mBoss, loc.add(0, 0.5, 0));
 							}
 							BoundingBox box = BoundingBox.of(loc, 0.85, 1.2, 0.85);
-							for (LivingEntity target : targets) {
+							for (LivingEntity target : players) {
 								if (target.getBoundingBox().overlaps(box)) {
 									lingeringHit(target, loc);
 								}
