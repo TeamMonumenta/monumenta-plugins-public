@@ -56,6 +56,7 @@ public class RestlessSouls extends Ability {
 	public static final String CHARM_DURATION = "Restless Souls Duration";
 	public static final String CHARM_CAP = "Restless Souls Vex Cap";
 	public static final String CHARM_DEBUFF_RANGE = "Restless Souls Debuff Radius";
+	public static final String CHARM_SPEED = "Restless Souls Movement Speed";
 
 	public static final AbilityInfo<RestlessSouls> INFO =
 		new AbilityInfo<>(RestlessSouls.class, "Restless Souls", RestlessSouls::new)
@@ -81,6 +82,7 @@ public class RestlessSouls extends Ability {
 	private final int mSilenceTime;
 	private final int mVexCap;
 	private final double mDebuffRange;
+	private final double mMoveSpeed;
 	private final List<Vex> mVexList = new ArrayList<Vex>();
 
 	public RestlessSouls(Plugin plugin, Player player) {
@@ -91,6 +93,7 @@ public class RestlessSouls extends Ability {
 		mSilenceTime = isLevelOne ? SILENCE_DURATION_1 : SILENCE_DURATION_2;
 		mVexCap = (int) CharmManager.getLevel(player, CHARM_CAP) + (isLevelOne ? VEX_CAP_1 : VEX_CAP_2);
 		mDebuffRange = CharmManager.calculateFlatAndPercentValue(player, CHARM_DEBUFF_RANGE, DEBUFF_RANGE);
+		mMoveSpeed = CharmManager.calculateFlatAndPercentValue(player, CHARM_SPEED, MOVESPEED);
 	}
 
 	@Override
@@ -194,7 +197,7 @@ public class RestlessSouls extends Ability {
 						}
 						vexLoc.setDirection(direction);
 						// set speed
-						vexLoc.add(direction.multiply(MOVESPEED * TICK_INTERVAL / 20));
+						vexLoc.add(direction.multiply(mMoveSpeed * TICK_INTERVAL / 20));
 						// attack
 						if (mBoss.getBoundingBox().overlaps(mTarget.getBoundingBox())) {
 							mBoss.attack(mTarget);

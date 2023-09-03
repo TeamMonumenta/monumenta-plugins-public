@@ -29,6 +29,7 @@ import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -39,6 +40,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -59,6 +61,8 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	private static final int MAX_RANGE = 30;
 	private static final int MAX_DAMAGE_RANGE = 12;
 	private static final double EXPLODE_RADIUS = 1.25;
+	private static final double EXPLODE_KNOCKBACK = 0.25;
+	private static final int PIERCING = 0;
 
 	private static final int DURATION = 20 * 5;
 
@@ -66,6 +70,9 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DAMAGE = "Predator Strike Damage";
 	public static final String CHARM_RADIUS = "Predator Strike Radius";
 	public static final String CHARM_RANGE = "Predator Strike Range";
+	public static final String CHARM_KNOCKBACK = "Predator Strike Knockback";
+	public static final String CHARM_PIERCING = "Predator Strike Enemies Pierced";
+
 
 	public static final AbilityInfo<PredatorStrike> INFO =
 			new AbilityInfo<>(PredatorStrike.class, "Predator Strike", PredatorStrike::new)
@@ -186,8 +193,27 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		mCosmetic.strikeLaunch(world, mPlayer);
 
 		double range = CharmManager.getRadius(mPlayer, CHARM_RANGE, MAX_RANGE);
+		int piercing = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PIERCING, PIERCING);
+		List<LivingEntity> piercedMobs = new ArrayList<>();
+
 		RayTraceResult result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
-				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
+			e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid());
+
+		while (piercing > 0) {
+			// if we hit a block then just stop
+			if (result == null || result.getHitBlock() != null) {
+				break;
+			}
+
+			Entity hitEntity = result.getHitEntity();
+			if (hitEntity instanceof LivingEntity) {
+				piercedMobs.add((LivingEntity) hitEntity);
+				piercing--;
+			}
+
+			result = world.rayTrace(loc, direction, range, FluidCollisionMode.NEVER, true, 0.425,
+				e -> EntityUtils.isHostileMob(e) && !ScoreboardUtils.checkTag(e, AbilityUtils.IGNORE_TAG) && !e.isDead() && e.isValid() && !piercedMobs.contains((LivingEntity) e));
+		}
 
 		Location endLoc;
 		if (result == null) {
@@ -197,15 +223,30 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 		}
 
 		mCosmetic.strikeImpact(() -> mCosmetic.strikeExplode(world, mPlayer, endLoc, mExplodeRadius), endLoc, mPlayer);
-		explode(endLoc);
+		explode(endLoc, piercedMobs);
 		mCosmetic.strikeParticleLine(mPlayer, loc, endLoc);
 
 		return true;
 	}
 
-	private void explode(Location loc) {
+	private void explode(Location loc, List<LivingEntity> piercedMobs) {
 		ItemStack item = mPlayer.getInventory().getItemInMainHand();
 
+		// go through pierced mobs and use their locations
+		for (LivingEntity piercedMob : piercedMobs) {
+			double damage = ItemStatUtils.getAttributeAmount(item, AttributeType.PROJECTILE_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND);
+			damage += PointBlank.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.POINT_BLANK));
+			damage += Sniper.apply(mPlayer, piercedMob.getLocation(), ItemStatUtils.getEnchantmentLevel(item, EnchantmentType.SNIPER));
+			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
+			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(piercedMob.getLocation()), MAX_DAMAGE_RANGE);
+
+			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
+
+			MovementUtils.knockAway(mPlayer.getLocation(), piercedMob, knockback, knockback, true);
+			DamageUtils.damage(mPlayer, piercedMob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
+		}
+
+		// go through exploded mobs and use the explosion's location
 		Hitbox hitbox = new Hitbox.SphereHitbox(loc, mExplodeRadius);
 		List<LivingEntity> mobs = hitbox.getHitMobs();
 		if (!mobs.isEmpty()) {
@@ -215,8 +256,10 @@ public class PredatorStrike extends Ability implements AbilityWithDuration {
 			damage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, damage);
 			damage *= DAMAGE_MULTIPLIER + mDistanceScale * Math.min(mPlayer.getLocation().distance(loc), MAX_DAMAGE_RANGE);
 
+			float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, EXPLODE_KNOCKBACK);
+
 			for (LivingEntity mob : mobs) {
-				MovementUtils.knockAway(loc, mob, 0.25f, 0.25f, true);
+				MovementUtils.knockAway(loc, mob, knockback, knockback, true);
 				DamageUtils.damage(mPlayer, mob, DamageType.PROJECTILE_SKILL, damage, mInfo.getLinkedSpell(), true);
 			}
 		}
