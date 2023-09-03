@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import dev.jorel.commandapi.Tooltip;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -11,7 +12,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class SoundsList {
-	public static class CSound {
+	public static class CSound implements Cloneable {
 		Sound mSound;
 		float mVolume;
 		float mPitch;
@@ -28,6 +29,14 @@ public class SoundsList {
 			mSound = sound;
 			mVolume = volume;
 			mPitch = pitch;
+		}
+
+		public void setPitch(float pitch) {
+			this.mPitch = pitch;
+		}
+
+		public float getPitch() {
+			return mPitch;
 		}
 
 		public void play(Location loc) {
@@ -61,6 +70,12 @@ public class SoundsList {
 		public String toString() {
 			return "(" + mSound + ", " + mVolume + ", " + mPitch + ")";
 		}
+
+		@Override
+		public CSound clone() {
+			return new CSound(mSound, mVolume, mPitch);
+		}
+
 	}
 
 	private final List<CSound> mSoundsList;
@@ -110,6 +125,12 @@ public class SoundsList {
 		for (CSound cSound : mSoundsList) {
 			cSound.play(player, volume, pitch);
 		}
+	}
+
+	public void playSoundsModified(Consumer<CSound> action, Location loc) {
+		List<CSound> sounds = mSoundsList.stream().map(CSound::clone).toList();
+		sounds.forEach(action);
+		new SoundsList(sounds).play(loc);
 	}
 
 	public boolean isEmpty() {

@@ -23,7 +23,7 @@ public class LacerateBoss extends BossAbilityGroup {
 		@BossParam(help = "Range at which the spell can be cast")
 		public int RANGE = 12;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "how long before first cast of the spell")
 		public int DELAY = 100;
 
 		@BossParam(help = "Damage that this spell deals to players per hit")
@@ -38,38 +38,21 @@ public class LacerateBoss extends BossAbilityGroup {
 		@BossParam(help = "The type of the damage dealt by the attack. Default: MELEE")
 		public DamageEvent.DamageType DAMAGE_TYPE = DamageEvent.DamageType.MELEE;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "time between casts of the spell")
 		public int COOLDOWN = 160;
 
-		@BossParam(help = "not written")
+		@BossParam(help = "range for targets to be in for spell to start casting")
 		public int DETECTION = 20;
 
 		@BossParam(help = "Time between casting the spell and the resulting flurry")
 		public int TELEGRAPH_DURATION = 50;
 
-		@BossParam(help = "Particles used in telegraph")
-		public Particle TELEGRAPH_CIRCLE = Particle.ELECTRIC_SPARK;
-
-		@BossParam(help = "Particles used when hit")
-		public Particle ON_HIT_PARTICLE = Particle.WAX_OFF;
-
-		@BossParam(help = "Particles used on the last hit")
-		public Particle FINISHER_PARTICLE = Particle.SWEEP_ATTACK;
 
 		@BossParam(help = "You should not use this. use TARGETS instead.", deprecated = true)
 		public boolean LINE_OF_SIGHT = true;
 
 		@BossParam(help = "target of this spell")
 		public EntityTargets TARGETS = EntityTargets.GENERIC_PLAYER_TARGET_LINE_OF_SIGHT;
-
-		@BossParam(help = "Sound played at the targeted player when the boss starts charging the ability ability")
-		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,5,0.75)]");
-
-		@BossParam(help = "Sound played every tick at the caster while the spell is charging. Pitch is automatically increased by 0.01 every tick")
-		public SoundsList SOUND_CHARGE_BOSS = SoundsList.fromString("[]");
-
-		@BossParam(help = "Sound played at the start of when the flurry happens.")
-		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(BLOCK_BEACON_POWER_SELECT,1,1.65)]");
 
 		@BossParam(help = "Knock away from the mob")
 		public double KNOCK_AWAY = 3.0;
@@ -85,9 +68,6 @@ public class LacerateBoss extends BossAbilityGroup {
 
 		@BossParam(help = "The color of the outer part of the curved lines in the flurry. (Default: #bd3535")
 		public Color SLASH_COLOR_OUTER = Color.fromRGB(189, 53, 53);
-
-		@BossParam(help = "Frequency of the Outer slashes")
-		public int SLASH_FREQUENCY = 2;
 
 		@BossParam(help = "Amount of rings in the curved slashes of the flurry.")
 		public int RINGS = 8;
@@ -107,9 +87,6 @@ public class LacerateBoss extends BossAbilityGroup {
 		@BossParam(help = "Length of the straight lines")
 		public double LINE_LENGTH = 2.25;
 
-		@BossParam(help = "Particle of the Circular Explosions")
-		public Particle EXPLOSION_PARTICLES = Particle.ELECTRIC_SPARK;
-
 		@BossParam(help = "Velocity of the Circle Explosion particles")
 		public float EXPLOSION_SPEED = 1.75f;
 
@@ -128,8 +105,38 @@ public class LacerateBoss extends BossAbilityGroup {
 		@BossParam(help = "end line redstone dust color")
 		public Color END_LINE_COLOR = Color.fromRGB(245, 233, 233);
 
+		@BossParam(help = "Sound played at the targeted player when the boss starts charging the ability ability")
+		public SoundsList SOUND_WARNING = SoundsList.fromString("[(ITEM_TRIDENT_RETURN,5,0.75)]");
+
+		@BossParam(help = "Sound played every tick at the caster while the spell is charging. Pitch is automatically increased by 0.01 every tick")
+		public SoundsList SOUND_CHARGE_BOSS = SoundsList.fromString("[]");
+
+		@BossParam(help = "Sound played at the start of when the flurry happens.")
+		public SoundsList SOUND_EXPLOSION = SoundsList.fromString("[(BLOCK_BEACON_POWER_SELECT,1,1.65)]");
+
+		@BossParam(help = "Sound played at the start of when the flurry happens.")
+		public SoundsList SOUND_FINISHER = SoundsList.fromString("[(ITEM_TRIDENT_RIPTIDE_3, 1.25, 1),(BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.25, 0.8)]");
+
+		@BossParam(help = "Sound of the flurries. increases by 0.125 every time")
+		public SoundsList SOUND_FLURRY_INCREMENT = SoundsList.fromString("[(ITEM_TRIDENT_THROW, 1.25, 0.85),(ENTITY_PUFFER_FISH_BLOW_OUT, 1.25, 0.75)]");
+
+		@BossParam(help = "background sound of the flurries. does not increment")
+		public SoundsList SOUND_FLURRY_BACKGROUND = SoundsList.fromString("[(ITEM_TRIDENT_HIT, 1.1, 0.75),(ITEM_TRIDENT_RETURN, 1.1, 1.25)]");
+
+		@BossParam(help = "Particles used in telegraph")
+		public Particle TELEGRAPH_CIRCLE = Particle.ELECTRIC_SPARK;
+
+		@BossParam(help = "Particles used when hit")
+		public Particle ON_HIT_PARTICLE = Particle.WAX_OFF;
+
+		@BossParam(help = "Particles used on the last hit")
+		public Particle FINISHER_PARTICLE = Particle.SWEEP_ATTACK;
+
+		@BossParam(help = "Particle of the Circular Explosions")
+		public Particle EXPLOSION_PARTICLES = Particle.ELECTRIC_SPARK;
+
 		@BossParam(help = "end line particle 2")
-		public Particle END_LINE_PARTICLE = Particle.END_ROD;
+		public Particle END_LINE_PARTICLE = Particle.ELECTRIC_SPARK;
 
 	}
 

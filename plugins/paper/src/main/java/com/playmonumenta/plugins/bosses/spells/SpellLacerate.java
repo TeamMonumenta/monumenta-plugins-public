@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.bosses.LacerateBoss;
-import com.playmonumenta.plugins.bosses.parameters.SoundsList;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -109,8 +108,7 @@ public class SpellLacerate extends Spell {
 
 		BukkitRunnable doFlurry = new BukkitRunnable() {
 			int mInc = 0;
-			float mFlurryTridentPitchIncrease = 0;
-			float mFlurryPufferPitchIncrease = 0;
+			float mFlurryPitchIncrease = 0;
 			@Override
 			public void run() {
 				mInc++;
@@ -121,12 +119,9 @@ public class SpellLacerate extends Spell {
 				}
 
 				if (mInc <= mParameters.HIT_AMOUNT) {
-					mFlurryTridentPitchIncrease += 0.125f;
-					mFlurryPufferPitchIncrease += 0.125f;
-					SoundsList.fromString("[(ITEM_TRIDENT_THROW, 1.25" + (0.85 + mFlurryTridentPitchIncrease) + ")]").play(loc);
-					SoundsList.fromString("[(ENTITY_PUFFER_FISH_BLOW_OUT, 1.25" + (0.75 + mFlurryPufferPitchIncrease) + ")]").play(loc);
-					SoundsList.fromString("[(ITEM_TRIDENT_HIT, 1.25, 0.75)]").play(loc);
-					SoundsList.fromString("[(ITEM_TRIDENT_RETURN, 1.25, 1.25)]").play(loc);
+					mFlurryPitchIncrease += 0.125f;
+					mParameters.SOUND_FLURRY_INCREMENT.playSoundsModified(cSound -> cSound.setPitch(cSound.getPitch() + mFlurryPitchIncrease), loc);
+					mParameters.SOUND_FLURRY_BACKGROUND.play(loc);
 					for (Player p : PlayerUtils.playersInRange(loc, mParameters.RADIUS, true)) {
 						new PartialParticle(mParameters.ON_HIT_PARTICLE, p.getLocation(), 5, 0.1, 0.1, 0.1, 0.75).spawnAsEntityActive(mLauncher);
 						MovementUtils.knockAwayRealistic(mLauncher.getLocation(), p, 0.1f, 0.03f, false);
@@ -171,8 +166,7 @@ public class SpellLacerate extends Spell {
 							(Location lineLoc, double middleProgress, double endProgress, boolean middle) -> new PartialParticle(mParameters.END_LINE_PARTICLE, lineLoc, 2, 0, 0, 0, 0).spawnAsEntityActive(mLauncher));
 					}
 
-					SoundsList.fromString("[(ITEM_TRIDENT_RIPTIDE_3, 1.25, 1)]").play(loc);
-					SoundsList.fromString("[(BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.25, 0.8)]").play(loc);
+					mParameters.SOUND_FINISHER.play(loc);
 					this.cancel();
 				}
 			}
