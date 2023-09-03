@@ -42,9 +42,8 @@ public class Abyssal implements Enchantment {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;
 		}
-		int level = plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.ABYSSAL);
 		if (EntityUtils.isInWater(enemy) || EntityUtils.isInWater(player) || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ABYSSAL_FORCED)) {
-			double multiplier = 1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * level);
+			double multiplier = 1 + CharmManager.calculateFlatAndPercentValue(player, CHARM_DAMAGE, DAMAGE_BONUS_PER_LEVEL * value);
 			event.setDamage(event.getDamage() * multiplier);
 		}
 	}
