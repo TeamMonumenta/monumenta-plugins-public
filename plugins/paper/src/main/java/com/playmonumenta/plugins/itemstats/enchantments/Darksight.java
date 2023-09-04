@@ -29,7 +29,7 @@ public class Darksight implements Enchantment {
 	public void onEquipmentUpdate(Plugin plugin, Player player) {
 		if (plugin.mItemStatManager.getEnchantmentLevel(player, EnchantmentType.DARKSIGHT) > 0 && !player.getScoreboardTags().contains(DARKSIGHT_DISABLED_TAG)) {
 			mDarksightPlayers.add(player.getUniqueId());
-			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, 10000000, 0, true, false));
+			plugin.mPotionManager.addPotion(player, PotionID.ITEM, new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0, true, false));
 		} else if (mDarksightPlayers.remove(player.getUniqueId())) {
 			plugin.mPotionManager.removePotion(player, PotionID.ITEM, PotionEffectType.NIGHT_VISION);
 		}

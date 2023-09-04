@@ -86,7 +86,7 @@ public class Shattered implements Infusion {
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				if (hasMaxShatteredItemEquipped(player)) {
 					mShatteredDebuff.add(player.getUniqueId());
-					plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, 10000000, MINING_FATIGUE_AMPLIFIER, false, false));
+					plugin.mPotionManager.addPotion(player, PotionManager.PotionID.ITEM, new PotionEffect(PotionEffectType.SLOW_DIGGING, PotionEffect.INFINITE_DURATION, MINING_FATIGUE_AMPLIFIER, false, false));
 				} else if (mShatteredDebuff.remove(player.getUniqueId())) {
 					plugin.mPotionManager.removePotion(player, PotionManager.PotionID.ITEM, PotionEffectType.SLOW_DIGGING, MINING_FATIGUE_AMPLIFIER);
 				}
@@ -125,8 +125,8 @@ public class Shattered implements Infusion {
 
 	public static int getHighestShatterLevelEquipped(Player player) {
 		return Arrays.stream(EquipmentSlot.values())
-			       .mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), InfusionType.SHATTERED))
-			       .max().orElse(0);
+				.mapToInt(slot -> ItemStatUtils.getInfusionLevel(player.getEquipment().getItem(slot), InfusionType.SHATTERED))
+				.max().orElse(0);
 	}
 
 	public static int getShatterLevel(ItemStack item) {

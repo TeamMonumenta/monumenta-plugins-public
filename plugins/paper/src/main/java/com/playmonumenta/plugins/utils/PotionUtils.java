@@ -132,6 +132,7 @@ public class PotionUtils {
 		public boolean mAmbient;
 		public boolean mShowParticles;
 		public boolean mShowIcon;
+		public boolean mInfinite;
 
 		public PotionInfo() {
 		}
@@ -143,6 +144,7 @@ public class PotionUtils {
 			mAmbient = effect.isAmbient();
 			mShowParticles = effect.hasParticles();
 			mShowIcon = effect.hasIcon();
+			mInfinite = isInfinite(effect.getDuration());
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
@@ -153,6 +155,7 @@ public class PotionUtils {
 			mAmbient = ambient;
 			mShowParticles = showParticles;
 			mShowIcon = showIcon;
+			mInfinite = isInfinite(duration);
 		}
 
 		public JsonObject getAsJsonObject() {
@@ -173,6 +176,7 @@ public class PotionUtils {
 			mAmplifier = object.get("amplifier").getAsInt();
 			mAmbient = object.get("ambient").getAsBoolean();
 			mShowParticles = object.get("show_particles").getAsBoolean();
+			mInfinite = isInfinite(mDuration);
 		}
 	}
 
@@ -423,13 +427,13 @@ public class PotionUtils {
 		return OPPOSITE_EFFECTS.get(type);
 	}
 
-	// Duration is greater than about 10 hours
+	// Duration is equal to -1 or greater than about 10 hours.
 	public static boolean isInfinite(PotionEffect effect) {
-		return isInfinite(effect.getDuration());
+		return effect.isInfinite();
 	}
 
 	public static boolean isInfinite(int duration) {
-		return duration > 1000000;
+		return duration == PotionEffect.INFINITE_DURATION || duration > 1000000;
 	}
 
 	/**

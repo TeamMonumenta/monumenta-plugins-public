@@ -51,8 +51,8 @@ public class PotionMap {
 			// Make sure the last effect has had a chance to trigger before refreshing it
 			PotionEffectType newPotionType = newPotionInfo.mType;
 			if (bestEffect == null
-				    || bestEffect.mAmplifier < newPotionInfo.mAmplifier
-				    || (bestEffect.mAmplifier == newPotionInfo.mAmplifier
+					|| bestEffect.mAmplifier < newPotionInfo.mAmplifier
+					|| (bestEffect.mAmplifier == newPotionInfo.mAmplifier
 					&& bestEffect.mDuration < newPotionInfo.mDuration
 					&& (!PotionEffectType.POISON.equals(newPotionType)
 					|| newPotionInfo.mDuration - bestEffect.mDuration >= 25 / (bestEffect.mAmplifier + 1) + 1)
@@ -72,9 +72,9 @@ public class PotionMap {
 			// Only add the new effect if it is longer for the same effect amplifier
 			PotionInfo currentInfo = trackedPotionInfo.get(amplifier);
 			if (currentInfo == null
-				    || (currentInfo.mDuration < newPotionInfo.mDuration
-					        && (!PotionEffectType.REGENERATION.equals(currentInfo.mType)
-						            || newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
+					|| ((currentInfo.mDuration < newPotionInfo.mDuration || (!currentInfo.mInfinite && newPotionInfo.mInfinite))
+					&& (!PotionEffectType.REGENERATION.equals(currentInfo.mType)
+					|| newPotionInfo.mDuration - currentInfo.mDuration >= 50 / (currentInfo.mAmplifier + 1) + 1))) {
 				trackedPotionInfo.put(amplifier, newPotionInfo);
 			}
 		}
@@ -144,8 +144,10 @@ public class PotionMap {
 				while (potionInfoIter.hasNext()) {
 					PotionInfo info = potionInfoIter.next().getValue();
 
-					info.mDuration -= ticks;
-					if (info.mDuration <= 0) {
+					if (info.mDuration > 0) {
+						info.mDuration -= ticks;
+					}
+					if (info.mDuration <= 0 && !info.mInfinite) {
 						effectWoreOff = true;
 						potionInfoIter.remove();
 					}
@@ -175,7 +177,7 @@ public class PotionMap {
 				} else if (info.mAmplifier > bestEffect.mAmplifier) {
 					bestEffect = info;
 				} else if (info.mAmplifier == bestEffect.mAmplifier &&
-					           info.mDuration > bestEffect.mDuration) {
+						info.mDuration > bestEffect.mDuration) {
 					bestEffect = info;
 				}
 			}
@@ -190,9 +192,9 @@ public class PotionMap {
 		PotionEffect currentVanillaEffect = player.getPotionEffect(mType);
 		if (currentVanillaEffect != null) {
 			if (bestEffect == null
-				    || currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20)
-				    || currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20)
-				    || bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
+					|| currentVanillaEffect.getDuration() > (bestEffect.mDuration + 20)
+					|| currentVanillaEffect.getDuration() < (bestEffect.mDuration - 20)
+					|| bestEffect.mAmplifier != currentVanillaEffect.getAmplifier()) {
 
 				// The current effect must be removed because the "best" effect is either less than it
 				// OR the same strength but less duration
@@ -214,8 +216,8 @@ public class PotionMap {
 
 		for (Entry<PotionID, TreeMap<Integer, PotionInfo>> potionMapping : mPotionMap.entrySet()) {
 			if (!includeAll && (potionMapping.getKey().equals(PotionID.ITEM)
-			                    || potionMapping.getKey().equals(PotionID.ABILITY_SELF)
-			                    || potionMapping.getKey().equals(PotionID.SAFE_ZONE))) {
+					|| potionMapping.getKey().equals(PotionID.ABILITY_SELF)
+					|| potionMapping.getKey().equals(PotionID.SAFE_ZONE))) {
 				/*
 				 * Don't save ITEM, ABILITY_SELF, or SAFE_ZONE potions
 				 * These will be re-applied elsewhere when the player rejoins

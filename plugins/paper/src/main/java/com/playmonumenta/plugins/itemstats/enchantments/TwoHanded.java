@@ -14,11 +14,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 
 public class TwoHanded implements Enchantment {
 
 	private static final String PERCENT_SPEED_EFFECT_NAME = "TwoHandedPercentSpeedEffect";
-	private static final int PERCENT_SPEED_DURATION = 1000000;
+	private static final int PERCENT_SPEED_DURATION = PotionEffect.INFINITE_DURATION;
 	private static final double PERCENT_SPEED = -0.4;
 	private static final double PERCENT_DAMAGE_REDUCTION = 0.6;
 

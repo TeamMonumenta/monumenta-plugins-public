@@ -32,7 +32,7 @@ public class SpellAbyssalSpawnPassive extends Spell {
 		mVexes = vexes;
 		//Give vexes immortality
 		for (LivingEntity vex : mVexes) {
-			vex.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10000000, 4));
+			vex.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, PotionEffect.INFINITE_DURATION, 4));
 		}
 	}
 
@@ -64,11 +64,11 @@ public class SpellAbyssalSpawnPassive extends Spell {
 
 			for (double deg = 0; deg < 360; deg += 6) {
 				new PartialParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 0, 2 * FastUtils.sinDeg(deg)), 1)
-					.spawnAsBoss();
+						.spawnAsBoss();
 				new PartialParticle(Particle.DOLPHIN, loc.clone().add(2 * FastUtils.cosDeg(deg), 2 * FastUtils.sinDeg(deg), 0), 1)
-					.spawnAsBoss();
+						.spawnAsBoss();
 				new PartialParticle(Particle.DOLPHIN, loc.clone().add(0, 2 * FastUtils.sinDeg(deg), 2 * FastUtils.cosDeg(deg)), 1)
-					.spawnAsBoss();
+						.spawnAsBoss();
 			}
 
 			if (mTicks % 20 == 0) {
