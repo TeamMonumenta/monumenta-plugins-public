@@ -15,11 +15,17 @@ public class NearbyPlayersTrigger extends Trigger {
 	private final double mRadius;
 	private final CompareOperation mOperation;
 	private final int mNumberOfPlayers;
+	private final boolean mLineOfSight;
 
 	private NearbyPlayersTrigger(double radius, CompareOperation opp, int numPlayers) {
+		this(radius, opp, numPlayers, false);
+	}
+
+	private NearbyPlayersTrigger(double radius, CompareOperation opp, int numPlayers, boolean lineOfSight) {
 		mRadius = radius;
 		mOperation = opp;
 		mNumberOfPlayers = numPlayers;
+		mLineOfSight = lineOfSight;
 	}
 
 
@@ -42,6 +48,9 @@ public class NearbyPlayersTrigger extends Trigger {
 
 	private boolean testPlayersInRange(Location loc) {
 		List<Player> players = PlayerUtils.playersInRange(loc, mRadius, true);
+		if (mLineOfSight) {
+			players.removeIf(player -> !player.hasLineOfSight(loc));
+		}
 
 		if (players.size() == mNumberOfPlayers && (mOperation == CompareOperation.EQUAL || mOperation == CompareOperation.LEQ || mOperation == CompareOperation.GEQ)) {
 			return true;
@@ -87,12 +96,32 @@ public class NearbyPlayersTrigger extends Trigger {
 			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "30", "range must be positive")));
 		}
 
-		//TODO -> read optional filters
+		Boolean requireLineOfSight = null;
+		if (reader.peek().equals(")")) {
+			if (!reader.advance(")")) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "this object requires brackets")));
+			}
+		} else if (reader.peek().equals(",")) {
+			if (!reader.advance(",")) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ",", "(..)")));
+			}
 
-		if (!reader.advance(")")) {
-			return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(..)")));
+			requireLineOfSight = reader.readBoolean();
+			if (requireLineOfSight == null) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + "true", "only count players in line of sight"),
+					Tooltip.ofString(reader.readSoFar() + "false", "count all players in range regardless of line of sight")));
+			}
+
+			if (!reader.advance(")")) {
+				return ParseResult.of(Tooltip.arrayOf(Tooltip.ofString(reader.readSoFar() + ")", "(..)")));
+			}
+		}
+
+		if (requireLineOfSight != null) {
+			return ParseResult.of(new NearbyPlayersTrigger(range, opp, playerCount.intValue(), requireLineOfSight));
 		}
 
 		return ParseResult.of(new NearbyPlayersTrigger(range, opp, playerCount.intValue()));
+
 	}
 }
