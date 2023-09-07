@@ -1,7 +1,7 @@
 package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.listeners.EntityListener;
+import com.playmonumenta.plugins.plots.AnimalLimits;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -23,10 +23,10 @@ public class MonsterEggOverride extends BaseOverride {
 			return true;
 		}
 		if (ZoneUtils.isInPlot(player)) {
-			if (!EntityListener.PLOT_ANIMAL_EGGS.contains(item.getType())) {
+			if (!AnimalLimits.PLOT_ANIMAL_EGGS.contains(item.getType())) {
 				return true;
 			}
-			return EntityListener.maySummonPlotAnimal(player.getLocation());
+			return AnimalLimits.maySummonPlotAnimal(player.getLocation());
 		}
 		return false;
 	}
@@ -55,12 +55,12 @@ public class MonsterEggOverride extends BaseOverride {
 				return false;
 			}
 
-			if (!EntityListener.PLOT_ANIMAL_EGGS.contains(dispensed.getType())) {
+			if (!AnimalLimits.PLOT_ANIMAL_EGGS.contains(dispensed.getType())) {
 				return true;
 			}
 
 			if (ZoneUtils.isInPlot(block.getLocation())) {
-				return EntityListener.maySummonPlotAnimal(block.getLocation());
+				return AnimalLimits.maySummonPlotAnimal(block.getLocation());
 			}
 		}
 

@@ -3,7 +3,7 @@ package com.playmonumenta.plugins.parrots;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.listeners.EntityListener;
+import com.playmonumenta.plugins.plots.AnimalLimits;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.HashMap;
@@ -334,7 +334,7 @@ public class ParrotManager implements Listener {
 	 * Spawns a parrot as a standalone entity, not on a player's shoulders.
 	 */
 	public static void spawnParrot(Player player, ParrotVariant variant) {
-		if (!EntityListener.maySummonPlotAnimal(player.getLocation())) {
+		if (!AnimalLimits.maySummonPlotAnimal(player.getLocation())) {
 			// sends an error message already
 			return;
 		}

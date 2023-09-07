@@ -56,6 +56,7 @@ import com.playmonumenta.plugins.overrides.ItemOverrides;
 import com.playmonumenta.plugins.parrots.ParrotManager;
 import com.playmonumenta.plugins.player.PlayerSaturationTracker;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
+import com.playmonumenta.plugins.plots.AnimalLimits;
 import com.playmonumenta.plugins.plots.PlotManager;
 import com.playmonumenta.plugins.plots.ShopManager;
 import com.playmonumenta.plugins.poi.POICommands;
@@ -410,6 +411,7 @@ public class Plugin extends JavaPlugin {
 		if (ServerProperties.getAuditMessagesEnabled()) {
 			manager.registerEvents(new AuditListener(getLogger()), this);
 		}
+		manager.registerEvents(new AnimalLimits(), this);
 		manager.registerEvents(new ExceptionListener(this), this);
 		manager.registerEvents(new PlayerListener(this), this);
 		manager.registerEvents(new MobListener(this), this);

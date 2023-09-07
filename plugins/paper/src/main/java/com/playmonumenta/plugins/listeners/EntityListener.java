@@ -33,17 +33,12 @@ import com.playmonumenta.plugins.utils.PotionUtils.PotionInfo;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
-import com.playmonumenta.scriptedquests.zones.Zone;
 import de.tr7zw.nbtapi.NBTEntity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
@@ -59,14 +54,46 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Bee;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Dolphin;
+import org.bukkit.entity.EnderPearl;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.EvokerFangs;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Guardian;
+import org.bukkit.entity.Hoglin;
+import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Painting;
+import org.bukkit.entity.Pig;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Ravager;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Trident;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.Vindicator;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.Zoglin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
-import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -90,7 +117,6 @@ import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -100,7 +126,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.event.entity.EntityDismountEvent;
@@ -134,69 +159,6 @@ public class EntityListener implements Listener {
 		DamageCause.WITHER
 	);
 
-	public static final EnumSet<EntityType> PLOT_ANIMALS = EnumSet.of(
-		EntityType.AXOLOTL,
-		EntityType.BEE,
-		EntityType.CAT,
-		EntityType.CHICKEN,
-		EntityType.COW,
-		EntityType.DONKEY,
-		EntityType.FOX,
-		EntityType.GOAT,
-		EntityType.HOGLIN,
-		EntityType.HORSE,
-		EntityType.LLAMA,
-		EntityType.MULE,
-		EntityType.MUSHROOM_COW,
-		EntityType.OCELOT,
-		EntityType.PANDA,
-		EntityType.PARROT,
-		EntityType.PIG,
-		EntityType.POLAR_BEAR,
-		EntityType.RABBIT,
-		EntityType.RAVAGER,
-		EntityType.SHEEP,
-		EntityType.SHULKER,
-		EntityType.SKELETON_HORSE,
-		EntityType.SLIME,
-		EntityType.STRIDER,
-		EntityType.TRADER_LLAMA,
-		EntityType.TURTLE,
-		EntityType.WOLF,
-		EntityType.ZOMBIE_HORSE
-	);
-
-	public static final EnumSet<Material> PLOT_ANIMAL_EGGS = EnumSet.of(
-		Material.AXOLOTL_SPAWN_EGG,
-		Material.CAT_SPAWN_EGG,
-		Material.CHICKEN_SPAWN_EGG,
-		Material.COW_SPAWN_EGG,
-		Material.DONKEY_SPAWN_EGG,
-		Material.FOX_SPAWN_EGG,
-		Material.GOAT_SPAWN_EGG,
-		Material.HOGLIN_SPAWN_EGG,
-		Material.HORSE_SPAWN_EGG,
-		Material.LLAMA_SPAWN_EGG,
-		Material.MULE_SPAWN_EGG,
-		Material.MOOSHROOM_SPAWN_EGG,
-		Material.OCELOT_SPAWN_EGG,
-		Material.PANDA_SPAWN_EGG,
-		Material.PARROT_SPAWN_EGG,
-		Material.PIG_SPAWN_EGG,
-		Material.POLAR_BEAR_SPAWN_EGG,
-		Material.RABBIT_SPAWN_EGG,
-		Material.SHEEP_SPAWN_EGG,
-		Material.SHULKER_SPAWN_EGG,
-		Material.SKELETON_HORSE_SPAWN_EGG,
-		Material.SLIME_SPAWN_EGG,
-		Material.STRIDER_SPAWN_EGG,
-		Material.TRADER_LLAMA_SPAWN_EGG,
-		Material.TURTLE_SPAWN_EGG,
-		Material.WOLF_SPAWN_EGG,
-		Material.ZOMBIE_HORSE_SPAWN_EGG
-	);
-
-	public static final int MAX_ANIMALS_IN_PLAYER_PLOT = 80;
 	public static final String INVULNERABLE_ITEM_TAG = "MonumentaInvulnerableItem";
 	public static final String INVISIBLE_ITEM_FRAME_NAME = "Invisible Item Frame";
 	public static final String BEES_BLOCK_HIVE_ENTER_EVENT = "BeeNoHive";
@@ -208,7 +170,6 @@ public class EntityListener implements Listener {
 
 	Plugin mPlugin;
 	AbilityManager mAbilities;
-	private static final Map<UUID, Integer> mLastPlotAnimalWarning = new HashMap<>();
 
 	public EntityListener(Plugin plugin, AbilityManager abilities) {
 		mPlugin = plugin;
@@ -1054,78 +1015,6 @@ public class EntityListener implements Listener {
 		if (event.getDismounted() instanceof ArmorStand) {
 			event.getDismounted().remove();
 		}
-	}
-
-	// Cancel breeding if on a plot full of animals
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entityBreedEvent(EntityBreedEvent event) {
-		Entity entity = event.getEntity();
-		if (!PLOT_ANIMALS.contains(entity.getType())) {
-			return;
-		}
-		if (!maySummonPlotAnimal(entity.getLocation())) {
-			event.setCancelled(true);
-		}
-	}
-
-	// Stop tracking last warning of unloaded world
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void worldUnloadEvent(WorldUnloadEvent event) {
-		mLastPlotAnimalWarning.remove(event.getWorld().getUID());
-	}
-
-	// Also used in MonsterEggOverride
-	public static boolean maySummonPlotAnimal(Location loc) {
-		if (!ZoneUtils.isInPlot(loc)) {
-			return true;
-		}
-
-		Optional<Zone> optionalZone = ZoneUtils.getZone(loc);
-		if (optionalZone.isEmpty()) {
-			// Fall back on killinator functions for plots world
-			return true;
-		}
-		Zone zone = optionalZone.get();
-		if (!zone.hasProperty(ZoneProperty.PLOT.getPropertyName())) {
-			// Fall back on killinator functions for plots world
-			return true;
-		}
-
-		int animalsRemaining = MAX_ANIMALS_IN_PLAYER_PLOT - 1;
-		World world = loc.getWorld();
-		BoundingBox bb = BoundingBox.of(zone.minCorner(), zone.maxCornerExclusive());
-		Set<Player> players = new HashSet<>();
-		for (Entity entity : world.getNearbyEntities(bb)) {
-			if (entity instanceof Player) {
-				players.add((Player) entity);
-			}
-			if (PLOT_ANIMALS.contains(entity.getType())) {
-				animalsRemaining -= 1;
-			}
-		}
-
-		Integer lastWarningCount = mLastPlotAnimalWarning.get(world.getUID());
-		if (lastWarningCount == null) {
-			lastWarningCount = MAX_ANIMALS_IN_PLAYER_PLOT;
-		}
-		mLastPlotAnimalWarning.put(world.getUID(), animalsRemaining);
-		if (animalsRemaining != lastWarningCount && animalsRemaining <= 5) {
-			String msg;
-			if (animalsRemaining >= 2) {
-				msg = "You may have " + animalsRemaining + " more animals on your plot.";
-			} else if (animalsRemaining == 1) {
-				msg = "You may have 1 more animal on your plot.";
-			} else if (animalsRemaining == 0) {
-				msg = "You may have no more animals on your plot.";
-			} else {
-				msg = "Spawn attempt cancelled, you have too many mobs.";
-			}
-			for (Player player : players) {
-				player.sendMessage(Component.text(msg, NamedTextColor.RED));
-			}
-		}
-
-		return animalsRemaining >= 0;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
