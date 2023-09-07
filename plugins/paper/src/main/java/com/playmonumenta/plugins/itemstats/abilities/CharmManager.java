@@ -422,6 +422,7 @@ public class CharmManager {
 			Smokescreen.CHARM_RANGE,
 			Smokescreen.CHARM_WEAKEN,
 			Smokescreen.CHARM_SLOW,
+			Smokescreen.CHARM_DURATION,
 			ViciousCombos.CHARM_CDR,
 			ViciousCombos.CHARM_RADIUS,
 			ViciousCombos.CHARM_VULN,
