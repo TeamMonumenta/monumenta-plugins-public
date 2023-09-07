@@ -441,6 +441,7 @@ public class PotionBarrelListener implements Listener {
 			int added = 0;
 			int injectorRefilled = 0;
 			String injectorName = null;
+			String potionName = ItemUtils.getPlainName(barrelPotion);
 			for (ItemStack playerItem : playerInventory) {
 				if (playerItem == null) {
 					continue;
@@ -494,10 +495,10 @@ public class PotionBarrelListener implements Listener {
 				}
 			}
 			if (added > 0) {
-				player.sendMessage(Component.text("Deposited " + added + " " + ItemUtils.getPlainName(barrelPotion) + ".", NamedTextColor.GRAY));
+				player.sendMessage(Component.text("Deposited " + added + " " + potionName + ".", NamedTextColor.GRAY));
 			}
 			if (injectorRefilled > 0) {
-				player.sendMessage(Component.text("Removed " + injectorRefilled + " " + ItemUtils.getPlainName(barrelPotion) + " to refill your " + injectorName + ".", NamedTextColor.WHITE));
+				player.sendMessage(Component.text("Removed " + injectorRefilled + " " + potionName + " to refill your " + injectorName + ".", NamedTextColor.WHITE));
 			}
 
 			return added > 0 || injectorRefilled > 0;
