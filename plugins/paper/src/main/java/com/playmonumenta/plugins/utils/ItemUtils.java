@@ -855,17 +855,18 @@ public class ItemUtils {
 	}
 
 	public static String getPlainName(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack) || !itemStack.hasItemMeta()) {
+		if (ItemUtils.isNullOrAir(itemStack)) {
 			return "";
 		}
-		if (!hasPlainName(itemStack)) {
-			return getRawDisplayNameAsString(itemStack);
+		String plainName = getPlainNameIfExists(itemStack);
+		if (plainName.isBlank()) {
+			plainName = getRawDisplayNameAsString(itemStack);
 		}
-		return getPlainNameIfExists(itemStack);
+		return plainName;
 	}
 
 	public static String getPlainNameIfExists(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack) || !itemStack.hasItemMeta()) {
+		if (ItemUtils.isNullOrAir(itemStack)) {
 			return "";
 		}
 		return NBT.get(itemStack, nbt -> {
@@ -919,19 +920,15 @@ public class ItemUtils {
 				// if (key exists) { return tag(key) } else { return new tag(key) }
 				nbt.getOrCreateCompound(PLAIN_KEY).getOrCreateCompound(DISPLAY_KEY).setString(NAME_KEY, plainName);
 			} else {
-					ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
-
+				ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
 				if (plain != null) {
-						ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
-
+					ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
 					if (display != null) {
-							display.removeKey(NAME_KEY);
-
-							if (display.getKeys().size() == 0) {
-								plain.removeKey(DISPLAY_KEY);
-
-								if (plain.getKeys().size() == 0) {
-									nbt.removeKey(PLAIN_KEY);
+						display.removeKey(NAME_KEY);
+						if (display.getKeys().size() == 0) {
+							plain.removeKey(DISPLAY_KEY);
+							if (plain.getKeys().size() == 0) {
+								nbt.removeKey(PLAIN_KEY);
 							}
 						}
 					}
@@ -941,46 +938,43 @@ public class ItemUtils {
 	}
 
 	public static List<String> getPlainLore(@Nullable ItemStack itemStack) {
-		if (ItemUtils.isNullOrAir(itemStack) || !itemStack.getItemMeta().hasLore()) {
-			return new ArrayList<>();
+		if (ItemUtils.isNullOrAir(itemStack)) {
+			return new ArrayList<>(0);
 		}
-		if (!hasPlainLore(itemStack)) {
-			if (itemStack.hasItemMeta()) {
-				ItemMeta itemMeta = itemStack.getItemMeta();
-				if (itemMeta.hasLore()) {
-					List<String> plainLore = new ArrayList<>();
-					if (itemMeta.lore() == null) {
-						return plainLore;
-					}
-					for (Component loreLine : itemMeta.lore()) {
-						plainLore.add(toPlainTagText(loreLine));
-					}
+		List<String> plainLore = getPlainLoreIfExists(itemStack);
+		if (plainLore.isEmpty() && itemStack.hasItemMeta()) {
+			ItemMeta itemMeta = itemStack.getItemMeta();
+			if (itemMeta.hasLore()) {
+				if (itemMeta.lore() == null) {
+					return plainLore;
+				}
+				for (Component loreLine : itemMeta.lore()) {
+					plainLore.add(toPlainTagText(loreLine));
 				}
 			}
-			return new ArrayList<>();
 		}
-		return getPlainLoreIfExists(itemStack);
+		return plainLore;
 	}
 
 	public static List<String> getPlainLoreIfExists(@Nullable ItemStack itemStack) {
-		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
-			return new ArrayList<>();
+		if (ItemUtils.isNullOrAir(itemStack)) {
+			return new ArrayList<>(0);
 		}
 		return NBT.get(itemStack, nbt -> {
 			ReadableNBT display = nbt.resolveCompound(plainDisplayPath);
 			if (display == null) {
-				return new ArrayList<>();
+				return new ArrayList<>(0);
 			}
 			ReadableNBTList<String> lore = display.getStringList(LORE_KEY);
 			if (lore == null || lore.isEmpty()) {
-				return new ArrayList<>();
+				return new ArrayList<>(0);
 			}
 			return lore.toListCopy();
 		});
 	}
 
 	public static boolean hasPlainLore(@Nullable ItemStack itemStack) {
-		if (itemStack == null || itemStack.getType().isAir() || !itemStack.hasItemMeta()) {
+		if (itemStack == null || itemStack.getType().isAir()) {
 			return false;
 		}
 		return NBT.get(itemStack, nbt -> {
@@ -993,7 +987,7 @@ public class ItemUtils {
 	}
 
 	public static void setPlainComponentLore(ReadWriteNBT nbt, List<Component> lore) {
-		List<String> plainLore = new ArrayList<>();
+		List<String> plainLore = new ArrayList<>(lore.size());
 		for (Component loreLine : lore) {
 			plainLore.add(toPlainTagText(loreLine));
 		}
@@ -1005,14 +999,14 @@ public class ItemUtils {
 		if (itemStack.hasItemMeta()) {
 			ItemMeta itemMeta = itemStack.getItemMeta();
 			if (itemMeta.hasLore()) {
-				plainLore = new ArrayList<>();
 				List<Component> lore = itemMeta.lore();
 				if (lore != null) {
+					plainLore = new ArrayList<>();
 					for (Component loreLine : lore) {
-					plainLore.add(toPlainTagText(loreLine));
+						plainLore.add(toPlainTagText(loreLine));
+					}
 				}
 			}
-		}
 		}
 		setPlainLore(itemStack, plainLore);
 	}
@@ -1041,19 +1035,15 @@ public class ItemUtils {
 				loreList.addAll(plainLore);
 			}
 		} else {
-				ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
-
+			ReadWriteNBT plain = nbt.getCompound(PLAIN_KEY);
 			if (plain != null) {
-					ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
-
+				ReadWriteNBT display = plain.getCompound(DISPLAY_KEY);
 				if (display != null) {
-						display.removeKey(LORE_KEY);
-
-						if (display.getKeys().size() == 0) {
-							plain.removeKey(DISPLAY_KEY);
-
-							if (plain.getKeys().size() == 0) {
-								nbt.removeKey(PLAIN_KEY);
+					display.removeKey(LORE_KEY);
+					if (display.getKeys().size() == 0) {
+						plain.removeKey(DISPLAY_KEY);
+						if (plain.getKeys().size() == 0) {
+							nbt.removeKey(PLAIN_KEY);
 						}
 					}
 				}
@@ -1086,7 +1076,7 @@ public class ItemUtils {
 
 	public static List<Component> getDisplayLore(ItemStack item) {
 		if (ItemUtils.isNullOrAir(item)) {
-			return new ArrayList<>();
+			return new ArrayList<>(0);
 		}
 		return NBT.get(item, nbt -> {
 			return getDisplayLore(nbt);
@@ -1114,6 +1104,9 @@ public class ItemUtils {
 	}
 
 	public static String toPlainTagText(Component formattedText) {
+		if (formattedText.equals(Component.empty())) {
+			return "";
+		}
 		String plainText = MessagingUtils.plainText(formattedText);
 		return NON_PLAIN_REGEX.matcher(plainText).replaceAll("").trim();
 	}
@@ -1438,12 +1431,10 @@ public class ItemUtils {
 		}
 
 		String itemId = item.getType().getKey().asString();
-		if (!item.hasItemMeta()) {
-			return "/give @s " + itemId + " " + item.getAmount();
-		}
 
-		String itemTag = NBT.get(item, nbt -> (String) nbt.toString());
-		return "/give @s " + itemId + itemTag + " " + item.getAmount();
+		return NBT.get(item, nbt -> {
+			return "/give @s " + itemId + nbt.toString() + " " + item.getAmount();
+		});
 	}
 
 	/**

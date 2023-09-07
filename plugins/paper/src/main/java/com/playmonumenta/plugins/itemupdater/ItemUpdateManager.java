@@ -212,47 +212,42 @@ public class ItemUpdateManager implements Listener {
 	}
 
 	public static void updateNested(List<String> path, @Nullable ItemStack item) {
-		if (item == null || !item.hasItemMeta()) {
+		if (item == null) {
 			return;
 		}
 
 		try {
-			if (ItemStatUtils.isClean(item) || GUIUtils.isPlaceholder(item)) {
+			if (!ItemStatUtils.isDirty(item) || GUIUtils.isPlaceholder(item)) {
 				return;
 			}
-			ItemStatUtils.markClean(item);
+			ItemStatUtils.removeDirty(item);
+
+			// Update quiver before generating item stats
+			if (ItemStatUtils.isQuiver(item)) {
+				final List<String> pathClone = path;
+				// Update arrows in quivers immediately - otherwise, they would need updating every time an arrow is shot or picked up
+				NBT.modify(item, nbt -> {
+					ReadWriteNBT playerModified = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
+					ReadWriteNBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
+					if (arrowNBTs != null) {
+						List<String> arrowPath = new ArrayList<>(pathClone);
+						arrowPath.add("in quiver");
+						List<ItemStack> arrows = new ArrayList<>(arrowNBTs.size());
+						for (ReadWriteNBT arrowNBT : arrowNBTs) {
+							ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
+							updateNested(arrowPath, arrow);
+							arrows.add(arrow);
+						}
+						arrowNBTs.clear();
+						for (ItemStack arrow : arrows) {
+							ReadWriteNBT newCompound = NBT.itemStackToNBT(arrow);
+							arrowNBTs.addCompound().mergeCompound(newCompound);
+						}
+					}
+				});
+			}
 
 			ItemUpdateHelper.generateItemStats(item);
-
-			// Only generate item stats on items with Monumenta tag
-			boolean hasMonumenta = NBT.get(item, nbt -> (boolean) nbt.hasTag(ItemStatUtils.MONUMENTA_KEY));
-			if (hasMonumenta) {
-				// Update arrows in quivers immediately - otherwise, they would need updating every time an arrow is shot or picked up
-				if (ItemStatUtils.isQuiver(item)) {
-					NBT.modify(item, nbt -> {
-						ReadWriteNBT playerModified = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-						if (playerModified != null) {
-							ReadWriteNBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-							if (arrowNBTs != null) {
-								List<String> arrowPath = new ArrayList<>();
-								arrowPath.add("in quiver");
-								List<ItemStack> arrows = new ArrayList<>(arrowNBTs.size());
-								for (ReadWriteNBT arrowNBT : arrowNBTs) {
-									ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
-									updateNested(arrowPath, arrow);
-									arrows.add(arrow);
-								}
-								arrowNBTs.clear();
-								for (ItemStack arrow : arrows) {
-									ReadWriteNBT newCompound = NBT.itemStackToNBT(arrow);
-									arrowNBTs.addCompound().mergeCompound(newCompound);
-								}
-							}
-						}
-					});
-				}
-
-			}
 		} catch (Exception e) {
 			path = new ArrayList<>(path);
 			path.add("in ItemStack " + ItemUtils.getGiveCommand(item));

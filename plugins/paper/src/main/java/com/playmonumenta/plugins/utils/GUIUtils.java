@@ -233,12 +233,12 @@ public class GUIUtils {
 
 	public static boolean isPlaceholder(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
-			return true;
+			return false;
 		}
 		return NBT.get(item, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound("GUI");
 			if (monumenta == null) {
-				return true;
+				return false;
 			}
 
 			return monumenta.hasTag(PLACEHOLDER_KEY);

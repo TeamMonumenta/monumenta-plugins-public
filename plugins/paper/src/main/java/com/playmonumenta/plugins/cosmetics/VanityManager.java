@@ -129,10 +129,10 @@ public class VanityManager implements Listener {
 			ItemStack item = NBTItem.convertNBTtoItem(new NBTContainer(entry.getValue().getAsString()));
 			EquipmentSlot slot = EquipmentSlot.valueOf(entry.getKey());
 			if (isValidVanityItem(player, item, slot)) {
-				if (!ItemStatUtils.isClean(item)) {
+				if (ItemStatUtils.isDirty(item)) {
 					ItemUtils.setPlainTag(item);
 					ItemUpdateHelper.generateItemStats(item);
-					ItemStatUtils.markClean(item);
+					ItemStatUtils.removeDirty(item);
 				}
 				vanityData.equip(slot, item, null);
 			}

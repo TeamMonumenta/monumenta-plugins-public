@@ -153,8 +153,8 @@ public class ItemUpdateHelper {
 			}
 
 			// Checks for PI + Totem of Transposing
-			String plainName = ItemUtils.getPlainName(item);
-			if (ItemUtils.isShulkerBox(item.getType()) && plainName.equals("Potion Injector")) {
+			String plainName = ItemUtils.getPlainNameIfExists(item);
+			if (plainName.equals("Potion Injector") && ItemUtils.isShulkerBox(item.getType())) {
 				List<String> plainLore = ItemUtils.getPlainLore(item);
 				Component potionName = Objects.requireNonNull(item.lore()).get(1);
 				lore.add(Component.text(plainLore.get(0), NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
@@ -165,65 +165,74 @@ public class ItemUpdateHelper {
 			}
 
 			List<Component> tagsLater = new ArrayList<>();
-			List<Component> unbreakingTags = new ArrayList<>();
-			List<Component> statTrackLater = new ArrayList<>();
-			List<Component> infusionTagsLater = new ArrayList<>();
 
 			// ENCHANTMENTS
 			ReadableNBT enchantments = ItemStatUtils.getEnchantments(nbt);
 			if (enchantments != null && ItemStatUtils.getEnchantmentLevel(enchantments, EnchantmentType.HIDE_ENCHANTS) == 0) {
-				for (EnchantmentType type : EnchantmentType.values()) {
-					if (type.isHidden()) {
+				EnumMap<EnchantmentType, Component> enchantmentMap = new EnumMap<>(EnchantmentType.class);
+				Set<String> keys = enchantments.getKeys();
+				for (String key : keys) {
+					EnchantmentType type = EnchantmentType.getEnchantmentType(key);
+					if (type == null || type.isHidden()) {
+						// invalid EnchantmentType
 						continue;
 					}
-					ReadableNBT enchantment = enchantments.getCompound(type.getName());
-					if (enchantment != null) {
-						Component display = type.getDisplay(enchantment.getInteger(ItemStatUtils.LEVEL_KEY));
-						if (type.isItemTypeEnchantment()) {
-							tagsLater.add(display);
-						} else if (type.getName().equals("Mending") || type.getName().equals("Unbreaking") || type.getName().equals("Unbreakable")) {
-							unbreakingTags.add(display);
-						} else {
-							lore.add(display);
-						}
+					ReadableNBT enchantmentNBT = enchantments.getCompound(key);
+					if (enchantmentNBT == null) {
+						// invalid nbt?
+						continue;
 					}
+					Integer level = enchantmentNBT.getInteger(ItemStatUtils.LEVEL_KEY);
+					if (level == null || level == 0) {
+						continue;
+					}
+					Component display = type.getDisplay(level);
+					if (type.isItemTypeEnchantment()) {
+						tagsLater.add(display);
+					} else {
+						enchantmentMap.put(type, display);
+					}
+				}
+				if (!enchantmentMap.isEmpty()) {
+					lore.addAll(enchantmentMap.values());
 				}
 			}
 
 			// INFUSIONS
 			ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
 			if (infusions != null) {
-				for (InfusionType type : InfusionType.values()) {
-					if (type.isHidden()) {
+				EnumMap<InfusionType, Component> infusionMap = new EnumMap<>(InfusionType.class);
+				Set<String> keys = infusions.getKeys();
+				for (String key : keys) {
+					InfusionType type = InfusionType.getInfusionType(key);
+					if (type == null || type.isHidden()) {
 						continue;
 					}
-					ReadableNBT infusion = infusions.getCompound(type.getName());
-					if (infusion != null) {
-						if (type == InfusionType.STAT_TRACK) {
-							statTrackLater.add(0, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY)))));
-						} else if (type.isStatTrackOption()) {
-							if (type == InfusionType.STAT_TRACK_DEATH && ItemUtils.isShulkerBox(item.getType())) {
-								// Easter egg: Times Dyed for shulker boxes
-								statTrackLater.add(Component.text("Times Dyed: " + (infusion.getInteger(ItemStatUtils.LEVEL_KEY) - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
-							} else {
-								statTrackLater.add(type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY)));
-							}
-						} else if (!type.getMessage().isEmpty()) {
-							infusionTagsLater.add(type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY)))));
-						} else {
-							lore.add(type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY)));
-						}
+					ReadableNBT infusion = infusions.getCompound(key);
+					if (infusion == null) {
+						continue;
 					}
+					if (type.isStatTrackOption()) {
+						if (type == InfusionType.STAT_TRACK_DEATH && ItemUtils.isShulkerBox(item.getType())) {
+							// Easter egg: Times Dyed for shulker boxes
+							infusionMap.put(type, Component.text("Times Dyed: " + (infusion.getInteger(ItemStatUtils.LEVEL_KEY) - 1), NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+						} else {
+							infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY)));
+						}
+						continue;
+					}
+					if (!type.getMessage().isEmpty()) {
+						infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY), MonumentaRedisSyncIntegration.cachedUuidToNameOrUuid(UUID.fromString(infusion.getString(ItemStatUtils.INFUSER_KEY)))));
+						continue;
+					}
+					infusionMap.put(type, type.getDisplay(infusion.getInteger(ItemStatUtils.LEVEL_KEY)));
+				}
+				if (!infusionMap.isEmpty()) {
+					lore.addAll(infusionMap.values());
 				}
 			}
 
-			// Add unbreaking tags
-			lore.addAll(unbreakingTags);
-			// Add infusions with message
-			lore.addAll(infusionTagsLater);
-			// Add stat tracking lore
-			lore.addAll(statTrackLater);
-			// Add Magic Wand Tag *after* all other stats,
+			// Add Magic Wand Tag *after* all other stats
 			lore.addAll(tagsLater);
 
 			// TIER/MASTERWORK
@@ -327,10 +336,10 @@ public class ItemUpdateHelper {
 
 					for (ReadWriteNBT effect : effects) {
 						String type = effect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
-						int duration = effect.getInteger(ItemStatUtils.EFFECT_DURATION_KEY);
-						double strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
 						EffectType effectType = EffectType.fromType(type);
 						if (effectType != null) {
+							int duration = effect.getInteger(ItemStatUtils.EFFECT_DURATION_KEY);
+							double strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
 							Component comp = EffectType.getComponent(effectType, strength, duration);
 							if (!lore.contains(comp)) {
 								lore.add(comp);
@@ -342,7 +351,7 @@ public class ItemUpdateHelper {
 
 			// ATTRIBUTES
 			ReadableNBTList<ReadWriteNBT> attributes = ItemStatUtils.getAttributes(nbt);
-			if (attributes != null && ItemStatUtils.getEnchantmentLevel(enchantments, EnchantmentType.HIDE_ATTRIBUTES) == 0) {
+			if (attributes != null && !attributes.isEmpty() && ItemStatUtils.getEnchantmentLevel(enchantments, EnchantmentType.HIDE_ATTRIBUTES) == 0) {
 				EnumMap<Slot, EnumMap<AttributeType, List<ReadWriteNBT>>> attributesBySlots = new EnumMap<>(Slot.class);
 				for (ReadWriteNBT attribute : attributes) {
 					Slot slot = Slot.getSlot(attribute.getString(Slot.KEY));
@@ -350,59 +359,47 @@ public class ItemUpdateHelper {
 					attributesBySlots.computeIfAbsent(slot, key -> new EnumMap<>(AttributeType.class)).computeIfAbsent(attributeType, key -> new ArrayList<>()).add(attribute);
 				}
 
-				for (Slot slot : Slot.values()) {
-					EnumMap<AttributeType, List<ReadWriteNBT>> attributesBySlot = attributesBySlots.get(slot);
-					if (attributesBySlot == null || attributesBySlot.isEmpty()) {
+				// sort by slot
+				EnumMap<Slot, List<Component>> slotMap = new EnumMap<>(Slot.class);
+
+				for (Map.Entry<Slot, EnumMap<AttributeType, List<ReadWriteNBT>>> attributeSlotEntry : attributesBySlots.entrySet()) {
+					Slot slot = attributeSlotEntry.getKey();
+					EnumMap<AttributeType, List<ReadWriteNBT>> attributesBySlot = attributeSlotEntry.getValue();
+					if (slot == null || attributesBySlot == null || attributesBySlot.isEmpty()) {
 						continue;
 					}
+					List<Component> attributeList = new ArrayList<>();
+					// sort by attribute
+					EnumMap<AttributeType, EnumMap<Operation, Component>> attributeMap = new EnumMap<>(AttributeType.class);
 
-					lore.add(Component.empty());
-					lore.add(slot.getDisplay());
+					attributeList.add(Component.empty());
+					attributeList.add(slot.getDisplay());
 
-					// If mainhand, display certain attributes differently (attack and projectile related ones), and also show them before other attributes
-					if (slot == Slot.MAINHAND) {
-						boolean needsAttackSpeed = false;
-						for (AttributeType attributeType : AttributeType.MAINHAND_ATTRIBUTE_TYPES) {
-							List<ReadWriteNBT> attributesByType = attributesBySlot.get(attributeType);
-							if (attributesByType != null) {
-								for (ReadWriteNBT attribute : attributesByType) {
-									Operation operation = Operation.getOperation(attribute.getString(Operation.KEY));
-									if (operation == null
-										|| (operation != Operation.ADD && attributeType != AttributeType.PROJECTILE_SPEED)) {
-										continue;
-									}
-									lore.add(AttributeType.getDisplay(attributeType, attribute.getDouble(ItemStatUtils.AMOUNT_KEY), slot, operation));
-									if (attributeType == AttributeType.ATTACK_DAMAGE_ADD) {
-										needsAttackSpeed = true;
-									} else if (attributeType == AttributeType.ATTACK_SPEED) {
-										needsAttackSpeed = false;
-									}
-								}
-							}
-							// show default attack speed if an item has attack damage, but no attack speed attribute
-							if (needsAttackSpeed && attributeType == AttributeType.ATTACK_SPEED) {
-								lore.add(AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
-							}
-						}
-					}
-
-					for (AttributeType type : AttributeType.values()) {
-						List<ReadWriteNBT> attributesByType = attributesBySlot.get(type);
-						if (attributesByType == null) {
+					for (Map.Entry<AttributeType, List<ReadWriteNBT>> attributeEntry : attributesBySlot.entrySet()) {
+						AttributeType type = attributeEntry.getKey();
+						List<ReadWriteNBT> attributesByType = attributeEntry.getValue();
+						if (type == null || attributesByType == null) {
 							continue;
 						}
-						for (Operation operation : Operation.values()) {
-							if (slot == Slot.MAINHAND && AttributeType.MAINHAND_ATTRIBUTE_TYPES.contains(type) && (operation == Operation.ADD || type == AttributeType.PROJECTILE_SPEED)) {
-								continue; // handled above
+						EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class);
+						for (ReadWriteNBT attribute : attributesByType) {
+							Operation operation = Operation.getOperation(attribute.getString(Operation.KEY));
+							if (operation == null) {
+								continue;
 							}
-							for (ReadWriteNBT attribute : attributesByType) {
-								if (Operation.getOperation(attribute.getString(Operation.KEY)) == operation) {
-									lore.add(AttributeType.getDisplay(type, attribute.getDouble(ItemStatUtils.AMOUNT_KEY), slot, operation));
-									break;
-								}
-							}
+							operationMap.put(operation, AttributeType.getDisplay(type, attribute.getDouble(ItemStatUtils.AMOUNT_KEY), slot, operation));
 						}
+						attributeMap.put(type, operationMap);
 					}
+					// add results together
+					for (EnumMap<Operation, Component> operationMap : attributeMap.values()) {
+						attributeList.addAll(operationMap.values());
+					}
+					slotMap.put(slot, attributeList);
+				}
+				// add the final lore to the main lore array
+				for (List<Component> finalLore : slotMap.values()) {
+					lore.addAll(finalLore);
 				}
 			}
 

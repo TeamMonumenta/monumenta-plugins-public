@@ -776,10 +776,10 @@ public class LoadoutManager implements Listener {
 				}
 			} else {
 				ItemStack item = ItemUtils.parseItemStack(json.getAsJsonPrimitive("displayItem").getAsString());
-				if (!ItemStatUtils.isClean(item)) {
+				if (ItemStatUtils.isDirty(item)) {
 					ItemUtils.setPlainTag(item);
 					ItemUpdateHelper.generateItemStats(item);
-					ItemStatUtils.markClean(item);
+					ItemStatUtils.removeDirty(item);
 					item = VanityManager.cleanCopyForDisplay(item);
 				}
 				loadout.mDisplayItem = item;
@@ -805,10 +805,10 @@ public class LoadoutManager implements Listener {
 
 			for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("vanity").entrySet()) {
 				ItemStack item = ItemUtils.parseItemStack(entry.getValue().getAsString());
-				if (!ItemStatUtils.isClean(item)) {
+				if (ItemStatUtils.isDirty(item)) {
 					ItemUtils.setPlainTag(item);
 					ItemUpdateHelper.generateItemStats(item);
-					ItemStatUtils.markClean(item);
+					ItemStatUtils.removeDirty(item);
 					item = VanityManager.cleanCopyForDisplay(item);
 				}
 				loadout.mVanity.put(EquipmentSlot.valueOf(entry.getKey()), item);

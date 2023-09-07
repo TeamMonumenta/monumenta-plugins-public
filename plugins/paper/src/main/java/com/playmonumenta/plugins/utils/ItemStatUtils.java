@@ -137,7 +137,7 @@ public class ItemStatUtils {
 					}
 				}
 			}
-	});
+		});
 	}
 
 	public static void changeEffectsDuration(Player player, ItemStack item, int durationChange) {
@@ -1177,21 +1177,21 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		});
 	}
 
-	public static boolean isClean(final @Nullable ItemStack item) {
+	public static boolean isDirty(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
-			return true;
+			return false;
 		}
 		return NBT.get(item, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound(MONUMENTA_KEY);
 			if (monumenta == null) {
-				return true;
+				return false;
 			}
 
-			return !monumenta.hasTag(DIRTY_KEY);
+			return monumenta.hasTag(DIRTY_KEY);
 		});
 	}
 
-	public static void markClean(final @Nullable ItemStack item) {
+	public static void removeDirty(final @Nullable ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
@@ -1201,9 +1201,6 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 				return;
 			}
 
-			if (!monumenta.hasTag(DIRTY_KEY)) {
-				return;
-			}
 			monumenta.removeKey(DIRTY_KEY);
 			if (monumenta.getKeys().isEmpty()) {
 				nbt.removeKey(MONUMENTA_KEY);
@@ -1212,9 +1209,9 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 	}
 
 	public static void cleanIfNecessary(final @Nullable ItemStack item) {
-		if (item != null && !isClean(item)) {
+		if (item != null && isDirty(item)) {
 			ItemUpdateHelper.generateItemStats(item);
-			markClean(item);
+			removeDirty(item);
 		}
 	}
 

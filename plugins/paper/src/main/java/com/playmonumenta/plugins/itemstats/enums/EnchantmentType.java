@@ -22,6 +22,7 @@ public enum EnchantmentType {
 	REGION_SCALING_DAMAGE_TAKEN(new RegionScalingDamageTaken(), false, false, false, false),
 	SKT_DAMAGE_DEALT(new SKTQuestDamageDealt(), false, false, false, false),
 	SKT_DAMAGE_TAKEN(new SKTQuestDamageTaken(), false, false, false, false),
+
 	// Vanilla
 	SWEEPING_EDGE(Enchantment.SWEEPING_EDGE, "Sweeping Edge", true, false, false, false),
 	KNOCKBACK(Enchantment.KNOCKBACK, "Knockback", true, false, false, false),
@@ -40,6 +41,7 @@ public enum EnchantmentType {
 	AQUA_AFFINITY(Enchantment.WATER_WORKER, "Aqua Affinity", false, false, false, false),
 	RESPIRATION(Enchantment.OXYGEN, "Respiration", true, false, false, false),
 	DEPTH_STRIDER(Enchantment.DEPTH_STRIDER, "Depth Strider", true, false, false, false),
+
 	// Protections
 	MELEE_PROTECTION(new MeleeProtection(), true, false, false, true),
 	PROJECTILE_PROTECTION(new ProjectileProtection(), true, false, false, true),
@@ -47,6 +49,7 @@ public enum EnchantmentType {
 	MAGIC_PROTECTION(new MagicProtection(), true, false, false, true),
 	FIRE_PROTECTION(new FireProtection(), true, false, false, true),
 	FEATHER_FALLING(new FeatherFalling(), true, false, false, true),
+
 	// Defense Scaling
 	SHIELDING(new Shielding(), true, false, false, true),
 	INURE(new Inure(), true, false, false, true),
@@ -59,6 +62,7 @@ public enum EnchantmentType {
 	EVASION(new Evasion(), true, false, false, true),
 	CLOAKED(new Cloaked(), true, false, false, true),
 	ADAPTABILITY(new Adaptability(), false, false, false, true),
+
 	// Custom Enchants
 	ABYSSAL(new Abyssal(), true, false, false, true),
 	ADRENALINE(new Adrenaline(), true, false, false, true),
@@ -137,32 +141,38 @@ public enum EnchantmentType {
 	FIRE_FRAGILITY(new FireFragility(), true, true, false, false),
 	FALL_FRAGILITY(new FallFragility(), true, true, false, false),
 	CUMBERSOME(new Cumbersome(), false, true, false, false),
-	// Durability
-	UNBREAKING(Enchantment.DURABILITY, "Unbreaking", true, false, false, false),
-	UNBREAKABLE(null, "Unbreakable", false, false, false, false),
-	MENDING(Enchantment.MENDING, "Mending", false, false, false, false),
+
 	// Cosmetic Item Enchants
 	BAAING(new Baaing(), false, true, true, false),
 	CLUCKING(new Clucking(), false, true, true, false),
 	DIVINE_AURA(new DivineAura(), false, false, false, false),
 	OINKING(new Oinking(), false, true, true, false),
 	MATERIAL(new MaterialEnch(), false, false, false, false),
-	// Item Tags
-	MAGIC_WAND(new MagicWandEnch(), false, false, false, false),
-	ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false),
+
 	//Random Stuff
 	PESTILENCE_TESSERACT(new PestilenceTesseract(), false, false, true, false),
+
 	// Hidden enchantments that affect display
 	HIDE_ATTRIBUTES(new HideAttributes(), false, false, false, false),
 	HIDE_ENCHANTS(new HideEnchants(), false, false, false, false),
 	HIDE_INFO(new HideInfo(), false, false, false, false),
 	NO_GLINT(new NoGlint(), false, false, false, false),
 	DELETE_ON_SHATTER(null, "DeleteOnShatter", false, false, false, false),
+
 	// Crit Calcs (defaults to value of 1, always active. DO NOT GIVE TO PLAYERS VIA ENCHANT)
 	ANTI_CRIT_SCALING(new AntiCritScaling(), false, false, false, false),
 	CRIT_SCALING(new CritScaling(), false, false, false, false),
 	STRENGTH_APPLY(new StrengthApply(), false, false, false, false),
-	STRENGTH_CANCEL(new StrengthCancel(), false, false, false, false);
+	STRENGTH_CANCEL(new StrengthCancel(), false, false, false, false),
+
+	// Durability
+	UNBREAKING(Enchantment.DURABILITY, "Unbreaking", true, false, false, false),
+	UNBREAKABLE(null, "Unbreakable", false, false, false, false),
+	MENDING(Enchantment.MENDING, "Mending", false, false, false, false),
+
+	// Item Tags (these are last)
+	MAGIC_WAND(new MagicWandEnch(), false, false, false, false),
+	ALCHEMICAL_ALEMBIC(null, "Alchemical Utensil", false, false, false, false);
 
 	public static final Map<String, EnchantmentType> REVERSE_MAPPINGS = Arrays.stream(EnchantmentType.values())
 		.collect(Collectors.toUnmodifiableMap(type -> type.getName().replace(" ", ""), type -> type));
