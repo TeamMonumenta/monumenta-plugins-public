@@ -356,7 +356,7 @@ public class ShulkerShortcutListener implements Listener {
 				if (item.getType() == Material.YELLOW_SHULKER_BOX) {
 					containerBlockData = Material.BARREL.createBlockData();
 					float pitch = player.getLocation().getPitch();
-					((Directional) containerBlockData).setFacing(pitch > 45 ? BlockFace.DOWN : pitch < -45 ? BlockFace.UP : player.getFacing().getOppositeFace());
+					((Directional) containerBlockData).setFacing(pitch > 45 ? BlockFace.UP : pitch < -45 ? BlockFace.DOWN : player.getFacing().getOppositeFace());
 				} else {
 					containerBlockData = Material.CHEST.createBlockData();
 					((Directional) containerBlockData).setFacing(player.getFacing().getOppositeFace());
