@@ -106,7 +106,9 @@ public class DelvesUtils {
 		List<DelvesModifier> rotatingMods = DelvesModifier.rotatingDelveModifiers();
 		for (int i = 0; i < rotatingMods.size() - 1; i++) {
 			for (int j = i + 1; j < rotatingMods.size(); j++) {
-				nWeekRotation.add(Arrays.asList(rotatingMods.get(i), rotatingMods.get(j)));
+				for (int k = j + 1; k < rotatingMods.size(); k++) {
+					nWeekRotation.add(Arrays.asList(rotatingMods.get(i), rotatingMods.get(j), rotatingMods.get(k)));
+				}
 			}
 		}
 		Collections.shuffle(nWeekRotation, new XoRoShiRo128PlusRandom(DateUtils.getWeeklyVersion() / nWeekRotation.size()));
