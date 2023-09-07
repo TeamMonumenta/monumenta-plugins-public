@@ -60,7 +60,7 @@ public abstract class BaseElementalSpirit extends Ability {
 			mEnemiesAffected.add(event.getDamagee());
 			if (mEnemiesAffectedProcessor == null) {
 
-				boolean isElementalArrows = ability == ClassAbility.ELEMENTAL_SPIRIT_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE;
+				boolean isElementalArrows = ability == ClassAbility.ELEMENTAL_ARROWS_FIRE || ability == ClassAbility.ELEMENTAL_ARROWS_ICE;
 				float spellDamage = isElementalArrows ? mLevelDamage : SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
 				ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 
