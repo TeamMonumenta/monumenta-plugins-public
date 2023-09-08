@@ -345,6 +345,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RiftBoss.identityTag, RiftBoss::new, new RiftBoss.Parameters());
 		registerStatelessBoss(LacerateBoss.identityTag, LacerateBoss::new, new LacerateBoss.Parameters());
 		registerStatelessBoss(DamageTransferBoss.identityTag, DamageTransferBoss::new, new DamageTransferBoss.Parameters());
+		registerStatelessBoss(ShockwaveBoss.identityTag, ShockwaveBoss::new, new ShockwaveBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
