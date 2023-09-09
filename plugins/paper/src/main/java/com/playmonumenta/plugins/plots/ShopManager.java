@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.plots;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
+import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils.ZoneProperty;
@@ -10,9 +11,7 @@ import com.playmonumenta.scriptedquests.quests.QuestNpc;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.BooleanArgument;
-import dev.jorel.commandapi.arguments.EntitySelectorArgument;
-import dev.jorel.commandapi.arguments.MultiLiteralArgument;
+import dev.jorel.commandapi.arguments.*;
 import dev.jorel.commandapi.exceptions.WrapperCommandSyntaxException;
 import java.util.Collection;
 import java.util.List;
@@ -55,6 +54,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
@@ -70,6 +71,8 @@ public class ShopManager implements Listener {
 	private static final String NPC_NAME = "SHOP NPC";
 	private static final String GUILD_NPC_NAME = "GUILD SHOP NPC";
 	private static final String DISABLE_LOCKING_TAG = "DisableLocking";
+	private static final String LOCK_PREFIX = "* Soulbound to ";
+	private static final String LOCK_SUFFIX = " *";
 
 	// handles cancelled damage events because we're only interested in the left click interaction (and the event is always cancelled on shop shulkers anyway)
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
@@ -459,6 +462,29 @@ public class ShopManager implements Listener {
 				shopReset((Entity)args[1], (Player)args[2]);
 			})
 			.register();
+
+		/******************** UTILITIES ****************************/
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new MultiLiteralArgument("utilities"))
+			.withArguments(new MultiLiteralArgument("unlocknearbybarrels"))
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.withArguments(new IntegerArgument("radius"))
+			.executes((sender, args) -> {
+				unlockMarketBarrels((Player) args[1], (Player) args[2], (int) args[3]);
+			})
+			.register();
+
+		new CommandAPICommand("monumentashop")
+			.withPermission(CommandPermission.fromString("monumenta.shop"))
+			.withArguments(new MultiLiteralArgument("utilities"))
+			.withArguments(new MultiLiteralArgument("createunlockkey"))
+			.withArguments(new StringArgument("player name"))
+			.executes((sender, args) -> {
+				createBarrelKey((Player) args[1], (String) args[2]);
+			})
+			.register();
+
 	}
 
 	private static void shopNew(Player player) throws WrapperCommandSyntaxException {
@@ -673,7 +699,7 @@ public class ShopManager implements Listener {
 				for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 					BlockState state = plat.getBlock().getState();
 					if (state instanceof Lockable && (((Lockable) state).getLock() == null || ((Lockable) state).getLock().isEmpty())) {
-						((Lockable) state).setLock("* Soulbound to " + shop.mOwnerName + " *");
+						((Lockable) state).setLock(LOCK_PREFIX + shop.mOwnerName + LOCK_SUFFIX);
 						state.update();
 					}
 					plat.add(0, 1, 0);
@@ -723,7 +749,7 @@ public class ShopManager implements Listener {
 			for (int y = 0; y <= SHOP_HEIGHT + SHOP_DEPTH + 2; y++) {
 				BlockState state = plat.getBlock().getState();
 				if (state instanceof Lockable) {
-					if (((Lockable)state).getLock() != null && ((Lockable)state).getLock().startsWith("* Soulbound to")) {
+					if (((Lockable)state).getLock() != null && ((Lockable)state).getLock().startsWith(LOCK_PREFIX)) {
 						((Lockable)state).setLock(null);
 						state.update();
 					}
@@ -824,5 +850,30 @@ public class ShopManager implements Listener {
 			((Container)state).getInventory().clear();
 			state.update();
 		}
+	}
+
+	private static void unlockMarketBarrels(Player sender, Player target, int radius) {
+		Location start = sender.getLocation();
+		for (double x = start.getX() - radius; x <= start.getX() + radius; x++) {
+			for (double y = start.getY() - radius; y <= start.getY() + radius; y++) {
+				for (double z = start.getZ() - radius; z <= start.getZ() + radius; z++) {
+					BlockState state = new Location(sender.getWorld(), x, y, z).getBlock().getState();
+					if (state instanceof Lockable) {
+						if (((Lockable)state).getLock() != null && ((Lockable)state).getLock().equalsIgnoreCase(LOCK_PREFIX + target.getName() + LOCK_SUFFIX)) {
+							((Lockable)state).setLock(null);
+							state.update();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private static void createBarrelKey(Player sender, String target) {
+		ItemStack newKey = new ItemStack(Material.LIGHTNING_ROD, 1);
+		ItemMeta keyMeta = newKey.getItemMeta();
+		keyMeta.displayName(Component.text(LOCK_PREFIX + target + LOCK_SUFFIX));
+		newKey.setItemMeta(keyMeta);
+		InventoryUtils.giveItem(sender, newKey);
 	}
 }
