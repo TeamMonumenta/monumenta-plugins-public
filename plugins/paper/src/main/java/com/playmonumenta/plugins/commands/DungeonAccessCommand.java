@@ -155,37 +155,38 @@ public class DungeonAccessCommand extends GenericCommand {
 	/**
 	 * Opens a new instance of a dungeon for the key player (if they don't already have an instance), and then invites the other players into the new instance.
 	 */
-	private static void startNew(Player keyPlayer, Collection<Player> otherPlayersRaw, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch, int type, boolean useDelvePreset) throws WrapperCommandSyntaxException {
+	private static void startNew(Player keyPlayer, Collection<Player> otherPlayersRaw, DungeonUtils.DungeonCommandMapping mapping, Location returnLocation, float returnYaw, float returnPitch, int type, final boolean useDelvePreset) throws WrapperCommandSyntaxException {
 
 		if (ScoreboardUtils.getScoreboardValue(keyPlayer, mapping.getAccessName()).orElse(0) != 0) {
 			throw CommandAPI.failWithString("You already have an open instance!");
 		}
 
-		DelvePreset delvePreset = mapping.getDelvePreset();
-		if (useDelvePreset && (delvePreset == null || mapping.getShardName() == null)) {
+		final DelvePreset delvePreset = mapping.getDelvePreset();
+		final String shardName = mapping.getShardName();
+		if (useDelvePreset && (delvePreset == null || shardName == null)) {
 			throw CommandAPI.failWithString("This dungeon doesn't have a delve preset!");
 		}
 
-		RBoardAPI.add("$Last", mapping.getAccessName(), 1).thenAccept(accessScore -> {
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
-				if (useDelvePreset && delvePreset != null && mapping.getShardName() != null) {
-					DelvesManager.savePlayerData(keyPlayer, mapping.getShardName(), delvePreset.mModifiers, delvePreset.mId);
-				}
-				if (mapping.getFinishedName() != null) {
-					ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getFinishedName(), 0);
-				}
-				if (mapping.getTypeName() != null) {
-					ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getTypeName(), type);
-				}
-				if (mapping.getStartDateName() != null) {
-					int startDate = (int) DateUtils.getDaysSinceEpoch();
-					ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getStartDateName(), startDate);
-				}
-				ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getAccessName(), (int) (long) accessScore);
+		RBoardAPI.add("$Last", mapping.getAccessName(), 1).thenAccept(accessScore
+			-> Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> { // must run on main server thread
+			// Neither delvePreset nor shardName are null if useDelvePreset is true, but nullaway won't let me remove this
+			if (useDelvePreset && delvePreset != null && shardName != null) {
+				DelvesManager.savePlayerData(keyPlayer, shardName, delvePreset.mModifiers, delvePreset.mId);
+			}
+			if (mapping.getFinishedName() != null) {
+				ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getFinishedName(), 0);
+			}
+			if (mapping.getTypeName() != null) {
+				ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getTypeName(), type);
+			}
+			if (mapping.getStartDateName() != null) {
+				int startDate = (int) DateUtils.getDaysSinceEpoch();
+				ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getStartDateName(), startDate);
+			}
+			ScoreboardUtils.setScoreboardValue(keyPlayer, mapping.getAccessName(), (int) (long) accessScore);
 
-				invite(keyPlayer, otherPlayersRaw, mapping, returnLocation, returnYaw, returnPitch);
-			});
-		}).exceptionally(t -> {
+			invite(keyPlayer, otherPlayersRaw, mapping, returnLocation, returnYaw, returnPitch);
+		})).exceptionally(t -> {
 			MMLog.warning("Could not get next free instance number for dungeon " + mapping.name().toLowerCase(Locale.ROOT) + ", player '" + keyPlayer.getName() + "' may need a key refund.", t);
 			keyPlayer.sendMessage(Component.text("An error occurred! Please contact a moderator for a potential key refund.", NamedTextColor.RED));
 			return null;
@@ -321,7 +322,11 @@ public class DungeonAccessCommand extends GenericCommand {
 					    && ScoreboardUtils.getScoreboardValue(player, "DelveDungeon").orElse(0) == mapping.getDelveBountyId()) {
 					int delveBountyStartDate = ScoreboardUtils.getScoreboardValue(player, "DelveStartDate").orElse(0);
 					int startDate = ScoreboardUtils.getScoreboardValue(player, mapping.getStartDateName()).orElse(0);
-					if (DateUtils.getWeeklyVersion(delveBountyStartDate) == DateUtils.getWeeklyVersion(startDate)) {
+
+					long thisWeek = DateUtils.getWeeklyVersion();
+					long startWeek = DateUtils.getWeeklyVersion(startDate);
+					long bountyWeek = DateUtils.getWeeklyVersion(delveBountyStartDate);
+					if (thisWeek > startWeek && bountyWeek == startWeek) {
 						ScoreboardUtils.setScoreboardValue(player, "DelveDungeon", 0);
 						ScoreboardUtils.setScoreboardValue(player, "DelveStartDate", 0);
 					}
