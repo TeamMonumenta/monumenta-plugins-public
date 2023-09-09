@@ -58,6 +58,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -68,8 +69,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 
 public class EntityUtils {
@@ -1623,6 +1627,30 @@ public class EntityUtils {
 	 */
 	public static void makeItemInvulnereable(Item item) {
 		item.addScoreboardTag(EntityListener.INVULNERABLE_ITEM_TAG);
+	}
+
+	public static BlockDisplay spawnBlockDisplay(World world, Location loc, Material type, float width, float height, boolean fullBrightness) {
+		return spawnBlockDisplay(world, loc, type.createBlockData(), width, height, fullBrightness);
+	}
+
+	public static BlockDisplay spawnBlockDisplay(World world, Location loc, BlockData blockData, float width, float height, boolean fullBrightness) {
+		BlockDisplay display = world.spawn(loc, BlockDisplay.class);
+		display.setBlock(blockData);
+		scaleDisplay(display, width, height);
+		lightDisplay(display);
+		return display;
+	}
+
+	public static void scaleDisplay(Display display, float width, float height) {
+		scaleDisplay(display, width, height, width);
+	}
+
+	public static void scaleDisplay(Display display, float x, float y, float z) {
+		display.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(x, y, z), new Quaternionf()));
+	}
+
+	public static void lightDisplay(Display display) {
+		display.setBrightness(new Display.Brightness(15, 15));
 	}
 
 }

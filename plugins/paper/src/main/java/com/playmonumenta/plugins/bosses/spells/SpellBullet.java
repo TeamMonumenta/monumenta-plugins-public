@@ -8,11 +8,10 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
@@ -92,13 +91,13 @@ public class SpellBullet extends Spell {
 	private final Pattern mPattern;
 	private final Vector mOffset;
 	// Junko Specific
-	private int mAccelStart;
-	private int mAccelEnd;
-	private double mAccel;
-	private boolean mPassThrough;
-	private double mRotationSpeed;
-	private final double ARMOR_STAND_HEAD_OFFSET = 1.6875;
-	private final double PLAYER_HITBOX_HEIGHT = 1.8;
+	private final int mAccelStart;
+	private final int mAccelEnd;
+	private final double mAccel;
+	private final boolean mPassThrough;
+	private final double mRotationSpeed;
+
+	private static final double PLAYER_HITBOX_HEIGHT = 1.8;
 
 	public SpellBullet(Plugin plugin, LivingEntity caster, Vector offset, int duration, int delay, int emissionSpeed, double velocity, double detectRange, double hitboxRadius, int cooldown, int bulletDuration, String pattern,
 					   double accel, int accelStart, int accelEnd, boolean passThrough, double rotationSpeed, TickAction tickAction, CastAction castAction, Material bulletMaterial, IntersectAction intersectAction) {
@@ -131,10 +130,10 @@ public class SpellBullet extends Spell {
 			int mTicks = 0;
 			int mCasts = 0;
 			double mRotation = 0;
-			int mJunkoOffset = (int) (Math.random() * 2);
-			double mRandomAngle = Math.random() * Math.PI;
-			Location mSanaeLoc = mCaster.getLocation().clone().add(new Vector(7.75, 0, 0).add(mOffset).rotateAroundY(mRandomAngle));
-			Location mHardSanaeLoc = mCaster.getLocation().clone().add(new Vector(3.375, 0, 0).add(mOffset).rotateAroundY(mRandomAngle));
+			final int mJunkoOffset = (int) (Math.random() * 2);
+			final double mRandomAngle = Math.random() * Math.PI;
+			final Location mSanaeLoc = mCaster.getLocation().clone().add(new Vector(7.75, 0, 0).add(mOffset).rotateAroundY(mRandomAngle));
+			final Location mHardSanaeLoc = mCaster.getLocation().clone().add(new Vector(3.375, 0, 0).add(mOffset).rotateAroundY(mRandomAngle));
 
 			double mSanaeAngle = 162 / 180.0 * Math.PI + mRandomAngle;
 
@@ -310,20 +309,6 @@ public class SpellBullet extends Spell {
 						} else if (mPattern == Pattern.INVALID) {
 							boolean small = true;
 							launchAcceleratingBullet(hittablePlayers, mCaster.getLocation().clone().add(0, 3, 0), 5000, new Vector(), 0, 0, 0, small);
-							/*
-							// HITBOX TESTING
-							//launchAcceleratingBullet(mCaster.getLocation().clone().add(0, 3, 0), 5000, new Vector(), 0, 0, 0);
-							double radius = mHitboxRadius / (small ? 2 : 1);
-							Location particleCenter = mCaster.getLocation().clone().add(0, 3, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(radius, radius, radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(-radius, radius, radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(-radius, -radius, radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(-radius, -radius, -radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(-radius, radius, -radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(radius, -radius, radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(radius, -radius, -radius), 1, 0, 0, 0, 0);
-							mCaster.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, particleCenter.clone().add(radius, radius, -radius), 1, 0, 0, 0, 0);
-							*/
 						}
 					}
 				} else if (mTicks >= mDuration + mDelay) {
@@ -338,8 +323,8 @@ public class SpellBullet extends Spell {
 		summonMarker(dir, length, 0);
 	}
 
-	private void summonMarker(Vector dir, double length, double yoffset) {
-		new PPLine(Particle.DRAGON_BREATH, mCaster.getLocation().add(0, yoffset, 0), dir, length).countPerMeter(10).spawnAsEnemy();
+	private void summonMarker(Vector dir, double length, double yOffset) {
+		new PPLine(Particle.DRAGON_BREATH, mCaster.getLocation().add(0, yOffset, 0), dir, length).countPerMeter(10).spawnAsEnemy();
 	}
 
 	private void slash(List<Player> players, double length, double distance, double granularity, boolean small) {
@@ -363,11 +348,11 @@ public class SpellBullet extends Spell {
 
 	private BukkitRunnable trapperRunnable(List<Player> players, Player target, Location detLoc, int waitTime, int offsetTicks, boolean small) {
 
-		ArmorStand bullet = spawnBullet(detLoc, small);
+		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 		double mInnerVelocity = mVelocity;
+		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 		return new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 			int mTicks = 0;
 
 			Vector mDir = new Vector();
@@ -380,21 +365,19 @@ public class SpellBullet extends Spell {
 					mDir.setY(0);
 					mDir = mDir.normalize();
 				}
-				checkForCollisions(mBox, mInnerVelocity, mDir, bullet, players, this);
-				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
+				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
+				teleportBullet(bullet, box);
 				mTicks++;
-				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET / (small ? 2 : 1), 0));
 				checkIfBulletExpired(mTicks + offsetTicks, mBulletDuration, bullet, this);
 			}
 		};
 	}
 
 	private BukkitRunnable hardSanaeRunnable(List<Player> players, Location detLoc, Vector initialDir, Vector collapseDir, int offsetTicks, boolean small) {
-
-		ArmorStand bullet = spawnBullet(detLoc, small);
+		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
+		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 		return new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
 
@@ -414,10 +397,9 @@ public class SpellBullet extends Spell {
 				if (mTicks + offsetTicks == 50) {
 					mDir = collapseDir;
 				}
-				checkForCollisions(mBox, mInnerVelocity, mDir, bullet, players, this);
-				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
+				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
+				teleportBullet(bullet, box);
 				mTicks++;
-				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET / (small ? 2 : 1), 0));
 				checkIfBulletExpired(mTicks + offsetTicks, mBulletDuration, bullet, this);
 			}
 		};
@@ -427,10 +409,10 @@ public class SpellBullet extends Spell {
 	private BukkitRunnable nueRunnable(List<Player> players, Vector initialDir, int even, int offsetTicks, boolean small) {
 		Location detLoc = mCaster.getLocation().clone().add(mOffset);
 
-		ArmorStand bullet = spawnBullet(detLoc, small);
+		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
+		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 		return new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
 
@@ -448,10 +430,9 @@ public class SpellBullet extends Spell {
 					mDir = initialDir.clone().multiply(shift);
 					mInnerVelocity = mVelocity;
 				}
-				checkForCollisions(mBox, mInnerVelocity, mDir, bullet, players, this);
-				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
+				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
+				teleportBullet(bullet, box);
 				mTicks++;
-				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET / (small ? 2 : 1), 0));
 				checkIfBulletExpired(mTicks, mBulletDuration, bullet, this);
 			}
 		};
@@ -460,10 +441,10 @@ public class SpellBullet extends Spell {
 	private BukkitRunnable freezeRunnable(List<Player> players, int offsetTicks, boolean small) {
 		Location detLoc = mCaster.getLocation().clone().add(mOffset);
 
-		ArmorStand bullet = spawnBullet(detLoc, small);
+		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
+		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 		return new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
 
@@ -482,10 +463,9 @@ public class SpellBullet extends Spell {
 				if (mTicks + offsetTicks >= 50 && mTicks + offsetTicks <= 54) {
 					mInnerVelocity += 0.025;
 				}
-				checkForCollisions(mBox, mInnerVelocity, mDir, bullet, players, this);
-				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
+				checkForCollisions(box, mInnerVelocity, mDir, bullet, players, this);
+				teleportBullet(bullet, box);
 				mTicks++;
-				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET / (small ? 2 : 1), 0));
 				checkIfBulletExpired(mTicks + offsetTicks, mBulletDuration, bullet, this);
 			}
 		};
@@ -519,21 +499,19 @@ public class SpellBullet extends Spell {
 
 	private void launchAcceleratingBullet(List<Player> players, Location detLoc, int bulletDuration, Vector dir, double accel, int accelStart, int accelEnd, boolean small, int playerHitboxSize) {
 		mCastAction.run(mCaster);
-
-		ArmorStand bullet = spawnBullet(detLoc, small);
+		BlockDisplay bullet = spawnBullet(detLoc, small);
 		double hitboxRadius = mHitboxRadius / (small ? 2 : 1);
 
+		BoundingBox box = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 		new BukkitRunnable() {
-			BoundingBox mBox = BoundingBox.of(detLoc, hitboxRadius, hitboxRadius, hitboxRadius);
 			int mTicks = 0;
 			double mInnerVelocity = mVelocity;
 
 			@Override
 			public void run() {
-				checkForCollisions(mBox, mInnerVelocity, dir, bullet, players, this, playerHitboxSize);
-				Location loc = mBox.getCenter().toLocation(mCaster.getWorld());
+				checkForCollisions(box, mInnerVelocity, dir, bullet, players, this, playerHitboxSize);
+				teleportBullet(bullet, box);
 				mTicks++;
-				bullet.teleport(loc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET / (small ? 2 : 1), 0));
 				checkIfBulletExpired(mTicks, bulletDuration, bullet, this);
 				if (mTicks >= accelStart && mTicks < accelEnd) {
 					mInnerVelocity += accel;
@@ -542,18 +520,19 @@ public class SpellBullet extends Spell {
 		}.runTaskTimer(mPlugin, 0, 1);
 	}
 
-	public ArmorStand spawnBullet(Location detLoc, boolean small) {
-		ArmorStand bullet = mCaster.getWorld().spawn(detLoc.clone().add(0, -ARMOR_STAND_HEAD_OFFSET / (small ? 2 : 1), 0), ArmorStand.class);
-		bullet.setSmall(small);
-		bullet.setVisible(false);
-		bullet.setGravity(false);
-		bullet.setMarker(true);
-		bullet.setCollidable(false);
-		bullet.getEquipment().setHelmet(new ItemStack(mBulletMaterial));
-		return bullet;
+	public BlockDisplay spawnBullet(Location loc, boolean small) {
+		float size = 0.575f;
+		if (small) {
+			size /= 2;
+		}
+		return spawnBullet(loc, size, size);
 	}
 
-	public void checkForCollisions(BoundingBox box, double velocity, Vector dir, ArmorStand bullet, List<Player> players, BukkitRunnable runnable, int playerHitboxSize) {
+	public BlockDisplay spawnBullet(Location loc, float width, float height) {
+		return EntityUtils.spawnBlockDisplay(loc.getWorld(), loc, mBulletMaterial, width, height, true);
+	}
+
+	public void checkForCollisions(BoundingBox box, double velocity, Vector dir, BlockDisplay bullet, List<Player> players, BukkitRunnable runnable, int playerHitboxSize) {
 		for (int j = 0; j < 2; j++) {
 			Location prevLoc = box.getCenter().toLocation(mCaster.getWorld());
 			box.shift(dir.clone().multiply(velocity * 0.5));
@@ -576,11 +555,27 @@ public class SpellBullet extends Spell {
 		}
 	}
 
-	public void checkForCollisions(BoundingBox box, double velocity, Vector dir, ArmorStand bullet, List<Player> players, BukkitRunnable runnable) {
+	public void checkForCollisions(BoundingBox box, double velocity, Vector dir, BlockDisplay bullet, List<Player> players, BukkitRunnable runnable) {
 		checkForCollisions(box, velocity, dir, bullet, players, runnable, 1);
 	}
 
-	public void checkIfBulletExpired(int totalTicks, int bulletDuration, ArmorStand bullet, BukkitRunnable runnable) {
+	public void teleportBullet(BlockDisplay bullet, BoundingBox box) {
+		Location loc = box.getCenter().toLocation(mCaster.getWorld());
+		loc.setY(mCaster.getLocation().getY() - getBulletHeight(bullet) / 2);
+		float widthOffset = getBulletWidth(bullet) / 2;
+		loc.subtract(widthOffset, 0, widthOffset);
+		bullet.teleport(loc);
+	}
+
+	public float getBulletHeight(BlockDisplay bullet) {
+		return bullet.getTransformation().getScale().y;
+	}
+
+	public float getBulletWidth(BlockDisplay bullet) {
+		return bullet.getTransformation().getScale().x;
+	}
+
+	public void checkIfBulletExpired(int totalTicks, int bulletDuration, BlockDisplay bullet, BukkitRunnable runnable) {
 		if (totalTicks >= bulletDuration || mCaster.isDead()) {
 			bullet.remove();
 			runnable.cancel();
