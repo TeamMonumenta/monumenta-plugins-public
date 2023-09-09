@@ -35,7 +35,8 @@ public class ChainHealingWave extends Ability {
 	public static final int COOLDOWN = 15 * 20;
 	public static final int TARGETS_1 = 4;
 	public static final int TARGETS_2 = 6;
-	public static final int BOUNCE_RANGE = 10;
+	public static final int BOUNCE_RANGE_1 = 10;
+	public static final int BOUNCE_RANGE_2 = 15;
 	public static final double HEAL_PERCENT_1 = 0.2;
 	public static final double HEAL_PERCENT_2 = 0.25;
 	public static final int CDR_ON_KILL = 30;
@@ -54,13 +55,14 @@ public class ChainHealingWave extends Ability {
 				String.format("Punch while holding a projectile weapon to cast a beam of healing, bouncing between up to %s players within %s blocks of the last target hit " +
 					"and healing for %s%% of their health. Will also bounce to nearby totems, decreasing their cooldowns by %ss without consuming a heal. %ss cooldown.",
 					TARGETS_1,
-					BOUNCE_RANGE,
+					BOUNCE_RANGE_1,
 					StringUtils.multiplierToPercentage(HEAL_PERCENT_1),
 					StringUtils.ticksToSeconds(CDR_ON_KILL),
 					StringUtils.ticksToSeconds(COOLDOWN)
 				),
-				String.format("Heal is increased to %s%% and can now heal up to %s targets.",
+				String.format("Heal is increased to %s%%, range between bounces has increased to %s, and can now heal up to %s targets.",
 					StringUtils.multiplierToPercentage(HEAL_PERCENT_2),
+					BOUNCE_RANGE_2,
 					TARGETS_2)
 			)
 			.simpleDescription("Cast a heal that will bounce between teammates and your totems.")
@@ -79,7 +81,7 @@ public class ChainHealingWave extends Ability {
 		if (!player.hasPermission(Shaman.PERMISSION_STRING)) {
 			AbilityUtils.resetClass(player);
 		}
-		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, BOUNCE_RANGE);
+		mBounceRange = CharmManager.getRadius(mPlayer, CHARM_RADIUS, isLevelTwo() ? BOUNCE_RANGE_2 : BOUNCE_RANGE_1);
 		mTargets = (int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_TARGETS, isLevelOne() ? TARGETS_1 : TARGETS_2);
 		mHealPercent = CharmManager.getExtraPercent(mPlayer, CHARM_HEALING, isLevelOne() ? HEAL_PERCENT_1 : HEAL_PERCENT_2);
 	}
@@ -92,7 +94,7 @@ public class ChainHealingWave extends Ability {
 		mHitTargets.add(mPlayer);
 
 		Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mBounceRange + 4, Math.toRadians(45))
-			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), mBounceRange + 4));
+			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 1.5));
 
 		List<Player> nearbyPlayers = hitbox.getHitPlayers(mPlayer, true);
 		if (nearbyPlayers.isEmpty()) {

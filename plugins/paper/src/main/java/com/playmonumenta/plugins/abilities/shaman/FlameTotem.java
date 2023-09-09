@@ -35,8 +35,8 @@ public class FlameTotem extends TotemAbility {
 	private static final int DURATION_2 = 12 * 20;
 	private static final int AOE_RANGE = 7;
 	private static final int FIRE_DURATION = 2 * 20;
-	private static final int DAMAGE_1 = 5;
-	private static final int DAMAGE_2 = 7;
+	private static final int DAMAGE_1 = 4;
+	private static final int DAMAGE_2 = 6;
 
 	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 

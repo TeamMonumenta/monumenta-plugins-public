@@ -35,8 +35,8 @@ import org.jetbrains.annotations.Nullable;
 public class ChainLightning extends MultipleChargeAbility {
 	public static final int COOLDOWN = 6 * 20;
 	public static final int CHARGES = 2;
-	public static final int TARGETS_1 = 3;
-	public static final int TARGETS_2 = 5;
+	public static final int TARGETS_1 = 2;
+	public static final int TARGETS_2 = 4;
 	public static final int BOUNCE_RANGE = 8;
 	public static final int DAMAGE_1 = 6;
 	public static final int DAMAGE_2 = 8;
@@ -103,7 +103,7 @@ public class ChainLightning extends MultipleChargeAbility {
 		mHitTargets.add(mPlayer);
 
 		Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), mBounceRange + 4, Math.toRadians(45))
-			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), mBounceRange + 4));
+			.union(new Hitbox.SphereHitbox(mPlayer.getLocation(), 1.5));
 
 		List<LivingEntity> nearbyMobs = hitbox.getHitMobs();
 		nearbyMobs.sort((a, b) -> (int) (a.getLocation().distance(mPlayer.getLocation()) - b.getLocation().distance(mPlayer.getLocation())));
@@ -126,7 +126,7 @@ public class ChainLightning extends MultipleChargeAbility {
 		LivingEntity nextTarget;
 		boolean atLeastOneMob = foundMob;
 		int safetyCounter = 0;
-		while (currentBounces(mHitTargets) < mTargets && safetyCounter <= 40) {
+		while (currentBounces(mHitTargets) <= mTargets && safetyCounter <= 40) {
 			safetyCounter++;
 			nextTarget = locateMobInRange(lastTarget.getLocation());
 			if (nextTarget != null) {
