@@ -40,13 +40,10 @@ import org.bukkit.entity.EvokerFangs;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Ghast;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Vex;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -55,6 +52,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -241,31 +239,11 @@ public class MobListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-
-		//TODO look for this "bug" (?) https://discord.com/channels/186225508562763776/186266724440604673/913044974768103484
-		//When a zombie damage another zombie with BossUtils.bossDamage(..) or bossDamagePercent(..)
-		//it also hit himselft, causing to setTarget(himselft) and make so it strikes itself to death
-		if (event.getDamager() == event.getEntity() && event.getDamager() instanceof Zombie) {
-			event.setCancelled(true);
-			if (((Mob) event.getDamager()).getTarget() == event.getDamager()) {
-				((Mob) event.getDamager()).setTarget(null);
-			}
-			return;
-		}
-		//end-todo
-
 		// Set base custom damage of crossbows and tridents before other modifications
 		// No firework damage!
 		if (event.getDamager() instanceof Firework) {
 			event.setCancelled(true);
 			return;
-		}
-
-		// Disable the randomness of Iron Golems' attacks
-		if (event.getDamager() instanceof IronGolem golem) {
-			if (event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-				event.setDamage(EntityUtils.getAttributeOrDefault(golem, Attribute.GENERIC_ATTACK_DAMAGE, 0));
-			}
 		}
 
 		if (event.getEntity() instanceof Player) {
@@ -346,6 +324,15 @@ public class MobListener implements Listener {
 					}
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityTargetEvent(EntityTargetEvent event) {
+		// Fix a bug where zombies that damaged other zombies sometimes target themselves
+		// Obviously there is no reasonable case where a mob should target itself so disable any time that happens
+		if (event.getTarget() == event.getEntity()) {
+			event.setCancelled(true);
 		}
 	}
 

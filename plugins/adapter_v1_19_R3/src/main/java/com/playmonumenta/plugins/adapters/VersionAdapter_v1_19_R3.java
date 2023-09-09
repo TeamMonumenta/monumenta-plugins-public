@@ -137,7 +137,7 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 				// death.attack.magic=%1$s was killed by magic
 				String s = "death.attack.magic";
 				return Component.translatable(s, killed.getDisplayName());
-			} else if (mKilledUsingMsg == null) {
+			} else if (mKilledUsingMsg == null || mKilledUsingMsg.isEmpty()) {
 				// death.attack.mob=%1$s was killed by %2$s
 				String s = "death.attack.mob";
 				return Component.translatable(s, killed.getDisplayName(), this.mDamager.getDisplayName());
@@ -150,7 +150,7 @@ public class VersionAdapter_v1_19_R3 implements VersionAdapter {
 	}
 
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg) {
-		String id = damager == null ? "monumenta:mob" : "monumenta:magic"; // datapack damage types
+		String id = "monumenta:custom"; // datapack damage types
 		Holder<DamageType> type = ((CraftLivingEntity) damagee).getHandle().getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(id))).get(); // this will throw if not present in the datapack
 		DamageSource reason = new CustomDamageSource(type, damager == null ? null : ((CraftLivingEntity) damager).getHandle(), blockable, killedUsingMsg);
 
