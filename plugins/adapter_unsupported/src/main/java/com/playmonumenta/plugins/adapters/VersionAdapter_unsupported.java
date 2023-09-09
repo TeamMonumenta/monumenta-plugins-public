@@ -118,11 +118,6 @@ public class VersionAdapter_unsupported implements VersionAdapter {
 	}
 
 	@Override
-	public void executeCommandAsBlock(Block block, String command) {
-
-	}
-
-	@Override
 	public void runConsoleCommandSilently(String command) {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
 	}

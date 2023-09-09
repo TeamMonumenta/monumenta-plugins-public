@@ -218,10 +218,13 @@ public class ChestOverride extends BaseOverride {
 					Block testBlock = loc.getBlock();
 
 					if (testBlock.getType().equals(Material.COMMAND_BLOCK)
-						    && testBlock.getState() instanceof CommandBlock commandBlock) {
-
-						// Run the command positioned at the chest block
-						NmsUtils.getVersionAdapter().executeCommandAsBlock(block, commandBlock.getCommand());
+							&& testBlock.getState() instanceof CommandBlock commandBlock) {
+						Location blockLoc = block.getLocation();
+						// Run an execute command in the block's world at the block's position
+						String command = "execute in " + blockLoc.getWorld().getKey().asString() +
+						" positioned " + blockLoc.blockX() + " " + blockLoc.blockY() + " " + blockLoc.blockZ() +
+						" run " + commandBlock.getCommand();
+						NmsUtils.getVersionAdapter().runConsoleCommandSilently(command);
 						break;
 					}
 				}

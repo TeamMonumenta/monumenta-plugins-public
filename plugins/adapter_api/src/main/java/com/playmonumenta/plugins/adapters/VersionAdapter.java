@@ -125,11 +125,6 @@ public interface VersionAdapter {
 	@Nullable World getWorldByResourceKey(Object currentWorldKey);
 
 	/**
-	 * Executes a command as a block. The block does not need to be a command block.
-	 */
-	void executeCommandAsBlock(Block block, String command);
-
-	/**
 	 * Runs a command as the console, without logging output to server logs.
 	 */
 	void runConsoleCommandSilently(String command);
