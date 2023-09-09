@@ -44,9 +44,12 @@ public class AlchemicalArtillery extends Ability {
 	private static final int ARTILLERY_POTION_COST = 2;
 	private static final int AFTERSHOCK_DELAY = 20;
 	private static final double AFTERSHOCK_DAMAGE_MULTIPLIER = 0.1;
+	public static final String CHARM_COOLDOWN = "Alchemical Artillery Cooldown";
 	public static final String CHARM_DAMAGE = "Alchemical Artillery Damage";
 	public static final String CHARM_RADIUS = "Alchemical Artillery Radius";
 	public static final String CHARM_VELOCITY = "Alchemical Artillery Velocity";
+	public static final String CHARM_SIZE = "Alchemical Artillery Size";
+
 	public static final String CHARM_AFTERSHOCK_DAMAGE = "Alchemical Artillery Aftershock Damage";
 	public static final String CHARM_AFTERSHOCK_DELAY = "Alchemical Artillery Aftershock Delay";
 
@@ -77,7 +80,7 @@ public class AlchemicalArtillery extends Ability {
 					)
 			)
 			.simpleDescription("Launch a bomb in the direction you're looking, which applies your selected potion's effects on impact.")
-			.cooldown(COOLDOWN)
+			.cooldown(COOLDOWN, CHARM_COOLDOWN)
 			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", AlchemicalArtillery::cast, new AbilityTrigger(AbilityTrigger.Key.DROP).sneaking(false),
 				PotionAbility.HOLDING_ALCHEMIST_BAG_RESTRICTION))
 			.displayItem(Material.CROSSBOW);
@@ -122,6 +125,8 @@ public class AlchemicalArtillery extends Ability {
 
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "AlchemicalGrenade");
 		if (e instanceof MagmaCube grenade) {
+			grenade.setSize((int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, 1));
+
 			// Adjust the Y velocity to make the arc easier to calculate and use
 			double velY = vel.getY();
 			if (velY > 0 && velY < 0.2) {
@@ -212,7 +217,7 @@ public class AlchemicalArtillery extends Ability {
 	}
 
 	private void aftershock(Location loc, double radius, double damage, ItemStatManager.PlayerItemStats playerItemStats, boolean isGruesome) {
-		int delay = (int) Math.ceil(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AFTERSHOCK_DELAY, AFTERSHOCK_DELAY));
+		int delay = CharmManager.getDuration(mPlayer, CHARM_AFTERSHOCK_DELAY, AFTERSHOCK_DELAY);
 		double damageMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_AFTERSHOCK_DAMAGE, AFTERSHOCK_DAMAGE_MULTIPLIER);
 		double finalDamage = damage * damageMultiplier;
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
