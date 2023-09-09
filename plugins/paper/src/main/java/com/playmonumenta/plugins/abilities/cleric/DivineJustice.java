@@ -34,6 +34,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -72,7 +73,7 @@ public class DivineJustice extends Ability {
 			.shorthandName("DJ")
 			.descriptions(
 				String.format(
-					"Your critical attacks passively deal %s magic damage to undead enemies, ignoring iframes.",
+					"Your critical melee or projectile attacks passively deal %s magic damage to undead enemies, ignoring iframes.",
 					DAMAGE
 				),
 				String.format(
@@ -98,7 +99,7 @@ public class DivineJustice extends Ability {
 					ENHANCEMENT_BONE_SHARD_BONUS_DAMAGE_DURATION / (60 * 20)
 				)
 			)
-			.simpleDescription("Deal extra damage on critical melee attacks against Undead enemies and heal when killing Undead enemies.")
+			.simpleDescription("Deal extra damage on critical melee or projectile attacks against Undead enemies and heal when killing Undead enemies.")
 			.remove(DivineJustice::remove)
 			.displayItem(Material.IRON_SWORD);
 
@@ -127,7 +128,11 @@ public class DivineJustice extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer) && Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
+		if (!Crusade.enemyTriggersAbilities(enemy, mCrusade)) {
+			return false;
+		}
+		if ((event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer)) ||
+			(event.getType() == DamageType.PROJECTILE && event.getDamager() instanceof Projectile projectile && EntityUtils.isAbilityTriggeringProjectile(projectile, true))) {
 			double damage = DAMAGE;
 			if (mDoHealingAndMultiplier) {
 				// Use the whole melee damage here
