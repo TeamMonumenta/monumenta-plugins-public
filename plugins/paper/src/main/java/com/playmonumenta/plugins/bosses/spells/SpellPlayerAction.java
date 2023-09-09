@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import java.util.Collection;
+import java.util.function.Supplier;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -27,26 +29,30 @@ public class SpellPlayerAction extends Spell {
 		void run(Player player, int tick);
 	}
 
-	private final LivingEntity mBoss;
-	private final double mRange;
+	private final Supplier<Collection<Player>> mPlayerSupplier;
 	private final TickAction mTickAction;
 	private int mTicks = 0;
 
 	public SpellPlayerAction(LivingEntity boss, double range, Action action) {
-		mBoss = boss;
-		mRange = range;
-		mTickAction = (player, tick) -> action.run(player);
+		this(boss, range, (player, tick) -> action.run(player));
 	}
 
 	public SpellPlayerAction(LivingEntity boss, double range, TickAction action) {
-		mBoss = boss;
-		mRange = range;
+		this(() -> PlayerUtils.playersInRange(boss.getLocation(), range, true), action);
+	}
+
+	public SpellPlayerAction(Supplier<Collection<Player>> supplier, Action action) {
+		this(supplier, (player, tick) -> action.run(player));
+	}
+
+	public SpellPlayerAction(Supplier<Collection<Player>> supplier, TickAction action) {
+		mPlayerSupplier = supplier;
 		mTickAction = action;
 	}
 
 	@Override
 	public void run() {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true)) {
+		for (Player player : mPlayerSupplier.get()) {
 			mTicks += 2;
 			mTickAction.run(player, mTicks);
 		}

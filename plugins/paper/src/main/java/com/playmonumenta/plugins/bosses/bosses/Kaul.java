@@ -170,8 +170,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		super(plugin, identityTag, boss, spawnLoc, endLoc);
 
 		mShrineMarker = boss;
-		for (Entity e : boss.getWorld().getEntities()) {
-			if (e instanceof LivingEntity le && e.getScoreboardTags().contains(LIGHTNING_STORM_TAG)) {
+		for (LivingEntity le : boss.getWorld().getLivingEntities()) {
+			if (le.getScoreboardTags().contains(LIGHTNING_STORM_TAG)) {
 				mShrineMarker = le;
 				break;
 			}
@@ -229,10 +229,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				new SpellVolcanicDemise(plugin, mBoss, 40D, mShrineMarker.getLocation()),
 				new SpellGroundSurge(mPlugin, mBoss, detectionRange)));
 
-		List<UUID> hit = new ArrayList<UUID>();
+		List<UUID> hit = new ArrayList<>();
 
-		List<UUID> cd = new ArrayList<UUID>();
-		SpellPlayerAction action = new SpellPlayerAction(mBoss, detectionRange, (Player player) -> {
+		List<UUID> cd = new ArrayList<>();
+		SpellPlayerAction action = new SpellPlayerAction(this::getArenaParticipants, (Player player) -> {
 			Vector loc = player.getLocation().toVector();
 			if (player.getLocation().getBlock().isLiquid() || !loc.isInSphere(mShrineMarker.getLocation().toVector(), 42)) {
 				if (player.getLocation().getY() >= 61 || cd.contains(player.getUniqueId())) {
@@ -335,14 +335,16 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		);
 
 
-		Map<Integer, BossHealthAction> events = new HashMap<Integer, BossHealthAction>();
+		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, mBoss -> {
-			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-			if (players.size() == 1) {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!\",\"color\":\"dark_green\"}]");
+			Collection<Player> players = getArenaParticipants();
+			Component message;
+			if (players.size() <= 1) {
+				message = Component.text("THE JUNGLE WILL NOT ALLOW A LONE MORTAL LIKE YOU TO LIVE. PERISH, FOOLISH USURPER!", NamedTextColor.DARK_GREEN);
 			} else {
-				PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USURPERS.\",\"color\":\"dark_green\"}]");
+				message = Component.text("THE JUNGLE WILL TAKE YOUR PRESENCE NO MORE. PERISH, USURPERS.", NamedTextColor.DARK_GREEN);
 			}
+			players.forEach(p -> p.sendMessage(message));
 		});
 
 		events.put(75, mBoss -> {
@@ -363,7 +365,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				public void run() {
 					teleport(mSpawnLoc.clone().add(0, 5, 0));
 					new BukkitRunnable() {
-						Location mLoc = mBoss.getLocation();
+						final Location mLoc = mBoss.getLocation();
 						float mJ = 0;
 						double mRotation = 0;
 						double mRadius = 10;
@@ -395,7 +397,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								changePhase(SpellManager.EMPTY, phase2PassiveSpells, null);
 								new BukkitRunnable() {
 									int mT = 0;
-									double mRotation = 0;
+									final double mRotation = 0;
 									double mRadius = 0;
 
 									@Override
@@ -456,7 +458,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.\",\"color\":\"dark_green\"}]");
+			sendDialogue("THE JUNGLE WILL DEVOUR YOU. ALL RETURNS TO ROT.");
 		});
 
 		// Forcecast Raise Jungle
@@ -474,7 +476,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 			teleport(mSpawnLoc.clone().add(0, 5, 0));
 			mPrimordialPhase = true;
 			new BukkitRunnable() {
-				Location mLoc = mSpawnLoc;
+				final Location mLoc = mSpawnLoc;
 				double mRotation = 0;
 				double mRadius = 10;
 
@@ -534,7 +536,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				}
 
 			}.runTaskTimer(plugin, 0, 1);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.\",\"color\":\"dark_green\"}]");
+			sendDialogue("THE EARTH AND JUNGLE ARE ENTWINED. PRIMORDIAL, HEWN FROM SOIL AND STONE, END THEM.");
 		});
 
 		//Force-cast Kaul's Judgement if it hasn't been casted yet.
@@ -553,13 +555,13 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 				@Override
 				public void run() {
-					List<ArmorStand> points = new ArrayList<ArmorStand>();
-					for (Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
-						if ((e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
+					List<ArmorStand> points = new ArrayList<>();
+					for (ArmorStand e : mBoss.getLocation().getNearbyEntitiesByType(ArmorStand.class, detectionRange, detectionRange, detectionRange)) {
+						if (e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_RED)
 							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_BLUE)
 							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_YELLOW)
-							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) && e instanceof ArmorStand) {
-							points.add((ArmorStand) e);
+							     || e.getScoreboardTags().contains(PUTRID_PLAGUE_TAG_GREEN)) {
+							points.add(e);
 						}
 					}
 
@@ -568,8 +570,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 						for (ArmorStand point : points) {
 							world.playSound(mBoss.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, SoundCategory.HOSTILE, 5, 0.75f);
 							new BukkitRunnable() {
-								Location mLoc = point.getLocation().add(0, 15, 0);
-								Vector mDir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), mLoc);
+								final Location mLoc = point.getLocation().add(0, 15, 0);
+								final Vector mDir = LocationUtils.getDirectionTo(mBoss.getLocation().add(0, 1, 0), mLoc);
 								float mT = 0;
 
 								@Override
@@ -614,7 +616,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										this.cancel();
 										new PartialParticle(Particle.SPELL_WITCH, mShrineMarker.getLocation().add(0, 3, 0), 25, 6, 5, 6, 1).spawnAsBoss();
 										new PartialParticle(Particle.FLAME, mShrineMarker.getLocation().add(0, 3, 0), 40, 6, 5, 6, 0.1).spawnAsBoss();
-										mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(mBoss.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getBaseValue() + 0.02);
+										EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0.02 + EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MOVEMENT_SPEED, 0));
 										mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 9999, 0));
 										changePhase(SpellManager.EMPTY, phase3PassiveSpells, null);
 										new PartialParticle(Particle.FLAME, mBoss.getLocation().add(0, 1, 0), 200, 0, 0, 0, 0.175).spawnAsBoss();
@@ -624,8 +626,8 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 										world.playSound(mBoss.getLocation().add(0, 1, 0), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 5, 0f);
 
 										new BukkitRunnable() {
-											Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
-											double mRotation = 0;
+											final Location mLoc = mShrineMarker.getLocation().subtract(0, 0.5, 0);
+											final double mRotation = 0;
 											double mRadius = 0;
 											int mT = 0;
 
@@ -684,7 +686,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 				}
 
 			}.runTaskLater(mPlugin, 20 * 2);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.\",\"color\":\"dark_green\"}]");
+			sendDialogue("YOU ARE NOT ANTS, BUT PREDATORS. YET THE JUNGLE'S WILL IS MANIFEST; DEATH COMES TO ALL.");
 		});
 
 
@@ -692,7 +694,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		//Summons a Immortal Elemental at 30% HP
 		events.put(30, mBoss -> {
 			summonImmortal(plugin, world);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.\",\"color\":\"dark_green\"}]");
+			sendDialogue("PRIMORDIAL, RETURN, NOW AS UNDYING AND EVERLASTING AS THE MOUNTAIN.");
 		});
 
 
@@ -704,7 +706,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		events.put(10, mBoss -> {
 			changePhase(phase4Spells, phase4PassiveSpells, null);
 			forceCastSpell(SpellVolcanicDemise.class);
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.\",\"color\":\"dark_green\"}]");
+			sendDialogue("THE VALLEY RUNS RED WITH BLOOD TODAY. LET THIS BLASPHEMY END. PREDATORS, FACE THE FULL WILL OF THE JUNGLE. COME.");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange + 30, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -721,7 +723,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 	private void summonImmortal(Plugin plugin, World world) {
 		new BukkitRunnable() {
-			Location mLoc = mSpawnLoc;
+			final Location mLoc = mSpawnLoc;
 			double mRotation = 0;
 			double mRadius = 5;
 
@@ -782,7 +784,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 		}
 		new BukkitRunnable() {
 			double mRotation = 0;
-			Location mLoc = mBoss.getLocation();
+			final Location mLoc = mBoss.getLocation();
 			double mRadius = 0;
 			double mY = 2.5;
 			double mYminus = 0.35;
@@ -866,13 +868,11 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 	}
 
 	private @Nullable LivingEntity spawnPrimordial(Location loc) {
-		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, primordial);
-		return entity;
+		return (LivingEntity) LibraryOfSoulsIntegration.summon(loc, primordial);
 	}
 
 	private @Nullable LivingEntity spawnImmortal(Location loc) {
-		LivingEntity entity = (LivingEntity) LibraryOfSoulsIntegration.summon(loc, immortal);
-		return entity;
+		return (LivingEntity) LibraryOfSoulsIntegration.summon(loc, immortal);
 	}
 
 	@Override
@@ -987,7 +987,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mT].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+				sendDialogue(dio[mT].toUpperCase());
 				mT++;
 				if (mT == dio.length) {
 					this.cancel();
@@ -1006,7 +1006,10 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 								new PartialParticle(Particle.BLOCK_DUST, mSpawnLoc, 7, 0.3, 0.1, 0.3, 0.25,
 									Material.COARSE_DIRT.createBlockData()).spawnAsBoss();
 							} else {
-								mBoss.getEquipment().clear();
+								EntityEquipment equipment = mBoss.getEquipment();
+								if (equipment != null) {
+									equipment.clear();
+								}
 								mBoss.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 27, 0));
 								mBoss.setAI(false);
 								mBoss.setSilent(true);
@@ -1082,7 +1085,7 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 						if (mT % (20 * 4) == 0) {
 							if (mIndex < dio.length) {
-								PlayerUtils.executeCommandOnNearbyPlayers(mSpawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + dio[mIndex].toUpperCase() + "\",\"color\":\"dark_green\"}]");
+								sendDialogue(dio[mIndex].toUpperCase());
 								mIndex++;
 							}
 						}
@@ -1141,5 +1144,12 @@ public class Kaul extends SerializedLocationBossAbilityGroup {
 
 	public static ChargeUpManager defaultChargeUp(LivingEntity boss, int chargeTime, String spellName) {
 		return new ChargeUpManager(boss, chargeTime, Component.text("Charging ", NamedTextColor.GREEN).append(Component.text(spellName + "...", NamedTextColor.DARK_GREEN)), BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10, detectionRange);
+	}
+
+	public void sendDialogue(String message) {
+		Component component = Component.text(message, NamedTextColor.DARK_GREEN);
+		for (Player player : getArenaParticipants()) {
+			player.sendMessage(component);
+		}
 	}
 }
