@@ -18,6 +18,7 @@ public class WorldlyProtection implements Enchantment {
 	private static final double DAMAGE_MULTIPLIER_R1 = 0.05; // 5% reduction for region 1
 	private static final double DAMAGE_MULTIPLIER_R2 = 0.0725; // 7.25% reduction for region 2
 	private static final double DAMAGE_MULTIPLIER_R3 = 0.1; // 10% reduction for region 3
+	private static final double ATTACK_REDUCTION = 0.25;
 
 	@Override
 	public String getName() {
@@ -32,6 +33,16 @@ public class WorldlyProtection implements Enchantment {
 	@Override
 	public EnumSet<Slot> getSlots() {
 		return EnumSet.of(Slot.MAINHAND);
+	}
+
+	@Override
+	public double getPriorityAmount() {
+		return 100;
+	} // nerfs all final damage
+
+	@Override
+	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
+		event.setDamage(event.getDamage() * (1 - ATTACK_REDUCTION * value));
 	}
 
 	@Override
