@@ -1033,9 +1033,12 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(zoglin, 1.8);
 		} else if (event.getEntity() instanceof Hoglin hoglin) {
 			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 1.8);
+		// TODO: disabled for now because of crashes
+		/*
 		} else if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
 			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
 			event.getEntity().remove();
+		*/
 		} else if (event.getEntity() instanceof FallingBlock fallingBlock) {
 			fallingBlock.setMetadata(FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, new FixedMetadataValue(mPlugin, ZoneUtils.hasZoneProperty(fallingBlock.getLocation(), ZoneProperty.ADVENTURE_MODE)));
 		}
