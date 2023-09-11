@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -78,6 +79,7 @@ public class AnvilOverride extends BaseOverride {
 					}
 
 				}.runTaskTimer(plugin, 0, 7);
+				CoreProtectIntegration.logRemoval(player, block);
 				block.setType(Material.AIR);
 				block.removeMetadata(Constants.ANVIL_CONFIRMATION_METAKEY, plugin);
 				int repCount = ScoreboardUtils.getScoreboardValue(player, REPAIR_OBJECTIVE).orElse(0) + 1;
