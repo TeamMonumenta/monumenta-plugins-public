@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.overrides;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils.EnchantmentType;
@@ -25,7 +26,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
-import com.playmonumenta.plugins.integrations.CoreProtectIntegration;
 
 public class AnvilOverride extends BaseOverride {
 	private static final String REPAIR_OBJECTIVE = "RepairT";
