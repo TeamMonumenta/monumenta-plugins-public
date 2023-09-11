@@ -38,6 +38,7 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -569,7 +570,7 @@ public class DelvesManager implements Listener {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (entity.getScoreboardTags().contains(Twisted.TWISTED_MINIBOSS_TAG)) {
 				Twisted.despawnTwistedMiniBoss((LivingEntity) entity);
-				entity.remove();
+				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> entity.remove());
 			}
 		}
 	}

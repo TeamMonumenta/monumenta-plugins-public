@@ -583,7 +583,7 @@ public class PortalManager implements Listener {
 					}
 					foundEntity = true;
 					portalLog("- entitiesLoadEvent: removed escapee portal map " + entity.getLocation());
-					entity.remove();
+					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> entity.remove());
 				}
 			}
 			if (foundEntity) {

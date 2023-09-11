@@ -367,11 +367,11 @@ public final class Grave {
 	}
 
 	void onChunkLoad() {
-		spawn();
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> spawn());
 	}
 
 	void onChunkUnload() {
-		remove();
+		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> remove());
 		mManager.addUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 	}
 

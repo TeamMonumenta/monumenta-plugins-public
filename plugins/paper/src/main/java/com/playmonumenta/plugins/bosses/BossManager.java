@@ -472,7 +472,9 @@ public class BossManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof LivingEntity living) {
-			unload(living, false);
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				unload(living, false);
+			});
 		}
 	}
 
@@ -494,11 +496,13 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkUnloadEvent(ChunkUnloadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
-			if (entity instanceof LivingEntity living) {
-				unload(living, false);
+		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+			for (Entity entity : event.getChunk().getEntities()) {
+				if (entity instanceof LivingEntity living) {
+					unload(living, false);
+				}
 			}
-		}
+		}, 1);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -117,7 +117,7 @@ public class TowerManager implements Listener {
 	public static void onChunkUnloadEvent(ChunkUnloadEvent event) {
 		for (Entity entity : List.of(event.getChunk().getEntities())) {
 			if (entity != null && entity.getScoreboardTags().contains(TowerConstants.TAG_UNLOAD_ENTITY)) {
-				entity.remove();
+				Bukkit.getScheduler().runTask(mPlugin, () -> entity.remove());
 			}
 		}
 	}

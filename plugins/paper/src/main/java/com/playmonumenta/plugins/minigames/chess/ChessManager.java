@@ -525,7 +525,7 @@ public class ChessManager implements Listener {
 		boolean shouldCheckInterfaces = false;
 		for (Entity entity : event.getChunk().getEntities()) {
 			if ((entity instanceof ItemFrame) && entity.getScoreboardTags().contains(ChessInterface.ITEM_FRAME_TAG)) {
-				entity.remove();
+				Bukkit.getScheduler().runTask(mPlugin, () -> entity.remove());
 				shouldCheckInterfaces = true;
 			}
 		}
