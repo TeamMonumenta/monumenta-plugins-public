@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -97,16 +96,16 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 
 		Map<Integer, BossHealthAction> events = new HashMap<>();
 		events.put(100, (mob) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Thank ye fer comin' and seein' me, but now this will be ye grave as well!\",\"color\":\"purple\"}]");
+			sendMessage("Yarharhar! Thank ye fer comin' and seein' me, but now this will be ye grave as well!");
 		});
 		events.put(50, (mob) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "I will hang ye out to dry!\",\"color\":\"purple\"}]");
+			sendMessage("I will hang ye out to dry!");
 		});
 		events.put(25, (mob) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "Yarharhar! Do ye feel it as well? That holy fleece? It be waitin' fer me!\",\"color\":\"purple\"}]");
+			sendMessage("Yarharhar! Do ye feel it as well? That holy fleece? It be waitin' fer me!");
 		});
 		events.put(10, (mob) -> {
-			PlayerUtils.executeCommandOnNearbyPlayers(spawnLoc, detectionRange, "tellraw @s [\"\",{\"text\":\"" + ChatColor.GOLD + "[Captain Varcosa] " + ChatColor.WHITE + "I be too close ter be stoppin' now! Me greed will never die!\",\"color\":\"purple\"}]");
+			sendMessage("I be too close ter be stoppin' now! Me greed will never die!");
 		});
 		BossBarManager bossBar = new BossBarManager(plugin, boss, detectionRange, BarColor.RED, BarStyle.SEGMENTED_10, events);
 
@@ -133,7 +132,7 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 		EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_MAX_HEALTH, bossTargetHp);
 		mBoss.setHealth(bossTargetHp);
 
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		for (Player player : getPlayers()) {
 			MessagingUtils.sendBoldTitle(player, Component.text("Captain Varcosa", NamedTextColor.DARK_PURPLE), Component.text("The Legendary Pirate King", NamedTextColor.RED));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 2, false, true, true));
 			player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 10, 0.7f);
@@ -142,11 +141,9 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 
 	@Override
 	public void death(@Nullable EntityDeathEvent event) {
-		for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+		for (Player player : getPlayers()) {
 			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_DEATH, SoundCategory.HOSTILE, 100.0f, 0.8f);
-			player.sendMessage(Component.text("", NamedTextColor.WHITE)
-				.append(Component.text("[Captain Varcosa] ", NamedTextColor.GOLD))
-				.append(Component.text("Ye thought I be the one in control here? Yarharhar! N'argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!")));
+			sendMessage("Ye thought I be the one in control here? Yarharhar! N'argh me lad, I merely be its pawn! But now me soul can rest, and ye will be its next meal! Yarharhar!", player);
 		}
 		mEndLoc.getBlock().setType(Material.REDSTONE_BLOCK);
 	}
@@ -155,5 +152,19 @@ public final class Varcosa extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		event.setDamage(event.getDamage() / mCoef);
+	}
+
+	private List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
+	}
+
+	private void sendMessage(String message) {
+		for (Player player : getPlayers()) {
+			sendMessage(message, player);
+		}
+	}
+
+	private void sendMessage(String message, Player player) {
+		com.playmonumenta.scriptedquests.utils.MessagingUtils.sendNPCMessage(player, "Captain Varcosa", message);
 	}
 }

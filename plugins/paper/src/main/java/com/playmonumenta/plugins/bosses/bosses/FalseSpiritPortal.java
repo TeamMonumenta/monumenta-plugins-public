@@ -12,6 +12,7 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -363,9 +363,9 @@ public class FalseSpiritPortal extends BossAbilityGroup {
 			ItemStack mainhand = player.getInventory().getItemInMainHand();
 			if (equalsTrident(mainhand)) {
 				event.setCancelled(true);
-				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " It needs to be travelling faster than that! Throw the Spear!");
+				MessagingUtils.sendNPCMessage(player, "Bhairavi", "It needs to be travelling faster than that! Throw the Spear!");
 			} else if (!mWarned.contains(player)) {
-				player.sendMessage(ChatColor.GOLD + "[Bhairavi]" + ChatColor.WHITE + " Don't attack the portal with your weapons! Kill the creatures, then hit the portal with the charged spear!");
+				MessagingUtils.sendNPCMessage(player, "Bhairavi", "Don't attack the portal with your weapons! Kill the creatures, then hit the portal with the charged spear!");
 				mWarned.add(player);
 			}
 		}

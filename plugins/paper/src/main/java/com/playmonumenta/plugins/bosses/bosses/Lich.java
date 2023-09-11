@@ -421,7 +421,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				public void run() {
 					if (mT % 60 == 0 && mDio < dio.length) {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mDio]);
+							p.sendMessage(Component.text(dio[mDio], NamedTextColor.LIGHT_PURPLE));
 						}
 						mDio++;
 					}
@@ -571,7 +571,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				public void run() {
 					if (mT % 60 == 0 && mDio < dio.length) {
 						for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-							p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mDio]);
+							p.sendMessage(Component.text(dio[mDio], NamedTextColor.LIGHT_PURPLE));
 						}
 						mDio++;
 					}
@@ -822,7 +822,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 								public void run() {
 									if (mIter < dio.length) {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mIter].toUpperCase());
+											p.sendMessage(Component.text(dio[mIter].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
 										}
 										mIter++;
 									} else {
@@ -1275,7 +1275,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (mT < dio1.length) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(ChatColor.LIGHT_PURPLE + dio1[mT].toUpperCase());
+						p.sendMessage(Component.text(dio1[mT].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
 					}
 					mT++;
 				} else {
@@ -1456,7 +1456,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 			public void run() {
 				if (mT < dio.length) {
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						p.sendMessage(ChatColor.LIGHT_PURPLE + dio[mT].toUpperCase());
+						p.sendMessage(Component.text(dio[mT].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
 					}
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_AMBIENT, SoundCategory.HOSTILE, 3, 1);
 					world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_HURT, SoundCategory.HOSTILE, 3, 1);
@@ -1839,7 +1839,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 						}
 						if (mT % 3 == 0 && mDio < finalDialog.length) {
 							for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-								p.sendMessage(ChatColor.LIGHT_PURPLE + finalDialog[mDio].toUpperCase());
+								p.sendMessage(Component.text(finalDialog[mDio].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
 							}
 							mDio++;
 						}
@@ -1939,7 +1939,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 								public void run() {
 									if (mT != 1 && mDio < endDialog.length) {
 										for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-											p.sendMessage(ChatColor.LIGHT_PURPLE + endDialog[mDio].toUpperCase());
+											p.sendMessage(Component.text(endDialog[mDio].toUpperCase(), NamedTextColor.LIGHT_PURPLE));
 										}
 										mDio++;
 									}

@@ -89,7 +89,7 @@ public class BlackflameBurst extends Spell {
 		mMissile.runInitiateAesthetic(mBoss.getWorld(), mBoss.getEyeLocation(), 0);
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), Ghalkor.detectionRange, true);
 		Collections.shuffle(players);
-		if (players.size() == 0 || mBoss.getTargetBlock(Ghalkor.detectionRange) == null) {
+		if (players.size() == 0 || mBoss.getTargetBlockExact(Ghalkor.detectionRange) == null) {
 			return;
 		}
 

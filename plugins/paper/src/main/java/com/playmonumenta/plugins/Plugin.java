@@ -92,6 +92,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.jetbrains.annotations.Nullable;
@@ -331,7 +332,7 @@ public class Plugin extends JavaPlugin {
 		Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		Objective obj = scoreboard.getObjective("const");
 		if (obj == null) {
-			obj = scoreboard.registerNewObjective("const", "dummy", Component.text("const"));
+			obj = scoreboard.registerNewObjective("const", Criteria.DUMMY, Component.text("const"));
 		}
 		obj.getScore("$IsPlay").setScore(IS_PLAY_SERVER ? 1 : 0);
 		getLogger().info("Setting $IsPlay const = " + Integer.toString(IS_PLAY_SERVER ? 1 : 0) + " (" + (IS_PLAY_SERVER ? "play" : "build") + " server)");

@@ -23,7 +23,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -668,8 +667,9 @@ public class KnickKnackSackGui extends Gui {
 		book.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
 		book.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		BookMeta bookMeta = (BookMeta) book.getItemMeta();
-		bookMeta.setTitle(ChatColor.RESET + "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "" + "Personal Enchanted Book");
-		bookMeta.displayName(Component.text("Personal Enchanted Book", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false));
+		Component title = Component.text("Personal Enchanted Book", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
+		bookMeta.title(title);
+		bookMeta.displayName(title);
 		bookMeta.setAuthor("P.E.B.E.");
 		bookMeta.lore(List.of(
 			Component.text("Click to open your PEB", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)

@@ -130,7 +130,7 @@ public class LightningBottle extends DepthsAbility {
 		PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
 
 		potionMeta.setBasePotionData(new PotionData(PotionType.MUNDANE));
-		potionMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS); // Hide "No Effects" vanilla potion effect lore
+		potionMeta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS); // Hide "No Effects" vanilla potion effect lore
 		potionMeta.setColor(Color.YELLOW);
 		potionMeta.displayName(Component.text(POTION_NAME, NamedTextColor.AQUA)); // OG Alchemist's Potion item name colour of &b
 		potionMeta.lore(List.of(Component.text("A unique potion used by Dawnbringers.", NamedTextColor.DARK_GRAY)));

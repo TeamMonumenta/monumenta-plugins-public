@@ -101,30 +101,30 @@ public class BoatUtilsCommand {
 			.register();
 	}
 
-	private static TreeSpecies getPreferredBoat(Player player) {
+	private static Boat.Type getPreferredBoat(Player player) {
 		// OakBoat, BirchBoat, JungleBoat, AcaciaBoat, DarkOakBoat (with spruce being default)
-		TreeSpecies selectedType = TreeSpecies.REDWOOD;
+		Boat.Type selectedType = Boat.Type.SPRUCE;
 
 		outside: for (String tag : player.getScoreboardTags()) {
 			switch (tag) {
 				case "OakBoat" -> {
-					selectedType = TreeSpecies.GENERIC;
+					selectedType = Boat.Type.OAK;
 					break outside;
 				}
 				case "BirchBoat" -> {
-					selectedType = TreeSpecies.BIRCH;
+					selectedType = Boat.Type.BIRCH;
 					break outside;
 				}
 				case "AcaciaBoat" -> {
-					selectedType = TreeSpecies.ACACIA;
+					selectedType = Boat.Type.ACACIA;
 					break outside;
 				}
 				case "DarkOakBoat" -> {
-					selectedType = TreeSpecies.DARK_OAK;
+					selectedType = Boat.Type.DARK_OAK;
 					break outside;
 				}
 				case "JungleBoat" -> {
-					selectedType = TreeSpecies.JUNGLE;
+					selectedType = Boat.Type.JUNGLE;
 					break outside;
 				}
 				default -> {
@@ -143,7 +143,7 @@ public class BoatUtilsCommand {
 		armorStand.setMarker(true);
 		armorStand.setSilent(true);
 		armorStand.addScoreboardTag(ONE_PLAYER_BOAT_TAG);
-		boat.setWoodType(getPreferredBoat(player));
+		boat.setBoatType(getPreferredBoat(player));
 		boat.addPassenger(armorStand);
 		boat.addPassenger(player);
 	}

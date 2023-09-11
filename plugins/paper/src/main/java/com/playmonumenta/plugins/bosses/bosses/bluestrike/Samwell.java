@@ -34,14 +34,15 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.scriptedquests.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -54,7 +55,6 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
@@ -87,8 +87,8 @@ public class Samwell extends BossAbilityGroup {
 	public int mPhase = 1;
 	public boolean mCraftPhase = false;
 	public boolean mDaggerPhase = false;
-	public @Nullable BossBar mGatheringBar;
-	public @Nullable BossBar mCraftingBar;
+	public final BossBar mGatheringBar;
+	public final BossBar mCraftingBar;
 	private final List<Spell> mInactivePassives;
 	private final List<Spell> mBasePassives;
 	List<Spell> mPhase1Passives;
@@ -140,6 +140,10 @@ public class Samwell extends BossAbilityGroup {
 
 		mDagger = InventoryUtils.getItemFromLootTable(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_dagger"));
 		mShards = InventoryUtils.getItemFromLootTable(mSpawnLoc, NamespacedKey.fromString("epic:r3/dungeons/bluestrike/boss/blackblood_shard"));
+
+		mCraftingBar = BossBar.bossBar(Component.text("Crafting...", NamedTextColor.YELLOW, TextDecoration.BOLD), 0, BossBar.Color.YELLOW, BossBar.Overlay.NOTCHED_6);
+		mGatheringBar = BossBar.bossBar(Component.empty(), 0, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_6);
+		// Title of mGatheringBar is properly set in init()
 
 		mInactivePassives = List.of(
 			new SpellDominion(plugin, boss, mSpawnLoc, false)
@@ -251,8 +255,6 @@ public class Samwell extends BossAbilityGroup {
 	@Override
 	public void init() {
 		mBoss.setAI(false);
-		mCraftingBar = Bukkit.getServer().createBossBar(ChatColor.YELLOW + "" + ChatColor.BOLD + "Crafting...", BarColor.YELLOW, BarStyle.SEGMENTED_6);
-		mCraftingBar.setProgress(0);
 
 		// Going to be using Scoreboards for this, easier to track between functions (I hope)
 		resetScoreboard();
@@ -267,9 +269,8 @@ public class Samwell extends BossAbilityGroup {
 		team.addEntity(mBoss);
 		mBoss.setGlowing(true);
 
-		mShardsReq = (int) (3 + Math.floor(PlayerUtils.playersInRange(mSpawnLoc, 100, true).size() / 2.0));
-		mGatheringBar = Bukkit.getServer().createBossBar(ChatColor.YELLOW + "Shards Obtained: " + ChatColor.GREEN + getShards() + ChatColor.YELLOW + " / " + ChatColor.RED + mShardsReq, BarColor.GREEN, BarStyle.SEGMENTED_6);
-		mGatheringBar.setProgress(0);
+		mShardsReq = (int) (3 + Math.floor(getPlayers().size() / 2.0));
+		refreshGatheringBar();
 
 		// Need to Delay this a bit, as BlueStrikeDaggerCraftingBoss will search for a nearby WitherSkeleton.
 		// (IK it is quite scuffed)
@@ -380,13 +381,12 @@ public class Samwell extends BossAbilityGroup {
 	public void startCraftPhase() {
 		changePhaseCraft();
 
-		mCraftingBar.setProgress(0);
+		mCraftingBar.progress(0);
 		resetScoreboard();
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75, true);
-		mCraftingBar.setVisible(true);
+		List<Player> players = getPlayers();
 
 		for (Player player : players) {
-			mCraftingBar.addPlayer(player);
+			player.showBossBar(mCraftingBar);
 		}
 
 		mBhairaviAbility.craft();
@@ -406,10 +406,12 @@ public class Samwell extends BossAbilityGroup {
 			@Override
 			public void run() {
 				mTimerCrafting++;
-				mCraftingBar.setProgress((double) mTimerCrafting / CRAFT_DURATION);
+				mCraftingBar.progress((float) mTimerCrafting / CRAFT_DURATION);
 				if (!mCraftPhase) {
 					mTimerCrafting = 0;
-					mCraftingBar.setVisible(false);
+					for (Player player : players) {
+						player.hideBossBar(mCraftingBar);
+					}
 					failCraft();
 					craftItem.remove();
 					this.cancel();
@@ -417,7 +419,9 @@ public class Samwell extends BossAbilityGroup {
 				}
 				if (mTimerCrafting >= CRAFT_DURATION) {
 					mTimerCrafting = 0;
-					mCraftingBar.setVisible(false);
+					for (Player player : players) {
+						player.hideBossBar(mCraftingBar);
+					}
 					spawnDagger();
 					craftItem.remove();
 					this.cancel();
@@ -477,7 +481,7 @@ public class Samwell extends BossAbilityGroup {
 
 				Player player = EntityUtils.getNearestPlayer(daggerEntity.getLocation(), 1);
 				if (player != null) {
-					((Plugin) mPlugin).mEffectManager.addEffect(player, DAGGER_EFFECT_SOURCE, new SamwellBlackbloodDagger(30 * 20));
+					Plugin.getInstance().mEffectManager.addEffect(player, DAGGER_EFFECT_SOURCE, new SamwellBlackbloodDagger(30 * 20));
 					daggerEntity.remove();
 					this.cancel();
 				}
@@ -485,7 +489,7 @@ public class Samwell extends BossAbilityGroup {
 		}.runTaskTimer(mPlugin, 0, 1);
 
 		new BukkitRunnable() {
-			int mCurrentPhase = mPhase;
+			final int mCurrentPhase = mPhase;
 			int mTimer = 0;
 
 			@Override
@@ -518,11 +522,9 @@ public class Samwell extends BossAbilityGroup {
 
 		clearAllAdds();
 		clearDaggerAndShards();
-		mGatheringBar.setVisible(false);
-		mCraftingBar.setVisible(false);
 
-		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
-		if (players.size() <= 0) {
+		List<Player> players = getPlayers();
+		if (players.isEmpty()) {
 			return;
 		}
 
@@ -534,6 +536,9 @@ public class Samwell extends BossAbilityGroup {
 		};
 
 		for (Player player : players) {
+			player.hideBossBar(mCraftingBar);
+			player.hideBossBar(mGatheringBar);
+
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 25, 10));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 25, 1));
 
@@ -599,7 +604,7 @@ public class Samwell extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", ChatColor.RED + dio[mT]));
+				players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text(dio[mT], NamedTextColor.RED)));
 				mT++;
 				if (mT == dio.length) {
 					this.cancel();
@@ -607,7 +612,7 @@ public class Samwell extends BossAbilityGroup {
 					mBoss.setHealth(0);
 
 					Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-						for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
+						for (Player player : getPlayers()) {
 							com.playmonumenta.plugins.utils.MessagingUtils.sendBoldTitle(player, Component.text("VICTORY", NamedTextColor.GREEN), Component.text("Samwell, Usurper Of Life", NamedTextColor.DARK_RED));
 							player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.HOSTILE, 100, 0.8f);
 						}
@@ -640,12 +645,9 @@ public class Samwell extends BossAbilityGroup {
 			@Override
 			public void run() {
 				mT++;
-				List<LivingEntity> livingEntities = EntityUtils.getNearbyMobs(mSpawnLoc, 50);
+				List<LivingEntity> livingEntities = EntityUtils.getNearbyMobs(mSpawnLoc, 50, mBoss);
 				for (LivingEntity e : livingEntities) {
-					if (EntityUtils.isHostileMob(e)
-						    && e != mBoss) {
-						e.setHealth(0);
-					}
+					e.setHealth(0);
 				}
 
 				if (mT >= 10) {
@@ -657,7 +659,7 @@ public class Samwell extends BossAbilityGroup {
 
 	// Clears Dagger and Shard items from player's inventory + world
 	public void clearDaggerAndShards() {
-		List<Item> itemList = (List<Item>) mBoss.getWorld().getEntitiesByClass(Item.class);
+		Collection<Item> itemList = mBoss.getWorld().getEntitiesByClass(Item.class);
 		for (Item item : itemList) {
 			if (isBossItem(item.getItemStack())) {
 				item.remove();
@@ -665,7 +667,7 @@ public class Samwell extends BossAbilityGroup {
 		}
 
 		List<Player> playerList = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
-		playerList.forEach(p -> ((Plugin) mPlugin).mEffectManager.clearEffects(p, DAGGER_EFFECT_SOURCE));
+		playerList.forEach(p -> Plugin.getInstance().mEffectManager.clearEffects(p, DAGGER_EFFECT_SOURCE));
 		for (Player player : playerList) {
 			for (ItemStack itemStack : player.getInventory()) {
 				if (isBossItem(itemStack)) {
@@ -680,7 +682,7 @@ public class Samwell extends BossAbilityGroup {
 
 	// Clears Daggers only.
 	public void clearDagger() {
-		List<Item> itemList = (List<Item>) mBoss.getWorld().getEntitiesByClass(Item.class);
+		Collection<Item> itemList = mBoss.getWorld().getEntitiesByClass(Item.class);
 		for (Item item : itemList) {
 			if (isDaggerItem(item.getItemStack())) {
 				item.remove();
@@ -688,7 +690,7 @@ public class Samwell extends BossAbilityGroup {
 		}
 
 		List<Player> playerList = EntityUtils.getNearestPlayers(mBoss.getLocation(), 100);
-		playerList.forEach(p -> ((Plugin) mPlugin).mEffectManager.clearEffects(p, DAGGER_EFFECT_SOURCE));
+		playerList.forEach(p -> Plugin.getInstance().mEffectManager.clearEffects(p, DAGGER_EFFECT_SOURCE));
 		for (Player player : playerList) {
 			for (ItemStack itemStack : player.getInventory()) {
 				if (isDaggerItem(itemStack)) {
@@ -707,13 +709,10 @@ public class Samwell extends BossAbilityGroup {
 		mDaggerPhase = false;
 
 		if (mPhase < 4) {
-			List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), 75, true);
-			mGatheringBar.setVisible(true);
-			mGatheringBar.setProgress(0);
-			mGatheringBar.setTitle(ChatColor.YELLOW + "Shards Obtained: " + ChatColor.GREEN + "0" + ChatColor.YELLOW + " / " + ChatColor.RED + mShardsReq);
-
+			List<Player> players = getPlayers();
+			refreshGatheringBar();
 			for (Player player : players) {
-				mGatheringBar.addPlayer(player);
+				player.showBossBar(mGatheringBar);
 			}
 		}
 
@@ -728,7 +727,9 @@ public class Samwell extends BossAbilityGroup {
 	public void changePhaseCraft() {
 		mCraftPhase = true;
 		mDaggerPhase = false;
-		mGatheringBar.setVisible(false);
+		for (Player player : getPlayers()) {
+			player.hideBossBar(mGatheringBar);
+		}
 		switch (mPhase) {
 			case 1 -> changePhase(mPhase1Actives, mCraft1Passives, null);
 			case 2 -> changePhase(mPhase2Actives, mCraft2Passives, null);
@@ -755,8 +756,12 @@ public class Samwell extends BossAbilityGroup {
 
 	public void addShards(int amount) {
 		ScoreboardUtils.setScoreboardValue(mBoss, Samwell.OBJECTIVE_SHARD_NAME, getShards() + amount);
-		mGatheringBar.setProgress((double) getShards() / mShardsReq);
-		mGatheringBar.setTitle(ChatColor.YELLOW + "Shards Obtained: " + ChatColor.GREEN + getShards() + ChatColor.YELLOW + " / " + ChatColor.RED + mShardsReq);
+		refreshGatheringBar();
+	}
+
+	private void refreshGatheringBar() {
+		mGatheringBar.progress((float) getShards() / mShardsReq);
+		mGatheringBar.name(Component.text("Shards Obtained: ", NamedTextColor.YELLOW).append(Component.text(getShards(), NamedTextColor.GREEN)).append(Component.text(" / ", NamedTextColor.YELLOW)).append(Component.text(mShardsReq, NamedTextColor.RED)));
 	}
 
 	public int getFails() {
@@ -778,5 +783,9 @@ public class Samwell extends BossAbilityGroup {
 	public void resetScoreboard() {
 		ScoreboardUtils.setScoreboardValue(mBoss, OBJECTIVE_SHARD_NAME, 0);
 		ScoreboardUtils.setScoreboardValue(mBoss, OBJECTIVE_FAILS_NAME, 0);
+	}
+
+	private List<Player> getPlayers() {
+		return PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true);
 	}
 }

@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -95,8 +96,7 @@ public class SpellLightningStorm extends Spell {
 		BossUtils.bossDamagePercent(mBoss, player, 0.5, "Lightning Storm");
 		if (!mWarnedPlayers.contains(player)) {
 			mWarnedPlayers.add(player);
-			player.sendMessage(ChatColor.AQUA
-				                   + "That hurt! There must be a lightning storm above you. Staying close to the ground might help to not get struck again.");
+			player.sendMessage(Component.text("That hurt! There must be a lightning storm above you. Staying close to the ground might help to not get struck again.", NamedTextColor.AQUA));
 		}
 	}
 

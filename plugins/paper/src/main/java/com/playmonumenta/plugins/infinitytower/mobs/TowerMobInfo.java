@@ -10,7 +10,6 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -77,7 +76,7 @@ public class TowerMobInfo {
 	}
 
 	public void stampStats(Player player) {
-		TowerGameUtils.sendMessage(player, "Mob stats for mob: " + ChatColor.WHITE + mLosName);
+		TowerGameUtils.sendMessage(player, "Mob stats for mob: " + mLosName);
 
 		player.sendMessage(TowerGameUtils.getRarityComponent(mMobRarity));
 		player.sendMessage(TowerGameUtils.getWeightComponent(mMobStats.mWeight));

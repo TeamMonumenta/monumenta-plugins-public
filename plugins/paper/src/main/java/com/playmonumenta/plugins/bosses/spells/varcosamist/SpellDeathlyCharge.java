@@ -7,7 +7,8 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,10 +50,8 @@ public class SpellDeathlyCharge extends Spell {
 		World world = mBoss.getWorld();
 		Creature c = (Creature) mBoss;
 		LivingEntity target = c.getTarget();
-
-		if (target instanceof Player) {
-			Player player = (Player) target;
-			player.sendMessage(ChatColor.RED + mDio);
+		if (target != null) {
+			target.sendMessage(Component.text(mDio, NamedTextColor.RED));
 		}
 		mBoss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 30, 1));
 		world.playSound(mBoss.getLocation(), Sound.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 3, 1.25f);
