@@ -89,7 +89,10 @@ public class ChaosDagger extends DepthsAbility {
 
 		dagger.setVelocity(vel);
 		dagger.setGlowing(true);
-		world.playSound(loc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.4f, 2.5f);
+
+		world.playSound(loc, Sound.ENTITY_WARDEN_HEARTBEAT, SoundCategory.PLAYERS, 2.0f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.0f, 0.7f);
 
 		new BukkitRunnable() {
 
@@ -127,7 +130,11 @@ public class ChaosDagger extends DepthsAbility {
 
 				if (mTarget.getBoundingBox().overlaps(dagger.getBoundingBox()) && !mTarget.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG)) {
 					new PartialParticle(Particle.EXPLOSION_NORMAL, tLoc, 30, 2, 0, 2).spawnAsPlayerActive(mPlayer);
-					world.playSound(tLoc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0.15f);
+					world.playSound(tLoc, Sound.BLOCK_ANVIL_PLACE, SoundCategory.PLAYERS, 0.3f, 1.4f);
+					world.playSound(tLoc, Sound.ENTITY_WITHER_SKELETON_HURT, SoundCategory.PLAYERS, 0.7f, 1.4f);
+					world.playSound(tLoc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.5f);
+					world.playSound(tLoc, Sound.ENTITY_PLAYER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
+					world.playSound(tLoc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 0.1f);
 					mHitMob = mTarget;
 					if (EntityUtils.isBoss(mTarget)) {
 						EntityUtils.applySlow(mPlugin, STUN_DURATION, 0.99f, mTarget);
@@ -184,6 +191,17 @@ public class ChaosDagger extends DepthsAbility {
 					AbilityUtils.applyStealth(mPlugin, mPlayer, STEALTH_DURATION, null);
 				}
 			}, 1);
+
+			Location loc = enemy.getLocation();
+			World world = loc.getWorld();
+			world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.3f, 2.0f);
+			world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.5f);
+			world.playSound(loc, Sound.ITEM_AXE_SCRAPE, SoundCategory.PLAYERS, 0.7f, 0.1f);
+			world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.6f, 2.0f);
+			world.playSound(loc, Sound.ENTITY_PHANTOM_BITE, SoundCategory.PLAYERS, 0.7f, 0.1f);
+			world.playSound(loc, Sound.ENTITY_PHANTOM_BITE, SoundCategory.PLAYERS, 0.7f, 0.9f);
+			world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 0.3f, 2.0f);
+
 		}
 		return false; // only changes event damage, and also prevents multiple calls itself by clearing mHitMob
 	}

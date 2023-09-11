@@ -70,13 +70,12 @@ public class Avalanche extends DepthsAbility {
 
 		putOnCooldown();
 
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 0.95f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 1, 0.95f);
-
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 0.75f);
-		world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.BLOCKS, 1, 1.25f);
-
-		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 0.5f, 1f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.7f, 0.5f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 2.0f, 1.0f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.7f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.PLAYERS, 0.6f, 0.7f);
+		world.playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_DEATH, SoundCategory.PLAYERS, 0.3f, 1.5f);
+		world.playSound(loc, Sound.ENTITY_WARDEN_DEATH, SoundCategory.PLAYERS, 1.0f, 0.1f);
 
 		List<LivingEntity> hitMobs = new ArrayList<>();
 

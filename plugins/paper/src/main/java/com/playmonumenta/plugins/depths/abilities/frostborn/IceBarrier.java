@@ -63,7 +63,7 @@ public class IceBarrier extends DepthsAbility {
 		}
 
 		World world = mPlayer.getWorld();
-		Block block = mPlayer.getTargetBlock(CAST_RANGE);
+		Block block = mPlayer.getTargetBlockExact(CAST_RANGE);
 		if (block == null) {
 			return;
 		}
@@ -74,7 +74,10 @@ public class IceBarrier extends DepthsAbility {
 			DepthsUtils.spawnIceTerrain(block.getLocation(), CAST_TIME, mPlayer);
 			new PartialParticle(Particle.CRIT, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 			new PartialParticle(Particle.CRIT_MAGIC, block.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
-			world.playSound(mPlayer.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 1, 1.4f);
+			Location loc = mPlayer.getLocation();
+			world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.0f);
+			world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 1.0f);
+			world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 2.0f);
 			if (!mIsPrimed || mPrimedLoc == null) {
 				mIsPrimed = true;
 				mPrimedLoc = block.getLocation();
@@ -87,7 +90,7 @@ public class IceBarrier extends DepthsAbility {
 						if (mIsPrimed && mPrimedLoc != null) {
 							mIsPrimed = false;
 							mPrimedLoc = null;
-							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.BLOCKS, 2.0f, 0.5f);
+							world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 2.0f, 0.5f);
 							//Reset cd
 							mPlugin.mTimers.addCooldown(mPlayer, ClassAbility.ICE_BARRIER, 0);
 						}
@@ -116,7 +119,16 @@ public class IceBarrier extends DepthsAbility {
 					new PartialParticle(Particle.CRIT, b.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 					new PartialParticle(Particle.CRIT_MAGIC, b.getLocation(), 15, 0, 0, 0, 0.6f).spawnAsPlayerActive(mPlayer);
 				}
-				world.playSound(mPlayer.getLocation(), Sound.BLOCK_BELL_USE, SoundCategory.BLOCKS, 2.0f, 2.0f);
+
+				world.playSound(loc, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 0.8f, 2.0f);
+				world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 0.5f);
+				world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 1.0f);
+				world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 0.6f, 1.6f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.2f, 2.0f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 0.8f, 2.0f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 0.4f, 0.7f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 2.0f);
+
 				mPrimedLoc = null;
 			}
 		}

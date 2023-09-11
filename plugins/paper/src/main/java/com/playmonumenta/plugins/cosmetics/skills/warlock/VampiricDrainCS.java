@@ -59,9 +59,9 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	}
 
 	@Override
-	public boolean isUnlocked(Player mPlayer) {
-		return ScoreboardUtils.getScoreboardValue(mPlayer, GALLERY_COMPLETE_SCB).orElse(0) >= 1
-			       || mPlayer.getGameMode() == GameMode.CREATIVE;
+	public boolean isUnlocked(Player player) {
+		return ScoreboardUtils.getScoreboardValue(player, GALLERY_COMPLETE_SCB).orElse(0) >= 1
+			       || player.getGameMode() == GameMode.CREATIVE;
 	}
 
 	@Override
@@ -90,17 +90,17 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	}
 
 	@Override
-	public void rendHitParticle1(Player mPlayer, Location loc) {
-		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.BLOCK_CRACK, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOOD_BLOCK).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 4, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(mPlayer);
+	public void rendHitParticle1(Player player, Location loc) {
+		new PartialParticle(Particle.REDSTONE, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOODY_COLOR1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, loc.clone().add(0, 1, 0), 20, 0.75, 0.5, 0.75, 0.0, BLOOD_BLOCK).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc.clone().add(0, 1, 0), 4, 0.75, 0.5, 0.75, 0.0).spawnAsPlayerActive(player);
 
-		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).count(16).data(BLOODY_COLOR1).spawnAsPlayerActive(mPlayer);
+		new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).count(16).data(BLOODY_COLOR1).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void rendHitParticle2(Player mPlayer, Location loc, double radius) {
-		rendHitParticle1(mPlayer, loc);
+	public void rendHitParticle2(Player player, Location loc, double radius) {
+		rendHitParticle1(player, loc);
 
 		PPCircle ring1 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.25, 0), 1.25).data(BLOODY_COLOR1);
 		PPCircle ring2 = new PPCircle(Particle.REDSTONE, loc.clone().add(0, 0.55, 0), 1.25).data(BLOODY_COLOR1);
@@ -114,8 +114,8 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 					this.cancel();
 				}
 				double mRadius = FastUtils.sin(0.5 * 3.1416 * mTicks / RING_FRAMES) * radius;
-				ring1.radius(mRadius).count((int) Math.ceil(mRadius * 4)).spawnAsPlayerActive(mPlayer);
-				ring2.radius(mRadius * 0.8).count((int) Math.ceil(mRadius * 3.2)).spawnAsPlayerActive(mPlayer);
+				ring1.radius(mRadius).count((int) Math.ceil(mRadius * 4)).spawnAsPlayerActive(player);
+				ring2.radius(mRadius * 0.8).count((int) Math.ceil(mRadius * 3.2)).spawnAsPlayerActive(player);
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
@@ -136,7 +136,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 						t -> FastUtils.cos(theta + t * dTheta),
 						t -> FastUtils.sin(theta + t * dTheta),
 						t -> h + 0.5 * t,
-						(l, t) -> new PartialParticle(Particle.DAMAGE_INDICATOR, l, 4, 0.75, 0.5, 0.75, 0.6).spawnAsPlayerActive(mPlayer)
+						(l, t) -> new PartialParticle(Particle.DAMAGE_INDICATOR, l, 4, 0.75, 0.5, 0.75, 0.6).spawnAsPlayerActive(player)
 					);
 				}
 			}.runTaskLater(Plugin.getInstance(), (int) Math.round(r / radius * RING_FRAMES));
@@ -144,7 +144,7 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 	}
 
 	@Override
-	public void rendHealEffect(Player mPlayer, Player healed, LivingEntity enemy) {
+	public void rendHealEffect(Player player, Player healed, LivingEntity enemy) {
 		Location loc1 = enemy.getLocation().add(0, enemy.getHeight() / 1.6, 0);
 		Location loc2 = healed.getLocation().add(0, 0.6, 0);
 		Vector mFront = loc2.clone().subtract(loc1).toVector();
@@ -155,28 +155,28 @@ public class VampiricDrainCS extends SoulRendCS implements GalleryCS {
 			t -> t * 0.34,
 				t -> FastUtils.sin(t * 3.1416 / 5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3, t -> FastUtils.cos(t * 3.1416 / 5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
 				(loc, t) -> {
-				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
 			}
 		);
 		ParticleUtils.drawCurve(loc1, 0, (int) Math.ceil(distance * 3), mFront.clone().normalize(),
 			t -> t * 0.34,
 				t -> FastUtils.sin(t * 3.1416 / 5 - 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3, t -> FastUtils.cos(t * 3.1416 / 5 - 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
 				(loc, t) -> {
-				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
 			}
 		);
 		ParticleUtils.drawCurve(loc1, 0, (int) Math.ceil(distance * 3), mFront.clone().normalize(),
 			t -> t * 0.34,
 				t -> FastUtils.sin(t * 3.1416 / 5 + 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3, t -> FastUtils.cos(t * 3.1416 / 5 + 3.1416 / 1.5) * (1.25 - FastUtils.sin(t * 3.1416)) * 0.3,
 				(loc, t) -> {
-				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.REDSTONE, loc, 2, 0, 0, 0, BLOODY_COLOR2).spawnAsPlayerActive(player);
 			}
 		);
 
 	}
 
 	@Override
-	public void rendAbsorptionEffect(Player mPlayer, Player healed, LivingEntity enemy) {
-		new PartialParticle(Particle.HEART, healed.getLocation().add(0, 1, 0), 5, 0.4, 0.6, 0.4, 0.0).spawnAsPlayerActive(mPlayer);
+	public void rendAbsorptionEffect(Player player, Player healed, LivingEntity enemy) {
+		new PartialParticle(Particle.HEART, healed.getLocation().add(0, 1, 0), 5, 0.4, 0.6, 0.4, 0.0).spawnAsPlayerActive(player);
 	}
 }

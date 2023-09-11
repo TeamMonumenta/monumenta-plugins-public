@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.depths.abilities.dawnbringer.SoothingCombos;
 import com.playmonumenta.plugins.depths.abilities.earthbound.EarthenCombos;
+import com.playmonumenta.plugins.depths.abilities.frostborn.FrigidCombos;
+import com.playmonumenta.plugins.depths.abilities.shadow.DarkCombos;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -47,11 +49,11 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 				int randInt = FastUtils.RANDOM.nextInt(0, 5);
 
 				switch (randInt) {
-					case 0 -> soothingCombo(entity, enemy);
-					case 1 -> earthenCombo(entity, enemy);
-					case 2 -> volcanicCombo(entity, enemy);
-					case 3 -> frigidCombo(entity, enemy);
-					case 4 -> darkCombo(entity, enemy);
+					case 0 -> soothingCombo(player, enemy);
+					case 1 -> earthenCombo(player, enemy);
+					case 2 -> volcanicCombo(player, enemy);
+					case 3 -> frigidCombo(player, enemy);
+					case 4 -> darkCombo(player, enemy);
 					default -> {
 					}
 				}
@@ -59,78 +61,76 @@ public class DeepGodsEndowment extends ZeroArgumentEffect {
 		}
 	}
 
-	public void soothingCombo(LivingEntity entity, LivingEntity enemy) {
+	public void soothingCombo(Player player, LivingEntity enemy) {
 		PotionEffect hasteEffect = new PotionEffect(PotionEffectType.FAST_DIGGING, 20 * 2, 0, false, true);
 
-		List<Player> players = PlayerUtils.playersInRange(entity.getLocation(), 12, true);
+		List<Player> players = PlayerUtils.playersInRange(player.getLocation(), 12, true);
 
 		for (Player p : players) {
 			p.addPotionEffect(hasteEffect);
 			Plugin.getInstance().mEffectManager.addEffect(p, SoothingCombos.SPEED_EFFECT_NAME, new PercentSpeed(20 * 2, 0.1, SoothingCombos.SPEED_EFFECT_NAME));
-			new PartialParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
-			new PartialParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
-			entity.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
+			new PartialParticle(Particle.END_ROD, p.getLocation().add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(player);
+			new PartialParticle(Particle.VILLAGER_HAPPY, p.getLocation().add(0, 1, 0), 5, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(player);
+			player.getWorld().playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
 		}
 
-		Location loc = entity.getLocation().add(0, 1, 0);
-		entity.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
-		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(entity);
+		Location loc = player.getLocation().add(0, 1, 0);
+		player.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.6f);
+		new PartialParticle(Particle.END_ROD, loc.add(0, 1, 0), 10, 0.7, 0.7, 0.7, 0.001).spawnAsEntityActive(player);
 	}
 
-	public void earthenCombo(LivingEntity entity, LivingEntity enemy) {
-		Plugin.getInstance().mEffectManager.addEffect(entity, EarthenCombos.PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(20 * 4, -.08));
+	public void earthenCombo(Player player, LivingEntity enemy) {
+		Plugin.getInstance().mEffectManager.addEffect(player, EarthenCombos.PERCENT_DAMAGE_RECEIVED_EFFECT_NAME, new PercentDamageReceived(20 * 4, -.08));
 		EntityUtils.applySlow(Plugin.getInstance(), 25, .99, enemy);
 
-		Location loc = entity.getLocation().add(0, 1, 0);
-		World world = entity.getWorld();
+		Location loc = player.getLocation().add(0, 1, 0);
+		World world = player.getWorld();
 		Location entityLoc = enemy.getLocation();
-		world.playSound(loc, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
-		world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
+		EarthenCombos.playSounds(world, loc);
 		new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65);
-		new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsEntityActive(entity);
-		new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsEntityActive(entity);
+		new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsEntityActive(player);
+		new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsEntityActive(player);
 	}
 
-	public void volcanicCombo(LivingEntity entity, LivingEntity enemy) {
+	public void volcanicCombo(Player player, LivingEntity enemy) {
 		Location location = enemy.getLocation();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(location, 4)) {
-			EntityUtils.applyFire(Plugin.getInstance(), 60, mob, (Player) entity);
-			DamageUtils.damage(entity, mob, DamageType.MAGIC, 6, null, true);
+			EntityUtils.applyFire(Plugin.getInstance(), 60, mob, (Player) player);
+			DamageUtils.damage(player, mob, DamageType.MAGIC, 6, null, true);
 		}
-		World world = entity.getWorld();
+		World world = player.getWorld();
 		for (int i = 0; i < 360; i += 45) {
 			double rad = Math.toRadians(i);
 			Location locationDelta = new Location(world, 4 / 2 * FastUtils.cos(rad), 0.5, 4 / 2 * FastUtils.sin(rad));
 			location.add(locationDelta);
-			new PartialParticle(Particle.FLAME, location, 1).spawnAsEntityActive(entity);
+			new PartialParticle(Particle.FLAME, location, 1).spawnAsEntityActive(player);
 			location.subtract(locationDelta);
 		}
 		world.playSound(location, Sound.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 0.5f, 1);
 	}
 
-	public void frigidCombo(LivingEntity entity, LivingEntity enemy) {
+	public void frigidCombo(Player player, LivingEntity enemy) {
 		Location targetLoc = enemy.getLocation();
 		World world = targetLoc.getWorld();
 		for (LivingEntity mob : EntityUtils.getNearbyMobs(targetLoc, 4)) {
 			if (!(mob.getHealth() <= 0)) {
-				new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65).spawnAsEntityActive(entity);
+				new PartialParticle(Particle.CRIT_MAGIC, mob.getLocation(), 25, .5, .2, .5, 0.65).spawnAsEntityActive(player);
 				EntityUtils.applySlow(Plugin.getInstance(), 2 * 20, 0.2, mob);
-				DamageUtils.damage(entity, mob, DamageType.MAGIC, 2, null, true);
+				DamageUtils.damage(player, mob, DamageType.MAGIC, 2, null, true);
 			}
 		}
 
-		Location playerLoc = entity.getLocation().add(0, 1, 0);
-		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
-		world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
-		new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsEntityActive(entity);
+		Location playerLoc = player.getLocation().add(0, 1, 0);
+		FrigidCombos.playSounds(world, playerLoc);
+		new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsEntityActive(player);
 	}
 
-	public void darkCombo(LivingEntity entity, LivingEntity enemy) {
+	public void darkCombo(Player player, LivingEntity enemy) {
 		EntityUtils.applyVulnerability(Plugin.getInstance(), 20 * 3, 0.15, enemy);
 
-		((Player) entity).playSound(entity.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.6f, 0.5f);
-		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsEntityActive(entity);
-		PotionUtils.applyPotion(entity, enemy,
+		DarkCombos.playSounds(player.getWorld(), player.getLocation());
+		new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsEntityActive(player);
+		PotionUtils.applyPotion(player, enemy,
 			new PotionEffect(PotionEffectType.GLOWING, 20 * 3, 0, true, false));
 	}
 

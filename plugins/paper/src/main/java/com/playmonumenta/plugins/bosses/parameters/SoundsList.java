@@ -43,15 +43,23 @@ public class SoundsList {
 			play(loc, 1);
 		}
 
+		public void play(Location loc, SoundCategory category) {
+			play(loc, 1, 1, category);
+		}
+
 		public void play(Location loc, float volume) {
 			play(loc, volume, 1);
 		}
 
 		public void play(Location loc, float volume, float pitch) {
+			play(loc, volume, pitch, SoundCategory.HOSTILE);
+		}
+
+		public void play(Location loc, float volume, float pitch, SoundCategory category) {
 			float fVolume = mVolume != 0 ? mVolume : volume;
 			float fPitch = mPitch != 0 ? mPitch : pitch;
 			World world = loc.getWorld();
-			world.playSound(loc, mSound, SoundCategory.HOSTILE, fVolume, fPitch);
+			world.playSound(loc, mSound, category, fVolume, fPitch);
 		}
 
 		public void play(Player player) {

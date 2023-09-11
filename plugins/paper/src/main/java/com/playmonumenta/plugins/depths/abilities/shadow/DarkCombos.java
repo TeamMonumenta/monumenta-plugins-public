@@ -14,10 +14,12 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -49,7 +51,7 @@ public class DarkCombos extends DepthsAbility {
 				EntityUtils.applyVulnerability(mPlugin, DURATION, VULN_AMPLIFIER[mRarity - 1], enemy);
 				mComboCount = 0;
 
-				mPlayer.playSound(mPlayer.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.6f, 0.5f);
+				playSounds(mPlayer.getWorld(), mPlayer.getLocation());
 				new PartialParticle(Particle.SPELL_WITCH, enemy.getLocation(), 15, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
 				PotionUtils.applyPotion(mPlayer, enemy,
 					new PotionEffect(PotionEffectType.GLOWING, DURATION, 0, true, false));
@@ -57,6 +59,15 @@ public class DarkCombos extends DepthsAbility {
 			return true;
 		}
 		return false;
+	}
+
+	public static void playSounds(World world, Location loc) {
+		world.playSound(loc, Sound.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 2.0f, 1.2f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_BREATH, SoundCategory.PLAYERS, 1.0f, 1.6f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_DEATH, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		world.playSound(loc, Sound.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_WITHER_SHOOT, SoundCategory.PLAYERS, 0.3f, 0.6f);
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {

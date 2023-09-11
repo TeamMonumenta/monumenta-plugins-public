@@ -122,7 +122,11 @@ public class EarthenWrath extends DepthsAbility {
 							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamageAbsorbed * PERCENT_DAMAGE_REFLECTED[mRarity - 1], mInfo.getLinkedSpell());
 						}
 
-						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0.5f);
+						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.PLAYERS, 1.0f, 0.6f);
+						world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 0.1f);
+						world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.7f, 0.4f);
+						world.playSound(loc, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 0.7f, 0.1f);
+						world.playSound(loc, Sound.ENTITY_IRON_GOLEM_REPAIR, SoundCategory.PLAYERS, 1.0f, 0.1f);
 						new PartialParticle(Particle.BLOCK_DUST, loc, 250, 3, 0.1, 3, 0.25, Material.COARSE_DIRT.createBlockData()).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.LAVA, loc, 100, 3, 0.1, 3, 0.25).spawnAsPlayerActive(mPlayer);
 						new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 75, 3, 0.1, 3, 0.25).spawnAsPlayerActive(mPlayer);

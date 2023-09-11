@@ -61,8 +61,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	}
 
 	@Override
-	public void beamHealEffect(World world, Player mPlayer, LivingEntity pe, Vector dir, double range) {
-		Location loc = mPlayer.getEyeLocation();
+	public void beamHealEffect(World world, Player player, LivingEntity pe, Vector dir, double range) {
+		Location loc = player.getEyeLocation();
 		// Launch sound
 		world.playSound(loc, Sound.BLOCK_TRIPWIRE_DETACH, SoundCategory.PLAYERS, 0.6f, 0.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.2f, 0.8f);
@@ -79,23 +79,23 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 			beamRadius = 0.2 * distance * FastUtils.sin(i / distance * 3.1416);
 			units = (int) Math.ceil(beamRadius * 6.4);
 			ParticleUtils.drawRing(loc, units, dir, beamRadius,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, GOLD_COLOR).spawnAsPlayerActive(player)
 			);
 			ParticleUtils.drawRing(loc, units / 2 + 1, dir, beamRadius + 0.1,
-				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+				(l, t) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(player)
 			);
 
 			// Sound near target
 			if (loc.distance(pe.getEyeLocation()) < 1.25) {
-				loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.2f, 1.5f);
-				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.0f, 1.5f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.2f, 1.5f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.0f, 1.5f);
 				break;
 			}
 		}
 
 		// Effect on target
-		new PartialParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15, 2.5, 1).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CLOUD, pe.getLocation(), 25, 1.0, 0.15, 1.0, 0.1).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.SPELL_INSTANT, pe.getLocation(), 500, 2.5, 0.15, 2.5, 1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CLOUD, pe.getLocation(), 25, 1.0, 0.15, 1.0, 0.1).spawnAsPlayerActive(player);
 		for (int i = 0; i < 5; i++) {
 			final double healEffectRadius = i * 1.25;
 			final int healRingUnits = i * 16;
@@ -103,7 +103,7 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 				@Override
 				public void run() {
 					ParticleUtils.drawRing(pe.getLocation().clone().add(0, 0.125, 0), healRingUnits, new Vector(0, 1, 0), healEffectRadius,
-						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.1, 0, 0.1, GOLD_COLOR).spawnAsPlayerActive(mPlayer)
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0.1, 0, 0.1, GOLD_COLOR).spawnAsPlayerActive(player)
 					);
 				}
 			}.runTaskLater(Plugin.getInstance(), i / 2);
@@ -111,8 +111,8 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 	}
 
 	@Override
-	public void beamHarm(World world, Player mPlayer, LivingEntity e, Vector dir, double range) {
-		Location loc = mPlayer.getEyeLocation();
+	public void beamHarm(World world, Player player, LivingEntity e, Vector dir, double range) {
+		Location loc = player.getEyeLocation();
 		world.playSound(loc, Sound.BLOCK_TRIPWIRE_DETACH, SoundCategory.PLAYERS, 0.6f, 0.75f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.2f, 0.6f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 0.5f);
@@ -125,33 +125,33 @@ public class PrestigiousBeamCS extends HallowedBeamCS implements PrestigeCS {
 				ParticleUtils.drawCurve(loc, 0, 0, dir.clone().multiply(0.6),
 					t -> 0,
 						t -> FastUtils.sin(theta), t -> FastUtils.cos(theta),
-						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.1, 0.1, 0.1, 0, BURN_COLOR).spawnAsPlayerActive(mPlayer)
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 4, 0.1, 0.1, 0.1, 0, BURN_COLOR).spawnAsPlayerActive(player)
 				);
 				ParticleUtils.drawCurve(loc, 0, 0, dir.clone().multiply(0.6),
 					t -> 0,
 						t -> FastUtils.sin(theta), t -> FastUtils.cos(theta),
-						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(mPlayer)
+						(l, t) -> new PartialParticle(Particle.REDSTONE, l, 2, 0, 0, 0, 0, LIGHT_COLOR).spawnAsPlayerActive(player)
 				);
 			}
 			if (loc.distance(e.getEyeLocation()) < 1.25) {
-				loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.0f, 1.25f);
-				loc.getWorld().playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.25f, 1.25f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_HIT_GROUND, SoundCategory.PLAYERS, 1.0f, 1.25f);
+				world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 1.25f, 1.25f);
 				break;
 			}
 		}
 	}
 
 	@Override
-	public void beamHarmCrusade(Player mPlayer, Location eLoc) {
-		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.2).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 60, 0, 0, 0, 0.25).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, eLoc, 100, 1.25, 1, 1.25, 0.5, BURN_COLOR).spawnAsPlayerActive(mPlayer);
+	public void beamHarmCrusade(Player player, Location eLoc) {
+		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.2).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FIREWORKS_SPARK, eLoc, 60, 0, 0, 0, 0.25).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, eLoc, 100, 1.25, 1, 1.25, 0.5, BURN_COLOR).spawnAsPlayerActive(player);
 	}
 
 	@Override
-	public void beamHarmOther(Player mPlayer, Location eLoc) {
-		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.25f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.CRIT_MAGIC, eLoc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.REDSTONE, eLoc, 75, 1.25, 1, 1.25, 0.5, GOLD_COLOR).spawnAsPlayerActive(mPlayer);
+	public void beamHarmOther(Player player, Location eLoc) {
+		new PartialParticle(Particle.SPIT, eLoc, 30, 0, 0, 0, 0.25f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT_MAGIC, eLoc, 30, 1, 1, 1, 0.25).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, eLoc, 75, 1.25, 1, 1.25, 0.5, GOLD_COLOR).spawnAsPlayerActive(player);
 	}
 }

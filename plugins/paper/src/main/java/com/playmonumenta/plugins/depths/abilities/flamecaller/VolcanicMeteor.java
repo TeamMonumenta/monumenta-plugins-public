@@ -58,7 +58,8 @@ public class VolcanicMeteor extends DepthsAbility {
 
 		Location loc = mPlayer.getEyeLocation();
 		World world = mPlayer.getWorld();
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.85f);
+		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 1.0f);
+		world.playSound(mPlayer.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.4f, 2.0f);
 		new PartialParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SOUL_FIRE_FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
@@ -89,7 +90,11 @@ public class VolcanicMeteor extends DepthsAbility {
 					loc.subtract(0, 0.2, 0);
 					if (loc.getBlock().getType().isSolid()) {
 						if (loc.getY() - ogLoc.getY() <= 2) {
-							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0);
+							world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1.0f, 0.1f);
+							world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 2.0f);
+							world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);
+							world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.1f);
+							world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 2.0f, 0.1f);
 
 							new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);
 							new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);

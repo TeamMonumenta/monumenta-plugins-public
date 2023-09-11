@@ -44,6 +44,7 @@ public class DeadlyRondeCS implements CosmeticSkill {
 		world.playSound(particleLoc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 2.0f);
 		world.playSound(particleLoc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.5f, 1.6f);
 		world.playSound(particleLoc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.5f, 0.7f);
+		world.playSound(particleLoc, Sound.ENTITY_WARDEN_DEATH, SoundCategory.PLAYERS, 0.5f, 2.0f);
 	}
 
 	public void rondeGainStackEffect(Player player, Location loc) {

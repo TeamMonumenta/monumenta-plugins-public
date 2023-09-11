@@ -63,13 +63,20 @@ public class FrigidCombos extends DepthsAbility {
 
 				//Particles
 				Location playerLoc = mPlayer.getLocation().add(0, 1, 0);
-				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
-				world.playSound(playerLoc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
+				playSounds(world, playerLoc);
 				new PartialParticle(Particle.SNOW_SHOVEL, targetLoc, 25, .5, .2, .5, 0.65).spawnAsPlayerActive(mPlayer);
 			}
 			return true;
 		}
 		return false;
+	}
+
+	public static void playSounds(World world, Location loc) {
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.5f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 0.8f, 1.0f);
+		world.playSound(loc, Sound.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 0.8f, 0.6f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 1.4f);
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {

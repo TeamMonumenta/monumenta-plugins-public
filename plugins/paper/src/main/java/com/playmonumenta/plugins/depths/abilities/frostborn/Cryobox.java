@@ -96,7 +96,16 @@ public class Cryobox extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		new PartialParticle(Particle.FIREWORKS_SPARK, center.clone().add(0, 1.15, 0), 150, 0.2, 0.35, 0.2, 0.5).spawnAsPlayerActive(mPlayer);
 		new PartialParticle(Particle.SPELL_INSTANT, center.clone().add(0, 1.15, 0), 100, 0.2, 0.35, 0.2, 1).spawnAsPlayerActive(mPlayer);
-		world.playSound(center, Sound.ITEM_TOTEM_USE, SoundCategory.BLOCKS, 1, 1.35f);
+		world.playSound(center, Sound.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.5f, 1.8f);
+		world.playSound(center, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.8f, 2.0f);
+		world.playSound(center, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.8f, 1.4f);
+		world.playSound(center, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.8f, 1.0f);
+		world.playSound(center, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 2.0f, 1.6f);
+		world.playSound(center, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.4f, 1.4f);
+		world.playSound(center, Sound.ENTITY_PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 2.0f, 0.5f);
+		world.playSound(center, Sound.ITEM_TRIDENT_RETURN, SoundCategory.PLAYERS, 1.0f, 1.4f);
+		world.playSound(center, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.0f, 0.1f);
+		world.playSound(center, Sound.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.3f, 2.0f);
 		MessagingUtils.sendActionBarMessage(mPlayer, "Cryobox has been activated!");
 
 		if (dealDamageLater) {

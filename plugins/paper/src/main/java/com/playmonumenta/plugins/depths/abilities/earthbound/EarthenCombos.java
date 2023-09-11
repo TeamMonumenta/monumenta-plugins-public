@@ -55,15 +55,21 @@ public class EarthenCombos extends DepthsAbility {
 				Location loc = mPlayer.getLocation().add(0, 1, 0);
 				World world = mPlayer.getWorld();
 				Location entityLoc = enemy.getLocation();
-				world.playSound(loc, Sound.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.65f);
-				world.playSound(loc, Sound.BLOCK_NETHER_BRICKS_BREAK, SoundCategory.PLAYERS, 0.8f, 0.45f);
+				playSounds(world, loc);
 				new PartialParticle(Particle.CRIT_MAGIC, entityLoc.add(0, 1, 0), 10, 0.5, 0.2, 0.5, 0.65).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(mPlayer);
-				new PartialParticle(Particle.BLOCK_DUST, loc.add(0, 1, 0), 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.PODZOL.createBlockData()).spawnAsPlayerActive(mPlayer);
+				new PartialParticle(Particle.BLOCK_DUST, loc, 15, 0.5, 0.3, 0.5, 0.5, Material.ANDESITE.createBlockData()).spawnAsPlayerActive(mPlayer);
 			}
 			return true;
 		}
 		return false;
+	}
+
+	public static void playSounds(World world, Location loc) {
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, SoundCategory.PLAYERS, 0.6f, 0.9f);
+		world.playSound(loc, Sound.ENTITY_IRON_GOLEM_DAMAGE, SoundCategory.PLAYERS, 0.6f, 0.1f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_HIT, SoundCategory.PLAYERS, 1.4f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.6f, 1.4f);
 	}
 
 	private static TextComponent getDescription(int rarity, TextColor color) {

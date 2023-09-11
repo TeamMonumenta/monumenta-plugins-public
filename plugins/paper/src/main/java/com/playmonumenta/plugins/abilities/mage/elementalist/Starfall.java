@@ -92,7 +92,7 @@ public class Starfall extends Ability {
 
 		ItemStatManager.PlayerItemStats playerItemStats = mPlugin.mItemStatManager.getPlayerItemStatsCopy(mPlayer);
 		float damage = SpellPower.getSpellDamage(mPlugin, mPlayer, mLevelDamage);
-		mCosmetic.starfallCastEffect(world, mPlayer);
+		mCosmetic.starfallCastEffect(world, mPlayer, mPlayer.getLocation());
 		Vector dir = loc.getDirection().normalize();
 		int dist = (int) Math.ceil(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_RANGE, DISTANCE));
 		for (int i = 0; i < dist; i++) {

@@ -37,7 +37,7 @@ public class MidnightToll extends Spell {
 		this.mSpawnLoc = spawnLoc;
 		this.mDamageCastTime = damageCastTime;
 		String abilityName = mDamage >= 2000 ? ABILITY_NAME + " (Enrage)" : ABILITY_NAME;
-		this.mChargeDamage = new ChargeUpManager(mBoss, mDamageCastTime, Component.text("Casting", NamedTextColor.GOLD).append(Component.text(abilityName, NamedTextColor.YELLOW)),
+		this.mChargeDamage = new ChargeUpManager(mBoss, mDamageCastTime, Component.text("Casting ", NamedTextColor.GOLD).append(Component.text(abilityName, NamedTextColor.YELLOW)),
 			BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS, mRange);
 	}
 

@@ -23,26 +23,31 @@ public class StarfallCS implements CosmeticSkill {
 		return Material.MAGMA_BLOCK;
 	}
 
-	public void starfallCastEffect(World world, Player mPlayer) {
-		world.playSound(mPlayer.getLocation(), Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 0.85f);
-		new PartialParticle(Particle.LAVA, mPlayer.getLocation(), 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.FLAME, mPlayer.getLocation(), 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(mPlayer);
+	public void starfallCastEffect(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 1.0f);
+		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.4f, 2.0f);
+		new PartialParticle(Particle.LAVA, loc, 15, 0.25f, 0.1f, 0.25f).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.FLAME, loc, 30, 0.25f, 0.1f, 0.25f, 0.15f).spawnAsPlayerActive(player);
 	}
 
-	public void starfallCastTrail(Location loc, Player mPlayer) {
-		new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(mPlayer);
+	public void starfallCastTrail(Location loc, Player player) {
+		new PartialParticle(Particle.FLAME, loc, 1, 0, 0, 0, 0).spawnAsPlayerActive(player);
 	}
 
-	public void starfallFallEffect(World world, Player mPlayer, Location loc) {
+	public void starfallFallEffect(World world, Player player, Location loc) {
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1, 1);
-		new PartialParticle(Particle.FLAME, loc, 25, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 0.25F, 0.25F, 0.25F, 0.1F).spawnAsPlayerActive(mPlayer);
+		new PartialParticle(Particle.FLAME, loc, 25, 0.25, 0.25, 0.25, 0.1).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 5, 0.25, 0.25, 0.25, 0.1).spawnAsPlayerActive(player);
 	}
 
-	public void starfallLandEffect(World world, Player mPlayer, Location loc) {
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1, 0);
-		new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2F).spawnAsPlayerActive(mPlayer);
+	public void starfallLandEffect(World world, Player player, Location loc) {
+		world.playSound(loc, Sound.ENTITY_PLAYER_HURT_ON_FIRE, SoundCategory.PLAYERS, 1.0f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.6f, 2.0f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 2.0f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.1f);
+		world.playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 2.0f, 0.1f);
+		new PartialParticle(Particle.FLAME, loc, 175, 0, 0, 0, 0.235).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_LARGE, loc, 50, 0, 0, 0, 0.2).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.EXPLOSION_NORMAL, loc, 50, 0, 0, 0, 0.2).spawnAsPlayerActive(player);
 	}
 }
