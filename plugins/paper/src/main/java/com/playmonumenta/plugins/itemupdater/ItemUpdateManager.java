@@ -212,7 +212,7 @@ public class ItemUpdateManager implements Listener {
 	}
 
 	public static void updateNested(List<String> path, @Nullable ItemStack item) {
-		if (item == null) {
+		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
 

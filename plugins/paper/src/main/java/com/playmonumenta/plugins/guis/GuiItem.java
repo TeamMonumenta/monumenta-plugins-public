@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.guis;
 
+import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class GuiItem {
 		if (setPlainTag) {
 			ItemUtils.setPlainTag(item);
 		}
+		GUIUtils.setPlaceholder(item);
 		mItem = item;
 	}
 

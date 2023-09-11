@@ -250,7 +250,7 @@ public class GUIUtils {
 			return;
 		}
 		NBT.modify(item, nbt -> {
-			nbt.getOrCreateCompound("GUI").setBoolean(PLACEHOLDER_KEY, true);
+			nbt.getOrCreateCompound(GUI_KEY).setBoolean(PLACEHOLDER_KEY, true);
 		});
 	}
 

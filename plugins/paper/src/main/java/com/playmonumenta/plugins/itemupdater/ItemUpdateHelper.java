@@ -137,6 +137,13 @@ public class ItemUpdateHelper {
 		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
+
+		// check if item has NBT data
+		boolean hasNBTData = NBT.get(item, nbt -> (boolean) nbt.hasNBTData());
+		if (!hasNBTData) {
+			return;
+		}
+
 		// There is probably a cleaner way to clean up unused NBT, not sure if recursion
 		// directly works due to the existence of both NBTCompounds and NBTCompoundLists
 		// TODO: clean up other unused things from item (e.g. empty lore, reset hideflags if no NBT)
@@ -489,7 +496,7 @@ public class ItemUpdateHelper {
 					|| name.contains("PATTERN") // banners
 					|| name.contains("BANNER") // banners
 					|| name.contains("SHIELD") // shield
-					|| ItemUtils.isArrow(item)) { // arrows
+					|| type == Material.TIPPED_ARROW) { // tipped arrows
 					meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 				} else {
 					meta.removeItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
