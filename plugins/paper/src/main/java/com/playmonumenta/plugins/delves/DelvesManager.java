@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.SpawnerCountCommand;
 import com.playmonumenta.plugins.delves.abilities.Astral;
 import com.playmonumenta.plugins.delves.abilities.Chivalrous;
@@ -38,7 +39,6 @@ import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -69,7 +69,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -566,11 +565,11 @@ public class DelvesManager implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onChunkUnloadEvent(ChunkUnloadEvent event) {
+	public void onChunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (entity.getScoreboardTags().contains(Twisted.TWISTED_MINIBOSS_TAG)) {
 				Twisted.despawnTwistedMiniBoss((LivingEntity) entity);
-				Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> entity.remove());
+				entity.remove();
 			}
 		}
 	}

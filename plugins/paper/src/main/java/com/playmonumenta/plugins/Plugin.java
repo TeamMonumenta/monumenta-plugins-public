@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.TemporaryBlockChangeManager;
 import com.playmonumenta.plugins.bosses.bosses.bluestrike.BlueStrikeDaggerCraftingBoss;
 import com.playmonumenta.plugins.bosses.spells.SpellDetectionCircle;
+import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.commands.*;
 import com.playmonumenta.plugins.commands.experiencinator.ExperiencinatorCommand;
@@ -383,6 +384,9 @@ public class Plugin extends JavaPlugin {
 
 		//  Load info.
 		reloadMonumentaConfig(null);
+
+		// Chunk loading/unloading helper
+		manager.registerEvents(new ChunkManager(this), this);
 
 		// These are both a command and an event listener
 		manager.registerEvents(new Spectate(this), this);

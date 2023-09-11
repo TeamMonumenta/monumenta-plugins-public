@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.portals;
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import com.google.common.collect.ImmutableSet;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
@@ -48,8 +50,6 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.world.EntitiesLoadEvent;
-import org.bukkit.event.world.EntitiesUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.util.BoundingBox;
@@ -542,7 +542,7 @@ public class PortalManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entitiesUnloadEvent(EntitiesUnloadEvent event) {
+	public void chunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
 		// Delete portals in unloading chunks
 		if (mPortalsByChunk != null) {
 			Chunk chunk = event.getChunk();
@@ -568,7 +568,7 @@ public class PortalManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entitiesLoadEvent(EntitiesLoadEvent event) {
+	public void chunkFullLoadEvent(ChunkFullLoadEvent event) {
 		// Remove assumed-unloaded portal maps
 		if (mPortalUuids != null) {
 			Chunk chunk = event.getChunk();
@@ -583,7 +583,7 @@ public class PortalManager implements Listener {
 					}
 					foundEntity = true;
 					portalLog("- entitiesLoadEvent: removed escapee portal map " + entity.getLocation());
-					Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> entity.remove());
+					entity.remove();
 				}
 			}
 			if (foundEntity) {

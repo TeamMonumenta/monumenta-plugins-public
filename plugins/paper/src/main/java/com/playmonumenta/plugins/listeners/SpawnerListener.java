@@ -309,9 +309,10 @@ public class SpawnerListener implements Listener {
 		// This could fire for many reasons - such as the mob dying or unloading
 		// Regardless of source, mark the mob as despawned
 		if (event.getEntity() instanceof LivingEntity mob) {
-			@Nullable MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());
+			UUID mobUuid = mob.getUniqueId();
+			@Nullable MobInfo mobInfo = mMobInfos.get(mobUuid);
 			if (mobInfo != null) {
-				MMLog.fine(() -> "SpawnerListener: Marked mob as despawned: " + event.getEntity().getUniqueId());
+				MMLog.fine(() -> "SpawnerListener: Marked mob as despawned: " + mobUuid);
 				mobInfo.mDespawned = true;
 			}
 		}
@@ -323,9 +324,10 @@ public class SpawnerListener implements Listener {
 		// If the mob was spawned, it won't be in the map or will already be up to date, so this change won't do much
 		// If the mob was chunk loaded, mark it as loaded and update the reference to the new mob
 		if (event.getEntity() instanceof LivingEntity mob) {
-			@Nullable MobInfo mobInfo = mMobInfos.get(event.getEntity().getUniqueId());
+			UUID mobUuid = mob.getUniqueId();
+			@Nullable MobInfo mobInfo = mMobInfos.get(mobUuid);
 			if (mobInfo != null) {
-				MMLog.fine(() -> "SpawnerListener: Updated mob with new entity: " + event.getEntity().getUniqueId());
+				MMLog.fine(() -> "SpawnerListener: Updated mob with new entity: " + mobUuid);
 				mobInfo.mDespawned = false;
 				mobInfo.mMob = new WeakReference<>(mob);
 				mobInfo.mUUID = event.getEntity().getUniqueId();

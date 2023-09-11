@@ -3,6 +3,8 @@ package com.playmonumenta.plugins.listeners;
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.GraveCommand;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
@@ -49,8 +51,6 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -139,8 +139,8 @@ public class GraveListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void chunkLoad(ChunkLoadEvent event) {
-		GraveManager.onChunkLoad(event);
+	public void chunkFullLoadEvent(ChunkFullLoadEvent event) {
+		GraveManager.onChunkFullLoadEvent(event);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -149,8 +149,8 @@ public class GraveListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void chunkUnload(ChunkUnloadEvent event) {
-		GraveManager.onChunkUnload(event);
+	public void chunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
+		GraveManager.onChunkPartialUnloadEvent(event);
 	}
 
 	// Fires whenever an item entity despawns due to time. Does not catch items that got killed in other ways.

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.networkrelay.NetworkRelayMessageEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiFloorDesignMob;
 import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -23,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class TowerManager implements Listener {
@@ -114,10 +114,10 @@ public class TowerManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public static void onChunkUnloadEvent(ChunkUnloadEvent event) {
+	public static void onChunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
 		for (Entity entity : List.of(event.getChunk().getEntities())) {
 			if (entity != null && entity.getScoreboardTags().contains(TowerConstants.TAG_UNLOAD_ENTITY)) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> entity.remove());
+				entity.remove();
 			}
 		}
 	}

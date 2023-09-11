@@ -5,6 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.itemstats.enums.Tier;
 import com.playmonumenta.plugins.itemstats.infusions.Phylactery;
@@ -37,8 +39,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -176,7 +176,7 @@ public class GraveManager {
 		}
 	}
 
-	public static void onChunkLoad(ChunkLoadEvent event) {
+	public static void onChunkFullLoadEvent(ChunkFullLoadEvent event) {
 		HashSet<Grave> graves = new HashSet<>(getUnloadedGraves(event.getChunk().getChunkKey()));
 		for (Grave grave : graves) {
 			grave.onChunkLoad();
@@ -187,7 +187,7 @@ public class GraveManager {
 		}
 	}
 
-	public static void onChunkUnload(ChunkUnloadEvent event) {
+	public static void onChunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
 		for (Entity entity : event.getChunk().getEntities()) {
 			if (GRAVES.containsKey(entity.getUniqueId())) {
 				GRAVES.get(entity.getUniqueId()).onChunkUnload();

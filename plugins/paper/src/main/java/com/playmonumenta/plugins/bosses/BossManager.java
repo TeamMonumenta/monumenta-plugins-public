@@ -37,6 +37,8 @@ import com.playmonumenta.plugins.bosses.bosses.lich.LichStrifeBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
+import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.StatMultiplierBoss;
@@ -96,8 +98,6 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
@@ -472,9 +472,7 @@ public class BossManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		if (event.getEntity() instanceof LivingEntity living) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				unload(living, false);
-			});
+			unload(living, false);
 		}
 	}
 
@@ -482,27 +480,21 @@ public class BossManager implements Listener {
 	// so we manually load/unload their boss data when the chunk is loaded/unloaded.
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void chunkLoadEvent(ChunkLoadEvent event) {
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> { // delay by a tick as the chunk is loaded before entities in 1.18+
-			if (event.getChunk().isLoaded()) { // the chunk may have unloaded already
-				for (Entity entity : event.getChunk().getEntities()) {
-					if (entity instanceof LivingEntity living) {
-						processEntity(living);
-					}
-				}
+	public void chunkFullLoadEvent(ChunkFullLoadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity instanceof LivingEntity living) {
+				processEntity(living);
 			}
-		}, 1);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void chunkUnloadEvent(ChunkUnloadEvent event) {
-		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			for (Entity entity : event.getChunk().getEntities()) {
-				if (entity instanceof LivingEntity living) {
-					unload(living, false);
-				}
+	public void chunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
+		for (Entity entity : event.getChunk().getEntities()) {
+			if (entity instanceof LivingEntity living) {
+				unload(living, false);
 			}
-		}, 1);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

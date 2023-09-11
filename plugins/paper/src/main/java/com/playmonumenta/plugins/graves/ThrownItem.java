@@ -7,7 +7,6 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -175,11 +174,11 @@ public class ThrownItem {
 	}
 
 	void onChunkLoad() {
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> spawn());
+		spawn();
 	}
 
 	void onChunkUnload() {
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> remove());
+		remove();
 		mManager.addUnloadedItem(Chunk.getChunkKey(mLocation), this);
 	}
 

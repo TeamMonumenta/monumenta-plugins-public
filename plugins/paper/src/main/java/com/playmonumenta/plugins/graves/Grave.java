@@ -11,7 +11,12 @@ import com.playmonumenta.plugins.itemstats.infusions.Shattered;
 import com.playmonumenta.plugins.listeners.PlayerListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
+import com.playmonumenta.plugins.utils.ItemUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import java.time.Instant;
@@ -367,11 +372,11 @@ public final class Grave {
 	}
 
 	void onChunkLoad() {
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> spawn());
+		spawn();
 	}
 
 	void onChunkUnload() {
-		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> remove());
+		remove();
 		mManager.addUnloadedGrave(Chunk.getChunkKey(mLocation), this);
 	}
 

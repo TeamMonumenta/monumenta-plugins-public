@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.listeners;
 
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
@@ -33,7 +34,6 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -269,7 +269,7 @@ public class RepairExplosionsListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+	public void chunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
 		if (!isEnabled(event.getWorld())) {
 			return;
 		}

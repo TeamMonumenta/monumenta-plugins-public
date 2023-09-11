@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.bosses;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
@@ -191,7 +191,7 @@ public class TemporaryBlockChangeManager implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public void chunkUnloadEvent(ChunkUnloadEvent event) {
+	public void chunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
 		Map<Block, ChangedBlock> worldBlocks = mChangedBlocks.get(event.getWorld());
 		if (worldBlocks == null) {
 			return;
