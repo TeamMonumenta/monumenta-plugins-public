@@ -33,6 +33,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.Tag;
 import org.bukkit.TreeType;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
@@ -132,7 +133,12 @@ public class WorldshaperOverride {
 		} else if (mode == Mode.WALL) {
 			cooldown = 5 * 20;
 
-			Location origin = player.getTargetBlockExact(3).getLocation();
+			Block block = player.getTargetBlock(null, 3);
+			if (block == null) {
+				return false;
+			}
+
+			Location origin = block.getLocation();
 			origin.setY(player.getLocation().getY() + 1);
 
 			float playerYaw = player.getLocation().getYaw();

@@ -63,7 +63,7 @@ public class IceBarrier extends DepthsAbility {
 		}
 
 		World world = mPlayer.getWorld();
-		Block block = mPlayer.getTargetBlockExact(CAST_RANGE);
+		Block block = mPlayer.getTargetBlock(null, CAST_RANGE);
 		if (block == null) {
 			return;
 		}
@@ -150,4 +150,3 @@ public class IceBarrier extends DepthsAbility {
 		return mIsPrimed ? "primed" : null;
 	}
 }
-

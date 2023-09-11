@@ -86,7 +86,7 @@ public class GhalkorFlameBolt extends Spell {
 	public void run() {
 		mMissile.runInitiateAesthetic(mBoss.getWorld(), mBoss.getEyeLocation(), 0);
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), Ghalkor.detectionRange, true);
-		if (players.size() == 0 || mBoss.getTargetBlockExact(Ghalkor.detectionRange) == null) {
+		if (players.size() == 0 || mBoss.getTargetBlock(null, Ghalkor.detectionRange) == null) {
 			return;
 		}
 

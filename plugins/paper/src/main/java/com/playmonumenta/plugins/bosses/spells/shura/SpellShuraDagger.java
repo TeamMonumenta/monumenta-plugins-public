@@ -88,7 +88,7 @@ public class SpellShuraDagger extends Spell {
 		mMissile.runInitiateAesthetic(mBoss.getWorld(), mBoss.getEyeLocation(), 0);
 		List<Player> players = PlayerUtils.playersInRange(mBoss.getLocation(), CShura.detectionRange, true);
 		Collections.shuffle(players);
-		if (players.size() == 0 || mBoss.getTargetBlockExact(CShura.detectionRange) == null) {
+		if (players.size() == 0 || mBoss.getTargetBlock(null, CShura.detectionRange) == null) {
 			return;
 		}
 
