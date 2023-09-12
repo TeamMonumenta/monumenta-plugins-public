@@ -64,6 +64,7 @@ public class CustomTradeGui extends Gui {
 	private final List<TradeWindowOpenEvent.Trade> mTrades;
 	private final Villager mVillager;
 	private final String mCustomTagKey = "trade_preview";
+	private final NamespacedKey mCustomTagNamespacedKey = new NamespacedKey(mPlugin, mCustomTagKey);
 
 	// Setup:
 	private final List<TradeType> mDisplayTradeTypes = new ArrayList<>();
@@ -626,12 +627,11 @@ public class CustomTradeGui extends Gui {
 
 	private void clearIllegalItems() {
 		Inventory inventory = mPlayer.getInventory();
-		NamespacedKey customTagKey = new NamespacedKey(mPlugin, mCustomTagKey);
 		for (ItemStack itemStack : inventory.getContents()) {
 			if (itemStack != null) {
 				ItemMeta itemMeta = itemStack.getItemMeta();
 				// Check if the custom tag exists on the item meta
-				if (itemMeta.getPersistentDataContainer().has(customTagKey, PersistentDataType.INTEGER)) {
+				if (itemMeta.getPersistentDataContainer().has(mCustomTagNamespacedKey, PersistentDataType.INTEGER)) {
 					// Custom tag exists, clear the item
 					inventory.remove(itemStack);
 				}
@@ -818,13 +818,12 @@ public class CustomTradeGui extends Gui {
 		ItemStack output = ItemUtils.clone(recipe.getResult());
 		ItemMeta itemMeta = output.getItemMeta();
 		// Add our custom NBT tag:
-		NamespacedKey customTagKey = new NamespacedKey(mPlugin, mCustomTagKey);
-		itemMeta.getPersistentDataContainer().set(customTagKey, PersistentDataType.INTEGER, 1);
+		itemMeta.getPersistentDataContainer().set(mCustomTagNamespacedKey, PersistentDataType.INTEGER, 1);
 		// Add price lore (if includePriceInLore AND PEB options allow):
 		if (includePriceInLore && mPebTradeGUIPreviewDisplay == 0) {
 			// Construct price tag lore:
 			List<Component> newLore = new ArrayList<>();
-			newLore.add(Component.newline());
+			newLore.add(Component.empty());
 			newLore.add(Component.text("Price: ", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 			newLore.addAll(tradeReq.lore());
 			if (mPebTradeGUIConfirm == 1) {
@@ -848,8 +847,7 @@ public class CustomTradeGui extends Gui {
 		// Create our item:
 		ItemMeta itemMeta = ItemUtils.clone(item).getItemMeta();
 		// Add custom NBT tag:
-		NamespacedKey customTagKey = new NamespacedKey(mPlugin, mCustomTagKey);
-		itemMeta.getPersistentDataContainer().set(customTagKey, PersistentDataType.INTEGER, 1);
+		itemMeta.getPersistentDataContainer().set(mCustomTagNamespacedKey, PersistentDataType.INTEGER, 1);
 		// Finalize and return:
 		item.setItemMeta(itemMeta);
 		return item;
