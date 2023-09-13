@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -173,5 +174,15 @@ public class ChunkManager implements Listener {
 			mLoaded--;
 			MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s); world unload");
 		}
+	}
+
+	public static boolean isChunkLoaded(Chunk chunk) {
+		UUID worldId = chunk.getWorld().getUID();
+		@Nullable Map<Long, EnumSet<ChunkType>> worldChunks = mLoadedChunks.get(worldId);
+		if (worldChunks == null) {
+			return false;
+		}
+		@Nullable EnumSet<ChunkType> loadedState = worldChunks.get(chunk.getChunkKey());
+		return loadedState == null || loadedState.size() == ChunkType.values().length;
 	}
 }
