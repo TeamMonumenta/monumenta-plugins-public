@@ -304,6 +304,24 @@ public class GalleryGame {
 			gPlayer.tick(oneSecond, twoHertz, ticks);
 		}
 
+		// if no mob has been killed in 1/6 of <SPECTERS_MOBS_COUNTDOWN>, and there are under 5 mobs left in the wave, make the alive mobs glow
+		if (mCanMobsSpawn && oneSecond) {
+			boolean glowing = ticks - mLastMobKilledTick >= SPECTERS_MOBS_COUNTDOWN / 6 && mMobsSpawnedThisRound - mMobsKilledThisRound <= 5 && mMobsToSpawnThisRound == mMobsSpawnedThisRound;
+			World world = Bukkit.getWorld(mUUIDGame);
+			if (world != null) {
+				for (LivingEntity entity : world.getLivingEntities()) {
+					if (entity.getScoreboardTags().contains(GalleryManager.MOB_TAG_FROM_SPAWNER)) {
+						List<LivingEntity> mobsToGlow = new ArrayList<>();
+						mobsToGlow.add(entity);
+						EntityUtils.getStackedMobsAbove(entity, mobsToGlow);
+						for (LivingEntity mobToGlow : mobsToGlow) {
+							mobToGlow.setGlowing(glowing);
+						}
+					}
+				}
+			}
+		}
+
 		//2 time in a sec if mob can spawn and no mob has been killed in <SPECTERS_MOBS_COUNTDOWN>, start spawning specters
 		if (mCanMobsSpawn && twoHertz && ticks - mLastMobKilledTick >= SPECTERS_MOBS_COUNTDOWN && !mSpawningSpawnersList.isEmpty()) {
 			//no mobs have been killed in the last 60s -> spawn specters
@@ -385,10 +403,25 @@ public class GalleryGame {
 			}
 		}
 
+		// will run the first time a box is placed
 		if (!mysteryBoxPlaced && !mysteryBox.isEmpty()) {
-			Collections.shuffle(mysteryBox);
-			mysteryBox.get(0).setValidBox(true);
-			mysteryBox.get(0).runCommandPlace();
+			List<MysteryBoxInteractable> validMysteryBox = new ArrayList<>();
+			if (mMap.getValidStartingChests().isEmpty()) {
+				validMysteryBox = mysteryBox;
+			} else {
+				for (MysteryBoxInteractable box : mysteryBox) {
+					if (mMap.getValidStartingChests().contains(box.getName())) {
+						validMysteryBox.add(box);
+					}
+				}
+				if (validMysteryBox.isEmpty()) {
+					validMysteryBox = mysteryBox;
+				}
+			}
+
+			Collections.shuffle(validMysteryBox);
+			validMysteryBox.get(0).setValidBox(true);
+			validMysteryBox.get(0).runCommandPlace();
 		}
 		mShouldReload = false;
 	}
@@ -474,6 +507,11 @@ public class GalleryGame {
 	}
 
 	public void despawnMob(LivingEntity mob) {
+		// only despawn bottom mobs in a stack
+		if (mob.isInsideVehicle()) {
+			return;
+		}
+
 		if (mob.getScoreboardTags().contains(GalleryManager.MOB_TAG_FROM_SPAWNER)) {
 			mMobsSpawnedThisRound--;
 		}
@@ -482,7 +520,12 @@ public class GalleryGame {
 			mEliteChance += 1;
 		}
 
-		mob.remove();
+		List<LivingEntity> mobsToRemove = new ArrayList<>();
+		mobsToRemove.add(mob);
+		EntityUtils.getStackedMobsAbove(mob, mobsToRemove);
+		for (LivingEntity mobToRemove : mobsToRemove) {
+			mobToRemove.remove();
+		}
 	}
 
 	public void scaleMob(LivingEntity livingEntity) {
@@ -490,6 +533,13 @@ public class GalleryGame {
 		GalleryUtils.scaleMobPerPlayerCount(livingEntity, mPlayersMap.size());
 	}
 
+	public double getHealthScale() {
+		return (1 + GalleryUtils.getHealthScaleForLevel(mCurrentRound)) * (1 + GalleryUtils.getHealthScaleForPlayerCount(mPlayersMap.size()));
+	}
+
+	public double getDamageScale() {
+		return (1 + GalleryUtils.getDamageScaleForLevel(mCurrentRound));
+	}
 
 	public void removeInteractable(String name) {
 		BaseInteractable interactable = mInteractableMap.get(name);
@@ -663,9 +713,9 @@ public class GalleryGame {
 		if (shouldCloseTheGame) {
 			mIsGameEnded = true;
 			for (GalleryPlayer player : new ArrayList<>(mPlayersMap.values())) {
-				if (player.isOnline()) {
-					player.sendMessage(Component.text("The Nightmare has taken you, a fresh canvas begging to be painted.", NamedTextColor.DARK_RED));
-					GalleryUtils.runCommandAsEntity(player.getPlayer(), "function monumenta:dungeons/gallery/enter_lootroom");
+				if (player.isOnline() && player.getPlayer() != null) {
+					String lootroomFunction = "function monumenta:dungeons/" + mMap.getNamespace() + "/enter_lootroom";
+					GalleryUtils.runCommandAsEntity(player.getPlayer(), lootroomFunction);
 				}
 			}
 		}
@@ -753,6 +803,7 @@ public class GalleryGame {
 		if (entity.getScoreboardTags().contains(GalleryManager.MOB_TAG_FROM_SPAWNER)) {
 			mMobsKilledThisRound++;
 		}
+
 		mLastMobKilledTick = ticks;
 	}
 
@@ -824,6 +875,9 @@ public class GalleryGame {
 			}
 
 			Location deadLoc = player.getLocation();
+			if (realPlayer.getLastSafeLocation() != null) {
+				deadLoc = realPlayer.getLastSafeLocation();
+			}
 
 			player.teleport(new Location(player.getWorld(), mDeathBoxLoc.getX(), mDeathBoxLoc.getY(), mDeathBoxLoc.getZ()));
 			Component mainTitle = Component.text("⎧", NamedTextColor.BLACK).append(Component.text("YOU DIED", NamedTextColor.DARK_RED).decoration(TextDecoration.BOLD, true)).append(Component.text("⎫", NamedTextColor.BLACK).decoration(TextDecoration.BOLD, false));
@@ -843,16 +897,8 @@ public class GalleryGame {
 	}
 
 	public void onPlayerHurtEvent(DamageEvent event, Player player, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (mCurrentRound > GalleryUtils.STARTING_ROUND_FOR_SCALING && (source == null || !GalleryUtils.ignoreScaling(source))) {
-			double multiply;
-			if (mCurrentRound <= GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER) {
-				int dif = mCurrentRound - GalleryUtils.STARTING_ROUND_FOR_SCALING;
-				multiply = 1 + dif * 0.1;
-			} else {
-				int difH = mCurrentRound - GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER;
-				multiply = 1 + (GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER - GalleryUtils.STARTING_ROUND_FOR_SCALING) * 0.1 + difH * 0.2;
-			}
-			event.setDamage(event.getDamage() * multiply);
+		if (source == null || !GalleryUtils.ignoreScaling(source)) {
+			event.setDamage(event.getDamage() * (1 + GalleryUtils.getDamageScaleForLevel(mCurrentRound)));
 		}
 
 		GalleryPlayer gPlayer = mPlayersMap.get(player.getUniqueId());
@@ -876,8 +922,8 @@ public class GalleryGame {
 		GalleryPlayer gPlayer = mPlayersMap.get(player.getUniqueId());
 		if (gPlayer != null) {
 			if (mIsGameEnded) {
-				gPlayer.sendMessage(Component.text("The Nightmare has taken you, a fresh canvas begging to be painted.", NamedTextColor.DARK_RED));
-				GalleryUtils.runCommandAsEntity(player, "function monumenta:dungeons/gallery/enter_lootroom");
+				String lootroomFunction = "function monumenta:dungeons/" + mMap.getNamespace() + "/enter_lootroom";
+				GalleryUtils.runCommandAsEntity(player, lootroomFunction);
 			}
 			gPlayer.onPlayerJoinEvent();
 		}

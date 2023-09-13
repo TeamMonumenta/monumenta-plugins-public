@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.gallery.bosses.GenericGalleryMobBoss;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
+import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.HashSet;
 import java.util.Map;
 import org.bukkit.Location;
@@ -56,6 +58,13 @@ public class GallerySpawner {
 	public @Nullable LivingEntity spawn(String pool, float velocity, boolean shouldGiveTag) {
 		final Location loc = mSpawningLocation.clone().add(mSpawningDirection.getOffset().clone().multiply(3));
 		LivingEntity mobSpawned = null;
+
+		// safety check if pool exists
+		if (!LibraryOfSoulsIntegration.getPoolNames().contains(pool)) {
+			GalleryUtils.printDebugMessage("Tried to spawn mob from LOS pool \"" + pool + "\", but the pool could not be found. Cancelling mob spawn.");
+			return null;
+		}
+
 		Map<Soul, Integer> mobsPool = LibraryOfSoulsIntegration.getPool(pool);
 		if (mobsPool != null) {
 			for (Map.Entry<Soul, Integer> mob : mobsPool.entrySet()) {
@@ -85,8 +94,8 @@ public class GallerySpawner {
 			@Override
 			public void run() {
 				mLoc.add(mSpawningDirection.getOffset().clone().multiply(-mDistancePerTick));
-				mLoc.setDirection(mSpawningDirection.getOffset().clone().multiply(-1));
-				finalMobSpawned.teleport(mLoc);
+				double[] dir = VectorUtils.vectorToRotation(mSpawningDirection.getOffset().clone().multiply(-1));
+				NmsUtils.getVersionAdapter().setEntityLocation(finalMobSpawned, mLoc.toVector(), (float)dir[0], (float)dir[1]);
 
 				if (mTimes >= mMaxTicks) {
 					finalMobSpawned.setAI(true);

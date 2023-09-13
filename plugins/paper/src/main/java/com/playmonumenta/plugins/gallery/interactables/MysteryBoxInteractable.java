@@ -100,6 +100,7 @@ public class MysteryBoxInteractable extends BasePricedInteractable {
 			slime.addScoreboardTag(AbilityUtils.IGNORE_TAG);
 			slime.addScoreboardTag("UNPUSHABLE");
 			slime.addScoreboardTag("MMBoxSlime");
+			slime.addScoreboardTag("SkillImmune");
 			ScoreboardUtils.addEntityToTeam(slime, "Aqua");
 		}
 	}

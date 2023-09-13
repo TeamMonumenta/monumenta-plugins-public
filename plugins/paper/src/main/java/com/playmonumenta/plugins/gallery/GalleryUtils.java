@@ -60,12 +60,8 @@ public class GalleryUtils {
 			return;
 		}
 
-		double healthScale;
-		if (round <= STARTING_ROUND_FOR_SCALING_HARDER) {
-			healthScale = HEALTH_SCALE_PER_ROUND * (round - STARTING_ROUND_FOR_SCALING);
-		} else {
-			healthScale = HEALTH_SCALE_PER_ROUND * (STARTING_ROUND_FOR_SCALING_HARDER - STARTING_ROUND_FOR_SCALING) + (HEALTH_SCALE_PER_ROUND_HARDER * (round - STARTING_ROUND_FOR_SCALING_HARDER));
-		}
+		double healthScale = getHealthScaleForLevel(round);
+
 		double speedScale = Math.min(SPEED_SCALE_PER_ROUND * (round - STARTING_ROUND_FOR_SCALING), MAX_SPEED_SCALE);
 
 		EntityUtils.scaleMaxHealth(mob, healthScale, "GalleryHealthScaleRound");
@@ -76,7 +72,31 @@ public class GalleryUtils {
 		if (count <= 1) {
 			return;
 		}
-		EntityUtils.scaleMaxHealth(mob, MOB_HEALTH_MULTIPLIER_PER_PLAYER[count - 1], "GalleryHealthScalePlayers");
+		EntityUtils.scaleMaxHealth(mob, GalleryUtils.getHealthScaleForPlayerCount(count), "GalleryHealthScalePlayers");
+	}
+
+	public static double getHealthScaleForLevel(int round) {
+		if (round <= STARTING_ROUND_FOR_SCALING) {
+			return 0;
+		} else if (round <= STARTING_ROUND_FOR_SCALING_HARDER) {
+			return HEALTH_SCALE_PER_ROUND * (round - STARTING_ROUND_FOR_SCALING);
+		} else {
+			return HEALTH_SCALE_PER_ROUND * (STARTING_ROUND_FOR_SCALING_HARDER - STARTING_ROUND_FOR_SCALING) + (HEALTH_SCALE_PER_ROUND_HARDER * (round - STARTING_ROUND_FOR_SCALING_HARDER));
+		}
+	}
+
+	public static double getDamageScaleForLevel(int round) {
+		if (round <= STARTING_ROUND_FOR_SCALING) {
+			return 0;
+		} else if (round <= STARTING_ROUND_FOR_SCALING_HARDER) {
+			return (round - GalleryUtils.STARTING_ROUND_FOR_SCALING) * 0.1;
+		} else {
+			return (GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER - GalleryUtils.STARTING_ROUND_FOR_SCALING) * 0.1 + (round - GalleryUtils.STARTING_ROUND_FOR_SCALING_HARDER) * 0.2;
+		}
+	}
+
+	public static double getHealthScaleForPlayerCount(int count) {
+		return MOB_HEALTH_MULTIPLIER_PER_PLAYER[count - 1];
 	}
 
 	public static boolean isLookingAt(Player player, BaseInteractable interactable) {

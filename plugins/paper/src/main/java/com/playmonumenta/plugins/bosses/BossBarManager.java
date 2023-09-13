@@ -93,6 +93,10 @@ public class BossBarManager {
 		}
 	}
 
+	public void setTitle(String newTitle) {
+		mBar.setTitle(newTitle);
+	}
+
 	public void setColor(BarColor barColor) {
 		mBar.setColor(barColor);
 	}

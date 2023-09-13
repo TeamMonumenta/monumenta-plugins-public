@@ -6,11 +6,7 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffect;
 import com.playmonumenta.plugins.gallery.effects.GalleryEffectType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -32,6 +28,8 @@ public class GalleryPlayer {
 	private boolean mIsDead = false;
 
 	private boolean mShouldTeleportToSpawn = false;
+
+	private @Nullable Location mLastSafeLocation = null;
 
 	private final Map<GalleryEffectType, GalleryEffect> mEffects = new HashMap<>();
 
@@ -71,6 +69,10 @@ public class GalleryPlayer {
 
 	public boolean getShouldTeleportWhenJoining() {
 		return mShouldTeleportToSpawn;
+	}
+
+	public @Nullable Location getLastSafeLocation() {
+		return mLastSafeLocation;
 	}
 
 	public void giveEffect(@Nullable GalleryEffect effect) {
@@ -116,6 +118,14 @@ public class GalleryPlayer {
 			effect.tick(this, oneSecond, twoHertz, ticks);
 		}
 
+		Player player = getPlayer();
+		if (player != null) {
+			if (player.getLocation().clone().add(0, -1, 0).getBlock().isSolid() && player.getLocation().getBlock().isEmpty() && player.getLocation().clone().add(0, 1, 0).getBlock().isEmpty()) {
+				mLastSafeLocation = player.getLocation();
+			}
+			// debug
+			// new PartialParticle(Particle.REDSTONE, mLastSafeLocation).data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 0.5f)).count(1).spawnAsPlayerActive(player);
+		}
 	}
 
 	protected void printPlayerInfo() {

@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -133,6 +134,9 @@ public class GalleryManager implements Listener {
 			game.onPlayerDamageEvent(event, player, damagee);
 		}
 
+		if (!(damagee instanceof Player) && (event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION) || event.getCause().equals(EntityDamageEvent.DamageCause.FALL))) {
+			event.setCancelled(true);
+		}
 	}
 
 	protected static int ticks = 0;
