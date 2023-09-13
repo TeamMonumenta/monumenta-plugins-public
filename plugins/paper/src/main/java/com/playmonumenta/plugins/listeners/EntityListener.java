@@ -54,40 +54,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.AreaEffectCloud;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Bee;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Dolphin;
-import org.bukkit.entity.EnderPearl;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.EvokerFangs;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Guardian;
-import org.bukkit.entity.Hoglin;
-import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Painting;
-import org.bukkit.entity.Pig;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Ravager;
-import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Trident;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Vindicator;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.Zoglin;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -1022,6 +989,14 @@ public class EntityListener implements Listener {
 		if (event.getEntity() instanceof Mob mob) {
 			NmsUtils.getVersionAdapter().mobAIChanges(mob);
 		}
+
+		if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
+			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
+			Entity entity = event.getEntity();
+			Bukkit.getScheduler().runTask(Plugin.getInstance(), entity::remove);
+			return;
+		}
+
 		if (event.getEntity() instanceof IronGolem golem) {
 			NmsUtils.getVersionAdapter().setAttackRange(golem, 2.5);
 		} else if (event.getEntity() instanceof Ravager ravager) {
@@ -1033,10 +1008,6 @@ public class EntityListener implements Listener {
 			NmsUtils.getVersionAdapter().setAttackRange(zoglin, 1.8);
 		} else if (event.getEntity() instanceof Hoglin hoglin) {
 			NmsUtils.getVersionAdapter().setAttackRange(hoglin, 1.8);
-		} else if (event.getEntity().getScoreboardTags().contains(Constants.Tags.REMOVE_ON_UNLOAD) && event.getEntity().getTicksLived() > 20) {
-			// This is a jank fix to make sure entities that is supposed to be removed on unload, if it gets loaded (and isn't spawned this tick), remove it.
-			Entity entity = event.getEntity();
-			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> entity.remove());
 		} else if (event.getEntity() instanceof FallingBlock fallingBlock) {
 			fallingBlock.setMetadata(FALLING_BLOCK_ADVENTURE_MODE_METADATA_KEY, new FixedMetadataValue(mPlugin, ZoneUtils.hasZoneProperty(fallingBlock.getLocation(), ZoneProperty.ADVENTURE_MODE)));
 		}

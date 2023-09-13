@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.infinitytower.guis.TowerGuiShowMobs;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -115,7 +114,7 @@ public class TowerManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public static void onChunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
-		for (Entity entity : List.of(event.getChunk().getEntities())) {
+		for (Entity entity : event.getEntities()) {
 			if (entity != null && entity.getScoreboardTags().contains(TowerConstants.TAG_UNLOAD_ENTITY)) {
 				entity.remove();
 			}

@@ -149,6 +149,7 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 			durationStand.setMarker(true);
 			durationStand.customName(Component.text(""));
 			durationStand.setCustomNameVisible(true);
+			durationStand.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
 		}
 
 		int duration = getInitialAbilityDuration();

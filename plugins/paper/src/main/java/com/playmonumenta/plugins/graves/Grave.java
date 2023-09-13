@@ -263,7 +263,9 @@ public final class Grave {
 			update();
 			stopTracking();
 			mManager.removeGrave(mEntity);
-			mEntity.remove();
+			if (mEntity.isValid()) {
+				mEntity.remove();
+			}
 			mEntity = null;
 		}
 	}

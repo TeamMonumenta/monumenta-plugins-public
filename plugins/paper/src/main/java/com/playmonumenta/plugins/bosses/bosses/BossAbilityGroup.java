@@ -3,10 +3,10 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
-import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.events.CustomEffectApplyEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.utils.BossUtils;
@@ -122,7 +122,7 @@ public abstract class BossAbilityGroup {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
 					if (isBossMissing()) {
-						handleMissingBoss();
+						MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. This should never happen!");
 						cancel();
 						return;
 					}
@@ -163,7 +163,7 @@ public abstract class BossAbilityGroup {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
 					if (isBossMissing()) {
-						handleMissingBoss();
+						MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. This should never happen!");
 						cancel();
 						return;
 					}
@@ -220,19 +220,6 @@ public abstract class BossAbilityGroup {
 
 	public String getIdentityTag() {
 		return mIdentityTag;
-	}
-
-	private void handleMissingBoss() {
-		MMLog.warning("Boss " + mIdentityTag + " is missing " + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. Unloading...");
-		BossManager mgr = BossManager.getInstance();
-		if (mgr != null) {
-			mgr.unload(mBoss, false);
-		}
-		// Just in case for some reason the boss is no longer registered with the manager...
-		if (!mUnloaded) {
-			MMLog.warning("Boss " + mIdentityTag + " was not unloaded by mgr.unload()!");
-		}
-		unload();
 	}
 
 	/********************************************************************************
@@ -483,7 +470,7 @@ public abstract class BossAbilityGroup {
 	/* Check if somehow the boss entity is missing even though this is still running */
 	private boolean isBossMissing() {
 		Location bossLoc = mBoss.getLocation();
-		if (!bossLoc.isWorldLoaded() || !bossLoc.isChunkLoaded()) {
+		if (!bossLoc.isWorldLoaded() || !ChunkManager.isChunkLoaded(bossLoc.getChunk())) {
 			return true;
 		}
 		for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4)) {

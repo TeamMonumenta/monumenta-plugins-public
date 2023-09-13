@@ -188,7 +188,7 @@ public class GraveManager {
 	}
 
 	public static void onChunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
+		for (Entity entity : event.getEntities()) {
 			if (GRAVES.containsKey(entity.getUniqueId())) {
 				GRAVES.get(entity.getUniqueId()).onChunkUnload();
 			} else if (THROWN_ITEMS.containsKey(entity.getUniqueId())) {

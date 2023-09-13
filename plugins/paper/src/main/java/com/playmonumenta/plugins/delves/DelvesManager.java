@@ -566,7 +566,7 @@ public class DelvesManager implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onChunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
+		for (Entity entity : event.getEntities()) {
 			if (entity.getScoreboardTags().contains(Twisted.TWISTED_MINIBOSS_TAG)) {
 				Twisted.despawnTwistedMiniBoss((LivingEntity) entity);
 				entity.remove();

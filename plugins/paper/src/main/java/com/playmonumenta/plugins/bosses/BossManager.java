@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.bosses;
 
-import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
@@ -448,32 +446,11 @@ public class BossManager implements Listener {
 	 * Event Handlers
 	 *******************************************************************************/
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
-		if (event.getEntity() instanceof LivingEntity living
-			    && !living.getScoreboardTags().isEmpty()) {
-			// EntityAddToWorldEvent is called at an inconvenient time in Minecraft's code, which can cause deadlocks,
-			// so we delay initialisation of boss data slightly to be outside the entity loading code.
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				if (living.isValid()) {
-					processEntity(living);
-				}
-			});
-		}
-	}
-
 	// Creature spawn event is also listened to in order to set up boss data for initial spawn at the moment the mob is summoned,
 	// which allows to immediately use the boss after summoning it.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void creatureSpawnEvent(CreatureSpawnEvent event) {
 		processEntity(event.getEntity());
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
-		if (event.getEntity() instanceof LivingEntity living) {
-			unload(living, false);
-		}
 	}
 
 	// Some entities seem to persist despite their chunk being unloaded,
@@ -490,7 +467,7 @@ public class BossManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void chunkPartialUnloadEvent(ChunkPartialUnloadEvent event) {
-		for (Entity entity : event.getChunk().getEntities()) {
+		for (Entity entity : event.getEntities()) {
 			if (entity instanceof LivingEntity living) {
 				unload(living, false);
 			}

@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.chunk;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.utils.MMLog;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,7 +100,7 @@ public class ChunkManager implements Listener {
 		if (loadedState.size() == ChunkType.values().length - 1) {
 			mLoaded--;
 			MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s) block partial unload");
-			ChunkPartialUnloadEvent partialEvent = new ChunkPartialUnloadEvent(chunk, event.isSaveChunk());
+			ChunkPartialUnloadEvent partialEvent = new ChunkPartialUnloadEvent(chunk, event.isSaveChunk(), Arrays.stream(chunk.getEntities()).toList());
 			Bukkit.getPluginManager().callEvent(partialEvent);
 			if (partialEvent.isNeedsSave()) {
 				worldNeedsSave.add(chunkKey);
@@ -138,7 +139,7 @@ public class ChunkManager implements Listener {
 		if (loadedState.size() == ChunkType.values().length - 1) {
 			mLoaded--;
 			MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s); entity partial unload");
-			ChunkPartialUnloadEvent partialEvent = new ChunkPartialUnloadEvent(chunk, true);
+			ChunkPartialUnloadEvent partialEvent = new ChunkPartialUnloadEvent(chunk, true, event.getEntities());
 			Bukkit.getPluginManager().callEvent(partialEvent);
 			if (partialEvent.isNeedsSave()) {
 				worldNeedsSave.add(chunkKey);
