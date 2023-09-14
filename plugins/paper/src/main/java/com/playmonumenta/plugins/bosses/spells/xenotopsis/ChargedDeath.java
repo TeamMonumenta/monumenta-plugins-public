@@ -12,7 +12,11 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -21,12 +25,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ChargedDeath extends Spell {
 
 	// the delay between each run of the passive, in ticks
-	private static final int DELAY = 80;
+	private static final int DELAY = 50;
 
 	// the length of the windup portion of each strike, in ticks
 	// motion is where it tracks the player, and total is the total time
-	private static final int WINDUP_MOTION_DURATION = 40;
-	private static final int WINDUP_TOTAL_DURATION = 65;
+	private static final int WINDUP_MOTION_DURATION = 20;
+	private static final int WINDUP_TOTAL_DURATION = 35;
 
 	// the radius of the attack
 	private static final double STRIKE_RADIUS = 2.25;
@@ -78,8 +82,8 @@ public class ChargedDeath extends Spell {
 		    @Override
 		    public void run() {
 				if (mTicks < WINDUP_MOTION_DURATION) {
-					if (mTicks % 4 == 0) {
-						mWorld.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.2f, 1.87f);
+					if (mTicks % 10 == 0) {
+						mWorld.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 0.8f, 1.87f);
 					}
 
 					if (mTicks == 0) {
@@ -93,8 +97,8 @@ public class ChargedDeath extends Spell {
 						mFinalLocation = player.getLocation().clone();
 					}
 
-					if (mTicks % 4 == 0) {
-						mWorld.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 1.2f, 1.35f);
+					if (mTicks % 5 == 0) {
+						mWorld.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.HOSTILE, 0.8f, 1.35f);
 					}
 					if (mTicks == WINDUP_MOTION_DURATION) {
 						mWorld.playSound(mFinalLocation, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.HOSTILE, 1.5f, 0.5f);
@@ -102,7 +106,7 @@ public class ChargedDeath extends Spell {
 
 					// particle effects
 					if (mTicks % 2 == 0) {
-						new PartialParticle(Particle.CRIT_MAGIC, mFinalLocation.clone().add(0, 1.5, 0), 10, 0, 1, 0)
+						new PartialParticle(Particle.CRIT_MAGIC, mFinalLocation.clone().add(0, 1.5, 0), 10, 0.3, 1, 0.3)
 							.spawnAsBoss();
 						new PPCircle(Particle.CLOUD, mFinalLocation, STRIKE_RADIUS)
 							.count(7)
@@ -115,7 +119,7 @@ public class ChargedDeath extends Spell {
 
 						Hitbox hitbox = new Hitbox.UprightCylinderHitbox(mFinalLocation, 3, STRIKE_RADIUS);
 						for (Player player : hitbox.getHitPlayers(true)) {
-							DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mXenotopsis.scaleDamage(ATTACK_DAMAGE), null, false, false, "Charged Death");
+							DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mXenotopsis.scaleDamage(ATTACK_DAMAGE), null, false, true, "Charged Death");
 							mXenotopsis.changePlayerDeathValue(player, DEATH_DAMAGE, false);
 						}
 					}

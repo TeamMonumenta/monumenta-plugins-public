@@ -9,13 +9,16 @@ import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -30,7 +33,7 @@ public class DeathTouchedBlade extends Spell {
 	private static final int SLASHES_PER_GROUP = 2;
 
 	// the attack and death damage of each slash
-	private static final int ATTACK_DAMAGE = 100;
+	private static final int ATTACK_DAMAGE = 85;
 	private static final int DEATH_DAMAGE = 3;
 
 	// the speed of the boss during the attack
@@ -80,6 +83,7 @@ public class DeathTouchedBlade extends Spell {
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_AXE_SCRAPE, SoundCategory.HOSTILE, 2.6f, 1.4f);
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_SQUID_SQUIRT, SoundCategory.HOSTILE, 1.3f, 1.1f);
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.HOSTILE, 1.5f, 0.8f);
+					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 4.5f, 1.8f);
 
 					new PPParametric(Particle.SQUID_INK, mBoss.getLocation().clone().add(0, 1.5, 0), (parameter, builder) -> {
 						double r = FastUtils.randomDoubleInRange(0, Math.PI * 2);
@@ -98,9 +102,6 @@ public class DeathTouchedBlade extends Spell {
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, SoundCategory.HOSTILE, 0.2f, 1.2f);
 					mWorld.playSound(mBoss.getLocation(), Sound.ITEM_AXE_SCRAPE, SoundCategory.HOSTILE, 2.6f, 1.5f);
 					mWorld.playSound(mBoss.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 0.9f, 0.8f);
-
-					// blindness telegraph
-					PlayerUtils.playersInRange(mBoss.getLocation(), Xenotopsis.DETECTION_RANGE, true).forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 25, 1)));
 				}
 
 				if (mTicks == 12) {

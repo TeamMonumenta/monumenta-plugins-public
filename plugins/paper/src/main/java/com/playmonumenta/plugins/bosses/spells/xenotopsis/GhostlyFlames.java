@@ -11,12 +11,18 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.HashMap;
 import java.util.Map;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class GhostlyFlames extends Spell {
 	// the duration of the entire attack, in ticks
@@ -29,8 +35,8 @@ public class GhostlyFlames extends Spell {
 	private static final int WINDUP_DURATION = 20 * 2;
 
 	// the attack and death damage of the attack
-	private static final int ATTACK_DAMAGE = 140;
-	private static final int DEATH_DAMAGE = 15;
+	private static final int ATTACK_DAMAGE = 115;
+	private static final int DEATH_DAMAGE = 12;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -130,6 +136,17 @@ public class GhostlyFlames extends Spell {
 							.delta(0.3)
 							.count((int) (11 * mFlameRadius))
 							.spawnAsBoss();
+						new PPParametric(Particle.FIREWORKS_SPARK, mLocation, (parameter, builder) -> {
+							double theta = (parameter + FastUtils.randomDoubleInRange(0, 1.0 / 6)) * Math.PI * 2;
+							Vector diff = new Vector(FastUtils.cos(theta) * mFlameRadius, 0.3, FastUtils.sin(theta) * mFlameRadius);
+
+							builder.location(mLocation.clone().add(diff));
+							builder.offset(0, FastUtils.randomDoubleInRange(0.15, 0.25), 0);
+						})
+							.directionalMode(true)
+							.extra(1)
+							.count(6)
+							.spawnAsBoss();
 					}
 
 					// sound effect
@@ -145,7 +162,7 @@ public class GhostlyFlames extends Spell {
 						if (mLastHit.containsKey(player) && mTicks - mLastHit.get(player) < 10) {
 							continue;
 						}
-						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mXenotopsis.scaleDamage(ATTACK_DAMAGE), null, false, false, "Ghostly Flames");
+						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, mXenotopsis.scaleDamage(ATTACK_DAMAGE), null, false, true, "Ghostly Flames");
 						mXenotopsis.changePlayerDeathValue(player, DEATH_DAMAGE, false);
 						//MovementUtils.knockAwayRealistic(mLocation, player, 0.3f, 0.35f, true);
 

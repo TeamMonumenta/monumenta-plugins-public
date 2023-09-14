@@ -14,13 +14,28 @@ import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
-import java.util.*;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.PlayerUtils;
+import com.playmonumenta.plugins.utils.ScoreboardUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -43,23 +58,19 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 	public static final TextColor DIALOGUE_COLOR = TextColor.color(100, 95, 107);
 
 	// the boss' unscaled health in part 1 and 2
-	private static final int BASE_HEALTH_PART1 = 16000;
-	private static final int BASE_HEALTH_PART2 = 13000;
+	private static final int BASE_HEALTH_PART1 = 15000;
+	private static final int BASE_HEALTH_PART2 = 12500;
 
 	// the boss' movement speed in part 1 and 2
 	private static final double MOVEMENT_SPEED_PART1 = 0.24;
 	private static final double MOVEMENT_SPEED_PART2 = 0.28;
 
 	// the attack and death damage of the melee attack
-	private static final int MELEE_ATTACK_DAMAGE = 85;
-	private static final int MELEE_DEATH_DAMAGE = 8;
+	private static final int MELEE_ATTACK_DAMAGE = 65;
+	private static final int MELEE_DEATH_DAMAGE = 7;
 
 	// how long shields are disabled for when the boss disables them, in ticks
 	public static final int SHIELD_STUN_TIME = 5 * 20;
-
-	// edit when music is added
-	// public static final String MUSIC_TITLE = "epic:music.";
-	// private static final int MUSIC_DURATION = 0; //seconds
 
 	private int mMeleeDeathDamageOverrideDamage;
 	private boolean mMeleeDeathDamageOverride = false;
@@ -114,9 +125,6 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			}
 		}
 
-		// edit when music is added
-		// SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS, MUSIC_DURATION, true, 2.0f, 1.0f, true), true, mBoss, true, 0, 5);
-
 		mBoss.setRemoveWhenFarAway(false);
 		mBoss.addScoreboardTag("Boss");
 		EntityUtils.setMaxHealthAndHealth(mBoss, mMaxHealthPart1);
@@ -145,7 +153,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 		SpellManager phase1Spells = new SpellManager(List.of(
 			new FearfulSouls(plugin, boss, this, mCooldownTicks, 3),
-			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 1, 10),
+			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 1, 5),
 			new GhostlyFlames(plugin, boss, this, mCooldownTicks, 4.0)
 		));
 		List<Spell> phase1Passives = List.of(
@@ -156,7 +164,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 		SpellManager phase2Spells = new SpellManager(List.of(
 			new FearfulSouls(plugin, boss, this, mCooldownTicks, 3),
 			new UmbralCannons(plugin, boss, this, mCooldownTicks),
-			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 2, 15),
+			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 1, 9),
 			new GhostlyFlames(plugin, boss, this, mCooldownTicks, 6.5)
 		));
 		List<Spell> phase2Passives = List.of(
@@ -167,7 +175,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 		SpellManager phase3Spells = new SpellManager(List.of(
 			new FearfulSouls(plugin, boss, this, mCooldownTicks, 4),
 			new UmbralCannons(plugin, boss, this, mCooldownTicks),
-			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 3, 25),
+			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 2, 13),
 			new GhostlyFlames(plugin, boss, this, mCooldownTicks, 11),
 			new DeathTouchedBlade(plugin, boss, this, mCooldownTicks, 3.25)
 		));
@@ -207,7 +215,8 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			mDeathValues.put(player, 0);
 			mTicksSinceLastDeathChange.put(player, 0);
 
-			BossBar bar = BossBar.bossBar(Component.text("☠ Death ☠", NamedTextColor.DARK_PURPLE), 0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
+			String playerName = player.getName();
+			BossBar bar = BossBar.bossBar(Component.text(playerName + "'" + (playerName.toLowerCase().endsWith("s") ? "" : "s") + " Death", NamedTextColor.DARK_PURPLE), 0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
 			player.showBossBar(bar);
 			mDeathBossBars.put(player, bar);
 		});

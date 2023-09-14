@@ -7,15 +7,31 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
-import java.util.*;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
@@ -46,8 +62,8 @@ public class UmbralCannons extends Spell {
 	private static final ArrayList<Material> SHOT_BLOCK_OPTIONS = new ArrayList<>(Arrays.asList(Material.BLACK_WOOL, Material.BLACK_CONCRETE, Material.BLACK_CONCRETE_POWDER));
 
 	// the attack and death damage of each cannon shot
-	private static final int ATTACK_DAMAGE = 260;
-	private static final int DEATH_DAMAGE = 25;
+	private static final int ATTACK_DAMAGE = 240;
+	private static final int DEATH_DAMAGE = 18;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -173,19 +189,19 @@ public class UmbralCannons extends Spell {
 				if (mTicks < SHOT_WINDUP_DURATION && mTicks % 2 == 0 && mLocation != null) {
 					new PPCircle(Particle.REDSTONE, mLocation, SHOT_RADIUS)
 						.ringMode(true)
-						.count(50)
+						.count(30)
 						.data(new Particle.DustOptions(Color.fromRGB(19, 19, 28), 1.8f))
 						.delta(0.08)
 						.spawnAsBoss();
 					new PPCircle(Particle.END_ROD, mLocation, SHOT_RADIUS)
 						.ringMode(true)
-						.count(20)
+						.count(12)
 						.delta(0.08)
 						.spawnAsBoss();
 
 					double height = 10 * (1 - ((double) mTicks / SHOT_WINDUP_DURATION));
 					new PartialParticle(Particle.REDSTONE, mLocation.clone().add(0, height, 0))
-						.count(5)
+						.count(2)
 						.extra(0.2)
 						.data(new Particle.DustOptions(Color.fromRGB(19, 19, 28), 2.3f))
 						.delta(0.02, 0.02, 0.02)

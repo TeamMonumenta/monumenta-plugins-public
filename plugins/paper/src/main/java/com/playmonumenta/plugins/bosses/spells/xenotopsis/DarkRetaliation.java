@@ -8,7 +8,12 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -25,16 +30,16 @@ public class DarkRetaliation extends Spell {
 	private static final double TRIGGER_DISTANCE = 8;
 
 	// the percent of the damage to transfer back
-	private static final double DAMAGE_TRANSFER_PERCENT = 0.5;
+	private static final double DAMAGE_TRANSFER_PERCENT = 0.6;
 
 	// the speed of the projectile, in blocks per tick
 	private static final double PROJECTILE_SPEED = 0.9;
 
 	// the turn speed of the projectile, or speed of the projectile orthogonal to the velocity, in blocks per tick
-	private static final double TURN_SPEED = 0.028;
+	private static final double TURN_SPEED = 0.039;
 
 	// the death damage of the attack
-	private static final int DEATH_DAMAGE = 8;
+	private static final int DEATH_DAMAGE = 7;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -65,7 +70,9 @@ public class DarkRetaliation extends Spell {
 		super.onHurt(event);
 
 		// check if requirements for retaliation are met
-		if (mTicks == 0 && event.getDamager() != null && event.getDamager() instanceof Player player && mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE) {
+		if (mTicks == 0 && event.getDamager() != null && event.getDamager() instanceof Player player
+				&& mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE
+				&& event.getType() == DamageEvent.DamageType.PROJECTILE) {
 			attackPlayer(player, event.getDamage() * DAMAGE_TRANSFER_PERCENT);
 			mTicks = COOLDOWN;
 		}
@@ -127,7 +134,7 @@ public class DarkRetaliation extends Spell {
 				if (hitbox.getHitPlayers(true).contains(player)) {
 					new PartialParticle(Particle.SMOKE_LARGE, player.getLocation().clone().add(0, 0.1, 0)).extra(0).delta(0.4, 0, 0.4).count(40).spawnAsBoss();
 
-					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, mXenotopsis.scaleDamage(damage), null, false, false, "Dark Retaliation");
+					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, mXenotopsis.scaleDamage(damage), null, false, true, "Dark Retaliation");
 					mXenotopsis.changePlayerDeathValue(player, DEATH_DAMAGE, false);
 
 					this.cancel();

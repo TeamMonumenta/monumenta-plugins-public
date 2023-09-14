@@ -6,10 +6,21 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DamageUtils;
+import com.playmonumenta.plugins.utils.EntityUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,12 +47,12 @@ public class DeathlyBombs extends Spell {
 	private static final double BOMB_RADIUS = 3.75;
 
 	// the attack and death damage of each bomb on impact
-	private static final int BOMB_ATTACK_DAMAGE = 190;
-	private static final int BOMB_DEATH_DAMAGE = 15;
+	private static final int BOMB_ATTACK_DAMAGE = 130;
+	private static final int BOMB_DEATH_DAMAGE = 12;
 
 	// the attack and death damage of each shrapnel
-	private static final int SHRAPNEL_ATTACK_DAMAGE = 80;
-	private static final int SHRAPNEL_DEATH_DAMAGE = 7;
+	private static final int SHRAPNEL_ATTACK_DAMAGE = 65;
+	private static final int SHRAPNEL_DEATH_DAMAGE = 6;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -166,7 +177,7 @@ public class DeathlyBombs extends Spell {
 						double r = FastUtils.randomDoubleInRange(((double) i / mShrapnelShots) * Math.PI * 2, ((double) (i + 1) / mShrapnelShots) * Math.PI * 2);
 						Vector direction = new Vector(FastUtils.cos(r), 0, FastUtils.sin(r));
 
-						launchShrapnel(shrapnelLocation, direction, 13.5, -4.5);
+						launchShrapnel(shrapnelLocation, direction, 9, -6);
 					}
 
 					fallingBlock.remove();
@@ -223,7 +234,7 @@ public class DeathlyBombs extends Spell {
 				// check collisions
 				Hitbox hitbox = new Hitbox.AABBHitbox(mWorld, BoundingBox.of(mAccurateLocation.clone().add(0, 0.3125, 0), 0.3125, 0.3125, 0.3125));
 				for (Player player : hitbox.getHitPlayers(true)) {
-					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, mXenotopsis.scaleDamage(SHRAPNEL_ATTACK_DAMAGE), null, false, false, "Deathly Shrapnel");
+					DamageUtils.damage(mBoss, player, DamageEvent.DamageType.PROJECTILE, mXenotopsis.scaleDamage(SHRAPNEL_ATTACK_DAMAGE), null, false, true, "Deathly Shrapnel");
 					mXenotopsis.changePlayerDeathValue(player, SHRAPNEL_DEATH_DAMAGE, false);
 					//MovementUtils.knockAwayRealistic(bullet.getLocation(), player, 0.3f, 0.35f, true);
 

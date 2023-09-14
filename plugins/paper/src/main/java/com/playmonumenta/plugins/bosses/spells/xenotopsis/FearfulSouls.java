@@ -6,12 +6,20 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.*;
+import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,8 +43,8 @@ public class FearfulSouls extends Spell {
 	private static final double SKULL_HEIGHT_VARIANCE = 0.5;
 
 	// the attack and death damage of each skull
-	private static final int ATTACK_DAMAGE = 150;
-	private static final int DEATH_DAMAGE = 10;
+	private static final int ATTACK_DAMAGE = 120;
+	private static final int DEATH_DAMAGE = 8;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
