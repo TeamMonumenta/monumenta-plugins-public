@@ -55,9 +55,6 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 	public static final int detectionRange = 50;
 	public static final int RKITXET_HEALTH = 1400;
 	public static final int SWAP_TARGET_SECONDS = 15;
-
-	private static final String MUSIC_TITLE = "epic:music.kaul";
-	private static final int MUSIC_DURATION = 3 * 60 + 39; //seconds
 	private static final String GOLEM_TAG = "Golem";
 	private static final int COOLDOWN_TICKS_1 = 10 * 20;
 	private static final int COOLDOWN_TICKS_2 = 7 * 20;
@@ -225,10 +222,6 @@ public class RKitxet extends SerializedLocationBossAbilityGroup {
 					mBoss.setInvulnerable(false);
 					mBoss.setAI(true);
 					EntityUtils.setAttributeBase(mBoss, Attribute.GENERIC_FOLLOW_RANGE, detectionRange);
-
-					SongManager.playBossSong(players, new SongManager.Song(MUSIC_TITLE, SoundCategory.RECORDS,
-						MUSIC_DURATION, true, 2.0f, 1.0f, true),
-						true, mBoss, true, 0, 5);
 
 					for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), detectionRange, true)) {
 						MessagingUtils.sendTitle(player, Component.text("R'Kitxet", NamedTextColor.DARK_GREEN, TextDecoration.BOLD), Component.text("Forsaken Elder", NamedTextColor.GREEN, TextDecoration.BOLD));
