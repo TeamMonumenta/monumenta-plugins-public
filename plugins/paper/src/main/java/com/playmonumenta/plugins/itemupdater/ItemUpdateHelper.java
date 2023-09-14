@@ -14,6 +14,7 @@ import com.playmonumenta.plugins.utils.StringUtils;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTType;
 import de.tr7zw.nbtapi.iface.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,7 +27,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -35,8 +35,22 @@ import org.jetbrains.annotations.Nullable;
 public class ItemUpdateHelper {
 	// Keys allowed to be empty
 	private static final List<String> whitelistedKeys = Arrays.asList("AttributeModifiers");
-	private static final ReadWriteNBT emptyAttributes = NBT.parseNBT("{AttributeModifiers:[]}");
 	private static final List<Component> loreToRemove = Collections.singletonList(ItemStatUtils.DUMMY_LORE_TO_REMOVE);
+	private static final UUID cachedDummyUUID = new UUID(0, 0);
+	private static final AttributeModifier cachedDummyAttributeModifier = new AttributeModifier(cachedDummyUUID, ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME, 1, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+
+	private static final Map<String, String> enchantmentConversionMap = Map.ofEntries(
+		Map.entry("Frost", "Ice Aspect"),
+		Map.entry("Spark", "Thunder Aspect"),
+		Map.entry("Flame", "Fire Aspect")
+	);
+	private static final Map<String, String> effectConversionMap = Map.ofEntries(
+		Map.entry("InstantHealth", "InstantHealthPercent")
+	);
+
+	public record VanillaEnchantmentType(Enchantment enchant, int level) {}
+
+	public record VanillaAttributeType(Attribute type, double amount, AttributeModifier.Operation operation, @Nullable EquipmentSlot slot) {}
 
 	public static List<String> getEmptyKeys(ReadableNBT nbt, List<String> paths, String baseKey) {
 		Set<String> keys = nbt.getKeys();
@@ -136,6 +150,10 @@ public class ItemUpdateHelper {
 	public static void generateItemStats(final ItemStack item) {
 		if (ItemUtils.isNullOrAir(item)) {
 			return;
+		}
+
+		if (ItemStatUtils.isDirty(item)) {
+			ItemStatUtils.removeDirty(item);
 		}
 
 		// check if item has NBT data
@@ -398,9 +416,30 @@ public class ItemUpdateHelper {
 						}
 						attributeMap.put(type, operationMap);
 					}
+					// show default attack speed if an item has attack damage, but no attack speed attribute (wands)
+					if (attributeMap.containsKey(AttributeType.ATTACK_DAMAGE_ADD) && !attributeMap.containsKey(AttributeType.ATTACK_SPEED)) {
+						EnumMap<Operation, Component> operationMap = new EnumMap<>(Operation.class); // placeholder
+						operationMap.put(Operation.ADD, AttributeType.getDisplay(AttributeType.ATTACK_SPEED, 0, slot, Operation.ADD));
+						attributeMap.put(AttributeType.ATTACK_SPEED, operationMap);
+					}
 					// add results together
-					for (EnumMap<Operation, Component> operationMap : attributeMap.values()) {
-						attributeList.addAll(operationMap.values());
+					// Mainhand slots have attack and projectile related attributes higher than other attributes
+					if (slot == Slot.MAINHAND) {
+						List<Component> regularList = new ArrayList<>();
+						List<Component> mainhandPriorityList = new ArrayList<>();
+						for (Map.Entry<AttributeType, EnumMap<Operation, Component>> entry : attributeMap.entrySet()) {
+							if (AttributeType.MAINHAND_ATTRIBUTE_TYPES.contains(entry.getKey())) {
+								mainhandPriorityList.addAll(entry.getValue().values());
+							} else {
+								regularList.addAll(entry.getValue().values());
+							}
+						}
+						attributeList.addAll(mainhandPriorityList);
+						attributeList.addAll(regularList);
+					} else {
+						for (EnumMap<Operation, Component> operationMap : attributeMap.values()) {
+							attributeList.addAll(operationMap.values());
+						}
 					}
 					slotMap.put(slot, attributeList);
 				}
@@ -437,14 +476,26 @@ public class ItemUpdateHelper {
 					cleanEmptyTags(nbt, path);
 				}
 			}
+
+			// return if no NBT
+			if (nbt.getKeys().isEmpty()) {
+				return;
+			}
+
 			nbt.modifyMeta((nbtr, meta) -> {
-				// placeholder attribute (can be removed once loottables are removed)
-				boolean hasDummyArmorToughnessAttribute = false;
+				// placeholder attributes (for items with default attributes)
+				boolean hasDummyAttribute = false;
+				boolean needsDummyAttribute = true;
 				if (meta.hasAttributeModifiers()) {
-					Collection<AttributeModifier> toughnessAttrs = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR_TOUGHNESS);
-					hasDummyArmorToughnessAttribute = toughnessAttrs != null && toughnessAttrs.size() == 1 && toughnessAttrs.iterator().next().getName().equals(ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME);
+					Collection<AttributeModifier> toughnessAttributes = meta.getAttributeModifiers(Attribute.GENERIC_ARMOR_TOUGHNESS);
+					hasDummyAttribute = toughnessAttributes != null && toughnessAttributes.size() == 1 && ItemStatUtils.MONUMENTA_DUMMY_TOUGHNESS_ATTRIBUTE_NAME.equals(toughnessAttributes.iterator().next().getName());
+					needsDummyAttribute = !(meta.getAttributeModifiers().size() >= (hasDummyAttribute ? 2 : 1));
 				}
-				if (hasDummyArmorToughnessAttribute) {
+				boolean hasDefaultAttributes = ItemUtils.hasDefaultAttributes(item);
+				if (hasDefaultAttributes && needsDummyAttribute) {
+					meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+				} else {
 					meta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
 				}
 
@@ -502,10 +553,6 @@ public class ItemUpdateHelper {
 					meta.removeItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
 				}
 			});
-			if (ItemUtils.hasDefaultAttributes(item) && !nbt.hasTag("AttributeModifiers")) {
-				// create a new empty list
-				nbt.mergeCompound(emptyAttributes);
-			}
 			ItemUtils.setDisplayLore(nbt, lore);
 			ItemUtils.setPlainComponentLore(nbt, lore);
 		});
@@ -531,204 +578,207 @@ public class ItemUpdateHelper {
 		}
 		NBT.modify(item, nbt -> {
 			ReadWriteNBT monumenta = nbt.getCompound(ItemStatUtils.MONUMENTA_KEY);
-			if (monumenta == null) {
-				return;
+			if (monumenta != null) {
+				monumenta.removeKey(ItemStatUtils.STOCK_KEY);
 			}
-			monumenta.removeKey(ItemStatUtils.STOCK_KEY);
 			nbt.removeKey("CustomPotionEffects");
 			nbt.removeKey("AttributeModifiers");
 			nbt.removeKey("Enchantments");
+			// readd placeholder attribute if needed
+			if (ItemUtils.hasDefaultAttributes(item)) {
+				nbt.modifyMeta((nbtr, meta) -> {
+						meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+				});
+			}
 		});
 	}
 
-	public record VanillaEnchantmentType(Enchantment enchant, int level) {}
-
-	public record VanillaAttributeType(Attribute type, double amount, AttributeModifier.Operation operation, @Nullable EquipmentSlot slot) {}
-
-	public static String checkForErrors(ItemStack item) {
-		String errorFound = NBT.get(item, nbt -> {
-			List<String> errors = new ArrayList<String>(5);
+	public static @Nullable String regenerateStats(ItemStack item) {
+		List<String> errors = new ArrayList<String>(5);
+		NBT.modify(item, nbt -> {
 			ReadableNBT monumenta = nbt.getCompound("Monumenta");
-			if (monumenta != null) {
-				if (monumenta.getString(Tier.KEY).equals("legacy")) {
-					if (monumenta.hasTag(ItemStatUtils.STOCK_KEY)) {
-						errors.add("Legacy contains Monumenta.Stock tag!");
-					}
-				}
-				List<VanillaEnchantmentType> nbtEnchantments = new ArrayList<>();
-				List<VanillaAttributeType> nbtAttributes = new ArrayList<>();
-				ItemMeta meta = item.getItemMeta();
+			if (nbt.hasTag("CustomPotionEffects") && monumenta != null && monumenta.hasTag(ItemStatUtils.STOCK_KEY)) {
+				errors.add("Has CustomPotionEffects & Monumenta.Stock tags!");
+			}
 
-				// custom enchantment checking
-				ReadableNBT enchantmentsNBT = ItemStatUtils.getEnchantments(nbt);
-				if (enchantmentsNBT != null) {
-					Set<String> keys = enchantmentsNBT.getKeys();
-					for (String key : keys) {
-						EnchantmentType enchantment = EnchantmentType.getEnchantmentType(key);
-						if (enchantment == null) {
-							errors.add("[Enchant] Invalid EnchantmentType: '" + key + "'");
-							continue;
-						}
-						Integer nbtLevel = enchantmentsNBT.resolveOrDefault(key + "." + ItemStatUtils.LEVEL_KEY, 0);
-						if (nbtLevel <= 0) { // enchant levels shouldn't go below 1
-							errors.add("[Enchant] Invalid amount: ('" + enchantment.getName() + "' " + nbtLevel + ")");
-						}
-						Enchantment nbtEnchantment = enchantment.getEnchantment();
-						if (nbtEnchantment == null) {
-							continue;
-						}
-						nbtEnchantments.add(new VanillaEnchantmentType(nbtEnchantment, nbtLevel));
-						// validation
-						if (!meta.hasEnchant(nbtEnchantment)) {
-							errors.add("[Enchant] Missing Vanilla Enchant: ('" + nbtEnchantment.getKey().asString() + "' " + nbtLevel + ")");
-							continue;
-						}
-						int vanillaLevel = meta.getEnchantLevel(nbtEnchantment);
-						if (vanillaLevel != nbtLevel) {
-							errors.add("[Enchant] Mismatched level: ('" + nbtEnchantment.getKey().asString() + "' Custom: " + nbtLevel + " | Vanilla: " + vanillaLevel + ")");
-						}
-					}
-				}
-				// vanilla enchantment checking
-				if (meta.hasEnchants()) {
-					Set<Map.Entry<Enchantment, Integer>> vanillaEnchantments = meta.getEnchants().entrySet();
-					if (vanillaEnchantments != null && !vanillaEnchantments.isEmpty()) {
-						Enchantment placeholderEnchantment = ItemUtils.isSomeBow(item) ? Enchantment.WATER_WORKER : Enchantment.ARROW_DAMAGE;
-						for (Map.Entry<Enchantment, Integer> vanillaCopy : vanillaEnchantments) {
-							Enchantment vanillaEnchantment = vanillaCopy.getKey();
-							Integer vanillaLevel = meta.getEnchantLevel(vanillaEnchantment);
-							// ignore placeholder enchant
-							if (vanillaEnchantment.equals(placeholderEnchantment) && vanillaLevel == 1) {
-								continue;
-							}
-							// find custom enchant that matches placeholder enchant
-							if (!nbtEnchantments.contains(new VanillaEnchantmentType(vanillaEnchantment, vanillaLevel))) {
-								errors.add("[Enchant] Extra Vanilla Enchant: ('" + vanillaEnchantment.getKey().asString() + "' " + vanillaLevel + ")");
-								continue;
-							}
-						}
-					}
-				}
+			List<VanillaEnchantmentType> nbtEnchantments = new ArrayList<>();
+			List<VanillaAttributeType> nbtAttributes = new ArrayList<>();
+			boolean isUnbreakable = false;
 
-				ReadableNBT infusions = ItemStatUtils.getInfusions(nbt);
-				if (infusions != null) {
-					Set<String> keys = infusions.getKeys();
-					for (String key : keys) {
-						InfusionType infusion = InfusionType.getInfusionType(key);
-						if (infusion == null) {
-							errors.add("[Infusion] Invalid InfusionType: '" + key + "'");
-							continue;
-						}
+			// custom enchantment checking
+			ReadWriteNBT enchantmentsNBT = ItemStatUtils.getEnchantments(nbt);
+			if (enchantmentsNBT != null) {
+				Set<String> keys = enchantmentsNBT.getKeys();
+				for (String key : keys) {
+					ReadWriteNBT enchantmentNBT = enchantmentsNBT.getCompound(key);
+					if (enchantmentNBT == null) {
+						errors.add("[Enchant] Invalid EnchantmentType: '" + key + "' (EnchantmentType removed)");
+						continue;
 					}
-				}
+					EnchantmentType enchantment = EnchantmentType.getEnchantmentType(key);
+					Integer nbtLevel = enchantmentNBT.getInteger(ItemStatUtils.LEVEL_KEY);
 
-				ReadableNBTList<ReadWriteNBT> attributesNBT = ItemStatUtils.getAttributes(nbt);
-				if (attributesNBT != null && !attributesNBT.isEmpty()) {
-					for (ReadWriteNBT attribute : attributesNBT) {
-						String name = attribute.getString(ItemStatUtils.ATTRIBUTE_NAME_KEY);
-						Double amount = attribute.getDouble(ItemStatUtils.AMOUNT_KEY);
-						String operation = attribute.getString(Operation.KEY);
-						String slot = attribute.getString(Slot.KEY);
-						AttributeType attributeType = AttributeType.getAttributeType(name);
-						Slot slotType = Slot.getSlot(slot);
-						Operation operationType = Operation.getOperation(operation);
-						// validate the custom attribute
-						if (attributeType == null || slotType == null || operationType == null) {
-							errors.add("[Attribute] Invalid AttributeType: '" + name + "' slot: '" + slot + "' operation: '" + operation + "' amount: '" + amount + "'");
-							continue;
-						}
-						if (amount == 0) { // attribute amount can technically go into the negatives...
-							errors.add("[Attribute] Invalid AttributeType amount: '" + name + "' slot: '" + slot + "' operation: '" + operation + "' amount: '" + amount + "'");
-							continue;
-						}
-						Attribute nbtAttribute = attributeType.getAttribute();
-						AttributeModifier.Operation nbtOperation = operationType.getAttributeOperation();
-						EquipmentSlot nbtSlot = slotType.getEquipmentSlot();
-						if (nbtAttribute == null || nbtOperation == null) {
-							continue;
-						}
-						nbtAttributes.add(new VanillaAttributeType(nbtAttribute, amount, nbtOperation, nbtSlot));
-
-						// try to find the vanilla attribute that matches this custom attribute
-						Collection<AttributeModifier> vanillaAttributeModifiers = meta.getAttributeModifiers(nbtAttribute);
-						if (vanillaAttributeModifiers == null) {
-							errors.add("[Attribute] Missing Vanilla Attribute: '" + nbtAttribute.getKey().asString() + "' slot: '" + nbtSlot + "' operation: '" + nbtOperation + "' amount: '" + amount + "' (0 Vanilla Attributes)");
-							continue;
-						}
+					// conversion from invalid enchantment to valid enchantment
+					if (enchantmentConversionMap.containsKey(key)) {
+						String newKey = enchantmentConversionMap.get(key);
 						boolean found = false;
-						int counter = 0;
-						for (AttributeModifier vanillaAttributeModifier : vanillaAttributeModifiers) {
-							if (vanillaAttributeModifier.getAmount() == amount &&
-								nbtOperation.equals(vanillaAttributeModifier.getOperation()) &&
-								(nbtSlot == null || nbtSlot.equals(vanillaAttributeModifier.getSlot()))) {
-								counter++;
-								if (found == true) {
-									errors.add("[Attribute] Duplicate Vanilla Attributes: '" + nbtAttribute.getKey().asString() + "' slot: '" + nbtSlot + "' operation: '" + nbtOperation + "' amount: '" + amount + "' (Count: " + counter + ")");
-								}
+						for (String otherKey : keys) {
+							if (Objects.equals(newKey, otherKey)) {
 								found = true;
+								break;
 							}
 						}
 						if (!found) {
-							errors.add("[Attribute] Missing Vanilla Attribute: '" + nbtAttribute.getKey().asString() + "' slot: '" + nbtSlot + "' operation: '" + nbtOperation + "' amount: '" + amount + "' (1+ Vanilla Attributes)");
-							continue;
+							errors.add("[Enchant] Converted EnchantmentType: ('" + key + "' -> '" + newKey + "')");
+							enchantmentsNBT.removeKey(key);
+							enchantmentsNBT.getOrCreateCompound(newKey).setInteger(ItemStatUtils.LEVEL_KEY, nbtLevel);
+							key = newKey;
+							enchantment = EnchantmentType.getEnchantmentType(key);
 						}
 					}
+
+					if (enchantment == null) {
+						errors.add("[Enchant] Invalid EnchantmentType: ('" + key + "' " + nbtLevel + ") (EnchantmentType removed)");
+						enchantmentsNBT.removeKey(key);
+						continue;
+					}
+					if (nbtLevel <= 0) { // enchant levels shouldn't go below 1
+						errors.add("[Enchant] Invalid amount: ('" + enchantment.getName() + "' " + nbtLevel + ") (Level set to 1)");
+						enchantmentNBT.setInteger(ItemStatUtils.LEVEL_KEY, 1);
+					}
+
+					// override for unbreakable items
+					if (enchantment == EnchantmentType.UNBREAKABLE) {
+						isUnbreakable = true;
+						continue;
+					}
+					// some custom enchants don't have vanilla counterparts
+					@Nullable Enchantment nbtEnchantment = enchantment.getEnchantment();
+					if (nbtEnchantment == null) {
+						continue;
+					}
+					nbtEnchantments.add(new VanillaEnchantmentType(nbtEnchantment, nbtLevel));
 				}
-				if (meta.hasAttributeModifiers()) {
-					Collection<Map.Entry<Attribute, AttributeModifier>> vanillaAttributes = meta.getAttributeModifiers().entries();
-					if (vanillaAttributes != null && !vanillaAttributes.isEmpty()) {
-						for (Map.Entry<Attribute, AttributeModifier> copy : vanillaAttributes) {
-							Attribute vanillaAttribute = copy.getKey();
-							AttributeModifier vanillaModifier = copy.getValue();
-							double vanillaAmount = vanillaModifier.getAmount();
-							AttributeModifier.Operation vanillaOperation = vanillaModifier.getOperation();
-							EquipmentSlot vanillaSlot = vanillaModifier.getSlot();
-							// find a custom attribute that matches this vanilla attribute
-							if (!nbtAttributes.contains(new VanillaAttributeType(vanillaAttribute, vanillaAmount, vanillaOperation, vanillaSlot))) {
-								errors.add("[Attribute] Extra Vanilla Attribute: '" + vanillaAttribute.getKey().asString() + "' slot: '" + vanillaSlot + "' operation: '" + vanillaOperation + "' amount: '" + vanillaAmount + "' friendlyName: '" + vanillaModifier.getName() + "'  (No Custom Attribute Found)");
-								continue;
+			}
+
+			ReadWriteNBTCompoundList attributesNBT = ItemStatUtils.getAttributes(nbt);
+			if (attributesNBT != null && !attributesNBT.isEmpty()) {
+				List<Integer> indexesToRemove = new ArrayList<>();
+				int i = -1;
+				for (ReadWriteNBT attribute : attributesNBT) {
+					i++;
+					String name = attribute.getString(ItemStatUtils.ATTRIBUTE_NAME_KEY);
+					Double amount = attribute.getDouble(ItemStatUtils.AMOUNT_KEY);
+					String operation = attribute.getString(Operation.KEY);
+					String slot = attribute.getString(Slot.KEY);
+					@Nullable AttributeType attributeType = AttributeType.getAttributeType(name);
+					@Nullable Slot slotType = Slot.getSlot(slot);
+					@Nullable Operation operationType = Operation.getOperation(operation);
+
+					// validate the custom attribute
+					if (attributeType == null || slotType == null || operationType == null) {
+						errors.add("[Attribute] Invalid AttributeType: '" + name + "' slot: '" + slot + "' operation: '" + operation + "' amount: '" + amount + "' (AttributeType removed)");
+						indexesToRemove.add(i);
+						continue;
+					}
+
+					if (amount == 0) { // attribute amount can technically go into the negatives...
+						errors.add("[Attribute] Invalid AttributeType amount: '" + name + "' slot: '" + slot + "' operation: '" + operation + "' amount: '" + amount + "' (AttributeType removed)");
+						indexesToRemove.add(i);
+						continue;
+					}
+
+					@Nullable Attribute nbtAttribute = attributeType.getAttribute();
+					AttributeModifier.Operation nbtOperation = operationType.getAttributeOperation();
+					@Nullable EquipmentSlot nbtSlot = slotType.getEquipmentSlot(); // can be null, means any slot
+					if (nbtAttribute == null || nbtOperation == null) {
+						continue;
+					}
+					nbtAttributes.add(new VanillaAttributeType(nbtAttribute, amount, nbtOperation, nbtSlot));
+				}
+				for (Integer index : indexesToRemove) {
+					attributesNBT.remove(index);
+				}
+			}
+
+			ReadWriteNBTCompoundList effectsNBT = ItemStatUtils.getEffects(nbt);
+			if (effectsNBT != null && !effectsNBT.isEmpty()) {
+				List<Integer> indexesToRemove = new ArrayList<>();
+				int i = -1;
+				for (ReadWriteNBT effect : effectsNBT) {
+					i++;
+					String type = effect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
+					int duration = effect.getInteger(ItemStatUtils.EFFECT_DURATION_KEY);
+					double strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
+
+					// conversion from invalid type to valid type
+					if (effectConversionMap.containsKey(type)) {
+						String newType = effectConversionMap.get(type);
+						boolean found = false;
+						for (ReadWriteNBT otherEffect : effectsNBT) {
+							String otherType = otherEffect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
+							if (Objects.equals(newType, otherType)) {
+								found = true;
+								break;
 							}
 						}
+						if (!found) {
+							errors.add("[Effect] Converted EffectType: ('" + type + "' -> '" + newType + "')");
+							type = newType;
+							effect.setString(ItemStatUtils.EFFECT_TYPE_KEY, type);
+						}
+					}
+
+					EffectType effectType = EffectType.fromType(type);
+					if (effectType == null) {
+						errors.add("[Effect] Invalid EffectType: '" + type + "' duration: '" + duration + "' strength: '" + strength + "' (EffectType removed)");
+						indexesToRemove.add(i);
+						continue;
+					}
+					if (duration <= 0) {
+						errors.add("[Effect] Invalid duration: '" + type + "' duration: '" + duration + "' strength: '" + strength + "' (Duration set to 1)");
+						effect.setInteger(ItemStatUtils.EFFECT_DURATION_KEY, 1);
+						continue;
+					}
+					if (strength <= 0) {
+						errors.add("[Effect] Invalid strength: '" + type + "' duration: '" + duration + "' strength: '" + strength + "' (No Action)");
+						continue;
+					}
+					// we don't store the actual potion effects on the item so no need to check for CustomPotionEffects validation
+				}
+				for (Integer index : indexesToRemove) {
+					effectsNBT.remove(index);
+				}
+			}
+
+			// purge vanilla enchantments and attribute modifiers
+			nbt.removeKey("AttributeModifiers");
+			nbt.removeKey("Enchantments");
+			// readd vanilla enchantments and attribute modifiers
+			final boolean unbreakable = isUnbreakable;
+			nbt.modifyMeta((nbtr, meta) -> {
+				meta.setUnbreakable(unbreakable);
+				for (VanillaEnchantmentType type : nbtEnchantments) {
+					meta.addEnchant(type.enchant, type.level, true);
+				}
+				// add placeholder if nbtAttributes is empty
+				if (ItemUtils.hasDefaultAttributes(item) && nbtAttributes.size() == 0) {
+					meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, cachedDummyAttributeModifier);
+				} else {
+					for (VanillaAttributeType type : nbtAttributes) {
+						UUID uuid = UUID.nameUUIDFromBytes(("" + type.type + type.operation + type.slot).getBytes(StandardCharsets.UTF_8));
+						if (type.slot == null) {
+							meta.addAttributeModifier(type.type, new AttributeModifier(uuid, "Modifier", type.amount, type.operation));
+						} else {
+							meta.addAttributeModifier(type.type, new AttributeModifier(uuid, "Modifier", type.amount, type.operation, type.slot));
+						}
 					}
 				}
-
-				ReadableNBTList<ReadWriteNBT> effects = ItemStatUtils.getEffects(nbt);
-				if (effects != null && !effects.isEmpty()) {
-					for (ReadWriteNBT effect : effects) {
-						String type = effect.getString(ItemStatUtils.EFFECT_TYPE_KEY);
-						int duration = effect.getInteger(ItemStatUtils.EFFECT_DURATION_KEY);
-						double strength = effect.getDouble(ItemStatUtils.EFFECT_STRENGTH_KEY);
-						EffectType effectType = EffectType.fromType(type);
-						if (effectType == null) {
-							errors.add("[Effect] Invalid EffectType: '" + type + "' duration: '" + duration + "' strength: '" + strength + "'");
-							continue;
-						}
-						if (duration <= 0) {
-							errors.add("[Effect] Invalid duration: '" + type + "' duration: '" + duration + "' strength: '" + strength + "'");
-							continue;
-						}
-						if (strength <= 0) {
-							errors.add("[Effect] Invalid strength: '" + type + "' duration: '" + duration + "' strength: '" + strength + "'");
-							continue;
-						}
-						// we don't store the actual potion effects on the item so no need to check for effectType validation
-					}
-				}
-
-			}
-			if (nbt.hasTag("CustomPotionEffects")) {
-				errors.add("Has CustomPotionEffects tag!");
-			}
-			boolean plain = nbt.hasTag("plain");
-			boolean display = nbt.hasTag("display");
-			if (!plain && display) {
-				errors.add("Has display but missing plain.display tag");
-			}
-			if (!errors.isEmpty()) {
-				return "Name: '" + ItemUtils.toPlainTagText(item.displayName()) + "\'\n" + String.join("\n", errors);
-			}
-			return null;
+			});
 		});
-		return errorFound;
+		if (!errors.isEmpty()) {
+			return "Name: '" + ItemUtils.toPlainTagText(item.displayName()) + "\'\n" + String.join("\n", errors);
+		}
+		return null;
 	}
 }

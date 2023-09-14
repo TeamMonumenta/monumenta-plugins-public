@@ -218,7 +218,7 @@ public class VirtualItemsReplacer extends PacketAdapter {
 							if (tag == null) {
 								continue;
 							}
-							ReadableNBT playerTag = ItemStatUtils.getPlayerModified(nbt);
+							ReadableNBT playerTag = ItemStatUtils.getPlayerModified(tag);
 							if (playerTag == null) {
 								continue;
 							}

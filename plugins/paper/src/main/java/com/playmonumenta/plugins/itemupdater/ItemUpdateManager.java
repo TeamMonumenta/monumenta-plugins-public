@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.AbstractArrow;
@@ -212,16 +213,18 @@ public class ItemUpdateManager implements Listener {
 	}
 
 	public static void updateNested(List<String> path, @Nullable ItemStack item) {
+		updateNested(path, item, false);
+	}
+
+	public static void updateNested(List<String> path, @Nullable ItemStack item, boolean bypass) {
 		if (ItemUtils.isNullOrAir(item)) {
 			return;
 		}
 
 		try {
-			if (!ItemStatUtils.isDirty(item) || GUIUtils.isPlaceholder(item)) {
+			if (!bypass && (!ItemStatUtils.isDirty(item) || GUIUtils.isPlaceholder(item))) {
 				return;
 			}
-			ItemStatUtils.removeDirty(item);
-
 			// Update quiver before generating item stats
 			if (ItemStatUtils.isQuiver(item)) {
 				final List<String> pathClone = path;
@@ -235,7 +238,7 @@ public class ItemUpdateManager implements Listener {
 						List<ItemStack> arrows = new ArrayList<>(arrowNBTs.size());
 						for (ReadWriteNBT arrowNBT : arrowNBTs) {
 							ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
-							updateNested(arrowPath, arrow);
+							updateNested(arrowPath, arrow, true);
 							arrows.add(arrow);
 						}
 						arrowNBTs.clear();
@@ -468,6 +471,14 @@ public class ItemUpdateManager implements Listener {
 				}
 			}
 		}
+	}
+
+	public static void broadcastPath(List<String> path, NamedTextColor color) {
+		String fox = "ItemUpdateManager: An exception occurred:\n";
+		for (String node : path) {
+			fox += node + "\n";
+		}
+		Plugin.getInstance().getLogger().warning(fox);
 	}
 
 	public static void logNestedException(List<String> path, Exception e) {

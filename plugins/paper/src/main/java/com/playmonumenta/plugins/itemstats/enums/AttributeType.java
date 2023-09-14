@@ -15,25 +15,23 @@ import org.bukkit.attribute.Attribute;
 import org.jetbrains.annotations.Nullable;
 
 public enum AttributeType {
-	// these attributes should be ordered first
-	ATTACK_DAMAGE_ADD(new AttackDamageAdd(), true, false),
-	ATTACK_SPEED(Attribute.GENERIC_ATTACK_SPEED, "Attack Speed", false, false),
-	PROJECTILE_DAMAGE_ADD(new ProjectileDamageAdd(), true, false),
-	PROJECTILE_SPEED(new ProjectileSpeed(), true, false),
-	THROW_RATE(new ThrowRate(), false, false),
-	POTION_DAMAGE(new PotionDamage(), true, false),
-	POTION_RADIUS(new PotionRadius(), true, false),
-
 	ARMOR(new Armor(), false, true),
 	AGILITY(new Agility(), false, true),
 	MAX_HEALTH(Attribute.GENERIC_MAX_HEALTH, "Max Health", false, false),
+	ATTACK_DAMAGE_ADD(new AttackDamageAdd(), true, false),
 	ATTACK_DAMAGE_MULTIPLY(new AttackDamageMultiply(), true, false),
+	ATTACK_SPEED(Attribute.GENERIC_ATTACK_SPEED, "Attack Speed", false, false),
+	PROJECTILE_DAMAGE_ADD(new ProjectileDamageAdd(), true, false),
 	PROJECTILE_DAMAGE_MULTIPLY(new ProjectileDamageMultiply(), true, false),
+	PROJECTILE_SPEED(new ProjectileSpeed(), true, false),
+	THROW_RATE(new ThrowRate(), false, false),
 	SPELL_DAMAGE(new SpellPower(), false, false),
 	MAGIC_DAMAGE_ADD(new MagicDamageAdd(), true, false),
 	MAGIC_DAMAGE_MULTIPLY(new MagicDamageMultiply(), true, false),
 	SPEED(Attribute.GENERIC_MOVEMENT_SPEED, "Speed", false, false),
 	KNOCKBACK_RESISTANCE(Attribute.GENERIC_KNOCKBACK_RESISTANCE, "Knockback Resistance", false, false),
+	POTION_DAMAGE(new PotionDamage(), true, false),
+	POTION_RADIUS(new PotionRadius(), true, false),
 	THORNS(new ThornsDamage(), true, true);
 
 	static final Map<String, AttributeType> REVERSE_MAPPINGS = Arrays.stream(AttributeType.values())

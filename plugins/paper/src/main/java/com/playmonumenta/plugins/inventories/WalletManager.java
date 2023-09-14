@@ -355,7 +355,19 @@ public class WalletManager implements Listener {
 		static Wallet deserialize(Player player, JsonObject json) {
 			Wallet wallet = new Wallet(player.getUniqueId());
 			for (JsonElement item : json.getAsJsonArray("items")) {
-				wallet.mItems.add(WalletItem.deserialize(item.getAsJsonObject()));
+				// code to combine duplicate bag of hoarding items together
+				WalletItem walletItem = WalletItem.deserialize(item.getAsJsonObject());
+				if (ItemUtils.isNullOrAir(walletItem.mItem)) { // item has been removed from the game
+					continue;
+				}
+				for (Iterator<WalletItem> it = wallet.mItems.iterator(); it.hasNext();) {
+					WalletItem otherWalletItem = it.next();
+					if (otherWalletItem.mItem.isSimilar(walletItem.mItem)) {
+						walletItem.mAmount += otherWalletItem.mAmount;
+						it.remove();
+					}
+				}
+				wallet.mItems.add(walletItem);
 			}
 			wallet.mItems.removeIf(item -> ItemUtils.isNullOrAir(item.mItem)); // item has been removed from the game
 			return wallet;

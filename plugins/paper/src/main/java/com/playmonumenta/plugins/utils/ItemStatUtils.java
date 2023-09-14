@@ -25,11 +25,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
@@ -735,14 +733,8 @@ public class ItemStatUtils {
 			enchantment.setInteger(LEVEL_KEY, level);
 		});
 
-		if (type.getEnchantment() != null) {
-			ItemMeta meta = item.getItemMeta();
-			meta.addEnchant(type.getEnchantment(), level, true);
-			item.setItemMeta(meta);
-		} else if (type == EnchantmentType.UNBREAKABLE) {
-			ItemMeta meta = item.getItemMeta();
-			meta.setUnbreakable(true);
-			item.setItemMeta(meta);
+		if (type.getEnchantment() != null || type == EnchantmentType.UNBREAKABLE) {
+			ItemUpdateHelper.regenerateStats(item);
 		}
 	}
 
@@ -759,14 +751,8 @@ public class ItemStatUtils {
 			enchantments.removeKey(type.getName());
 		});
 
-		if (type.getEnchantment() != null) {
-			ItemMeta meta = item.getItemMeta();
-			meta.removeEnchant(type.getEnchantment());
-			item.setItemMeta(meta);
-		} else if (type == EnchantmentType.UNBREAKABLE) {
-			ItemMeta meta = item.getItemMeta();
-			meta.setUnbreakable(false);
-			item.setItemMeta(meta);
+		if (type.getEnchantment() != null || type == EnchantmentType.UNBREAKABLE) {
+			ItemUpdateHelper.regenerateStats(item);
 		}
 	}
 
@@ -1034,10 +1020,12 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 		if (item == null || item.getType() == Material.AIR) {
 			return;
 		}
-		removeAttribute(item, type, operation, slot);
 
 		NBT.modify(item, nbt -> {
 			ReadWriteNBTCompoundList attributes = nbt.getOrCreateCompound(MONUMENTA_KEY).getOrCreateCompound(STOCK_KEY).getCompoundList(AttributeType.KEY);
+			// remove previous attribute before adding
+			attributes.removeIf((attribute) ->
+				attribute.getString(ATTRIBUTE_NAME_KEY).equals(type.getName()) && attribute.getString(Operation.KEY).equals(operation.getName()) && attribute.getString(Slot.KEY).equals(slot.getName()));
 			ReadWriteNBT attribute = attributes.addCompound();
 			attribute.setString(ATTRIBUTE_NAME_KEY, type.getName());
 			attribute.setString(Operation.KEY, operation.getName());
@@ -1047,9 +1035,7 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 
 		EquipmentSlot equipmentSlot = slot.getEquipmentSlot();
 		if (type.getAttribute() != null && equipmentSlot != null) {
-			ItemMeta meta = item.getItemMeta();
-			meta.addAttributeModifier(type.getAttribute(), new AttributeModifier(UUID.randomUUID(), "Modifier", amount, operation.getAttributeOperation(), equipmentSlot));
-			item.setItemMeta(meta);
+			ItemUpdateHelper.regenerateStats(item);
 		}
 	}
 
@@ -1075,17 +1061,7 @@ public static @Nullable ReadWriteNBT getInfusions(final ReadWriteNBT nbt) {
 
 		EquipmentSlot equipmentSlot = slot.getEquipmentSlot();
 		if (type.getAttribute() != null && equipmentSlot != null) {
-			ItemMeta meta = item.getItemMeta();
-			Collection<AttributeModifier> modifiers = meta.getAttributeModifiers(equipmentSlot).get(type.getAttribute());
-
-			for (AttributeModifier modifier : modifiers) {
-				if (modifier.getOperation() == operation.getAttributeOperation()) {
-					meta.removeAttributeModifier(type.getAttribute(), modifier);
-					break;
-				}
-			}
-
-			item.setItemMeta(meta);
+			ItemUpdateHelper.regenerateStats(item);
 		}
 	}
 

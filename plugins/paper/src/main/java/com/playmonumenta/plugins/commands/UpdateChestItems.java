@@ -41,8 +41,9 @@ public class UpdateChestItems extends GenericCommand {
 				}
 				try {
 					ItemUpdateHelper.fixLegacies(item);
+					String errorFound = ItemUpdateHelper.regenerateStats(item);
 					ItemUpdateHelper.generateItemStats(item);
-					String errorFound = ItemUpdateHelper.checkForErrors(item);
+					// String errorFound = ItemUpdateHelper.checkForErrors(item);
 					if (errorFound != null) {
 						errorFound = "Chest: '" + ItemUtils.toPlainTagText(chest.customName()) + "' Slot: " + slot + " at: " + pos + " " + errorFound;
 						MMLog.warning(errorFound);
