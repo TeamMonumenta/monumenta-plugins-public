@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.bosses;
 
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.bosses.bosses.*;
 import com.playmonumenta.plugins.bosses.bosses.abilities.AbilityMarkerEntityBoss;
@@ -36,6 +38,7 @@ import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
+import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
@@ -472,6 +475,25 @@ public class BossManager implements Listener {
 			if (entity instanceof LivingEntity living) {
 				unload(living, false);
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
+		Entity entity = event.getEntity();
+
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			if (entity instanceof LivingEntity living && ChunkManager.isChunkLoaded(entity.getChunk())) {
+				processEntity(living);
+			}
+		});
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof LivingEntity living && ChunkManager.isChunkLoaded(entity.getChunk())) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> unload(living, false));
 		}
 	}
 
@@ -1014,7 +1036,7 @@ public class BossManager implements Listener {
 		}
 
 		if (boss.hasNearbyPlayerDeathTrigger()) {
-			if (!mNearbyBlockBreakEnabled) {
+			if (!mNearbyPlayerDeathEnabled) {
 				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyPlayerDeathTrigger but feature was not enabled. Definitely a bug!");
 			}
 

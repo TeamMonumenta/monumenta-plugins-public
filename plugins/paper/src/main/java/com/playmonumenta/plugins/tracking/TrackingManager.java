@@ -2,12 +2,14 @@ package com.playmonumenta.plugins.tracking;
 
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
+import java.util.EnumSet;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
@@ -23,6 +25,14 @@ public final class TrackingManager {
 	private final Plugin mPlugin;
 	private final Team mUnpushableTeam;
 
+	public static final EnumSet<EntityType> trackedEntityTypes = EnumSet.of(
+		EntityType.PLAYER,
+		EntityType.CREEPER,
+		EntityType.BOAT,
+		EntityType.MINECART,
+		EntityType.SILVERFISH,
+		EntityType.FISHING_HOOK
+	);
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
 	public BoatTracking mBoats;

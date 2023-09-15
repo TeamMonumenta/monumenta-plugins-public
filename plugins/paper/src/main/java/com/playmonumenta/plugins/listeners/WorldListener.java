@@ -8,8 +8,10 @@ import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.adapters.VersionAdapter;
+import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.player.activity.ActivityManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.tracking.TrackingManager;
 import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.ChestUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
@@ -90,7 +92,13 @@ public class WorldListener implements Listener {
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		Entity entity = event.getEntity();
 
-		mPlugin.mTrackingManager.addEntity(entity);
+		if (TrackingManager.trackedEntityTypes.contains(entity.getType())) {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				if (ChunkManager.isChunkLoaded(entity.getChunk())) {
+					mPlugin.mTrackingManager.addEntity(entity);
+				}
+			});
+		}
 	}
 
 	// Convenience list of offsets to get adjacent blocks
