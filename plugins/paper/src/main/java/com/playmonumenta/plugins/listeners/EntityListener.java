@@ -474,7 +474,7 @@ public class EntityListener implements Listener {
 
 				// Check if the player has an infinity snowball and not throw rate
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
-					&& itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0
+					/* && (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0 || ItemStatUtils.hasEnchantment(itemInMainHand, EnchantmentType.INFINITY)) */
 					&& ItemStatUtils.getAttributeAmount(itemInMainHand, AttributeType.THROW_RATE, Operation.ADD, Slot.MAINHAND) == 0) {
 					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
@@ -494,7 +494,7 @@ public class EntityListener implements Listener {
 
 				// Check if the player has an infinity ender pearl
 				if (itemInMainHand.getType().equals(Material.ENDER_PEARL)
-					    && itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+						/* && (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0 || ItemStatUtils.hasEnchantment(itemInMainHand, EnchantmentType.INFINITY)) */) {
 					EnderPearl newPearl = (EnderPearl) origPearl.getWorld().spawnEntity(origPearl.getLocation(), EntityType.ENDER_PEARL);
 
 					// Copy the item's name/etc. so it can be textured
@@ -526,7 +526,7 @@ public class EntityListener implements Listener {
 				ItemStack potionItem = potion.getItem();
 
 				if (potionItem.getType().equals(Material.SPLASH_POTION)
-					&& potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0) {
+					 && (potionItem.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0 || ItemStatUtils.hasEnchantment(potionItem, EnchantmentType.INFINITY) || ItemStatUtils.hasEnchantment(potionItem, EnchantmentType.ALCHEMICAL_ALEMBIC))) {
 					ThrownPotion potionClone = (ThrownPotion) potion.getWorld().spawnEntity(potion.getLocation(), EntityType.SPLASH_POTION);
 					ItemStack newPotion = potionItem.clone();
 					if (newPotion.hasItemMeta() && newPotion.getItemMeta().hasLore()) {
