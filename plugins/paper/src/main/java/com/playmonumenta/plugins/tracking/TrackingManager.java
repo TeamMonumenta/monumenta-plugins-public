@@ -25,14 +25,6 @@ public final class TrackingManager {
 	private final Plugin mPlugin;
 	private final Team mUnpushableTeam;
 
-	public static final EnumSet<EntityType> trackedEntityTypes = EnumSet.of(
-		EntityType.PLAYER,
-		EntityType.CREEPER,
-		EntityType.BOAT,
-		EntityType.MINECART,
-		EntityType.SILVERFISH,
-		EntityType.FISHING_HOOK
-	);
 	public PlayerTracking mPlayers;
 	public CreeperTracking mCreepers;
 	public BoatTracking mBoats;
@@ -89,15 +81,15 @@ public final class TrackingManager {
 			}
 
 			if (entity instanceof Player) {
-				mPlayers.addEntity(entity);
+				Bukkit.getScheduler().runTask(mPlugin, () -> mPlayers.addEntity(entity));
 			} else if (entity instanceof Creeper) {
-				mCreepers.addEntity(entity);
+				Bukkit.getScheduler().runTask(mPlugin, () -> mCreepers.addEntity(entity));
 			} else if (entity instanceof Boat) {
-				mBoats.addEntity(entity);
+				Bukkit.getScheduler().runTask(mPlugin, () -> mBoats.addEntity(entity));
 			} else if (entity instanceof Minecart) {
-				mMinecarts.addEntity(entity);
+				Bukkit.getScheduler().runTask(mPlugin, () -> mMinecarts.addEntity(entity));
 			} else if (entity instanceof Silverfish) {
-				mSilverfish.addEntity(entity);
+				Bukkit.getScheduler().runTask(mPlugin, () -> mSilverfish.addEntity(entity));
 			}
 		}
 	}
