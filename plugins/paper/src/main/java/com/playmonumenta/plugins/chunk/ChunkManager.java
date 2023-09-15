@@ -25,7 +25,9 @@ import org.bukkit.event.world.WorldUnloadEvent;
 public class ChunkManager implements Listener {
 	private enum ChunkType {
 		BLOCK_CHUNK,
-		ENTITY_CHUNK;
+		BLOCK_CHUNK_LOAD_DELAY,
+		ENTITY_CHUNK,
+		ENTITY_CHUNK_LOAD_DELAY;
 	}
 
 	private static final Map<UUID, Map<Long, EnumSet<ChunkType>>> mLoadedChunks = new HashMap<>();
@@ -35,6 +37,16 @@ public class ChunkManager implements Listener {
 
 	public ChunkManager(Plugin plugin) {
 		mPlugin = plugin;
+		for (World world : Bukkit.getServer().getWorlds()) {
+			UUID worldId = world.getUID();
+			Map<Long, EnumSet<ChunkType>> worldChunks
+				= mLoadedChunks.computeIfAbsent(worldId, (UUID unused1) -> new HashMap<>());
+			for (Chunk chunk : world.getLoadedChunks()) {
+				long chunkKey = chunk.getChunkKey();
+				worldChunks.put(chunkKey, EnumSet.allOf(ChunkType.class));
+				mLoaded++;
+			}
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -49,15 +61,17 @@ public class ChunkManager implements Listener {
 			= worldChunks.computeIfAbsent(chunkKey, (Long unused) -> EnumSet.noneOf(ChunkType.class));
 
 		loadedState.add(ChunkType.BLOCK_CHUNK);
-		if (loadedState.size() == ChunkType.values().length) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				if (loadedState.size() == ChunkType.values().length) {
-					mLoaded++;
-					MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s); block load");
-					Bukkit.getPluginManager().callEvent(new ChunkFullLoadEvent(chunk));
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			if (loadedState.contains(ChunkType.BLOCK_CHUNK)) {
+				if (loadedState.add(ChunkType.BLOCK_CHUNK_LOAD_DELAY)) {
+					if (loadedState.size() == ChunkType.values().length) {
+						mLoaded++;
+						MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s); block load");
+						Bukkit.getPluginManager().callEvent(new ChunkFullLoadEvent(chunk));
+					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -72,15 +86,17 @@ public class ChunkManager implements Listener {
 			= worldChunks.computeIfAbsent(chunkKey, (Long unused) -> EnumSet.noneOf(ChunkType.class));
 
 		loadedState.add(ChunkType.ENTITY_CHUNK);
-		if (loadedState.size() == ChunkType.values().length) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
-				if (loadedState.size() == ChunkType.values().length) {
-					mLoaded++;
-					MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s); entity load");
-					Bukkit.getPluginManager().callEvent(new ChunkFullLoadEvent(chunk));
+		Bukkit.getScheduler().runTask(mPlugin, () -> {
+			if (loadedState.contains(ChunkType.ENTITY_CHUNK)) {
+				if (loadedState.add(ChunkType.ENTITY_CHUNK_LOAD_DELAY)) {
+					if (loadedState.size() == ChunkType.values().length) {
+						mLoaded++;
+						MMLog.finest(() -> "[CHUNK] Loaded " + mLoaded + "/" + worldChunks.size() + "/" + mLoadedChunks.size() + "chunk(s); entity load");
+						Bukkit.getPluginManager().callEvent(new ChunkFullLoadEvent(chunk));
+					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -106,6 +122,7 @@ public class ChunkManager implements Listener {
 				worldNeedsSave.add(chunkKey);
 			}
 		}
+		loadedState.remove(ChunkType.BLOCK_CHUNK_LOAD_DELAY);
 		if (worldNeedsSave.contains(chunkKey)) {
 			event.setSaveChunk(true);
 		}
@@ -145,6 +162,7 @@ public class ChunkManager implements Listener {
 				worldNeedsSave.add(chunkKey);
 			}
 		}
+		loadedState.remove(ChunkType.ENTITY_CHUNK_LOAD_DELAY);
 		if (loadedState.isEmpty()) {
 			worldChunks.remove(chunkKey);
 			if (worldChunks.isEmpty()) {
