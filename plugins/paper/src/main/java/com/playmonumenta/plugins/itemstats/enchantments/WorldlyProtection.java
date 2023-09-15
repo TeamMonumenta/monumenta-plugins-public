@@ -36,16 +36,6 @@ public class WorldlyProtection implements Enchantment {
 	}
 
 	@Override
-	public double getPriorityAmount() {
-		return 100;
-	} // nerfs all final damage
-
-	@Override
-	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		event.setDamage(event.getDamage() * (1 - ATTACK_REDUCTION * value));
-	}
-
-	@Override
 	public void onHurt(Plugin plugin, Player player, double value, DamageEvent event, @Nullable Entity damager, @Nullable LivingEntity source) {
 		if (event.getType() == DamageEvent.DamageType.TRUE) {
 			return;

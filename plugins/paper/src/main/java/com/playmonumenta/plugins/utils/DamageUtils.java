@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.StasisListener;
 import java.util.List;
 import org.bukkit.GameMode;
@@ -166,9 +167,15 @@ public class DamageUtils {
 			damagee.setNoDamageTicks(0);
 		}
 
+		Plugin plugin = Plugin.getInstance();
+		double amountFinal = amount;
+		if (damager instanceof Player) {
+			amountFinal = amount * (1 - 0.25 * plugin.mItemStatManager.getEnchantmentLevel((Player) damager, EnchantmentType.WORLDLY_PROTECTION));
+		}
+
 		DamageUtils.nextEventMetadata = metadata;
 		try {
-			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amount, blockable, metadata.getBossSpellName());
+			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName());
 		} finally {
 			DamageUtils.nextEventMetadata = null;
 
