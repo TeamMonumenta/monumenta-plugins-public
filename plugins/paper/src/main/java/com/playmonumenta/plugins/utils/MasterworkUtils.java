@@ -59,7 +59,8 @@ public class MasterworkUtils {
 	private static final String MASK_FRAG = "epic:r3/fragments/masquerader_fragment";
 	private static final String MASK_MAT = "epic:r3/items/currency/shattered_mask";
 
-	private static final String GALLEY_MAT = "epic:r3/gallery/items/torn_canvas";
+	private static final String GALLERY1_MAT = "epic:r3/gallery/items/torn_canvas";
+	private static final String GALLERY2_MAT = "epic:r3/gallery/map2/deathly_piece_of_eight";
 
 	private static final String GODSPORE_MAT = "epic:r3/godspore/items/fungal_remnants";
 
@@ -147,13 +148,23 @@ public class MasterworkUtils {
 
 		HALLS_ONE("gallery1_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		HALLS_TWO("gallery1_2", INVALID_ITEM, 1, INVALID_ITEM, 1),
-		HALLS_THREE("gallery1_3", GALLEY_MAT, 12, HYPER_ARCHOS_RING, 4),
-		HALLS_FOUR("gallery1_4", GALLEY_MAT, 20, HYPER_ARCHOS_RING, 4),
+		HALLS_THREE("gallery1_3", GALLERY1_MAT, 12, HYPER_ARCHOS_RING, 4),
+		HALLS_FOUR("gallery1_4", GALLERY1_MAT, 20, HYPER_ARCHOS_RING, 4),
 		HALLS_FIVE("gallery1_5", PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4),
-		HALLS_SIX("gallery1_6", GALLEY_MAT, 28, HYPER_ARCHOS_RING, 4),
-		HALLS_SEVENA("gallery1_7a", GALLEY_MAT, 48, FORTITUDE_AUGMENT, 16),
-		HALLS_SEVENB("gallery1_7b", GALLEY_MAT, 48, POTENCY_AUGMENT, 16),
-		HALLS_SEVENC("gallery1_7c", GALLEY_MAT, 48, ALACRITY_AUGMENT, 16),
+		HALLS_SIX("gallery1_6", GALLERY1_MAT, 28, HYPER_ARCHOS_RING, 4),
+		HALLS_SEVENA("gallery1_7a", GALLERY1_MAT, 48, FORTITUDE_AUGMENT, 16),
+		HALLS_SEVENB("gallery1_7b", GALLERY1_MAT, 48, POTENCY_AUGMENT, 16),
+		HALLS_SEVENC("gallery1_7c", GALLERY1_MAT, 48, ALACRITY_AUGMENT, 16),
+
+		MARINA_ONE("gallery2_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		MARINA_TWO("gallery2_2", INVALID_ITEM, 1, INVALID_ITEM, 1),
+		MARINA_THREE("gallery2_3", GALLERY2_MAT, 12, HYPER_ARCHOS_RING, 4),
+		MARINA_FOUR("gallery2_4", GALLERY2_MAT, 20, HYPER_ARCHOS_RING, 4),
+		MARINA_FIVE("gallery2_5", PULSATING_DIAMOND, 4, HYPER_ARCHOS_RING, 4),
+		MARINA_SIX("gallery2_6", GALLERY2_MAT, 28, HYPER_ARCHOS_RING, 4),
+		MARINA_SEVENA("gallery2_7a", GALLERY2_MAT, 48, FORTITUDE_AUGMENT, 16),
+		MARINA_SEVENB("gallery2_7b", GALLERY2_MAT, 48, POTENCY_AUGMENT, 16),
+		MARINA_SEVENC("gallery2_7c", GALLERY2_MAT, 48, ALACRITY_AUGMENT, 16),
 
 		GODSPORE_ONE("godspore_1", INVALID_ITEM, 1, INVALID_ITEM, 1),
 		GODSPORE_TWO("godspore_2", INVALID_ITEM, 1, INVALID_ITEM, 1),
@@ -346,10 +357,10 @@ public class MasterworkUtils {
 	}
 
 	private static String itemNameSuffix(Player p, String itemName) {
-		if (itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
-			NamespacedKeyUtils.fromString(GALLEY_MAT)))) || itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p,
-			NamespacedKeyUtils.fromString(GODSPORE_MAT))))) {
-			//Torn Canvas or Fungal Remnants, do nothing
+		if (itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GALLERY1_MAT)))) ||
+			itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GALLERY2_MAT)))) ||
+			itemName.equals(ItemUtils.getPlainName(InventoryUtils.getItemFromLootTable(p, NamespacedKeyUtils.fromString(GODSPORE_MAT))))) {
+			// Torn Canvas or Deathly Piece of Eight or Fungal Remnants, do nothing
 			return "";
 		}
 		return "s";
