@@ -43,6 +43,13 @@ public class Excavator implements Enchantment {
 			return;
 		}
 
+		if (ServerProperties.getShardName().equals("plots")) {
+			return;
+		}
+
+		// if anyone decides that disabling it in bazaar only is better:
+		// coords for corners of bz are -665, 46, 1054 to -650, 51, 1086
+
 		Block block = event.getBlock();
 		if (mIgnoredMats.contains(block.getType())) {
 			return;
