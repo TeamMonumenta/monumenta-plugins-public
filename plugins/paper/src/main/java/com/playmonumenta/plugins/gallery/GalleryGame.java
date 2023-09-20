@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
@@ -521,7 +522,6 @@ public class GalleryGame {
 		}
 
 		List<LivingEntity> mobsToRemove = new ArrayList<>();
-		mobsToRemove.add(mob);
 		EntityUtils.getStackedMobsAbove(mob, mobsToRemove);
 		for (LivingEntity mobToRemove : mobsToRemove) {
 			mobToRemove.remove();
@@ -711,13 +711,26 @@ public class GalleryGame {
 		}
 
 		if (shouldCloseTheGame) {
-			mIsGameEnded = true;
-			for (GalleryPlayer player : new ArrayList<>(mPlayersMap.values())) {
-				if (player.isOnline() && player.getPlayer() != null) {
-					String lootroomFunction = "function monumenta:dungeons/" + mMap.getNamespace() + "/enter_lootroom";
-					GalleryUtils.runCommandAsEntity(player.getPlayer(), lootroomFunction);
-				}
+			endGame();
+		}
+	}
+
+	private void endGame() {
+		mIsGameEnded = true;
+		for (GalleryPlayer player : new ArrayList<>(mPlayersMap.values())) {
+			if (player.isOnline() && player.getPlayer() != null) {
+				String lootroomFunction = "function monumenta:dungeons/" + mMap.getNamespace() + "/enter_lootroom";
+				GalleryUtils.runCommandAsEntity(player.getPlayer(), lootroomFunction);
 			}
+		}
+
+		// Despawn and unload all the remaining mobs
+		World galleryWorld = Bukkit.getWorld(mUUIDGame);
+		if (galleryWorld != null) {
+			galleryWorld.getLivingEntities().stream()
+				.filter(Objects::nonNull)
+				.filter(e -> e.getScoreboardTags().contains(GalleryManager.MOB_TAG_FROM_SPAWNER))
+				.forEach(this::despawnMob);
 		}
 	}
 

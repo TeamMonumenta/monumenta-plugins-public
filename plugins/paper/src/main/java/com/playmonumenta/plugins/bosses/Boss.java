@@ -217,6 +217,10 @@ public class Boss {
 		}
 	}
 
+	public void clearAbilities() {
+		Bukkit.getScheduler().runTask(mPlugin, mAbilities::clear);
+	}
+
 	public void removeAbility(String identityTag) {
 		for (BossAbilityGroup abilityGroup : getAbilities()) {
 			if (abilityGroup.getIdentityTag().equals(identityTag)) {

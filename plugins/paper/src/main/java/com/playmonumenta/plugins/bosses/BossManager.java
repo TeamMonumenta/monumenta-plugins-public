@@ -38,7 +38,6 @@ import com.playmonumenta.plugins.bosses.bosses.lich.LichWarlockBoss;
 import com.playmonumenta.plugins.bosses.bosses.lich.LichWarriorBoss;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
-import com.playmonumenta.plugins.chunk.ChunkManager;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.delves.mobabilities.DreadfulSummonBoss;
 import com.playmonumenta.plugins.delves.mobabilities.SpectralSummonBoss;
@@ -481,19 +480,16 @@ public class BossManager implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		Entity entity = event.getEntity();
-
-		Bukkit.getScheduler().runTask(mPlugin, () -> {
-			if (entity instanceof LivingEntity living && ChunkManager.isChunkLoaded(entity.getChunk())) {
-				processEntity(living);
-			}
-		});
+		if (entity instanceof LivingEntity living) {
+			processEntity(living);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void entityRemoveFromWorldEvent(EntityRemoveFromWorldEvent event) {
 		Entity entity = event.getEntity();
-		if (entity instanceof LivingEntity living && ChunkManager.isChunkLoaded(entity.getChunk())) {
-			Bukkit.getScheduler().runTask(mPlugin, () -> unload(living, false));
+		if (entity instanceof LivingEntity living) {
+			unload(living, false);
 		}
 	}
 
@@ -550,20 +546,20 @@ public class BossManager implements Listener {
 	// Handling the death in the prime event itself doesn't quite work, as the creeper is still alive and
 	// will explode after the event, damaging any mobs the death handler spawned for example.
 	// Delaying by a tick doesn't work either, as the creeper will be discarded just after the explosion.
-	private @Nullable Creeper mLastPrimedCreeper = null;
+	private @Nullable UUID mLastPrimedCreeperId = null;
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void explosionPrimeEvent(ExplosionPrimeEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Creeper creeper) {
-			mLastPrimedCreeper = creeper;
+			mLastPrimedCreeperId = creeper.getUniqueId();
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
 		Entity entity = event.getEntity();
-		if (entity == mLastPrimedCreeper) {
+		if (entity.getUniqueId().equals(mLastPrimedCreeperId)) {
 			Boss boss = mBosses.remove(entity.getUniqueId());
 			if (boss != null) {
 				boss.death(null);
@@ -895,6 +891,13 @@ public class BossManager implements Listener {
 		Boss boss = mBosses.get(entity.getUniqueId());
 		if (boss != null) {
 			boss.removeAbility(identityTag);
+		}
+	}
+
+	public void stopTrackingBoss(LivingEntity boss) {
+		Boss removedBoss = mBosses.remove(boss.getUniqueId());
+		if (removedBoss != null) {
+			removedBoss.clearAbilities();
 		}
 	}
 

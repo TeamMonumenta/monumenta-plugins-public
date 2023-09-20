@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.bosses.bosses;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
 import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.bosses.BossBarManager;
+import com.playmonumenta.plugins.bosses.BossManager;
 import com.playmonumenta.plugins.bosses.SpellManager;
 import com.playmonumenta.plugins.bosses.events.SpellCastEvent;
 import com.playmonumenta.plugins.bosses.spells.Spell;
@@ -122,7 +123,7 @@ public abstract class BossAbilityGroup {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
 					if (isBossMissing()) {
-						MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. This should never happen!");
+						handleMissingBoss();
 						cancel();
 						return;
 					}
@@ -163,7 +164,7 @@ public abstract class BossAbilityGroup {
 					mMissingTicks = 0;
 					/* Check if somehow the boss entity is missing even though this is still running */
 					if (isBossMissing()) {
-						MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. This should never happen!");
+						handleMissingBoss();
 						cancel();
 						return;
 					}
@@ -197,6 +198,12 @@ public abstract class BossAbilityGroup {
 			}
 		};
 		mTaskActive.runTaskTimer(mPlugin, spellDelay, 2L);
+	}
+
+	private void handleMissingBoss() {
+		MMLog.warning("Boss " + mIdentityTag + " is missing" + (mBoss.isValid() ? " (but valid)" : "") + " but still registered as an active boss. It has been removed and untracked via the fallback system.");
+		BossManager.getInstance().stopTrackingBoss(mBoss);
+		mBoss.remove();
 	}
 
 	public void forceCastRandomSpell() {
@@ -470,7 +477,7 @@ public abstract class BossAbilityGroup {
 	/* Check if somehow the boss entity is missing even though this is still running */
 	private boolean isBossMissing() {
 		Location bossLoc = mBoss.getLocation();
-		if (!bossLoc.isWorldLoaded() || !ChunkManager.isChunkLoaded(bossLoc.getChunk())) {
+		if (!bossLoc.isWorldLoaded() || !ChunkManager.isChunkLoaded(bossLoc)) {
 			return true;
 		}
 		for (Entity entity : bossLoc.getWorld().getNearbyEntities(bossLoc, 4, 4, 4)) {

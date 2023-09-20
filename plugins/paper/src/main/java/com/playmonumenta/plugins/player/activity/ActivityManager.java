@@ -88,11 +88,13 @@ public class ActivityManager {
 	}
 
 	public void addActivity(Player player) {
-		mActivity.put(player.getUniqueId(), mActivity.getOrDefault(player.getUniqueId(), 0) + 1);
+		UUID playerId = player.getUniqueId();
+		String playerName = player.getName();
+		mActivity.put(playerId, mActivity.getOrDefault(playerId, 0) + 1);
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
-			mActivity.put(player.getUniqueId(), Math.max(mActivity.getOrDefault(player.getUniqueId(), 0) - 1, 0));
-			MMLog.fine("Player " + player.getName() + " has activity: " + mActivity.getOrDefault(player.getUniqueId(), 0));
+			mActivity.put(playerId, Math.max(mActivity.getOrDefault(playerId, 0) - 1, 0));
+			MMLog.fine("Player " + playerId + " has activity: " + mActivity.getOrDefault(playerId, 0));
 		}, 20 * 6 * 60);
-		MMLog.fine("Player " + player.getName() + " has activity: " + mActivity.getOrDefault(player.getUniqueId(), 0));
+		MMLog.fine("Player " + playerName + " has activity: " + mActivity.getOrDefault(playerId, 0));
 	}
 }

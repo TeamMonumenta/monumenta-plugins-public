@@ -12,7 +12,9 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -195,13 +197,28 @@ public class ChunkManager implements Listener {
 		}
 	}
 
-	public static boolean isChunkLoaded(Chunk chunk) {
-		UUID worldId = chunk.getWorld().getUID();
+	private static boolean checkChunkLoaded(UUID worldId, long chunkKey) {
 		@Nullable Map<Long, EnumSet<ChunkType>> worldChunks = mLoadedChunks.get(worldId);
 		if (worldChunks == null) {
 			return false;
 		}
-		@Nullable EnumSet<ChunkType> loadedState = worldChunks.get(chunk.getChunkKey());
+		@Nullable EnumSet<ChunkType> loadedState = worldChunks.get(chunkKey);
 		return loadedState == null || loadedState.size() == ChunkType.values().length;
+	}
+
+	/**
+	 * <b>Be very careful when using this method, as calling the "getChunk()" method on an entity or location
+	 * or anything similar will actually cause that chunk to load.</b>
+	 */
+	public static boolean isChunkLoaded(Chunk chunk) {
+		return checkChunkLoaded(chunk.getWorld().getUID(), chunk.getChunkKey());
+	}
+
+	public static boolean isChunkLoaded(Location location) {
+		return checkChunkLoaded(location.getWorld().getUID(), Chunk.getChunkKey(location));
+	}
+
+	public static boolean isChunkLoaded(Entity entity) {
+		return isChunkLoaded(entity.getLocation());
 	}
 }
