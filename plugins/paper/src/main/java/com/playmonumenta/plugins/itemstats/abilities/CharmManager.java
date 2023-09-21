@@ -448,6 +448,7 @@ public class CharmManager {
 			BodkinBlitz.CHARM_STEALTH,
 			CloakAndDagger.CHARM_DAMAGE,
 			CloakAndDagger.CHARM_STACKS,
+			CloakAndDagger.CHARM_STACKS_GAIN,
 			CloakAndDagger.CHARM_STEALTH,
 			CoupDeGrace.CHARM_NORMAL,
 			CoupDeGrace.CHARM_THRESHOLD,
