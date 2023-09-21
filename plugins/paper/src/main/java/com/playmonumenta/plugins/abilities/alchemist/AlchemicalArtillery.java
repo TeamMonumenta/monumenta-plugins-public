@@ -125,7 +125,7 @@ public class AlchemicalArtillery extends Ability {
 
 		Entity e = LibraryOfSoulsIntegration.summon(loc, "AlchemicalGrenade");
 		if (e instanceof MagmaCube grenade) {
-			grenade.setSize((int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, 1));
+			grenade.setSize((int) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_SIZE, 2));
 
 			// Adjust the Y velocity to make the arc easier to calculate and use
 			double velY = vel.getY();

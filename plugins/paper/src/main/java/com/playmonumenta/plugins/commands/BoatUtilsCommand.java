@@ -9,7 +9,6 @@ import dev.jorel.commandapi.arguments.PlayerArgument;
 import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.TreeSpecies;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
@@ -125,6 +124,10 @@ public class BoatUtilsCommand {
 				}
 				case "JungleBoat" -> {
 					selectedType = Boat.Type.JUNGLE;
+					break outside;
+				}
+				case "MangroveBoat" -> {
+					selectedType = Boat.Type.MANGROVE;
 					break outside;
 				}
 				default -> {
