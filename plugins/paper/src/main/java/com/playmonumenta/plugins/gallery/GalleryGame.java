@@ -695,6 +695,10 @@ public class GalleryGame {
 		return null;
 	}
 
+	public void setSpawnLocation(Location newLocation) {
+		mSpawningLoc = newLocation.toVector();
+	}
+
 	public BaseInteractable getInteractable(String name) {
 		return mInteractableMap.get(name);
 	}

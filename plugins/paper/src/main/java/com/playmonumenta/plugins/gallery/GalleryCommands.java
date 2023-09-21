@@ -9,6 +9,8 @@ import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.LocationType;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.wrappers.NativeProxyCommandSender;
@@ -434,6 +436,21 @@ public class GalleryCommands {
 				return 1;
 			}).register();
 
+		new CommandAPICommand(COMMAND)
+				.withPermission(PERMISSION)
+				.withArguments(
+						util,
+						new MultiLiteralArgument("set"),
+						new MultiLiteralArgument("spawnlocation"),
+						new LocationArgument("location", LocationType.BLOCK_POSITION))
+				.executes((sender, args) -> {
+					GalleryGame game = getGameFromSender(sender);
+					if (game == null) {
+						throw CommandAPI.failWithString("Could not detect game");
+					}
+					game.setSpawnLocation((Location) args[3]);
+					return 1;
+				}).register();
 	}
 
 
