@@ -639,18 +639,6 @@ public class PassGui extends Gui {
 			});
 	}
 
-	public void addWeekIcon(int y,
-	                        int x,
-	                        int week) {
-		ItemStack item = new ItemStack(Material.CLOCK, week);
-		ItemMeta meta = item.getItemMeta();
-		meta.displayName(Component.text("Week " + week, NamedTextColor.GOLD, TextDecoration.BOLD)
-			.decoration(TextDecoration.ITALIC, false));
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		item.setItemMeta(meta);
-		setItem(y, x, item);
-	}
-
 	public void addMissionIcon(int y,
 	                           int x,
 	                           List<WeeklyMission> weekMissions,
@@ -663,6 +651,13 @@ public class PassGui extends Gui {
 			meta.displayName(Component.text("Mission?", NamedTextColor.RED, TextDecoration.BOLD)
 				.decoration(TextDecoration.ITALIC, false));
 			GUIUtils.splitLoreLine(meta, "Failed to load mission", NamedTextColor.RED, 30, false);
+			List<Component> lore = meta.lore();
+			if (lore == null) {
+				lore = new ArrayList<>();
+			}
+			lore.add(0, Component.text("Week " + (week + 1), NamedTextColor.GOLD, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false));
+			meta.lore(lore);
 			item.setItemMeta(meta);
 			setItem(y, x, item);
 			return;
@@ -686,10 +681,17 @@ public class PassGui extends Gui {
 			if (lore == null) {
 				lore = new ArrayList<>();
 			}
+			lore.add(0, Component.text("Week " + (week + 1), NamedTextColor.GOLD, TextDecoration.BOLD)
+				.decoration(TextDecoration.ITALIC, false));
 			lore.add(Component.text("Progress: ?/" + missionAmount, NamedTextColor.GRAY)
 				.decoration(TextDecoration.ITALIC, false));
-			lore.add(Component.text("Reward: " + mission.mMP + "MP", NamedTextColor.GOLD)
-				.decoration(TextDecoration.ITALIC, false));
+			if (mission.mIsBonus) {
+				lore.add(Component.text("Reward: " + mission.mMP + " Bonus MP", NamedTextColor.GOLD)
+					.decoration(TextDecoration.ITALIC, false));
+			} else {
+				lore.add(Component.text("Reward: " + mission.mMP + " MP", NamedTextColor.GOLD)
+					.decoration(TextDecoration.ITALIC, false));
+			}
 			lore.add(Component.text("Progress Unknown", NamedTextColor.GRAY)
 				.decoration(TextDecoration.ITALIC, false));
 
@@ -746,10 +748,17 @@ public class PassGui extends Gui {
 		if (lore == null) {
 			lore = new ArrayList<>();
 		}
+		lore.add(0, Component.text("Week " + (week + 1), NamedTextColor.GOLD, TextDecoration.BOLD)
+			.decoration(TextDecoration.ITALIC, false));
 		lore.add(Component.text("Progress: " + progressStr + "/" + missionAmount, NamedTextColor.DARK_GREEN)
 			.decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text("Reward: " + mission.mMP + "MP", NamedTextColor.GOLD)
-			.decoration(TextDecoration.ITALIC, false));
+		if (mission.mIsBonus) {
+			lore.add(Component.text("Reward: " + mission.mMP + " Bonus MP", NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false));
+		} else {
+			lore.add(Component.text("Reward: " + mission.mMP + " MP", NamedTextColor.GOLD)
+				.decoration(TextDecoration.ITALIC, false));
+		}
 		lore.add(statusMessage);
 		if (mIsModerator) {
 			int modifiedProgress = mModifiedPlayerProgress.getPassMissionProgress(weekStart, missionIndex).orElse(0);

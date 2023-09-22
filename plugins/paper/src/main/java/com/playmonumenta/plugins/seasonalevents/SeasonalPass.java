@@ -283,6 +283,11 @@ public class SeasonalPass {
 							+ mName + ": Mission MP is <= 0: " + mission.mMP, NamedTextColor.RED)
 						.hoverEvent(Component.text(missionElement.toString(), NamedTextColor.RED)));
 				}
+				if (toParse.get("is_bonus") instanceof JsonPrimitive bonusPrimitive
+					&& bonusPrimitive.isBoolean()
+					&& bonusPrimitive.getAsBoolean()) {
+					mission.mIsBonus = true;
+				}
 				mission.mAmount = toParse.get("amount").getAsInt();
 				if (mission.mAmount <= 0 && showWarnings) {
 					sender.sendMessage(Component.text("[SeasonPass] loadMissions for " + startDateStr + " "
@@ -374,10 +379,10 @@ public class SeasonalPass {
 						}
 					}
 				}
-				mTotalMp += mission.mMP;
-				if (mission.mWeek > numberOfWeeks) {
-					numberOfWeeks = mission.mWeek;
+				if (!mission.mIsBonus) {
+					mTotalMp += mission.mMP;
 				}
+				numberOfWeeks = Integer.max(numberOfWeeks, mission.mWeek);
 				mMissions.computeIfAbsent(mission.mWeek, k -> new ArrayList<>()).add(mission);
 			} catch (Exception e) {
 				MessagingUtils.sendStackTrace(sender, e);
@@ -414,8 +419,8 @@ public class SeasonalPass {
 		}
 
 		// Special case - finished all missions
-		if (newMP == mTotalMp && !CosmeticsManager.getInstance().playerHasCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME)) {
-			p.sendMessage(Component.text("You finished all the missions!", NamedTextColor.GOLD)
+		if (newMP >= mTotalMp && !CosmeticsManager.getInstance().playerHasCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME)) {
+			p.sendMessage(Component.text("You fully completed this pass!", NamedTextColor.GOLD)
 				.decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true));
 			EntityUtils.fireworkAnimation(p);
 			CosmeticsManager.getInstance().addCosmetic(p, CosmeticType.TITLE, SeasonalEventManager.ALL_MISSIONS_TITLE_NAME);

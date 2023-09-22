@@ -9,6 +9,8 @@ public class WeeklyMission {
 	public int mWeek;
 	//XP granted for completing the mission
 	public int mMP;
+	//Is bonus MP
+	public boolean mIsBonus = false;
 	//Type of mission - content, kills, etc
 	public @Nullable WeeklyMissionType mType;
 	//Times needed to do the thing (content clears, kills, room number, etc.)

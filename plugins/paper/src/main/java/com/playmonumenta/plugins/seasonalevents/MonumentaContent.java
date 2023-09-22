@@ -49,12 +49,12 @@ public enum MonumentaContent {
 	PORTAL("portal", ContentType.STRIKE, 3),
 	GALLERY("gallery", ContentType.OTHER, 3),
 	GALLERY_ROUND("galleryround", ContentType.OTHER, 0),
-	FISHING_COMBAT("fishingcombat", ContentType.OTHER, 3),
 	GODSPORE("godspore", ContentType.BOSS, 3),
 	KINGS_BOUNTY("r1daily", ContentType.OTHER, 0),
 	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
 	RING_BOUNTY("r3daily", ContentType.OTHER, 0),
-	DELVE_BOUNTY("delvebounty", ContentType.OTHER, 0);
+	DELVE_BOUNTY("delvebounty", ContentType.OTHER, 0),
+	FISHING_COMBAT("fishingcombat", ContentType.OTHER, 0);
 
 	public static final Set<Integer> ALL_CONTENT_REGION_INDEXES
 		= Arrays.stream(MonumentaContent.values())

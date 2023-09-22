@@ -17,17 +17,27 @@ public class MissionsView extends View {
 		SeasonalPass pass = mGui.mPass;
 		PlayerProgress playerProgress = SeasonalEventManager.getPlayerProgress(displayedPlayer);
 
-		for (int metaColumn = 0; metaColumn <= 1; metaColumn++) {
-			for (int y = 0; y < 6; y++) {
-				int x = 4 * metaColumn + 1;
-				int week = 6 * metaColumn + y;
-				int displayWeek = week + 1;
+		int weeksPerRow = pass.mNumberOfWeeks / 2;
+		int bonusWeeks = pass.mNumberOfWeeks % 2;
 
+		for (int metaRow = 0; metaRow <= 1; metaRow++) {
+			for (int column = 0; column < weeksPerRow + (metaRow == 1 ? bonusWeeks : 0); column++) {
+				int x = column + 1;
+				if (x >= 9) {
+					// Outside of inventory, redesign required
+					continue;
+				}
+				int week = weeksPerRow * metaRow + column;
+				if (week > pass.mNumberOfWeeks) {
+					// This should not happen, but just in case
+					continue;
+				}
+				int displayWeek = week + 1;
 				List<WeeklyMission> weekMissions = pass.getMissionsInWeek(displayWeek);
 
-				mGui.addWeekIcon(y, x, displayWeek);
 				for (int missionIndex = 0; missionIndex < 3; missionIndex++) {
-					mGui.addMissionIcon(y, x + missionIndex + 1, weekMissions, playerProgress, week, missionIndex);
+					int y = 3 * metaRow + missionIndex;
+					mGui.addMissionIcon(y, x, weekMissions, playerProgress, week, missionIndex);
 				}
 			}
 		}
