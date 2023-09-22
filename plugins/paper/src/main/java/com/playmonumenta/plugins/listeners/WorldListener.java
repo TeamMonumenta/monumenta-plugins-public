@@ -92,7 +92,7 @@ public class WorldListener implements Listener {
 	public void entityAddToWorldEvent(EntityAddToWorldEvent event) {
 		Entity entity = event.getEntity();
 
-		mPlugin.mTrackingManager.addEntity(entity);
+		Bukkit.getScheduler().runTask(mPlugin, () -> mPlugin.mTrackingManager.addEntity(entity));
 	}
 
 	// Convenience list of offsets to get adjacent blocks

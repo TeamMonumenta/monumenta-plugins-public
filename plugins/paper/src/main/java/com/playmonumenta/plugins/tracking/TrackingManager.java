@@ -81,15 +81,15 @@ public final class TrackingManager {
 			}
 
 			if (entity instanceof Player) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> mPlayers.addEntity(entity));
+				mPlayers.addEntity(entity);
 			} else if (entity instanceof Creeper) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> mCreepers.addEntity(entity));
+				mCreepers.addEntity(entity);
 			} else if (entity instanceof Boat) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> mBoats.addEntity(entity));
+				mBoats.addEntity(entity);
 			} else if (entity instanceof Minecart) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> mMinecarts.addEntity(entity));
+				mMinecarts.addEntity(entity);
 			} else if (entity instanceof Silverfish) {
-				Bukkit.getScheduler().runTask(mPlugin, () -> mSilverfish.addEntity(entity));
+				mSilverfish.addEntity(entity);
 			}
 		}
 	}
