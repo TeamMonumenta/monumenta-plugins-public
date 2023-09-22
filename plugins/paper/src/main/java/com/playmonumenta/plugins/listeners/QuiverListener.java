@@ -23,6 +23,7 @@ import de.tr7zw.nbtapi.iface.ReadableNBTList;
 import io.papermc.paper.event.block.BlockPreDispenseEvent;
 import io.papermc.paper.event.entity.EntityLoadCrossbowEvent;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -124,7 +125,11 @@ public class QuiverListener implements Listener {
 				}
 				long amount = 0;
 				for (ReadWriteNBT compound : items) {
-					ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(compound.getOrCreateCompound("tag"));
+					ReadWriteNBT tag = compound.getCompound("tag");
+					if (tag == null) {
+						continue;
+					}
+					ReadWriteNBT playerModified = ItemStatUtils.getPlayerModified(tag);
 					if (playerModified == null) {
 						continue;
 					}
@@ -178,15 +183,16 @@ public class QuiverListener implements Listener {
 								// Swap: transform all applicable arrows in the quiver
 								NBT.modify(quiver, nbt -> {
 									ReadWriteNBTCompoundList itemsList = ItemStatUtils.getItemList(nbt);
-									List<ReadWriteNBT> itemsListCopy = itemsList.toListCopy();
 									ReadWriteNBT firstArrowPlayerModified = null;
-									for (int i = 0; i < itemsListCopy.size(); i++) {
-										ReadWriteNBT compound = itemsList.get(i);
+									for (Iterator<ReadWriteNBT> it = itemsList.iterator(); it.hasNext();) {
+										ReadWriteNBT compound = it.next();
 										ItemStack containedItem = NBT.itemStackFromNBT(compound);
 										if (containedItem == null) {
 											continue;
 										}
-										NBT.modify(containedItem, ItemStatUtils::removePlayerModified);
+										NBT.modify(containedItem, inbt -> {
+											ItemStatUtils.removePlayerModified(inbt);
+										});
 										if (Arrays.stream(ArrowTransformMode.values()).anyMatch(m -> containedItem.isSimilar(m.mItemStack))) {
 											if (firstArrowPlayerModified == null) {
 												// Modify the item in the quiver by modifying the transformed item copy, then overwriting the whole NBT
@@ -195,11 +201,15 @@ public class QuiverListener implements Listener {
 													ItemStatUtils.addPlayerModified(inbt).mergeCompound(ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag")));
 												});
 												compound.removeKey("tag");
-												compound.mergeCompound(NBT.itemStackToNBT(transformed));
+												ReadWriteNBT newCompound = NBT.itemStackToNBT(transformed);
+												if (newCompound == null) {
+													continue;
+												}
+												compound.mergeCompound(newCompound);
 												firstArrowPlayerModified = ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag"));
 											} else {
 												// An arrow was transformed already: remove this item and increase the count of the transformed item
-												itemsList.remove(i);
+												it.remove();
 												firstArrowPlayerModified.setLong(CustomContainerItemManager.AMOUNT_KEY,
 													firstArrowPlayerModified.getLong(CustomContainerItemManager.AMOUNT_KEY)
 														+ ItemStatUtils.addPlayerModified(compound.getOrCreateCompound("tag")).getLong(CustomContainerItemManager.AMOUNT_KEY));

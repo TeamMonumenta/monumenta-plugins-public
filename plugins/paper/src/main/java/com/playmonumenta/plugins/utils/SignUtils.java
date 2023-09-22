@@ -188,7 +188,6 @@ public final class SignUtils {
 			} else {
 				signMat = Material.OAK_SIGN;
 				location = player.getLocation().clone();
-				location.setY(255.0);
 			}
 			mPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 

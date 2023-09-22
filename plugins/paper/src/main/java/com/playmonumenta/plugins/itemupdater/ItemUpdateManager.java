@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.itemupdater;
 
 import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.inventories.CustomContainerItemManager;
 import com.playmonumenta.plugins.tracking.PlayerTracking;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
@@ -12,6 +13,7 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.BlockState;
@@ -230,23 +232,25 @@ public class ItemUpdateManager implements Listener {
 				final List<String> pathClone = path;
 				// Update arrows in quivers immediately - otherwise, they would need updating every time an arrow is shot or picked up
 				NBT.modify(item, nbt -> {
-					ReadWriteNBT playerModified = nbt.getOrCreateCompound(ItemStatUtils.MONUMENTA_KEY).getOrCreateCompound(ItemStatUtils.PLAYER_MODIFIED_KEY);
-					ReadWriteNBTCompoundList arrowNBTs = playerModified.getCompoundList(ItemStatUtils.ITEMS_KEY);
-					if (arrowNBTs != null) {
-						List<String> arrowPath = new ArrayList<>(pathClone);
-						arrowPath.add("in quiver");
-						List<ItemStack> arrows = new ArrayList<>(arrowNBTs.size());
-						for (ReadWriteNBT arrowNBT : arrowNBTs) {
-							ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
-							updateNested(arrowPath, arrow, true);
-							arrows.add(arrow);
-						}
-						arrowNBTs.clear();
-						for (ItemStack arrow : arrows) {
-							ReadWriteNBT newCompound = NBT.itemStackToNBT(arrow);
-							arrowNBTs.addCompound().mergeCompound(newCompound);
-						}
+					ReadWriteNBTCompoundList arrowNBTs = ItemStatUtils.getItemList(nbt);
+					List<String> arrowPath = new ArrayList<>(pathClone);
+					arrowPath.add("in quiver");
+					for (Iterator<ReadWriteNBT> it = arrowNBTs.iterator(); it.hasNext();) {
+						ReadWriteNBT arrowNBT = it.next();
+						ItemStack arrow = NBT.itemStackFromNBT(arrowNBT);
+						long currentAmount = NBT.modify(arrow, anbt -> {
+							long a = ItemStatUtils.addPlayerModified(anbt).getLong(CustomContainerItemManager.AMOUNT_KEY);
+							ItemStatUtils.removePlayerModified(anbt);
+							return a;
+						});
+						updateNested(arrowPath, arrow, true);
+						NBT.modify(arrow, anbt -> {
+							ItemStatUtils.addPlayerModified(anbt).setLong(CustomContainerItemManager.AMOUNT_KEY, currentAmount);
+						});
+						arrowNBT.clearNBT();
+						arrowNBT.mergeCompound(NBT.itemStackToNBT(arrow));
 					}
+					return;
 				});
 			}
 

@@ -357,19 +357,39 @@ public class WalletManager implements Listener {
 			for (JsonElement item : json.getAsJsonArray("items")) {
 				// code to combine duplicate bag of hoarding items together
 				WalletItem walletItem = WalletItem.deserialize(item.getAsJsonObject());
-				if (ItemUtils.isNullOrAir(walletItem.mItem)) { // item has been removed from the game
+				if (ItemUtils.isNullOrAir(walletItem.mItem) || walletItem.mAmount <= 0) { // item has been removed from the game
 					continue;
 				}
-				for (Iterator<WalletItem> it = wallet.mItems.iterator(); it.hasNext();) {
-					WalletItem otherWalletItem = it.next();
-					if (otherWalletItem.mItem.isSimilar(walletItem.mItem)) {
-						walletItem.mAmount += otherWalletItem.mAmount;
-						it.remove();
+				// add duplicate compressed items differently
+				CompressionInfo info = getCompressionInfo(walletItem.mItem);
+				if (info != null) {
+					boolean found = false;
+					for (Iterator<WalletItem> it = wallet.mItems.iterator(); it.hasNext();) {
+						WalletItem otherWalletItem = it.next();
+						if (otherWalletItem.mItem.isSimilar(info.mBase)) {
+							otherWalletItem.mAmount += walletItem.mAmount * info.mAmount;
+							found = true;
+							break;
+						}
+					}
+					// if found, skip creating an item
+					if (found) {
+						continue;
+					} else {
+						walletItem = new WalletItem(info.mBase, walletItem.mAmount * info.mAmount);
+					}
+				} else {
+					// perform basic deduplication
+					for (Iterator<WalletItem> it = wallet.mItems.iterator(); it.hasNext();) {
+						WalletItem otherWalletItem = it.next();
+						if (otherWalletItem.mItem.isSimilar(walletItem.mItem)) {
+							walletItem.mAmount += otherWalletItem.mAmount;
+							it.remove();
+						}
 					}
 				}
 				wallet.mItems.add(walletItem);
 			}
-			wallet.mItems.removeIf(item -> ItemUtils.isNullOrAir(item.mItem)); // item has been removed from the game
 			return wallet;
 		}
 	}

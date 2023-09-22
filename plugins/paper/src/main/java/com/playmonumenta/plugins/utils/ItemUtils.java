@@ -486,7 +486,7 @@ public class ItemUtils {
 
 	@Contract("null -> true")
 	public static boolean isNullOrAir(@Nullable ItemStack itemStack) {
-		return itemStack == null || itemStack.getType() == Material.AIR;
+		return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
 	}
 
 	// Returns the costs (in tier 2 currency (CXP/CCS/etc.)) for each region to reforge a list of items.
