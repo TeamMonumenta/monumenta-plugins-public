@@ -43,8 +43,8 @@ public class FearfulSouls extends Spell {
 	private static final double SKULL_HEIGHT_VARIANCE = 0.5;
 
 	// the attack and death damage of each skull
-	private static final int ATTACK_DAMAGE = 120;
-	private static final int DEATH_DAMAGE = 8;
+	private static final int ATTACK_DAMAGE = 95;
+	private static final int DEATH_DAMAGE = 12;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;

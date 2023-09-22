@@ -25,7 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ChargedDeath extends Spell {
 
 	// the delay between each run of the passive, in ticks
-	private static final int DELAY = 50;
+	private static final int TOTAL_DELAY = 240;
 
 	// the length of the windup portion of each strike, in ticks
 	// motion is where it tracks the player, and total is the total time
@@ -36,13 +36,15 @@ public class ChargedDeath extends Spell {
 	private static final double STRIKE_RADIUS = 2.25;
 
 	// the attack and death damage of the attack
-	private static final int ATTACK_DAMAGE = 120;
-	private static final int DEATH_DAMAGE = 5;
+	private static final int ATTACK_DAMAGE = 75;
+	private static final int DEATH_DAMAGE = 10;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final World mWorld;
 	private final Xenotopsis mXenotopsis;
+
+	private final int mDelay;
 
 	private final ArrayList<Player> mTargetedPlayers = new ArrayList<>();
 
@@ -53,12 +55,15 @@ public class ChargedDeath extends Spell {
 		mBoss = boss;
 		mWorld = boss.getWorld();
 		mXenotopsis = xenotopsis;
+
+		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), Xenotopsis.DETECTION_RANGE, true).size();
+		mDelay = (int) (TOTAL_DELAY / (1 + 2 * Math.log(playerCount))); // formula for cooldown reduction: delay / (1 + 2log(c))
 	}
 
 	@Override
 	public void run() {
 		mDelayTicks += 5;
-		if (mDelayTicks > DELAY) {
+		if (mDelayTicks > mDelay) {
 			mDelayTicks = 0;
 
 			List<Player> validPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), Xenotopsis.DETECTION_RANGE, true);

@@ -69,6 +69,14 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 	private static final int MELEE_ATTACK_DAMAGE = 65;
 	private static final int MELEE_DEATH_DAMAGE = 7;
 
+	// the factor of gallery scaling applied to the boss
+	private static final double HEALTH_SCALING_FACTOR = 0.5;
+	private static final double DAMAGE_SCALING_FACTOR = 0.4;
+
+	// values for decreasing a player's death value when hit by melee
+	private static final int DAMAGE_DECREASE_CUTOFF = 70;
+	private static final int DAMAGE_DECREASE_VALUE = 4;
+
 	// how long shields are disabled for when the boss disables them, in ticks
 	public static final int SHIELD_STUN_TIME = 5 * 20;
 
@@ -117,11 +125,11 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 				mMaxHealthPart1 = BASE_HEALTH_PART1;
 				mMaxHealthPart2 = BASE_HEALTH_PART2;
 			} else {
-				double healthScale = (galleryGame.getHealthScale() - 1) * 0.5 + 1; // get gallery health scale and scale by 50%
+				double healthScale = (galleryGame.getHealthScale() - 1) * HEALTH_SCALING_FACTOR + 1; // get gallery health scale and scale by factor
 				mMaxHealthPart1 = BASE_HEALTH_PART1 * healthScale;
 				mMaxHealthPart2 = BASE_HEALTH_PART2 * healthScale;
 
-				mDamageScale = (galleryGame.getDamageScale() - 1) * 0.5 + 1; // get gallery damage scale and scale by 50%
+				mDamageScale = (galleryGame.getDamageScale() - 1) * DAMAGE_SCALING_FACTOR + 1; // get gallery damage scale and scale by factor
 			}
 		}
 
@@ -177,7 +185,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			new UmbralCannons(plugin, boss, this, mCooldownTicks),
 			new DeathlyBombs(plugin, boss, this, mCooldownTicks, 2, 13),
 			new GhostlyFlames(plugin, boss, this, mCooldownTicks, 11),
-			new DeathTouchedBlade(plugin, boss, this, mCooldownTicks, 3.25)
+			new DeathTouchedBlade(plugin, boss, this, mCooldownTicks, 2.75)
 		));
 		List<Spell> phase3Passives = List.of(
 			new SpellShieldStun(SHIELD_STUN_TIME),
@@ -226,17 +234,25 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 			@Override
 			public void run() {
-				// decrease all player's death values by 2 per second, if they have not been hit in the past two seconds
-				if (mTicks % 10 == 0) {
-					PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).forEach(player -> {
-						if (mTicksSinceLastDeathChange.get(player) != null) {
-							if (mTicksSinceLastDeathChange.get(player) >= 20 * 2) {
+				// decrease all player's death values depending on range, if they have not been hit in the past two seconds
+				PlayerUtils.playersInRange(mBoss.getLocation(), DETECTION_RANGE, true).forEach(player -> {
+					Integer lastDeathChangeTicks = mTicksSinceLastDeathChange.get(player);
+					if (lastDeathChangeTicks != null) {
+						if (lastDeathChangeTicks >= 20 * 2) {
+							double range = mBoss.getLocation().distance(player.getLocation());
+							int ticks = lastDeathChangeTicks - 20 * 2;
+
+							// check if death should be decreased this tick
+							if ((range <= 6 && ticks % 8 == 0)
+									|| (range > 6 && range <= 16 && ticks % 16 == 0)
+									|| (range > 16 && ticks % 36 == 0)) {
 								changePlayerDeathValue(player, -1, true);
 							}
 						}
-					});
-				}
+					}
+				});
 
+				// increment ticks since last death change for each player
 				mTicksSinceLastDeathChange.keySet().forEach(player -> {
 					if (mTicksSinceLastDeathChange.get(player) != null) {
 						mTicksSinceLastDeathChange.replace(player, mTicksSinceLastDeathChange.get(player) + 1);
@@ -334,6 +350,12 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 			event.getDamagee().setHealth(mMaxHealthPart1 * 0.05 - 1); // set health to just under 5%, resulting in phase 3 trigger
 			event.setDamage(0);
 		}
+
+		if (event.getDamager() instanceof Player player) {
+			if (event.getType() == DamageEvent.DamageType.MELEE && event.getDamage() > DAMAGE_DECREASE_CUTOFF) {
+				changePlayerDeathValue(player, -DAMAGE_DECREASE_VALUE, true);
+			}
+		}
 	}
 
 	@Override
@@ -342,6 +364,8 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 		if (damagee instanceof Player player) {
 			event.setDamage(scaleDamage(event.getDamage()));
+
+			Bukkit.getScheduler().runTask(mPlugin, () -> mMonumentaPlugin.mPotionManager.clearPotionEffectType(player, PotionEffectType.WITHER));
 
 			changePlayerDeathValue(player, mMeleeDeathDamageOverride ? mMeleeDeathDamageOverrideDamage : MELEE_DEATH_DAMAGE, false);
 		}

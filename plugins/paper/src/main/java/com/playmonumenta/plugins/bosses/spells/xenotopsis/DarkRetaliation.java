@@ -33,13 +33,13 @@ public class DarkRetaliation extends Spell {
 	private static final double DAMAGE_TRANSFER_PERCENT = 0.6;
 
 	// the speed of the projectile, in blocks per tick
-	private static final double PROJECTILE_SPEED = 0.9;
+	private static final double PROJECTILE_SPEED = 0.85;
 
 	// the turn speed of the projectile, or speed of the projectile orthogonal to the velocity, in blocks per tick
-	private static final double TURN_SPEED = 0.039;
+	private static final double TURN_SPEED = 0.043;
 
 	// the death damage of the attack
-	private static final int DEATH_DAMAGE = 7;
+	private static final int DEATH_DAMAGE = 15;
 
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
@@ -72,7 +72,7 @@ public class DarkRetaliation extends Spell {
 		// check if requirements for retaliation are met
 		if (mTicks == 0 && event.getDamager() != null && event.getDamager() instanceof Player player
 				&& mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE
-				&& event.getType() == DamageEvent.DamageType.PROJECTILE) {
+				&& event.getType() != DamageEvent.DamageType.AILMENT) {
 			attackPlayer(player, event.getDamage() * DAMAGE_TRANSFER_PERCENT);
 			mTicks = COOLDOWN;
 		}
