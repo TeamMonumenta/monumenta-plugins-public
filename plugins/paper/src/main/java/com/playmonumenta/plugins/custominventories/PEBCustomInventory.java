@@ -379,10 +379,12 @@ public class PEBCustomInventory extends CustomInventory {
 				inventory.setLayout(inventory.mCurrentPage);
 			}),
 			new PebItem(43, gui -> "Wallet integration: ",
-				gui -> Component.text("Toggles whether to take currency directly from your wallet, prioritizing it over inventory. \n\nCurrent: " + (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.WALLET).orElse(0) == 0 ? "Enabled." : "Disabled."), NamedTextColor.LIGHT_PURPLE),
+				gui -> Component.text("Toggles whether to take currency directly from your wallet. \n\nCurrent: " +
+					                      (ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.WALLET).orElse(0) == 0 ? "Enabled, prioritize inventory." :
+						                       ScoreboardUtils.getScoreboardValue(gui.mPlayer, CustomTradeGui.WALLET).orElse(0) == 1 ? "Disabled." : "Enabled, prioritize wallet."), NamedTextColor.LIGHT_PURPLE),
 				Material.FLOWER_POT, false).action((inventory, action) -> {
 				int oldValue = ScoreboardUtils.getScoreboardValue(inventory.mPlayer, CustomTradeGui.WALLET).orElse(0);
-				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.WALLET, oldValue == 0 ? 1 : 0);
+				ScoreboardUtils.setScoreboardValue(inventory.mPlayer, CustomTradeGui.WALLET, oldValue == 2 ? 0 : oldValue + 1);
 				inventory.setLayout(inventory.mCurrentPage);
 			})
 		);
