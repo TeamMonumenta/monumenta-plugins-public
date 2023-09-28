@@ -8,13 +8,11 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPExplosion;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
+import com.playmonumenta.plugins.utils.DisplayEntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -27,16 +25,11 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Transformation;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 public class UmbralCannons extends Spell {
 	// the duration and windup duration of the attack, in ticks
@@ -227,7 +220,8 @@ public class UmbralCannons extends Spell {
 						.speed(0.5)
 						.spawnAsBoss();
 
-					shotEffect(mLocation);
+					// visual effect for the cannon shot
+					mActiveTasks.add(DisplayEntityUtils.groundBlockQuake(mLocation, SHOT_RADIUS, SHOT_BLOCK_OPTIONS, new Display.Brightness(15, 15)));
 				}
 
 				mTicks++;
@@ -235,86 +229,6 @@ public class UmbralCannons extends Spell {
 					this.cancel();
 					mCurrentCannonLocations.remove(mLocation);
 				}
-			}
-		};
-		runnable.runTaskTimer(mPlugin, 0, 1);
-		mActiveRunnables.add(runnable);
-	}
-
-	// visual effect for the cannon shot
-	private void shotEffect(Location location) {
-		BukkitRunnable runnable = new BukkitRunnable() {
-			int mTicks = 0;
-			final Map<Integer, ArrayList<Location>> mLocationDelays = new HashMap<>();
-			List<BlockDisplay> mAllDisplays = new ArrayList<>();
-
-			@Override
-			public void run() {
-				for (int i = 1; i <= SHOT_RADIUS; i++) {
-					for (int c = 0; c < i * 2 * Math.PI * 0.06; c++) { // 0.06 was 0.23
-						int delay = FastUtils.randomIntInRange(0, 3) * 2 + i;
-						double theta = FastUtils.randomDoubleInRange(0, Math.PI * 2);
-						double r = i + FastUtils.randomDoubleInRange(-0.5, 0.5);
-						Location l = location.clone().add(FastUtils.cos(theta) * r, 0, FastUtils.sin(theta) * r).toCenterLocation().add(0, -1.4, 0);
-						ArrayList<Location> k = mLocationDelays.computeIfAbsent(delay, key -> new ArrayList<>());
-						if (!k.contains(l)) {
-							k.add(l);
-						}
-					}
-				}
-
-				if (mLocationDelays.containsKey(mTicks)) {
-					mLocationDelays.get(mTicks).forEach(l -> {
-						BlockDisplay b = mWorld.spawn(l.clone().add(-0.5, -0.3, -0.5), BlockDisplay.class);
-						b.setBlock(SHOT_BLOCK_OPTIONS.get(FastUtils.randomIntInRange(0, SHOT_BLOCK_OPTIONS.size() - 1)).createBlockData());
-						b.setBrightness(new Display.Brightness(15, 15));
-						b.setTransformation(new Transformation(new Vector3f(), new Quaternionf(), new Vector3f(1.0f, 1.0f, 1.0f), new Quaternionf()));
-						b.setInterpolationDuration(2);
-						mAllDisplays.add(b);
-
-						BukkitRunnable runnable = new BukkitRunnable() {
-							int mTicks = 0;
-							final double mMaxHeight = FastUtils.randomDoubleInRange(0.5, 0.8);
-
-							@Override
-							public void run() {
-								double currentHeight = mMaxHeight * (-0.04 * ((mTicks - 5) * (mTicks - 5)) + 1);
-								b.setTransformation(new Transformation(new Vector3f(0, (float)currentHeight, 0), b.getTransformation().getLeftRotation(), b.getTransformation().getScale(), b.getTransformation().getRightRotation()));
-								b.setInterpolationDelay(-1);
-
-								mTicks++;
-								if (mTicks > 10 || mBoss.isDead()) {
-									this.cancel();
-								}
-							}
-
-							@Override
-							public synchronized void cancel() throws IllegalStateException {
-								super.cancel();
-
-								b.remove();
-							}
-						};
-						runnable.runTaskTimer(mPlugin, 0, 1);
-						mActiveRunnables.add(runnable);
-					});
-				}
-
-				if (mTicks < SHOT_RADIUS * 3 && mTicks % 3 == 0) {
-					mWorld.playSound(mBoss.getLocation(), Sound.BLOCK_NETHER_GOLD_ORE_BREAK, SoundCategory.HOSTILE, 4f, 0.9f - (mTicks * 0.015f));
-				}
-
-				mTicks++;
-				if (mTicks > (SHOT_RADIUS + 1) * 2 + 8 || mBoss.isDead()) {
-					this.cancel();
-				}
-			}
-
-			@Override
-			public synchronized void cancel() throws IllegalStateException {
-				super.cancel();
-
-				mAllDisplays.forEach(Entity::remove);
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
