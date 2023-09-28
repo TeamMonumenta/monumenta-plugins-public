@@ -218,21 +218,29 @@ public class DailyReset {
 	}
 
 	public static void handle(Player player, int dailyVersion) {
-		if (player != null) {
-			//  Test to see if the player's Daily version is different from the servers.
-			if (dailyVersion != getDailyVersion()) {
-				//  If so reset some scoreboards and message the player.
-				String commandStr = DAILY_PLAYER_CHANGES_COMMAND.replaceAll("@S", player.getName());
-				NmsUtils.getVersionAdapter().runConsoleCommandSilently(commandStr);
-
-				POIManager.handlePlayerDailyChange(player);
-
-				ScoreboardUtils.setScoreboardValue(player, "DailyVersion", getDailyVersion());
-
-				String message = getNewDayMessage(dailyVersion);
-				Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
-				player.sendMessage(component);
-			}
+		if (player == null) {
+			return;
 		}
+
+		//  Test to see if the player's Daily version is different from the servers.
+		int currentDailyVersion = getDailyVersion();
+		if (dailyVersion == currentDailyVersion) {
+			return;
+		}
+		boolean isNewWeek = DateUtils.getWeeklyVersion(dailyVersion) != DateUtils.getWeeklyVersion();
+
+		//  If so reset some scoreboards and message the player.
+		String commandStr = DAILY_PLAYER_CHANGES_COMMAND.replace("@S", player.getName());
+		NmsUtils.getVersionAdapter().runConsoleCommandSilently(commandStr);
+
+		if (isNewWeek) {
+			POIManager.handlePlayerDailyChange(player);
+		}
+
+		ScoreboardUtils.setScoreboardValue(player, "DailyVersion", currentDailyVersion);
+
+		String message = getNewDayMessage(dailyVersion);
+		Component component = Component.text(message, NamedTextColor.GOLD, TextDecoration.BOLD);
+		player.sendMessage(component);
 	}
 }

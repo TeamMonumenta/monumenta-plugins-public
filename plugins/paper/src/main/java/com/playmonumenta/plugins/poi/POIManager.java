@@ -4,15 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
-import com.playmonumenta.plugins.seasonalevents.SeasonalPass;
 import com.playmonumenta.plugins.utils.ChestUtils;
-import com.playmonumenta.plugins.utils.DateUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -68,17 +63,7 @@ public class POIManager implements Listener {
 	}
 
 	public static void handlePlayerDailyChange(Player p) {
-		// Use Season Pass for week data
-		SeasonalPass seasonalPass = SeasonalEventManager.getPass();
-		if (seasonalPass != null && seasonalPass.isActive()) {
-			int currentPassWeek = seasonalPass.getWeekOfPass();
-			int playerLastDailyVersion = ScoreboardUtils.getScoreboardValue(p, "DailyVersion").orElse(0);
-			LocalDateTime lastPlayedDate = DateUtils.localDateTime(playerLastDailyVersion);
-			int lastPlayedWeek = seasonalPass.getWeekOfPass(lastPlayedDate);
-			if (lastPlayedWeek != currentPassWeek) {
-				getInstance().resetWeeklyClears(p);
-			}
-		}
+		getInstance().resetWeeklyClears(p);
 	}
 
 	//Handlers for player lifecycle events
