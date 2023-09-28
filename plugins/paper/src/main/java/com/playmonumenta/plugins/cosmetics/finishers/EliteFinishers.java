@@ -36,6 +36,7 @@ public class EliteFinishers {
 			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(Woolerman.NAME, new Woolerman())
 			.put(Whirlpool.NAME, new Whirlpool())
+			.put(LocustSwarmFinisher.NAME, new LocustSwarmFinisher())
 			.put(EntombFinisher.NAME, new EntombFinisher())
 			.build();
 
