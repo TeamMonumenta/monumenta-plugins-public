@@ -934,6 +934,7 @@ public class CharmManager {
 			Taboo.CHARM_SELF_DAMAGE,
 			Taboo.CHARM_HEALING_PENALTY,
 			Taboo.CHARM_ABSORPTION_PENALTY,
+			AlchemicalArtillery.CHARM_COOLDOWN,
 			AlchemicalArtillery.CHARM_AFTERSHOCK_DELAY,
 			AmplifyingHex.CHARM_COOLDOWN,
 			CholericFlames.CHARM_COOLDOWN,

@@ -44,12 +44,12 @@ public class AlchemicalArtillery extends Ability {
 	private static final int ARTILLERY_POTION_COST = 2;
 	private static final int AFTERSHOCK_DELAY = 20;
 	private static final double AFTERSHOCK_DAMAGE_MULTIPLIER = 0.1;
+
 	public static final String CHARM_COOLDOWN = "Alchemical Artillery Cooldown";
 	public static final String CHARM_DAMAGE = "Alchemical Artillery Damage";
 	public static final String CHARM_RADIUS = "Alchemical Artillery Radius";
 	public static final String CHARM_VELOCITY = "Alchemical Artillery Velocity";
 	public static final String CHARM_SIZE = "Alchemical Artillery Size";
-
 	public static final String CHARM_AFTERSHOCK_DAMAGE = "Alchemical Artillery Aftershock Damage";
 	public static final String CHARM_AFTERSHOCK_DELAY = "Alchemical Artillery Aftershock Delay";
 
