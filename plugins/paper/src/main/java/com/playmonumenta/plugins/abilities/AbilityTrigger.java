@@ -101,6 +101,14 @@ public class AbilityTrigger {
 			NO_MISC
 		};
 
+		public static final KeyOptions[] NO_USABLE_ITEMS_EXCEPT_SHIELD = {
+			NO_POTION,
+			NO_FOOD,
+			NO_PROJECTILE_WEAPON,
+			NO_BLOCKS,
+			NO_MISC
+		};
+
 		private final String mEnabledDisplay;
 		private final String mDisabledDisplay;
 		private final Material mMaterial;

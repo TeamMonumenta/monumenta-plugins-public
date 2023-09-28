@@ -532,7 +532,7 @@ public class Samwell extends BossAbilityGroup {
 			"I... I shouldn't have ever left the Valley...",
 			"None of this was worth it... None of it...",
 			"Listening to you... was the biggest mistake... I ever...",
-			"&omade..."
+			"made..."
 		};
 
 		for (Player player : players) {
@@ -604,7 +604,11 @@ public class Samwell extends BossAbilityGroup {
 
 			@Override
 			public void run() {
-				players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text(dio[mT], NamedTextColor.RED)));
+				if (mT < 3) {
+					players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text(dio[mT], NamedTextColor.RED)));
+				} else {
+					players.forEach(p -> MessagingUtils.sendNPCMessage(p, "Samwell", Component.text(dio[mT], NamedTextColor.RED, TextDecoration.ITALIC)));
+				}
 				mT++;
 				if (mT == dio.length) {
 					this.cancel();

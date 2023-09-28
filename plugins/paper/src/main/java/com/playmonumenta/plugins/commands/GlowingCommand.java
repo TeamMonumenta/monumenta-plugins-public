@@ -203,8 +203,8 @@ public class GlowingCommand {
 		}
 		ScoreboardUtils.setScoreboardValue(player, SCOREBOARD_OBJECTIVE, value);
 
-		player.sendMessage(Component.text("Glowing ", NamedTextColor.GOLD) + operation + "d"
-			                   + " for " + StringUtils.join(options, ", ") + ". Your new options are:");
+		player.sendMessage(Component.text("Glowing " + operation + "d"
+			+ " for " + StringUtils.join(options, ", ") + ". Your new options are:", NamedTextColor.GOLD));
 		showConfig(player, false);
 		player.sendMessage(Component.text(" You may need to leave and re-enter the current area for all entities to be updated.", NamedTextColor.GRAY));
 
