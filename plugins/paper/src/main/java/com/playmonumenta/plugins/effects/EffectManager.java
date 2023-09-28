@@ -234,7 +234,7 @@ public final class EffectManager implements Listener {
 		/**
 		 * Gets all effects as a json object
 		 */
-		public JsonObject getAsJsonObject() {
+		public JsonObject getAsJsonObject(boolean isLogout) {
 			JsonObject ret = new JsonObject();
 			for (Map.Entry<EffectPriority, Map<String, NavigableSet<Effect>>> priorityEntries : mPriorityMap.entrySet()) {
 				JsonObject mid = new JsonObject();
@@ -242,6 +242,9 @@ public final class EffectManager implements Listener {
 				for (Map.Entry<String, NavigableSet<Effect>> effects : priorityEntries.getValue().entrySet()) {
 					JsonArray inner = new JsonArray();
 					for (Effect effect : effects.getValue()) {
+						if (isLogout && effect.shouldDeleteOnLogout()) {
+							continue;
+						}
 						JsonObject serializedEffect = effect.serialize();
 						serializedEffect.addProperty("displaysTime", effect.doesDisplayTime());
 						serializedEffect.addProperty("displays", effect.doesDisplay());
@@ -682,10 +685,10 @@ public final class EffectManager implements Listener {
 	 *
 	 * @param entity the entity to get effects for
 	 */
-	public JsonObject getAsJsonObject(Entity entity) {
+	public JsonObject getAsJsonObject(Entity entity, boolean isLogout) {
 		Effects effects = mEntities.get(entity);
 		if (effects != null) {
-			return effects.getAsJsonObject();
+			return effects.getAsJsonObject(isLogout);
 		}
 		return new JsonObject();
 	}
@@ -950,16 +953,25 @@ public final class EffectManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void playerQuitEvent(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		Effects effects = mEntities.get(player);
+		if (effects != null) {
+			for (Map<String, NavigableSet<Effect>> priorityEffects : effects.mPriorityMap.values()) {
+				for (NavigableSet<Effect> effectGroup : priorityEffects.values()) {
+					Effect effect = effectGroup.last();
+					if (effect.shouldDeleteOnLogout()) {
+						effect.entityLoseEffect(player);
+					}
+				}
+			}
+		}
+
 		// 1s after the player leaves, remove them from the map to avoid leaking memory
 		// If the player happens to log back in immediately, still remove them - they will get a new entity object which will be tracked again
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			// NOTE: If the Entity map is ever changed to key'd by Entity UUID, this will need a guard to check that the player didn't log back in
-			mEntities.remove(event.getPlayer());
+			mEntities.remove(player);
 		}, 20);
-
-		// TODO: There is nothing that actually stores the player's effects before they log out.
-		// The above code is NOT the reason that a player can log out and back in to clear their effects
-		// Fixing this will require serializing the Effects to plugindata, then restoring them on player join
 	}
 
 	public void applyEffectsOnRespawn(Plugin plugin, Player player) {

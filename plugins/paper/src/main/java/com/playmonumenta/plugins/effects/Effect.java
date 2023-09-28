@@ -29,6 +29,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	public String mEffectID;
 	private boolean mDisplay = true;
 	private boolean mDisplayTime = true;
+	private boolean mDeleteOnLogout = false;
 	boolean mUsed = false;
 
 	public Effect(int duration, String effectID) {
@@ -214,6 +215,15 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	public boolean doesDisplayTime() {
 		return mDisplayTime;
+	}
+
+	public Effect deleteOnLogout(boolean deleteOnLogout) {
+		mDeleteOnLogout = deleteOnLogout;
+		return this;
+	}
+
+	public boolean shouldDeleteOnLogout() {
+		return mDeleteOnLogout;
 	}
 
 	/* Must implement this method to print info about what the effect does for debug */

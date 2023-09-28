@@ -1,11 +1,14 @@
 package com.playmonumenta.plugins.integrations;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.seasonalevents.SeasonalEventManager;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
+import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
+import com.playmonumenta.plugins.utils.StringUtils;
 import com.playmonumenta.redissync.MonumentaRedisSyncAPI;
 import com.playmonumenta.redissync.event.PlayerSaveEvent;
 import com.playmonumenta.redissync.event.PlayerServerTransferEvent;
@@ -91,6 +94,25 @@ public class MonumentaRedisSyncIntegration implements Listener {
 			}
 
 			SeasonalEventManager.loadPlayerProgressJson(player, data.get("season_pass_progress"));
+
+			if (data.has("health")) {
+				try {
+					double health = data.get("health").getAsDouble();
+					if (health > 0) {
+						// Delay by 5 ticks to allow time for effects, attributes to be processed
+						Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
+							if (!player.isDead() && health > player.getHealth()) {
+								player.setHealth(Math.min(health, EntityUtils.getMaxHealth(player)));
+							}
+						}, 5);
+					}
+
+					mLogger.fine("Loaded health data (" + StringUtils.to2DP(health) + ") for player " + player.getName());
+				} catch (Exception ex) {
+					mLogger.severe("Failed to load health data for player " + player.getName() + ":" + ex.getMessage());
+					ex.printStackTrace();
+				}
+			}
 		} else {
 			// data is null
 			SeasonalEventManager.loadPlayerProgressJson(player, null);
@@ -103,8 +125,9 @@ public class MonumentaRedisSyncIntegration implements Listener {
 
 		JsonObject pluginData = new JsonObject();
 		pluginData.add("potions", mPlugin.mPotionManager.getAsJsonObject(player, false));
-		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(player));
+		pluginData.add("effects", mPlugin.mEffectManager.getAsJsonObject(player, true));
 		pluginData.add("season_pass_progress", SeasonalEventManager.getPlayerProgressJson(player));
+		pluginData.add("health", new JsonPrimitive(player.getHealth()));
 		event.setPluginData(IDENTIFIER, pluginData);
 	}
 

@@ -49,7 +49,7 @@ public class RewriteHistory extends Spell {
 				}
 				if (mChargeHealth.nextTick()) {
 					PlayerUtils.playersInRange(mSpawnLoc, mRange, true).forEach(p -> {
-						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PERCENT_HEALTH_EFFECT, new PercentHealthBoost(72000, (-20 * mStack) / 100.0, PERCENT_HEALTH_EFFECT).displaysTime(false));
+						com.playmonumenta.plugins.Plugin.getInstance().mEffectManager.addEffect(p, PERCENT_HEALTH_EFFECT, new PercentHealthBoost(72000, (-20 * mStack) / 100.0, PERCENT_HEALTH_EFFECT).displaysTime(false).deleteOnLogout(true));
 						new PPExplosion(Particle.WAX_ON, p.getLocation())
 							.speed(1)
 							.count(120)
