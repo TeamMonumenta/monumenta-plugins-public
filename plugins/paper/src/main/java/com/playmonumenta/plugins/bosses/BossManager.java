@@ -171,7 +171,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(PlayerTargetBoss.identityTag, PlayerTargetBoss::new);
 		registerStatelessBoss(DamageReducedBoss.identityTag, DamageReducedBoss::new);
 		registerStatelessBoss(WinterSnowmanEventBoss.identityTag, WinterSnowmanEventBoss::new);
-		registerStatelessBoss(TrainingDummyBoss.identityTag, TrainingDummyBoss::new);
+		registerStatelessBoss(TrainingDummyBoss.identityTag, TrainingDummyBoss::new, new TrainingDummyBoss.Parameters());
 		registerStatelessBoss(FestiveTesseractSnowmanBoss.identityTag, FestiveTesseractSnowmanBoss::new);
 		registerStatelessBoss(CrowdControlImmunityBoss.identityTag, CrowdControlImmunityBoss::new);
 		registerStatelessBoss(FloatBoss.identityTag, FloatBoss::new);

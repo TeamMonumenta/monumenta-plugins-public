@@ -22,6 +22,7 @@ public enum WeeklyMissionType {
 	SPAWNERS_POI("spawners_poi"),
 	DELVE_MODIFIER("delve_modifier"), //Also checks content array
 	DELVE_POINTS("delve_points"), //Also checks content array
+	CHALLENGE_DELVE("challenge_delve"), //Also checks content array
 	ROD_WAVES("rod_waves"),
 	DEPTHS_ROOMS("depths_rooms"),
 	DAILY_BOUNTY("daily_bounty"),

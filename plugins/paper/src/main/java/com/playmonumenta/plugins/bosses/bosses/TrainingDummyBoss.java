@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,13 +46,23 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 	private double mMaxDPS = -1;
 	private @Nullable ArmorStand mHologram = null;
 
+	public static class Parameters extends BossParameters {
+		public boolean REGEN = true;
+	}
+
+	private boolean mRegen;
+
 	public TrainingDummyBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		SpellManager activeSpells = new SpellManager(List.of(
-			new SpellRunAction(() -> {
-				boss.setHealth(EntityUtils.getMaxHealth(boss));
-			}, 60 * 20)
-		));
+
+		Parameters p = BossParameters.getParameters(boss, identityTag, new Parameters());
+		mRegen = p.REGEN;
+
+		SpellManager activeSpells = SpellManager.EMPTY;
+		if (mRegen) {
+			activeSpells = new SpellManager(List.of(
+				new SpellRunAction(() -> boss.setHealth(EntityUtils.getMaxHealth(boss)), 60 * 20)));
+		}
 
 		/*
 		List<Spell> passiveSpells = List.of(
@@ -174,7 +185,7 @@ public class TrainingDummyBoss extends BossAbilityGroup {
 			*/
 		}
 
-		if (mBoss.isValid() && !mBoss.isDead() && mBoss.getHealth() > 0) {
+		if (mRegen && mBoss.isValid() && !mBoss.isDead() && mBoss.getHealth() > 0) {
 			mBoss.setHealth(EntityUtils.getAttributeOrDefault(mBoss, Attribute.GENERIC_MAX_HEALTH, 1000));
 		}
 	}

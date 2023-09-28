@@ -368,6 +368,9 @@ public class DelvesUtils {
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("red", "D15Delve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("black", "D16Delve");
 
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("ruin", "DMASDelve");
+		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("portal", "DPSDelve");
+
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev1", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("dev2", "DTestDelve");
 		SHARD_SCOREBOARD_PREFIX_MAPPINGS.put("mobs", "DTestDelve");

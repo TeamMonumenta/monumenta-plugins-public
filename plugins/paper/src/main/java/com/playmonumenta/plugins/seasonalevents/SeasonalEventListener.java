@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.seasonalevents;
 
+import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.events.MonumentaEvent;
@@ -137,6 +138,10 @@ public class SeasonalEventListener implements Listener {
 						if ((mission.mContent == null || mission.mContent.contains(content)) && modsActive) {
 							SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 						}
+					}
+				} else if (mission.mType == WeeklyMissionType.CHALLENGE_DELVE && DelvesUtils.SHARD_SCOREBOARD_PREFIX_MAPPINGS.containsKey(content.getLabel())) {
+					if (DelvesManager.validateDelvePreset(p, content.getLabel())) {
+						SeasonalEventManager.addWeeklyMissionProgress(p, missionNumber, 1);
 					}
 				} else if (mission.mType == WeeklyMissionType.REGIONAL_CONTENT && content.getRegion() == mission.mRegion) {
 					// Region matches up - award points
