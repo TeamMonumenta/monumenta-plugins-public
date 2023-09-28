@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+
+
 public class EliteFinishers {
 
 	private static final ImmutableMap<String, EliteFinisher> FINISHERS =
@@ -34,6 +36,7 @@ public class EliteFinishers {
 			.put(FishedUpFinisher.NAME, new FishedUpFinisher())
 			.put(Woolerman.NAME, new Woolerman())
 			.put(Whirlpool.NAME, new Whirlpool())
+			.put(EntombFinisher.NAME, new EntombFinisher())
 			.build();
 
 	// Delegate based on elite finisher name
