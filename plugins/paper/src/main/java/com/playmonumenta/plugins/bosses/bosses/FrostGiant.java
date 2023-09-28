@@ -34,6 +34,7 @@ import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.scriptedquests.growables.GrowableAPI;
+import com.playmonumenta.scriptedquests.managers.SongManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -757,6 +758,7 @@ public class FrostGiant extends SerializedLocationBossAbilityGroup {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 40, 10));
 			player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 40, 1));
+			SongManager.stopSong(player, true);
 		}
 
 		Location loc = mBoss.getLocation().clone();

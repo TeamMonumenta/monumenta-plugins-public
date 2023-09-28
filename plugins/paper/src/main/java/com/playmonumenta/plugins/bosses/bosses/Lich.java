@@ -1263,6 +1263,7 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 		for (Player player : players) {
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 17, 10));
 			PotionUtils.applyPotion(com.playmonumenta.plugins.Plugin.getInstance(), player, new PotionEffect(PotionEffectType.REGENERATION, 20 * 17, 1));
+			SongManager.stopSong(player, true);
 		}
 		String[] dio1 = new String[]{
 			"I... WILL... NOT... BE... DESTROYED...",
@@ -1396,7 +1397,6 @@ public final class Lich extends SerializedLocationBossAbilityGroup {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () -> {
 					//prevent players above the barrier ceiling from seeing title
 					for (Player p : playersInRange(mStart.getLocation(), detectionRange, true)) {
-						SongManager.stopSong(p, true);
 						p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 100f, 0.8f);
 						MessagingUtils.sendTitle(p, Component.text("VICTORY", NamedTextColor.GOLD, TextDecoration.BOLD),
 							Component.text("Hekawt, The Eternal", NamedTextColor.DARK_GRAY, TextDecoration.BOLD),
