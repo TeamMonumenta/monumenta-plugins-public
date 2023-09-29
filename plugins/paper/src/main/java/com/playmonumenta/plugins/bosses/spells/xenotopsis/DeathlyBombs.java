@@ -47,11 +47,11 @@ public class DeathlyBombs extends Spell {
 	private static final double BOMB_RADIUS = 3.75;
 
 	// the attack and death damage of each bomb on impact
-	private static final int BOMB_ATTACK_DAMAGE = 95;
+	private static final int BOMB_ATTACK_DAMAGE = 105;
 	private static final int BOMB_DEATH_DAMAGE = 15;
 
 	// the attack and death damage of each shrapnel
-	private static final int SHRAPNEL_ATTACK_DAMAGE = 50;
+	private static final int SHRAPNEL_ATTACK_DAMAGE = 60;
 	private static final int SHRAPNEL_DEATH_DAMAGE = 9;
 
 	private final Plugin mPlugin;

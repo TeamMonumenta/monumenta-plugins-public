@@ -33,7 +33,7 @@ public class DeathTouchedBlade extends Spell {
 	private static final int SLASHES_PER_GROUP = 2;
 
 	// the attack and death damage of each slash
-	private static final int ATTACK_DAMAGE = 55;
+	private static final int ATTACK_DAMAGE = 65;
 	private static final int DEATH_DAMAGE = 6;
 
 	// the speed of the boss during the attack

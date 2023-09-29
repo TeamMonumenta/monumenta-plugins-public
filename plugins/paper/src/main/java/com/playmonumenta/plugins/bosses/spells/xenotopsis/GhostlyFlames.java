@@ -35,7 +35,7 @@ public class GhostlyFlames extends Spell {
 	private static final int WINDUP_DURATION = 20 * 2;
 
 	// the attack and death damage of the attack
-	private static final int ATTACK_DAMAGE = 80;
+	private static final int ATTACK_DAMAGE = 90;
 	private static final int DEATH_DAMAGE = 15;
 
 	private final Plugin mPlugin;

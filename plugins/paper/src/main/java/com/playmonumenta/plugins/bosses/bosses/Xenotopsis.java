@@ -61,6 +61,10 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 	private static final int BASE_HEALTH_PART1 = 15000;
 	private static final int BASE_HEALTH_PART2 = 12500;
 
+	// the percent health for the damage cap and the overflow scaling
+	private static final double DAMAGE_CAP_PERCENT = 0.03;
+	private static final double DAMAGE_CAP_REDUCTION = 0.9;
+
 	// the boss' movement speed in part 1 and 2
 	private static final double MOVEMENT_SPEED_PART1 = 0.24;
 	private static final double MOVEMENT_SPEED_PART2 = 0.28;
@@ -71,7 +75,7 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 
 	// the factor of gallery scaling applied to the boss
 	private static final double HEALTH_SCALING_FACTOR = 0.5;
-	private static final double DAMAGE_SCALING_FACTOR = 0.4;
+	private static final double DAMAGE_SCALING_FACTOR = 0.3;
 
 	// values for decreasing a player's death value when hit by melee
 	private static final int DAMAGE_DECREASE_CUTOFF = 70;
@@ -343,6 +347,16 @@ public class Xenotopsis extends SerializedLocationBossAbilityGroup {
 	@Override
 	public void onHurt(DamageEvent event) {
 		super.onHurt(event);
+
+		// check if damage exceeds damage cap
+		double eventDamage = event.getDamage();
+		double part1Cap = DAMAGE_CAP_PERCENT * mMaxHealthPart1;
+		double part2Cap = DAMAGE_CAP_PERCENT * mMaxHealthPart2;
+		if (mPhase < 3 && eventDamage > part1Cap) {
+			event.setDamage(part1Cap + (eventDamage - part1Cap) * (1 - DAMAGE_CAP_REDUCTION));
+		} else if (eventDamage > part2Cap) {
+			event.setDamage(part2Cap + (eventDamage - part2Cap) * (1 - DAMAGE_CAP_REDUCTION));
+		}
 
 		double newBossHealth = event.getDamagee().getHealth() - event.getDamage();
 

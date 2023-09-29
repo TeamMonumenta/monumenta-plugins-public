@@ -55,7 +55,7 @@ public class UmbralCannons extends Spell {
 	private static final ArrayList<Material> SHOT_BLOCK_OPTIONS = new ArrayList<>(Arrays.asList(Material.BLACK_WOOL, Material.BLACK_CONCRETE, Material.BLACK_CONCRETE_POWDER));
 
 	// the attack and death damage of each cannon shot
-	private static final int ATTACK_DAMAGE = 120;
+	private static final int ATTACK_DAMAGE = 135;
 	private static final int DEATH_DAMAGE = 24;
 
 	private final Plugin mPlugin;

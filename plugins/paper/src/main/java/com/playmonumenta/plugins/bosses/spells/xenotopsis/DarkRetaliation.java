@@ -2,6 +2,7 @@ package com.playmonumenta.plugins.bosses.spells.xenotopsis;
 
 import com.playmonumenta.plugins.bosses.bosses.Xenotopsis;
 import com.playmonumenta.plugins.bosses.spells.Spell;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PPParametric;
 import com.playmonumenta.plugins.particle.PartialParticle;
@@ -27,16 +28,19 @@ public class DarkRetaliation extends Spell {
 	private static final int COOLDOWN = 24;
 
 	// the distance from which the attack will start triggering on players
-	private static final double TRIGGER_DISTANCE = 8;
+	private static final double TRIGGER_DISTANCE = 10;
 
 	// the percent of the damage to transfer back
 	private static final double DAMAGE_TRANSFER_PERCENT = 0.6;
 
 	// the speed of the projectile, in blocks per tick
-	private static final double PROJECTILE_SPEED = 0.85;
+	private static final double PROJECTILE_SPEED = 0.67;
 
 	// the turn speed of the projectile, or speed of the projectile orthogonal to the velocity, in blocks per tick
-	private static final double TURN_SPEED = 0.043;
+	private static final double TURN_SPEED = 0.081;
+
+	// the maximum amount of time the projectile can exist
+	private static final int MAX_LIFETIME = 20 * 6;
 
 	// the death damage of the attack
 	private static final int DEATH_DAMAGE = 15;
@@ -72,7 +76,9 @@ public class DarkRetaliation extends Spell {
 		// check if requirements for retaliation are met
 		if (mTicks == 0 && event.getDamager() != null && event.getDamager() instanceof Player player
 				&& mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE
-				&& event.getType() != DamageEvent.DamageType.AILMENT) {
+				&& event.getType() != DamageEvent.DamageType.AILMENT
+				&& event.getAbility() != ClassAbility.BRUTAL_ALCHEMY
+				&& event.getType() != DamageEvent.DamageType.THORNS) {
 			attackPlayer(player, event.getDamage() * DAMAGE_TRANSFER_PERCENT);
 			mTicks = COOLDOWN;
 		}
@@ -144,7 +150,7 @@ public class DarkRetaliation extends Spell {
 				new PartialParticle(Particle.SMOKE_LARGE, mLocation).delta(0.1).extra(0).count(10).spawnAsBoss();
 
 				mTicks++;
-				if (mTicks > 60 || mBoss.isDead()) {
+				if (mTicks > MAX_LIFETIME || mBoss.isDead()) {
 					this.cancel();
 				}
 			}

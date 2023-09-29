@@ -9,6 +9,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -43,7 +45,7 @@ public class FearfulSouls extends Spell {
 	private static final double SKULL_HEIGHT_VARIANCE = 0.5;
 
 	// the attack and death damage of each skull
-	private static final int ATTACK_DAMAGE = 95;
+	private static final int ATTACK_DAMAGE = 100;
 	private static final int DEATH_DAMAGE = 12;
 
 	private final Plugin mPlugin;
@@ -73,9 +75,6 @@ public class FearfulSouls extends Spell {
 	public void run() {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			int mTicks = 0;
-			//final Map<Player, Pair<ArrayList<ArmorStand>, ArrayList<Pair<Double, Double>>>> mSkullsAndTargets = new HashMap<>();
-			// double pair right = height
-			// double pair left = speed
 			final Map<Player, List<FearfulSoulData>> mSkullsAndTargets = new HashMap<>();
 
 			@Override
@@ -94,13 +93,13 @@ public class FearfulSouls extends Spell {
 
 							// particle effect for each skull summon
 							new PartialParticle(Particle.SPELL_MOB, skull.getLocation().clone().add(0, 0.9, 0))
-								.count(10)
-								.delta(0.12)
-								.spawnAsBoss();
+									.count(10)
+									.delta(0.12)
+									.spawnAsBoss();
 							new PartialParticle(Particle.SPELL, skull.getLocation().clone().add(0, 0.9, 0))
-								.count(10)
-								.delta(0.15)
-								.spawnAsBoss();
+									.count(10)
+									.delta(0.15)
+									.spawnAsBoss();
 
 							// set the rotation of each skull to be the same as the boss
 							skull.setRotation(mBoss.getLocation().getYaw(), 0);
@@ -124,9 +123,17 @@ public class FearfulSouls extends Spell {
 
 				if (mTicks < 20) {
 					new PPCircle(Particle.SPELL, mBoss.getLocation().clone().add(0, 0.2, 0), 3 * ((double)(20 - mTicks) / 20))
-						.count(30)
-						.ringMode(true)
-						.spawnAsBoss();
+							.count(30)
+							.ringMode(true)
+							.spawnAsBoss();
+				}
+
+				if (mTicks == 40) {
+					mSkullsAndTargets.values().forEach(skullList -> skullList.forEach(skullData -> {
+						List<LivingEntity> entities = new ArrayList<>();
+						getStackedMobsAbove(skullData.skull, entities);
+						entities.forEach(entity -> entity.addScoreboardTag("XenotopsisActivated"));
+					}));
 				}
 
 				// move the skulls toward their respective targets
@@ -144,9 +151,8 @@ public class FearfulSouls extends Spell {
 									if (skull.getLocation().distance(target.getLocation()) > 8) {
 										skullSpeed *= 2.5;
 									}
-									skull.teleport(skull.getLocation().clone().add(direction.multiply(skullSpeed)));
-
-									skull.setRotation((float) Math.toDegrees(Math.atan2(direction.getZ(), direction.getX()) - Math.PI / 2), (float) Math.toDegrees(Math.cos(direction.getY())));
+									Vector destination = skull.getLocation().clone().add(direction.multiply(skullSpeed)).toVector();
+									NmsUtils.getVersionAdapter().setEntityLocation(skull, destination, (float) Math.toDegrees(Math.atan2(direction.getZ(), direction.getX()) - Math.PI / 2), (float) Math.toDegrees(Math.cos(direction.getY())));
 								}
 							});
 						}
@@ -166,7 +172,7 @@ public class FearfulSouls extends Spell {
 					mSkullsAndTargets.keySet().forEach(player -> {
 						if (mBoss.getLocation().distance(player.getLocation()) > 50) {
 							if (mSkullsAndTargets.get(player) != null) {
-								mSkullsAndTargets.get(player).forEach(skullData -> skullData.skull.remove());
+								mSkullsAndTargets.get(player).forEach(skullData -> despawnSkullStack(skullData.skull));
 							}
 						}
 					});
@@ -177,30 +183,57 @@ public class FearfulSouls extends Spell {
 					mSkullsAndTargets.values().forEach(skullList -> skullList.forEach(skullData -> {
 						ArmorStand skull = skullData.skull;
 
-						skull.remove();
+						despawnSkullStack(skull);
 
 						// particle effect for each skull summon
 						new PartialParticle(Particle.SPELL_MOB, skull.getLocation().clone().add(0, 0.9, 0))
-							.count(10)
-							.delta(0.12)
-							.spawnAsBoss();
+								.count(10)
+								.delta(0.12)
+								.spawnAsBoss();
 						new PartialParticle(Particle.SPELL, skull.getLocation().clone().add(0, 0.9, 0))
-							.count(10)
-							.delta(0.15)
-							.spawnAsBoss();
+								.count(10)
+								.delta(0.15)
+								.spawnAsBoss();
 
 						mWorld.playSound(skull.getLocation(), Sound.ENTITY_PHANTOM_HURT, SoundCategory.HOSTILE, 0.7f, 1.7f);
 					}));
 				}
 
-				// particle effect
-				mSkullsAndTargets.values().forEach(skullList -> skullList.forEach(skullData -> {
-					ArmorStand skull = skullData.skull;
-					new PartialParticle(Particle.REDSTONE, skull.getLocation().clone().add(0, 0.8, 0).subtract(skull.getLocation().getDirection().clone().multiply(0.3)))
-						.count(1)
-						.data(new Particle.DustOptions(Color.fromRGB(224, 224, 224), 1.9f))
-						.spawnAsBoss();
-				}));
+
+				mSkullsAndTargets.values().forEach(skullList -> {
+					List<ArmorStand> toRemove = new ArrayList<>();
+					skullList.forEach(skullData -> {
+						ArmorStand skull = skullData.skull;
+
+						// particle effect
+						new PartialParticle(Particle.REDSTONE, skull.getLocation().clone().add(0, 0.8, 0).subtract(skull.getLocation().getDirection().clone().multiply(0.3)))
+								.count(1)
+								.data(new Particle.DustOptions(Color.fromRGB(224, 224, 224), 1.9f))
+								.spawnAsBoss();
+
+						// check if a skull has a passenger with a tag - meaning it has been successfully hit by a player
+						List<LivingEntity> skullPassengers = new ArrayList<>();
+						getStackedMobsAbove(skull, skullPassengers);
+						skullPassengers.forEach(entity -> {
+							if (entity.getScoreboardTags().contains("XenotopsisSkullHit")) { // skull should be removed
+								despawnSkullStack(skull);
+								toRemove.add(skull);
+
+								new PartialParticle(Particle.SPELL, skull.getLocation().clone().add(0, 0.4, 0))
+										.count(20)
+										.delta(0.2, 0.5, 0.2)
+										.spawnAsBoss();
+								new PartialParticle(Particle.SPELL_MOB, skull.getLocation().clone().add(0, 0.4, 0))
+										.count(20)
+										.delta(0.2, 0.5, 0.2)
+										.spawnAsBoss();
+
+								mWorld.playSound(skull.getLocation(), Sound.ENTITY_ALLAY_ITEM_THROWN, SoundCategory.HOSTILE, 1.5f, 0.65f);
+							}
+						});
+					});
+					skullList.removeIf(data -> toRemove.contains(data.skull));
+				});
 
 				// check for collisions
 				Map<Player, ArmorStand> toRemove = new HashMap<>(); // this sucks, but is needed to avoid concurrent modification exception
@@ -210,16 +243,16 @@ public class FearfulSouls extends Spell {
 							ArmorStand skull = skullData.skull;
 							Hitbox hitbox = new Hitbox.AABBHitbox(mWorld, BoundingBox.of(skull.getLocation().clone().add(0, 0.9, 0), 0.5, 0.5, 0.5));
 							for (Player player : hitbox.getHitPlayers(true)) {
-								skull.remove();
+								despawnSkullStack(skull);
 								toRemove.put(target, skull);
 								new PartialParticle(Particle.SPELL, target.getLocation().clone().add(0, 0.4, 0))
-									.count(20)
-									.delta(0.2, 0.5, 0.2)
-									.spawnAsBoss();
+										.count(20)
+										.delta(0.2, 0.5, 0.2)
+										.spawnAsBoss();
 								new PartialParticle(Particle.SPELL_MOB, target.getLocation().clone().add(0, 0.4, 0))
-									.count(20)
-									.delta(0.2, 0.5, 0.2)
-									.spawnAsBoss();
+										.count(20)
+										.delta(0.2, 0.5, 0.2)
+										.spawnAsBoss();
 
 								BossUtils.blockableDamage(mBoss, player, DamageEvent.DamageType.MAGIC, mXenotopsis.scaleDamage(ATTACK_DAMAGE), "Fearful Souls", skull.getLocation(), Xenotopsis.SHIELD_STUN_TIME);
 								mXenotopsis.changePlayerDeathValue(player, DEATH_DAMAGE, false);
@@ -245,13 +278,27 @@ public class FearfulSouls extends Spell {
 
 			@Override
 			public synchronized void cancel() throws IllegalStateException {
-				mSkullsAndTargets.values().forEach(skullList -> skullList.forEach(skullData -> skullData.skull.remove()));
+				mSkullsAndTargets.values().forEach(skullList -> skullList.forEach(skullData -> despawnSkullStack(skullData.skull)));
 
 				super.cancel();
 			}
 		};
 		runnable.runTaskTimer(mPlugin, 0, 1);
 		mActiveRunnables.add(runnable);
+	}
+
+	private void despawnSkullStack(LivingEntity skullBase) {
+		List<LivingEntity> stack = new ArrayList<>();
+		getStackedMobsAbove(skullBase, stack);
+		stack.forEach(Entity::remove);
+	}
+
+	// stolen from EntityUtils, but with the hostile check removed
+	public static void getStackedMobsAbove(Entity base, List<LivingEntity> prior) {
+		prior.add((LivingEntity) base);
+		for (Entity entity : base.getPassengers()) {
+			getStackedMobsAbove(entity, prior);
+		}
 	}
 
 	@Override
