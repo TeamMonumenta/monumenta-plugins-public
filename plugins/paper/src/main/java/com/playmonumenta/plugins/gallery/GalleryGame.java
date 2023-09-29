@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.utils.MessagingUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,6 +60,12 @@ public class GalleryGame {
 	private static final int SPECTERS_MOBS_COUNTDOWN = 20 * 60;
 	private static final int SPECTERS_MOBS_COUNT = 10;
 	private static final int ELITE_STARTING_ROUND = 11;
+
+	private static final EnumSet<DamageEvent.DamageType> EXCLUDED_DAMAGE_TYPES = EnumSet.of(
+		DamageEvent.DamageType.AILMENT,
+		DamageEvent.DamageType.TRUE,
+		DamageEvent.DamageType.OTHER
+	);
 
 	//UUID of the world and also this game key for the GalleryManager
 	protected final UUID mUUIDGame;
@@ -914,7 +921,7 @@ public class GalleryGame {
 	}
 
 	public void onPlayerHurtEvent(DamageEvent event, Player player, @Nullable Entity damager, @Nullable LivingEntity source) {
-		if (source == null || !GalleryUtils.ignoreScaling(source)) {
+		if ((source == null || !GalleryUtils.ignoreScaling(source)) && !EXCLUDED_DAMAGE_TYPES.contains(event.getType())) {
 			event.setDamage(event.getDamage() * (1 + GalleryUtils.getDamageScaleForLevel(mCurrentRound)));
 		}
 
