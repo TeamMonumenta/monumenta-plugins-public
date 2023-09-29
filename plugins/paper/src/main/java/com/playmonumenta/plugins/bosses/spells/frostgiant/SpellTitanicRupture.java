@@ -161,9 +161,8 @@ public class SpellTitanicRupture extends Spell {
 					BoundingBox smallBox = BoundingBox.of(loc, 1, 20, 1);
 					for (Player player : players) {
 						if (smallBox.overlaps(player.getBoundingBox())) {
-							BossUtils.bossDamagePercent(mBoss, player, 1, "Titanic Rupture");
-							player.damage(420, mBoss);
-
+							BossUtils.bossDamagePercent(mBoss, player, 10, "Titanic Rupture");
+							player.damage(1);
 							// If player is in Stasis, grant advancement of Lonely Soloist
 							if (StasisListener.isInStasis(player)) {
 								AdvancementUtils.grantAdvancement(player, "monumenta:challenges/r2/fg/lonely_soloist");
