@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.gallery.GalleryManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
@@ -170,6 +171,9 @@ public class PhlegmaticResolve extends Ability {
 					}
 				}
 			}
+
+			// Hotfixed: Fix Gallery scaling not working with Phlegmatic Resolve.
+			GalleryManager.onEntityDamageEvent(event);
 
 			// If player isn't under invincibility ticks. (This means we can have attacks that bypass Iframes hopefully)
 			if (event.getDamage() > mLastMaxDamage) {
