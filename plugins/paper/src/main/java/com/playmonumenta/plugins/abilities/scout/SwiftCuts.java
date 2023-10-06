@@ -10,7 +10,11 @@ import com.playmonumenta.plugins.effects.PercentDamageDealt;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.network.ClientModHandler;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import java.util.EnumSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,6 +22,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
 
 public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 	private static final int EFFECT_DURATION = 5 * 20;
@@ -46,7 +51,7 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 			.scoreboardId("SwiftCuts")
 			.shorthandName("SC")
 			.descriptions(
-				String.format("Attacking an enemy with a fully charged melee attack grants you a Swift Cuts stack with a maximum of %d stacks. Every stack grants you +%d%% melee damage. Stacks decay by 1 after %d seconds.",
+				String.format("Attacking an enemy with a fully charged valid melee weapon attack grants you a Swift Cuts stack with a maximum of %d stacks. Every stack grants you +%d%% melee damage. Stacks decay by 1 after %d seconds.",
 					STACKS_CAP_1,
 					(int) (DAMAGE_AMPLIFIER * 100),
 					EFFECT_DURATION / 20
@@ -83,7 +88,9 @@ public class SwiftCuts extends Ability implements AbilityWithChargesOrStacks {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageType.MELEE && mPlayer.getCooledAttackStrength(0.5f) > 0.9) {
+		EntityEquipment equip = mPlayer.getEquipment();
+		if (event.getType() == DamageType.MELEE && mPlayer.getCooledAttackStrength(0.5f) > 0.9 &&
+			    ItemStatUtils.getAttributeAmount(equip.getItemInMainHand(), AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) > 0) {
 			Location loc = enemy.getLocation();
 			World world = mPlayer.getWorld();
 			mCosmetic.onHit(mPlayer, loc, world);

@@ -69,7 +69,7 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.descriptions(
 				("Dealing indirect damage with an ability grants you a Glorious Battle stack. " +
 					 "Shift and swap hands to consume a stack and charge forwards at %s blocks per second, gaining full knockback resistance until landing. " +
-					 "Vertical movement speed is capped at %s blocks per second. " +
+					 "Vertical movement speed is capped at %s blocks per second upwards. " +
 					 "When you land, deal %s damage to the nearest mob within %s blocks. " +
 					 "Additionally, knock back all mobs within %s blocks.")
 					.formatted(
@@ -118,9 +118,12 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 		Vector dir = mPlayer.getLocation().getDirection();
 		dir.multiply(CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, mVelocity));
 		// vertical speed cap for level 1
-		if (isLevelOne() && (dir.getY() > VERTICAL_SPEED_CAP || dir.getY() < -VERTICAL_SPEED_CAP)) {
-			double sign = Math.signum(dir.getY());
-			dir.setY((VERTICAL_SPEED_CAP + 0.2) * sign);
+		if (isLevelOne()) {
+			if (dir.getY() > VERTICAL_SPEED_CAP) {
+				dir.setY(VERTICAL_SPEED_CAP + 0.2);
+			} else {
+				dir.setY(dir.getY() * 0.5);
+			}
 		} else {
 			if (Math.signum(dir.getY()) > 0) {
 				// +0.22 to allow for horizontal movement
