@@ -481,7 +481,7 @@ public class ShopManager implements Listener {
 			.withArguments(new MultiLiteralArgument("createunlockkey"))
 			.withArguments(new StringArgument("player name"))
 			.executes((sender, args) -> {
-				createBarrelKey((Player) args[1], (String) args[2]);
+				createBarrelKey((Player) args[0], (String) args[1]);
 			})
 			.register();
 
