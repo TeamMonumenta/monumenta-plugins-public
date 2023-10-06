@@ -28,7 +28,7 @@ public class DarkRetaliation extends Spell {
 	private static final int COOLDOWN = 24;
 
 	// the distance from which the attack will start triggering on players
-	private static final double TRIGGER_DISTANCE = 10;
+	private static final double TRIGGER_DISTANCE = 9;
 
 	// the percent of the damage to transfer back
 	private static final double DAMAGE_TRANSFER_PERCENT = 0.6;
@@ -37,7 +37,7 @@ public class DarkRetaliation extends Spell {
 	private static final double PROJECTILE_SPEED = 0.67;
 
 	// the turn speed of the projectile, or speed of the projectile orthogonal to the velocity, in blocks per tick
-	private static final double TURN_SPEED = 0.081;
+	private static final double TURN_SPEED = 0.078;
 
 	// the maximum amount of time the projectile can exist
 	private static final int MAX_LIFETIME = 20 * 6;

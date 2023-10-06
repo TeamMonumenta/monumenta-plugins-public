@@ -23,7 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ChargedDeath extends Spell {
 
 	// the delay between each run of the passive, in ticks
-	private static final int TOTAL_DELAY = 240;
+	private static final int TOTAL_DELAY = 400;
 
 	// the length of the windup portion, in ticks
 	private static final int WINDUP_DURATION = 20 * 3;
@@ -55,7 +55,7 @@ public class ChargedDeath extends Spell {
 		mXenotopsis = xenotopsis;
 
 		int playerCount = PlayerUtils.playersInRange(mBoss.getLocation(), Xenotopsis.DETECTION_RANGE, true).size();
-		mDelay = (int) (TOTAL_DELAY / (1 + 2 * Math.log(playerCount))); // formula for cooldown reduction: delay / (1 + 2log(c))
+		mDelay = (int) (TOTAL_DELAY / (1 + 2 * Math.log10(playerCount))); // formula for cooldown reduction: delay / (1 + 2log(c))
 	}
 
 	@Override
