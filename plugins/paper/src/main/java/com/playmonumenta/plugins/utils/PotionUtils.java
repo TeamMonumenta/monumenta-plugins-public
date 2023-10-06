@@ -133,6 +133,7 @@ public class PotionUtils {
 		public boolean mShowParticles;
 		public boolean mShowIcon;
 		public boolean mInfinite;
+		public int mHeavenlyBoonExtensions;
 
 		public PotionInfo() {
 		}
@@ -145,10 +146,16 @@ public class PotionUtils {
 			mShowParticles = effect.hasParticles();
 			mShowIcon = effect.hasIcon();
 			mInfinite = isInfinite(effect.getDuration());
+			mHeavenlyBoonExtensions = 0;
 		}
 
 		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
-						  boolean showParticles, boolean showIcon) {
+		                  boolean showParticles, boolean showIcon) {
+			this(type, duration, amplifier, ambient, showParticles, showIcon, 0);
+		}
+
+		public PotionInfo(@Nullable PotionEffectType type, int duration, int amplifier, boolean ambient,
+						  boolean showParticles, boolean showIcon, int heavenlyBoonExtensions) {
 			mType = type;
 			mDuration = duration;
 			mAmplifier = amplifier;
@@ -156,6 +163,7 @@ public class PotionUtils {
 			mShowParticles = showParticles;
 			mShowIcon = showIcon;
 			mInfinite = isInfinite(duration);
+			mHeavenlyBoonExtensions = heavenlyBoonExtensions;
 		}
 
 		public JsonObject getAsJsonObject() {
@@ -166,6 +174,7 @@ public class PotionUtils {
 			potionInfoObject.addProperty("amplifier", mAmplifier);
 			potionInfoObject.addProperty("ambient", mAmbient);
 			potionInfoObject.addProperty("show_particles", mShowParticles);
+			potionInfoObject.addProperty("heavenly_boon_extensions", mHeavenlyBoonExtensions);
 
 			return potionInfoObject;
 		}
@@ -177,6 +186,11 @@ public class PotionUtils {
 			mAmbient = object.get("ambient").getAsBoolean();
 			mShowParticles = object.get("show_particles").getAsBoolean();
 			mInfinite = isInfinite(mDuration);
+			if (object.has("heavenly_boon_extensions")) {
+				mHeavenlyBoonExtensions = object.get("heavenly_boon_extensions").getAsInt();
+			} else {
+				mHeavenlyBoonExtensions = 0;
+			}
 		}
 	}
 

@@ -31,6 +31,7 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 	private boolean mDisplayTime = true;
 	private boolean mDeleteOnLogout = false;
 	boolean mUsed = false;
+	public int mHeavenlyBoonExtensions = 0;
 
 	public Effect(int duration, String effectID) {
 		mDuration = duration;
@@ -224,6 +225,14 @@ public abstract class Effect implements Comparable<Effect>, DisplayableEffect {
 
 	public boolean shouldDeleteOnLogout() {
 		return mDeleteOnLogout;
+	}
+
+	public int getHeavenlyBoonExtensions() {
+		return mHeavenlyBoonExtensions;
+	}
+
+	public void incrementHeavenlyBoonExtensions() {
+		mHeavenlyBoonExtensions++;
 	}
 
 	/* Must implement this method to print info about what the effect does for debug */

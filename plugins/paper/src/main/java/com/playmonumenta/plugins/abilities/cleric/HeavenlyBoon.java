@@ -48,8 +48,8 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 	private static final double HEAVENLY_BOON_RADIUS = 12;
 	private static final double HEAVENLY_BOON_TRIGGER_INTENSITY = 0;
 	private static final double ENHANCEMENT_POTION_EFFECT_BONUS = 0.2;
-	private static final int ENHANCEMENT_POTION_EFFECT_MAX_BOOST = 24 * 20;
-	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 3 * 60 * 20;
+	private static final int ENHANCEMENT_POTION_EFFECT_MAX_DURATION = 2 * 60 * 60 * 20;
+	private static final int MAX_EXTENSIONS = 10;
 
 	private static final int ENHANCEMENT_COOLDOWN_TICKS = 20;
 
@@ -78,10 +78,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 							"The chance to be splashed upon killing an undead mob is increased to 20%. The effect potions now give 40% Instant Health and the durations of each are increased to 50 seconds.",
 							String.format(
 									"When a potion is created by this skill, also increase all current positive potion durations by %s%%" +
-											" (capped at +%ss, and up to a maximum of %s minutes) on all players in the radius.",
+											" (up to a maximum of %s hours, and up to %s times per effect) on all players in the radius.",
 									(int) (ENHANCEMENT_POTION_EFFECT_BONUS * 100),
-									ENHANCEMENT_POTION_EFFECT_MAX_BOOST / 20,
-									ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 20)
+									ENHANCEMENT_POTION_EFFECT_MAX_DURATION / (60 * 60 * 20),
+									MAX_EXTENSIONS
 							))
 					.simpleDescription("Share all positive splash potion effects with nearby players and occasionally generate splash potions when killing Undead enemies.")
 					.displayItem(Material.SPLASH_POTION);
@@ -224,10 +224,12 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 								if (potionInfo.mDuration > ENHANCEMENT_POTION_EFFECT_MAX_DURATION
 										|| potionInfo.mInfinite
 										|| potionInfo.mType == null
-										|| !PotionUtils.hasPositiveEffects(potionInfo.mType)) {
+										|| !PotionUtils.hasPositiveEffects(potionInfo.mType)
+									    || potionInfo.mHeavenlyBoonExtensions >= MAX_EXTENSIONS) {
 									return potionInfo.mDuration;
 								}
-								return Math.min(potionInfo.mDuration + Math.min((int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
+								potionInfo.mHeavenlyBoonExtensions++;
+								return Math.min(potionInfo.mDuration + (int) (potionInfo.mDuration * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_DURATION);
 							});
 					List<Effect> effects = mPlugin.mEffectManager.getEffects(p);
 					if (effects != null) {
@@ -235,8 +237,10 @@ public final class HeavenlyBoon extends Ability implements KillTriggeredAbility 
 							if (e.isBuff()
 									&& (e.getDuration() < ENHANCEMENT_POTION_EFFECT_MAX_DURATION
 									&& e.getDuration() != PotionEffect.INFINITE_DURATION)
-									&& EffectType.isEffectTypeAppliedEffect(mPlugin.mEffectManager.getSource(mPlayer, e))) {
-								e.setDuration(Math.min(e.getDuration() + Math.min((int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_BOOST), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
+									&& EffectType.isEffectTypeAppliedEffect(mPlugin.mEffectManager.getSource(mPlayer, e))
+								    && e.getHeavenlyBoonExtensions() < MAX_EXTENSIONS) {
+								e.incrementHeavenlyBoonExtensions();
+								e.setDuration(Math.min(e.getDuration() + (int) (e.getDuration() * ENHANCEMENT_POTION_EFFECT_BONUS), ENHANCEMENT_POTION_EFFECT_MAX_DURATION));
 							}
 						}
 					}

@@ -248,6 +248,7 @@ public final class EffectManager implements Listener {
 						JsonObject serializedEffect = effect.serialize();
 						serializedEffect.addProperty("displaysTime", effect.doesDisplayTime());
 						serializedEffect.addProperty("displays", effect.doesDisplay());
+						serializedEffect.addProperty("heavenlyBoonExtensions", effect.mHeavenlyBoonExtensions);
 						if (serializedEffect.has("effectID")) {
 							inner.add(serializedEffect);
 						} else {
@@ -711,6 +712,9 @@ public final class EffectManager implements Listener {
 		}
 		if (deserializedEffect != null && object.has("displays")) {
 			deserializedEffect.displays(object.get("displays").getAsBoolean());
+		}
+		if (deserializedEffect != null && object.has("heavenlyBoonExtensions")) {
+			deserializedEffect.mHeavenlyBoonExtensions = object.get("heavenlyBoonExtensions").getAsInt();
 		}
 
 		return deserializedEffect;
