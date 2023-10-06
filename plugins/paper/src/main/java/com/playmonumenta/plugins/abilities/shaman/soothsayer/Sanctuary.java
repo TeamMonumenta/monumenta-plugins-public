@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 public class Sanctuary extends Ability {
 	public static final double SLOWNESS_PERCENT = 0.15;
 	public static final double WEAKNESS_PERCENT = 0.2;
-	public static final double VULNERABILITY_PERCENT = 0.125;
+	public static final double VULNERABILITY_PERCENT = 0.1;
 
 	public static final String CHARM_SLOWNESS_PERCENT = "Sanctuary Slowness";
 	public static final String CHARM_WEAKNESS_PERCENT = "Sanctuary Weakness";

@@ -17,6 +17,7 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,15 +38,17 @@ public class ChainLightning extends MultipleChargeAbility {
 	public static final int CHARGES = 2;
 	public static final int TARGETS_1 = 2;
 	public static final int TARGETS_2 = 4;
-	public static final int BOUNCE_RANGE = 8;
-	public static final int DAMAGE_1 = 6;
-	public static final int DAMAGE_2 = 8;
+	public static final int BOUNCE_RANGE = 6;
+	public static final int DAMAGE_1 = 5;
+	public static final int DAMAGE_2 = 7;
+	public static final float KNOCKBACK = 0.2f;
 
 	public static final String CHARM_COOLDOWN = "Chain Lightning Cooldown";
 	public static final String CHARM_DAMAGE = "Chain Lightning Damage";
 	public static final String CHARM_RADIUS = "Chain Lightning Bounce Radius";
 	public static final String CHARM_TARGETS = "Chain Lightning Targets";
 	public static final String CHARM_CHARGES = "Chain Lightning Charges";
+	public static final String CHARM_KNOCKBACK = "Chain Lightning Knockback";
 
 	public static final AbilityInfo<ChainLightning> INFO =
 		new AbilityInfo<>(ChainLightning.class, "Chain Lightning", ChainLightning::new)
@@ -157,7 +160,11 @@ public class ChainLightning extends MultipleChargeAbility {
 		for (int i = 0; i < mHitTargets.size() - 1; i++) {
 			LivingEntity target = mHitTargets.get(i + 1);
 			if (target != null) {
-				DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, mDamage, ClassAbility.CHAIN_LIGHTNING, true, true);
+				DamageUtils.damage(mPlayer, target, DamageEvent.DamageType.MAGIC, mDamage, ClassAbility.CHAIN_LIGHTNING, true, false);
+
+				float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCKBACK);
+				MovementUtils.knockAway(mPlayer.getLocation(), target, knockback, 0.6f * knockback, true);
+
 				new PPLine(Particle.END_ROD, mHitTargets.get(i).getEyeLocation().add(0, -0.5, 0), target.getEyeLocation().add(0, -0.5, 0), 0.08).deltaVariance(true).countPerMeter(8).spawnAsPlayerActive(mPlayer);
 			}
 		}

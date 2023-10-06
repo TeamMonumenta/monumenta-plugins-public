@@ -34,8 +34,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LightningTotem extends TotemAbility {
 
-	private static final int COOLDOWN = 20 * 20;
-	private static final int TOTEM_DURATION = 10 * 20;
+	private static final int COOLDOWN = 22 * 20;
+	private static final int TOTEM_DURATION = 11 * 20;
 	private static final int INTERVAL = 2 * 20;
 	private static final int AOE_RANGE = 7;
 	private static final int DAMAGE_1 = 16;

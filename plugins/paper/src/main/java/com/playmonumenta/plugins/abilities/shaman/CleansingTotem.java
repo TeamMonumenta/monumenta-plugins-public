@@ -35,11 +35,11 @@ public class CleansingTotem extends TotemAbility {
 
 	public static final Particle.DustOptions DUST_CLEANSING_RING = new Particle.DustOptions(Color.fromRGB(0, 87, 255), 1.25f);
 
-	private static final int COOLDOWN = 30 * 20;
+	private static final int COOLDOWN = 32 * 20;
 	private static final int AOE_RANGE = 6;
 	private static final double HEAL_PERCENT = 0.06;
-	private static final int DURATION_1 = 8 * 20;
-	private static final int DURATION_2 = 12 * 20;
+	private static final int DURATION_1 = 9 * 20;
+	private static final int DURATION_2 = 13 * 20;
 	private static final int CLEANSES = 2;
 	public static final double WEAKNESS_PERCENT = 0.4;
 	public static final int WEAKNESS_DURATION = 8 * 20;

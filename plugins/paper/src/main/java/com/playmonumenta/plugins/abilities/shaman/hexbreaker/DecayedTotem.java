@@ -35,17 +35,17 @@ import org.bukkit.entity.Player;
 
 public class DecayedTotem extends TotemAbility {
 
-	private static final int COOLDOWN = 25 * 20;
+	private static final int COOLDOWN = 26 * 20;
 	private static final int AOE_RANGE = 8;
-	private static final int DURATION_1 = 8 * 20;
-	private static final int DURATION_2 = 12 * 20;
+	private static final int DURATION_1 = 9 * 20;
+	private static final int DURATION_2 = 13 * 20;
 	private static final int DAMAGE = 4;
 	private static final double SLOWNESS_PERCENT = 0.4;
 	public static final int DECAY_LEVEL = 5;
 	public static final int DECAY_DURATION = 5 * 20;
 	private static final int TARGETS = 3;
-	private static final int FLAME_TOTEM_DAMAGE_BUFF = 2;
-	private static final int LIGHTNING_TOTEM_DAMAGE_BUFF = 8;
+	private static final int FLAME_TOTEM_DAMAGE_BUFF = 1;
+	private static final int LIGHTNING_TOTEM_DAMAGE_BUFF = 5;
 
 	private static final Particle.DustOptions BLACK = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 	private static final Particle.DustOptions GREEN = new Particle.DustOptions(Color.fromRGB(5, 120, 5), 1.0f);

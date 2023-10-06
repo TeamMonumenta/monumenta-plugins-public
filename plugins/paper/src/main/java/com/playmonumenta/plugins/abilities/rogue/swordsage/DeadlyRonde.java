@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
-	private static final int RONDE_1_DAMAGE = 5;
-	private static final int RONDE_2_DAMAGE = 7;
+	private static final int RONDE_1_DAMAGE = 4;
+	private static final int RONDE_2_DAMAGE = 6;
 	private static final int RONDE_1_MAX_STACKS = 2;
 	private static final int RONDE_2_MAX_STACKS = 3;
 	private static final double RONDE_SPEED_BONUS = 0.2;
@@ -35,6 +35,7 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	private static final double RONDE_RADIUS = 4.5;
 	private static final double RONDE_ANGLE = 35;
 	private static final float RONDE_KNOCKBACK_SPEED = 0.14f;
+	private static final float RONDE_ATTACK_SPEED_SCALING_PORTION = 0.35f;
 
 	public static final String CHARM_DAMAGE = "Deadly Ronde Damage";
 	public static final String CHARM_RADIUS = "Deadly Ronde Radius";
@@ -127,11 +128,16 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 		if (mActiveRunnable != null
 			    && event.getType() == DamageType.MELEE
 			    && InventoryUtils.rogueTriggerCheck(mPlugin, mPlayer)) {
+			float cooldownRatio = mPlayer.getCooledAttackStrength(0);
+			float damageRatio = (1 - RONDE_ATTACK_SPEED_SCALING_PORTION) + (RONDE_ATTACK_SPEED_SCALING_PORTION * cooldownRatio);
+			double damage = mDamage * damageRatio;
+
 			double angle = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_ANGLE, RONDE_ANGLE);
 			double radius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RONDE_RADIUS);
 			Hitbox hitbox = Hitbox.approximateCone(mPlayer.getEyeLocation(), radius, Math.toRadians(angle));
+
 			for (LivingEntity mob : hitbox.getHitMobs()) {
-				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mDamage, mInfo.getLinkedSpell(), true);
+				DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, damage, mInfo.getLinkedSpell(), true);
 				MovementUtils.knockAway(mPlayer, mob, mKnockback, true);
 			}
 

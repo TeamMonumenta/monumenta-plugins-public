@@ -5,6 +5,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.SpellShockStatic;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
@@ -93,6 +95,7 @@ public class ElementalArrows extends Ability {
 			.displayItem(Material.SPECTRAL_ARROW);
 
 	private double mLastDamage = 0;
+	public boolean mSpellshockEnhanced = false;
 
 	public ElementalArrows(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -148,6 +151,13 @@ public class ElementalArrows extends Ability {
 		if (thunder) {
 			int stunDuration = CharmManager.getDuration(mPlayer, CHARM_STUN_DURATION, ENHANCED_ARROW_STUN_DURATION);
 			effectAction = effectAction.andThen(entity -> EntityUtils.applyStun(mPlugin, stunDuration, entity));
+			if (mSpellshockEnhanced) {
+				SpellShockStatic existingStatic = mPlugin.mEffectManager.getActiveEffect(enemy, SpellShockStatic.class);
+				if (existingStatic != null && existingStatic.isTriggered()) {
+					double weaknessMultiplier = CharmManager.calculateFlatAndPercentValue(mPlayer, Spellshock.CHARM_ENHANCE_WEAK, Spellshock.ENHANCEMENT_WEAK_MULTIPLIER);
+					mPlugin.mEffectManager.addEffect(enemy, Spellshock.PERCENT_WEAK_ENHANCEMENT_EFFECT_NAME, new PercentDamageDealt(Spellshock.ENHANCEMENT_EFFECT_DURATION, weaknessMultiplier, Spellshock.ENHANCEMENT_WEAKEN_AFFECTED_DAMAGE_TYPES));
+				}
+			}
 		}
 		effectAction.accept(enemy);
 		//Jank fix - run the effect twice, before and after the damage

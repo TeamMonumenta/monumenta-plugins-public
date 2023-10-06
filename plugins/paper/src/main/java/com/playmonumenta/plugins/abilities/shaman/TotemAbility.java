@@ -34,7 +34,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class TotemAbility extends Ability implements AbilityWithDuration {
 
-	private static final double VELOCITY = 2;
+	private static final double VELOCITY = 0.65;
+	private static final int TOTEM_DELAY = 20;
 
 	private final Map<Snowball, ItemStatManager.PlayerItemStats> mProjectiles = new WeakHashMap<>();
 	private final String mProjectileName;
@@ -165,7 +166,9 @@ public abstract class TotemAbility extends Ability implements AbilityWithDuratio
 					return;
 				}
 
-				onTotemTick(mT, stand, world, standLocation, stats);
+				if (mT - TOTEM_DELAY >= 0) {
+					onTotemTick(mT - TOTEM_DELAY, stand, world, standLocation, stats);
+				}
 
 				if (mAttachedMob != null) {
 					if (mAttachedMob.isDead() || !mAttachedMob.isValid()) {

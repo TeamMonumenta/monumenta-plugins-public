@@ -30,9 +30,9 @@ import org.bukkit.entity.Player;
 
 public class FlameTotem extends TotemAbility {
 
-	private static final int COOLDOWN = 20 * 20;
-	private static final int DURATION_1 = 10 * 20;
-	private static final int DURATION_2 = 12 * 20;
+	private static final int COOLDOWN = 22 * 20;
+	private static final int DURATION_1 = 11 * 20;
+	private static final int DURATION_2 = 13 * 20;
 	private static final int AOE_RANGE = 7;
 	private static final int FIRE_DURATION = 2 * 20;
 	private static final int DAMAGE_1 = 4;

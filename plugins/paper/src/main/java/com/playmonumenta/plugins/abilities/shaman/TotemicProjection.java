@@ -37,7 +37,7 @@ public class TotemicProjection extends Ability {
 	private static final double SLOWNESS_PERCENT = 0.2;
 	private static final int SLOWNESS_DURATION = 3 * 20;
 	private static final int RADIUS = 6;
-	private static final double VELOCITY = 2;
+	private static final double VELOCITY = 0.65;
 	private static final int DISTRIBUTION_RADIUS = 3;
 
 	public static final String CHARM_SLOWNESS_PERCENT = "Totemic Projection Slowness";

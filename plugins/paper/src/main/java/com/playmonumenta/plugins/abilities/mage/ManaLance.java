@@ -29,6 +29,7 @@ public class ManaLance extends MultipleChargeAbility {
 	private static final int COOLDOWN_1 = 5 * 20;
 	private static final int COOLDOWN_2 = 3 * 20;
 	private static final int RANGE = 8;
+	private static final float KNOCKBACK = 0.25f;
 
 	public static final String CHARM_DAMAGE = "Mana Lance Damage";
 	public static final String CHARM_COOLDOWN = "Mana Lance Cooldown";
@@ -93,7 +94,9 @@ public class ManaLance extends MultipleChargeAbility {
 		boolean hit = false;
 		for (LivingEntity mob : Hitbox.approximateCylinder(startLoc, endLoc, 0.7, true).accuracy(0.5).getHitMobs()) {
 			DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, damage, mInfo.getLinkedSpell(), true);
-			MovementUtils.knockAway(mPlayer.getLocation(), mob, 0.25f, 0.25f, true);
+
+			MovementUtils.knockAway(mPlayer.getLocation(), mob, KNOCKBACK, KNOCKBACK, true);
+
 			if (!hit) {
 				mCosmetic.lanceHit(LocationUtils.getHalfHeightLocation(mob), mPlayer);
 				hit = true;

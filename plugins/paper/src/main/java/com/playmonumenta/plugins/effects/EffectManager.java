@@ -340,7 +340,6 @@ public final class EffectManager implements Listener {
 		mEffectDeserializer.put(ShamanCooldownDecreasePerSecond.effectID, ShamanCooldownDecreasePerSecond::deserialize);
 		mEffectDeserializer.put(GearChanged.effectID, GearChanged::deserialize);
 		mEffectDeserializer.put(SilverPrayer.effectID, SilverPrayer::deserialize);
-		mEffectDeserializer.put(SpellShockExplosion.effectID, SpellShockExplosion::deserialize);
 		mEffectDeserializer.put(SpellShockStatic.effectID, SpellShockStatic::deserialize);
 		mEffectDeserializer.put(SplitArrowIframesEffect.effectID, SplitArrowIframesEffect::deserialize);
 		mEffectDeserializer.put(SpreadEffectOnDeath.effectID, SpreadEffectOnDeath::deserialize);

@@ -30,11 +30,11 @@ import org.bukkit.entity.Player;
 
 public class WhirlwindTotem extends TotemAbility {
 
-	private static final int COOLDOWN = 25 * 20;
+	private static final int COOLDOWN = 26 * 20;
 	private static final int INTERVAL = 2 * 20;
 	private static final int AOE_RANGE = 5;
-	private static final int DURATION_1 = 8 * 20;
-	private static final int DURATION_2 = 12 * 20;
+	private static final int DURATION_1 = 9 * 20;
+	private static final int DURATION_2 = 13 * 20;
 	private static final double CDR_PERCENT = 0.025;
 	private static final int CDR_MAX_PER_SECOND = 20;
 	private static final double SPEED_PERCENT = 0.1;

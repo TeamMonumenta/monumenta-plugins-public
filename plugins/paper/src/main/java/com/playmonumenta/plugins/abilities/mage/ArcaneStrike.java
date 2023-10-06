@@ -117,7 +117,6 @@ public class ArcaneStrike extends Ability {
 				}
 
 				DamageUtils.damage(mPlayer, mob, DamageType.MAGIC, dmg, ability, true, true);
-
 			}
 
 			Location enemyLoc = enemy.getLocation().add(0, 1, 0);
