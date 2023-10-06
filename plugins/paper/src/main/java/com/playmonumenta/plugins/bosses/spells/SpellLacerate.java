@@ -4,13 +4,7 @@ import com.playmonumenta.plugins.bosses.bosses.LacerateBoss;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.DamageUtils;
-import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.FastUtils;
-import com.playmonumenta.plugins.utils.MovementUtils;
-import com.playmonumenta.plugins.utils.ParticleUtils;
-import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.VectorUtils;
+import com.playmonumenta.plugins.utils.*;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -18,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
 
 
 public class SpellLacerate extends Spell {
@@ -37,9 +30,9 @@ public class SpellLacerate extends Spell {
 	public void run() {
 		for (LivingEntity target : mParameters.TARGETS.getTargetsList(mLauncher)) {
 			mParameters.SOUND_WARNING.play(target.getLocation());
-			new PPLine(Particle.WAX_OFF, mLauncher.getLocation(), target.getLocation())
+			new PPLine(mParameters.TELEGRAPH_CIRCLE, mLauncher.getEyeLocation(), target.getLocation())
 				.delta(0.4, 0.4, 0.4)
-				.countPerMeter(5)
+				.countPerMeter(20)
 				.spawnAsEntityActive(mLauncher);
 			performFlurry(target);
 		}
@@ -80,25 +73,13 @@ public class SpellLacerate extends Spell {
 	protected void chargeActions(Location loc, int ticks) {
 		if (ticks <= (mParameters.TELEGRAPH_DURATION - 5)) {
 			mParameters.SOUND_CHARGE_BOSS.play(loc);
-		}
-		BukkitRunnable doTel = new BukkitRunnable() {
-			int mTicks = 0;
-			@Override
-			public void run() {
-				if (mTicks <= mParameters.TELEGRAPH_DURATION / 4) {
-					new PPCircle(mParameters.TELEGRAPH_CIRCLE, loc, mParameters.RADIUS)
-						.count(3)
-						.delta(0.02, 0.08, 0.02)
-						.spawnAsEntityActive(mLauncher);
-				}
-				mTicks++;
-				if (mTicks > mParameters.TELEGRAPH_DURATION) {
-					this.cancel();
-				}
+			if (ticks % 2 == 0) {
+				new PPCircle(mParameters.TELEGRAPH_CIRCLE, loc, mParameters.RADIUS)
+					.count(20)
+					.delta(0.02, 0.08, 0.02)
+					.spawnAsEntityActive(mLauncher);
 			}
-		};
-		doTel.runTaskTimer(mPlugin, 0, 3);
-
+		}
 	}
 
 
@@ -109,6 +90,7 @@ public class SpellLacerate extends Spell {
 		BukkitRunnable doFlurry = new BukkitRunnable() {
 			int mInc = 0;
 			float mFlurryPitchIncrease = 0;
+
 			@Override
 			public void run() {
 				mInc++;
@@ -135,19 +117,22 @@ public class SpellLacerate extends Spell {
 					}
 
 					if (mParameters.SHOW_SLASHES) {
-							ParticleUtils.drawCleaveArc(loc, mParameters.RADIUS * 0.8, 160, -80, 260, mParameters.RINGS, 0, 0, mParameters.SPACING, 60,
-								(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
-									new Particle.DustOptions(
-										ParticleUtils.getTransition(mParameters.SLASH_COLOR_INNER, mParameters.SLASH_COLOR_OUTER, ring / 8D),
-										(mParameters.FORCED_PARTICLE_SIZE > 0) ? (float) mParameters.FORCED_PARTICLE_SIZE : 0.6f + (ring * 0.1f)
-									)).spawnAsEntityActive(mLauncher));
+						Location launcherLoc = mLauncher.getEyeLocation();
+						Vector targetDirection = loc.toVector().subtract(launcherLoc.toVector()).normalize();
+						Location outerSlashDirection = loc.clone().setDirection(targetDirection);
+						ParticleUtils.drawCleaveArc(outerSlashDirection, mParameters.RADIUS * 0.8, 160, -80, 260, mParameters.RINGS, 0, 0, mParameters.SPACING, 60,
+							(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+								new Particle.DustOptions(
+									ParticleUtils.getTransition(mParameters.SLASH_COLOR_INNER, mParameters.SLASH_COLOR_OUTER, ring / 8D),
+									(mParameters.FORCED_PARTICLE_SIZE > 0) ? (float) mParameters.FORCED_PARTICLE_SIZE : 0.6f + (ring * 0.1f)
+								)).spawnAsEntityActive(mLauncher));
 
-							ParticleUtils.drawCleaveArc(loc, mParameters.RADIUS * 0.8, 20, -80, 260, mParameters.RINGS, 0, 0, mParameters.SPACING, 60,
-								(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
-									new Particle.DustOptions(
-										ParticleUtils.getTransition(mParameters.SLASH_COLOR_INNER, mParameters.SLASH_COLOR_OUTER, ring / 8D),
-										(mParameters.FORCED_PARTICLE_SIZE > 0) ? (float) mParameters.FORCED_PARTICLE_SIZE : 0.6f + (ring * 0.1f)
-									)).spawnAsEntityActive(mLauncher));
+						ParticleUtils.drawCleaveArc(outerSlashDirection, mParameters.RADIUS * 0.8, 20, -80, 260, mParameters.RINGS, 0, 0, mParameters.SPACING, 60,
+							(Location l, int ring) -> new PartialParticle(Particle.REDSTONE, l, 1, 0, 0, 0, 0,
+								new Particle.DustOptions(
+									ParticleUtils.getTransition(mParameters.SLASH_COLOR_INNER, mParameters.SLASH_COLOR_OUTER, ring / 8D),
+									(mParameters.FORCED_PARTICLE_SIZE > 0) ? (float) mParameters.FORCED_PARTICLE_SIZE : 0.6f + (ring * 0.1f)
+								)).spawnAsEntityActive(mLauncher));
 					}
 					if (mParameters.SHOW_END_LINE) {
 						Location pLoc = loc.add(0, mParameters.RADIUS * 0.7, 0);
